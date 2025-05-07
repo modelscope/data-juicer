@@ -18,24 +18,30 @@ class LazyLoader(types.ModuleType):
     Uses uv for fast dependency installation when needed.
     """
 
-    def __init__(self, local_name, name, auto_install=True):
+    def __init__(self,
+                 module_name: str,
+                 package_name: str = None,
+                 auto_install: bool = True):
         """
         Initialize the LazyLoader.
 
         Args:
-            local_name: The local name to use for the module
-            name: The actual module name to import
+            module_name: The name of the module to import (e.g., 'cv2', 'ffmpeg')
+            package_name: The name of the pip package to install (e.g., 'opencv-python', 'ffmpeg-python')
+                        If None, will use module_name as package_name
             auto_install: Whether to automatically install missing dependencies
         """
-        self._local_name = local_name
-        self._name = name
+        self._module_name = module_name
+        self._package_name = package_name or module_name
         self._auto_install = auto_install
         frame = inspect.currentframe().f_back
         self._parent_module_globals = frame.f_globals
         self._dependencies = self._load_dependencies()
         self._module = None
-        logger.debug(f'Initialized LazyLoader for module: {name}')
-        super(LazyLoader, self).__init__(name)
+        logger.debug(
+            f'Initialized LazyLoader for module: {module_name} (package: {self._package_name})'
+        )
+        super(LazyLoader, self).__init__(module_name)
 
     def _handle_error(self, error, module_name):
         """Handle errors, including optional dependencies."""
@@ -168,42 +174,59 @@ class LazyLoader(types.ModuleType):
 
         try:
             # Try to import the module directly first
-            self._module = importlib.import_module(self.__name__)
+            self._module = importlib.import_module(self._module_name)
         except ImportError:
             if not self._auto_install:
                 raise
 
             # Try to install the package using uv first
             try:
-                logger.info(f'Attempting to install {self._name} '
-                            f'using uv...')
-                subprocess.check_call(
-                    [sys.executable, '-m', 'uv', 'pip', 'install', self._name])
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                # Fall back to pip if uv fails
-                logger.info(f'uv not available, falling back to pip '
-                            f'for {self._name}...')
+                logger.info(
+                    f'Attempting to install {self._package_name} using uv...')
+                # Try using uv directly first
                 try:
                     subprocess.check_call(
-                        [sys.executable, '-m', 'pip', 'install', self._name])
+                        ['uv', 'pip', 'install', self._package_name])
+                except (subprocess.CalledProcessError, FileNotFoundError):
+                    # If uv command fails, try using python -m uv
+                    subprocess.check_call([
+                        sys.executable, '-m', 'uv', 'pip', 'install',
+                        self._package_name
+                    ])
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                # Fall back to pip if uv fails
+                logger.info(
+                    f'uv not available, falling back to pip for {self._package_name}...'
+                )
+                try:
+                    # Try using pip directly first
+                    try:
+                        subprocess.check_call(
+                            ['pip', 'install', self._package_name])
+                    except (subprocess.CalledProcessError, FileNotFoundError):
+                        # If pip command fails, try using python -m pip
+                        subprocess.check_call([
+                            sys.executable, '-m', 'pip', 'install',
+                            self._package_name
+                        ])
                 except subprocess.CalledProcessError as pip_error:
                     raise ImportError(
-                        f'Failed to install {self._name}. This package may '
+                        f'Failed to install {self._package_name}. This package may '
                         f'require system-level dependencies. Please try '
-                        f'Please try installing it manually with: pip install '
-                        f'{self._name}\n'
+                        f'installing it manually with: pip install {self._package_name}\n'
                         f'Error details: {str(pip_error)}')
 
             # Try importing again - use the original module name
             try:
-                self._module = importlib.import_module(self._local_name)
+                self._module = importlib.import_module(self._module_name)
             except ImportError as import_error:
-                raise ImportError(f'Failed to import {self._local_name} after '
-                                  f'installing {self._name}. '
-                                  f'Error details: {str(import_error)}')
+                raise ImportError(
+                    f'Failed to import {self._module_name} after '
+                    f'installing {self._package_name}. '
+                    f'Error details: {str(import_error)}')
 
         # Update the parent module's globals with the loaded module
-        self._parent_module_globals[self._local_name] = self._module
+        self._parent_module_globals[self._module_name] = self._module
         self.__dict__.update(self._module.__dict__)
         return self._module
 

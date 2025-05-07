@@ -6,7 +6,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Mapper
 
-ffmpeg = LazyLoader('ffmpeg', 'ffmpeg')
+ffmpeg = LazyLoader('ffmpeg', 'ffmpeg-python')
 
 OP_NAME = 'audio_ffmpeg_wrapped_mapper'
 

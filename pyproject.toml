@@ -81,6 +81,7 @@ audio = [
     "soundfile",  # audio handling
     "librosa>=0.10",  # audio processing
     "resampy",  # audio resampling
+    "ffmpeg-python"
 ]
 
 # Distributed Computing
@@ -204,6 +205,7 @@ all = [
     "soundfile",  # audio handling
     "librosa>=0.10",  # audio processing
     "resampy",  # audio resampling
+    "ffmpeg-python",
 
     # Distributed Computing
     "ray==2.40.0",  # distributed computing

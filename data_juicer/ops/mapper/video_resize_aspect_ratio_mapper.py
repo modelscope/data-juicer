@@ -9,7 +9,7 @@ from data_juicer.utils.mm_utils import close_video, load_video
 
 from ..base_op import OPERATORS, Mapper
 
-ffmpeg = LazyLoader('ffmpeg', 'ffmpeg')
+ffmpeg = LazyLoader('ffmpeg', 'ffmpeg-python')
 OP_NAME = 'video_resize_aspect_ratio_mapper'
 
 
