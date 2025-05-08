@@ -11,7 +11,7 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 class LazyLoaderTest(DataJuicerTestCaseBase):
 
     def test_basic_func(self):
-        torch = LazyLoader('torch', 'torch')
+        torch = LazyLoader('torch')
         # it's a LazyLoader at the beginning
         self.assertIsInstance(torch, LazyLoader)
         # invoke it or check the dir to install and activate it
@@ -88,6 +88,52 @@ class LazyLoaderTest(DataJuicerTestCaseBase):
         dir(numpy1)
         # numpy2 should still be a LazyLoader
         self.assertIsInstance(numpy2, LazyLoader)
+
+    def test_package_url_format(self):
+        """Test package URL format handling."""
+        # Test with @ in package name
+        loader1 = LazyLoader('test', 'package@https://github.com/user/repo.git')
+        self.assertEqual(loader1._package_name, 'package')
+        self.assertEqual(loader1._package_url, 'https://github.com/user/repo.git')
+
+        # Test with separate package_url
+        loader2 = LazyLoader('test', 'package', package_url='https://github.com/user/repo.git')
+        self.assertEqual(loader2._package_name, 'package')
+        self.assertEqual(loader2._package_url, 'https://github.com/user/repo.git')
+
+        # Test with no URL
+        loader3 = LazyLoader('test', 'package')
+        self.assertEqual(loader3._package_name, 'package')
+        self.assertIsNone(loader3._package_url)
+
+    def test_github_installation(self):
+        """Test GitHub package installation."""
+        with patch('subprocess.check_call') as mock_check_call:
+            try:
+                loader = LazyLoader('test', package_url='git+https://github.com/user/repo.git')
+                dir(loader)  # This should trigger installation
+            except ImportError:
+                # This is expected since the repo doesn't exist
+                # Verify git clone was called with the correct URL
+                mock_check_call.assert_called_once()
+                args, kwargs = mock_check_call.call_args
+                self.assertEqual(args[0][0], 'git')
+                self.assertEqual(args[0][1], 'clone')
+                self.assertEqual(args[0][2], 'https://github.com/user/repo.git')
+                pass
+
+    def test_dependency_handling(self):
+        """Test handling of optional dependencies."""
+        with patch('subprocess.check_call') as mock_check_call:
+            try:
+                loader = LazyLoader('test')
+                # Simulate a missing dependency error
+                with patch.object(loader, '_handle_error', return_value=True):
+                    loader._load()
+            except ImportError:
+                # This is expected since the package doesn't exist
+                mock_check_call.assert_called()
+                pass
 
 
 if __name__ == '__main__':
