@@ -16,7 +16,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens
 
 cv2 = LazyLoader('cv2', 'opencv-python')
-nltk = LazyLoader('nltk', 'nltk')
+nltk = LazyLoader('nltk')
 
 
 def is_noun(word):

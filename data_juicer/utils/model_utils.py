@@ -18,24 +18,24 @@ from data_juicer.utils.nltk_utils import (ensure_nltk_resource,
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
 
-torch = LazyLoader('torch', 'torch')
-transformers = LazyLoader('transformers', 'transformers')
-nn = LazyLoader('nn', 'torch.nn')
+torch = LazyLoader('torch')
+transformers = LazyLoader('transformers')
+nn = LazyLoader('torch.nn')
 fasttext = LazyLoader('fasttext', 'fasttext-wheel')
-sentencepiece = LazyLoader('sentencepiece', 'sentencepiece')
-kenlm = LazyLoader('kenlm', 'kenlm')
-nltk = LazyLoader('nltk', 'nltk')
+sentencepiece = LazyLoader('sentencepiece')
+kenlm = LazyLoader('kenlm')
+nltk = LazyLoader('nltk')
 aes_pred = LazyLoader('aesthetics_predictor', 'simple-aesthetics-predictor')
-vllm = LazyLoader('vllm', 'vllm')
-diffusers = LazyLoader('diffusers', 'diffusers')
+vllm = LazyLoader('vllm')
+diffusers = LazyLoader('diffusers')
 ram = LazyLoader(
     'ram',
     package_url='git+https://github.com/xinyu1205/recognize-anything.git')
 cv2 = LazyLoader('cv2', 'opencv-python')
-openai = LazyLoader('openai', 'openai')
-ultralytics = LazyLoader('ultralytics', 'ultralytics')
-tiktoken = LazyLoader('tiktoken', 'tiktoken')
-dashscope = LazyLoader('dashscope', 'dashscope')
+openai = LazyLoader('openai')
+ultralytics = LazyLoader('ultralytics')
+tiktoken = LazyLoader('tiktoken')
+dashscope = LazyLoader('dashscope')
 
 MODEL_ZOO = {}
 

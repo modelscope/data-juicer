@@ -22,7 +22,7 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
-simhash = LazyLoader('simhash', 'simhash')
+simhash = LazyLoader('simhash')
 
 OP_NAME = 'video_captioning_from_frames_mapper'
 

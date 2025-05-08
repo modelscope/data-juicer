@@ -11,7 +11,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from ...base_op import Mapper
 from ...mixins import EventDrivenMixin, NotificationMixin
 
-label_studio_sdk = LazyLoader('label_studio_sdk', 'label_studio_sdk')
+label_studio_sdk = LazyLoader('label_studio_sdk')
 
 # Common annotation event types
 ANNOTATION_EVENTS = {

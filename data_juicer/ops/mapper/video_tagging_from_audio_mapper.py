@@ -8,7 +8,7 @@ from data_juicer.utils.model_utils import get_model, prepare_model, torch
 from ..base_op import OPERATORS, TAGGING_OPS, Mapper
 
 OP_NAME = 'video_tagging_from_audio_mapper'
-torchaudio = LazyLoader('torchaudio', 'torchaudio')
+torchaudio = LazyLoader('torchaudio')
 
 
 @TAGGING_OPS.register_module(OP_NAME)

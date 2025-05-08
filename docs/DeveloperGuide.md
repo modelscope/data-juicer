@@ -383,8 +383,8 @@ else:
 from data_juicer.utils.lazy_loader import LazyLoader
 
 # lazy import
-kenlm = LazyLoader('kenlm', 'kenlm')
-sp = LazyLoader('sp', 'sentencepiece')
+kenlm = LazyLoader('kenlm')
+sp = LazyLoader('sentencepiece')
 
 class PerplexityFilter(Filter):
     def __init__(self,

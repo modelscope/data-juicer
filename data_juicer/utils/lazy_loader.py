@@ -27,24 +27,23 @@ class LazyLoader(types.ModuleType):
         Initialize the LazyLoader.
 
         Args:
-            module_name: The name of the module to import (e.g., 'cv2', 'ffmpeg')
-            package_name: The name of the pip package to install (e.g., 'opencv-python', 'ffmpeg-python')
-                        If None, will use module_name as package_name.
-                        Can also be in format 'package@url' for URL-based installations.
+            module_name: The name of the module to import (e.g., 'cv2', 'ray.data', 'torchvision.models')
+            package_name: The name of the pip package to install (e.g., 'opencv-python', 'ray', 'torchvision')
+                        If None, will use the base module name (e.g., 'ray' for 'ray.data')
             package_url: The URL to install the package from (e.g., git+https://github.com/...)
-                        If package_name contains '@', this parameter is ignored.
             auto_install: Whether to automatically install missing dependencies
         """
         self._module_name = module_name
 
-        # Handle package_name in format 'package@url'
-        if package_name and '@' in package_name:
-            self._package_name, self._package_url = package_name.split('@', 1)
+        # For installation, use the provided package_name or base module name
+        if package_name is None:
+            self._package_name = module_name.split('.')[0]
         else:
-            self._package_name = package_name or module_name
-            self._package_url = package_url
+            self._package_name = package_name
 
+        self._package_url = package_url
         self._auto_install = auto_install
+
         frame = inspect.currentframe().f_back
         self._parent_module_globals = frame.f_globals
         self._dependencies = self._load_dependencies()
@@ -303,7 +302,7 @@ class LazyLoader(types.ModuleType):
                         f'installing it manually with: pip install {package_spec}\n'
                         f'Error details: {str(pip_error)}')
 
-            # Try importing again - use the module name
+            # Try importing again - use the module path
             try:
                 self._module = importlib.import_module(self._module_name)
             except ImportError as import_error:

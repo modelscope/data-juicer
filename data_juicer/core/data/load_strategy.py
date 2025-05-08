@@ -15,8 +15,8 @@ from data_juicer.format.formatter import unify_format
 from data_juicer.format.load import load_formatter
 from data_juicer.utils.lazy_loader import LazyLoader
 
-ray = LazyLoader('ray', 'ray')
-rd = LazyLoader('rd', 'ray.data')
+ray = LazyLoader('ray')
+rd = LazyLoader('ray.data')
 
 # based on executor type and data source type, use different
 # data load strategy to product corresponding datasets
