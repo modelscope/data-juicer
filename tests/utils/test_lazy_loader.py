@@ -79,8 +79,8 @@ class LazyLoaderTest(DataJuicerTestCaseBase):
 
     def test_multiple_instances(self):
         # Test multiple instances of the same module
-        numpy1 = LazyLoader('numpy1', 'numpy')
-        numpy2 = LazyLoader('numpy2', 'numpy')
+        numpy1 = LazyLoader('numpy')
+        numpy2 = LazyLoader('numpy')
         # Both should be LazyLoader instances initially
         self.assertIsInstance(numpy1, LazyLoader)
         self.assertIsInstance(numpy2, LazyLoader)
@@ -89,18 +89,6 @@ class LazyLoaderTest(DataJuicerTestCaseBase):
         # numpy2 should still be a LazyLoader
         self.assertIsInstance(numpy2, LazyLoader)
 
-    def test_parent_module_globals(self):
-        # Test that the module is added to parent globals
-        # Create a LazyLoader in the current scope
-        numpy = LazyLoader('numpy3', 'numpy')
-        # Module should not be in the current scope's globals before trigger
-        self.assertNotIn('numpy3', globals())
-        # Access the module to trigger loading
-        dir(numpy)
-        # Module should be in the current scope's globals now
-        self.assertIn('numpy3', globals())
-        # The module should be the same instance
-        self.assertIs(globals()['numpy3'], numpy._module)
 
 if __name__ == '__main__':
     unittest.main()
