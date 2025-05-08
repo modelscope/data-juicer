@@ -338,8 +338,12 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
         self.assertEqual(ram._module_name, 'ram')
         self.assertEqual(ram._package_url, 'git+https://github.com/xinyu1205/recognize-anything.git')
         
+        # Create a mock module with models attribute
+        mock_module = MagicMock()
+        mock_module.models = MagicMock()
+        
         # Mock the import to fail first time to trigger GitHub installation
-        mock_import.side_effect = [ImportError("Module not found"), MagicMock()]
+        mock_import.side_effect = [ImportError("Module not found"), mock_module]
         
         # Access the module to trigger loading
         _ = ram.models
