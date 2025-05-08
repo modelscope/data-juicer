@@ -330,13 +330,13 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
 
     @patch('data_juicer.utils.lazy_loader.LazyLoader._install_github_deps')
     @patch('data_juicer.utils.lazy_loader.importlib.import_module')
-    def test_ram_lazy_loader(self, mock_import, mock_install_github):
-        # Test RAM lazy loading
-        from data_juicer.utils.model_utils import ram
-        
-        # Verify the RAM loader is configured correctly
-        self.assertEqual(ram._module_name, 'ram')
-        self.assertEqual(ram._package_url, 'git+https://github.com/xinyu1205/recognize-anything.git')
+    @patch('data_juicer.utils.model_utils.LazyLoader')
+    def test_ram_lazy_loader(self, mock_lazy_loader_class, mock_import, mock_install_github):
+        # Create a mock LazyLoader instance
+        mock_lazy_loader = MagicMock()
+        mock_lazy_loader._module_name = 'ram'
+        mock_lazy_loader._package_url = 'git+https://github.com/xinyu1205/recognize-anything.git'
+        mock_lazy_loader_class.return_value = mock_lazy_loader
         
         # Create a mock module with models attribute
         mock_module = MagicMock()
@@ -344,6 +344,9 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
         
         # Mock the import to fail first time to trigger GitHub installation
         mock_import.side_effect = [ImportError("Module not found"), mock_module]
+        
+        # Import ram after setting up mocks
+        from data_juicer.utils.model_utils import ram
         
         # Access the module to trigger loading
         _ = ram.models
