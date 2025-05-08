@@ -18,6 +18,7 @@ from data_juicer.utils.model_utils import (
     prepare_model,
     get_model,
     free_models,
+    prepare_recognizeAnything_model,
 )
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
@@ -271,6 +272,84 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
         get_model(model_key)
         free_models()
         # No assertion needed, just checking it doesn't raise an exception
+
+    @patch('data_juicer.utils.model_utils.ram')
+    @patch('data_juicer.utils.model_utils.check_model')
+    def test_prepare_recognizeAnything_model(self, mock_check_model, mock_ram):
+        # Set up mocks
+        mock_model = MagicMock()
+        mock_model.to.return_value = mock_model
+        mock_model.eval.return_value = mock_model
+        mock_ram.models.ram_plus.return_value = mock_model
+        mock_check_model.return_value = 'test_model_path'
+
+        # Test normal initialization
+        model = prepare_recognizeAnything_model(
+            pretrained_model_name_or_path='test_model.pth',
+            input_size=384
+        )
+        self.assertEqual(model, mock_model)
+        mock_ram.models.ram_plus.assert_called_once_with(
+            pretrained='test_model_path',
+            image_size=384,
+            vit='swin_l'
+        )
+        mock_model.to.assert_called_once_with('cpu')
+        mock_model.eval.assert_called_once()
+
+        # Reset mocks for next test
+        mock_model.reset_mock()
+        mock_ram.models.ram_plus.reset_mock()
+        mock_check_model.reset_mock()
+        mock_check_model.return_value = 'test_model_path'
+
+        # Test with custom device
+        model = prepare_recognizeAnything_model(
+            pretrained_model_name_or_path='test_model.pth',
+            input_size=384,
+            device='cuda:0'
+        )
+        self.assertEqual(model, mock_model)
+        mock_model.to.assert_called_once_with('cuda:0')
+
+        # Reset mocks for error handling test
+        mock_model.reset_mock()
+        mock_ram.models.ram_plus.reset_mock()
+        mock_check_model.reset_mock()
+        mock_check_model.side_effect = ['test_model_path', 'test_model_path_force']
+        mock_ram.models.ram_plus.side_effect = [RuntimeError(), mock_model]
+
+        # Test error handling with force=True
+        model = prepare_recognizeAnything_model(
+            pretrained_model_name_or_path='test_model.pth',
+            input_size=384
+        )
+        self.assertEqual(model, mock_model)
+        self.assertEqual(mock_check_model.call_count, 2)
+        self.assertEqual(mock_ram.models.ram_plus.call_count, 2)
+
+    @patch('data_juicer.utils.lazy_loader.LazyLoader._install_github_deps')
+    @patch('data_juicer.utils.lazy_loader.importlib.import_module')
+    def test_ram_lazy_loader(self, mock_import, mock_install_github):
+        # Test RAM lazy loading
+        from data_juicer.utils.model_utils import ram
+        
+        # Verify the RAM loader is configured correctly
+        self.assertEqual(ram._module_name, 'ram')
+        self.assertEqual(ram._package_url, 'git+https://github.com/xinyu1205/recognize-anything.git')
+        
+        # Mock the import to fail first time to trigger GitHub installation
+        mock_import.side_effect = [ImportError("Module not found"), MagicMock()]
+        
+        # Access the module to trigger loading
+        _ = ram.models
+        
+        # Verify installation was attempted
+        mock_install_github.assert_called_once_with(
+            'git+https://github.com/xinyu1205/recognize-anything.git',
+            use_uv=True
+        )
+        self.assertEqual(mock_import.call_count, 2)  # Called twice: once for import, once after installation
 
 
 if __name__ == '__main__':

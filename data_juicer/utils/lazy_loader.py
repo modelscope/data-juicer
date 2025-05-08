@@ -180,7 +180,16 @@ class LazyLoader(types.ModuleType):
                     f'module name.')
 
     def _install_github_deps(self, package_spec, use_uv=True):
-        """Install dependencies for a GitHub package."""
+        """Install dependencies for a GitHub package.
+
+        Relies on pip's built-in dependency resolution to handle:
+        - requirements.txt
+        - requirements/*.txt
+        - pyproject.toml
+        - setup.py
+        - setup.cfg
+        - MANIFEST.in
+        """
         repo_path = package_spec.split('github.com/')[1].split('.git')[0]
 
         # Clone the repo to a temp directory
@@ -194,7 +203,22 @@ class LazyLoader(types.ModuleType):
                     temp_dir
                 ])
 
-                # Install the package with dependencies
+                # First install dependencies if specified
+                if hasattr(self, '_dependencies') and self._dependencies:
+                    logger.info(f'Installing dependencies for {repo_path}...')
+                    for dep in self._dependencies:
+                        try:
+                            if use_uv:
+                                subprocess.check_call(
+                                    ['uv', 'pip', 'install', dep])
+                            else:
+                                subprocess.check_call(['pip', 'install', dep])
+                        except subprocess.CalledProcessError as e:
+                            logger.warning(
+                                f'Failed to install dependency {dep}: {e}')
+
+                # Then let pip handle all dependency resolution
+                logger.info(f'Installing {repo_path} and its dependencies...')
                 if use_uv:
                     subprocess.check_call(['uv', 'pip', 'install', '.'],
                                           cwd=temp_dir)
