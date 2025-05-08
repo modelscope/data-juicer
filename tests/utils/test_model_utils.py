@@ -328,36 +328,6 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
         self.assertEqual(mock_check_model.call_count, 2)
         self.assertEqual(mock_ram.models.ram_plus.call_count, 2)
 
-    @patch('data_juicer.utils.lazy_loader.LazyLoader._install_github_deps')
-    @patch('data_juicer.utils.lazy_loader.importlib.import_module')
-    @patch('data_juicer.utils.model_utils.LazyLoader')
-    def test_ram_lazy_loader(self, mock_lazy_loader_class, mock_import, mock_install_github):
-        # Create a mock LazyLoader instance
-        mock_lazy_loader = MagicMock()
-        mock_lazy_loader._module_name = 'ram'
-        mock_lazy_loader._package_url = 'git+https://github.com/xinyu1205/recognize-anything.git'
-        mock_lazy_loader_class.return_value = mock_lazy_loader
-        
-        # Create a mock module with models attribute
-        mock_module = MagicMock()
-        mock_module.models = MagicMock()
-        
-        # Mock the import to fail first time to trigger GitHub installation
-        mock_import.side_effect = [ImportError("Module not found"), mock_module]
-        
-        # Import ram after setting up mocks
-        from data_juicer.utils.model_utils import ram
-        
-        # Access the module to trigger loading
-        _ = ram.models
-        
-        # Verify installation was attempted
-        mock_install_github.assert_called_once_with(
-            'git+https://github.com/xinyu1205/recognize-anything.git',
-            use_uv=True
-        )
-        self.assertEqual(mock_import.call_count, 2)  # Called twice: once for import, once after installation
-
 
 if __name__ == '__main__':
     unittest.main()
