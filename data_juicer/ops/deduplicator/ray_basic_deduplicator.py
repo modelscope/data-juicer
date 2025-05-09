@@ -7,7 +7,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import Filter
 
-redis = LazyLoader('redis', 'redis')
+redis = LazyLoader('redis')
 
 MERSENNE_PRIME = (1 << 61) - 1
 

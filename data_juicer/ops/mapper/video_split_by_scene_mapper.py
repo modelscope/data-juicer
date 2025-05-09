@@ -12,7 +12,7 @@ from data_juicer.utils.mm_utils import SpecialTokens
 
 from ..base_op import OPERATORS, Mapper
 
-scenedetect = LazyLoader('scenedetect', 'scenedetect')
+scenedetect = LazyLoader('scenedetect')
 
 OP_NAME = 'video_split_by_scene_mapper'
 

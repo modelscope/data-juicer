@@ -11,7 +11,7 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
-torch = LazyLoader('torch', 'torch')
+torch = LazyLoader('torch')
 
 OP_NAME = 'video_nsfw_filter'
 

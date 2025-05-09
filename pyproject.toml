@@ -1,0 +1,267 @@
+[project]
+name = "py-data-juicer"
+dynamic = ["version"]
+description = "A One-Stop Data Processing System for Large Language Models."
+authors = [
+    {name = "SysML Team of Alibaba Tongyi Lab"}
+]
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+dependencies = [
+    "datasets>=2.19.0",  # core data loading
+    "fsspec==2023.5.0",  # file system operations
+    "pandas",  # data manipulation
+    "numpy>=1.26.4,<2.0.0",  # numerical operations
+    "loguru",  # logging
+    "tqdm",  # progress bars
+    "jsonargparse[signatures]",  # configuration
+    "jsonlines",  # JSONL handling
+    "zstandard",  # compression
+    "lz4",  # compression
+    "multiprocess==0.70.12",  # parallel processing
+    "dill==0.3.4",  # serialization
+    "psutil",  # system monitoring
+    "pydantic>=2.0",  # data validation
+]
+
+[project.optional-dependencies]
+# Generic ML & DL
+generic = [
+    "torch>=1.11.0",  # PyTorch
+    "transformers>=4.47.0,<4.48.0",  # Hugging Face Transformers
+    "transformers_stream_generator",  # Stream generation for Transformers
+    "einops",  # Tensor operations
+    "accelerate",  # Model acceleration
+    "vllm>=0.6.5",  # LLM serving
+    "huggingface_hub<0.26.0",  # Hugging Face Hub
+    "onnxruntime",  # ONNX runtime
+]
+
+# Computer Vision
+vision = [
+    "opencv-python",  # OpenCV
+    "imagededup",  # Image deduplication
+    "diffusers>=0.18.0",  # Diffusion models
+    "simple-aesthetics-predictor",  # Image aesthetics
+    "scenedetect[opencv]",  # Scene detection
+    "ultralytics",  # YOLO models
+    "rembg",  # Background removal
+    "Pillow",  # image handling
+    "matplotlib",  # visualization
+    "seaborn",  # visualization
+]
+
+# Natural Language Processing
+nlp = [
+    "spacy==3.7.0",  # NLP processing
+    "nltk==3.9.1",  # NLP toolkit
+    "emoji==2.2.0",  # emoji handling
+    "regex",  # regular expressions
+    "bs4",  # HTML parsing
+    "easyocr==1.7.1",  # OCR
+    "fasttext-wheel",  # FastText
+    "kenlm",  # Language modeling
+    "sentencepiece",  # Tokenization
+    "ftfy",  # Text fixing
+    "simhash-pybind",  # Text similarity
+    "selectolax",  # HTML parsing
+    "nlpaug",  # Text augmentation
+    "nlpcda",  # Chinese text augmentation
+    "tiktoken",  # Token counting
+    "opencc==1.1.6",  # Chinese conversion
+    "spacy-pkuseg",  # Chinese segmentation
+    "rouge",  # Text evaluation
+]
+
+# Audio Processing
+audio = [
+    "torchaudio",  # Audio processing with PyTorch
+    "av==13.1.0",  # video/audio handling
+    "soundfile",  # audio handling
+    "librosa>=0.10",  # audio processing
+    "resampy",  # audio resampling
+    "ffmpeg-python"
+]
+
+# Distributed Computing
+distributed = [
+    "ray==2.40.0",  # distributed computing
+    "pyspark",  # distributed data processing
+]
+
+# Development & Tools
+dev = [
+    "coverage",
+    "pre-commit",  # pre-commit hooks
+    "sphinx",
+    "sphinx-autobuild",
+    "sphinx_rtd_theme",
+    "recommonmark",
+    "wandb<=0.19.0",
+    "fire",
+    "click",
+    "wget",
+    "toml",  # for yapf configuration
+]
+
+# AI Services & APIs
+ai_services = [
+    "dashscope",  # Alibaba Cloud AI
+    "openai",  # OpenAI API
+    "label-studio==1.17.0",  # Data labeling
+]
+
+# Document Processing
+document = [
+    "pdfplumber",  # PDF processing
+    "python-docx",  # Word document processing
+    "mwparserfromhell",  # wiki text parsing
+]
+
+# Visualization
+visualization = [
+    "plotly",  # interactive plots
+    "wordcloud",  # word cloud generation
+]
+
+# Web & API
+web = [
+    "requests",  # HTTP requests
+    "httpx",  # async HTTP
+    "streamlit",  # web interface
+    "fastapi[standard]>=0.110",  # API framework
+]
+
+# Sandbox Environment
+sandbox = [
+    "torch>=1.11.0",
+    "fire",
+    "pyspark",
+    "vbench",
+    "modelscope",
+    "Pillow",
+    "deepspeed",
+    "safetensors",
+    "timm",
+    "xformers",
+    "decord",
+    "opencv-python",
+    "omegaconf",
+    "imageio[ffmpeg,pyav]",
+    "tensorboard",
+    "diffusers==0.27.0",
+    "transformers>=4.37.2",
+    "func_timeout",
+]
+
+# All dependencies (default + all optional, except sandbox)
+all = [
+    # Generic ML & DL
+    "torch>=1.11.0",  # PyTorch
+    "transformers>=4.47.0,<4.48.0",  # Hugging Face Transformers
+    "transformers_stream_generator",  # Stream generation for Transformers
+    "einops",  # Tensor operations
+    "accelerate",  # Model acceleration
+    "vllm>=0.6.5",  # LLM serving
+    "huggingface_hub<0.26.0",  # Hugging Face Hub
+    "onnxruntime",  # ONNX runtime
+
+    # Computer Vision
+    "opencv-python",  # OpenCV
+    "imagededup",  # Image deduplication
+    "diffusers>=0.18.0",  # Diffusion models
+    "simple-aesthetics-predictor",  # Image aesthetics
+    "scenedetect[opencv]",  # Scene detection
+    "ultralytics",  # YOLO models
+    "rembg",  # Background removal
+    "Pillow",  # image handling
+    "matplotlib",  # visualization
+    "seaborn",  # visualization
+
+    # Natural Language Processing
+    "spacy==3.7.0",  # NLP processing
+    "nltk==3.9.1",  # NLP toolkit
+    "emoji==2.2.0",  # emoji handling
+    "regex",  # regular expressions
+    "bs4",  # HTML parsing
+    "easyocr==1.7.1",  # OCR
+    "fasttext-wheel",  # FastText
+    "kenlm",  # Language modeling
+    "sentencepiece",  # Tokenization
+    "ftfy",  # Text fixing
+    "simhash-pybind",  # Text similarity
+    "selectolax",  # HTML parsing
+    "nlpaug",  # Text augmentation
+    "nlpcda",  # Chinese text augmentation
+    "tiktoken",  # Token counting
+    "opencc==1.1.6",  # Chinese conversion
+    "spacy-pkuseg",  # Chinese segmentation
+    "rouge",  # Text evaluation
+
+    # Audio Processing
+    "torchaudio",  # Audio processing with PyTorch
+    "av==13.1.0",  # video/audio handling
+    "soundfile",  # audio handling
+    "librosa>=0.10",  # audio processing
+    "resampy",  # audio resampling
+    "ffmpeg-python",
+
+    # Distributed Computing
+    "ray==2.40.0",  # distributed computing
+    "pyspark",  # distributed data processing
+
+    # Development & Tools
+    "coverage",
+    "pre-commit",  # pre-commit hooks
+    "sphinx",
+    "sphinx-autobuild",
+    "sphinx_rtd_theme",
+    "recommonmark",
+    "wandb<=0.19.0",
+    "fire",
+    "click",
+    "wget",
+    "toml",  # for yapf configuration
+
+    # AI Services & APIs
+    "dashscope",  # Alibaba Cloud AI
+    "openai",  # OpenAI API
+    "label-studio==1.17.0",  # Data labeling
+
+    # Document Processing
+    "pdfplumber",  # PDF processing
+    "python-docx",  # Word document processing
+    "mwparserfromhell",  # wiki text parsing
+
+    # Visualization
+    "plotly",  # interactive plots
+    "wordcloud",  # word cloud generation
+
+    # Web & API
+    "requests",  # HTTP requests
+    "httpx",  # async HTTP
+    "streamlit",  # web interface
+    "fastapi[standard]>=0.110",  # API framework
+]
+
+[project.scripts]
+dj-process = "data_juicer.tools.process_data:main"
+dj-analyze = "data_juicer.tools.analyze_data:main"
+dj-install = "data_juicer.tools.dj_install:main"
+
+[build-system]
+requires = ["hatchling", "uv>=0.1.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["data_juicer"]
+
+[tool.flake8]
+per-file-ignores = [
+    "*/__init__.py: F401"
+]
+max-line-length = 120
+
+[tool.hatch.version]
+path = "data_juicer/__init__.py"

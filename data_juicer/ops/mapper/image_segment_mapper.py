@@ -10,8 +10,8 @@ from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_segment_mapper'
 
-torch = LazyLoader('torch', 'torch')
-ultralytics = LazyLoader('ultralytics', 'ultralytics')
+torch = LazyLoader('torch')
+ultralytics = LazyLoader('ultralytics')
 
 
 @UNFORKABLE.register_module(OP_NAME)

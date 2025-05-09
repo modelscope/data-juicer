@@ -48,7 +48,7 @@ class DatasetBuilder(object):
 
         # validate dataset config for type constraints
         # TODO other constraints; ray dataset only supports local, etc.
-        if type(ds_configs) != dict:
+        if not isinstance(ds_configs, dict):
             raise ConfigValidationError(
                 'Dataset config should be a dictionary')
         if 'configs' not in ds_configs:
@@ -59,12 +59,12 @@ class DatasetBuilder(object):
             raise ConfigValidationError(
                 'Dataset config "configs" should be a non-empty list')
         if ('max_sample_num' in ds_configs
-                and (type(ds_configs['max_sample_num']) != int
+                and (not isinstance(ds_configs['max_sample_num'], int)
                      or ds_configs['max_sample_num'] <= 0)):
             raise ConfigValidationError(
                 'Dataset config "max_sample_num" should be a positive integer')
         for ds_config in ds_configs['configs']:
-            if type(ds_config) != dict:
+            if not isinstance(ds_config, dict):
                 raise ConfigValidationError(
                     'Dataset configs should be dictionaries')
         types = [

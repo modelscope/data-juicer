@@ -14,7 +14,7 @@ from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 with HiddenPrints():
-    ffmpeg = LazyLoader('ffmpeg', 'ffmpeg')
+    ffmpeg = LazyLoader('ffmpeg', 'ffmpeg-python')
 
 OP_NAME = 'video_resize_resolution_mapper'
 

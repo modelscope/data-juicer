@@ -3,15 +3,11 @@ from collections import Counter
 import numpy as np
 
 from data_juicer.utils.constant import Fields, MetaKeys
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
-from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.model_utils import get_model, prepare_model, ram, torch
 
 from ..base_op import OPERATORS, TAGGING_OPS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_IMAGES
-
-torch = LazyLoader('torch', 'torch')
-ram = LazyLoader('ram', 'ram')
 
 OP_NAME = 'image_tagging_mapper'
 

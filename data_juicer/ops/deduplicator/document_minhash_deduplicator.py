@@ -21,7 +21,7 @@ from data_juicer.utils.model_utils import prepare_sentencepiece_model
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import UnionFind, split_on_whitespace
 
-integrate = LazyLoader('integrate', 'scipy.integrate')
+integrate = LazyLoader('scipy.integrate')
 
 OP_NAME = 'document_minhash_deduplicator'
 

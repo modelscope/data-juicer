@@ -13,7 +13,7 @@ from data_juicer.utils.mm_utils import (close_video,
 from ..base_op import OPERATORS, UNFORKABLE, Filter
 from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
-easyocr = LazyLoader('easyocr', 'easyocr')
+easyocr = LazyLoader('easyocr')
 
 OP_NAME = 'video_ocr_area_ratio_filter'
 

@@ -10,10 +10,9 @@ from data_juicer.utils.file_utils import transfer_data_dir
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-diffusers = LazyLoader('diffusers', 'diffusers')
-torch = LazyLoader('torch', 'torch')
-p2p_pipeline = LazyLoader('p2p_pipeline',
-                          'data_juicer.ops.common.prompt2prompt_pipeline',
+diffusers = LazyLoader('diffusers')
+torch = LazyLoader('torch')
+p2p_pipeline = LazyLoader('data_juicer.ops.common.prompt2prompt_pipeline',
                           auto_install=False)
 
 logger = logging.getLogger(__name__)

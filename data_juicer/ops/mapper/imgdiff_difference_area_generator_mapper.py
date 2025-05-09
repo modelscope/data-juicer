@@ -15,8 +15,8 @@ from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens
 
-cv2 = LazyLoader('cv2', 'cv2')
-nltk = LazyLoader('nltk', 'nltk')
+cv2 = LazyLoader('cv2', 'opencv-python')
+nltk = LazyLoader('nltk')
 
 
 def is_noun(word):

@@ -2,12 +2,13 @@ import os
 import unittest
 import numpy as np
 import av
-import cv2
 import io
 from typing import Iterator
 
 from PIL import ImageFilter
 from PIL.Image import Image
+from data_juicer.utils.lazy_loader import LazyLoader
+cv2 = LazyLoader('cv2', 'opencv-python')
 
 from data_juicer.utils.mm_utils import (
     remove_special_tokens, remove_non_special_tokens, load_data_with_context,
