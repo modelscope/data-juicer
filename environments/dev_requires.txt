@@ -3,5 +3,6 @@ pre-commit
 sphinx
 sphinx-autobuild
 sphinx_rtd_theme
+snowballstemmer>=2.2.0,<3.0.0
 recommonmark
 wandb<=0.19.0
