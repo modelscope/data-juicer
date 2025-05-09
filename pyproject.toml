@@ -23,6 +23,7 @@ dependencies = [
     "dill==0.3.4",  # serialization
     "psutil",  # system monitoring
     "pydantic>=2.0",  # data validation
+    "uv",
 ]
 
 [project.optional-dependencies]
@@ -81,7 +82,8 @@ audio = [
     "soundfile",  # audio handling
     "librosa>=0.10",  # audio processing
     "resampy",  # audio resampling
-    "ffmpeg-python"
+    "ffmpeg-python",
+    "audiomentations",
 ]
 
 # Distributed Computing
@@ -157,6 +159,23 @@ sandbox = [
 
 # All dependencies (default + all optional, except sandbox)
 all = [
+    # Base dependencies
+    "datasets>=2.19.0",  # core data loading
+    "fsspec==2023.5.0",  # file system operations
+    "pandas",  # data manipulation
+    "numpy>=1.26.4,<2.0.0",  # numerical operations
+    "loguru",  # logging
+    "tqdm",  # progress bars
+    "jsonargparse[signatures]",  # configuration
+    "jsonlines",  # JSONL handling
+    "zstandard",  # compression
+    "lz4",  # compression
+    "multiprocess==0.70.12",  # parallel processing
+    "dill==0.3.4",  # serialization
+    "psutil",  # system monitoring
+    "pydantic>=2.0",  # data validation
+    "uv",
+
     # Generic ML & DL
     "torch>=1.11.0",  # PyTorch
     "transformers>=4.47.0,<4.48.0",  # Hugging Face Transformers
@@ -206,6 +225,7 @@ all = [
     "librosa>=0.10",  # audio processing
     "resampy",  # audio resampling
     "ffmpeg-python",
+    "audiomentations",
 
     # Distributed Computing
     "ray==2.40.0",  # distributed computing

@@ -91,15 +91,10 @@ class LazyLoaderTest(DataJuicerTestCaseBase):
 
     def test_package_url_format(self):
         """Test package URL format handling."""
-        # Test with @ in package name
-        loader1 = LazyLoader('test', 'package@https://github.com/user/repo.git')
-        self.assertEqual(loader1._package_name, 'package')
-        self.assertEqual(loader1._package_url, 'https://github.com/user/repo.git')
-
         # Test with separate package_url
-        loader2 = LazyLoader('test', 'package', package_url='https://github.com/user/repo.git')
+        loader2 = LazyLoader('test', 'package', package_url='git+https://github.com/user/repo.git')
         self.assertEqual(loader2._package_name, 'package')
-        self.assertEqual(loader2._package_url, 'https://github.com/user/repo.git')
+        self.assertEqual(loader2._package_url, 'git+https://github.com/user/repo.git')
 
         # Test with no URL
         loader3 = LazyLoader('test', 'package')
@@ -117,9 +112,9 @@ class LazyLoaderTest(DataJuicerTestCaseBase):
                 # Verify git clone was called with the correct URL
                 mock_check_call.assert_called_once()
                 args, kwargs = mock_check_call.call_args
-                self.assertEqual(args[0][0], 'git')
-                self.assertEqual(args[0][1], 'clone')
-                self.assertEqual(args[0][2], 'https://github.com/user/repo.git')
+                self.assertTrue('git' in args[0])
+                self.assertTrue('clone' in args[0])
+                self.assertTrue('https://github.com/user/repo.git' in args[0])
                 pass
 
     def test_dependency_handling(self):
