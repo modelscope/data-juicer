@@ -5,7 +5,8 @@ from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
                                                  VBenchEvaluator)
 from data_juicer.core.sandbox.model_executors import (
     EasyAnimateInferExecutor, EasyAnimateTrainExecutor,
-    ModelscopeInferProbeExecutor, ModelscopeTrainExecutor)
+    ModelscopeInferProbeExecutor, ModelscopeTrainExecutor,
+    TrinityRFTTrainExecutor)
 
 
 class DataExecutorFactory(object):
@@ -105,6 +106,8 @@ class ModelTrainExecutorFactory(object):
             return ModelscopeTrainExecutor(model_cfg, **kwargs)
         elif model_cfg.type == 'easyanimate':
             return EasyAnimateTrainExecutor(model_cfg, **kwargs)
+        elif model_cfg.type == 'trinity-rft':
+            return TrinityRFTTrainExecutor(model_cfg, **kwargs)
 
         # add more model trainer here freely
 

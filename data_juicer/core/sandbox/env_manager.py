@@ -286,3 +286,11 @@ class VirtualEnv(Env):
             return True
         else:
             raise RuntimeError(f'Failed to execute command [{cmd}].')
+
+
+ALL_ENVS = {CondaEnv, VirtualEnv}
+
+ENV_ROUTER = {}
+for env_cls in ALL_ENVS:
+    for env_name in env_cls.SUPPORTED_MANAGERS:
+        ENV_ROUTER[env_name] = env_cls
