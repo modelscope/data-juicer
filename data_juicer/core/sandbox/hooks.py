@@ -8,6 +8,7 @@ from data_juicer.config import get_init_configs, prepare_side_configs
 from data_juicer.core.sandbox.factories import (data_analyzer_factory,
                                                 data_evaluator_factory,
                                                 data_executor_factory,
+                                                data_pool_manipulator_factory,
                                                 mode_infer_evaluator_factory,
                                                 model_evaluator_factory,
                                                 model_infer_executor_factory,
@@ -172,6 +173,21 @@ class ProcessDataHook(BaseHook):
         return kwargs
 
 
+class DataPoolManipulationHook(BaseHook):
+    """
+    Hook for data pool manipulation, including construction, combination, ranking, etc.
+    """
+
+    def __init__(self, job_cfg, watcher, *args, **kwargs):
+        super(DataPoolManipulationHook, self).__init__(job_cfg, watcher, *args, **kwargs)
+
+    def hook(self, **kwargs):
+        data_pool_manipulator = data_pool_manipulator_factory(self.other_cfg)
+        logger.info('Begin to manipulate data pools.')
+        data_pool_manipulator.run()
+        return kwargs
+
+
 class TrainModelHook(BaseHook):
 
     def __init__(self, job_cfg, watcher, *args, **kwargs):
@@ -272,6 +288,7 @@ HOOK_MAPPING = {
     'RefineRecipeViaKSigmaHook': RefineRecipeViaKSigmaHook,
     'RefineRecipeViaModelFeedbackHook': RefineRecipeViaModelFeedbackHook,
     'ProcessDataHook': ProcessDataHook,
+    'DataPoolManipulationHook': DataPoolManipulationHook,
     'TrainModelHook': TrainModelHook,
     'InferModelHook': InferModelHook,
     'EvaluateDataHook': EvaluateDataHook,

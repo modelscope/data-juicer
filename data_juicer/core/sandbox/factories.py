@@ -64,6 +64,30 @@ class DataEvaluatorFactory(object):
 data_evaluator_factory = DataEvaluatorFactory()
 
 
+class DataPoolManipulatorFactory(object):
+
+    def __call__(self, data_pool_cfg: dict = None, *args, **kwargs):
+        if data_pool_cfg is None:
+            return None
+
+        manipulator = None
+        if data_pool_cfg.type == 'data_pool_construction':
+            pass
+        elif data_pool_cfg.type == 'data_pool_combination':
+            pass
+        elif data_pool_cfg.type == 'data_pool_duplication':
+            pass
+        elif data_pool_cfg.type == 'data_pool_ranking':
+            pass
+        elif data_pool_cfg.type == 'data_pool_downsampling':
+            pass
+
+        return manipulator
+
+
+data_pool_manipulator_factory = DataPoolManipulatorFactory()
+
+
 class ModelEvaluatorFactory(object):
     """
     Factory for model evaluators, whose input is expected to be a loaded model
