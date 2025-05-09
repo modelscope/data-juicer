@@ -941,6 +941,12 @@ process:
       tmp_file_name: './outputs/ray-dedup-tmp/'               # the temporary folder name for deduplication.
 
   # Selector ops
+  - domain_diversity_selector:                              # selector to select samples based on the diversity between domains
+      select_ratio:                                           # the ratio to select
+      init_k:                                                 # the value of k in k-means algorithm
+      ebd_dim: 512                                            # the embedding's dimension via API
+      strategy: 'inter'                                       # 'inter'-domain's inter diversity, 'intra'-domain's intra diversity, 'global'-diversity to global centroid
+      model_path: 'api'                                       # local embedding model path, else set 'api' for API embedding
   - frequency_specified_field_selector:                     # selector to select samples based on the sorted frequency of specified field value
       field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
       top_ratio:                                              # ratio of selected top specified field value
