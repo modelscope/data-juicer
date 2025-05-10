@@ -18,6 +18,7 @@ env:
 jobs:
   build:
     runs-on: [docker]
+    timeout-minutes: 600 # 10 hours
     permissions:
       contents: read
       packages: write
