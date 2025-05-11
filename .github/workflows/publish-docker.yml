@@ -70,5 +70,5 @@ jobs:
           context: dj-${{ github.run_id }}
           push: true
           outputs: type=docker,dest=data-juicer-v${{ steps.get-version-tag.outputs.version }}.tar
-          tags: ${{ env.IMAGE_NAME }}:v${{ steps.get-version-tag.outputs.version }}
+          tags: ${{ env.IMAGE_NAME }}:v${{ steps.get-version-tag.outputs.version }},${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
