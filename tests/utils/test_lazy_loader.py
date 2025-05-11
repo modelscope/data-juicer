@@ -25,14 +25,6 @@ class LazyLoaderTest(DataJuicerTestCaseBase):
             nonexistent = LazyLoader('nonexistent', 'nonexistent_module', auto_install=False)
             dir(nonexistent)
 
-    def test_dependency_loading(self):
-        # Test dependency loading from pyproject.toml
-        loader = LazyLoader('test', 'test')
-        deps = loader._load_dependencies()
-        self.assertIsInstance(deps, dict)
-        # Check if it contains some expected dependencies
-        self.assertTrue(any('torch' in key for key in deps.keys()))
-
     def test_error_handling(self):
         # Test error handling for missing dependencies
         with patch('subprocess.check_call') as mock_check_call:
@@ -119,16 +111,18 @@ class LazyLoaderTest(DataJuicerTestCaseBase):
 
     def test_dependency_handling(self):
         """Test handling of optional dependencies."""
-        with patch('subprocess.check_call') as mock_check_call:
-            try:
-                loader = LazyLoader('test')
-                # Simulate a missing dependency error
-                with patch.object(loader, '_handle_error', return_value=True):
-                    loader._load()
-            except ImportError:
-                # This is expected since the package doesn't exist
-                mock_check_call.assert_called()
-                pass
+        with patch('subprocess.check_call') as mock_check_call, \
+             patch('importlib.import_module') as mock_import:
+            # First import attempt fails
+            mock_import.side_effect = ImportError("Module not found")
+            # Installation attempt fails
+            mock_check_call.side_effect = subprocess.CalledProcessError(1, 'cmd')
+            
+            loader = LazyLoader('test')
+            with self.assertRaises(ImportError):
+                loader._load()
+            # Verify that installation was attempted
+            mock_check_call.assert_called()
 
 
 if __name__ == '__main__':

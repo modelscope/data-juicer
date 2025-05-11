@@ -3,10 +3,13 @@ import os
 import unittest
 
 from data_juicer.core.data import NestedDataset as Dataset
-from data_juicer.ops.mapper.image_tagging_mapper import \
-    ImageTaggingMapper
+from data_juicer.ops.mapper.image_tagging_mapper import ImageTaggingMapper
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from tests.utils.test_utils import setup_test_environment
+
+# Set up test environment before importing RAM-dependent code
+setup_test_environment()
 
 class ImageTaggingMapperTest(DataJuicerTestCaseBase):
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
@@ -14,6 +17,12 @@ class ImageTaggingMapperTest(DataJuicerTestCaseBase):
     img1_path = os.path.join(data_path, 'img1.png')
     img2_path = os.path.join(data_path, 'img2.jpg')
     img3_path = os.path.join(data_path, 'img3.jpg')
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up the test class by ensuring dependencies are installed."""
+        super().setUpClass()
+        setup_test_environment()
 
     def _run_image_tagging_mapper(self,
                                   op,

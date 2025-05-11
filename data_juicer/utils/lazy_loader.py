@@ -2,21 +2,56 @@
 
 import importlib
 import inspect
-import re
 import subprocess
 import sys
 import types
-from pathlib import Path
 
-import tomli
 from loguru import logger
 
 
 class LazyLoader(types.ModuleType):
     """
     Lazily import a module, mainly to avoid pulling in large dependencies.
-    Uses uv for fast dependency installation when needed.
+    Uses uv for fast dependency installation when available.
     """
+
+    @classmethod
+    def check_packages(cls, package_specs, pip_args=None):
+        """
+        Check if packages are installed and install them if needed.
+
+        Args:
+            package_specs: A list of package specifications to check/install.
+                          Can be package names or URLs (e.g., 'torch' or 'git+https://github.com/...')
+            pip_args: Optional list of additional arguments to pass to pip install command
+                     (e.g., ['--no-deps', '--upgrade'])
+        """
+
+        def _is_package_installed(package_name):
+            """Check if a package is installed by attempting to import it."""
+            if '@' in package_name:
+                package_name = package_name.split('@')[0]
+            if '[' in package_name:
+                package_name = package_name.split('[')[0]
+            if '/' in package_name:  # Handle GitHub URLs
+                package_name = package_name.split('/')[-1].replace('.git', '')
+            try:
+                importlib.import_module(package_name)
+                return True
+            except ImportError:
+                return False
+
+        for package_spec in package_specs:
+            if not _is_package_installed(package_spec):
+                logger.info(f'Package {package_spec} not found, installing...')
+                try:
+                    cls._install_package(package_spec, pip_args)
+                except subprocess.CalledProcessError as e:
+                    raise ImportError(
+                        f'Failed to install {package_spec}. This package may '
+                        f'require system-level dependencies. Please try '
+                        f'installing it manually with: pip install {package_spec}\n'
+                        f'Error details: {str(e)}')
 
     def __init__(self,
                  module_name: str,
@@ -41,12 +76,17 @@ class LazyLoader(types.ModuleType):
         else:
             self._package_name = package_name
 
-        self._package_url = package_url
+        # Standardize package_url to use git+ format
+        if package_url and '@' in package_url:
+            # Convert from package@git+ format to git+ format
+            self._package_url = package_url.split('@', 1)[1]
+        else:
+            self._package_url = package_url
+
         self._auto_install = auto_install
 
         frame = inspect.currentframe().f_back
         self._parent_module_globals = frame.f_globals
-        self._dependencies = self._load_dependencies()
         self._module = None
         logger.debug(
             f'Initialized LazyLoader for module: {module_name} '
@@ -54,182 +94,95 @@ class LazyLoader(types.ModuleType):
             (f', url: {self._package_url}' if self._package_url else '') + ')')
         super(LazyLoader, self).__init__(module_name)
 
-    def _handle_error(self, error, module_name):
-        """Handle errors, including optional dependencies."""
-        # Check if the error message indicates a missing optional dependency
-        error_msg = str(error)
+    @classmethod
+    def _install_package(cls, package_spec, pip_args=None):
+        """Install a package using uv if available, otherwise pip."""
+        # For GitHub repositories, clone first then install locally
+        if package_spec.startswith(('git+', 'https://github.com/')):
+            import os
+            import shutil
+            import tempfile
 
-        # Try different patterns to extract the package name
-        patterns = [
-            r'requires `([^`]+)`',  # "requires `package`"
-            r'install `([^`]+)`',  # "install `package`"
-            r'install ([^\s]+)',  # "install package"
-            r'requires ([^\s]+)',  # "requires package"
-        ]
+            import git
 
-        # Then check for other dependencies
-        for pattern in patterns:
-            match = re.search(pattern, error_msg)
-            if match:
-                dep_name = match.group(1)
-                package_name = dep_name
-                if package_name in self._dependencies:
-                    logger.info(f'Installing optional dependency '
-                                f"{package_name}'...")
-                    try:
-                        subprocess.check_call([
-                            sys.executable, '-m', 'uv', 'pip', 'install',
-                            self._dependencies[package_name]
-                        ])
-                    except (subprocess.CalledProcessError, FileNotFoundError):
-                        subprocess.check_call([
-                            sys.executable, '-m', 'pip', 'install',
-                            self._dependencies[package_name]
-                        ])
-                    return True
-
-        return False
-
-    def _load_dependencies(self):
-        """Load dependencies from pyproject.toml"""
-        project_root = Path(__file__).parent.parent.parent
-        pyproject_path = project_root / 'pyproject.toml'
-
-        if not pyproject_path.exists():
-            logger.warning(f'pyproject.toml not found at {pyproject_path}')
-            return {}
-
-        with open(pyproject_path, 'rb') as f:
-            config = tomli.load(f)
-
-        # Get all dependencies
-        dependencies = {}
-
-        # Main dependencies
-        main_deps = config.get('project', {}).get('dependencies', [])
-        for dep in main_deps:
-            name = dep.split('[')[0].split('>')[0].split('<')[0].split(
-                '=')[0].strip()  # noqa: E501
-            dependencies[name] = dep
-
-        # Optional dependencies
-        optional_deps = config.get('project', {}).get('optional-dependencies',
-                                                      {})  # noqa: E501
-        for group, deps in optional_deps.items():
-            for dep in deps:
-                name = dep.split('[')[0].split('>')[0].split('<')[0].split(
-                    '=')[0].strip()  # noqa: E501
-                dependencies[name] = dep
-                logger.debug(f'Found optional dependency: {name} '
-                             f'in group {group}')
-
-        return dependencies
-
-    @staticmethod
-    def check_packages(packages, extra_args=None):
-        """
-        Check if modules are installed and install them if needed.
-
-        Args:
-            packages (list): List of module names to check/install
-            extra_args (str, optional): Additional arguments for installation
-
-        Note:
-            For modules where the package name differs from the module name,
-            use the MODULE_MAPPINGS dictionary to specify the correct mapping.
-            For example: 'cv2' -> 'opencv-python'
-        """
-        for module_name in packages:
-            # First try to import the module directly
+            # Create a temporary directory for cloning
+            temp_dir = tempfile.mkdtemp()
             try:
-                importlib.import_module(module_name)
-                continue
-            except ImportError:
-                pass
-
-            # Install the package
-            logger.info(
-                f"Module '{module_name}' not found. Installing package "
-                f"{module_name}'...")
-            try:
-                # Try uv first
-                cmd = [
-                    sys.executable, '-m', 'uv', 'pip', 'install', module_name
-                ]
-                if extra_args:
-                    cmd.extend(extra_args.split())
-                subprocess.check_call(cmd)
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                # Fallback to pip if uv is not available
-                logger.warning('uv not found, falling back to pip...')
-                cmd = [sys.executable, '-m', 'pip', 'install', module_name]
-                if extra_args:
-                    cmd.extend(extra_args.split())
-                subprocess.check_call(cmd)
-            logger.info(f'Successfully installed {module_name}')
-
-            # After installation, try importing the module again
-            try:
-                importlib.import_module(module_name)
-            except ImportError:
-                logger.warning(
-                    f'Package {module_name} was installed but module '
-                    f'{module_name} could not be imported. This might '
-                    f'indicate a mismatch between the package name and '
-                    f'module name.')
-
-    def _install_github_deps(self, package_spec, use_uv=True):
-        """Install dependencies for a GitHub package.
-
-        Relies on pip's built-in dependency resolution to handle:
-        - requirements.txt
-        - requirements/*.txt
-        - pyproject.toml
-        - setup.py
-        - setup.cfg
-        - MANIFEST.in
-        """
-        repo_path = package_spec.split('github.com/')[1].split('.git')[0]
-
-        # Clone the repo to a temp directory
-        import tempfile
-
-        with tempfile.TemporaryDirectory() as temp_dir:
-            try:
-                # Clone the repo
-                subprocess.check_call([
-                    'git', 'clone', f'https://github.com/{repo_path}.git',
-                    temp_dir
-                ])
-
-                # First install dependencies if specified
-                if hasattr(self, '_dependencies') and self._dependencies:
-                    logger.info(f'Installing dependencies for {repo_path}...')
-                    for dep in self._dependencies:
-                        try:
-                            if use_uv:
-                                subprocess.check_call(
-                                    ['uv', 'pip', 'install', dep])
-                            else:
-                                subprocess.check_call(['pip', 'install', dep])
-                        except subprocess.CalledProcessError as e:
-                            logger.warning(
-                                f'Failed to install dependency {dep}: {e}')
-
-                # Then let pip handle all dependency resolution
-                logger.info(f'Installing {repo_path} and its dependencies...')
-                if use_uv:
-                    subprocess.check_call(['uv', 'pip', 'install', '.'],
-                                          cwd=temp_dir)
+                # Clone the repository
+                logger.info(f'Cloning {package_spec}...')
+                if package_spec.startswith('git+'):
+                    repo_url = package_spec[4:]  # Remove 'git+' prefix
                 else:
-                    subprocess.check_call(['pip', 'install', '.'],
-                                          cwd=temp_dir)
+                    repo_url = package_spec
+                git.Repo.clone_from(repo_url, temp_dir)
+
+                # Check for requirements.txt and install dependencies first
+                requirements_path = os.path.join(temp_dir, 'requirements.txt')
+                if os.path.exists(requirements_path):
+                    logger.info(
+                        'Installing requirements from requirements.txt...')
+                    try:
+                        # Try uv first
+                        cmd = [
+                            sys.executable, '-m', 'uv', 'pip', 'install', '-r',
+                            requirements_path
+                        ]
+                        if pip_args:
+                            cmd.extend(pip_args)
+                        subprocess.check_call(cmd)
+                    except (subprocess.CalledProcessError, FileNotFoundError):
+                        logger.warning(
+                            'uv not found or failed, falling back to pip...')
+                        cmd = [
+                            sys.executable, '-m', 'pip', 'install', '-r',
+                            requirements_path
+                        ]
+                        if pip_args:
+                            cmd.extend(pip_args)
+                        subprocess.check_call(cmd)
+
+                # Install the package in editable mode
+                try:
+                    logger.info('Installing package in editable mode...')
+                    cmd = [
+                        sys.executable, '-m', 'uv', 'pip', 'install', '-e',
+                        temp_dir
+                    ]
+                    if pip_args:
+                        cmd.extend(pip_args)
+                    subprocess.check_call(cmd)
+                except (subprocess.CalledProcessError, FileNotFoundError):
+                    logger.warning(
+                        'uv not found or failed, falling back to pip...')
+                    cmd = [
+                        sys.executable, '-m', 'pip', 'install', '-e', temp_dir
+                    ]
+                    if pip_args:
+                        cmd.extend(pip_args)
+                    subprocess.check_call(cmd)
                 return True
-            except Exception as e:
+            finally:
+                # Clean up the temporary directory
+                shutil.rmtree(temp_dir)
+        else:
+            # For non-GitHub packages, use direct installation
+            try:
+                logger.info(f'Installing {package_spec} using uv...')
+                cmd = [
+                    sys.executable, '-m', 'uv', 'pip', 'install', package_spec
+                ]
+                if pip_args:
+                    cmd.extend(pip_args)
+                subprocess.check_call(cmd)
+                return True
+            except (subprocess.CalledProcessError, FileNotFoundError):
                 logger.warning(
-                    f'Failed to install dependencies for {package_spec}: {str(e)}'
-                )
-                return False
+                    'uv not found or failed, falling back to pip...')
+                cmd = [sys.executable, '-m', 'pip', 'install', package_spec]
+                if pip_args:
+                    cmd.extend(pip_args)
+                subprocess.check_call(cmd)
+                return True
 
     def _load(self):
         """Load the module and handle any missing dependencies."""
@@ -246,63 +199,17 @@ class LazyLoader(types.ModuleType):
             # Prepare the package spec for installation
             package_spec = self._package_url if self._package_url else self._package_name
 
-            # Try to install the package using uv first
+            # Install the package
             try:
-                logger.info(
-                    f'Attempting to install {package_spec} using uv...')
-                # Try using uv directly first
-                try:
-                    # For GitHub packages, install with dependencies
-                    if 'git+' in package_spec:
-                        # Install package with dependencies
-                        self._install_github_deps(package_spec, use_uv=True)
-                    else:
-                        subprocess.check_call(
-                            ['uv', 'pip', 'install', package_spec])
-                except (subprocess.CalledProcessError, FileNotFoundError):
-                    # If uv command fails, try using python -m uv
-                    if 'git+' in package_spec:
-                        # Install package with dependencies
-                        self._install_github_deps(package_spec, use_uv=True)
-                    else:
-                        subprocess.check_call([
-                            sys.executable, '-m', 'uv', 'pip', 'install',
-                            package_spec
-                        ])
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                # Fall back to pip if uv fails
-                logger.info(
-                    f'uv not available, falling back to pip for {package_spec}...'
-                )
-                try:
-                    # Try using pip directly first
-                    try:
-                        if 'git+' in package_spec:
-                            # Install package with dependencies
-                            self._install_github_deps(package_spec,
-                                                      use_uv=False)
-                        else:
-                            subprocess.check_call(
-                                ['pip', 'install', package_spec])
-                    except (subprocess.CalledProcessError, FileNotFoundError):
-                        # If pip command fails, try using python -m pip
-                        if 'git+' in package_spec:
-                            # Install package with dependencies
-                            self._install_github_deps(package_spec,
-                                                      use_uv=False)
-                        else:
-                            subprocess.check_call([
-                                sys.executable, '-m', 'pip', 'install',
-                                package_spec
-                            ])
-                except subprocess.CalledProcessError as pip_error:
-                    raise ImportError(
-                        f'Failed to install {package_spec}. This package may '
-                        f'require system-level dependencies. Please try '
-                        f'installing it manually with: pip install {package_spec}\n'
-                        f'Error details: {str(pip_error)}')
+                self._install_package(package_spec)
+            except subprocess.CalledProcessError as e:
+                raise ImportError(
+                    f'Failed to install {package_spec}. This package may '
+                    f'require system-level dependencies. Please try '
+                    f'installing it manually with: pip install {package_spec}\n'
+                    f'Error details: {str(e)}')
 
-            # Try importing again - use the module path
+            # Try importing again
             try:
                 self._module = importlib.import_module(self._module_name)
             except ImportError as import_error:
