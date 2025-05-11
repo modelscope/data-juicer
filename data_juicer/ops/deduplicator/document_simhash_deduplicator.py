@@ -16,7 +16,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
 
-simhash = LazyLoader('simhash')
+simhash = LazyLoader('simhash', 'simhash-pybind')
 
 OP_NAME = 'document_simhash_deduplicator'
 

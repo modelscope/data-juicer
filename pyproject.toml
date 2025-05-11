@@ -25,6 +25,7 @@ dependencies = [
     "dill==0.3.4",  # serialization
     "psutil",  # system monitoring
     "pydantic>=2.0",  # data validation
+    "uv",
 ]
 
 [project.optional-dependencies]
@@ -83,7 +84,8 @@ audio = [
     "soundfile",  # audio handling
     "librosa>=0.10",  # audio processing
     "resampy",  # audio resampling
-    "ffmpeg-python"
+    "ffmpeg-python",
+    "audiomentations",
 ]
 
 # Distributed Computing

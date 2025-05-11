@@ -28,9 +28,8 @@ nltk = LazyLoader('nltk')
 aes_pred = LazyLoader('aesthetics_predictor', 'simple-aesthetics-predictor')
 vllm = LazyLoader('vllm')
 diffusers = LazyLoader('diffusers')
-ram = LazyLoader(
-    'ram',
-    package_url='git+https://github.com/xinyu1205/recognize-anything.git')
+ram = LazyLoader('ram',
+                 'git+https://github.com/xinyu1205/recognize-anything.git')
 cv2 = LazyLoader('cv2', 'opencv-python')
 openai = LazyLoader('openai')
 ultralytics = LazyLoader('ultralytics')
