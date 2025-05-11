@@ -41,6 +41,10 @@ class LazyLoader(types.ModuleType):
             except ImportError:
                 return False
 
+        # Convert pip_args to list if it's a string
+        if isinstance(pip_args, str):
+            pip_args = [pip_args]
+
         for package_spec in package_specs:
             if not _is_package_installed(package_spec):
                 logger.info(f'Package {package_spec} not found, installing...')
@@ -97,6 +101,10 @@ class LazyLoader(types.ModuleType):
     @classmethod
     def _install_package(cls, package_spec, pip_args=None):
         """Install a package using uv if available, otherwise pip."""
+        # Convert pip_args to list if it's a string
+        if isinstance(pip_args, str):
+            pip_args = [pip_args]
+
         # For GitHub repositories, clone first then install locally
         if package_spec.startswith(('git+', 'https://github.com/')):
             import os
