@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import get_args, get_origin
 
 import jsonlines as jl
@@ -12,10 +13,44 @@ from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import add_suffix_to_filename
 
 
+def make_hashable(obj):
+    if isinstance(obj, np.ndarray):
+        return tuple(obj.flatten().tolist())  # 将数组转换为元组
+    elif isinstance(obj, datetime):
+        return obj.isoformat()  # 将时间转换为字符串
+    elif isinstance(obj, dict):
+        return tuple(sorted((k, make_hashable(v)) for k, v in obj.items()))
+    elif isinstance(obj, (list, set)):
+        return tuple(make_hashable(e) for e in obj)
+    elif isinstance(obj, tuple):
+        return tuple(make_hashable(e) for e in obj)
+    else:
+        return obj
+
+
+def get_longest_common_prefix(list_of_strings):
+    """Get the longest common prefix of the given list of strings."""
+    if len(list_of_strings) == 0:
+        return ''
+    res = ''
+    for chars in zip(*list_of_strings):
+        if len(set(chars)) == 1:
+            res += chars[0]
+        else:
+            break
+    return res
+
+
 class BaseDataPoolManipulator(object):
 
     def __init__(self, data_pool_cfg: dict):
         self.data_pool_cfg = data_pool_cfg
+
+    @staticmethod
+    def _load_ds(ds_path):
+        db = DatasetBuilder(dict_to_namespace({'dataset_path': ds_path}))
+        ds = db.load_dataset()
+        return ds
 
     def run(self):
         """
@@ -38,17 +73,17 @@ class DataPoolConstruction(BaseDataPoolManipulator):
             They are named following the rule "<stats_key_name>/<original_name>_<part_idx>.jsonl"
         """
         # read inputs
-        input_dataset_path = self.data_pool_cfg.get('dataset_path', [])
+        input_dataset_paths = self.data_pool_cfg.get('dataset_path', [])
         export_path = self.data_pool_cfg.get('export_path', None)
         split_ratios = self.data_pool_cfg.get('split_ratios',
                                               [1.0 / 3.0, 2.0 / 3.0])
 
         # check I/O paths
-        if isinstance(input_dataset_path, str):
-            input_dataset_path = [input_dataset_path]
+        if isinstance(input_dataset_paths, str):
+            input_dataset_paths = [input_dataset_paths]
         existing_input_paths = []
         missing_paths = []
-        for p in input_dataset_path:
+        for p in input_dataset_paths:
             if not os.path.exists(p):
                 missing_paths.append(p)
             else:
@@ -72,8 +107,7 @@ class DataPoolConstruction(BaseDataPoolManipulator):
     def _construct_data_pool(self, ds_path, export_path, split_ratios):
         logger.info(f'Constructing data pool for {ds_path}...')
         ds_basename = os.path.splitext(os.path.basename(ds_path))[0]
-        db = DatasetBuilder(dict_to_namespace({'dataset_path': ds_path}))
-        ds = db.load_dataset()
+        ds = self._load_ds(ds_path)
         ds_schema = ds.schema()
         if Fields.stats not in ds_schema.columns:
             logger.warning(
@@ -143,11 +177,103 @@ class DataPoolCombination(BaseDataPoolManipulator):
         combine data pool from specified data pools
 
         Input:
-            - N split data pools, with their ranks.
+            - N split data pools, which are already ordered by their ranks.
         Output: 2^N combined data pools including the original N data pools. Equals to N + C(N, 2) + ... + C(N, N). They
-            are named following the rule "<most_common_prefix>_top_<combined_ranks>.jsonl"
+            are named following the rule "<longest_common_prefix>_top_<combined_ranks>_num_<num_samples>.jsonl"
         """
-        raise NotImplementedError
+        # read inputs
+        ordered_data_pool_paths = self.data_pool_cfg.get('data_pool_paths', [])
+        export_path = self.data_pool_cfg.get('export_path', None)
+
+        # check I/O paths
+        if isinstance(ordered_data_pool_paths, str):
+            ordered_data_pool_paths = [ordered_data_pool_paths]
+        existing_input_paths = []
+        missing_paths = []
+        for p in ordered_data_pool_paths:
+            if not os.path.exists(p):
+                missing_paths.append(p)
+            else:
+                existing_input_paths.append(p)
+        if len(missing_paths) > 0:
+            logger.error(
+                f'Input data pool paths [{",".join(missing_paths)}] does not exist. Skipped!'
+            )
+        if len(existing_input_paths) == 0:
+            return None
+        if export_path is None:
+            raise ValueError('export_path is not specified.')
+        os.makedirs(export_path, exist_ok=True)
+
+        # start to combine these data pools
+        combined_hierarchies, dataset_records = self._combine_data_pools(
+            existing_input_paths, export_path)
+        # print hierarchies:
+        # [
+        #   [('0_1_2', num_samples)],
+        #   [('0_1', num_samples), ('0_2', num_samples), ('1_2', num_samples)],
+        #   [...],
+        #   ...
+        # ]
+        print_msg = '\n'
+        for pools in combined_hierarchies[::-1]:
+            fmt_pools = [
+                f'{cur_rank}: {len(pool)}' for cur_rank, pool in pools
+            ]
+            print_msg += ';\t'.join(fmt_pools) + '\n'
+        logger.info(f'Combined hierarchies: {print_msg}')
+        # export hierarchies
+        longest_common_prefix = get_longest_common_prefix([
+            os.path.splitext(os.path.basename(p))[0]
+            for p in existing_input_paths
+        ])
+        output_path_pattern = os.path.join(
+            export_path, f'{longest_common_prefix}_top_%s_num_%d.jsonl')
+        for pools in combined_hierarchies:
+            for cur_rank, pool in pools:
+                output_ds = [dataset_records[key] for key in pool]
+                with jl.open(output_path_pattern % (cur_rank, len(pool)),
+                             'w') as writer:
+                    writer.write_all(output_ds)
+        return export_path
+
+    def _combine_data_pools(self, ordered_data_pool_paths, export_path):
+        curr_rank = 0
+        dataset_records = {}
+        hierarchies = []
+        while True:
+            # 1. read a new rank ds
+            logger.info(f'Reading dataset of rank [{curr_rank}]...')
+            ds = self._load_ds(ordered_data_pool_paths[curr_rank]).to_list()
+            ds_dict = {make_hashable(s): s for s in ds}
+            dataset_records.update(ds_dict)
+
+            # 2. intersect new rank ds with each level in the hierarchies
+            logger.info(f'Try to merge rank [{curr_rank}]...')
+            new_items = [[(curr_rank, set(ds_dict.keys()))]]
+            for pools in hierarchies:
+                new_pools = []
+                for this_rank, pool in pools:
+                    new_rank = f'{this_rank}_{curr_rank}'
+                    new_pool = pool.intersection(set(ds_dict.keys()))
+                    new_pools.append((new_rank, new_pool))
+                new_items.append(new_pools)
+
+            # 3. count the top num
+            top_num = len(new_items[-1][0][1])
+            logger.info(
+                f'After merging rank [{curr_rank}], there are [{top_num}] samples in the top level'
+            )
+
+            # 4. merge to the hierarchies
+            assert len(hierarchies) == len(new_items) - 1
+            for i in range(len(hierarchies)):
+                hierarchies[i].extend(new_items[i])
+            hierarchies.append(new_items[-1])
+            curr_rank += 1
+            if curr_rank >= len(ordered_data_pool_paths):
+                break
+        return hierarchies, dataset_records
 
 
 class DataPoolDuplication(BaseDataPoolManipulator):
