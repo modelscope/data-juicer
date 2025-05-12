@@ -78,6 +78,11 @@ class DJDataset(ABC):
         """
         pass
 
+    @abstractmethod
+    def to_list(self) -> list:
+        """Convert the current dataset to a Python list."""
+        pass
+
 
 def wrap_func_with_nested_access(f):
     """
@@ -462,6 +467,9 @@ class NestedDataset(Dataset, DJDataset):
         """Override the select func, such that selected samples can be accessed
         by nested manner."""
         return nested_obj_factory(super().select(*args, **kargs))
+
+    def to_list(self) -> list:
+        return Dataset.to_list(self)
 
     @classmethod
     def from_dict(cls, *args, **kargs):

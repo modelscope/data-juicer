@@ -264,6 +264,9 @@ class RayDataset(DJDataset):
         except AttributeError:
             return rd.read_json(paths)
 
+    def to_list(self) -> list:
+        return self.data.to_pandas().to_dict(orient='records')
+
 
 class JSONStreamDatasource(ds.JSONDatasource):
     """
