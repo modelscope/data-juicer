@@ -1,0 +1,7 @@
+qwen-vl-utils
+pillow
+lmdeploy
+torch
+tqdm
+transformers
+ultralytics
