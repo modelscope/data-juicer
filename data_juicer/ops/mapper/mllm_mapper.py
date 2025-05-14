@@ -8,7 +8,6 @@ OP_NAME = 'mllm_mapper'
 
 torch = LazyLoader('torch')
 transformers = LazyLoader('transformers')
-torch.set_num_threads(1)
 
 
 @LOADED_IMAGES.register_module(OP_NAME)
@@ -45,6 +44,8 @@ class MllmMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
+        torch.set_num_threads(1)
+
         kwargs.setdefault('mem_required', '32GB')
         kwargs.setdefault('num_proc', 1)
         super().__init__(*args, **kwargs)

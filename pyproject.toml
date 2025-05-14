@@ -26,6 +26,27 @@ dependencies = [
     "psutil",  # system monitoring
     "pydantic>=2.0",  # data validation
     "uv",
+    "wordcloud",
+    "spacy==3.7.0",
+    "httpx",
+    "av==13.1.0",  # video/audio handling
+    "emoji==2.2.0",  # emoji handling
+    "tabulate",
+    "librosa>=0.10",
+    "resampy",
+    "bs4",
+    "matplotlib",
+    "plotly",  # interactive plots
+    "seaborn",
+    "requests",
+    "wget",
+    "pdfplumber",
+    "python-docx",
+    "streamlit",
+    "Pillow",
+    "fastapi>=0.110",
+    "mwparserfromhell",
+    "regex",  # regular expressions
 ]
 
 [project.optional-dependencies]
@@ -50,18 +71,11 @@ vision = [
     "scenedetect[opencv]",  # Scene detection
     "ultralytics",  # YOLO models
     "rembg",  # Background removal
-    "Pillow",  # image handling
-    "matplotlib",  # visualization
-    "seaborn",  # visualization
 ]
 
 # Natural Language Processing
 nlp = [
-    "spacy==3.7.0",  # NLP processing
     "nltk==3.9.1",  # NLP toolkit
-    "emoji==2.2.0",  # emoji handling
-    "regex",  # regular expressions
-    "bs4",  # HTML parsing
     "easyocr==1.7.1",  # OCR
     "fasttext-wheel",  # FastText
     "kenlm",  # Language modeling
@@ -80,10 +94,7 @@ nlp = [
 # Audio Processing
 audio = [
     "torchaudio",  # Audio processing with PyTorch
-    "av==13.1.0",  # video/audio handling
     "soundfile",  # audio handling
-    "librosa>=0.10",  # audio processing
-    "resampy",  # audio resampling
     "ffmpeg-python",
     "audiomentations",
 ]
@@ -105,7 +116,6 @@ dev = [
     "wandb<=0.19.0",
     "fire",
     "click",
-    "wget",
     "toml",  # for yapf configuration
 ]
 
@@ -123,18 +133,8 @@ document = [
     "mwparserfromhell",  # wiki text parsing
 ]
 
-# Utils, including visualization, Web & API
-utils = [
-    "plotly",  # interactive plots
-    "wordcloud",  # word cloud generation
-    "requests",  # HTTP requests
-    "httpx",  # async HTTP
-    "streamlit",  # web interface
-    "fastapi[standard]>=0.110",  # API framework
-]
-
-# Sandbox Environment 
-# Todo: the sandbox dependencies will be provided in 
+# Sandbox Environment
+# Todo: the sandbox dependencies will be provided in
 # micro-services rather than all-in-one env
 sandbox = [
     "torch>=1.11.0",
@@ -142,7 +142,6 @@ sandbox = [
     "pyspark",
     "vbench",
     "modelscope",
-    "Pillow",
     "deepspeed",
     "safetensors",
     "timm",
@@ -159,15 +158,14 @@ sandbox = [
 
 # All dependencies (default + all optional, except sandbox)
 all = [
-    {include-group = "generic"},
-    {include-group = "vision"},
-    {include-group = "nlp"},
-    {include-group = "audio"},
-    {include-group = "distributed"},
-    {include-group = "dev"},
-    {include-group = "ai_services"},
-    {include-group = "document"},
-    {include-group = "utils"},
+    "data-juicer[generic]",
+    "data-juicer[vision]",
+    "data-juicer[nlp]",
+    "data-juicer[audio]",
+    "data-juicer[distributed]",
+    "data-juicer[dev]",
+    "data-juicer[ai_services]",
+    "data-juicer[document]",
 ]
 
 [project.scripts]

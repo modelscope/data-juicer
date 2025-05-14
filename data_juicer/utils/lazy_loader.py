@@ -4,6 +4,7 @@ import importlib
 import inspect
 import subprocess
 import sys
+import traceback
 import types
 
 from loguru import logger
@@ -92,15 +93,29 @@ class LazyLoader(types.ModuleType):
         frame = inspect.currentframe().f_back
         self._parent_module_globals = frame.f_globals
         self._module = None
+
+        # Print trace information
         logger.debug(
             f'Initialized LazyLoader for module: {module_name} '
             f'(package: {self._package_name}' +
             (f', url: {self._package_url}' if self._package_url else '') + ')')
+        # Get last 3 frames of the stack trace
+        stack = traceback.extract_stack(frame)[-3:]
+        logger.debug('LazyLoader called from:\n' +
+                     ''.join(traceback.format_list(stack)))
+
         super(LazyLoader, self).__init__(module_name)
 
     @classmethod
     def _install_package(cls, package_spec, pip_args=None):
         """Install a package using uv if available, otherwise pip."""
+        # Print trace information for package installation
+        logger.debug(f'Installing package: {package_spec}')
+        # Get last 3 frames of the stack trace
+        stack = traceback.extract_stack()[-3:]
+        logger.debug('Package installation triggered from:\n' +
+                     ''.join(traceback.format_list(stack)))
+
         # Convert pip_args to list if it's a string
         if isinstance(pip_args, str):
             pip_args = [pip_args]
@@ -194,6 +209,8 @@ class LazyLoader(types.ModuleType):
 
     def _load(self):
         """Load the module and handle any missing dependencies."""
+        logger.debug(f'Loading {self._module_name}...')
+
         if self._module is not None:
             return self._module
 

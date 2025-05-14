@@ -1,7 +1,6 @@
 import unittest
 from types import ModuleType
 from unittest.mock import patch
-import inspect
 import subprocess
 
 from data_juicer.utils.lazy_loader import LazyLoader

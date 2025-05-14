@@ -5,11 +5,12 @@ import subprocess
 import sys
 
 from loguru import logger
-# allow loading truncated images for some too large images.
 from PIL import ImageFile
 
 from data_juicer.utils.availability_utils import _is_package_available
+from data_juicer.utils.lazy_loader import LazyLoader
 
+torch = LazyLoader('torch')
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # For now, only INFO will be shown. Later the severity level will be changed
@@ -22,7 +23,6 @@ def _cuda_device_count():
     _torch_available = _is_package_available('torch')
 
     if _torch_available:
-        import torch
         return torch.cuda.device_count()
 
     try:
@@ -42,12 +42,9 @@ def _cuda_device_count():
         return 0
 
 
-_CUDA_DEVICE_COUNT = _cuda_device_count()
-
-
 def cuda_device_count():
-    return _CUDA_DEVICE_COUNT
+    return _cuda_device_count()
 
 
 def is_cuda_available():
-    return _CUDA_DEVICE_COUNT > 0
+    return cuda_device_count() > 0

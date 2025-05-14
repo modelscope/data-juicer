@@ -4,14 +4,12 @@ import shutil
 import subprocess
 import unittest
 
-import numpy
-import ray.data as rd
-
 from data_juicer import is_cuda_available
 from data_juicer.core.data import DJDataset, NestedDataset
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import free_models
 
+numpy = LazyLoader('numpy')
 transformers = LazyLoader('transformers')
 
 CLEAR_MODEL = False
@@ -105,8 +103,10 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         if current_tag.startswith('standalone'):
             return NestedDataset.from_list(data)
         elif current_tag.startswith('ray'):
+            # Only import Ray when needed
+            ray = LazyLoader('ray')
             from data_juicer.core.data.ray_dataset import RayDataset
-            dataset = rd.from_items(data)
+            dataset = ray.data.from_items(data)
             return RayDataset(dataset)
         else:
             raise ValueError('Unsupported type')

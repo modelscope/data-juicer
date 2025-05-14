@@ -73,12 +73,6 @@ BACKUP_MODEL_LINKS = {
     'FastSAM-x.pt',
 }
 
-TORCH_DTYPE_MAPPING = {
-    'fp32': torch.float32,
-    'fp16': torch.float16,
-    'bf16': torch.bfloat16,
-}
-
 
 def get_backup_model_link(model_name):
     for pattern, url in BACKUP_MODEL_LINKS.items():
@@ -298,6 +292,13 @@ def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
         'image2image', 'text2image', 'inpainting'
     :return: a Diffusion model.
     """
+
+    TORCH_DTYPE_MAPPING = {
+        'fp32': torch.float32,
+        'fp16': torch.float16,
+        'bf16': torch.bfloat16,
+    }
+
     LazyLoader.check_packages(['torch', 'transformers'])
 
     device = model_params.pop('device', None)
