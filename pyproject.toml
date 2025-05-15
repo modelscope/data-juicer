@@ -188,8 +188,5 @@ per-file-ignores = [
 ]
 max-line-length = 120
 
-[tool.yapf]
-column_limit = 120
-
 [tool.hatch.version]
 path = "data_juicer/__init__.py"
