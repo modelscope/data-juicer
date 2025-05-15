@@ -9,7 +9,7 @@ readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.10"
 
-# Minimal required dependencies
+# Core dependencies
 dependencies = [
     "datasets>=2.19.0",  # core data loading
     "fsspec==2023.5.0",  # file system operations
@@ -160,14 +160,14 @@ sandbox = [
 
 # All dependencies (default + all optional, except sandbox)
 all = [
-    "data-juicer[generic]",
-    "data-juicer[vision]",
-    "data-juicer[nlp]",
-    "data-juicer[audio]",
-    "data-juicer[distributed]",
-    "data-juicer[dev]",
-    "data-juicer[ai_services]",
-    "data-juicer[document]",
+    "py-data-juicer[generic]",
+    "py-data-juicer[vision]",
+    "py-data-juicer[nlp]",
+    "py-data-juicer[audio]",
+    "py-data-juicer[distributed]",
+    "py-data-juicer[dev]",
+    "py-data-juicer[ai_services]",
+    "py-data-juicer[document]",
 ]
 
 [project.scripts]
