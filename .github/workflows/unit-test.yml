@@ -35,7 +35,6 @@ jobs:
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
         docker compose exec ray-head uv pip install -e .\[all\]
-        docker compose exec ray-worker uv pip install -e .\[all\]
 
     - name: Clean dataset cache
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
@@ -59,6 +58,41 @@ jobs:
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
         echo "total=$(docker compose exec ray-head coverage report --format=total)" >> $GITHUB_OUTPUT
+
+    - name: Remove docker compose
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      if: always()
+      run: |
+        docker compose down --remove-orphans
+
+    - name: Cleanup workspace
+      if: always()
+      run: |
+        rm -rf  dj-${{ github.run_id }}
+
+  unittest-dist:
+    runs-on: [GPU, unittest]
+    environment: Testing
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        path: dj-${{ github.run_id }}
+
+    - name: Setup docker compose
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose up -d
+
+    - name: Install data-juicer
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose exec ray-head uv pip install -e .\[all\]
+        docker compose exec ray-worker uv pip install -e .\[all\]
+
+    - name: Clean dataset cache
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose exec ray-head rm -rf /data/huggingface/dataset
 
     - name: Run unittest ray
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
