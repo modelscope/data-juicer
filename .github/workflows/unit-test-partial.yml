@@ -34,7 +34,7 @@ jobs:
     - name: Install data-juicer
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        docker compose exec ray-head uv pip install -e .\[all\]
+        docker compose exec ray-head bash -c '/root/.local/bin/uv venv /workspace/.venv && source /workspace/.venv/bin/activate && /root/.local/bin/uv pip install -e .\[all\]'
 
     - name: Clean dataset cache
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
@@ -44,7 +44,7 @@ jobs:
     - name: Run unittest standalone
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        docker compose exec -e OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ray-head python tests/run.py --tag standalone --mode partial
+        docker compose exec -e OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ray-head bash -c 'source /workspace/.venv/bin/activate && python tests/run.py --tag standalone --mode partial'
 
     - name: Upload coverage report of standalone
       uses: actions/upload-artifact@v4
@@ -52,6 +52,12 @@ jobs:
         name: coverage_report_standalone
         include-hidden-files: true
         path: dj-${{ github.run_id }}/coverage_report_standalone
+
+    - name: Get Total Coverage Result
+      id: total
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        echo "total=$(docker compose exec ray-head bash -c 'source /workspace/.venv/bin/activate && coverage report --format=total')" >> $GITHUB_OUTPUT
 
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
@@ -81,8 +87,8 @@ jobs:
     - name: Install data-juicer
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        docker compose exec ray-head uv pip install -e .\[all\]
-        docker compose exec ray-worker uv pip install -e .\[all\]
+        docker compose exec ray-head bash -c '/root/.local/bin/uv venv /workspace/.venv && source /workspace/.venv/bin/activate && /root/.local/bin/uv pip install -e .\[all\]'
+        docker compose exec ray-worker bash -c '/root/.local/bin/uv venv /workspace/.venv && source /workspace/.venv/bin/activate && /root/.local/bin/uv pip install -e .\[all\]'
 
     - name: Clean dataset cache
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
@@ -92,7 +98,7 @@ jobs:
     - name: Run unittest ray
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        docker compose exec ray-head python tests/run.py --tag ray --mode regression
+        docker compose exec ray-head bash -c 'source /workspace/.venv/bin/activate && python tests/run.py --tag ray --mode partial'
 
     - name: Upload coverage report of ray
       uses: actions/upload-artifact@v4
