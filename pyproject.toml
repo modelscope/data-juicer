@@ -117,6 +117,8 @@ dev = [
     "fire",
     "click",
     "toml",  # for yapf configuration
+    "pytest",  # testing framework
+    "pytest-cov",  # coverage reporting
 ]
 
 # AI Services & APIs
@@ -185,6 +187,9 @@ per-file-ignores = [
     "*/__init__.py: F401"
 ]
 max-line-length = 120
+
+[tool.yapf]
+column_limit = 120
 
 [tool.hatch.version]
 path = "data_juicer/__init__.py"

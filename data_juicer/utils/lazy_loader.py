@@ -1,13 +1,21 @@
 """A LazyLoader class for on-demand module loading with uv integration."""
 
 import importlib
+import importlib.resources
 import inspect
 import subprocess
 import sys
 import traceback
 import types
 
+import tomli
 from loguru import logger
+
+
+def get_toml_file_path():
+    with importlib.resources.path('data_juicer', '__init__.py') as init_path:
+        project_root = init_path.parent.parent
+        return project_root / 'pyproject.toml'
 
 
 class LazyLoader(types.ModuleType):
@@ -15,6 +23,80 @@ class LazyLoader(types.ModuleType):
     Lazily import a module, mainly to avoid pulling in large dependencies.
     Uses uv for fast dependency installation when available.
     """
+
+    # Class variable to cache dependencies
+    _dependencies = None
+
+    @classmethod
+    def reset_dependencies_cache(cls):
+        """Reset the dependencies cache."""
+        cls._dependencies = None
+
+    @classmethod
+    def get_all_dependencies(cls):
+        """
+        Get all dependencies from pyproject.toml, including optional ones.
+
+        Returns:
+            dict: A dictionary mapping module names to their full package specifications
+                 e.g. {'numpy': 'numpy>=1.26.4,<2.0.0', 'pandas': 'pandas>=2.0.0'}
+        """
+        # Return cached dependencies if available
+        if cls._dependencies is not None:
+            return cls._dependencies
+
+        try:
+            pyproject_path = get_toml_file_path()
+
+            if not pyproject_path.exists():
+                logger.debug('pyproject.toml not found')
+                cls._dependencies = {}
+                return cls._dependencies
+
+            with open(pyproject_path, 'rb') as f:
+                pyproject = tomli.load(f)
+
+            result = {}
+
+            # Get main dependencies
+            if 'project' in pyproject and 'dependencies' in pyproject['project']:
+                for dep in pyproject['project']['dependencies']:
+                    if '>=' in dep or '<=' in dep or '==' in dep or '>' in dep or '<' in dep:
+                        # Find the first occurrence of any version operator
+                        for op in ['>=', '<=', '==', '>', '<']:
+                            if op in dep:
+                                name, version = dep.split(op, 1)
+                                name = name.strip()
+                                result[name] = f'{name}{op}{version.strip()}'
+                                break
+                    else:
+                        name = dep.strip()
+                        result[name] = name
+
+            # Get optional dependencies
+            if 'project' in pyproject and 'optional-dependencies' in pyproject['project']:
+                for group in pyproject['project']['optional-dependencies'].values():
+                    for dep in group:
+                        if '>=' in dep or '<=' in dep or '==' in dep or '>' in dep or '<' in dep:
+                            # Find the first occurrence of any version operator
+                            for op in ['>=', '<=', '==', '>', '<']:
+                                if op in dep:
+                                    name, version = dep.split(op, 1)
+                                    name = name.strip()
+                                    result[name] = f'{name}{op}{version.strip()}'
+                                    break
+                        else:
+                            name = dep.strip()
+                            result[name] = name
+
+            # Cache the dependencies
+            cls._dependencies = result
+            return cls._dependencies
+
+        except Exception as e:
+            logger.debug(f'Failed to read dependencies from pyproject.toml: {str(e)}')
+            cls._dependencies = {}
+            return cls._dependencies
 
     @classmethod
     def check_packages(cls, package_specs, pip_args=None):
@@ -52,17 +134,12 @@ class LazyLoader(types.ModuleType):
                 try:
                     cls._install_package(package_spec, pip_args)
                 except subprocess.CalledProcessError as e:
-                    raise ImportError(
-                        f'Failed to install {package_spec}. This package may '
-                        f'require system-level dependencies. Please try '
-                        f'installing it manually with: pip install {package_spec}\n'
-                        f'Error details: {str(e)}')
+                    raise ImportError(f'Failed to install {package_spec}. This package may '
+                                      f'require system-level dependencies. Please try '
+                                      f'installing it manually with: pip install {package_spec}\n'
+                                      f'Error details: {str(e)}')
 
-    def __init__(self,
-                 module_name: str,
-                 package_name: str = None,
-                 package_url: str = None,
-                 auto_install: bool = True):
+    def __init__(self, module_name: str, package_name: str = None, package_url: str = None, auto_install: bool = True):
         """
         Initialize the LazyLoader.
 
@@ -95,14 +172,12 @@ class LazyLoader(types.ModuleType):
         self._module = None
 
         # Print trace information
-        logger.debug(
-            f'Initialized LazyLoader for module: {module_name} '
-            f'(package: {self._package_name}' +
-            (f', url: {self._package_url}' if self._package_url else '') + ')')
+        logger.debug(f'Initialized LazyLoader for module: {module_name} '
+                     f'(package: {self._package_name}' + (f', url: {self._package_url}' if self._package_url else '') +
+                     ')')
         # Get last 3 frames of the stack trace
         stack = traceback.extract_stack(frame)[-3:]
-        logger.debug('LazyLoader called from:\n' +
-                     ''.join(traceback.format_list(stack)))
+        logger.debug('LazyLoader called from:\n' + ''.join(traceback.format_list(stack)))
 
         super(LazyLoader, self).__init__(module_name)
 
@@ -113,8 +188,7 @@ class LazyLoader(types.ModuleType):
         logger.debug(f'Installing package: {package_spec}')
         # Get last 3 frames of the stack trace
         stack = traceback.extract_stack()[-3:]
-        logger.debug('Package installation triggered from:\n' +
-                     ''.join(traceback.format_list(stack)))
+        logger.debug('Package installation triggered from:\n' + ''.join(traceback.format_list(stack)))
 
         # Convert pip_args to list if it's a string
         if isinstance(pip_args, str):
@@ -142,24 +216,16 @@ class LazyLoader(types.ModuleType):
                 # Check for requirements.txt and install dependencies first
                 requirements_path = os.path.join(temp_dir, 'requirements.txt')
                 if os.path.exists(requirements_path):
-                    logger.info(
-                        'Installing requirements from requirements.txt...')
+                    logger.info('Installing requirements from requirements.txt...')
                     try:
                         # Try uv first
-                        cmd = [
-                            sys.executable, '-m', 'uv', 'pip', 'install', '-r',
-                            requirements_path
-                        ]
+                        cmd = [sys.executable, '-m', 'uv', 'pip', 'install', '-r', requirements_path]
                         if pip_args:
                             cmd.extend(pip_args)
                         subprocess.check_call(cmd)
                     except (subprocess.CalledProcessError, FileNotFoundError):
-                        logger.warning(
-                            'uv not found or failed, falling back to pip...')
-                        cmd = [
-                            sys.executable, '-m', 'pip', 'install', '-r',
-                            requirements_path
-                        ]
+                        logger.warning('uv not found or failed, falling back to pip...')
+                        cmd = [sys.executable, '-m', 'pip', 'install', '-r', requirements_path]
                         if pip_args:
                             cmd.extend(pip_args)
                         subprocess.check_call(cmd)
@@ -167,19 +233,13 @@ class LazyLoader(types.ModuleType):
                 # Install the package in editable mode
                 try:
                     logger.info('Installing package in editable mode...')
-                    cmd = [
-                        sys.executable, '-m', 'uv', 'pip', 'install', '-e',
-                        temp_dir
-                    ]
+                    cmd = [sys.executable, '-m', 'uv', 'pip', 'install', '-e', temp_dir]
                     if pip_args:
                         cmd.extend(pip_args)
                     subprocess.check_call(cmd)
                 except (subprocess.CalledProcessError, FileNotFoundError):
-                    logger.warning(
-                        'uv not found or failed, falling back to pip...')
-                    cmd = [
-                        sys.executable, '-m', 'pip', 'install', '-e', temp_dir
-                    ]
+                    logger.warning('uv not found or failed, falling back to pip...')
+                    cmd = [sys.executable, '-m', 'pip', 'install', '-e', temp_dir]
                     if pip_args:
                         cmd.extend(pip_args)
                     subprocess.check_call(cmd)
@@ -188,19 +248,32 @@ class LazyLoader(types.ModuleType):
                 # Clean up the temporary directory
                 shutil.rmtree(temp_dir)
         else:
+            # Get the full package spec from dependencies
+            deps = cls.get_all_dependencies()
+            package_name = package_spec.split('@')[0] if '@' in package_spec else package_spec
+            if '[' in package_name:
+                package_name = package_name.split('[')[0]
+            if '/' in package_name:  # Handle GitHub URLs
+                package_name = package_name.split('/')[-1].replace('.git', '')
+
+            # Use the version from dependencies if available and not a URL
+            if package_name in deps and not package_spec.startswith(('git+', 'https://')):
+                package_spec = deps[package_name]
+                logger.info(f'Using version from dependencies: {package_spec}')
+            else:
+                logger.warning(f'No version constraint found in pyproject.toml for {package_name}, '
+                               f'using original spec: {package_spec}')
+
             # For non-GitHub packages, use direct installation
             try:
                 logger.info(f'Installing {package_spec} using uv...')
-                cmd = [
-                    sys.executable, '-m', 'uv', 'pip', 'install', package_spec
-                ]
+                cmd = [sys.executable, '-m', 'uv', 'pip', 'install', package_spec]
                 if pip_args:
                     cmd.extend(pip_args)
                 subprocess.check_call(cmd)
                 return True
             except (subprocess.CalledProcessError, FileNotFoundError):
-                logger.warning(
-                    'uv not found or failed, falling back to pip...')
+                logger.warning('uv not found or failed, falling back to pip...')
                 cmd = [sys.executable, '-m', 'pip', 'install', package_spec]
                 if pip_args:
                     cmd.extend(pip_args)
@@ -228,20 +301,18 @@ class LazyLoader(types.ModuleType):
             try:
                 self._install_package(package_spec)
             except subprocess.CalledProcessError as e:
-                raise ImportError(
-                    f'Failed to install {package_spec}. This package may '
-                    f'require system-level dependencies. Please try '
-                    f'installing it manually with: pip install {package_spec}\n'
-                    f'Error details: {str(e)}')
+                raise ImportError(f'Failed to install {package_spec}. This package may '
+                                  f'require system-level dependencies. Please try '
+                                  f'installing it manually with: pip install {package_spec}\n'
+                                  f'Error details: {str(e)}')
 
             # Try importing again
             try:
                 self._module = importlib.import_module(self._module_name)
             except ImportError as import_error:
-                raise ImportError(
-                    f'Failed to import {self._module_name} after '
-                    f'installing {package_spec}. '
-                    f'Error details: {str(import_error)}')
+                raise ImportError(f'Failed to import {self._module_name} after '
+                                  f'installing {package_spec}. '
+                                  f'Error details: {str(import_error)}')
 
         # Update the parent module's globals with the loaded module
         self._parent_module_globals[self._module_name] = self._module
@@ -259,13 +330,11 @@ class LazyLoader(types.ModuleType):
         except AttributeError:
             # If not found, try importing it as a submodule
             try:
-                submodule = importlib.import_module(
-                    f'{self._module_name}.{item}')
+                submodule = importlib.import_module(f'{self._module_name}.{item}')
                 setattr(self._module, item, submodule)
                 return submodule
             except ImportError:
-                raise AttributeError(
-                    f"module '{self._module_name}' has no attribute '{item}'")
+                raise AttributeError(f"module '{self._module_name}' has no attribute '{item}'")
 
     def __dir__(self):
         if self._module is None:
