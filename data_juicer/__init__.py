@@ -26,13 +26,15 @@ def _cuda_device_count():
         return torch.cuda.device_count()
 
     try:
-        nvidia_smi_output = subprocess.check_output(['nvidia-smi', '-L'], text=True)
+        nvidia_smi_output = subprocess.check_output(['nvidia-smi', '-L'],
+                                                    text=True)
         all_devices = nvidia_smi_output.strip().split('\n')
 
         cuda_visible_devices = os.getenv('CUDA_VISIBLE_DEVICES')
         if cuda_visible_devices is not None:
-            logger.warning('CUDA_VISIBLE_DEVICES is ignored when torch is unavailable. '
-                           'All detected GPUs will be used.')
+            logger.warning(
+                'CUDA_VISIBLE_DEVICES is ignored when torch is unavailable. '
+                'All detected GPUs will be used.')
 
         return len(all_devices)
     except Exception:
