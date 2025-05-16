@@ -54,7 +54,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 - [2024-08-09] 我们提出了Img-Diff，它通过*对比数据合成*来增强多模态大型语言模型的性能，在[MMVP benchmark](https://tsb0601.github.io/mmvp_blog/)中比GPT-4V高出12个点。 更多细节请参阅我们的 [论文](https://arxiv.org/abs/2408.04594), 以及从 [huggingface](https://huggingface.co/datasets/datajuicer/Img-Diff) 和 [modelscope](https://modelscope.cn/datasets/Data-Juicer/Img-Diff)下载这份数据集。
 - [2024-07-24] “天池 Better Synth 多模态大模型数据合成赛”——第四届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532251)，了解赛事详情。
-- [2024-07-17] 我们利用Data-Juicer[沙盒实验室套件](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox-ZH.md)，通过数据与模型间的系统性研发工作流，调优数据和模型，在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。相关成果已经整理发表在[论文](http://arxiv.org/abs/2407.11784)中，并且模型已在[ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V)和[HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V)平台发布。
+- [2024-07-17] 我们利用Data-Juicer[沙盒实验室套件](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox_ZH.md)，通过数据与模型间的系统性研发工作流，调优数据和模型，在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。相关成果已经整理发表在[论文](http://arxiv.org/abs/2407.11784)中，并且模型已在[ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V)和[HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V)平台发布。
 - [2024-07-12] 我们的MLLM-Data精选列表已经演化为一个模型-数据协同开发的角度系统性[综述](https://arxiv.org/abs/2407.08583)。欢迎[浏览](docs/awesome_llm_data.md)或参与贡献!
 - [2024-06-01] ModelScope-Sora“数据导演”创意竞速——第三届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532219)，了解赛事详情。
 - [2024-03-07] 我们现在发布了 **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)**! 在这个新版本中，我们支持了更多的 **多模态数据(包括视频)** 相关特性。我们还启动了 **[DJ-SORA](docs/DJ_SORA_ZH.md)** ，为SORA-like大模型构建开放的大规模高质量数据集！
@@ -118,7 +118,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 - **高效、稳定**：提供性能优化的[并行数据处理能力](docs/Distributed_ZH.md)（Aliyun-PAI\Ray\CUDA\OP Fusion），
 更快、更少资源消耗，基于大规模生产环境打磨。
 
-- **效果验证、沙盒**：支持数据模型协同开发，通过[沙盒实验室](docs/Sandbox-ZH.md)实现快速迭代，提供反馈循环、可视化等功能，让您更好地理解和改进数据和模型。已经有许多基于 DJ 衍生的数据菜谱和模型经过了效用验证，譬如在预训练、文生视频、图文生成等场景。
+- **效果验证、沙盒**：支持数据模型协同开发，通过[沙盒实验室](docs/Sandbox_ZH.md)实现快速迭代，提供反馈循环、可视化等功能，让您更好地理解和改进数据和模型。已经有许多基于 DJ 衍生的数据菜谱和模型经过了效用验证，譬如在预训练、文生视频、图文生成等场景。
 ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
 ## DJ-Cookbook
@@ -140,8 +140,8 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
   - [开发者指南](docs/DeveloperGuide_ZH.md)
   - [预处理工具](tools/preprocess/README_ZH.md)
   - [后处理工具](tools/postprocess/README_ZH.md)
-  - [沙盒](docs/Sandbox-ZH.md)
-  - [API服务化](docs/DJ_service_ZH.md))
+  - [沙盒](docs/Sandbox_ZH.md)
+  - [API服务化](docs/DJ_service_ZH.md)
   - [给数据打分](tools/quality_classifier/README_ZH.md)
   - [自动评估](tools/evaluator/README_ZH.md)
   - [第三方集成](thirdparty/LLM_ecosystems/README_ZH.md)
@@ -251,8 +251,8 @@ pip install py-data-juicer
 
 * **注意**：
   * 使用这种方法安装时，只有`data_juicer`中的基础的 API 和2个基础工具
-    （数据[处理](#数据处理)与[分析](#数据分析)）可以使用。如需更定制化地使用完整功能，建议[从源码进行安装](#从源码安装)。
-  * pypi 的发布版本较源码的最新版本有一定的滞后性，如需要随时跟进 `data_juicer` 的最新功能支持，建议[从源码进行安装](#从源码安装)。
+    （数据[处理](#数据处理)与[分析](#数据分析)）可以使用。如需更定制化地使用完整功能，建议[从源码进行安装](#从源码安装 (指定使用场景))。
+  * pypi 的发布版本较源码的最新版本有一定的滞后性，如需要随时跟进 `data_juicer` 的最新功能支持，建议[从源码进行安装](#从源码安装 (指定使用场景))。
 
 ### 使用 Docker 安装
 
@@ -429,7 +429,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 - 用户在沙盒中可以基于一些小规模数据集、模型对数据菜谱进行快速实验、迭代、优化，再迁移到更大尺度上，大规模生产高质量数据以服务大模型。
 - 用户在沙盒中，除了Data-Juicer基础的数据优化与数据菜谱微调功能外，还可以便捷地使用数据洞察与分析、沙盒模型训练与评测、基于数据和模型反馈优化数据菜谱等可配置组件，共同组成完整的一站式数据-模型研发流水线。
 
-沙盒默认通过如下命令运行，更多介绍和细节请参阅[沙盒文档](docs/Sandbox-ZH.md).
+沙盒默认通过如下命令运行，更多介绍和细节请参阅[沙盒文档](docs/Sandbox_ZH.md).
 ```shell
 python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 ```

@@ -1,5 +1,6 @@
-# 用户指南
-## 应用和成果
+# 沙盒
+## 用户指南
+### 应用和成果
 我们利用Data-Juicer沙盒实验室套件，通过数据与模型间的系统性研发工作流，调优数据和模型，相关工作请参考[论文](http://arxiv.org/abs/2407.11784)。在本工作中，我们在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。
 ![top-1_in_vbench](https://img.alicdn.com/imgextra/i1/O1CN01I9wHW91UNnX9wtCWu_!!6000000002506-2-tps-1275-668.png)
 
@@ -25,12 +26,12 @@ Data-Juicer (DJ, 228k)模型输出样例如下表所示。
 复现论文实验请参考下面的sandbox使用指南，下图的实验流程，[初始数据集](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip)，以及该流程的工作流的配置文件demo：[1_single_op_pipeline.yaml](../configs/demo/bench/1_single_op_pipeline.yaml)、[2_multi_op_pipeline.yaml](../configs/demo/bench/2_multi_op_pipeline.yaml)、[3_duplicate_pipeline.yaml](../configs/demo/bench/3_duplicate_pipeline.yaml)。
 ![bench_bottom_up](https://img.alicdn.com/imgextra/i2/O1CN01xvu2fo1HU80biR6Q5_!!6000000000760-2-tps-7756-3693.png)
 
-## 什么是沙盒实验室（DJ-Sandbox）？
+### 什么是沙盒实验室（DJ-Sandbox）？
 在Data-Juicer中，数据沙盒实验室为用户提供了持续生产数据菜谱的最佳实践，其具有低开销、可迁移、有指导性等特点，用户在沙盒中基于一些小规模数据集、模型对数据菜谱进行快速实验、迭代、优化，再迁移到更大尺度上，大规模生产高质量数据以服务大模型。
 
 用户在沙盒中，除了Data-Juicer基础的数据优化与数据菜谱微调功能外，还可以便捷地使用数据洞察与分析、沙盒模型训练与评测、基于数据和模型反馈优化数据菜谱等可配置组件，共同组成完整的一站式数据-模型研发流水线。
-## 快速上手
-### 依赖准备
+### 快速上手
+#### 依赖准备
 在使用沙盒实验室前，你可能需要使用如下命令安装沙盒相关的第三方依赖：
 ```shell
 pip install -v -e .[sandbox]
@@ -54,7 +55,7 @@ pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7
 ```
 因此如果使用沙盒过程中，这些第三方依赖抛出了一些"未找到模块（Module-Not-Found）"的报错时，用户需要先检查这些库的文档以寻求帮助。
 
-### 准备沙盒配置文件
+#### 准备沙盒配置文件
 沙河实验总共会依次执行四类任务：数据/模型洞察（`probe_job_configs`）、基于洞察结果的数据菜谱微调迭代（`refine_recipe_job_configs`）、数据处理与模型训练（`execution_job_configs`）和数据/模型评估（`evaluation_job_configs`）。每类任务中，任务按照配置的任务列表依次执行。每个任务需要指定：挂载这个任务的钩子（`hook`），记录中间结果的标记名(`meta_name`)，Data-Juicer数据处理参数（`dj_configs`），以及该任务其他的特定参数（`extra_configs`）。这些参数中`hook`是必须指定的，其他允许置空。`dj_configs`可以参考完整的Data-Juicer数据处理参数 [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml)。`extra_configs`为任务特定的参数，没有限定，可以是模型训练、推理、评测等参数，比如用`path_k_sigma_recipe`指定利用k-sigma方法微调后的数据菜谱保存路径。一个sandbox的配置文件示例可参考`configs/demo/sandbox/sandbox.yaml`：
 ```yaml
 # Sandbox config example
@@ -112,7 +113,7 @@ evaluation_job_configs:
 
 6. 用打分器给筛选后的数据打分。
 
-### 运行沙盒
+#### 运行沙盒
 沙盒的运行入口为`tools/sandbox_starter.py`，使用方法和数据处理与分析工具类似，需要指定沙盒配置文件：
 ```yaml
 python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
@@ -127,7 +128,7 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 如此便完成了一轮沙盒流水线运行，最终用户只需比较数据菜谱微调以及数据集处理前后的洞察结果和评估结果，即可验证该轮实验对于数据生产的有效性。
 
 如果在配置文件里设置了`hpo_config`，并在其中配置了合适的优化目标以及待优化的算子超参，则沙盒会以HPO的形式进行多轮的流水线运行，并自动进行算子超参的多轮迭代微调优化。该配置文件的准备可参考 [hpo工具](https://github.com/modelscope/data-juicer/tree/main/tools/hpo) 。
-## 组件工厂
+### 组件工厂
 在沙盒流水线的单次运行中，包括了四个大的步骤，其中涉及到如下一些可配置组件，他们分别对应了一个用于初始化这些组件的工厂类：
 
 - **数据处理（DataExecutor）**：数据处理的执行器，即Data-Juicer的executor
@@ -185,17 +186,17 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
    - TBD
 
 详细定义可参考`data_juicer/core/sandbox/factories.py`。
-# 开发者指南
+## 开发者指南
 正如上一章节所说，开发者可开发更多的可配置组件并将它们添加到对应的工厂类中，并用参数`type`进行实例化方法分配。实现了组件后，开发者可以将它们封装为钩子，并将钩子注册到工作列表中，工作列表在流水线中进行编排后，沙盒流水线执行时，会依次在每个步骤执行每个工作列表中的工作。这其中的每一个部分：组件、组件工厂、钩子、工作列表、流水线注册与执行流程编排，都可以由开发者自定义。各个部分的关系由下图示意。
 ![sandbox-pipeline](https://img.alicdn.com/imgextra/i3/O1CN01ERmGre1uz3luKOn4n_!!6000000006107-2-tps-4655-1918.png)
 
-## 组件内部实现
+### 组件内部实现
 目前组件主要分为两个大类：
 
 - **执行器（Executor）**：由于数据执行器已经由Data-Juicer的Executor承担，因此此处的执行器特指模型的执行器，包括模型训练、推理、评估等执行器。代码位于`data_juicer/core/sandbox/model_executors.py`
 - **评估器（Evaluator）**：用于对数据集或者模型进行质量以及性能的评估。代码位于`data_juicer/core/sandbox/evaluators.py`
 
-### 执行器
+#### 执行器
 模型执行器核心功能为对配置文件中指定的模型用指定的数据集进行训练、推理或评测。模型执行器需继承`BaseModelExecutor`并实现若干核心方法：
 
 - 模型执行器的具体行为（训练、推理、评测等）需要在`_run`方法中进行定义
@@ -206,14 +207,14 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 - `_run`方法：读入数据集后，根据模型训练配置开始进行模型训练，训练结束后向标准输出流（已重定向到指定的日志文件）输出一个预定义的任务执行结束标识符
 - `watch_run`方法：监控指定的日志文件，逐行读取，并调用根据模型训练框架自定义的`_watch_run`方法解析最新的日志内容行，提取关键指标并进行监测，直到读取到预定义的任务结束标识符
-### 评估器
+#### 评估器
 评估器核心功能为对待评估对象使用某种方法进行质量、性能等维度的评估，并最终返回一个评估结果，通常为数值型结果。评估器需继承基类`BaseEvaluator`并实现`run`方法。`run`方法默认接受两个必要参数：
 
 - `eval_type`：评估类型，用于在某种评估器内部进行评估类型选择
 - `eval_obj`：待评估的对象
 
 用户也可根据自己的实现方式对这两个参数进行扩展使用。
-## 流水线钩子
+### 流水线钩子
 正如章节开始部分所说，在流水线中，我们需要实现若干钩子将组件与流水线执行步骤通过工作列表连接起来。被激活的钩子会在流水线的工作列表中进行注册，然后在流水线执行时依次对各个步骤工作列表中的钩子执行。四个步骤对应的工作列表分别如下：
 
 1. **数据/模型洞察**：洞察工作列表 -- probe_jobs
@@ -237,10 +238,10 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 值得注意的是，一个钩子可以在多个工作列表进行注册，因为这个钩子在不同的流水线阶段可以扮演不同的角色，比如我们可以对处理前后的数据集都进行分析，以比较数据集处理前后的质量、多样性等维度的变化情况。
 
-## 自定义沙盒流水线
+### 自定义沙盒流水线
 用户直接在参数配置文件中修改任务配置列表即可实现任务修改和编排。
 
-## 监测器
+### 监测器
 在上述章节中，反复提到“监测”这个概念。流水线会对各个步骤中产生的若干指标都进行监测，这些监测过程都依靠沙盒监测器`SandboxWatcher`实现的。
 
 `SandboxWatcher`基于wandb实现，主要包括4个方法：

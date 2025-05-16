@@ -263,9 +263,9 @@ pip install py-data-juicer
 - **Note**:
   - only the basic APIs in `data_juicer` and two basic tools
     (data [processing](#data-processing) and [analysis](#data-analysis)) are available in this way. If you want customizable
-    and complete functions, we recommend you install `data_juicer` [from source](#from-source).
+    and complete functions, we recommend you install `data_juicer` [from source](#from-Source-for-specific-scenarios).
   - The release versions from pypi have a certain lag compared to the latest version from source.
-    So if you want to follow the latest functions of `data_juicer`, we recommend you install [from source](#from-source).
+    So if you want to follow the latest functions of `data_juicer`, we recommend you install [from source](#from-Source-for-specific-scenarios).
 
 ### Using Docker
 
