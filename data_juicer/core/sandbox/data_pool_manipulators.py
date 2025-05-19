@@ -4,6 +4,7 @@ from typing import get_args, get_origin
 
 import jsonlines as jl
 import numpy as np
+from datasets import concatenate_datasets
 from jsonargparse import dict_to_namespace
 from loguru import logger
 
@@ -41,6 +42,28 @@ def get_longest_common_prefix(list_of_strings):
     return res
 
 
+def check_io_paths(input_paths, export_path):
+    if isinstance(input_paths, str):
+        input_paths = [input_paths]
+    existing_input_paths = []
+    missing_paths = []
+    for p in input_paths:
+        if not os.path.exists(p):
+            missing_paths.append(p)
+        else:
+            existing_input_paths.append(p)
+    if len(missing_paths) > 0:
+        logger.error(
+            f'Input paths [{",".join(missing_paths)}] does not exist. Skipped!'
+        )
+    if len(existing_input_paths) == 0:
+        return None
+    if export_path is None:
+        raise ValueError('export_path is not specified.')
+    os.makedirs(export_path, exist_ok=True)
+    return existing_input_paths, export_path
+
+
 class BaseDataPoolManipulator(object):
 
     def __init__(self, data_pool_cfg: dict):
@@ -48,6 +71,7 @@ class BaseDataPoolManipulator(object):
 
     @staticmethod
     def _load_ds(ds_path):
+        """Load dataset. Can only return NestedDataset."""
         db = DatasetBuilder(dict_to_namespace({'dataset_path': ds_path}))
         ds = db.load_dataset()
         return ds
@@ -79,30 +103,19 @@ class DataPoolConstruction(BaseDataPoolManipulator):
                                               [1.0 / 3.0, 2.0 / 3.0])
 
         # check I/O paths
-        if isinstance(input_dataset_paths, str):
-            input_dataset_paths = [input_dataset_paths]
-        existing_input_paths = []
-        missing_paths = []
-        for p in input_dataset_paths:
-            if not os.path.exists(p):
-                missing_paths.append(p)
-            else:
-                existing_input_paths.append(p)
-        if len(missing_paths) > 0:
-            logger.error(
-                f'Input dataset paths [{",".join(missing_paths)}] does not exist. Skipped!'
-            )
-        if len(existing_input_paths) == 0:
-            return None
-        if export_path is None:
-            raise ValueError('export_path is not specified.')
-        os.makedirs(export_path, exist_ok=True)
+        existing_input_paths, output_path = check_io_paths(
+            input_dataset_paths, export_path)
+        # check split ratios, should be in (0, 1)
+        if any([r <= 0 or r >= 1 for r in split_ratios]):
+            raise ValueError('split_ratios should be in (0, 1).')
 
         # start to construct the data pools
+        output_paths = []
         for ds_path in existing_input_paths:
-            self._construct_data_pool(ds_path, export_path, split_ratios)
+            output_paths.extend(
+                self._construct_data_pool(ds_path, export_path, split_ratios))
 
-        return export_path
+        return output_paths
 
     def _construct_data_pool(self, ds_path, export_path, split_ratios):
         logger.info(f'Constructing data pool for {ds_path}...')
@@ -131,6 +144,7 @@ class DataPoolConstruction(BaseDataPoolManipulator):
             logger.warning(
                 f'Dataset {ds_path} does not contain stats. Skipped!')
             return
+        output_paths = []
         for stats_key in stats_keys:
             logger.info(f'Splitting data pools for stats key {stats_key}...')
             # 1. sort by this key
@@ -165,9 +179,11 @@ class DataPoolConstruction(BaseDataPoolManipulator):
                 part_ds = ds[start_idx:end_idx]
                 curr_export_name = add_suffix_to_filename(
                     ds_basename, f'_{i}.jsonl')
-                with jl.open(os.path.join(stored_dir, curr_export_name),
-                             'w') as writer:
+                output_path = os.path.join(stored_dir, curr_export_name)
+                with jl.open(output_path, 'w') as writer:
                     writer.write_all(part_ds)
+                output_paths.append(output_path)
+        return output_paths
 
 
 class DataPoolCombination(BaseDataPoolManipulator):
@@ -182,32 +198,16 @@ class DataPoolCombination(BaseDataPoolManipulator):
             are named following the rule "<longest_common_prefix>_top_<combined_ranks>_num_<num_samples>.jsonl"
         """
         # read inputs
-        ordered_data_pool_paths = self.data_pool_cfg.get('data_pool_paths', [])
+        ordered_data_pool_paths = self.data_pool_cfg.get('dataset_paths', [])
         export_path = self.data_pool_cfg.get('export_path', None)
 
         # check I/O paths
-        if isinstance(ordered_data_pool_paths, str):
-            ordered_data_pool_paths = [ordered_data_pool_paths]
-        existing_input_paths = []
-        missing_paths = []
-        for p in ordered_data_pool_paths:
-            if not os.path.exists(p):
-                missing_paths.append(p)
-            else:
-                existing_input_paths.append(p)
-        if len(missing_paths) > 0:
-            logger.error(
-                f'Input data pool paths [{",".join(missing_paths)}] does not exist. Skipped!'
-            )
-        if len(existing_input_paths) == 0:
-            return None
-        if export_path is None:
-            raise ValueError('export_path is not specified.')
-        os.makedirs(export_path, exist_ok=True)
+        existing_input_paths, output_path = check_io_paths(
+            ordered_data_pool_paths, export_path)
 
         # start to combine these data pools
         combined_hierarchies, dataset_records = self._combine_data_pools(
-            existing_input_paths, export_path)
+            existing_input_paths)
         # print hierarchies:
         # [
         #   [('0_1_2', num_samples)],
@@ -227,17 +227,19 @@ class DataPoolCombination(BaseDataPoolManipulator):
             os.path.splitext(os.path.basename(p))[0]
             for p in existing_input_paths
         ])
+        output_paths = []
         output_path_pattern = os.path.join(
             export_path, f'{longest_common_prefix}_top_%s_num_%d.jsonl')
         for pools in combined_hierarchies:
             for cur_rank, pool in pools:
                 output_ds = [dataset_records[key] for key in pool]
-                with jl.open(output_path_pattern % (cur_rank, len(pool)),
-                             'w') as writer:
+                output_path = output_path_pattern % (cur_rank, len(pool))
+                with jl.open(output_path, 'w') as writer:
                     writer.write_all(output_ds)
-        return export_path
+                output_paths.append(output_path)
+        return output_paths
 
-    def _combine_data_pools(self, ordered_data_pool_paths, export_path):
+    def _combine_data_pools(self, ordered_data_pool_paths):
         curr_rank = 0
         dataset_records = {}
         hierarchies = []
@@ -285,10 +287,50 @@ class DataPoolDuplication(BaseDataPoolManipulator):
         Input:
             - N specified data pools.
             - a list of duplicating times. E.g. [2, 4, 8]
+            - whether to shuffle the duplicated dataset.
         Output: NxM new duplicated data pools, where M means the length of the times list. They are named following the
             rule "<original_name>_x<times>.jsonl"
         """
-        raise NotImplementedError
+        # read inputs
+        input_dataset_paths = self.data_pool_cfg.get('dataset_path', [])
+        export_path = self.data_pool_cfg.get('export_path', None)
+        dup_times = self.data_pool_cfg.get('duplicating_times', [])
+        shuffle = self.data_pool_cfg.get('shuffle', False)
+        seed = self.data_pool_cfg.get('shuffle_seed', 42)
+
+        # check I/O paths
+        existing_input_paths, output_path = check_io_paths(
+            input_dataset_paths, export_path)
+        # check duplicating times, should be int >= 1
+        if any([not isinstance(r, int) or r <= 0 for r in dup_times]):
+            raise ValueError('duplicating_times should be integers >= 1.')
+
+        output_paths = []
+        for input_dataset in input_dataset_paths:
+            output_paths.extend(
+                self._duplicate_dataset(input_dataset, output_path, dup_times,
+                                        shuffle, seed))
+        return output_paths
+
+    def _duplicate_dataset(self,
+                           dataset_path,
+                           export_path,
+                           dup_times,
+                           shuffle=False,
+                           seed=42):
+        logger.info(f'Duplicating dataset for {dataset_path}...')
+        ds_basename = os.path.splitext(os.path.basename(dataset_path))[0]
+        ds = self._load_ds(dataset_path)
+        output_paths = []
+        for t in dup_times:
+            res_ds = concatenate_datasets([ds] * t)
+            if shuffle:
+                res_ds = res_ds.shuffle(seed=seed).flatten_indices()
+            output_path = os.path.join(export_path,
+                                       f'{ds_basename}_x{t}.jsonl')
+            res_ds.to_json(output_path)
+            output_paths.append(output_path)
+        return output_paths
 
 
 class DataPoolRanking(BaseDataPoolManipulator):
@@ -298,7 +340,8 @@ class DataPoolRanking(BaseDataPoolManipulator):
         rank data pools according to specified evaluation metrics.
 
         Input:
-            - N specified data pools with their evaluated metrics.
+            - N specified data pools
+            - The evaluated metrics of these N data pools.
             - (optional) Some ranking methods or rules. Ranked in descending order in default.
         Output: A ordered list of data pool paths according to their evaluated metrics.
         """
