@@ -9,6 +9,7 @@ from jsonargparse import dict_to_namespace
 from loguru import logger
 
 from data_juicer.core.data.dataset_builder import DatasetBuilder
+from data_juicer.core.data.dj_dataset import NestedQueryDict
 from data_juicer.core.data.schema import Schema
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import add_suffix_to_filename
@@ -57,7 +58,7 @@ def check_io_paths(input_paths, export_path):
             f'Input paths [{",".join(missing_paths)}] does not exist. Skipped!'
         )
     if len(existing_input_paths) == 0:
-        return None
+        return None, None
     if export_path is None:
         raise ValueError('export_path is not specified.')
     os.makedirs(export_path, exist_ok=True)
@@ -341,11 +342,55 @@ class DataPoolRanking(BaseDataPoolManipulator):
 
         Input:
             - N specified data pools
-            - The evaluated metrics of these N data pools.
-            - (optional) Some ranking methods or rules. Ranked in descending order in default.
+            - The evaluated metrics of these N data pools in dict with data paths as keys.
+            - Keys in the metrics to rank the data pools. Support '.' operator to get a nested key. Use the whole metric
+                obj in default.
+            - whether to sort in descending. It's True in default
         Output: A ordered list of data pool paths according to their evaluated metrics.
         """
-        raise NotImplementedError
+        input_dataset_paths = self.data_pool_cfg.get('dataset_path', [])
+        metrics = self.data_pool_cfg.get('metrics', {})
+        ranking_keys = self.data_pool_cfg.get('ranking_keys', [])
+        descending = self.data_pool_cfg.get('descending', True)
+
+        # check input paths and metrics
+        if not isinstance(input_dataset_paths, list) or not isinstance(
+                metrics, list) or len(input_dataset_paths) != len(metrics):
+            raise ValueError(
+                'dataset_path and metrics should be lists of the same length.')
+
+        # check ranking keys
+        metrics = NestedQueryDict(metrics)
+        existing_keys = []
+        missing_keys = []
+        for key in ranking_keys:
+            if metrics[key] is not None:
+                existing_keys.append(key)
+            else:
+                missing_keys.append(key)
+        if len(missing_keys) > 0:
+            logger.error(
+                f'Ranking keys [{",".join(missing_keys)}] does not exist. Skipped!'
+            )
+
+        def _key_func(zipped_metric):
+            return (zipped_metric[1][k] for k in existing_keys)
+
+        def _default_key_func(zipped_metric):
+            return zipped_metric[1]
+
+        if len(existing_keys) <= 0:
+            selected_key_func = _default_key_func
+        else:
+            selected_key_func = _key_func
+
+        # sort by metrics
+        ranked_paths = [
+            zipped[0] for zipped in sorted(zip(input_dataset_paths, metrics),
+                                           key=selected_key_func,
+                                           reverse=descending)
+        ]
+        return ranked_paths
 
 
 class DataPoolDownsampling(BaseDataPoolManipulator):
