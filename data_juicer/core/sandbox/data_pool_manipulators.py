@@ -9,7 +9,7 @@ from jsonargparse import dict_to_namespace
 from loguru import logger
 
 from data_juicer.core.data.dataset_builder import DatasetBuilder
-from data_juicer.core.data.dj_dataset import NestedQueryDict
+from data_juicer.core.data.dj_dataset import NestedDataset, NestedQueryDict
 from data_juicer.core.data.schema import Schema
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import add_suffix_to_filename
@@ -71,7 +71,7 @@ class BaseDataPoolManipulator(object):
         self.data_pool_cfg = data_pool_cfg
 
     @staticmethod
-    def _load_ds(ds_path):
+    def _load_ds(ds_path) -> NestedDataset:
         """Load dataset. Can only return NestedDataset."""
         db = DatasetBuilder(dict_to_namespace({'dataset_path': ds_path}))
         ds = db.load_dataset()
@@ -104,7 +104,7 @@ class DataPoolConstruction(BaseDataPoolManipulator):
                                               [1.0 / 3.0, 2.0 / 3.0])
 
         # check I/O paths
-        existing_input_paths, output_path = check_io_paths(
+        existing_input_paths, export_path = check_io_paths(
             input_dataset_paths, export_path)
         # check split ratios, should be in (0, 1)
         if any([r <= 0 or r >= 1 for r in split_ratios]):
@@ -300,7 +300,7 @@ class DataPoolDuplication(BaseDataPoolManipulator):
         seed = self.data_pool_cfg.get('shuffle_seed', 42)
 
         # check I/O paths
-        existing_input_paths, output_path = check_io_paths(
+        existing_input_paths, export_path = check_io_paths(
             input_dataset_paths, export_path)
         # check duplicating times, should be int >= 1
         if any([not isinstance(r, int) or r <= 0 for r in dup_times]):
@@ -309,7 +309,7 @@ class DataPoolDuplication(BaseDataPoolManipulator):
         output_paths = []
         for input_dataset in input_dataset_paths:
             output_paths.extend(
-                self._duplicate_dataset(input_dataset, output_path, dup_times,
+                self._duplicate_dataset(input_dataset, export_path, dup_times,
                                         shuffle, seed))
         return output_paths
 
@@ -343,9 +343,9 @@ class DataPoolRanking(BaseDataPoolManipulator):
         Input:
             - N specified data pools
             - The evaluated metrics of these N data pools in dict with data paths as keys.
-            - Keys in the metrics to rank the data pools. Support '.' operator to get a nested key. Use the whole metric
-                obj in default.
-            - whether to sort in descending. It's True in default
+            - (optional) Keys in the metrics to rank the data pools. Support '.' operator to get a nested key. Use the
+                whole metric obj in default.
+            - (optional) whether to sort in descending. It's True in default
         Output: A ordered list of data pool paths according to their evaluated metrics.
         """
         input_dataset_paths = self.data_pool_cfg.get('dataset_path', [])
@@ -377,7 +377,7 @@ class DataPoolRanking(BaseDataPoolManipulator):
         def _key_func(zipped_metric):
             return (zipped_metric[1][k] for k in existing_keys)
 
-        # default key func that use the whole metric obj to rank
+        # default key func that uses the whole metric obj to rank
         def _default_key_func(zipped_metric):
             return zipped_metric[1]
 
@@ -399,11 +399,39 @@ class DataPoolDownsampling(BaseDataPoolManipulator):
 
     def run(self):
         """
-        downsample data pools to specified scale.
+        Randomly downsample data pools to specified scale.
 
         Input:
             - N specified data pools.
             - (optional) the target number of samples. It's decided by the smallest data pool in default.
+            - (optional) seed for randomness.
         Output: N downsampled data pools. They are named following the rule "<original_name>_<num_sample>.jsonl"
         """
-        raise NotImplementedError
+        # read inputs
+        input_dataset_paths = self.data_pool_cfg.get('dataset_path', [])
+        export_path = self.data_pool_cfg.get('export_path', None)
+        target_num = self.data_pool_cfg.get('target_num_samples', None)
+        seed = self.data_pool_cfg.get('shuffle_seed', 42)
+
+        # check I/O paths
+        existing_input_paths, export_path = check_io_paths(
+            input_dataset_paths, export_path)
+
+        # load all datasets
+        all_datasets = [self._load_ds(path) for path in existing_input_paths]
+        all_lengths = [len(ds) for ds in all_datasets]
+        if target_num is None:
+            target_num = min(all_lengths)
+
+        all_datasets = [
+            ds.shuffle(seed=seed).take(min(target_num, len(ds)))
+            for ds in all_datasets
+        ]
+        output_paths = []
+        for ds, path in zip(all_datasets, existing_input_paths):
+            ds_basename = os.path.splitext(os.path.basename(path))[0]
+            output_path = os.path.join(export_path,
+                                       f'{ds_basename}_{target_num}.jsonl')
+            ds.to_json(output_path)
+            output_paths.append(output_path)
+        return output_paths
