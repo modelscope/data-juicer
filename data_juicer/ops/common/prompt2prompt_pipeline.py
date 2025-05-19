@@ -1,11 +1,12 @@
 import abc
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
+import numpy as np
+
 from data_juicer.utils.lazy_loader import LazyLoader
 
 diffusers = LazyLoader('diffusers')
 torch = LazyLoader('torch')
-np = LazyLoader('numpy')
 
 
 # Copied from diffusers.pipelines.stable_diffusion.
