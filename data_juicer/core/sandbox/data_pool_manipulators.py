@@ -373,9 +373,11 @@ class DataPoolRanking(BaseDataPoolManipulator):
                 f'Ranking keys [{",".join(missing_keys)}] does not exist. Skipped!'
             )
 
+        # key func that extracts key info to rank
         def _key_func(zipped_metric):
             return (zipped_metric[1][k] for k in existing_keys)
 
+        # default key func that use the whole metric obj to rank
         def _default_key_func(zipped_metric):
             return zipped_metric[1]
 
