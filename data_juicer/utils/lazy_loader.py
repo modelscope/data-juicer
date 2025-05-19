@@ -207,7 +207,7 @@ class LazyLoader(types.ModuleType):
         if isinstance(pip_args, str):
             pip_args = [pip_args]
 
-        # For GitHub repositories, clone first then install locally
+        # For GitHub repositories, clone only to get dependencies
         if package_spec.startswith(('git+', 'https://github.com/')):
             import os
             import shutil
@@ -219,44 +219,101 @@ class LazyLoader(types.ModuleType):
             temp_dir = tempfile.mkdtemp()
             try:
                 # Clone the repository
-                logger.info(f'Cloning {package_spec}...')
+                logger.info(f'Cloning {package_spec} to get dependencies...')
                 if package_spec.startswith('git+'):
                     repo_url = package_spec[4:]  # Remove 'git+' prefix
                 else:
                     repo_url = package_spec
                 git.Repo.clone_from(repo_url, temp_dir)
 
-                # Check for requirements.txt and install dependencies first
-                requirements_path = os.path.join(temp_dir, 'requirements.txt')
-                if os.path.exists(requirements_path):
-                    logger.info(
-                        'Installing requirements from requirements.txt...')
-                    try:
-                        # Try uv first
-                        cmd = [
-                            sys.executable, '-m', 'uv', 'pip', 'install', '-r',
-                            requirements_path
-                        ]
-                        if pip_args:
-                            cmd.extend(pip_args)
-                        subprocess.check_call(cmd)
-                    except (subprocess.CalledProcessError, FileNotFoundError):
-                        logger.warning(
-                            'uv not found or failed, falling back to pip...')
-                        cmd = [
-                            sys.executable, '-m', 'pip', 'install', '-r',
-                            requirements_path
-                        ]
-                        if pip_args:
-                            cmd.extend(pip_args)
-                        subprocess.check_call(cmd)
+                # Define all possible dependency files
+                dep_files = {
+                    'requirements.txt':
+                    'Installing requirements from requirements.txt...',
+                    'pyproject.toml':
+                    'Installing dependencies from pyproject.toml...',
+                    'setup.py': 'Installing dependencies from setup.py...',
+                    'setup.cfg': 'Installing dependencies from setup.cfg...',
+                    'Pipfile': 'Installing dependencies from Pipfile...',
+                    'poetry.lock':
+                    'Installing dependencies from poetry.lock...'
+                }
 
-                # Install the package in editable mode
+                # Try to install dependencies from each file if it exists
+                for dep_file, log_msg in dep_files.items():
+                    dep_path = os.path.join(temp_dir, dep_file)
+                    if os.path.exists(dep_path):
+                        logger.info(log_msg)
+                        try:
+                            # Try uv first
+                            if dep_file in [
+                                    'pyproject.toml', 'setup.py', 'setup.cfg'
+                            ]:
+                                # For these files, install dependencies only
+                                cmd = [
+                                    sys.executable, '-m', 'uv', 'pip',
+                                    'install', temp_dir
+                                ]
+                            elif dep_file == 'Pipfile':
+                                # For Pipfile, use pipenv
+                                cmd = [
+                                    sys.executable, '-m', 'pipenv', 'install',
+                                    '--deploy', '--skip-lock'
+                                ]
+                            elif dep_file == 'poetry.lock':
+                                # For poetry.lock, use poetry
+                                cmd = [
+                                    sys.executable, '-m', 'poetry', 'install',
+                                    '--no-root', '--no-sync'
+                                ]
+                            else:
+                                # For requirements.txt, use standard pip install
+                                cmd = [
+                                    sys.executable, '-m', 'uv', 'pip',
+                                    'install', '-r', dep_path
+                                ]
+
+                            if pip_args:
+                                cmd.extend(pip_args)
+                            subprocess.check_call(cmd)
+                        except (subprocess.CalledProcessError,
+                                FileNotFoundError):
+                            logger.warning(
+                                'uv not found or failed, falling back to pip...'
+                            )
+                            if dep_file in [
+                                    'pyproject.toml', 'setup.py', 'setup.cfg'
+                            ]:
+                                cmd = [
+                                    sys.executable, '-m', 'pip', 'install',
+                                    temp_dir
+                                ]
+                            elif dep_file == 'Pipfile':
+                                cmd = [
+                                    sys.executable, '-m', 'pipenv', 'install',
+                                    '--deploy', '--skip-lock'
+                                ]
+                            elif dep_file == 'poetry.lock':
+                                cmd = [
+                                    sys.executable, '-m', 'poetry', 'install',
+                                    '--no-root', '--no-sync'
+                                ]
+                            else:
+                                cmd = [
+                                    sys.executable, '-m', 'pip', 'install',
+                                    '-r', dep_path
+                                ]
+                            if pip_args:
+                                cmd.extend(pip_args)
+                            subprocess.check_call(cmd)
+
+                # Install the package directly from remote
                 try:
-                    logger.info('Installing package in editable mode...')
+                    logger.info(
+                        f'Installing {package_spec} directly from remote...')
                     cmd = [
-                        sys.executable, '-m', 'uv', 'pip', 'install', '-e',
-                        temp_dir
+                        sys.executable, '-m', 'uv', 'pip', 'install',
+                        '--force-reinstall', package_spec
                     ]
                     if pip_args:
                         cmd.extend(pip_args)
@@ -265,7 +322,8 @@ class LazyLoader(types.ModuleType):
                     logger.warning(
                         'uv not found or failed, falling back to pip...')
                     cmd = [
-                        sys.executable, '-m', 'pip', 'install', '-e', temp_dir
+                        sys.executable, '-m', 'pip', 'install',
+                        '--force-reinstall', package_spec
                     ]
                     if pip_args:
                         cmd.extend(pip_args)
