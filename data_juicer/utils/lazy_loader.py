@@ -182,14 +182,14 @@ class LazyLoader(types.ModuleType):
         self._module = None
 
         # Print trace information
-        logger.debug(
-            f'Initialized LazyLoader for module: {module_name} '
-            f'(package: {self._package_name}' +
-            (f', url: {self._package_url}' if self._package_url else '') + ')')
-        # Get last 3 frames of the stack trace
-        stack = traceback.extract_stack(frame)[-3:]
-        logger.debug('LazyLoader called from:\n' +
-                     ''.join(traceback.format_list(stack)))
+        # logger.debug(
+        #     f'Initialized LazyLoader for module: {module_name} '
+        #     f'(package: {self._package_name}' +
+        #     (f', url: {self._package_url}' if self._package_url else '') + ')')
+        # # Get last 3 frames of the stack trace
+        # stack = traceback.extract_stack(frame)[-3:]
+        # logger.debug('LazyLoader called from:\n' +
+        #              ''.join(traceback.format_list(stack)))
 
         super(LazyLoader, self).__init__(module_name)
 
