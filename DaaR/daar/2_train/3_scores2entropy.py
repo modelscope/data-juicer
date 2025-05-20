@@ -53,7 +53,7 @@ def process_jsonl(input_file, output_file):
             outfile.write(json.dumps(entry, ensure_ascii=False) + '\n')
 
 if __name__ == "__main__":
-    input_file = '/home/daoyuan_dj/DaaR/daar/2_training/ce_res/qw25/infer_data_scores.jsonl'
-    output_file = '/home/daoyuan_dj/DaaR/daar/2_training/ce_res/qw25/infer_data_entropy.jsonl'
+    input_file = './daar/2_training/ce_res/qw25/infer_data_scores.jsonl'
+    output_file = './daar/2_training/ce_res/qw25/infer_data_entropy.jsonl'
     process_jsonl(input_file, output_file)
     print(f"Processed and saved results to {output_file}")

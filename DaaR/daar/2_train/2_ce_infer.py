@@ -52,7 +52,7 @@ parser.add_argument('--clip_layer', type=int, default=3, help='Layer to clip')
 parser.add_argument('--input_file', type=str, default="./daar/1_centroid/train_data/qw25/train_data.jsonl", help='Input JSONL file path')
 parser.add_argument('--output_file', type=str, default="./daar/2_training/ce_res/qw25/infer_data_scores.jsonl", help='Output JSONL file path')
 parser.add_argument('--use_first_token', action='store_true', help='Use the first token (similar to [CLS]) instead of the last token')
-parser.add_argument('--use_mean_token', action='store_true', help='Use mean pooling of all tokens instead of the last token')
+parser.add_argument('--use_mean_token', action='store_true', help='Use mean token of all tokens instead of the last token')
 args = parser.parse_args()
 
 # devices
@@ -79,6 +79,8 @@ for param in base_model.parameters():
 input_dim = base_model.config.hidden_size
 hidden_dim = 256
 output_dim = 4
+args.use_first_token = False
+args.use_mean_token = True
 
 # load MLP
 model = CustomClassifier(base_model, input_dim, hidden_dim, output_dim).to(device)

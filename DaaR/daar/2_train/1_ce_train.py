@@ -82,7 +82,7 @@ parser.add_argument('--eval_step', type=float, default=200, help='Eval step')
 parser.add_argument('--clip_layer', type=int, default=3, help='Layer to clip')
 parser.add_argument('--output_dir', type=str, default='./daar/2_training/ce_res/qw25', help='Output directory for results')
 parser.add_argument('--use_first_token', action='store_true', help='Use the first token (similar to [CLS]) instead of the last token')
-parser.add_argument('--use_mean_pooling', action='store_true', help='Use mean pooling of all tokens instead of the last token')
+parser.add_argument('--use_mean_token', action='store_true', help='Use mean token of all tokens instead of the last token')
 parser.add_argument('--model_path', type=str, default='./models/Qwen2.5-7B', help='Model path')
 parser.add_argument('--file_path', type=str, default='./daar/1_centroid/train_data/qw25/train_data.jsonl', help='Used file path')
 args = parser.parse_args()
@@ -116,6 +116,8 @@ output_dim = 4
 
 # Init MLP
 mlp = MLP(last_hidden_state_dim, hidden_dim, output_dim)
+args.use_first_token = False
+args.use_mean_token = True
 
 # Freeze pretrain-LLM
 for param in model.parameters():
@@ -159,7 +161,7 @@ def eval_model(model, dataloader, criterion, device):
 
             if args.use_first_token:
                 cls_embeddings = hidden_states[:, 0]
-            elif args.use_mean_pooling:
+            elif args.use_mean_token:
                 cls_embeddings = torch.mean(hidden_states, dim=1)
             else:
                 cls_embeddings = hidden_states[:, -1]
@@ -212,7 +214,7 @@ def train_and_validate_mlp(train_dataloader, val_dataloader, mlp, criterion, opt
 
             if args.use_first_token:
                 cls_embeddings = hidden_states[:, 0]
-            elif args.use_mean_pooling:
+            elif args.use_mean_token:
                 cls_embeddings = torch.mean(hidden_states, dim=1)
             else:
                 cls_embeddings = hidden_states[:, -1]
@@ -298,7 +300,7 @@ for name, param in model.named_parameters():
 train_and_validate_mlp(train_dataloader, val_dataloader, mlp, criterion, optimizer, device)
 
 # A predict
-def predict(text, model, tokenizer, mlp, device, use_first_token=False, use_mean_pooling=False):
+def predict(text, model, tokenizer, mlp, device, use_first_token=False, use_mean_token=False):
     model.eval()
     mlp.eval()
     
@@ -327,7 +329,7 @@ def predict(text, model, tokenizer, mlp, device, use_first_token=False, use_mean
     
     if use_first_token:
         cls_embeddings = hidden_states[:, 0]
-    elif use_mean_pooling:
+    elif use_mean_token:
         cls_embeddings = torch.mean(hidden_states, dim=1)
     else:
         cls_embeddings = hidden_states[:, -1]

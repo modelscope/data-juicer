@@ -19,7 +19,7 @@ def parse_arguments():
 
 # 加载模型和分词器
 args = parse_arguments()
-model_name_or_path = args.model
+model_name_or_path = args.model_path
 tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
 # 设置 pad_token
 if tokenizer.pad_token is None:

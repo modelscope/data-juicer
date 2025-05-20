@@ -32,13 +32,15 @@ pip install -r requirements.txt
 
 As mentioned in the paper, we selected four basic capability datasets: [Dolly-15K](https://modelscope.cn/datasets/AI-ModelScope/databricks-dolly-15k) for *Common Sense*, [Cot-en](https://modelscope.cn/datasets/YorickHe/CoT) for *Reasoning*, [Math-Instruct](https://modelscope.cn/datasets/AI-ModelScope/MathInstruct) for *Mathematics* and [Code-Alpaca](https://modelscope.cn/datasets/AI-ModelScope/CodeAlpaca-20k) for *Coding* to construct the data pool.
 
-Each dataset was initially filtered and randomly reduced to 10,000 entries, resulting in a combined data pool of 40,000 entries. Specifically, for the [Math-Instruct ]([Math-Instruct](https://modelscope.cn/datasets/AI-ModelScope/MathInstruct))dataset, due to its inclusion of CoT and certain coding capabilities, we extract a highly mathematics-related subset and use regular expressions to filter out the coding-related content (including `program`, `python`, `def`, `import`, `print`, `return`), ensuring it remains within the domain of mathematics.
-
-As a result, we have provided the original data pool instruction training datasets for the four domains in `./data/raw`. All subsequent experiments are based on this data pool. And we will utilize `Qwen2.5-7B` as an example. For each piece of data in the data pool, it first needs to be vectorized into corresponding embeddings using the **LLM's Embedding Layer** for all subsequent processing. The code for this, located in `./distribution_syn/ebd_save.py`, is as follows:
+Each dataset was initially filtered and randomly reduced to 10,000 entries, resulting in a combined data pool of 40,000 entries. As a result, we have provided the original data pool instruction training datasets for the four domains in `./data/raw`. All subsequent experiments are based on this data pool. And we will utilize `Qwen2.5-7B` as an example. For each piece of data in the data pool, it first needs to be vectorized into corresponding embeddings using the **LLM's Embedding Layer** for all subsequent processing. The code for this, located in `./distribution_syn/ebd_save.py`, is as follows:
 
 ```bash
 python ./distribution_syn/ebd_save.py --model_path ./models/Qwen2.5-7B --output_path ./data/ebd/qw25
 ```
+
+> Specifically, for the [Math-Instruct]([Math-Instruct](https://modelscope.cn/datasets/AI-ModelScope/MathInstruct))dataset, due to its inclusion of CoT and certain coding capabilities, we extract a highly mathematics-related subset and use regular expressions to filter out the coding-related content (including `program`, `python`, `def`, `import`, `print`, `return`), ensuring it remains within the domain of mathematics.
+
+
 
 ## Contrastive Distribution Synthesis
 
@@ -80,12 +82,12 @@ python ./daar/1_centroid/1_warmup.py --model_path ./models/Qwen2.5-7B-Instruct
 **Next**, we proceed to the formal generation of **model-aware** domain data. For each domain, adjust the arguments sequentially and execute the following command-line code. Note that **empirical validation** with only 10 samples is sufficient to represent the semantic information of the domain. To accelerate generation, you can slightly increase the `--similarity_threshold` parameter. The generated files will be saved in the same directory under `./syn/qw25`.
 
 ```bash
-python ./daar/1_centroid/2_syn.py \\
-    --model_path ./models/Qwen2.5-7B-Instruct \\
-    --selected_domain coding \\
-    --save_dir ./daar/1_centroid/syn/qw25/coding.jsonl \\
-    --warmup_file ./daar/1_centroid/warmup_seed/qw25/jsonl/coding_warmup.jsonl \\
-    --gen_num 10 \\
+python ./daar/1_centroid/2_syn.py \
+    --model_path ./models/Qwen2.5-7B-Instruct \
+    --selected_domain coding \
+    --save_dir ./daar/1_centroid/syn/qw25/coding.jsonl \
+    --warmup_file ./daar/1_centroid/warmup_seed/qw25/jsonl/coding_warmup.jsonl \
+    --gen_num 10 \
     --similarity_threshold 0.85
 ```
 
@@ -95,7 +97,7 @@ python ./daar/1_centroid/2_syn.py \\
 python ./daar/1_centroid/3_syn_ebd.py --model_path ./models/Qwen2.5-7B
 ```
 
-**Finally**, we obtain the DaaR Probe training data with model-aware labels. Before executing this step, you need to sample your actual LLM SFT data to obtain a dataset with the same distribution. Then, use the embedding method mentioned above to generate embedding information. Place both of these files in the following directory: `./daar/1_centroid/train_data/[models]/[raw_data.jsonl, ebd.npz]`. In our study, we selected 5,000 data points that share the same distribution as the SFT data but remain isolated, ensuring both rigor and generalization.
+**Finally**, we obtain the DaaR Probe training data with model-aware labels. Before executing this step, you need to sample your actual LLM SFT data to obtain a dataset with the same distribution **for probe training**. Then, use the embedding method mentioned above to generate embedding information. Place both of these files in the following directory: `./daar/1_centroid/train_data/[models]/[raw_data.jsonl, ebd.npz]`. In our study, we selected 5,000 data points that share the same distribution as the SFT data but remain isolated, ensuring both rigor and generalization.
 
 ```bash
 python ./daar/1_centroid/4_kmeans.py
@@ -107,7 +109,7 @@ python ./daar/1_centroid/4_kmeans.py
 
 ```bash
 # Training discrimination probe
-python ./daar/2_train/1_ce_train.py
+python ./daar/2_train/1_ce_train.py 
 
 # Infering
 python ./daar/2_train/2_ce_infer.py

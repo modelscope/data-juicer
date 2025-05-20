@@ -8,27 +8,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
-# Function to merge files
-def merge_files(input_folder, output_file):
-    filenames = ['code-en.jsonl', 'cot-en.jsonl', 'dolly-en.jsonl', 'math-en.jsonl']
-    with open(output_file, 'w', encoding='utf-8') as outfile:
-        for filename in filenames:
-            file_path = os.path.join(input_folder, filename)
-            with open(file_path, 'r', encoding='utf-8') as infile:
-                for line in infile:
-                    outfile.write(line)
-
 # Argument parser
 parser = argparse.ArgumentParser(description="Generate and plot embeddings.")
 parser.add_argument('--model_path', type=str, required=True, help="Path to the pre-trained model.")
 parser.add_argument('--output_path', type=str, required=True, help="Path to save the output files.")
 args = parser.parse_args()
-
-# Merge files
-data_folder = './data/raw'
-merged_file = os.path.join(data_folder, '40k_data.jsonl')
-merge_files(data_folder, merged_file)
-print('Raw data successfully merged.')
 
 # Random seed
 seed = 42
@@ -91,17 +75,42 @@ def plot_and_save_embeddings(embeddings, labels, output_folder):
 output_folder = args.output_path
 os.makedirs(output_folder, exist_ok=True)
 
+data_folder = './data/raw'
+filenames = ['code-en.jsonl', 'cot-en.jsonl', 'dolly-en.jsonl', 'math-en.jsonl']
+merged_file = os.path.join(data_folder, '40k_data.jsonl')
+
 embeddings = []
 labels = []
 
-with open(merged_file, 'r', encoding='utf-8') as f:
-    for line in tqdm(f, desc="Processing merged file"):
-        data = json.loads(line)
-        label = data['filename'].split('.')[0]  # Assuming each data entry has a 'filename' field
-        text = f"{data['instruction']} {data['input']} {data['output']}"
-        embedding = get_embedding(text)
-        embeddings.append(embedding)
-        labels.append(label)
+# Process each file separately
+temp_data = []
+for filename in filenames:
+    file_path = os.path.join(data_folder, filename)
+    with open(file_path, 'r', encoding='utf-8') as f:
+        for line in tqdm(f, desc=f"Processing {filename}"):
+            data = json.loads(line)
+            text = f"{data['instruction']} {data['input']} {data['output']}"
+            embedding = get_embedding(text)
+            # Append embedding and filename (label)
+            embeddings.append(embedding)
+            labels.append(filename.split('.')[0])
+            # Append to temp data for merging
+            temp_data.append({
+                'instruction': data['instruction'],
+                'input': data['input'],
+                'output': data['output']
+            })
 
+# Concatenate embeddings
 embeddings = np.concatenate(embeddings, axis=0)
+
+# Plot and save embeddings
 plot_and_save_embeddings(embeddings, labels, output_folder)
+
+# After processing, merge data and store in final file
+with open(merged_file, 'w', encoding='utf-8') as outfile:
+    for entry in temp_data:
+        json.dump(entry, outfile)
+        outfile.write('\n')
+
+print('Processed data and embeddings successfully saved.')
