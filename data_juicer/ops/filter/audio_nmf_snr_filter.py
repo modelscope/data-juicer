@@ -1,7 +1,8 @@
-import os
 import sys
 
+import librosa
 import numpy as np
+from librosa.decompose import decompose
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -9,10 +10,6 @@ from data_juicer.utils.mm_utils import load_audio, load_data_with_context
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_AUDIOS
-
-os.environ['LIBROSA_DISABLE_SAMPLERATE'] = '1'  # noqa: E402
-import librosa  # noqa: E402
-from librosa.decompose import decompose  # noqa: E402
 
 OP_NAME = 'audio_nmf_snr_filter'
 
