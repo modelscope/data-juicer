@@ -485,7 +485,7 @@ pip install uv
 
 ### 虚拟环境管理
 
-`uv` 提供了强大的虚拟环境管理功能，可以替代 `venv` 和 `virtualenv`。以下是常用命令：
+`uv` 提供了虚拟环境管理功能，可以替代 `venv` 和 `virtualenv`。以下是常用命令：
 
 ```bash
 # 创建新的虚拟环境
@@ -500,21 +500,9 @@ source .venv/bin/activate
 # 在 Windows 上
 .venv\Scripts\activate
 
-# 在虚拟环境中安装依赖
-uv pip install -e ".[all]"
-
-# 导出依赖列表
-uv pip freeze > requirements.txt
-
-# 从 requirements.txt 安装依赖
-uv pip install -r requirements.txt
+# 在虚拟环境中安装最小依赖
+uv pip install -e .
 ```
-
-`uv` 的虚拟环境管理相比传统工具的优势：
-- 更快的环境创建和依赖安装
-- 更好的依赖解析和冲突处理
-- 支持锁定文件（lockfile）确保依赖版本一致性
-- 与 `pyproject.toml` 无缝集成
 
 ### 添加新依赖
 
@@ -522,7 +510,7 @@ uv pip install -r requirements.txt
 
 1. 将依赖添加到 `pyproject.toml` 的相应部分：
    - 核心依赖放在 `[project.dependencies]` 中
-   - 可选依赖放在 `[project.optional-dependencies]` 的相应组中（sci、dev、tools 等）
+   - 可选依赖放在 `[project.optional-dependencies]` 的相应组中（ generic、dev、audio、video，etc.）
 
 2. 延迟加载系统会在首次使用时自动处理依赖安装。
 
@@ -533,9 +521,10 @@ uv pip install -r requirements.txt
 numpy = ">=1.26.4,<2.0.0"
 
 [project.optional-dependencies]
-sci = [
+generic = [
     "torch>=1.11.0",
     "transformers>=4.47.0,<4.48.0",
+    ...
 ]
 ```
 
@@ -548,9 +537,9 @@ uv pip install -e ".[all]"
 
 2. 或安装特定组：
 ```bash
-uv pip install -e ".[sci]"    # 科学计算依赖
-uv pip install -e ".[dev]"    # 开发工具
-uv pip install -e ".[tools]"  # 工具依赖
+uv pip install -e ".[generic]"      # 通用依赖
+uv pip install -e ".[dev]"          # 开发工具
+uv pip install -e ".[ai_services]"  # 服务依赖
 ```
 
 ### 延迟加载

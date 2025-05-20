@@ -57,7 +57,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 - [2024-07-17] 我们利用Data-Juicer[沙盒实验室套件](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox-ZH.md)，通过数据与模型间的系统性研发工作流，调优数据和模型，在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。相关成果已经整理发表在[论文](http://arxiv.org/abs/2407.11784)中，并且模型已在[ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V)和[HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V)平台发布。
 - [2024-07-12] 我们的MLLM-Data精选列表已经演化为一个模型-数据协同开发的角度系统性[综述](https://arxiv.org/abs/2407.08583)。欢迎[浏览](docs/awesome_llm_data.md)或参与贡献!
 - [2024-06-01] ModelScope-Sora"数据导演"创意竞速——第三届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532219)，了解赛事详情。
-- [2024-03-07] 我们现在发布了 **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)**! 在这个新版本中，我们支持了更多的 **多模态数据(包括视频)** 相关特性。我们还启动了 **[DJ-SORA](docs/DJ_SORA_ZH.md)** ，为SORA-like大模型构建开放的大规模高质量数据集！
+- [2024-03-07] 我们现在发布了 **Data-Juicer [v0.2.0](https://github.com/modelscope/data-juicer/releases/tag/v0.2.0)**! 在这个新版本中，我们支持了更多的 **多模态数据(包括视频)** 相关特性。我们还启动了 **[DJ-SORA](docs/DJ_SORA_ZH.md)** ，为SORA-like大模型构建开放的大规模高质量数据集！
 - [2024-02-20] 我们在积极维护一份关于LLM-Data的*精选列表*，欢迎[访问](docs/awesome_llm_data.md)并参与贡献！
 - [2024-02-05] 我们的论文被SIGMOD'24 industrial track接收！
 - [2024-01-10] 开启"数据混合"新视界——第二届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532174)，了解赛事详情。
@@ -141,7 +141,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
   - [预处理工具](tools/preprocess/README_ZH.md)
   - [后处理工具](tools/postprocess/README_ZH.md)
   - [沙盒](docs/Sandbox-ZH.md)
-  - [API服务化](docs/DJ_service_ZH.md))
+  - [API服务化](docs/DJ_service_ZH.md)
   - [给数据打分](tools/quality_classifier/README_ZH.md)
   - [自动评估](tools/evaluator/README_ZH.md)
   - [第三方集成](thirdparty/LLM_ecosystems/README_ZH.md)
@@ -189,95 +189,172 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 ## 安装
 
-Data-Juicer 现已上架 PyPI，您可以通过以下方式安装：
+### 前置条件
+
+- Python >= 3.10
+- Git (用于源码安装)
+- uv (推荐的包安装器)
+
+### 基础安装
+
+Data-Juicer 现已上架 PyPI。最小安装包含核心数据处理能力：
 
 ```bash
-# 使用 pip 安装
-pip install data-juicer
-
-# 或使用 uv 进行更快的安装
-uv pip install data-juicer
+pip install py-data-juicer
 ```
 
-对于开发环境，您可以以可编辑模式安装：
+这将提供：
+- 数据加载和操作
+- 文件系统操作
+- 并行处理
+- 基础 I/O 和工具
+
+### 场景化安装
+组件详情请参考 [pyproject.toml](pyproject.toml)。
+
+**核心 ML & DL**
+```bash
+# 通用 ML/DL 能力
+pip install "py-data-juicer[generic]"
+```
+包括：PyTorch、Transformers、VLLM 等。
+
+**领域特定功能**
+
+```bash
+# 计算机视觉
+pip install "py-data-juicer[vision]"
+
+# 自然语言处理
+pip install "py-data-juicer[nlp]"
+
+# 音频处理
+pip install "py-data-juicer[audio]"
+
+**附加组件**
+
+```bash
+# 分布式计算
+pip install "py-data-juicer[distributed]"
+
+# AI 服务和 API
+pip install "py-data-juicer[ai_services]"
+
+**开发工具**
+```bash
+# 开发和测试
+pip install "py-data-juicer[dev]"
+```
+
+### 常见安装模式
+
+**1. 文本处理设置**
+```bash
+pip install "py-data-juicer[generic,nlp]"
+```
+
+**2. 视觉处理设置**
+```bash
+pip install "py-data-juicer[generic,vision]"
+```
+
+**3. 完整处理流程**
+```bash
+pip install "py-data-juicer[generic,nlp,vision,distributed]"
+```
+
+**4. 完整安装**
+```bash
+# 安装所有功能（除沙盒外）
+pip install "py-data-juicer[all]"
+```
+
+**5. 开发模式**
+
+对于贡献者和开发者：
 
 ```bash
 # 克隆仓库
-git clone https://github.com/alibaba/data-juicer.git
+git clone https://github.com/modelscope/data-juicer.git
 cd data-juicer
 
-# 使用 pip 安装所有依赖
-pip install -e ".[all]"
+# 安装开发依赖
+pip install -e ".[dev]"
 
-# 或安装特定组
-pip install -e ".[sci]"    # 科学计算依赖
-pip install -e ".[dev]"    # 开发工具
-pip install -e ".[tools]"  # 工具依赖
-
-# 或者使用 uv 进行更快的安装
-uv pip install -e ".[all]"
-uv pip install -e ".[sci]"    # 科学计算依赖
-uv pip install -e ".[dev]"    # 开发工具
-uv pip install -e ".[tools]"  # 工具依赖
+# 可选：使用 uv 进行虚拟环境和依赖管理
+curl -LsSf https://astral.sh/uv/install.sh | sh   # 安装 uv
+uv venv --python 3.10                             # 使用 Python 3.10 初始化虚拟环境
+source .venv/bin/activate                         # 激活虚拟环境
+uv pip install -e .                               # 安装最小依赖
 ```
 
-依赖会在首次使用时按需安装。这意味着：
-- 初始安装更快
-- 只安装必需的依赖
-- 依赖按需安装
-- 优先使用 uv 进行快速安装
+### 特定算子安装
+除了基于场景的安装外，我们还提供基于算子和基于菜谱的安装方式。
 
-### 开发环境设置
+- 安装特定算子的依赖
 
-#### 安装 uv
+随着算子数量的增长，所有算子的依赖变得非常庞大。除了使用 `pip install -v -e .[all]` 安装所有依赖外，
+我们提供了两个更轻量级的替代方案：
 
-`uv` 是一个用 Rust 编写的快速 Python 包安装器和解析器。您可以通过以下方式安装：
+  - 自动最小依赖安装：在 Data-Juicer 执行过程中，将自动安装最小依赖。这允许立即执行，但可能会导致依赖冲突。
 
-```bash
-# 使用 curl 安装
-curl -LsSf https://astral.sh/uv/install.sh | sh
+  - 手动最小依赖安装：要手动安装针对特定执行配置的最小依赖，请运行以下命令：
+    ```shell
+    # 仅适用于从源码安装
+    python tools/dj_install.py --config path_to_your_data-juicer_config_file
 
-# 或使用 pip 安装
-pip install uv
+    # 使用命令行工具
+    dj-install --config path_to_your_data-juicer_config_file
+    ```
+
+### 使用 Docker 安装
+
+- 您可以
+  - 从 DockerHub 拉取预构建镜像：
+    ```shell
+    docker pull datajuicer/data-juicer:<version_tag>
+    ```
+  
+    - 如果无法连接到 DockerHub，请使用其他镜像源（您可以在互联网上找到一些）：
+    ```shell
+    docker pull <other_registry_mirror>/datajuicer/data-juicer:<version_tag>
+    ```
+
+  - 或运行以下命令构建包含最新 `data-juicer` 的 docker 镜像，使用提供的 [Dockerfile](Dockerfile)：
+
+    ```shell
+    docker build -t datajuicer/data-juicer:<version_tag> .
+    ```
+
+  - `<version_tag>` 的格式类似于 `v0.2.0`，与发布版本标签相同。
+
+### 注意事项和故障排除
+
+0. **安装检查**
+   
+```python
+import data_juicer as dj
+print(dj.__version__)
 ```
 
-安装完成后，您可以使用以下命令验证安装：
-```bash
-uv --version
-```
+1. **模块化安装**
+   - 只安装您需要的组件
+   - 根据需要组合组件
+   - 使用 `all` 进行完整安装
 
-#### 虚拟环境管理
+2. **沙盒环境**
+   - 实验性功能的单独安装
+   - 未来将作为微服务提供
 
-`uv` 提供了强大的虚拟环境管理功能。以下是常用命令：
+3. **视频相关算子**
+   - 在使用视频相关算子之前，需要安装 **FFmpeg** 并确保可以通过 $PATH 环境变量访问。
+   - 您可以使用包管理器安装 FFmpeg（例如在 Debian/Ubuntu 上使用 sudo apt install ffmpeg，在 OS X 上使用 brew install ffmpeg）或访问 [官方 ffmpeg 链接](https://ffmpeg.org/download.html)。
+   - 通过从终端运行 ffmpeg 命令来检查您的环境路径是否正确设置。
 
-```bash
-# 创建新的虚拟环境
-uv venv
-
-# 创建指定 Python 版本的虚拟环境
-uv venv --python 3.10
-
-# 激活虚拟环境
-# 在 Unix/macOS 上
-source .venv/bin/activate
-# 在 Windows 上
-.venv\Scripts\activate
-
-# 在虚拟环境中安装依赖
-uv pip install -e ".[all]"
-
-# 导出依赖列表
-uv pip freeze > requirements.txt
-
-# 从 requirements.txt 安装依赖
-uv pip install -r requirements.txt
-```
-
-使用 `uv` 进行虚拟环境管理的优势：
-- 更快的环境创建和依赖安装
-- 更好的依赖解析和冲突处理
-- 支持锁定文件（lockfile）确保依赖版本一致性
-- 与 `pyproject.toml` 无缝集成
+4. **获取帮助**  
+   - 请先查看文档/问题
+   - 必要时创建 GitHub issues
+   - 加入社区频道进行讨论
 
 ## 快速上手
 ### 数据集配置

@@ -406,7 +406,7 @@ Data-Juicer uses a modern dependency management system based on `uv` and `pyproj
 
 ### Installing uv
 
-`uv` is a fast Python package installer and resolver, written in Rust, designed as a drop-in replacement for pip. You can install it using:
+`uv` is a fast Python package installer and resolver, as a better drop-in replacement for pip. You can install it using:
 
 ```bash
 # Using curl
@@ -420,7 +420,7 @@ After installation, verify it's working by running `uv --version`.
 
 ### Virtual Environment Management
 
-`uv` provides powerful virtual environment management capabilities that can replace `venv` and `virtualenv`. Here are the common commands:
+`uv` provides virtual environment management capabilities that replaces `venv` and `virtualenv`. Here are the common commands:
 
 ```bash
 # Create a new virtual environment
@@ -436,21 +436,9 @@ source .venv/bin/activate
 .venv\Scripts\activate
 
 # Install minimal dependencies in the virtual environment
-uv pip install -e 
+uv pip install -e .
 
-# Optional: lock up dependency versions
-# Export dependencies to requirements.txt
-uv pip freeze > requirements.txt
-
-# Install dependencies from requirements.txt
-uv pip install -r requirements.txt
 ```
-
-Advantages of using `uv` for virtual environment management:
-- Faster environment creation and dependency installation
-- Better dependency resolution and conflict handling
-- Support for lockfiles to ensure dependency version consistency
-- Seamless integration with `pyproject.toml`
 
 ### Adding New Dependencies
 
@@ -458,7 +446,7 @@ To add new dependencies:
 
 1. Add them to the appropriate section in `pyproject.toml`:
    - Core dependencies go in `[project.dependencies]`
-   - Optional dependencies go in `[project.optional-dependencies]` under the appropriate group (sci, dev, tools, etc.)
+   - Optional dependencies go in `[project.optional-dependencies]` under the appropriate group (generic, dev, audio, video, etc.)
 
 2. The lazy loading system will automatically handle installation when the dependencies are first used.
 
@@ -469,9 +457,10 @@ Example:
 numpy = ">=1.26.4,<2.0.0"
 
 [project.optional-dependencies]
-sci = [
+generic = [
     "torch>=1.11.0",
     "transformers>=4.47.0,<4.48.0",
+    ...
 ]
 ```
 
@@ -484,9 +473,9 @@ uv pip install -e ".[all]"
 
 2. Or install with specific groups:
 ```bash
-uv pip install -e ".[sci]"    # Scientific dependencies
-uv pip install -e ".[dev]"    # Development tools
-uv pip install -e ".[tools]"  # Tool dependencies
+uv pip install -e ".[generic]"      # Generic dependencies
+uv pip install -e ".[dev]"          # Development tools
+uv pip install -e ".[ai_services]"  # Services dependencies
 ```
 
 ### Lazy Loading

@@ -53,12 +53,6 @@ jobs:
         include-hidden-files: true
         path: dj-${{ github.run_id }}/coverage_report_standalone
 
-    - name: Get Total Coverage Result
-      id: total
-      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
-      run: |
-        echo "total=$(docker compose exec ray-head coverage report --format=total)" >> $GITHUB_OUTPUT
-
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       if: always()

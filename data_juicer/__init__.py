@@ -5,6 +5,7 @@ import subprocess
 import sys
 
 from loguru import logger
+# allow loading truncated images for some too large images.
 from PIL import ImageFile
 
 from data_juicer.utils.availability_utils import _is_package_available

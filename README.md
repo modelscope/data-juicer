@@ -61,7 +61,7 @@ Data-Juicer is being actively updated and maintained. We will periodically enhan
 - [2024-07-17] We utilized the Data-Juicer [Sandbox Laboratory Suite](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox.md) to systematically optimize data and models through a co-development workflow between data and models, achieving a new top spot on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard. The related achievements have been compiled and published in a [paper](http://arxiv.org/abs/2407.11784), and the model has been released on the [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) and [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) platforms.
 - [2024-07-12] Our *awesome list of MLLM-Data* has evolved into a systemic [survey](https://arxiv.org/abs/2407.08583) from model-data co-development perspective. Welcome to [explore](docs/awesome_llm_data.md) and contribute!
 - [2024-06-01] ModelScope-Sora "Data Directors" creative sprint—Our third data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532219) for more information.
-- [2024-03-07] We release **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)** now! 
+- [2024-03-07] We release **Data-Juicer [v0.2.0](https://github.com/modelscope/data-juicer/releases/tag/v0.2.0)** now! 
 In this new version, we support more features for **multimodal data (including video now)**, and introduce **[DJ-SORA](docs/DJ_SORA.md)** to provide open large-scale, high-quality datasets for SORA-like models.
 - [2024-02-20] We have actively maintained an *awesome list of LLM-Data*, welcome to [visit](docs/awesome_llm_data.md) and contribute!
 - [2024-02-05] Our paper has been accepted by SIGMOD'24 industrial track!
@@ -211,7 +211,7 @@ Table of Contents
 Data-Juicer is now available on PyPI. The minimal installation includes core data processing capabilities:
 
 ```bash
-pip install data-juicer
+pip install py-data-juicer
 ```
 
 This provides:
@@ -220,35 +220,6 @@ This provides:
 - Parallel processing
 - Basic I/O and utilities
 
-**Installing with uv**
-
-`uv` is a high-performance Python package installer:
-
-```bash
-# 1.1 Using curl (recommended)
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# 1.2 Or using pip
-pip install uv
-
-# 2. Then instal dj with uv
-uv pip install py-data-juicer
-```
-
-**Environment Management**
-
-```bash
-# Create virtual environment
-uv venv
-
-# Activate
-source .venv/bin/activate  # Unix/macOS
-# or
-.venv\Scripts\activate     # Windows
-
-# Install dependencies
-uv pip install -e ".[desired_components]"
-```
 
 ### Scenario-based Installation
 For component details, plz refer to [pyproject.toml](pyproject.toml).
@@ -256,7 +227,7 @@ For component details, plz refer to [pyproject.toml](pyproject.toml).
 **Core ML & DL**
 ```bash
 # Generic ML/DL capabilities
-uv pip install "py-data-juicer[generic]"
+pip install "py-data-juicer[generic]"
 ```
 Includes: PyTorch, Transformers, VLLM, etc.
 
@@ -264,59 +235,51 @@ Includes: PyTorch, Transformers, VLLM, etc.
 
 ```bash
 # Computer Vision
-uv pip install "py-data-juicer[vision]"
+pip install "py-data-juicer[vision]"
 
 # Natural Language Processing
-uv pip install "py-data-juicer[nlp]"
+pip install "py-data-juicer[nlp]"
 
 # Audio Processing
-uv pip install "py-data-juicer[audio]"
-
-# Document Processing
-uv pip install "py-data-juicer[document]"
-```
+pip install "py-data-juicer[audio]"
 
 **Additional Components**
 
 ```bash
 # Distributed Computing
-uv pip install "py-data-juicer[distributed]"
+pip install "py-data-juicer[distributed]"
 
 # AI Services & APIs
-uv pip install "py-data-juicer[ai_services]"
-
-# Utilities (Web, API, Visualization)
-uv pip install "py-data-juicer[utils]"
-```
+pip install "py-data-juicer[ai_services]"
 
 **Development Tools**
 ```bash
 # Development & Testing
-uv pip install "py-data-juicer[dev]"
+pip install "py-data-juicer[dev]"
 ```
 
 ### Common Installation Patterns
 
 **1. Text Processing Setup**
 ```bash
-uv pip install "py-data-juicer[generic,nlp,document]"
+pip install "py-data-juicer[generic,nlp]"
 ```
 
 **2. Vision Processing Setup**
 ```bash
-uv pip install "py-data-juicer[generic,vision,utils]"
+pip install "py-data-juicer[generic,vision]"
 ```
 
 **3. Full Processing Pipeline**
 ```bash
-uv pip install "py-data-juicer[generic,nlp,vision,distributed]"
+pip install "py-data-juicer[generic,nlp,vision,distributed]"
 ```
 
 
 **4. Complete Installation**
 ```bash
 # Install all features (except sandbox)
-uv pip install "py-data-juicer[all]"
+pip install "py-data-juicer[all]"
 ```
 
 
@@ -326,11 +289,18 @@ For contributors and developers:
 
 ```bash
 # Clone repository
-git clone https://github.com/alibaba/data-juicer.git
+git clone https://github.com/modelscope/data-juicer.git
 cd data-juicer
 
 # Install dev dependencies
-uv pip install -e ".[dev]"
+pip install -e ".[dev]"
+
+# Optionally, use uv for venv and dependency management
+curl -LsSf https://astral.sh/uv/install.sh | sh   # install uv
+uv venv --python 3.10                             # initialize virtual env with python 3.10
+source .venv/bin/activate                         # activate virtual env
+uv pip install -e .                               # install minimal dependencies
+
 ```
 
 
@@ -389,25 +359,16 @@ print(dj.__version__)
    - Combine components as required
    - Use `all` for complete installation
 
-2. **Version Management**
-   ```bash
-   # Export dependencies
-   uv pip freeze > requirements.txt
-   
-   # Install from requirements
-   uv pip install -r requirements.txt
-   ```
-
-3. **Sandbox Environment**
+2. **Sandbox Environment**
    - Separate installation for experimental features
    - Will be provided as micro-services in future
 
-4. **For Video-related Operators**
+3. **For Video-related Operators**
    - Before using video-related operators, **FFmpeg** should be installed and accessible via the $PATH environment variable.
    - You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on Debian/Ubuntu, brew install ffmpeg on OS X) or visit the [official ffmpeg link](https://ffmpeg.org/download.html).
    - Check if your environment path is set correctly by running the ffmpeg command from the terminal.
 
-5. **Getting Help**  
+4. **Getting Help**  
    - Plz check documentation/issues first
    - Create GitHub issues when necessary
    - Join community channels for discussions

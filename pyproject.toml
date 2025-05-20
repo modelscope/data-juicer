@@ -8,6 +8,12 @@ authors = [
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.10"
+urls = {repository = "https://github.com/modelscope/data-juicer"}
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
 
 # Core dependencies
 dependencies = [
@@ -48,6 +54,8 @@ dependencies = [
     "fastapi>=0.110",
     "mwparserfromhell",
     "regex",  # regular expressions
+    "tomli",
+    "gitpython"
 ]
 
 [project.optional-dependencies]
@@ -129,13 +137,6 @@ ai_services = [
     "label-studio==1.17.0",  # Data labeling
 ]
 
-# Document Processing
-document = [
-    "pdfplumber",  # PDF processing
-    "python-docx",  # Word document processing
-    "mwparserfromhell",  # wiki text parsing
-]
-
 # Sandbox Environment
 # Todo: the sandbox dependencies will be provided in
 # micro-services rather than all-in-one env
@@ -168,7 +169,6 @@ all = [
     "py-data-juicer[distributed]",
     "py-data-juicer[dev]",
     "py-data-juicer[ai_services]",
-    "py-data-juicer[document]",
 ]
 
 [project.scripts]
