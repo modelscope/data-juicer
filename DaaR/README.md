@@ -37,7 +37,7 @@ Each dataset was initially filtered and randomly reduced to 10,000 entries, resu
 As a result, we have provided the original data pool instruction training datasets for the four domains in `./data/raw`. All subsequent experiments are based on this data pool. And we will utilize `Qwen2.5-7B` as an example. For each piece of data in the data pool, it first needs to be vectorized into corresponding embeddings using the **LLM's Embedding Layer** for all subsequent processing. The code for this, located in `./distribution_syn/ebd_save.py`, is as follows:
 
 ```bash
-python ./distribution/ebd_save.py --model_path ./models/Qwen2.5-7B --output_path ./data/ebd/qw25
+python ./distribution_syn/ebd_save.py --model_path ./models/Qwen2.5-7B --output_path ./data/ebd/qw25
 ```
 
 ## Contrastive Distribution Synthesis
@@ -126,11 +126,14 @@ python ./daar/2_train/4_mse_train.py
 python ./daar/2_train/5_mse_infer.py
 ```
 
-***3-Data Selection:*** Finally, based on the predicted entropy scores, we select the top 20% of the data to obtain the DaaR training data in `./daar/2_train/mse_res/[models]/daar_data.jsonl`
-
+***3-Data Selection:*** Finally, based on the predicted entropy scores, we select the top 20% of the data to obtain the DaaR training data in `./daar/2_train/mse_res/[models]/daar_data.jsonl`. To evaluate DaaR's domain-specific customization, first generate pseudo-labels using `2_ce_infer.py`. Subsequently, enable the customized selection strategy by setting `--selection_strategy='customized'` and define the target domain (e.g., coding) with `--customized_domain`.
 ```bash
-# Data selection
-python ./daar/2_train/6_select_data.py
+# Data selection of original DaaR
+python ./daar/2_train/6_select_data.py --selection_strategy overall
+
+# Exploring the Customization of DaaR in Coding Tasks
+python ./daar/2_train/6_select_data.py --selection_strategy customized --customized_domain coding
+
 ```
 
 ## Implementation of Baselines
@@ -203,7 +206,7 @@ wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/Ope
 unzip OpenCompassData-core-20240207.zip
 ```
 
-Next, you can evaluate specific models and their corresponding checkpoints (please fill in as needed) on seven evaluation tasks: `NQ`, `TriviaQA`, `HellaSwag`, `GSM8K`, `MATH`, `MBPP`, and `HumanEval`.
+Next, you can evaluate specific models and their corresponding checkpoints (please fill in as needed) on seven evaluation tasks: `NQ`, `TriviaQA`, `HellaSwag`, `GSM8K`, `MATH`, `MBPP`, and `HumanEval`. For an out-of-distribution(OOD) generalizability assessment, consider including the `MMLU` benchmark in the dataset suite.
 
 ```bash
 python run.py \
@@ -214,6 +217,9 @@ python run.py \
     --batch-size 16 \
     --hf-num-gpus 1 \
     --debug
+
+# For MMLU Evaluation
+    --datasets mmlu_gen \
 ```
 
 For this paper, considering the large number of experiments and time constraints, we uniformly tailored the evaluation datasets while maintaining consistency across all evaluations. The number of samples in each dataset is shown in the table below. Specifically, for each original evaluation dataset, we used `df.sample()` with `seed=42` for tailoring.
@@ -223,6 +229,22 @@ For this paper, considering the large number of experiments and time constraints
 | :----:            | :----:       | :----:    | :----:      | :----: | :----:| :----:| :----:    |
 | Original          | 3,610        | 8,837     | 10,042      | 1,319  | 5,000 | 974   | 164       |
 | Utilized          | 3,610        | 5,000     | 10,042      | 500    | 1,000 | 500   | 164       |
+
+
+## Guidance of Ablation Studies
+
+We provide comprehensive instructions to reproduce the ablation studies and similarity analyses presented in our paper:
+- **Layer Selection**: The `--clip_layer` argument (specifying where to truncate the LLM and insert the reward probe) is available in `./daar/2_train/{1_ce_train.py, 2_ce_infer.py, 4_mse_train.py, 5_mse_infer.py}`.
+- **Seed Number**: Modify the prompt variable within the create_prompt function in `./daar/1_centroid/1_warmup.py`.
+- **Number of Augmented Data**: Adjust the `--gen_num parameter` in `./daar/1_centroid/2_syn.py`.
+- **Sliding Window Size**: Configure the `--win_size` parameter in `./daar/1_centroid/2_syn.py`.
+- **Diversity Threshold**: Tune the `--similarity_threshold` parameter in `./daar/1_centroid/2_syn.py`.
+- **Data Processing for Similarity Analysis**: Generated data can be processed into embeddings with `./daar/1_centroid/3_syn_ebd.py` and compared for similarity using `torch.nn.functional.cosine_similarity`.
+
+## Evaluation on Qwen3
+
+For Qwen3, the overall workflow follows the same procedure outlined above, with the exception of updating specific dependency libraries' version requirements (e.g., `transformers>=4.51.0`). For training processes, we utilize the `latest ms-swift` library (which already supports Qwen3 series) with identical hyperparameters to previous implementations. Regarding evaluation, due to [the lack of native support](https://github.com/open-compass/opencompass/issues/2079) in OpenCompass' latest version at the time of code completion, we manually configured Qwen3-8B by referencing `./opencompass/configs/models/qwen2_5/hf_qwen_2_5_7b.py`. As noted in the paper's Appendix, the absolute evaluation scores for Qwen3 remain suboptimal. We hypothesize this may stem from unoptimized thinking module configurations and associated recommended parameters.
+
 
 ## References
 If you find our work useful for your research or development, please kindly cite the following [paper](https://www.arxiv.org/abs/2502.04380).

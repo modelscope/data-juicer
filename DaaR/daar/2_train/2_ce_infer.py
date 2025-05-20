@@ -48,6 +48,7 @@ parser = argparse.ArgumentParser(description='Infer Qwen2-7B Classifier')
 parser.add_argument('--model_path', type=str, default="./daar/2_training/ce_res/qw25/mlp.pth", help='Path to the trained MLP model')
 parser.add_argument('--base_model_path', type=str, default="./models/Qwen2.5-7B", help='Path to the base Qwen model')
 parser.add_argument('--tokenizer_path', type=str, default="./models/Qwen2.5-7B", help='Path to the tokenizer')
+parser.add_argument('--clip_layer', type=int, default=3, help='Layer to clip')
 parser.add_argument('--input_file', type=str, default="./daar/1_centroid/train_data/qw25/train_data.jsonl", help='Input JSONL file path')
 parser.add_argument('--output_file', type=str, default="./daar/2_training/ce_res/qw25/infer_data_scores.jsonl", help='Output JSONL file path')
 parser.add_argument('--use_first_token', action='store_true', help='Use the first token (similar to [CLS]) instead of the last token')
@@ -66,8 +67,8 @@ if tokenizer.pad_token is None:
 
 base_model = AutoModelForCausalLM.from_pretrained(args.base_model_path, output_hidden_states=True)
 
-# clip model to layer-5
-num_layers_to_keep = 3
+# clip model
+num_layers_to_keep = args.clip_layer
 base_model.model.layers = nn.ModuleList(base_model.model.layers[:num_layers_to_keep])
 
 # freeze LLM

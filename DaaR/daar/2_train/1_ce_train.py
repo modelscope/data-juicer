@@ -79,6 +79,7 @@ parser = argparse.ArgumentParser(description='Train Qwen2-7B Classifier')
 parser.add_argument('--lr', type=float, default=1e-5, help='Learning rate')
 parser.add_argument('--log_save', type=float, default=50, help='Log Save')
 parser.add_argument('--eval_step', type=float, default=200, help='Eval step')
+parser.add_argument('--clip_layer', type=int, default=3, help='Layer to clip')
 parser.add_argument('--output_dir', type=str, default='./daar/2_training/ce_res/qw25', help='Output directory for results')
 parser.add_argument('--use_first_token', action='store_true', help='Use the first token (similar to [CLS]) instead of the last token')
 parser.add_argument('--use_mean_pooling', action='store_true', help='Use mean pooling of all tokens instead of the last token')
@@ -102,8 +103,8 @@ if tokenizer.pad_token is None:
 
 model = AutoModelForCausalLM.from_pretrained(model_name)
 
-# Clip LLM to layer-5
-num_layers_to_keep = 3
+# Clip LLM
+num_layers_to_keep = args.clip_layer
 model.model.layers = nn.ModuleList(model.model.layers[:num_layers_to_keep])
 
 # Get last layer dimension

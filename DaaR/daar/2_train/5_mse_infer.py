@@ -6,7 +6,7 @@ import torch.nn.functional as F
 import argparse
 import tqdm
 
-# 定义CustomClassifier类
+# Define CustomClassifier
 class CustomClassifier(nn.Module):
     def __init__(self, base_model, input_dim, hidden_dim, output_dim=1):
         super(CustomClassifier, self).__init__()
@@ -40,61 +40,60 @@ class CustomClassifier(nn.Module):
         else:
             cls_embeddings = hidden_states[:, -1]
         
-        value = self.mlp(cls_embeddings)  # 输出连续值
+        value = self.mlp(cls_embeddings)
         return value
 
-# 添加命令行参数解析
+# Args
 parser = argparse.ArgumentParser(description='Infer Qwen2-7B Regressor')
 parser.add_argument('--model_path', type=str, default="./daar/2_training/mse_res/qw25/mlp.pth", help='Path to the trained MLP model')
 parser.add_argument('--base_model_path', type=str, default="./models/Qwen2.5-7B", help='Path to the base Qwen model')
 parser.add_argument('--tokenizer_path', type=str, default="./models/Qwen2.5-7B", help='Path to the tokenizer')
 parser.add_argument('--input_file', type=str, default="./data/raw/40k_data.jsonl", help='Input JSONL file path')
+parser.add_argument('--clip_layer', type=int, default=3, help='Layer to clip')
 parser.add_argument('--output_file', type=str, default="./daar/2_training/mse_res/qw25/40k_infer_data.jsonl", help='Output JSONL file path')
 parser.add_argument('--use_first_token', action='store_true', help='Use the first token (similar to [CLS]) instead of the last token')
 parser.add_argument('--use_mean_token', action='store_true', help='Use mean pooling of all tokens instead of the last token')
 args = parser.parse_args()
 
-# 设置设备
+# Device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# 加载tokenizer和模型
+# Load models and tokenizer
 tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_path)
 
-# 设置 pad_token
 if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
 
 base_model = AutoModelForCausalLM.from_pretrained(args.base_model_path, output_hidden_states=True)
 
-# 截断模型到第五层
-num_layers_to_keep = 3
+# Clip LLM
+num_layers_to_keep = args.clip_layer
 base_model.model.layers = nn.ModuleList(base_model.model.layers[:num_layers_to_keep])
 
-# 冻结 base_model 的所有层
+# Froze base model
 for param in base_model.parameters():
     param.requires_grad = False
 
-# 获取模型配置的hidden size
+# Hidden size
 input_dim = base_model.config.hidden_size
 hidden_dim = 256
-output_dim = 1  # 修改为 1
+output_dim = 1
 
-# 加载MLP模型
-model = CustomClassifier(base_model, input_dim, hidden_dim, output_dim).to(device)  # 将模型移动到设备
+# Load MLP
+model = CustomClassifier(base_model, input_dim, hidden_dim, output_dim).to(device)
 
-checkpoint = torch.load(args.model_path, map_location=device)  # 指定加载位置为设备
+checkpoint = torch.load(args.model_path, map_location=device)
 state_dict = checkpoint['mlp_state_dict']
 
-# 去掉键的前缀
 new_state_dict = {}
 for k, v in state_dict.items():
-    name = k.replace('mlp.', '')  # 去掉前缀 'mlp.'
+    name = k.replace('mlp.', '')
     new_state_dict[name] = v
 
 model.mlp.load_state_dict(new_state_dict, strict=False)
 model.eval()
 
-# 进行推理
+# Infer
 def infer(model, tokenizer, input_text, device):
     encoding = tokenizer.encode_plus(
         input_text,
@@ -112,14 +111,14 @@ def infer(model, tokenizer, input_text, device):
     with torch.no_grad():
         value = model(input_ids=input_ids, attention_mask=attention_mask)
     
-    return value.item()  # 返回一个标量值
+    return value.item()
 
-# 读取输入文件
+# Read and write
 with open(args.input_file, 'r') as f:
     data = [json.loads(line) for line in f]
     data = data[:]
 
-# 处理数据
+# Data process
 processed_data = []
 for item in tqdm.tqdm(data, desc="Processing"):
     instruction = item.get("instruction", "")
@@ -130,7 +129,7 @@ for item in tqdm.tqdm(data, desc="Processing"):
     item["predicted_entropy"] = predicted_value
     processed_data.append(item)
 
-# 保存输出文件
+# Save output
 with open(args.output_file, 'w') as f:
     for item in processed_data:
         f.write(json.dumps(item) + '\n')

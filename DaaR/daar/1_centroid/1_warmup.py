@@ -86,7 +86,7 @@ def warm_up_stage(selected_domain, tokenizer, model, txt_output_dir, jsonl_outpu
             clean_entry = entry.strip()
             f.write(clean_entry + '\n\n')
 
-    # 提取逻辑修改
+    # May be failed
     extracted_pairs = []
     for entry in warm_up_data:
         clean_entry = entry.strip()

@@ -25,7 +25,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
 if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
 
-model = AutoModelForCausalLM.from_pretrained(model_name_or_path).to('cuda')  # 假设使用CUDA设备
+model = AutoModelForCausalLM.from_pretrained(model_name_or_path).to('cuda')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 
@@ -33,7 +33,7 @@ def get_embedding(text, max_length=512):
     inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=max_length).to(device)
     with torch.no_grad():
         outputs = model(**inputs, output_hidden_states=True)
-        embeddings = outputs.hidden_states[-1].mean(dim=1).cpu().numpy()  # 使用最后一层隐藏状态的平均作为嵌入
+        embeddings = outputs.hidden_states[-1].mean(dim=1).cpu().numpy()
     return embeddings
 
 def generate_instruction_pair(prompt):
@@ -124,14 +124,13 @@ def generate_instruction_pairs(selected_domain, domains, warmup_file_path, num_p
     generated_count = 0
     attempts = 0
     
-    while generated_count < num_pairs and attempts < num_pairs * 5:  # 设置最大尝试次数以防无限循环
+    while generated_count < num_pairs:
         attempts += 1
         
-        # 随机选择三条已有的指令对
         sample_examples = random.sample(concatenated_strings, min(3, len(concatenated_strings)))
         examples_str = '\n'.join(sample_examples)
         
-        # 打印参考的examples
+        
         print(f"Reference Examples for Pair {generated_count + 1}:\n{examples_str}\n")
 
         prompt = prompt_template.format(
@@ -143,7 +142,6 @@ def generate_instruction_pairs(selected_domain, domains, warmup_file_path, num_p
         )
         raw_response = generate_instruction_pair(prompt)
         
-        # 打印原始生成文本
         print(f"Raw Response {attempts}: {raw_response}\n")
         
         extracted_pair = extract_instruction_parts(raw_response)
@@ -154,11 +152,10 @@ def generate_instruction_pairs(selected_domain, domains, warmup_file_path, num_p
             similarities = [F.cosine_similarity(torch.tensor(new_embedding), torch.tensor(old_emb), dim=-1).item() for old_emb in embeddings_list]
             print(f"Similarities to existing pairs: {similarities}")
 
-            if all(sim < similarity_threshold for sim in similarities):  # 确保所有相似度都低于阈值
+            if all(sim < similarity_threshold for sim in similarities):
                 instruction_pairs.append(extracted_pair)
                 generated_count += 1
                 
-                # 将新生成的指令对加入到instructions, inputs, outputs以备后续使用
                 instructions = list(instructions) + [extracted_pair['instruction']]
                 inputs = list(inputs) + [extracted_pair['input']]
                 outputs = list(outputs) + [extracted_pair['output']]
@@ -166,7 +163,7 @@ def generate_instruction_pairs(selected_domain, domains, warmup_file_path, num_p
                 embeddings_list.append(new_embedding)
 
     if save_dir:
-        os.makedirs(os.path.dirname(save_dir), exist_ok=True)  # 确保目录存在
+        os.makedirs(os.path.dirname(save_dir), exist_ok=True)
         with open(save_dir, 'w', encoding='utf-8') as f:
             for pair in instruction_pairs:
                 f.write(json.dumps(pair, ensure_ascii=False) + '\n')
@@ -174,7 +171,7 @@ def generate_instruction_pairs(selected_domain, domains, warmup_file_path, num_p
     
     return instruction_pairs
 
-# 定义领域及其描述
+# Domain description
 domains = {
     "common_sense": "Common sense generally includes a knowledge-based question and its corresponding answer, without reasoning.",
     "reasoning": "Reasoning involves the ability to think logically about a situation or problem, to draw conclusions from available information, and to apply knowledge in new situations.",
@@ -182,7 +179,6 @@ domains = {
     "coding": "Design and generate specific code programs, or apply algorithms and data structures, with code generation in the Output."
 }
 
-# 使用命令行参数来选择一个领域并生成指定数量的指令对
 instruction_pairs = generate_instruction_pairs(
     selected_domain=args.selected_domain,
     domains=domains,
@@ -192,7 +188,6 @@ instruction_pairs = generate_instruction_pairs(
     save_dir=args.save_dir
 )
 
-# 打印生成的指令对（可选）
 for idx, pair in enumerate(instruction_pairs, start=1):
     print(f"Generated Pair {idx}:")
     print(f"Instruction: {pair['instruction']}")
