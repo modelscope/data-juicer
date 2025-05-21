@@ -9,13 +9,11 @@ from data_juicer.config import init_configs
 from data_juicer.utils.lazy_loader import LazyLoader
 
 
-def is_relative_or_local_import(module_name: str) -> bool:
+def is_local_import(module_name: str) -> bool:
     """Check if a module name is a relative or local import."""
+    logger.info(f'Checking if {module_name} is a relative or local import')
     return (module_name.startswith('data_juicer') or  # local imports
-            module_name.startswith('.') or  # relative imports
-            module_name.startswith('__') or  # special imports
-            any(part.startswith('.')
-                for part in module_name.split('.')))  # nested relative imports
+            module_name.startswith('__'))  # special imports
 
 
 def get_imports_from_file(file_path: Path) -> Set[str]:
@@ -28,11 +26,14 @@ def get_imports_from_file(file_path: Path) -> Set[str]:
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 for name in node.names:
-                    if not is_relative_or_local_import(name.name):
+                    if not is_local_import(name.name):
                         imports.add(name.name)
             elif isinstance(node, ast.ImportFrom):
-                if node.module and not is_relative_or_local_import(
-                        node.module):
+                # For ImportFrom, we need to check both the module and the level
+                # level > 0 means it's a relative import
+                if node.level > 0:
+                    continue
+                if node.module and not is_local_import(node.module):
                     imports.add(node.module)
     except Exception as e:
         logger.warning(f'Failed to parse imports from {file_path}: {e}')
@@ -53,9 +54,6 @@ def find_lazy_loaders(file_path: Path) -> List[Tuple[str, str]]:
                     # Get the module name (first argument)
                     if node.args and isinstance(node.args[0], ast.Constant):
                         module_name = node.args[0].value
-                        # Skip local and relative imports
-                        if is_relative_or_local_import(module_name):
-                            continue
                         # Get the package name (second argument) if provided
                         package_name = None
                         if len(node.args) > 1 and isinstance(
@@ -137,13 +135,11 @@ def main():
 
     # Install dependencies using LazyLoader
     try:
-        logger.info('Installing dependencies...')
-        for package in required_packages:
-            logger.info(f'Installing {package}...')
-            LazyLoader._install_package(package)
-        logger.info('Dependencies installed successfully.')
+        logger.info('Resolving dependencies...')
+        LazyLoader.check_packages(list(required_packages))
+        logger.info('Dependencies resolved successfully.')
     except Exception as e:
-        logger.error(f'Failed to install dependencies: {e}')
+        logger.error(f'Failed to resolve dependencies: {e}')
         sys.exit(1)
 
 

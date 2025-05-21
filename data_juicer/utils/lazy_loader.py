@@ -220,7 +220,8 @@ class LazyLoader(types.ModuleType):
 
         for package_spec in package_specs:
             if not _is_package_installed(package_spec):
-                logger.info(f'Package {package_spec} not found, installing...')
+                logger.info(
+                    f'Package [{package_spec}] not found, installing...')
                 try:
                     cls._install_package(package_spec, pip_args)
                 except subprocess.CalledProcessError as e:
@@ -229,6 +230,9 @@ class LazyLoader(types.ModuleType):
                         f'require system-level dependencies. Please try '
                         f'installing it manually with: pip install {package_spec}\n'
                         f'Error details: {str(e)}')
+            else:
+                logger.info(
+                    f'Package [{package_spec}] already installed, carry on..')
 
     def __init__(self,
                  module_name: str,
