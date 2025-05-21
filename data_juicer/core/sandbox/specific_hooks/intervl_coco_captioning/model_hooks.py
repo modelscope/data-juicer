@@ -15,7 +15,7 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
     A training executor for InternVL COCO Caption Fine-Tuning.
 
     The config file for this executor should at least include the following items:
-    1. `type`: must be "internvl-coco-caption".
+    1. `type`: must be "internvl_coco_caption".
     2. `env_name`: the name of the environment for InternVL
     3. `env_manager`: the environment manager. Should be one of {"conda", "mamba", "venv", "virtualenv", "uv"}.
     4. `env_params`: a dict for other parameters of environments. Only works for conda-like environment. The
@@ -237,7 +237,7 @@ class InternVLCOCOCaptionEvaluator(BaseEvaluator):
     An evaluator for InternVL COCO Caption task.
 
     The config file for this executor should at least include the following items:
-    1. `type`: must be "internvl-coco-caption".
+    1. `type`: must be "internvl_coco_caption".
     2. `env_name`: the name of the environment for InternVL
     3. `env_manager`: the environment manager. Should be one of {"conda", "mamba", "venv", "virtualenv", "uv"}.
     4. `env_params`: a dict for other parameters of environments. Only works for conda-like environment. The

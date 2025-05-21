@@ -1,5 +1,8 @@
 from data_juicer.core import Analyzer as DJAnalyzer
 from data_juicer.core.executor import DefaultExecutor as DJExecutor
+from data_juicer.core.sandbox.data_pool_manipulators import (
+    DataPoolCombination, DataPoolConstruction, DataPoolDownsampling,
+    DataPoolDuplication, DataPoolRanking)
 from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
                                                  InceptionEvaluator,
                                                  VBenchEvaluator)
@@ -72,15 +75,15 @@ class DataPoolManipulatorFactory(object):
 
         manipulator = None
         if data_pool_cfg.type == 'data_pool_construction':
-            pass
+            manipulator = DataPoolConstruction(data_pool_cfg)
         elif data_pool_cfg.type == 'data_pool_combination':
-            pass
+            manipulator = DataPoolCombination(data_pool_cfg)
         elif data_pool_cfg.type == 'data_pool_duplication':
-            pass
+            manipulator = DataPoolDuplication(data_pool_cfg)
         elif data_pool_cfg.type == 'data_pool_ranking':
-            pass
+            manipulator = DataPoolRanking(data_pool_cfg)
         elif data_pool_cfg.type == 'data_pool_downsampling':
-            pass
+            manipulator = DataPoolDownsampling(data_pool_cfg)
 
         return manipulator
 
@@ -99,7 +102,13 @@ class ModelEvaluatorFactory(object):
         if eval_cfg is None:
             return None
 
-        pass
+        evaluator = None
+        if eval_cfg.type == 'internvl_coco_caption':
+            from data_juicer.core.sandbox.specific_hooks.intervl_coco_captioning.model_hooks import \
+                InternVLCOCOCaptionEvaluator
+            evaluator = InternVLCOCOCaptionEvaluator(eval_cfg)
+
+        return evaluator
 
 
 model_evaluator_factory = ModelEvaluatorFactory()
@@ -126,14 +135,19 @@ class ModelTrainExecutorFactory(object):
         if model_cfg is None:
             return None
 
+        trainer = None
         if model_cfg.type == 'modelscope':
-            return ModelscopeTrainExecutor(model_cfg, **kwargs)
+            trainer = ModelscopeTrainExecutor(model_cfg, **kwargs)
         elif model_cfg.type == 'easyanimate':
-            return EasyAnimateTrainExecutor(model_cfg, **kwargs)
+            trainer = EasyAnimateTrainExecutor(model_cfg, **kwargs)
         elif model_cfg.type == 'trinity-rft':
-            return TrinityRFTTrainExecutor(model_cfg, **kwargs)
+            trainer = TrinityRFTTrainExecutor(model_cfg, **kwargs)
+        elif model_cfg.type == 'internvl_coco_caption':
+            from data_juicer.core.sandbox.specific_hooks.intervl_coco_captioning.model_hooks import \
+                InternVLCOCOCaptionTrainExecutor
+            trainer = InternVLCOCOCaptionTrainExecutor(model_cfg, **kwargs)
 
-        # add more model trainer here freely
+        return trainer
 
 
 model_train_executor_factory = ModelTrainExecutorFactory()
