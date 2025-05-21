@@ -57,7 +57,8 @@ class COCOCaptionMetaGeneration(BaseDataPoolManipulator):
             - data root path to store the InternVL COCO Caption datasets, where there should be deeper directory
                 starting with "data/coco/xxx"
         Output:
-            - N meta file paths. They are named following the rule "<original_name>_meta.json"
+            - N meta file paths. They are named following the rule "<original_name>.json". Refer to:
+                https://github.com/OpenGVLab/InternVL/blob/main/internvl_chat/shell/data/coco_caption.json
         """
         # read inputs
         input_dataset_paths = self.data_pool_cfg.get('dataset_path', [])
