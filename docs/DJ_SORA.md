@@ -1,4 +1,4 @@
- DJ-SORA
+# DJ-SORA
 English | [中文页面](DJ_SORA_ZH.md) 
 
 ---

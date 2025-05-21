@@ -1,4 +1,4 @@
-# 沙盒
+# 沙盒实验室
 ## 用户指南
 ### 应用和成果
 我们利用Data-Juicer沙盒实验室套件，通过数据与模型间的系统性研发工作流，调优数据和模型，相关工作请参考[论文](http://arxiv.org/abs/2407.11784)。在本工作中，我们在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。
