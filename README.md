@@ -1,8 +1,13 @@
-# DetailMaster: Can Your Text-to-Image Model Handle Lengthy Prompts?
+# DetailMaster: Can Your Text-to-Image Model Handle Long Prompts?
 
 ## **README under construction!!!**
 
-> **Abstract:** While recent text-to-image (T2I) models show impressive capabilities in synthesizing images from brief descriptions, their performance significantly degrades when confronted with lengthy, detail-intensive prompts required in professional applications. We present DetailMaster, the first comprehensive benchmark specifically designed to evaluate T2I systems' abilities to handle extended textual inputs that contain complex compositional requirements. Our framework introduces four critical evaluation dimensions: Character Attributes, Structured Character Locations, Multi-Dimensional Scene Attributes, and Explicit Spatial/Interactive Relationships. The benchmark comprises lengthy and detail-rich prompts averaging 284.89 tokens, with high quality validated by expert annotators. We evaluate 7 general-purpose and 5 lengthy-prompt-optimized T2I models, revealing critical performance limitations: state-of-the-art systems achieve merely 50% accuracy in key dimensions like attribute binding and spatial reasoning, while all models showing progressive performance degradation as prompt length increases. Our analysis highlights systemic failures in structural comprehension and detail overload handling, motivating future research into architectures with enhanced compositional reasoning. We open-source our dataset, data construction code, and evaluation tools to advance the field of lengthy-prompt-driven and detail-rich T2I generation.
+> **Abstract:** While recent text-to-image (T2I) models show impressive capabilities in synthesizing images from brief descriptions, their performance significantly degrades when confronted with long, detail-intensive prompts required in professional applications. We present DetailMaster, the first comprehensive benchmark specifically designed to evaluate T2I models' systematical abilities to handle extended textual inputs that contain complex compositional requirements.
+Our benchmark introduces four critical evaluation dimensions: Character Attributes, Structured Character Locations, Multi-Dimensional Scene Attributes, and Explicit Spatial/Interactive Relationships. 
+The benchmark comprises long and detail-rich prompts averaging 284.89 tokens, with high quality validated by expert annotators. 
+Evaluation on 7 general-purpose and 5 long-prompt-optimized T2I models reveals critical performance limitations: state-of-the-art models achieve merely ~50% accuracy in key dimensions like attribute binding and spatial reasoning, while all models showing progressive performance degradation as prompt length increases. 
+Our analysis highlights systemic failures in structural comprehension and detail overload handling, motivating future research into architectures with enhanced compositional reasoning. 
+We open-source the dataset, data curation code, and evaluation tools to advance detail-rich T2I generation and enable broad applications that would otherwise be infeasible due to the lack of a dedicated benchmark.
 
 
 
@@ -81,6 +86,14 @@ $ bash evaluation_pipeline/cal_eval.sh
 Now, you get the evaluation results.
 
 
+### Mini-Benchmark Evaluation (Optional)
+To facilitate rapid evaluation, we design a mini version of our benchmark: [​​DetailMaster_mini_benchmark​](https://github.com/modelscope/data-juicer/tree/DetailMaster/DetailMaster_Dataset)​.
+
+Evaluation command:
+```shell
+$ bash evaluation_pipeline/eval_mini_benchmark/eval_process_mini.sh
+$ bash evaluation_pipeline/eval_mini_benchmark/cal_eval_mini.sh
+```
 
 
 
