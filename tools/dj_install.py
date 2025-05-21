@@ -9,6 +9,15 @@ from data_juicer.config import init_configs
 from data_juicer.utils.lazy_loader import LazyLoader
 
 
+def is_relative_or_local_import(module_name: str) -> bool:
+    """Check if a module name is a relative or local import."""
+    return (module_name.startswith('data_juicer') or  # local imports
+            module_name.startswith('.') or  # relative imports
+            module_name.startswith('__') or  # special imports
+            any(part.startswith('.')
+                for part in module_name.split('.')))  # nested relative imports
+
+
 def get_imports_from_file(file_path: Path) -> Set[str]:
     """Extract all imports from a Python file."""
     imports = set()
@@ -19,16 +28,12 @@ def get_imports_from_file(file_path: Path) -> Set[str]:
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 for name in node.names:
-                    # Skip local imports (those starting with data_juicer)
-                    if not name.name.startswith('data_juicer'):
+                    if not is_relative_or_local_import(name.name):
                         imports.add(name.name)
             elif isinstance(node, ast.ImportFrom):
-                if node.module:
-                    # Skip local imports and relative imports
-                    if not (node.module.startswith('data_juicer')
-                            or node.module.startswith('.')
-                            or node.module.startswith('..')):
-                        imports.add(node.module)
+                if node.module and not is_relative_or_local_import(
+                        node.module):
+                    imports.add(node.module)
     except Exception as e:
         logger.warning(f'Failed to parse imports from {file_path}: {e}')
     return imports
@@ -48,6 +53,9 @@ def find_lazy_loaders(file_path: Path) -> List[Tuple[str, str]]:
                     # Get the module name (first argument)
                     if node.args and isinstance(node.args[0], ast.Constant):
                         module_name = node.args[0].value
+                        # Skip local and relative imports
+                        if is_relative_or_local_import(module_name):
+                            continue
                         # Get the package name (second argument) if provided
                         package_name = None
                         if len(node.args) > 1 and isinstance(
