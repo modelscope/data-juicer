@@ -13,9 +13,33 @@ from loguru import logger
 
 
 def get_toml_file_path():
-    with importlib.resources.path('data_juicer', '__init__.py') as init_path:
-        project_root = init_path.parent.parent
-        return project_root / 'pyproject.toml'
+    """Get the path to pyproject.toml file."""
+    try:
+        # First try to find it in the installed package data
+        with importlib.resources.path('py_data_juicer',
+                                      'pyproject.toml') as toml_path:
+            return toml_path
+    except (ImportError, FileNotFoundError):
+        # If not found in package data, try project root
+        with importlib.resources.path('data_juicer',
+                                      '__init__.py') as init_path:
+            project_root = init_path.parent.parent
+            return project_root / 'pyproject.toml'
+
+
+def get_uv_lock_path():
+    """Get the path to uv.lock file."""
+    try:
+        # First try to find it in the installed package data
+        with importlib.resources.path('py_data_juicer',
+                                      'uv.lock') as lock_path:
+            return lock_path
+    except (ImportError, FileNotFoundError):
+        # If not found in package data, try project root
+        with importlib.resources.path('data_juicer',
+                                      '__init__.py') as init_path:
+            project_root = init_path.parent.parent
+            return project_root / 'uv.lock'
 
 
 class LazyLoader(types.ModuleType):
@@ -35,7 +59,8 @@ class LazyLoader(types.ModuleType):
     @classmethod
     def get_all_dependencies(cls):
         """
-        Get all dependencies from pyproject.toml, including optional ones.
+        Get all dependencies, prioritizing uv.lock if available.
+        Falls back to pyproject.toml if uv.lock is not found.
 
         Returns:
             dict: A dictionary mapping module names to their full package specifications
@@ -45,6 +70,29 @@ class LazyLoader(types.ModuleType):
         if cls._dependencies is not None:
             return cls._dependencies
 
+        # Try to get dependencies from uv.lock first
+        try:
+            lock_path = get_uv_lock_path()
+            if lock_path.exists():
+                with open(lock_path, 'rb') as f:
+                    lock_data = tomli.load(f)
+
+                result = {}
+                # Extract package versions from uv.lock
+                if 'package' in lock_data:
+                    for pkg in lock_data['package']:
+                        if 'name' in pkg and 'version' in pkg:
+                            name = pkg['name']
+                            version = pkg['version']
+                            result[name] = f'{name}=={version}'
+
+                if result:
+                    cls._dependencies = result
+                    return cls._dependencies
+        except Exception as e:
+            logger.debug(f'Failed to read dependencies from uv.lock: {str(e)}')
+
+        # Fall back to pyproject.toml if uv.lock is not available or empty
         try:
             pyproject_path = get_toml_file_path()
 

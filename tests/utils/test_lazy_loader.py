@@ -137,6 +137,8 @@ class LazyLoaderDependencyTest(DataJuicerTestCaseBase):
         super().setUp()
         # Reset the dependencies cache before each test
         LazyLoader.reset_dependencies_cache()
+        
+        # Create test pyproject.toml
         self.pyproject_content = """
 [project]
 dependencies = [
@@ -195,11 +197,47 @@ audio = [
 ]
 """
         self.pyproject_path = self.create_test_pyproject(self.pyproject_content)
+        
+        # Create test uv.lock
+        self.uv_lock_content = """
+revision = 2
+requires-python = ">=3.10"
+
+[[package]]
+name = "numpy"
+version = "1.26.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/.../numpy-1.26.4.tar.gz", hash = "sha256:...", size = 12345, upload-time = "2024-01-01T00:00:00.000Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/.../numpy-1.26.4-py3-none-any.whl", hash = "sha256:...", size = 12345, upload-time = "2024-01-01T00:00:00.000Z" }
+]
+
+[[package]]
+name = "pandas"
+version = "2.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/.../pandas-2.2.0.tar.gz", hash = "sha256:...", size = 12345, upload-time = "2024-01-01T00:00:00.000Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/.../pandas-2.2.0-py3-none-any.whl", hash = "sha256:...", size = 12345, upload-time = "2024-01-01T00:00:00.000Z" }
+]
+
+[[package]]
+name = "torch"
+version = "2.5.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/.../torch-2.5.1.tar.gz", hash = "sha256:...", size = 12345, upload-time = "2024-01-01T00:00:00.000Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/.../torch-2.5.1-py3-none-any.whl", hash = "sha256:...", size = 12345, upload-time = "2024-01-01T00:00:00.000Z" }
+]
+"""
+        self.uv_lock_path = self.create_test_uv_lock(self.uv_lock_content)
 
     def tearDown(self):
         """Clean up test environment."""
-        if os.path.exists(self.pyproject_path):
+        if hasattr(self, 'pyproject_path') and os.path.exists(self.pyproject_path):
             os.unlink(self.pyproject_path)
+        if hasattr(self, 'uv_lock_path') and self.uv_lock_path.exists():
+            self.uv_lock_path.unlink()
         super().tearDown()
 
     def create_test_pyproject(self, content):
@@ -207,6 +245,14 @@ audio = [
         with tempfile.NamedTemporaryFile(mode='w', suffix='.toml', delete=False) as f:
             f.write(content)
             return f.name
+
+    def create_test_uv_lock(self, content):
+        """Create a temporary uv.lock file with the given content."""
+        temp_dir = Path(tempfile.mkdtemp())
+        lock_path = temp_dir / 'uv.lock'
+        with open(lock_path, 'w') as f:
+            f.write(content)
+        return lock_path
 
     def test_get_all_dependencies(self):
         """Test getting all dependencies from pyproject.toml."""
@@ -224,6 +270,77 @@ audio = [
             self.assertEqual(deps['Pillow'], 'Pillow>=10.0.0')
             self.assertEqual(deps['transformers'], 'transformers>=4.30.0')
             self.assertEqual(deps['librosa'], 'librosa>=0.10')
+
+    @patch('data_juicer.utils.lazy_loader.get_uv_lock_path')
+    def test_get_dependencies_from_uv_lock(self, mock_get_uv_lock_path):
+        """Test getting dependencies from uv.lock."""
+        mock_get_uv_lock_path.return_value = self.uv_lock_path
+        
+        deps = LazyLoader.get_all_dependencies()
+        
+        # Check that we got the exact versions from uv.lock
+        self.assertEqual(deps['numpy'], 'numpy==1.26.4')
+        self.assertEqual(deps['pandas'], 'pandas==2.2.0')
+        self.assertEqual(deps['torch'], 'torch==2.5.1')
+
+    @patch('data_juicer.utils.lazy_loader.get_uv_lock_path')
+    def test_uv_lock_not_found_fallback(self, mock_get_uv_lock_path):
+        """Test fallback to pyproject.toml when uv.lock is not found."""
+        # Make get_uv_lock_path raise FileNotFoundError
+        mock_get_uv_lock_path.side_effect = FileNotFoundError
+        
+        with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_toml:
+            mock_get_toml.return_value = Path(self.pyproject_path)
+            deps = LazyLoader.get_all_dependencies()
+            
+            # Should get versions from pyproject.toml
+            self.assertEqual(deps['numpy'], 'numpy>=1.26.4,<2.0.0')
+            self.assertEqual(deps['pandas'], 'pandas>=2.0.0')
+
+    @patch('data_juicer.utils.lazy_loader.get_uv_lock_path')
+    def test_uv_lock_empty_fallback(self, mock_get_uv_lock_path):
+        """Test fallback to pyproject.toml when uv.lock is empty."""
+        # Create an empty uv.lock
+        empty_lock = self.create_test_uv_lock("")
+        mock_get_uv_lock_path.return_value = empty_lock
+        
+        with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_toml:
+            mock_get_toml.return_value = Path(self.pyproject_path)
+            deps = LazyLoader.get_all_dependencies()
+            
+            # Should get versions from pyproject.toml
+            self.assertEqual(deps['numpy'], 'numpy>=1.26.4,<2.0.0')
+            self.assertEqual(deps['pandas'], 'pandas>=2.0.0')
+
+    @patch('data_juicer.utils.lazy_loader.get_uv_lock_path')
+    def test_uv_lock_invalid_json(self, mock_get_uv_lock_path):
+        """Test handling of invalid uv.lock JSON."""
+        # Create an invalid uv.lock
+        invalid_lock = self.create_test_uv_lock("invalid json content")
+        mock_get_uv_lock_path.return_value = invalid_lock
+        
+        with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_toml:
+            mock_get_toml.return_value = Path(self.pyproject_path)
+            deps = LazyLoader.get_all_dependencies()
+            
+            # Should get versions from pyproject.toml
+            self.assertEqual(deps['numpy'], 'numpy>=1.26.4,<2.0.0')
+            self.assertEqual(deps['pandas'], 'pandas>=2.0.0')
+
+    @patch('data_juicer.utils.lazy_loader.get_uv_lock_path')
+    def test_uv_lock_missing_packages_key(self, mock_get_uv_lock_path):
+        """Test handling of uv.lock with missing packages key."""
+        # Create uv.lock without packages key
+        invalid_lock = self.create_test_uv_lock("")
+        mock_get_uv_lock_path.return_value = invalid_lock
+        
+        with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_toml:
+            mock_get_toml.return_value = Path(self.pyproject_path)
+            deps = LazyLoader.get_all_dependencies()
+            
+            # Should get versions from pyproject.toml
+            self.assertEqual(deps['numpy'], 'numpy>=1.26.4,<2.0.0')
+            self.assertEqual(deps['pandas'], 'pandas>=2.0.0')
 
     def test_get_all_dependencies_not_found(self):
         """Test behavior when pyproject.toml is not found."""

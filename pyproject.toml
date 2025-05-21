@@ -40,7 +40,7 @@ dependencies = [
     "tabulate",
     "librosa>=0.10",
     "resampy",
-    "samplerate",
+    "samplerate==0.1.0",
     "bs4",
     "matplotlib",
     "plotly",  # interactive plots
@@ -128,6 +128,7 @@ dev = [
     "toml",  # for yapf configuration
     "pytest",  # testing framework
     "pytest-cov",  # coverage reporting
+    "build",  # package building
 ]
 
 # AI Services & APIs
@@ -136,6 +137,7 @@ ai_services = [
     "openai",  # OpenAI API
     "label-studio==1.17.0",  # Data labeling
 ]
+
 
 # Sandbox Environment
 # Todo: the sandbox dependencies will be provided in
@@ -160,6 +162,7 @@ sandbox = [
     "func_timeout",
 ]
 
+
 # All dependencies (default + all optional, except sandbox)
 all = [
     "py-data-juicer[generic]",
@@ -182,6 +185,14 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["data_juicer"]
+include = ["uv.lock", "pyproject.toml"]
+
+[tool.hatch.build]
+include = ["uv.lock", "pyproject.toml"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"uv.lock" = "uv.lock"
+"pyproject.toml" = "pyproject.toml"
 
 [tool.flake8]
 per-file-ignores = [
