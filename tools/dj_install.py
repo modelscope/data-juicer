@@ -1,117 +1,142 @@
-import argparse
-import os
-import subprocess
+import ast
 import sys
-import tempfile
 from pathlib import Path
+from typing import List, Set, Tuple
 
 from loguru import logger
 
-from data_juicer.utils.config_utils import init_configs
+from data_juicer.config import init_configs
 from data_juicer.utils.lazy_loader import LazyLoader
 
-# Map operators to their required packages
-OPS_TO_PKG = {
-    # Add your operator to package mappings here
-    # Example:
-    # 'text_length_filter': ['numpy'],
-    # 'image_quality_filter': ['opencv-python', 'numpy'],
-}
 
-# Paths to requirements files for version constraints
-require_version_paths = [
-    Path(__file__).parent.parent / 'requirements.txt',
-    Path(__file__).parent.parent / 'requirements-dev.txt',
-]
+def get_imports_from_file(file_path: Path) -> Set[str]:
+    """Extract all imports from a Python file."""
+    imports = set()
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            tree = ast.parse(f.read())
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for name in node.names:
+                    # Skip local imports (those starting with data_juicer)
+                    if not name.name.startswith('data_juicer'):
+                        imports.add(name.name)
+            elif isinstance(node, ast.ImportFrom):
+                if node.module:
+                    # Skip local imports and relative imports
+                    if not (node.module.startswith('data_juicer')
+                            or node.module.startswith('.')
+                            or node.module.startswith('..')):
+                        imports.add(node.module)
+    except Exception as e:
+        logger.warning(f'Failed to parse imports from {file_path}: {e}')
+    return imports
+
+
+def find_lazy_loaders(file_path: Path) -> List[Tuple[str, str]]:
+    """Find all LazyLoader instances in a file and their package names."""
+    lazy_loaders = []
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            tree = ast.parse(f.read())
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                if isinstance(node.func,
+                              ast.Name) and node.func.id == 'LazyLoader':
+                    # Get the module name (first argument)
+                    if node.args and isinstance(node.args[0], ast.Constant):
+                        module_name = node.args[0].value
+                        # Get the package name (second argument) if provided
+                        package_name = None
+                        if len(node.args) > 1 and isinstance(
+                                node.args[1], ast.Constant):
+                            package_name = node.args[1].value
+                        elif len(node.keywords) > 0:
+                            for kw in node.keywords:
+                                if kw.arg == 'package_name' and isinstance(
+                                        kw.value, ast.Constant):
+                                    package_name = kw.value.value
+                                    break
+                        lazy_loaders.append((module_name, package_name))
+    except Exception as e:
+        logger.warning(
+            f'Failed to parse LazyLoader instances from {file_path}: {e}')
+    return lazy_loaders
+
+
+def get_operator_imports(op_name: str) -> Set[str]:
+    """Get all imports needed by an operator."""
+    # Try to find the operator file in all op subdirectories
+    op_dirs = [
+        'filter', 'mapper', 'deduplicator', 'selector', 'aggregrator',
+        'grouper'
+    ]
+    op_paths = []
+    for op_dir in op_dirs:
+        op_paths.extend([
+            Path(__file__).parent.parent / 'data_juicer' / 'ops' / op_dir /
+            f'{op_name}.py',
+            Path(__file__).parent.parent / 'data_juicer' / 'ops' / op_dir /
+            op_name / '__init__.py',
+        ])
+
+    imports = set()
+    for path in op_paths:
+        if path.exists():
+            # Get regular imports
+            imports.update(get_imports_from_file(path))
+
+            # Get LazyLoader dependencies
+            lazy_loaders = find_lazy_loaders(path)
+            for module_name, package_name in lazy_loaders:
+                if package_name:
+                    imports.add(package_name)
+                else:
+                    # If no package name specified, use the base module name
+                    imports.add(module_name.split('.')[0])
+
+    return imports
+
+
+def get_package_name(module_name: str) -> str:
+    """Convert a module name to its corresponding package name."""
+    return LazyLoader.get_package_name(module_name)
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='Install Data-Juicer dependencies')
-    parser.add_argument(
-        '--config',
-        type=str,
-        help='Path to the config file to determine required operators')
-    parser.add_argument(
-        '--ops',
-        type=str,
-        nargs='+',
-        help='Operator categories to install '
-        '(e.g., vision, nlp, audio, generic, distributed, sandbox)')
-    args = parser.parse_args()
+    # Initialize config and get operators
+    cfg = init_configs()
+    op_names = [list(op.keys())[0] for op in cfg.process]
+    logger.info(f'Operators: {op_names}')
 
-    # If no specific ops or config provided, install all dependencies
-    if not args.ops and not args.config:
-        logger.info('Installing all dependencies...')
-        try:
-            LazyLoader.check_packages(['.'])
-            logger.info('All dependencies installed successfully.')
-        except Exception as e:
-            logger.error(f'Failed to install dependencies: {e}')
-            sys.exit(1)
+    # Get all required imports
+    all_imports = set()
+    for op_name in op_names:
+        op_imports = get_operator_imports(op_name)
+        all_imports.update(op_imports)
+
+    logger.info(f'All imports: {all_imports}')
+
+    # Convert imports to package names
+    required_packages = {get_package_name(imp) for imp in all_imports}
+    logger.info(f'Required packages: {required_packages}')
+
+    if not required_packages:
+        logger.warning('No dependencies found for the specified operators.')
         return
 
-    # If config is provided, install based on operators in config
-    if args.config:
-        cfg = init_configs(args.config)
-
-        # get the ops in the recipe
-        op_names = [list(op.keys())[0] for op in cfg.process]
-        recipe_reqs = []
-        for op_name in op_names:
-            if op_name in OPS_TO_PKG:
-                recipe_reqs.extend(OPS_TO_PKG[op_name])
-        recipe_reqs = list(set(recipe_reqs))
-
-        # get the package version limit of Data-Juicer
-        version_map, reqs = {}, []
-        for path in require_version_paths:
-            if not os.path.exists(path):
-                logger.warning(f'target file does not exist: {path}')
-            else:
-                with open(path, 'r', encoding='utf-8') as fin:
-                    reqs += [x.strip() for x in fin.read().splitlines()]
-        for req in reqs:
-            clean_req = req.replace('<', ' ').replace('>', ' ').replace(
-                '=', ' ').split(' ')[0]
-            version_map[clean_req] = req
-
-        # generate require file for the recipe
-        with tempfile.NamedTemporaryFile(delete=False, mode='w') as temp_file:
-            temp_file_path = temp_file.name
-            for req in recipe_reqs:
-                if req in version_map:
-                    temp_file.write(version_map[req] + '\n')
-                else:
-                    temp_file.write(req + '\n')
-
-        # install by calling 'pip install -r ...'
-        try:
-            subprocess.check_call(
-                [sys.executable, '-m', 'pip', 'install', '-r', temp_file_path])
-            logger.info('Requirements were installed successfully.')
-        except subprocess.CalledProcessError as e:
-            logger.error(
-                f'An error occurred while installing the requirements: {e}')
-            if os.path.exists(temp_file_path):
-                os.remove(temp_file_path)
-            sys.exit(1)
-        finally:
-            if os.path.exists(temp_file_path):
-                os.remove(temp_file_path)
-        return
-
-    # Install specific operator categories
-    for op_category in args.ops:
-        logger.info(f'Installing dependencies for {op_category}...')
-        try:
-            LazyLoader.check_packages([f'.[{op_category}]'])
-            logger.info(
-                f'Dependencies for {op_category} installed successfully.')
-        except Exception as e:
-            logger.error(
-                f'Failed to install dependencies for {op_category}: {e}')
-            sys.exit(1)
+    # Install dependencies using LazyLoader
+    try:
+        logger.info('Installing dependencies...')
+        for package in required_packages:
+            logger.info(f'Installing {package}...')
+            LazyLoader._install_package(package)
+        logger.info('Dependencies installed successfully.')
+    except Exception as e:
+        logger.error(f'Failed to install dependencies: {e}')
+        sys.exit(1)
 
 
 if __name__ == '__main__':

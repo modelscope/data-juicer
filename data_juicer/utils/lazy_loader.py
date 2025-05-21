@@ -51,6 +51,33 @@ class LazyLoader(types.ModuleType):
     # Class variable to cache dependencies
     _dependencies = None
 
+    # Mapping of module names to their corresponding package names
+    _module_to_package = {
+        'cv2': 'opencv-python',
+        'PIL': 'Pillow',
+        'bs4': 'beautifulsoup4',
+        'sklearn': 'scikit-learn',
+        'yaml': 'PyYAML',
+        'git': 'gitpython',
+    }
+
+    @classmethod
+    def get_package_name(cls, module_name: str) -> str:
+        """Convert a module name to its corresponding package name.
+
+        Args:
+            module_name: The name of the module (e.g., 'cv2', 'PIL')
+
+        Returns:
+            str: The corresponding package name (e.g., 'opencv-python', 'Pillow')
+        """
+        # Try to get the package name from the mapping
+        if module_name in cls._module_to_package:
+            return cls._module_to_package[module_name]
+
+        # If not in mapping, return the module name as is
+        return module_name
+
     @classmethod
     def reset_dependencies_cache(cls):
         """Reset the dependencies cache."""
@@ -60,7 +87,7 @@ class LazyLoader(types.ModuleType):
     def get_all_dependencies(cls):
         """
         Get all dependencies, prioritizing uv.lock if available.
-        Falls back to pyproject.toml if uv.lock is not found.
+        Falls back to pyproject.toml if uv.lock is not found or fails to parse.
 
         Returns:
             dict: A dictionary mapping module names to their full package specifications
@@ -75,20 +102,25 @@ class LazyLoader(types.ModuleType):
             lock_path = get_uv_lock_path()
             if lock_path.exists():
                 with open(lock_path, 'rb') as f:
-                    lock_data = tomli.load(f)
+                    try:
+                        lock_data = tomli.load(f)
+                    except Exception as e:
+                        logger.debug(f'Failed to parse uv.lock: {str(e)}')
+                        # Don't return empty dict here, fall back to pyproject.toml
+                        pass
+                    else:
+                        result = {}
+                        # Extract package versions from uv.lock
+                        if 'package' in lock_data:
+                            for pkg in lock_data['package']:
+                                if 'name' in pkg and 'version' in pkg:
+                                    name = pkg['name']
+                                    version = pkg['version']
+                                    result[name] = f'{name}=={version}'
 
-                result = {}
-                # Extract package versions from uv.lock
-                if 'package' in lock_data:
-                    for pkg in lock_data['package']:
-                        if 'name' in pkg and 'version' in pkg:
-                            name = pkg['name']
-                            version = pkg['version']
-                            result[name] = f'{name}=={version}'
-
-                if result:
-                    cls._dependencies = result
-                    return cls._dependencies
+                        if result:
+                            cls._dependencies = result
+                            return cls._dependencies
         except Exception as e:
             logger.debug(f'Failed to read dependencies from uv.lock: {str(e)}')
 
@@ -102,7 +134,12 @@ class LazyLoader(types.ModuleType):
                 return cls._dependencies
 
             with open(pyproject_path, 'rb') as f:
-                pyproject = tomli.load(f)
+                try:
+                    pyproject = tomli.load(f)
+                except Exception as e:
+                    logger.debug(f'Failed to parse pyproject.toml: {str(e)}')
+                    cls._dependencies = {}
+                    return cls._dependencies
 
             result = {}
 
@@ -210,9 +247,10 @@ class LazyLoader(types.ModuleType):
         """
         self._module_name = module_name
 
-        # For installation, use the provided package_name or base module name
+        # For installation, use the provided package_name or get it from mapping
         if package_name is None:
-            self._package_name = module_name.split('.')[0]
+            base_module = module_name.split('.')[0]
+            self._package_name = self.get_package_name(base_module)
         else:
             self._package_name = package_name
 

@@ -6,6 +6,7 @@ import os
 import tempfile
 from pathlib import Path
 import shutil
+import io
 
 from data_juicer.utils.lazy_loader import LazyLoader, get_toml_file_path
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
@@ -254,22 +255,23 @@ wheels = [
             f.write(content)
         return lock_path
 
-    def test_get_all_dependencies(self):
+    @patch('data_juicer.utils.lazy_loader.get_uv_lock_path')
+    @patch('data_juicer.utils.lazy_loader.get_toml_file_path')
+    def test_get_all_dependencies(self, mock_get_toml_file_path, mock_get_uv_lock_path):
         """Test getting all dependencies from pyproject.toml."""
-        with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path:
-            mock_get_path.return_value = Path(self.pyproject_path)
-            deps = LazyLoader.get_all_dependencies()
-            
-            # Check main dependencies
-            self.assertEqual(deps['pandas'], 'pandas>=2.0.0')
-            self.assertEqual(deps['numpy'], 'numpy>=1.26.4,<2.0.0')
-            self.assertEqual(deps['loguru'], 'loguru')
-            
-            # Check optional dependencies
-            self.assertEqual(deps['opencv-python'], 'opencv-python')
-            self.assertEqual(deps['Pillow'], 'Pillow>=10.0.0')
-            self.assertEqual(deps['transformers'], 'transformers>=4.30.0')
-            self.assertEqual(deps['librosa'], 'librosa>=0.10')
+        # Mock get_uv_lock_path to return a non-existent path
+        mock_get_uv_lock_path.return_value = Path('/nonexistent/path/uv.lock')
+        mock_get_toml_file_path.return_value = Path(self.pyproject_path)
+
+        deps = LazyLoader.get_all_dependencies()
+        # check the dependencies per self.pyproject_content
+        self.assertEqual(deps['pandas'], 'pandas>=2.0.0')
+        self.assertEqual(deps['numpy'], 'numpy>=1.26.4,<2.0.0')
+        self.assertEqual(deps['loguru'], 'loguru')
+        self.assertEqual(deps['tqdm'], 'tqdm')
+        self.assertEqual(deps['jsonargparse[signatures]'], 'jsonargparse[signatures]')
+        self.assertEqual(deps['jsonlines'], 'jsonlines')
+        self.assertEqual(deps['zstandard'], 'zstandard')
 
     @patch('data_juicer.utils.lazy_loader.get_uv_lock_path')
     def test_get_dependencies_from_uv_lock(self, mock_get_uv_lock_path):
@@ -344,18 +346,21 @@ wheels = [
 
     def test_get_all_dependencies_not_found(self):
         """Test behavior when pyproject.toml is not found."""
-        with patch('data_juicer.utils.lazy_loader.get_toml_file_path', side_effect=FileNotFoundError):
+        with patch('data_juicer.utils.lazy_loader.get_toml_file_path', side_effect=FileNotFoundError), \
+             patch('data_juicer.utils.lazy_loader.get_uv_lock_path', side_effect=FileNotFoundError):
             deps = LazyLoader.get_all_dependencies()
             self.assertEqual(deps, {})
 
     def test_get_all_dependencies_parse_error(self):
-        """Test behavior when pyproject.toml is invalid."""
+        """Test behavior when uv.lock is missing and pyproject.toml is invalid."""
         with tempfile.NamedTemporaryFile(mode='w', suffix='.toml') as f:
             f.write('invalid toml content')
             f.flush()
             
-            with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path:
+            with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+                 patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock:
                 mock_get_path.return_value = Path(f.name)
+                mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
                 deps = LazyLoader.get_all_dependencies()
                 self.assertEqual(deps, {})
 
@@ -371,8 +376,10 @@ dependencies = []
             f.write(empty_content)
             f.flush()
             
-            with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path:
+            with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+                 patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock:
                 mock_get_path.return_value = Path(f.name)
+                mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
                 deps = LazyLoader.get_all_dependencies()
                 self.assertEqual(deps, {})
 
@@ -387,17 +394,21 @@ version = "0.1.0"
             f.write(minimal_content)
             f.flush()
             
-            with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path:
+            with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+                 patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock:
                 mock_get_path.return_value = Path(f.name)
+                mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
                 deps = LazyLoader.get_all_dependencies()
                 self.assertEqual(deps, {})
 
     def test_install_package_with_version(self):
         """Test package installation with version from dependencies."""
         with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+             patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock, \
              patch('subprocess.check_call') as mock_check_call:
             # Set up the mock pyproject.toml
             mock_get_path.return_value = Path(self.pyproject_path)
+            mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
             
             # Test installing a package that has a version in dependencies
             LazyLoader._install_package('pandas')
@@ -410,9 +421,11 @@ version = "0.1.0"
     def test_install_package_with_complex_version(self):
         """Test package installation with complex version constraints."""
         with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+             patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock, \
              patch('subprocess.check_call') as mock_check_call:
             # Set up the mock pyproject.toml
             mock_get_path.return_value = Path(self.pyproject_path)
+            mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
             
             # Test installing a package with complex version constraints
             LazyLoader._install_package('numpy')
@@ -425,9 +438,11 @@ version = "0.1.0"
     def test_install_package_with_extras(self):
         """Test package installation with extras."""
         with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+             patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock, \
              patch('subprocess.check_call') as mock_check_call:
             # Set up the mock pyproject.toml
             mock_get_path.return_value = Path(self.pyproject_path)
+            mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
             
             # Test installing a package with extras
             LazyLoader._install_package('jsonargparse[signatures]')
@@ -440,9 +455,11 @@ version = "0.1.0"
     def test_install_package_without_version(self):
         """Test package installation for packages without version in dependencies."""
         with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+             patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock, \
              patch('subprocess.check_call') as mock_check_call:
             # Set up the mock pyproject.toml
             mock_get_path.return_value = Path(self.pyproject_path)
+            mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
             
             # Test installing a package that doesn't have a version in dependencies
             LazyLoader._install_package('nonexistent')
@@ -455,10 +472,12 @@ version = "0.1.0"
     def test_install_package_with_github_url(self):
         """Test package installation with GitHub URL."""
         with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+             patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock, \
              patch('subprocess.check_call') as mock_check_call, \
              patch('git.Repo.clone_from') as mock_clone:
             # Set up the mock pyproject.toml
             mock_get_path.return_value = Path(self.pyproject_path)
+            mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
             
             # Test installing a package from GitHub
             LazyLoader._install_package('git+https://github.com/user/repo.git')
@@ -472,9 +491,11 @@ version = "0.1.0"
     def test_install_package_with_cached_dependencies(self):
         """Test that package installation uses cached dependencies."""
         with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+             patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock, \
              patch('subprocess.check_call') as mock_check_call:
             # Set up the mock pyproject.toml
             mock_get_path.return_value = Path(self.pyproject_path)
+            mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
             
             # First call should load dependencies
             LazyLoader._install_package('pandas')
@@ -497,9 +518,11 @@ version = "0.1.0"
     def test_install_package_with_optional_dependency(self):
         """Test installing a package from optional dependencies."""
         with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+             patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock, \
              patch('subprocess.check_call') as mock_check_call:
             # Set up the mock pyproject.toml
             mock_get_path.return_value = Path(self.pyproject_path)
+            mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
             
             # Test installing a package from optional dependencies
             LazyLoader._install_package('opencv-python')
@@ -512,12 +535,14 @@ version = "0.1.0"
     def test_install_package_with_version_override(self):
         """Test that package URL overrides version from dependencies."""
         with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+             patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock, \
              patch('subprocess.check_call') as mock_check_call, \
              patch('git.Repo.clone_from') as mock_clone, \
              patch('os.path.exists') as mock_exists, \
              patch('shutil.rmtree') as mock_rmtree:
             # Set up the mock pyproject.toml
             mock_get_path.return_value = Path(self.pyproject_path)
+            mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
             # Mock requirements.txt not existing
             mock_exists.return_value = False
             
@@ -538,10 +563,12 @@ version = "0.1.0"
     def test_install_package_with_version_constraint(self):
         """Test package installation when version constraint is found in dependencies."""
         with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+             patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock, \
              patch('subprocess.check_call') as mock_check_call, \
              patch('loguru.logger.info') as mock_info:
             # Set up the mock pyproject.toml
             mock_get_path.return_value = Path(self.pyproject_path)
+            mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
             
             # Test installing a package that has a version in dependencies
             LazyLoader._install_package('pandas')
@@ -559,10 +586,12 @@ version = "0.1.0"
     def test_install_package_without_version_constraint(self):
         """Test package installation when no version constraint is found in dependencies."""
         with patch('data_juicer.utils.lazy_loader.get_toml_file_path') as mock_get_path, \
+             patch('data_juicer.utils.lazy_loader.get_uv_lock_path') as mock_get_uv_lock, \
              patch('subprocess.check_call') as mock_check_call, \
              patch('loguru.logger.warning') as mock_warning:
             # Set up the mock pyproject.toml
             mock_get_path.return_value = Path(self.pyproject_path)
+            mock_get_uv_lock.return_value = Path('/nonexistent/path/uv.lock')
             
             # Test installing a package that doesn't exist in dependencies
             LazyLoader._install_package('nonexistent-package')
