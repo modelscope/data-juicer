@@ -1,7 +1,7 @@
 import numpy as np
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.lazy_loader import AUTOINSTALL
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import remove_special_tokens
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -37,7 +37,7 @@ class TextEntityDependencyFilter(Filter):
         """
         super().__init__(*args, **kwargs)
         # '--no-deps' do not update numpy
-        AUTOINSTALL.check(['spacy-pkuseg'], '--no-deps')
+        LazyLoader.check_packages(['spacy-pkuseg'], '--no-deps')
 
         if lang not in ['en', 'zh']:
             raise ValueError(

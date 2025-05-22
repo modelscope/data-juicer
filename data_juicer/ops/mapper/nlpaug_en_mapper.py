@@ -7,10 +7,10 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Mapper
 
-nlpaug = LazyLoader('nlpaug', 'nlpaug')
-nac = LazyLoader('nac', 'nlpaug.augmenter.char')
-naw = LazyLoader('naw', 'nlpaug.augmenter.word')
-naf = LazyLoader('naf', 'nlpaug.flow')
+nlpaug = LazyLoader('nlpaug')
+nac = LazyLoader('nlpaug.augmenter.char')
+naw = LazyLoader('nlpaug.augmenter.word')
+naf = LazyLoader('nlpaug.flow')
 
 OP_NAME = 'nlpaug_en_mapper'
 

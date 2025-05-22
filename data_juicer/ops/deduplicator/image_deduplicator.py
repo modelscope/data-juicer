@@ -11,7 +11,7 @@ from ..base_op import OPERATORS, Deduplicator
 from ..op_fusion import LOADED_IMAGES
 from .document_deduplicator import DocumentDeduplicator
 
-imgdedup_methods = LazyLoader('imgdedup_methods', 'imagededup.methods')
+imgdedup_methods = LazyLoader('imagededup.methods')
 
 OP_NAME = 'image_deduplicator'
 

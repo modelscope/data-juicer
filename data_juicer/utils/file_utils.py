@@ -337,7 +337,7 @@ def read_single_partition(
         if input_meta is not None:
             read_kwargs['dtype'] \
                 = (ast.literal_eval(input_meta)
-                   if type(input_meta) == str else input_meta)
+                   if isinstance(input_meta, str) else input_meta)
 
     elif filetype == 'parquet':
         read_kwargs = {'columns': columns}

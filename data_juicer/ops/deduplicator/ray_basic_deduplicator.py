@@ -1,18 +1,16 @@
 from abc import ABC, abstractmethod
 
-import ray
-
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import Filter
 
-redis = LazyLoader('redis', 'redis')
+ray = LazyLoader('ray')
+redis = LazyLoader('redis')
 
 MERSENNE_PRIME = (1 << 61) - 1
 
 
-@ray.remote(scheduling_strategy='SPREAD')
 class DedupSet:
 
     def __init__(self):
@@ -24,6 +22,11 @@ class DedupSet:
             return True
         else:
             return False
+
+
+def get_remote_dedup_set():
+    """Get the remote version of DedupSet with Ray decorator applied at runtime."""
+    return ray.remote(scheduling_strategy='SPREAD')(DedupSet)
 
 
 class Backend(ABC):
@@ -45,10 +48,12 @@ class ActorBackend(Backend):
     Ray actor backend for deduplicator.
     """
 
-    def __init__(self, dedup_set_num: int):
+    def __init__(self, dedup_set_num: int, RemoteDedupSet=None):
         self.dedup_set_num = dedup_set_num
+        if RemoteDedupSet is None:
+            RemoteDedupSet = get_remote_dedup_set()
         self.dedup_sets = [
-            DedupSet.remote() for _ in range(self.dedup_set_num)
+            RemoteDedupSet.remote() for _ in range(self.dedup_set_num)
         ]
 
     def is_unique(self, md5_value: str):

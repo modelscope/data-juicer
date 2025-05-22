@@ -3,7 +3,7 @@ import os
 
 import regex as re
 
-from data_juicer.utils.lazy_loader import AUTOINSTALL
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens, extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -34,7 +34,7 @@ class VideoCaptioningFromAudioMapper(Mapper):
         """
         kwargs.setdefault('mem_required', '30GB')
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check([
+        LazyLoader.check_packages([
             'transformers', 'transformers_stream_generator', 'einops',
             'accelerate', 'tiktoken'
         ])

@@ -2,7 +2,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Mapper
 
-ftfy = LazyLoader('ftfy', 'ftfy')
+ftfy = LazyLoader('ftfy')
 
 OP_NAME = 'fix_unicode_mapper'
 

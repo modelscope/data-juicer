@@ -6,8 +6,12 @@ from typing import Any, Dict, List, Optional
 
 from loguru import logger
 
+from data_juicer.utils.lazy_loader import LazyLoader
+
 from ...base_op import Mapper
 from ...mixins import EventDrivenMixin, NotificationMixin
+
+label_studio_sdk = LazyLoader('label_studio_sdk')
 
 # Common annotation event types
 ANNOTATION_EVENTS = {
@@ -565,8 +569,8 @@ class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
 
         # Initialize Label Studio client
         try:
-            from label_studio_sdk import Client
-            self.client = Client(url=self.api_url, api_key=self.api_key)
+            self.client = label_studio_sdk.Client(url=self.api_url,
+                                                  api_key=self.api_key)
             logger.info(f'Connected to Label Studio at {self.api_url}')
         except ImportError:
             logger.error(
@@ -773,8 +777,8 @@ class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
         # Reconnect to Label Studio if needed
         if hasattr(self, 'api_url') and hasattr(self, 'api_key'):
             try:
-                from label_studio_sdk import Client
-                self.client = Client(url=self.api_url, api_key=self.api_key)
+                self.client = label_studio_sdk.Client(url=self.api_url,
+                                                      api_key=self.api_key)
                 if hasattr(self, 'project_id'):
                     self.project = self.client.get_project(self.project_id)
             except ImportError:

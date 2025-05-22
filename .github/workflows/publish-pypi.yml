@@ -29,8 +29,8 @@ jobs:
         python-version: '3.x'
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install setuptools
+          uv pip install --upgrade pip
+          uv pip install setuptools
     - name: Build package
       run: python setup.py sdist bdist_wheel
     - name: Publish package
