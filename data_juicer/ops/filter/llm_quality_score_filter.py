@@ -12,8 +12,8 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import (get_model, prepare_model,
                                            update_sampling_params)
 
-torch = LazyLoader('torch', 'torch')
-vllm = LazyLoader('vllm', 'vllm')
+torch = LazyLoader('torch')
+vllm = LazyLoader('vllm')
 
 OP_NAME = 'llm_quality_score_filter'
 

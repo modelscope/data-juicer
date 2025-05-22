@@ -8,7 +8,7 @@ from data_juicer.utils.logger_utils import HiddenPrints
 
 from ..base_op import OPERATORS, Mapper
 
-nlpcda = LazyLoader('nlpcda', 'nlpcda')
+nlpcda = LazyLoader('nlpcda')
 
 OP_NAME = 'nlpcda_zh_mapper'
 

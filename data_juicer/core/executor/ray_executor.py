@@ -3,7 +3,6 @@ import shutil
 import time
 from typing import Optional
 
-import ray
 from jsonargparse import Namespace
 from loguru import logger
 from pydantic import PositiveInt
@@ -13,6 +12,9 @@ from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.executor import ExecutorBase
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
+from data_juicer.utils.lazy_loader import LazyLoader
+
+ray = LazyLoader('ray')
 
 
 class TempDirManager:

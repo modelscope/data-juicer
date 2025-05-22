@@ -2,11 +2,10 @@ import numpy as np
 
 from data_juicer.utils.lazy_loader import LazyLoader
 
-torch = LazyLoader('torch', 'torch')
-td = LazyLoader('td', 'torch.distributions')
-F = LazyLoader('F', 'torch.nn.functional')
-
-stats = LazyLoader('stats', 'scipy.stats')
+torch = LazyLoader('torch')
+td = LazyLoader('torch.distributions')
+F = LazyLoader('torch.nn.functional')
+stats = LazyLoader('scipy.stats')
 
 
 class Measure(object):
