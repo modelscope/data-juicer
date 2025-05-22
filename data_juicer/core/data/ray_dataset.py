@@ -6,8 +6,6 @@ from functools import partial
 from typing import Any, Dict, List, Literal, Optional, Union
 
 import pyarrow
-import ray.data as rd
-import ray.data.read_api as ds
 from loguru import logger
 
 from data_juicer import cuda_device_count
@@ -16,8 +14,11 @@ from data_juicer.core.data.schema import Schema
 from data_juicer.ops import Deduplicator, Filter, Mapper
 from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.process_utils import calculate_np
+
+ray = LazyLoader('ray')
 
 
 def get_abs_path(path, dataset_dir):
@@ -68,7 +69,8 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     return dataset
 
 
-def preprocess_dataset(dataset: rd.Dataset, dataset_path, cfg) -> rd.Dataset:
+def preprocess_dataset(dataset: ray.data.Dataset, dataset_path,
+                       cfg) -> ray.data.Dataset:
     if dataset_path:
         dataset = set_dataset_to_absolute_path(dataset, dataset_path, cfg)
     return dataset
@@ -89,7 +91,7 @@ def filter_batch(batch, filter_func):
 class RayDataset(DJDataset):
 
     def __init__(self,
-                 dataset: rd.Dataset,
+                 dataset: ray.data.Dataset,
                  dataset_path: str = None,
                  cfg: Optional[Namespace] = None) -> None:
         self.data = preprocess_dataset(dataset, dataset_path, cfg)
@@ -259,13 +261,13 @@ class RayDataset(DJDataset):
             js.open_json
             return read_json_stream(paths)
         except AttributeError:
-            return rd.read_json(paths)
+            return ray.data.read_json(paths)
 
     def to_list(self) -> list:
         return self.data.to_pandas().to_dict(orient='records')
 
 
-class JSONStreamDatasource(ds.JSONDatasource):
+class JSONStreamDatasource(ray.data.read_api.JSONDatasource):
     """
     A temp Datasource for reading json stream.
 
@@ -306,7 +308,7 @@ def read_json_stream(
     arrow_open_stream_args: Optional[Dict[str, Any]] = None,
     meta_provider=None,
     partition_filter=None,
-    partitioning=ds.Partitioning('hive'),
+    partitioning=ray.data.read_api.Partitioning('hive'),
     include_paths: bool = False,
     ignore_missing_paths: bool = False,
     shuffle: Union[Literal['files'], None] = None,
@@ -314,9 +316,9 @@ def read_json_stream(
     concurrency: Optional[int] = None,
     override_num_blocks: Optional[int] = None,
     **arrow_json_args,
-) -> rd.Dataset:
+) -> ray.data.Dataset:
     if meta_provider is None:
-        meta_provider = ds.DefaultFileMetadataProvider()
+        meta_provider = ray.data.read_api.DefaultFileMetadataProvider()
 
     datasource = JSONStreamDatasource(
         paths,
@@ -331,7 +333,7 @@ def read_json_stream(
         include_paths=include_paths,
         file_extensions=file_extensions,
     )
-    return rd.read_datasource(
+    return ray.data.read_datasource(
         datasource,
         parallelism=parallelism,
         ray_remote_args=ray_remote_args,

@@ -4,8 +4,8 @@ from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-torch = LazyLoader('torch', 'torch')
-transformers = LazyLoader('transformers', 'transformers')
+torch = LazyLoader('torch')
+transformers = LazyLoader('transformers')
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

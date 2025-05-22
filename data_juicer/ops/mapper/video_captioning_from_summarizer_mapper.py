@@ -4,7 +4,7 @@ from typing import Dict, Optional
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, MetaKeys
-from data_juicer.utils.lazy_loader import AUTOINSTALL
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens, remove_special_tokens
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -83,7 +83,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         """
         kwargs.setdefault('mem_required', '40GB')
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check([
+        LazyLoader.check_packages([
             'torch',
             'transformers',
             'transformers_stream_generator',

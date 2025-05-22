@@ -10,9 +10,9 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, UNFORKABLE
 
-torch = LazyLoader('torch', 'torch')
-tvm = LazyLoader('tvm', 'torchvision.models')
-tvt = LazyLoader('tvt', 'torchvision.transforms')
+torch = LazyLoader('torch')
+tvm = LazyLoader('torchvision.models')
+tvt = LazyLoader('torchvision.transforms')
 
 OP_NAME = 'video_motion_score_raft_filter'
 

@@ -32,11 +32,14 @@ ENV JAVA_HOME=/opt/jdk
 
 WORKDIR /data-juicer
 
+# install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # install requirements which need to be installed from source
-RUN pip install --upgrade setuptools==69.5.1 setuptools_scm -i https://pypi.tuna.tsinghua.edu.cn/simple \
-    && pip install http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/recognize-anything-main.zip --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN uv pip install --upgrade setuptools==69.5.1 setuptools_scm -i https://pypi.tuna.tsinghua.edu.cn/simple \
+    && uv pip install http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/recognize-anything-main.zip --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # install data-juicer then
 COPY . .
-RUN pip install -v -e .[all] --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple \
+RUN pip install -v -e .[all] --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple --ignore-installed \
     && python -c "import nltk; nltk.download('punkt_tab'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger');  nltk.download('averaged_perceptron_tagger_eng')"

@@ -9,7 +9,7 @@ from ...utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
-torch = LazyLoader('torch', 'torch')
+torch = LazyLoader('torch')
 
 OP_NAME = 'image_aesthetics_filter'
 

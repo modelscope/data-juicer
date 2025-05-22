@@ -268,6 +268,9 @@ class StatsKeysConstant(object):
     # video-text
     video_frames_text_similarity = 'video_frames_text_similarity'
 
+    # general-field-filter
+    general_field_filter_condition = 'general_field_filter_condition'
+
 
 class StatsKeys(object, metaclass=StatsKeysMeta):
     _constants_class = StatsKeysConstant
