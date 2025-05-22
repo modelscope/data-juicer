@@ -1,0 +1,40 @@
+.language-selector {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: #f3f3f3;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.language-selector select {
+    min-width: 100px;
+}
+
+/* 优化移动端显示 */
+@media screen and (max-width: 768px) {
+    .language-selector {
+        top: 10px;
+        right: 10px;
+    }
+}
+
+.caption-text {
+    cursor: pointer;
+}
+
+.caption-text:hover {
+    color: #2980B9;
+}
+
+/* Optional: Add a dropdown indicator */
+.caption-text::after {
+    content: ' ▼';
+    font-size: 0.8em;
+}
+
+.caption-text.collapsed::after {
+    content: ' ►';
+}
+

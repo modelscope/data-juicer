@@ -3,7 +3,7 @@
    :format: html
 
 
-`[中文主页] <zh-CN/index_ZH>`_ | `[DJ-Cookbook] <DJ-cookbook>`_ | `[OperatorZoo] <docs/Operators>`_ | `[API] <api>`_ | `[Awesome LLM Data] <docs/awesome_llm_data>`_
+`[英文主页] <../index>`_ | `[DJ-Cookbook] <DJ-cookbook_ZH>`_ | `[算子池] <docs/Operators>`_ | `[API] <../api>`_ | `[Awesome LLM Data] <docs/awesome_llm_data>`_
 
 Data Processing for and with Foundation Models
 ==============================================
@@ -43,12 +43,12 @@ Data Processing for and with Foundation Models
 
 
 .. image:: https://img.shields.io/badge/DataModality-Text,Image,Audio,Video-brightgreen.svg
-   :target: DJ-cookbook
+   :target: ../DJ-cookbook
    :alt: DataModality
 
 
 .. image:: https://img.shields.io/badge/Usage-Cleaning,Synthesis,Analysis-FFD21E.svg
-   :target: DJ-cookbook
+   :target: ../DJ-cookbook
    :alt: Usage
 
 
@@ -64,18 +64,18 @@ Data Processing for and with Foundation Models
 
 
 .. image:: https://img.shields.io/badge/Doc-DJ_Cookbook-blue?logo=Markdown
-   :target: DJ-cookbook
+   :target: ../DJ-cookbook
    :alt: Document_List
 
 
 .. image:: https://img.shields.io/badge/文档-DJ指南-blue?logo=Markdown
-   :target: zh-CN/DJ-cookbook_ZH
+   :target: DJ-cookbook_ZH
    :alt: 文档列表
 
 
-.. image:: https://img.shields.io/badge/Doc-OperatorZoo-blue?logo=Markdown
-   :target: https://github.com/modelscope/data-juicer/blob/main/docs/Operators.md
-   :alt: OpZoo
+.. image:: https://img.shields.io/badge/文档-算子池-blue?logo=Markdown
+   :target: docs/Operators
+   :alt: 算子池
 
 
 .. image:: http://img.shields.io/badge/cs.LG-1.0Paper(SIGMOD'24)-B31B1B?logo=arxiv&logoColor=red
@@ -88,81 +88,82 @@ Data Processing for and with Foundation Models
    :alt: Paper
 
 
-Data-Juicer is a one-stop system to process text and multimodal data for and with foundation models (typically LLMs).
-We provide a `playground <http://8.138.149.181/>`_ with a managed JupyterLab. `Try Data-Juicer <http://8.138.149.181/>`_ straight away in your browser! If you find Data-Juicer useful for your research or development, please kindly support us by starting it (then be instantly notified of our new releases) and citing our `works <#references>`_.
+Data-Juicer 是一个一站式系统，面向大模型的文本及多模态数据处理。我们提供了一个基于 JupyterLab 的 `Playground <http://8.138.149.181/>`_\ ，您可以从浏览器中在线试用 Data-Juicer。 如果Data-Juicer对您的研发有帮助，请支持加星（自动订阅我们的新发布）、以及引用我们的\ `工作 <#参考文献>`_ 。
 
-`Platform for AI of Alibaba Cloud (PAI) <https://www.aliyun.com/product/bigdata/learn>`_ has cited our work and integrated Data-Juicer into its data processing products. PAI is an AI Native large model and AIGC engineering platform that provides dataset management, computing power management, model tool chain, model development, model training, model deployment, and AI asset management. For documentation on data processing, please refer to: `PAI-Data Processing for Large Models <https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX>`_.
+`阿里云人工智能平台 PAI <https://www.aliyun.com/product/bigdata/learn>`_ 已引用Data-Juicer并将其能力集成到PAI的数据处理产品中。PAI提供包含数据集管理、算力管理、模型工具链、模型开发、模型训练、模型部署、AI资产管理在内的功能模块，为用户提供高性能、高稳定、企业级的大模型工程化能力。数据处理的使用文档请参考：\ `PAI-大模型数据处理 <https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX>`_\ 。
 
-Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets.  We welcome you to join us (via issues, PRs, `Slack <https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw>`_  channel, `DingDing <https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11>`_ group, ...), in promoting data-model co-development along with research and applications of foundation models!
+Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多的功能和数据菜谱。热烈欢迎您加入我们（issues/PRs/\ `Slack频道 <https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8275bc8g7ypp>`_ /\ `钉钉群 <https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11>`_\ /...），一起推进大模型的数据-模型协同开发和研究应用！
 
-News
 ----
 
-.. include:: README.md
-   :start-after: ## News
-   :end-before: Table of Contents
-   :parser: myst_parser.sphinx_
+新消息
+------
+.. include:: README_ZH.md
+    :start-after: ## 新消息
+    :end-before: 目录
+    :parser: myst_parser.sphinx_
 
-Table of Contents
-=================
-* `News`_
-* `Why Data-Juicer?`_
+目录
+====
+
+
+* `新消息 <#id7>`_
+* `为什么选择 Data-Juicer？ <#id14>`_
 .. toctree::
    :maxdepth: 2
-   :caption: Tutorial
+   :caption: 教程
 
-   DJ-cookbook
-   Installation
-   quick-start
+   DJ-cookbook_ZH
+   Installation_ZH
+   quick-start_ZH
 
-* `License`_
-* `Contributing`_
-* `Acknowledgement`_
-* `References`_
+* `开源协议 <#id15>`_
+* `贡献 <#id16>`_
+* `致谢 <#id17>`_
+* `参考文献 <#id18>`_
 
-Why Data-Juicer?
-----------------
+为什么选择 Data-Juicer？
+------------------------
 
-.. include:: README.md
-   :start-after: ## Why Data-Juicer?
-   :end-before: ## DJ-Cookbook
-   :parser: myst_parser.sphinx_
-   
+.. include:: README_ZH.md
+    :start-after: ## 为什么选择 Data-Juicer？
+    :end-before: ## DJ-Cookbook
+    :parser: myst_parser.sphinx_
 
-License
--------
+开源协议
+--------
 
-.. include:: README.md
-   :start-after: ## License
-   :end-before: ## Contributing
-   :parser: myst_parser.sphinx_
+.. include:: README_ZH.md
+    :start-after: ## 开源协议
+    :end-before: ## 贡献
+    :parser: myst_parser.sphinx_
 
-Contributing
-------------
+贡献
+----
 
-.. include:: README.md
-   :start-after: ## Contributing
-   :end-before: ## Acknowledgement
-   :parser: myst_parser.sphinx_
+.. include:: README_ZH.md
+    :start-after: ## 贡献
+    :end-before: ## 致谢
+    :parser: myst_parser.sphinx_
 
-Acknowledgement
----------------
+致谢
+----
 
-.. include:: README.md
-   :start-after: ## Acknowledgement
-   :end-before: ## Reference
-   :parser: myst_parser.sphinx_
+.. include:: README_ZH.md
+    :start-after: ## 致谢
+    :end-before: ## 参考文献
+    :parser: myst_parser.sphinx_
 
-References
-----------
+参考文献
+--------
 
-.. include:: README.md
-   :start-after: ## Reference
-   :parser: myst_parser.sphinx_
+.. include:: README_ZH.md
+    :start-after: ## 参考文献
+    :parser: myst_parser.sphinx_
 
 .. toctree::
    :maxdepth: 2
-   :caption: docs
+   :caption: 帮助文档
    :glob:
    :hidden:
 
@@ -179,7 +180,7 @@ References
 
 .. toctree::
    :maxdepth: 2
-   :caption: tools
+   :caption: 工具
    :glob:
    :hidden:
 
@@ -188,7 +189,7 @@ References
 
 .. toctree::
    :maxdepth: 2
-   :caption: thirdparty
+   :caption: 第三方
    :glob:
    :hidden:
 
@@ -197,10 +198,7 @@ References
 
 .. toctree::
    :maxdepth: 2
-   :caption: API Reference
    :hidden:
+   :caption: API Reference
 
    api
-
-
-

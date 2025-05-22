@@ -4,7 +4,7 @@ Welcome to the "Awesome List" for data-model co-development of Multi-Modal Large
 ![Overview of Our Taxonomy](https://img.alicdn.com/imgextra/i1/O1CN01aN3TVo1mgGZAuSHJ4_!!6000000004983-2-tps-3255-1327.png)
 Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. **Please feel free to make pull requests or open issues to [contribute to](#contribution-to-this-survey) this list and add more related resources!**
 
-# News
+## News
 + ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-10-23] We built a [dynamic table](https://modelscope.github.io/data-juicer/_static/awesome-list.html) based on the [paper list](#paper-list) that supports filtering and searching.
 + ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-10-22] We restructured our [paper list](#paper-list) to provide more streamlined information.
 
@@ -226,12 +226,12 @@ Below is a paper list summarized based on our survey. Additionally, we have prov
 |Multimodal C4: An Open, Billion-scale Corpus of Images Interleaved With Text|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|
 |ChartAssisstant: A Universal Chart Multimodal Language Model via Chart-to-Table Pre-training and Multitask Instruction Tuning|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|
 
-# Contribution to This Survey
+## Contribution to This Survey
 Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. Please feel free to make pull requests or open issues to contribute to this list and add more related resources!
 **You can add the titles of relevant papers to the table above, and (optionally) provide suggested tags along with the corresponding sections if possible.**
 We will attempt to complete the remaining information and periodically update our survey based on the updated content of this document.
 
-# References
+## References
 If you find our work useful for your research or development, please kindly cite the following [paper](https://arxiv.org/abs/2407.08583).
 
 
@@ -247,7 +247,7 @@ If you find our work useful for your research or development, please kindly cite
 
 ---
 
-# "Section - Mentioned Papers" Retrieval List
+## "Section - Mentioned Papers" Retrieval List
 We provide a collapsible list of back reference, allowing readers to see which (sub)section mention the papers from the table above. 
 The collapsible list of back reference will be periodically updated based on the content of the table and our paper.
 

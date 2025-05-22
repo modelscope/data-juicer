@@ -1,6 +1,7 @@
+# 给数据打分
 中文 | [English](./README.md)
 
-# 数据打分能力
+## 数据打分能力
 
 Data-Juicer 提供了一组数据打分能力，可帮助您评估数据集。
 
@@ -10,24 +11,24 @@ Data-Juicer 提供了一组数据打分能力，可帮助您评估数据集。
 
 - 此外，我们还提供了一个工具包来复现 GPT-3 质量分类器，如下一节所述。
 
-# 复现GPT3的质量分类器套件
+## 复现GPT3的质量分类器套件
 
 帮助您复现类似于 GPT-3 质量分类器并将其应用到您的 Web 数据集。
 
 整个工具包基于PySpark，分类器的基本模块包括：
 
-- tokenizer: PySpark 的 [standard Tokenizer](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Tokenizer.html#tokenizer) 或 [sentencepiece](https://github.com/google/sentencepiece) 模型
-- feature extractor: [HashingTF](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.HashingTF.html#hashingtf)
-- classifier: [LogisticRegression](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.classification.LogisticRegression.html#logisticregression)
+- tokenizer: PySpark 的 [standard Tokenizer](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Tokenizer.html##tokenizer) 或 [sentencepiece](https://github.com/google/sentencepiece) 模型
+- feature extractor: [HashingTF](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.HashingTF.html##hashingtf)
+- classifier: [LogisticRegression](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.classification.LogisticRegression.html##logisticregression)
 
-## 用法
+### 用法
 
-### 使用现有的分类器进行预测
+#### 使用现有的分类器进行预测
 
 使用 `predict.py` 来预测一个文档的“质量”分数，并为每个样本添加一个标签，以根据分数判断是否应该保留该样本。
 
 ```shell
-# 预测数据集的 doc_score
+## 预测数据集的 doc_score
 python predict.py \
     <dataset_path> \
     <result_path> \
@@ -37,24 +38,24 @@ python predict.py \
     [--text_key <text_key>] \
     [--overall_stats]
 
-# 打印帮助信息
+## 打印帮助信息
 python predict.py --help
 ```
 
 - `dataset_path`: 输入数据集路径。要求路径的后缀为 `[json, jsonl, parquet]` 之一。
 - `result_path`: 存储带有预测结果的数据集的路径。要求路径的后缀为`[json, jsonl, parquet]`之一。
 - `model_path`: (可选，默认为 `gpt3`) 用于预测的模型的路径。您可以使用我们提供的模型之一`[gpt3, chinese,code]`。或者您可以使用`train.py`脚本使用自己训练的模型。
-- `tokenizer`: (可选，默认为 None) 用于标记要分类的文本的标记器。 如果为 None，则将使用 PySpark 的 [standard Tokenizer](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Tokenizer.html#tokenizer)。 此外，您可以使用我们提供的标记器`[zh.sp.model, code.sp.model]`之一。您也可以将其设置为您自己的 [sentencepiece](https://github.com/google/sentencepiece) 模型的路径。
+- `tokenizer`: (可选，默认为 None) 用于标记要分类的文本的标记器。 如果为 None，则将使用 PySpark 的 [standard Tokenizer](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Tokenizer.html##tokenizer)。 此外，您可以使用我们提供的标记器`[zh.sp.model, code.sp.model]`之一。您也可以将其设置为您自己的 [sentencepiece](https://github.com/google/sentencepiece) 模型的路径。
 - `keep_method`: (可选，默认为 `gpt3`) 根据 doc_score 决定是否保留样本的方法。应为 `[gpt3, label]` 之一。
 - `text_key`: (可选，默认为 `text`) 用于存储输入数据集中需要被分类的文本的字段名称。
 - `overall_stats`: (可选，默认为 False) 是否生成文档分数的汇总统计报告。
 
-### 训练自己的质量分类器
+#### 训练自己的质量分类器
 
 使用`train.py`在您的数据集上训练您自己的质量分类器。
 
 ```shell
-# 为自己的数据集训练质量分类器
+## 为自己的数据集训练质量分类器
 python train.py \
     <positive_datasets>] \
     <negative_datasets>] \
@@ -65,7 +66,7 @@ python train.py \
     [--evaluation <evaluation>] \
     [--text_key <text_key>]
 
-# 打印帮助信息
+## 打印帮助信息
 python train.py --help
 ```
 
@@ -74,16 +75,16 @@ python train.py --help
 - `output_model_path`: (可选，默认值为 `my_quality_model`) 存储训练好的分类器的路径。
 - `num_training_samples`: (可选，默认值为 0) 分别用于训练 正/负样本数据集模型的样本数量。 默认0表示使用所有样本进行训练。
 - `train_test_split_ratio`: (可选，默认值为0.8) 分割训练集的比率，其余样本将作为测试集用于评估。
-- `tokenizer`: (可选，默认值为None) 用于对要分类的文本进行标记的标记生成器。如果为 None，则将使用 PySpark 的[标准 Tokenizer](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Tokenizer.html#tokenizer) 此外，您可以使用我们提供的标记器`[zh.sp.model，code.sp.model]`之一。也可以将其设置为您自己的 [sentencepiece](https://github.com/google/sentencepiece) 模型的路径。
+- `tokenizer`: (可选，默认值为None) 用于对要分类的文本进行标记的标记生成器。如果为 None，则将使用 PySpark 的[标准 Tokenizer](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Tokenizer.html##tokenizer) 此外，您可以使用我们提供的标记器`[zh.sp.model，code.sp.model]`之一。也可以将其设置为您自己的 [sentencepiece](https://github.com/google/sentencepiece) 模型的路径。
 - `evaluation`: (可选，默认值为 True) 是否在训练后使用测试集评估训练好的分类器。
 - `text_key`: (可选，默认值为 `text`) 用于存储输入数据集中需要被分类的文本的字段名称。
 
-### 评估质量分类器
+#### 评估质量分类器
 
 使用`eval.py`以报告精度、召回率和 F1 指标来评估质量分类器。
 
 ```shell
-# 在自己的数据集上评估质量分类器
+## 在自己的数据集上评估质量分类器
 python eval.py \
     [--positive_datasets <positive_datasets>] \
     [--negative_datasets <negative_datasets>] \
@@ -91,17 +92,17 @@ python eval.py \
     [--tokenizer <tokenizer_type>] \
     [--text_key <text_key>]
 
-# 打印帮助信息
+## 打印帮助信息
 python eval.py --help
 ```
 
 - `positive_datasets`: (Optional. Default: None) the paths to the positive datasets. It could be a string for a single dataset, e.g. `'pos.parquet'`, or a list of strings for multiple datasets, e.g. `'["pos1.parquet", "pos2.parquet"]'`.
 - `negative_datasets`: (Optional. Default: None) the paths to the negative datasets. Similar to `positive_datasets`.
 - `model_path`: (Optional. Default: "my_quality_model") the path to the model to be evaluated. You can evaluate one of the models we provide `[gpt3, chinese, code]`. Or you can evaluate the model trained by yourself using the `train.py` script.
-- `tokenizer`: (Optional. Default: None) the tokenizer to tokenize texts to be classified. If it's None, the [standard Tokenizer](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Tokenizer.html#tokenizer) of PySpark will be used. Besides, you can use one of the tokenizers we provide `[zh.sp.model, code.sp.model]`. Or you can set it to a path to your own [sentencepiece](https://github.com/google/sentencepiece) model.
+- `tokenizer`: (Optional. Default: None) the tokenizer to tokenize texts to be classified. If it's None, the [standard Tokenizer](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Tokenizer.html##tokenizer) of PySpark will be used. Besides, you can use one of the tokenizers we provide `[zh.sp.model, code.sp.model]`. Or you can set it to a path to your own [sentencepiece](https://github.com/google/sentencepiece) model.
 - `text_key`: (Optional. Default: "text") the field name to store texts to be classified in the input dataset.
 
-## Model Zoo
+### Model Zoo
 
 我们提供了已训练好的三个模型：`gpt3`，`chinese`，`code`。每个模型都有其 tokenizer 和 keep method。其中Tokenizer `xx.sp.model` 使用 [sentencepiece](https://github.com/google/sentencepiece) 的训练数据进行训练。
 
@@ -130,9 +131,9 @@ python eval.py --help
 | `gpt3`                               | 3.22%               | 1.41%               |
 | `chinese`                            | 1.81%               | -                   |
 
-## 有关质量分类器的更多信息
+### 有关质量分类器的更多信息
 
-### 方法
+#### 方法
 
 这里的质量分类器主要参考GPT-3论文附录A中提到的GPT-3质量分类器：
 
@@ -142,12 +143,12 @@ python eval.py --help
 >
 > We chose α = 9 in order to take mostly documents the classifier scored highly, but still include some documents that were out of distribution. α was chosen to match the distribution of scores from our classifier on WebText. We found this re-weighting increased quality as measured by loss on a range of out-of-distribution generative text samples.
 
-### Tokenizers
+#### Tokenizers
 
 - Spark 中的标准 Tokenizer: 根据空白字符分割文本.
 - zh/code.sp.model: 使用 sentencepiece 训练得到。
 
-### Keep Methods
+#### Keep Methods
 
 - label: `doc_score > 0.5`
 - pareto: `doc_score > 1 - np.random.pareto(α), α = 9`
