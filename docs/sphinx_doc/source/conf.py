@@ -18,8 +18,6 @@ import sphinx_rtd_theme
 from data_juicer import __version__ as version
 import os
 import sys
-import shutil
-import tempfile
 
 sys.path.insert(0, os.path.abspath('../../'))
 release = version
