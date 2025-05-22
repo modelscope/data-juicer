@@ -105,17 +105,12 @@ def available_gpu_memories():
 
 
 def get_ray_nodes_info():
-    import subprocess
-
-    import psutil
-    import ray
-
-    ray.init(address='auto', ignore_reinit_error=True)
-
     global _RAY_NODES_INFO
 
     if _RAY_NODES_INFO is not None:
         return _RAY_NODES_INFO
+
+    import ray
 
     @ray.remote
     def collect_node_info():
@@ -142,6 +137,8 @@ def get_ray_nodes_info():
             'cpu_count': cpu_count,
             'gpus_memory': free_gpus_memory,  # MB
         }
+
+    ray.init(address='auto', ignore_reinit_error=True)
 
     nodes = ray.nodes()
     alive_nodes = [node for node in nodes if node['Alive']]
