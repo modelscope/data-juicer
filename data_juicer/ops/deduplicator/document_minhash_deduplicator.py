@@ -342,9 +342,14 @@ class DocumentMinhashDeduplicatorWithUid(DocumentMinhashDeduplicator):
     """
     A Deduplicator that performs document-level deduplication using MinHashLSH.
 
-    Unlike `DocumentMinhashDeduplicator`, this class requires the dataset to include an additional column named '__dj__uid' of type int, with unique values for each sample. This column is essential for supporting incremental deduplication scenarios.
+    Unlike `DocumentMinhashDeduplicator`, this class requires the dataset to include an additional column named
+    '__dj__uid' of type int, with unique values for each sample. This column is essential for supporting
+    incremental deduplication scenarios.
 
-    For example, consider a scenario where you have an already deduplicated dataset A and a new dataset B that you wish to add. If you want to perform joint deduplication on both A and B while prioritizing the retention of data from A, you can ensure that all '__dj__uid' values in B are greater than those in A. Then, by applying this deduplicator to the combined dataset, duplicates will be resolved in favor of the entries from A.
+    For example, consider a scenario where you have an already deduplicated dataset A and a new dataset B that
+    you wish to add. If you want to perform joint deduplication on both A and B while prioritizing the retention of
+    data from A, you can ensure that all '__dj__uid' values in B are greater than those in A. Then, by applying
+    this deduplicator to the combined dataset, duplicates will be resolved in favor of the entries from A.
     """
 
     def process(self, dataset, show_num=0):
