@@ -1,0 +1,26 @@
+# This is one of the config file for reproducing the Sandbox experiments for InternVL COCO Caption task.
+#
+# This is the training config for InternVLCOCOCaptionTrainExecutor hook.
+# You should clone the repo to your own <internvl_home> path and replace it with the real path.
+# You can follow the doc [here](https://internvl.readthedocs.io/en/latest/get_started/installation.html) to install
+# the InternVL or you can only need to clone and let the sandbox create and install the environment automatically.
+
+type: internvl_coco_caption
+
+# env related
+env_name: internvl
+env_manager: conda
+env_params:
+  env_py_version: 3.9
+internvl_home: '<internvl_home>'
+
+# training related
+num_gpus: 8
+batch_size_per_device: 4
+
+work_dir: '<internvl_home>/internvl_chatwork_dirs'
+model_name_or_path: '<internvl_home>/pretrained/InternVL2-1B'
+conv_style_or_scale: '1B'
+meta_paths:
+  - '<these_paths_should_be_replaced_by_the_previous_COCOCaptionMetaGeneration_hook>'
+script_dir: '<internvl_home>/internvl_chat/scripts/'
