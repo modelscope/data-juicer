@@ -92,11 +92,11 @@ def find_components(edges):
     a = edges
     while True:
         b = a.flatMap(large_star_map).groupByKey().flatMap(
-            large_star_reduce).distinct().cache()
+            large_star_reduce).distinct()
         a = b.map(small_star_map).groupByKey().flatMap(
-            small_star_reduce).distinct().cache()
-        changes = a.subtract(b).union(b.subtract(a)).collect()
-        if len(changes) == 0:
+            small_star_reduce).distinct()
+        changes = a.subtract(b).union(b.subtract(a)).count()
+        if changes == 0:
             break
 
     results = a.collect()
