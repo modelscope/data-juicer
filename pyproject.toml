@@ -55,6 +55,7 @@ dependencies = [
     "mwparserfromhell",
     "regex",  # regular expressions
     "tomli",
+    "tomli-w",
     "gitpython"
 ]
 
