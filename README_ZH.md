@@ -36,7 +36,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 ## 新消息
 - 🎉 [2025-05-06] 我们的 [Data-Juicer Sandbox](https://arxiv.org/abs/2407.11784) 已被 *ICML 2025* 接收为 **Spotlight**（处于所有投稿中的前 2.6%）！
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-03-13] 我们提出了一种新的数据合成方法 *MindGym*，该方法鼓励 LLM 自我生成具有挑战性的认知问题，实现优于 SOTA 基线的数据效率、跨模态泛化和 SFT 效果（例如，仅使用 *400 个样本* 即可在 [MathVision](https://mathllm.github.io/mathvision/#leaderboard) 上获得 *16%* 的增益）。有关更多详细信息，请参阅[MindGym: Enhancing Vision-Language Models via Synthetic Self-Challenging Questions](https://arxiv.org/abs/2503.09499)。
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-28] DJ 已被集成到 [Ray官方 Ecosystem](https://docs.ray.io/en/latest/ray-overview/ray-libraries.html) 和 [Example Gallery](https://docs.ray.io/en/latest/data/examples/data_juicer_distributed_data_processing.html)。此外，我们在 DJ2.0 中的流式 JSON 加载补丁已被 [Apache Arrow 官方集成](https://github.com/apache/arrow/pull/45084)。
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-28] DJ 已被集成到 [Ray官方 Ecosystem](https://docs.ray.io/en/latest/ray-overview/ray-libraries.html) 和 [Example Gallery](https://docs.ray.io/en/latest/ray-more-libs/data_juicer_distributed_data_processing.html)。此外，我们在 DJ2.0 中的流式 JSON 加载补丁已被 [Apache Arrow 官方集成](https://github.com/apache/arrow/pull/45084)。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-27] 我们的对比数据合成工作， [ImgDiff](https://arxiv.org/pdf/2408.04594)， 已被 *CVPR 2025* 接收！
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-05] 我们提出了一种新的数据选择方法 *DaaR*，该方法基于理论指导，将数据多样性建模为奖励信号，在 7 个基准测试中，微调 SOTA LLMs 取得了更好的整体表现。有关更多详细信息，请参阅 [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380) 。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-11] 我们发布了 2.0 版论文 [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://arxiv.org/abs/2501.14755)。DJ现在可以使用阿里云集群中 50 个 Ray 节点上的 6400 个 CPU 核心在 2.1 小时内处理 70B 数据样本，并使用 8 个 Ray 节点上的 1280 个 CPU 核心在 2.8 小时内对 5TB 数据进行重复数据删除。
@@ -118,7 +118,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 - **高效、稳定**：提供性能优化的[并行数据处理能力](docs/Distributed_ZH.md)（Aliyun-PAI\Ray\CUDA\OP Fusion），
 更快、更少资源消耗，基于大规模生产环境打磨。
 
-- **效果验证、沙盒**：支持数据模型协同开发，通过[沙盒实验室](docs/Sandbox-ZH.md)实现快速迭代，提供反馈循环、可视化等功能，让您更好地理解和改进数据和模型。已经有许多基于 DJ 衍生的数据菜谱和模型经过了效用验证，譬如在预训练、文生视频、图文生成等场景。
+- **效果验证、沙盒**：支持数据模型协同开发，通过[沙盒实验室](docs/Sandbox_ZH.md)实现快速迭代，提供反馈循环、可视化等功能，让您更好地理解和改进数据和模型。已经有许多基于 DJ 衍生的数据菜谱和模型经过了效用验证，譬如在预训练、文生视频、图文生成等场景。
 ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
 ## DJ-Cookbook
@@ -140,7 +140,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
   - [开发者指南](docs/DeveloperGuide_ZH.md)
   - [预处理工具](tools/preprocess/README_ZH.md)
   - [后处理工具](tools/postprocess/README_ZH.md)
-  - [沙盒](docs/Sandbox-ZH.md)
+  - [沙盒](docs/Sandbox_ZH.md)
   - [API服务化](docs/DJ_service_ZH.md)
   - [给数据打分](tools/quality_classifier/README_ZH.md)
   - [自动评估](tools/evaluator/README_ZH.md)
@@ -492,7 +492,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 - 用户在沙盒中可以基于一些小规模数据集、模型对数据菜谱进行快速实验、迭代、优化，再迁移到更大尺度上，大规模生产高质量数据以服务大模型。
 - 用户在沙盒中，除了Data-Juicer基础的数据优化与数据菜谱微调功能外，还可以便捷地使用数据洞察与分析、沙盒模型训练与评测、基于数据和模型反馈优化数据菜谱等可配置组件，共同组成完整的一站式数据-模型研发流水线。
 
-沙盒默认通过如下命令运行，更多介绍和细节请参阅[沙盒文档](docs/Sandbox-ZH.md).
+沙盒默认通过如下命令运行，更多介绍和细节请参阅[沙盒文档](docs/Sandbox_ZH.md).
 ```shell
 python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 ```

@@ -1,0 +1,32 @@
+<div class="sidebar-bottom-menu">
+    <div class="current-info">
+        <span class="current-lang">{{ language }}</span>|<span class="current-version">{{ current_version.name }}</span>
+    </div>
+    <div class="dropdown-panel">
+        {% if supported_languages %}
+        <div class="section">
+            <dt>Language</dt>
+            <dd>
+                {% for lang_code, lang_name in supported_languages.items() %}
+                    <a href="{{ pathto('', 1) + get_lang_link(language, pagename, lang_code, non_zh_pages, current_version.name + '/') }}"
+                        {% if language == lang_code %}class="active"{% endif %}>
+                        {{ lang_name }}
+                    </a>
+                {% endfor %}
+            </dd>
+        </div>
+        {% endif %}
+        
+        {% if versions %}
+        <div class="section">
+            <dt>Version</dt>
+            <dd>
+                {%- for item in versions %}
+                <a href="{{ item.url }}">{{ item.name }}</a>
+                {%- endfor %}
+            </dd>
+        </div>
+        {% endif %}
+    </div>
+</div>
+

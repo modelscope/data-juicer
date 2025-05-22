@@ -1,0 +1,14 @@
+{% if versions %}
+<div class="sidebar-versions">
+    <div class="dropdown">
+        <button class="dropdown-button">
+            Versions
+        </button>
+        <div class="dropdown-content">
+            {%- for item in versions %}
+            <a href="{{ item.url }}">{{ item.name }}</a>
+            {%- endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}

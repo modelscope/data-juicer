@@ -18,14 +18,19 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+    - name: Get tags
+      run: |
+        git remote add upstream https://github.com/modelscope/data-juicer.git
+        git fetch upstream --unshallow --tags
+        git tag -l
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@master
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        uv pip install --upgrade pip
-        uv pip install -v -e .[dev]
+        python -m pip install --upgrade pip
+        pip install -v -e .[dev]
     - id: build
       name: Build Documentation
       run: |
@@ -35,9 +40,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: SphinxDoc
-        path: 'docs/sphinx_doc/build/html'
+        path: 'docs/sphinx_doc/build'
     - uses: peaceiris/actions-gh-pages@v3
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: 'docs/sphinx_doc/build/html'
+        publish_dir: 'docs/sphinx_doc/build'
