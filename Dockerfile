@@ -38,5 +38,5 @@ RUN pip install --upgrade setuptools==69.5.1 setuptools_scm -i https://pypi.tuna
 
 # install data-juicer then
 COPY . .
-RUN pip install -v -e .[all] --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple \
+RUN pip install -v -e .[all] --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple --ignore-installed \
     && python -c "import nltk; nltk.download('punkt_tab'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger');  nltk.download('averaged_perceptron_tagger_eng')"
