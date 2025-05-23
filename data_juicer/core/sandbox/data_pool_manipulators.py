@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from fractions import Fraction
 from typing import get_args, get_origin
 
 import jsonlines as jl
@@ -93,7 +94,7 @@ class DataPoolConstruction(BaseDataPoolManipulator):
         Input:
             - an analyzed dataset.
             - an output path.
-            - (optional) split_ratios. It's [1/3, 2/3] in default
+            - (optional) split_ratios. It's [1/3, 2/3] in default, Support fraction in string format.
         Output: MxN data pools, where N is the number of types of analyzed stats and M means the number of split parts.
             They are named following the rule "<stats_key_name>/<original_name>_<part_idx>.jsonl"
         """
@@ -107,6 +108,8 @@ class DataPoolConstruction(BaseDataPoolManipulator):
         existing_input_paths, export_path = check_io_paths(
             input_dataset_paths, export_path)
         # check split ratios, should be in (0, 1)
+        split_ratios = [float(Fraction(r)) for r in split_ratios
+                        ]  # make sure each ratio is a float
         if any([r <= 0 or r >= 1 for r in split_ratios]):
             raise ValueError('split_ratios should be in (0, 1).')
 
@@ -199,7 +202,7 @@ class DataPoolCombination(BaseDataPoolManipulator):
             are named following the rule "<longest_common_prefix>_top_<combined_ranks>_num_<num_samples>.jsonl"
         """
         # read inputs
-        ordered_data_pool_paths = self.data_pool_cfg.get('dataset_paths', [])
+        ordered_data_pool_paths = self.data_pool_cfg.get('dataset_path', [])
         export_path = self.data_pool_cfg.get('export_path', None)
 
         # check I/O paths
@@ -346,12 +349,14 @@ class DataPoolRanking(BaseDataPoolManipulator):
             - (optional) Keys in the metrics to rank the data pools. Support '.' operator to get a nested key. Use the
                 whole metric obj in default.
             - (optional) whether to sort in descending. It's True in default
+            - (optional) a number N that only return the top-N data pool paths.
         Output: A ordered list of data pool paths according to their evaluated metrics.
         """
         input_dataset_paths = self.data_pool_cfg.get('dataset_path', [])
         metrics = self.data_pool_cfg.get('metrics', {})
         ranking_keys = self.data_pool_cfg.get('ranking_keys', [])
         descending = self.data_pool_cfg.get('descending', True)
+        top_n = self.data_pool_cfg.get('top_n', None)
 
         # check input paths and metrics
         if not isinstance(input_dataset_paths, list) or not isinstance(
@@ -392,6 +397,8 @@ class DataPoolRanking(BaseDataPoolManipulator):
                                            key=selected_key_func,
                                            reverse=descending)
         ]
+        if top_n is not None:
+            ranked_paths = ranked_paths[:top_n]
         return ranked_paths
 
 

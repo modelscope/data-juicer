@@ -324,4 +324,6 @@ class InternVLCOCOCaptionEvaluator(BaseEvaluator):
                     result[dim] = float(res[0])
             results[ckpt_path] = result
 
+        results['avg_score'] = sum(results.values()) / len(results)
+
         return results

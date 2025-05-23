@@ -112,14 +112,14 @@ class GeneralDataExecutorFactory(object):
             return None
 
         executor = None
-        if data_exec_cfg.type == 'COCOCaptionToDJConversion':
+        if data_exec_cfg.type == 'coco_caption_to_dj_conversion':
             from data_juicer.core.sandbox.specific_hooks.intervl_coco_captioning.preparation_hooks import \
                 COCOCaptionToDJConversion
-            executor = COCOCaptionToDJConversion()
-        elif data_exec_cfg.type == 'COCOCaptionMetaGeneration':
+            executor = COCOCaptionToDJConversion(data_exec_cfg)
+        elif data_exec_cfg.type == 'coco_caption_meta_generation':
             from data_juicer.core.sandbox.specific_hooks.intervl_coco_captioning.preparation_hooks import \
                 COCOCaptionMetaGeneration
-            executor = COCOCaptionMetaGeneration()
+            executor = COCOCaptionMetaGeneration(data_exec_cfg)
 
         return executor
 
