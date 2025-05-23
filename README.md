@@ -1,4 +1,4 @@
-# Official repo for **Img-Diff: Contrastive Data Synthesis for Multimodal Large Language Models**
+# Official repo for **Img-Diff: Contrastive Data Synthesis for Multimodal Large Language Models** (CVPR25)
 
 We release **Img-Diff**,  A high-quality synthesis dataset focusing on describing object differences for MLLMs. See more details in our [paper](https://arxiv.org/abs/2408.04594) and download the dataset: [huggingface](https://huggingface.co/datasets/datajuicer/Img-Diff) and [modelscope](https://modelscope.cn/datasets/Data-Juicer/Img-Diff). 
 
@@ -18,7 +18,7 @@ We release **Img-Diff**,  A high-quality synthesis dataset focusing on describin
 
 - The original codes are organized and presented in [Img-Diff-codes](https://github.com/modelscope/data-juicer/tree/ImgDiff/Img-Diff-codes).
 - We develop a series of data-juicer operators related to Img-Diff, including: `image_pair_similarity_filter`, `mllm_mapper`, `sdxl_prompt2prompt_mapper`, `image_segment_mapper`, `sentence_augmentation_mapper`, and `text_pair_similarity_filter`. Relevant information can be accessed on the [main branch](https://github.com/modelscope/data-juicer/blob/main/docs/Operators.md).
-
+- We provide configurable data recipes, including the YAML configuration file [img-diff-recipe](https://github.com/modelscope/data-juicer/blob/main/configs/data_juicer_recipes/img-diff-recipe.yaml), and two Mapper operators: [imgdiff_difference_area_generator_mapper](https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/imgdiff_difference_area_generator_mapper.py) and [imgdiff_difference_caption_generator_mapper.py](https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/imgdiff_difference_caption_generator_mapper.py).
 
 
 
