@@ -147,7 +147,7 @@ sandbox = [
     "fire",
     "pyspark",
     "vbench",
-    "modelscope",
+    "modelscope[framework,nlp]",
     "deepspeed",
     "safetensors",
     "timm",

@@ -4,7 +4,6 @@ import shutil
 
 import torch
 from loguru import logger
-from vbench import VBench
 
 from data_juicer import cuda_device_count
 from tools.mm_eval.inception_metrics.calc_metrics_for_videos import \
@@ -113,6 +112,7 @@ class VBenchEvaluator(BaseEvaluator):
 
     def run(self, eval_type, eval_obj=None, **kwargs):
         if eval_type == 'data':
+            from vbench import VBench
             prompt_path = self.eval_config.prompt_path
             videos_path = self.eval_config.videos_path
             result_dir = self.eval_config.result_dir

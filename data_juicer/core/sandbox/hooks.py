@@ -26,6 +26,7 @@ class BaseHook:
         self.watcher = watcher
         self.meta_name = job_cfg[JobRequiredKeys.meta_name.value]
         self.dj_cfg = job_cfg[JobRequiredKeys.dj_configs.value]
+        self.inited_dj_cfg = None
         self.other_cfg = job_cfg[JobRequiredKeys.extra_configs.value]
 
     def hook(self, **kwargs):

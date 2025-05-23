@@ -1,13 +1,15 @@
 import os
+from copy import deepcopy
 from typing import List
 
-import wandb
 import yaml
 from jsonargparse import Namespace as JsonNamespace
-from jsonargparse import namespace_to_dict
+from jsonargparse import dict_to_namespace, namespace_to_dict
 
-from data_juicer.config import merge_config
+import wandb
+from data_juicer.config import merge_config, prepare_side_configs
 from data_juicer.core.sandbox.hooks import register_hook
+from data_juicer.utils.constant import JobRequiredKeys
 
 
 class SandBoxWatcher:
@@ -103,32 +105,18 @@ class SandBoxWatcher:
         wandb.config.update(merged_cfgs)
 
 
-class SandBoxExecutor:
-    """
-    This SandBoxExecutor class is used to provide a sandbox environment for
-        exploring data-model co-designs in a one-stop manner with fast feedback
-         and tiny model size, small data size, and high efficiency.
+class SandboxPipeline:
 
-        It plays as a middleware maintains the data-juicer's data executor,
-        a model processor (training and inference), and an auto-evaluator,
-        where the latter two ones are usually from third-party libraries.
-
-    """
-
-    def __init__(
-        self,
-        cfg=None,
-    ):
+    def __init__(self,
+                 pipeline_name='anonymous',
+                 pipeline_cfg=None,
+                 watcher=None):
         """
         Initialization method.
-
-        :param cfg: configuration of sandbox.
-
         """
-        self.cfg = cfg
-
-        self.watcher = SandBoxWatcher(self.cfg)
-        self.watcher.watch_cfgs([(cfg, 'sandbox')])
+        self.name = pipeline_name
+        self.cfg = pipeline_cfg
+        self.watcher = watcher
 
         # jobs to probe, refine_recipe, execution and evaluation for
         # interested data and model within the sandbox
@@ -216,3 +204,104 @@ class SandBoxExecutor:
                         function=self.one_trial,
                         count=hpo_configuration['sweep_max_count']
                         if 'sweep_max_count' in hpo_configuration else None)
+
+
+class SandBoxExecutor:
+    """
+    This SandBoxExecutor class is used to provide a sandbox environment for
+        exploring data-model co-designs in a one-stop manner with fast feedback
+         and tiny model size, small data size, and high efficiency.
+
+        It plays as a middleware maintains the data-juicer's data executor,
+        a model processor (training and inference), and an auto-evaluator,
+        where the latter two ones are usually from third-party libraries.
+
+    """
+
+    def __init__(
+        self,
+        cfg=None,
+    ):
+        """
+        Initialization method.
+
+        :param cfg: configuration of sandbox.
+
+        """
+        self.cfg = cfg
+
+        self.watcher = SandBoxWatcher(self.cfg)
+        self.watcher.watch_cfgs([(cfg, 'sandbox')])
+
+        self.pipelines = self.parse_pipelines(self.cfg)
+
+    def parse_pipelines(self, cfg):
+        """
+        Parse the pipeline configs.
+
+        :param cfg: the original config
+        :return: a list of SandBoxPipeline objects.
+        """
+        pipelines = []
+        pipeline_keys = [
+            'pipelines', 'probe_job_configs', 'refine_recipe_job_configs',
+            'execution_job_configs', 'evaluation_job_configs'
+        ]
+        global_cfgs = deepcopy(cfg)
+        for pipeline_key in pipeline_keys:
+            if pipeline_key in global_cfgs:
+                global_cfgs.pop(pipeline_key)
+        if cfg.pipelines:
+            # specify the pipelines
+            for pipeline_name, pipeline_cfg in cfg.pipelines.items():
+                pipeline_cfg = self.specify_job_configs(pipeline_cfg)
+                pipeline_cfg = merge_config(global_cfgs, pipeline_cfg)
+                pipelines.append(
+                    SandboxPipeline(pipeline_name, pipeline_cfg, self.watcher))
+        else:
+            pipeline = SandboxPipeline(
+                pipeline_cfg=self.specify_jobs_configs(cfg),
+                watcher=self.watcher)
+            pipelines.append(pipeline)
+        return pipelines
+
+    def specify_job_configs(self, ori_config):
+
+        config = prepare_side_configs(ori_config)
+
+        for key in JobRequiredKeys:
+            if key.value not in config:
+                raise ValueError(
+                    f'Need to specify param "{key.value}" in [{ori_config}]')
+
+        return dict_to_namespace(config)
+
+    def specify_jobs_configs(self, cfg):
+        """
+        Specify job configs by their dict objects or config file path strings.
+
+        :param cfg: the original config
+        :return: a dict of different configs.
+        """
+
+        def configs_to_job_list(cfgs):
+            job_cfgs = []
+            if cfgs:
+                job_cfgs = [
+                    self.specify_job_configs(job_cfg) for job_cfg in cfgs
+                ]
+            return job_cfgs
+
+        cfg.probe_job_configs = configs_to_job_list(cfg.probe_job_configs)
+        cfg.refine_recipe_job_configs = configs_to_job_list(
+            cfg.refine_recipe_job_configs)
+        cfg.execution_job_configs = configs_to_job_list(
+            cfg.execution_job_configs)
+        cfg.evaluation_job_configs = configs_to_job_list(
+            cfg.evaluation_job_configs)
+
+        return cfg
+
+    def run(self):
+        for pipeline in self.pipelines:
+            pipeline.run()
