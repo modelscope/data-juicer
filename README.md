@@ -49,7 +49,7 @@ You should compile the results into a JSON file with the following structure:
 
 ### Step2. Split the dataset (Optional)
 
-Our evaluation process requires 20GB–39GB of GPU memory (varies with `cache_max_entry_count` parameter values between 0.01–0.8). On a single NVIDIA L20 GPU, the evaluation process takes approximately 10 hours when `cache_max_entry_count=0.8`.
+Our evaluation process requires 20GB–39GB of GPU memory (varies with `cache_max_entry_count` parameter values between 0.01–0.8). On a single NVIDIA L20 GPU, the evaluation process takes 10-20 hours when `cache_max_entry_count=0.8`, with duration positively correlated with generated image quality.
 
 To reduce evaluation time, we provide dataset partitioning code. Please run:
 
@@ -89,12 +89,17 @@ Now, you get the evaluation results.
 ### Mini-Benchmark Evaluation (Optional)
 To facilitate rapid evaluation, we design a mini version of our benchmark: [​​DetailMaster_mini_benchmark​](https://github.com/modelscope/data-juicer/tree/DetailMaster/DetailMaster_Dataset)​.
 
-Evaluation command:
+For the fastest evaluation (i.e., evaluating only the designated metric per sample - fastest but less stable), please run::
 ```shell
 $ bash evaluation_pipeline/eval_mini_benchmark/eval_process_mini.sh
 $ bash evaluation_pipeline/eval_mini_benchmark/cal_eval_mini.sh
 ```
 
+Alternatively, you can use the original evaluation code, which assesses all metrics per sample (i.e., taking a subset from the full version, balancing speed and stability). Please run:
+```shell
+$ bash evaluation_pipeline/eval_process.sh (with --ann_json_path ./DetailMaster_Dataset/DetailMaster_mini_benchmark.json)
+$ bash evaluation_pipeline/cal_eval.sh
+```
 
 
 ## Dataset Construction  
