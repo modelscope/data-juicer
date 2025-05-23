@@ -9,25 +9,6 @@ from data_juicer.core.sandbox.data_pool_manipulators import (
 from data_juicer.utils.mm_utils import SpecialTokens
 
 
-# The hook factory for this specific task
-class COCOCaptionDataPreparationFactory(object):
-
-    def __call__(self, hook_type: str = None, **kwargs):
-        if hook_type is None:
-            return None
-
-        hook = None
-        if hook_type == 'COCOCaptionToDJConversion':
-            hook = COCOCaptionToDJConversion()
-        elif hook_type == 'COCOCaptionMetaGeneration':
-            hook = COCOCaptionMetaGeneration()
-
-        return hook
-
-
-coco_caption_data_preparation_factory = COCOCaptionDataPreparationFactory()
-
-
 class COCOCaptionToDJConversion(BaseDataPoolManipulator):
 
     def run(self):

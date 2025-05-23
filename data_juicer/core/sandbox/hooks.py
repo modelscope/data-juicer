@@ -9,6 +9,8 @@ from data_juicer.core.sandbox.factories import (data_analyzer_factory,
                                                 data_evaluator_factory,
                                                 data_executor_factory,
                                                 data_pool_manipulator_factory,
+                                                general_data_executor_factory,
+                                                general_probe_factory,
                                                 mode_infer_evaluator_factory,
                                                 model_evaluator_factory,
                                                 model_infer_executor_factory,
@@ -103,6 +105,18 @@ class ProbeViaModelInferHook(BaseHook):
         return kwargs
 
 
+class GeneralProbeHook(BaseHook):
+    def __init__(self, job_cfg, watcher, *args, **kwargs):
+        super(GeneralProbeHook, self).__init__(job_cfg, watcher, *args, **kwargs)
+
+    def hook(self, **kwargs):
+        self.specify_dj_and_extra_configs()
+        data_probe = general_probe_factory(self.other_cfg)
+        logger.info('Begin to probe data.')
+        data_probe.run()
+        return kwargs
+
+
 class RefineRecipeViaKSigmaHook(BaseHook):
 
     def __init__(self, job_cfg, watcher, *args, **kwargs):
@@ -185,6 +199,17 @@ class DataPoolManipulationHook(BaseHook):
         data_pool_manipulator = data_pool_manipulator_factory(self.other_cfg)
         logger.info('Begin to manipulate data pools.')
         data_pool_manipulator.run()
+        return kwargs
+
+
+class GeneralDataExecutorHook(BaseHook):
+    def __init__(self, job_cfg, watcher, *args, **kwargs):
+        super(GeneralDataExecutorHook, self).__init__(job_cfg, watcher, *args, **kwargs)
+
+    def hook(self, **kwargs):
+        data_executor = general_data_executor_factory(self.other_cfg)
+        logger.info('Begin to execute general data executor.')
+        data_executor.run()
         return kwargs
 
 
@@ -283,14 +308,23 @@ class EvaluateModelHook(BaseHook):
 
 
 HOOK_MAPPING = {
+    # Data/Model Probe hooks
     'ProbeViaAnalyzerHook': ProbeViaAnalyzerHook,
     'ProbeViaModelInferHook': ProbeViaModelInferHook,
+    'GeneralProbeHook': GeneralProbeHook,
+
+    # Data-Recipe Refinement hooks
     'RefineRecipeViaKSigmaHook': RefineRecipeViaKSigmaHook,
     'RefineRecipeViaModelFeedbackHook': RefineRecipeViaModelFeedbackHook,
+
+    # Data/Model Execution hooks
     'ProcessDataHook': ProcessDataHook,
     'DataPoolManipulationHook': DataPoolManipulationHook,
+    'GeneralDataExecutorHook': GeneralDataExecutorHook,
     'TrainModelHook': TrainModelHook,
     'InferModelHook': InferModelHook,
+
+    # Evaluation hooks
     'EvaluateDataHook': EvaluateDataHook,
     'EvaluateModelHook': EvaluateModelHook,
 }

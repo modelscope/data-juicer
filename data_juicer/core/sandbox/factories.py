@@ -67,6 +67,22 @@ class DataEvaluatorFactory(object):
 data_evaluator_factory = DataEvaluatorFactory()
 
 
+class GeneralProbeFactory(object):
+
+    def __call__(self, probe_cfg: dict = None, *args, **kwargs):
+        if probe_cfg is None:
+            return None
+
+        probe = None
+        if probe_cfg.type == 'data_pool_ranking':
+            probe = DataPoolRanking(probe_cfg)
+
+        return probe
+
+
+general_probe_factory = GeneralProbeFactory()
+
+
 class DataPoolManipulatorFactory(object):
 
     def __call__(self, data_pool_cfg: dict = None, *args, **kwargs):
@@ -80,8 +96,6 @@ class DataPoolManipulatorFactory(object):
             manipulator = DataPoolCombination(data_pool_cfg)
         elif data_pool_cfg.type == 'data_pool_duplication':
             manipulator = DataPoolDuplication(data_pool_cfg)
-        elif data_pool_cfg.type == 'data_pool_ranking':
-            manipulator = DataPoolRanking(data_pool_cfg)
         elif data_pool_cfg.type == 'data_pool_downsampling':
             manipulator = DataPoolDownsampling(data_pool_cfg)
 
@@ -89,6 +103,28 @@ class DataPoolManipulatorFactory(object):
 
 
 data_pool_manipulator_factory = DataPoolManipulatorFactory()
+
+
+class GeneralDataExecutorFactory(object):
+
+    def __call__(self, data_exec_cfg: dict = None, *args, **kwargs):
+        if data_exec_cfg is None:
+            return None
+
+        executor = None
+        if data_exec_cfg.type == 'COCOCaptionToDJConversion':
+            from data_juicer.core.sandbox.specific_hooks.intervl_coco_captioning.preparation_hooks import \
+                COCOCaptionToDJConversion
+            executor = COCOCaptionToDJConversion()
+        elif data_exec_cfg.type == 'COCOCaptionMetaGeneration':
+            from data_juicer.core.sandbox.specific_hooks.intervl_coco_captioning.preparation_hooks import \
+                COCOCaptionMetaGeneration
+            executor = COCOCaptionMetaGeneration()
+
+        return executor
+
+
+general_data_executor_factory = GeneralDataExecutorFactory()
 
 
 class ModelEvaluatorFactory(object):
