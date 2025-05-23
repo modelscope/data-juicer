@@ -126,6 +126,13 @@ pipelines:
             descending: true
             top_n: 3
       execution_job_configs:
+        - hook: 'GeneralDataExecutorHook'
+          extra_configs:
+            type: 'coco_caption_meta_generation'
+            dataset_path:
+              - '<internvl_home>/internvl_chat/data/coco/multiple_ops/<top_n_downsampled_combined_data_pools>.jsonl'
+            export_path: '<internvl_home>/internvl_chat/data/coco/multiple_ops/'
+            data_root_path: '<internvl_home>/internvl_chat/'
         - hook: 'TrainModelHook'
           meta_name: 'scaling_op_exps_train_2B'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_train_config.yaml'
