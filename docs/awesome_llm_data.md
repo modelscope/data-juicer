@@ -5,7 +5,7 @@ Welcome to the "Awesome List" for data-model co-development of Multi-Modal Large
 Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. **Please feel free to make pull requests or open issues to [contribute to](#contribution-to-this-survey) this list and add more related resources!**
 
 # News
-+ ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-05-25] We added 20 academic papers involving with this survey.
++ [2025-05-25] We added 20 academic papers involving with this survey.
 + ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-10-23] We built a [dynamic table](https://modelscope.github.io/data-juicer/_static/awesome-list.html) based on the [paper list](#paper-list) that supports filtering and searching.
 + ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-10-22] We restructured our [paper list](#paper-list) to provide more streamlined information.
 
