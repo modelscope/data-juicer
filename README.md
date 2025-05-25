@@ -224,3 +224,17 @@ Please run:
 $ python data_construction_pipeline/final_filter_valid_prompt.py
 ```
 
+
+
+## Citation
+
+If you find our work useful for your research, please consider citing our paper.
+
+```
+@article{jiao2025detailmaster,
+  title={DetailMaster: Can Your Text-to-Image Model Handle Long Prompts?},
+  author={Jiao, Qirui and Chen, Daoyuan and Huang, Yilun and Lin, Xika and Shen, Ying and Li, Yaliang},
+  journal={arXiv preprint arXiv:2505.16915},
+  year={2025}
+}
+```
