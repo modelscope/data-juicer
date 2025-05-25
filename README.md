@@ -1,6 +1,6 @@
-# Official repo for **Img-Diff: Contrastive Data Synthesis for Multimodal Large Language Models** (CVPR25)
+# Official repo for **Img-Diff: Contrastive Data Synthesis for Multimodal Large Language Models** [CVPR2025]
 
-We release **Img-Diff**,  A high-quality synthesis dataset focusing on describing object differences for MLLMs. See more details in our [paper](https://arxiv.org/abs/2408.04594) and download the dataset: [huggingface](https://huggingface.co/datasets/datajuicer/Img-Diff) and [modelscope](https://modelscope.cn/datasets/Data-Juicer/Img-Diff). 
+We release **Img-Diff**,  a high-quality synthesis dataset focusing on describing object differences for MLLMs. See more details in our [paper](https://arxiv.org/abs/2408.04594) and download the dataset: [huggingface](https://huggingface.co/datasets/datajuicer/Img-Diff) and [modelscope](https://modelscope.cn/datasets/Data-Juicer/Img-Diff). 
 
 > 
 >
