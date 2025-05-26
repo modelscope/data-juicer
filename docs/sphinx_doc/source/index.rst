@@ -2,98 +2,12 @@
 .. role:: raw-html-m2r(raw)
    :format: html
 
-
-`[中文主页] <zh-CN/index_ZH>`_ | `[DJ-Cookbook] <DJ-cookbook>`_ | `[OperatorZoo] <docs/Operators>`_ | `[API] <api>`_ | `[Awesome LLM Data] <docs/awesome_llm_data>`_
+`[中文主页] <zh-CN/index_ZH>`_ | `[DJ-Cookbook] <dj-cookbook>`_ | `[OperatorZoo] <docs/Operators>`_ | `[API] <api>`_ | `[Awesome LLM Data] <docs/awesome_llm_data>`_
 
 Data Processing for and with Foundation Models
 ==============================================
 
  :raw-html-m2r:`<img src="https://img.alicdn.com/imgextra/i1/O1CN01fUfM5A1vPclzPQ6VI_!!6000000006165-0-tps-1792-1024.jpg" width = "533" height = "300" alt="Data-Juicer"/>`
-
-
-.. image:: https://img.shields.io/badge/language-Python-214870.svg
-   :target: https://img.shields.io/badge/language-Python-214870.svg
-   :alt: 
-
-
-.. image:: https://img.shields.io/badge/license-Apache--2.0-000000.svg
-   :target: https://img.shields.io/badge/license-Apache--2.0-000000.svg
-   :alt: 
-
-
-.. image:: https://img.shields.io/pypi/v/py-data-juicer?logo=pypi&color=026cad
-   :target: https://pypi.org/project/py-data-juicer
-   :alt: pypi version
-
-
-.. image:: https://img.shields.io/docker/v/datajuicer/data-juicer?logo=docker&label=Docker&color=498bdf
-   :target: https://hub.docker.com/r/datajuicer/data-juicer
-   :alt: Docker version
-
-
-.. image:: https://img.shields.io/badge/OSS%20latest-none?logo=docker&label=Docker&color=498bdf
-   :target: https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/docker_images/data-juicer-latest.tar.gz
-   :alt: Docker on OSS
-
-
-.. image:: https://img.shields.io/endpoint?url=https%3A%2F%2Fgist.githubusercontent.com%2FHYLcool%2Ff856b14416f08f73d05d32fd992a9c29%2Fraw%2Ftotal_cov.json
-   :target: https://img.shields.io/endpoint?url=https%3A%2F%2Fgist.githubusercontent.com%2FHYLcool%2Ff856b14416f08f73d05d32fd992a9c29%2Fraw%2Ftotal_cov.json
-   :alt: 
-
-
-
-.. image:: https://img.shields.io/badge/DataModality-Text,Image,Audio,Video-brightgreen.svg
-   :target: DJ-cookbook
-   :alt: DataModality
-
-
-.. image:: https://img.shields.io/badge/Usage-Cleaning,Synthesis,Analysis-FFD21E.svg
-   :target: DJ-cookbook
-   :alt: Usage
-
-
-.. image:: https://img.shields.io/badge/ModelScope-Demos-4e29ff.svg?logo=data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjI0IDEyMS4zMyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCTxwYXRoIGQ9Im0wIDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtOTkuMTQgNzMuNDloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xNzYuMDkgOTkuMTRoLTI1LjY1djIyLjE5aDQ3Ljg0di00Ny44NGgtMjIuMTl6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTEyNC43OSA0Ny44NGgyNS42NXYyNS42NWgtMjUuNjV6IiBmaWxsPSIjMzZjZmQxIiAvPgoJPHBhdGggZD0ibTAgMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xOTguMjggNDcuODRoMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xOTguMjggMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xNTAuNDQgMHYyMi4xOWgyNS42NXYyNS42NWgyMi4xOXYtNDcuODR6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTczLjQ5IDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiMzNmNmZDEiIC8+Cgk8cGF0aCBkPSJtNDcuODQgMjIuMTloMjUuNjV2LTIyLjE5aC00Ny44NHY0Ny44NGgyMi4xOXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtNDcuODQgNzMuNDloLTIyLjE5djQ3Ljg0aDQ3Ljg0di0yMi4xOWgtMjUuNjV6IiBmaWxsPSIjNjI0YWZmIiAvPgo8L3N2Zz4K
-   :target: https://modelscope.cn/studios?name=Data-Jiucer&page=1&sort=latest&type=1
-   :alt: ModelScope- Demos
-
-
-.. image:: https://img.shields.io/badge/🤗HuggingFace-Demos-4e29ff.svg
-   :target: https://huggingface.co/spaces?&search=datajuicer
-   :alt: HuggingFace- Demos
-
-
-
-.. image:: https://img.shields.io/badge/Doc-DJ_Cookbook-blue?logo=Markdown
-   :target: DJ-cookbook
-   :alt: Document_List
-
-
-.. image:: https://img.shields.io/badge/文档-DJ指南-blue?logo=Markdown
-   :target: zh-CN/DJ-cookbook_ZH
-   :alt: 文档列表
-
-
-.. image:: https://img.shields.io/badge/Doc-OperatorZoo-blue?logo=Markdown
-   :target: https://github.com/modelscope/data-juicer/blob/main/docs/Operators.md
-   :alt: OpZoo
-
-
-.. image:: http://img.shields.io/badge/cs.LG-1.0Paper(SIGMOD'24)-B31B1B?logo=arxiv&logoColor=red
-   :target: https://arxiv.org/abs/2309.02033
-   :alt: Paper
-
-
-.. image:: http://img.shields.io/badge/cs.AI-2.0Paper-B31B1B?logo=arxiv&logoColor=red
-   :target: https://arxiv.org/abs/2501.14755
-   :alt: Paper
-
-
-Data-Juicer is a one-stop system to process text and multimodal data for and with foundation models (typically LLMs).
-We provide a `playground <http://8.138.149.181/>`_ with a managed JupyterLab. `Try Data-Juicer <http://8.138.149.181/>`_ straight away in your browser! If you find Data-Juicer useful for your research or development, please kindly support us by starting it (then be instantly notified of our new releases) and citing our `works <#references>`_.
-
-`Platform for AI of Alibaba Cloud (PAI) <https://www.aliyun.com/product/bigdata/learn>`_ has cited our work and integrated Data-Juicer into its data processing products. PAI is an AI Native large model and AIGC engineering platform that provides dataset management, computing power management, model tool chain, model development, model training, model deployment, and AI asset management. For documentation on data processing, please refer to: `PAI-Data Processing for Large Models <https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX>`_.
-
-Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets.  We welcome you to join us (via issues, PRs, `Slack <https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw>`_  channel, `DingDing <https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11>`_ group, ...), in promoting data-model co-development along with research and applications of foundation models!
 
 News
 ----
@@ -111,9 +25,10 @@ Table of Contents
    :maxdepth: 2
    :caption: Tutorial
 
-   DJ-cookbook
-   Installation
-   quick-start
+   dj-cookbook
+   installation
+   quick_start
+   docs/my_test
 
 * `License`_
 * `Contributing`_

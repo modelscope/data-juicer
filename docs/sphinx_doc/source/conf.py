@@ -3,28 +3,29 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+import os
+import re
+import sys
+import shutil
+from pathlib import Path
+from data_juicer import __version__ as version
+
+from sphinx import project as sphinx_project
+
+release = version
+
+# -- Path setup --------------------------------------------------------------
+sys.path.insert(0, os.path.abspath("../../"))
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
 project = "data_juicer"
 copyright = "2024, Data-Juicer Team"
 author = "Data-Juicer Team"
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-
-from data_juicer import __version__ as version
-import re
-import os
-import sys
-import shutil
-from pathlib import Path
-
-sys.path.insert(0, os.path.abspath("../../"))
-
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+source_suffix = {".rst": "restructuredtext", ".md": "markdown"}
 
 extensions = [
     "sphinx.ext.autodoc",
@@ -35,16 +36,19 @@ extensions = [
     "myst_parser",
     "sphinx_copybutton",
     "sphinx_multiversion",
-    # 'sphinxcontrib.apidoc', # TODO: Replace with sphinx.ext.apidoc when sphinx>=8.2
+    'sphinxcontrib.apidoc', # TODO: Replace with sphinx.ext.apidoc when sphinx>=8.2
 ]
 
+# -- Extension configuration ------------------------------------------------
 myst_heading_anchors = 4
-smv_tag_whitelist = r'^v\d+\.\d+\.\d+$'
+
+# sphinx_multiversion configuration
+# smv_tag_whitelist = r"^v\d+\.\d+\.\d+$"
+smv_tag_whitelist = rf"^v{release}$"
 smv_branch_whitelist = r"^main$"
-smv_released_pattern = r"^tags/.*$"
 smv_released_pattern = r"^refs/tags/v\d+\.\d+\.\d+$"
 
-# apidoc set
+# apidoc settings
 apidoc_module_dir = "../../../data_juicer"
 apidoc_output_dir = "./"
 
@@ -53,24 +57,19 @@ apidoc_output_dir = "./"
 autosectionlabel_prefix_document = True
 autosummary_generate = True
 autosummary_ignore_module_all = False
-
 autodoc_member_order = "bysource"
 
+# -- Templates and patterns -------------------------------------------------
 templates_path = ["_templates"]
-exclude_patterns = ["build"]
+exclude_patterns = ["build", ".venv"]
 
-# -- Options for HTML output -------------------------------------------------
-
+# -- Options for HTML output ------------------------------------------------
+# The theme to use for HTML and HTML Help pages.
+# See the documentation for a list of builtin themes.
 html_theme = "furo"
 html_title = "data-juicer"
-# html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
-html_css_files = [
-    "custom.css",
-]
-
-html_js_files = ["custom.js"]
-
+# Sidebar configuration
 html_sidebars = {
     "**": [
         "sidebar/brand.html",
@@ -81,36 +80,42 @@ html_sidebars = {
         "sidebar/bottom_menu.html",
     ],
 }
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+html_css_files = ["sidebar-menu.css"]
+html_static_path = ["_static"]
 
-# language settings
+# -- Internationalization settings ------------------------------------------
+# Language settings
 language = "en"
-locale_dirs = ["locale/"]  # path is example but recommended.
-gettext_compact = False  # optional.
+locale_dirs = ["locale/"]  # path is example but recommended
+gettext_compact = False  # optional
 
-# list of supported languages
+# List of supported languages
 supported_languages = {
     "en": "English",
-    "zh-CN": "简体中文",
+    "zh_CN": "简体中文",
     # 'ja': '日本語',
 }
 
 
 def get_lang_link(language, pagename, lang_code, non_zh_pages=[], current_version=""):
-    if current_version:
-        base_path = "../../"
-    else:
-        base_path = "../"
+    """Generate language specific links for documentation pages"""
+    base_path = "../../" if current_version else "../"
 
     def norm_pagename(pagename):
         return os.path.normpath(pagename)
 
     norm_non_zh_pages = set(map(norm_pagename, non_zh_pages))
     target_page = pagename
-    if language == "zh-CN" and pagename.endswith("_ZH"):
+
+    if "CN" in language and pagename.endswith("_ZH") and "CN" not in lang_code:
         target_page = pagename[:-3]
-    if lang_code == "zh-CN" and not pagename.endswith("_ZH"):
+    if "CN" in lang_code and not pagename.endswith("_ZH"):
         if norm_pagename(pagename) not in norm_non_zh_pages:
             target_page += "_ZH"
+
     return f"{base_path}{lang_code}/{current_version}{target_page}.html"
 
 
@@ -118,31 +123,29 @@ html_context = {
     "supported_languages": supported_languages,
     "get_lang_link": get_lang_link,
 }
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
 
 
+# -- setup configuration ------------------------------------------------
 def find_zh_exclusions(app, config):
     """
     Find Chinese translation files to exclude when building English documentation
     """
     non_zh_pages = set()
     zh_exclusions = []
+
     for root, dirs, files in os.walk(app.srcdir):
         for file in files:
             # Check for files with English base names and corresponding _ZH versions
-            if not file.endswith("_ZH.md") and not file.endswith("_ZH.rst"):
+            if not file.endswith(("_ZH.md", "_ZH.rst")):
                 base_name, ext = os.path.splitext(file)
                 zh_file = f"{base_name}_ZH{ext}"
                 zh_file_path = os.path.join(root, zh_file)
                 rel_path = os.path.normpath(
                     os.path.relpath(os.path.join(root, file), app.srcdir)
                 )
+
                 # If Chinese version exists, add to exclusions
                 if os.path.exists(zh_file_path):
-                    # Convert to relative path from source directory
                     zh_exclusions.append(rel_path)
                 else:
                     non_zh_pages.add(
@@ -151,7 +154,7 @@ def find_zh_exclusions(app, config):
                         )
                     )
 
-    if config.language == "zh-CN":
+    if config.language == "zh_CN":
         config.exclude_patterns.extend(zh_exclusions)
     else:
         config.exclude_patterns.extend(["*_ZH*", "**/*_ZH*"])
@@ -159,74 +162,168 @@ def find_zh_exclusions(app, config):
     app.config.html_context.setdefault("non_zh_pages", set()).update(non_zh_pages)
 
 
+def create_symlinks(source_dir):
+    """Create symbolic links for markdown files in the documentation"""
+    # Use app.srcdir to get the current version of the document source directory
+    project_root = source_dir.parent.parent.parent
+
+    for md_file in project_root.rglob("*.md"):
+        exclude_paths = ["outputs", "sphinx_doc"]
+
+        if any(path in str(md_file) for path in exclude_paths):
+            continue
+
+        target = source_dir / md_file.relative_to(project_root)
+        target.parent.mkdir(parents=True, exist_ok=True)
+
+        if not target.exists():
+            target.symlink_to(os.path.relpath(md_file, target.parent))
+
+
+def extract_sections(readme_path, section_titles, title_map={}, output_dir=None):
+    try:
+        with open(readme_path, "r", encoding="utf-8") as f:
+            readme_content = f.read()
+    except FileNotFoundError:
+        raise FileNotFoundError(f"File not found at: {readme_path}")
+
+    if not output_dir:
+        output_dir = os.path.dirname(readme_path) or "."
+
+    for title in section_titles:
+        # Construct regular expression to find the section
+        #  - Starts with ## and the title
+        #  - Matches all characters until the next ## or the end of the document
+        pattern = rf"^## {title}.*(?:\n(?!## ).*)*"
+        match = re.findall(pattern, readme_content, re.MULTILINE)
+
+        if match:
+            section_content = match[0]
+
+            # Create output file name
+            title = title_map.get(title, title.replace(" ", "_").lower())
+            output_file = f"{output_dir}/{title}.md"
+
+            try:
+                with open(output_file, "w", encoding="utf-8") as outfile:
+                    outfile.write(
+                        f"{section_content}"
+                    )  # Include the title in the output file
+            except Exception as e:
+                print(f"Error writing to file '{output_file}': {e}")
+
+        else:
+            raise ValueError(f"Section title '{title}' not found in {readme_path}")
+
+
+def update_metadata_docnames(app, config):
+    if hasattr(app.config, "smv_metadata"):
+        metadata = app.config.smv_metadata
+    else:
+        print(
+            "smv_metadata not found in app.config.  sphinx_multiversion likely not initialized yet."
+        )
+        return
+
+    main_sourcedir = metadata["main"].get("sourcedir")
+    source_suffixes = config.source_suffix
+    project = sphinx_project.Project(main_sourcedir, source_suffixes)
+    updated_docnames = list(project.discover())
+    for version_name, _ in metadata.items():
+        app.config.smv_metadata[version_name]["docnames"] = updated_docnames
+
+
+def rebuild_source_dir(app, config):
+    """Rebuild source directory for documentation"""
+    source_dir = Path(app.srcdir)
+    create_symlinks(source_dir)
+
+    # Extract sections from README.md
+    readme_path = source_dir / "README.md"
+    readme_zh_path = source_dir / "README_ZH.md"
+    section_titles = ["DJ-Cookbook", "Installation", "Quick Start"]
+    section_zh_titles = ["DJ-Cookbook", "安装", "快速上手"]
+    title_zh_map = {
+        "DJ-Cookbook": "dj-cookbook_ZH",
+        "安装": "installation_ZH",
+        "快速上手": "quick_start_ZH",
+    }
+    extract_sections(readme_zh_path, section_zh_titles, title_zh_map)
+    extract_sections(readme_path, section_titles)
+    update_metadata_docnames(app, config)
+
+    # Find Chinese translation files
+    find_zh_exclusions(app, config)
+
+
 def skip(app, what, name, obj, would_skip, options):
+    """Control which members to skip in documentation"""
     if name == "__init__":
         return False
     return would_skip
 
 
-def create_symlinks(app, config):
-    # Use app.srcdir to get the current version of the document source directory
-    source_dir = Path(app.srcdir)
-    project_root = source_dir.parent.parent.parent
-
-    for md_file in project_root.rglob("*.md"):
-        if "outputs" in str(md_file) or "sphinx_doc" in str(md_file):
-            continue
-
-        rel_path = md_file.relative_to(project_root)
-        target = source_dir / rel_path
-
-        target.parent.mkdir(parents=True, exist_ok=True)
-
-        if not target.exists():
-            rel_source = os.path.relpath(md_file, target.parent)
-            target.symlink_to(rel_source)
-    
-    find_zh_exclusions(app, config)
-
-
-def copy_sphinx_doc(app):
-    source_dir = Path(app.srcdir)
-    project_root = source_dir.parent.parent.parent
-    sphinx_doc_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-    shutil.copytree(sphinx_doc_path, project_root / "docs", dirs_exist_ok=True)
-
-
 def process_doc_links(app, docname, source):
-    repo_base_url = "https://github.com/modelscope/data-juicer/blob/main/"
-
+    """Process and update documentation links"""
+    repo_base = "https://github.com/modelscope/data-juicer/blob/main/"
 
     def link_replacer(match):
-        link_text = match.group(1)
-        relative_path = match.group(2)
+        text, path = match.group(1), match.group(2)
+        abs_path = os.path.normpath(os.path.join(os.path.dirname(docname), path))
+        return f"[{text}]({repo_base}{abs_path})"
 
-        current_doc_dir = os.path.dirname(docname)
-
-        absolute_path = os.path.normpath(os.path.join(current_doc_dir, relative_path))
-
-        full_github_link = f"{repo_base_url}{absolute_path}"
-
-        return f"[{link_text}]({full_github_link})"
-
-    pattern = r"\[([^\]]+)\]\((?!http|#)([^)]*(?<!\.md))\)"
+    pattern = r"\[([^\]]+)\]\((?!http|#)([^)]*(?<!\.md)(?<!\.rst))\)"
     source[0] = re.sub(pattern, link_replacer, source[0])
+    return source[0]
 
+
+def process_tutorial(app, docname, source):
+    """Process tutorial during reading"""
+    overview_placeholder = ""
+    api_placeholder = ""
+    if app.config.language == "zh_CN":
+        overview_placeholder = "- [DJ概览](README_ZH.md)"
+        api_placeholder = "API参考"
+    else:
+        overview_placeholder = "- [Overview of DJ](README.md)"
+        api_placeholder = "API references"
+    source[0] = source[0].replace(overview_placeholder, "")
+    source[0] = source[0].replace(
+        f"[{api_placeholder}](https://modelscope.github.io/data-juicer/)",
+        f"[{api_placeholder}](api.rst)",
+    )
+    source[0] = source[0].replace(
+        '<p align="right"><a href="#table">🔼 back to index</a></p>', ""
+    )
     return source[0]
 
 
 def process_read(app, docname, source):
+    """Process document during reading"""
+    source[0] = process_tutorial(app, docname, source)
     source[0] = process_doc_links(app, docname, source)
 
-def process_include(app, relative_path, parent_docname, source):
-    source[0] = process_doc_links(app, relative_path, source)
-    
+
+def copy_sphinx_doc_to_build(app, config):
+    """Copies the entire project directory to the Sphinx build directory."""
+    source_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+    dest_dir = app.srcdir.parent.parent.parent / "docs"
+
+    try:
+        shutil.copytree(source_dir, dest_dir, dirs_exist_ok=True)
+    except Exception as e:
+        print(f"Error copying documentation: {e}")
+
 
 def setup(app):
-    app.connect("config-inited", create_symlinks)
-    app.config.root_doc = "index_ZH" if app.config.language == "zh-CN" else "index"
-    if app.config.smv_current_version != "main":
-        app.connect("builder-inited", copy_sphinx_doc)
+    """Setup Sphinx application hooks"""
+    # current_version = app.config.smv_current_version
+    current_version = app.config.smv_current_version
+    app.config.smv_latest_version = f"v{release}"
+    if current_version != "main":
+        app.connect("config-inited", copy_sphinx_doc_to_build)
+    app.connect("config-inited", rebuild_source_dir)
+    app.config.root_doc = "index_ZH" if app.config.language == "zh_CN" else "index"
+
     app.connect("source-read", process_read)
-    app.connect('include-read', process_include)
     app.connect("autodoc-skip-member", skip)
