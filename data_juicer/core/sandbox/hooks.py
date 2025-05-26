@@ -1,5 +1,6 @@
 # yapf: disable
 import asyncio
+from copy import deepcopy
 
 from jsonargparse import dict_to_namespace
 from loguru import logger
@@ -57,6 +58,9 @@ class BaseHook:
 
     def _input_updating_hook(self, **context_infos):
         self.specify_dj_and_extra_configs(allow_fail=True)
+
+        prev_dj_cfg = deepcopy(self.dj_cfg) if self.dj_cfg else None
+        prev_extra_cfg = deepcopy(self.extra_cfg) if self.extra_cfg else None
 
         # update configs according to local settings
         for key, value in self.local_settings.items():
@@ -130,7 +134,9 @@ class BaseHook:
                 elif cfg_type == JobRequiredKeys.extra_configs.value:
                     self.extra_cfg = target_value
 
-        self.specify_dj_and_extra_configs()
+        if self.dj_cfg != prev_dj_cfg or self.extra_cfg != prev_extra_cfg:
+            logger.info('Configs are updated according to input and local settings. Re-initializing them...')
+            self.specify_dj_and_extra_configs()
 
     def _output_recording_hook(self, outputs):
         if not isinstance(outputs, list):

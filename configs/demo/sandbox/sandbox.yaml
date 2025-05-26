@@ -24,7 +24,7 @@ probe_job_configs:
 
 refine_recipe_job_configs:
   - hook: 'RefineRecipeViaKSigmaHook'
-    meta_name: 'analysis_ori_data'
+    meta_name: 'refine_ori_data'
     output: 'refined_recipe_path'
     dj_configs: 'configs/demo/process.yaml'
     extra_configs:
