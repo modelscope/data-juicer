@@ -5,6 +5,7 @@ from typing import List
 import yaml
 from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import dict_to_namespace, namespace_to_dict
+from loguru import logger
 
 import wandb
 from data_juicer.config import merge_config, prepare_side_configs
@@ -146,17 +147,17 @@ class SandboxPipeline:
         for job_cfg in self.cfg.evaluation_job_configs:
             self.evaluation_jobs.append(register_hook(job_cfg, self.watcher))
 
-    def run(self):
+    def run(self, **pipeline_infos):
         """
          Running the sandbox pipeline at once or in HPO style.
         """
         if self.cfg.hpo_config is not None:
             # execute_hpo_wandb contains running one_trail with HPO scheduler
-            self.execute_hpo_wandb()
+            return self.execute_hpo_wandb(**pipeline_infos)
         else:
-            self.one_trial()
+            return self.one_trial(**pipeline_infos)
 
-    def one_trial(self):
+    def one_trial(self, **context_infos):
         """
         Running the sandbox pipeline at once.
          Users can flexibly conduct some steps of the whole sandbox pipeline
@@ -171,25 +172,35 @@ class SandboxPipeline:
             self.cfg = merge_config(self.cfg, wandb.config)
             self.watcher.watch_cfgs([self.cfg, 'after_hpo'])
 
-        job_infos = {}
+        if self.name in context_infos:
+            raise ValueError(
+                f'There are different pipelines with the same pipeline name {self.name}.'
+            )
+        context_infos[self.name] = []
 
         # ====== Data & model probe ======
         for probe_hook in self.probe_jobs:
-            job_infos = probe_hook.hook(**job_infos)
+            new_job_infos = probe_hook.run(**context_infos)
+            context_infos[self.name].append(new_job_infos)
 
         # ====== Data-model recipes iteration based on probe results ======
         for refine_hook in self.refine_recipe_jobs:
-            job_infos = refine_hook.hook(**job_infos)
+            new_job_infos = refine_hook.run(**context_infos)
+            context_infos[self.name].append(new_job_infos)
 
         # ====== Data processing & model training ======
         for exec_hook in self.execution_jobs:
-            job_infos = exec_hook.hook(**job_infos)
+            new_job_infos = exec_hook.run(**context_infos)
+            context_infos[self.name].append(new_job_infos)
 
         # ====== Evaluation on processed data or trained model ======
         for eval_hook in self.evaluation_jobs:
-            job_infos = eval_hook.hook(**job_infos)
+            new_job_infos = eval_hook.run(**context_infos)
+            context_infos[self.name].append(new_job_infos)
 
-    def execute_hpo_wandb(self):
+        return context_infos
+
+    def execute_hpo_wandb(self, **pipeline_infos):
         """
         Running the sandbox pipeline in HPO style.
          Users can flexibly conduct some steps of the whole sandbox pipeline
@@ -204,6 +215,7 @@ class SandboxPipeline:
                         function=self.one_trial,
                         count=hpo_configuration['sweep_max_count']
                         if 'sweep_max_count' in hpo_configuration else None)
+        return None
 
 
 class SandBoxExecutor:
@@ -271,8 +283,9 @@ class SandBoxExecutor:
 
         for key in JobRequiredKeys:
             if key.value not in config:
-                raise ValueError(
-                    f'Need to specify param "{key.value}" in [{ori_config}]')
+                logger.warning(
+                    f'The key "{key.value}" is not specified in [{ori_config}]'
+                )
 
         return dict_to_namespace(config)
 
@@ -303,5 +316,7 @@ class SandBoxExecutor:
         return cfg
 
     def run(self):
+        context_infos = {}
+
         for pipeline in self.pipelines:
-            pipeline.run()
+            context_infos = pipeline.run(**context_infos)

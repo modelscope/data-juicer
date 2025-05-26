@@ -16,7 +16,8 @@ class COCOCaptionToDJConversion(BaseDataPoolManipulator):
         Generate meta file for InternVL COCO Caption datasets.
 
         Input:
-            - N InternVL COCO Caption datasets
+            - dataset_path: N InternVL COCO Caption datasets
+            - export_path: path to export the result datasets
         Output:
             - N InternVL COCO Caption datasets in DJ format, with two new fields added: "text" for only caption with
                 special tokens and "images" with a list of images. They are named following the rule
@@ -53,9 +54,10 @@ class COCOCaptionMetaGeneration(BaseDataPoolManipulator):
         Generate meta file for InternVL COCO Caption datasets.
 
         Input:
-            - N InternVL COCO Caption datasets
-            - data root path to store the InternVL COCO Caption datasets, where there should be deeper directory
-                starting with "data/coco/xxx"
+            - dataset_path: N InternVL COCO Caption datasets
+            - data_root_path: data root path to store the InternVL COCO Caption datasets, where there should be deeper
+                directory starting with "data/coco/xxx"
+            - export_path: path to export the result datasets
         Output:
             - N meta file paths. They are named following the rule "<original_name>.json". Refer to:
                 https://github.com/OpenGVLab/InternVL/blob/main/internvl_chat/shell/data/coco_caption.json

@@ -17,11 +17,17 @@ pipelines:
   - baseline_preparation:
       execution_job_configs:
         - hook: 'GeneralDataExecutorHook'
+          meta_name: 'convert_to_coco_caption'
+          output: 'output_paths'
           extra_configs:
             type: 'coco_caption_to_dj_conversion'
             dataset_path: '<internvl_home>/internvl_chat/data/coco/coco_karpathy_train_567k.jsonl'
             export_path: '<internvl_home>/internvl_chat/data/coco'
         - hook: 'GeneralDataExecutorHook'
+          meta_name: 'generate_meta_file_dj_fmt'
+          input:
+            extra_configs.dataset_path: '-1.output_paths'
+          output: 'output_paths'
           extra_configs:
             type: 'coco_caption_meta_generation'
             dataset_path: '<internvl_home>/internvl_chat/data/coco/coco_karpathy_train_567k_dj_fmt.jsonl'
@@ -38,27 +44,42 @@ pipelines:
       probe_job_configs:
         - hook: 'ProbeViaAnalyzerHook'
           meta_name: 'analysis_all_stats'
+          input:
+            dj_configs.dataset_path: 'baseline_preparation.convert_to_coco_caption.output_paths'
+          output: 'dataset_with_stats_paths'
           dj_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/all_text_image_stats.yaml'
       execution_job_configs:
         - hook: 'DataPoolManipulationHook'
+          meta_name: 'construct_single_op_data_pools'
+          input:
+            extra_configs.dataset_path: '-1.dataset_with_stats_paths'
+          output: 'single_op_data_pool_paths'
           extra_configs:
             type: 'data_pool_construction'
             dataset_path: '<internvl_home>/internvl_chat/data/coco/computed_stats/coco_karpathy_train_567k_dj_fmt_with_stats.jsonl'
             export_path: '<internvl_home>/internvl_chat/data/coco/single_ops/'
             split_ratios: ['1.0 / 3.0', '2.0 / 3.0']
         - hook: 'GeneralDataExecutorHook'
+          input:
+            extra_configs.dataset_path: '-1.single_op_data_pool_paths'
+          output: 'single_op_data_pool_meta_paths'
           extra_configs:
             type: 'coco_caption_meta_generation'
-            dataset_path:
-              - '<internvl_home>/internvl_chat/data/coco/single_ops/<stats_key_name>/<parts>.jsonl'
+            dataset_path: '<internvl_home>/internvl_chat/data/coco/single_ops/<stats_key_name>/<parts>.jsonl'
             export_path: '<internvl_home>/internvl_chat/data/coco/single_ops/'
             data_root_path: '<internvl_home>/internvl_chat/'
         - hook: 'TrainModelHook'
           meta_name: 'single_op_exps_train'
+          input:
+            extra_configs.meta_paths: '-1.single_op_data_pool_meta_paths'
+          output: 'single_op_exps_trained_model_paths'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_train_config.yaml'
       evaluation_job_configs:
         - hook: 'EvaluateModelHook'
           meta_name: 'single_op_exps_eval'
+          input:
+            extra_configs.ckpt_paths: '-1.single_op_exps_trained_model_paths'
+          output: 'single_op_exps_eval_results'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_eval_config.yaml'
 
   # Multiple-OP Exps:
@@ -73,6 +94,10 @@ pipelines:
       probe_job_configs:
         - hook: 'GeneralProbeHook'
           meta_name: 'rank_single_op_data_pools'
+          input:
+            extra_configs.dataset_path: 'single_op_exps.construct_single_op_data_pools.single_op_data_pool_paths'
+            extra_configs.metrics: '-1.single_op_exps_eval_results'
+          output: 'top3_single_op_data_pool_paths'
           extra_configs:
             type: 'data_pool_ranking'
             dataset_path: '<internvl_home>/internvl_chat/data/coco/single_ops/<stats_key_name>/<parts>.jsonl'
@@ -83,17 +108,27 @@ pipelines:
             top_n: 3
       execution_job_configs:
         - hook: 'DataPoolManipulationHook'
+          input:
+            extra_configs.dataset_path: '-1.top3_single_op_data_pool_paths'
+          output: 'top3_combined_data_pool_paths'
           extra_configs:
             type: 'data_pool_combination'
             dataset_path: '<internvl_home>/internvl_chat/data/coco/single_ops/<stats_key_name>/<top_n_parts>.jsonl'
             export_path: '<internvl_home>/internvl_chat/data/coco/multiple_ops/'
         - hook: 'DataPoolManipulationHook'
+          meta_name: 'align_data_pool_size'
+          input:
+            extra_configs.dataset_path: '-1.top3_combined_data_pool_paths'
+          output: 'top3_aligned_combined_data_pool_paths'
           extra_configs:
             type: 'data_pool_downsampling'
             dataset_path: '<internvl_home>/internvl_chat/data/coco/multiple_ops/<combined_data_pools>.jsonl'
             export_path: '<internvl_home>/internvl_chat/data/coco/multiple_ops/'
             seed: 42
         - hook: 'GeneralDataExecutorHook'
+          input:
+            extra_configs.dataset_path: '-1.top3_aligned_combined_data_pool_paths'
+          output: 'top3_aligned_combined_data_pool_meta_paths'
           extra_configs:
             type: 'coco_caption_meta_generation'
             dataset_path:
@@ -102,10 +137,16 @@ pipelines:
             data_root_path: '<internvl_home>/internvl_chat/'
         - hook: 'TrainModelHook'
           meta_name: 'multiple_op_exps_train'
+          input:
+            extra_configs.meta_paths: '-1.top3_aligned_combined_data_pool_meta_paths'
+          output: 'multiple_op_exps_trained_model_paths'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_train_config.yaml'
       evaluation_job_configs:
         - hook: 'EvaluateModelHook'
           meta_name: 'multiple_op_exps_eval'
+          input:
+            extra_configs.ckpt_paths: '-1.multiple_op_exps_trained_model_paths'
+          output: 'multiple_op_exps_eval_results'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_eval_config.yaml'
 
   # Scaling Exps:
@@ -117,6 +158,10 @@ pipelines:
       probe_job_configs:
         - hook: 'GeneralProbeHook'
           meta_name: 'rank_multiple_op_data_pools'
+          input:
+            extra_configs.dataset_path: 'multiple_op_exps.align_data_pool_size.top3_aligned_combined_data_pool_paths'
+            extra_configs.metrics: '-1.multiple_op_exps_eval_results'
+          output: 'top3_multiple_op_data_pool_paths'
           extra_configs:
             type: 'data_pool_ranking'
             dataset_path: '<internvl_home>/internvl_chat/data/coco/multiple_ops/<downsampled_combined_data_pools>.jsonl'
@@ -127,6 +172,10 @@ pipelines:
             top_n: 3
       execution_job_configs:
         - hook: 'GeneralDataExecutorHook'
+          meta_name: 'generate_meta_files_for_scaling_exps'
+          input:
+            extra_configs.dataset_path: '-1.top3_multiple_op_data_pool_paths'
+          output: 'top3_multiple_op_data_pool_meta_paths'
           extra_configs:
             type: 'coco_caption_meta_generation'
             dataset_path:
@@ -135,20 +184,41 @@ pipelines:
             data_root_path: '<internvl_home>/internvl_chat/'
         - hook: 'TrainModelHook'
           meta_name: 'scaling_op_exps_train_2B'
+          input:
+            extra_configs.meta_paths: 'scaling_exps.generate_meta_files_for_scaling_exps.top3_multiple_op_data_pool_meta_paths'
+          output: 'scaling_op_exps_2B_trained_model_paths'
+          local:
+            extra_configs.model_name_or_path: '<internvl_home>/pretrained/InternVL2-2B'
+            conv_style_or_scale: '2B'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_train_config.yaml'
         - hook: 'TrainModelHook'
           meta_name: 'scaling_op_exps_train_4B'
+          input:
+            extra_configs.meta_paths: 'scaling_exps.generate_meta_files_for_scaling_exps.top3_multiple_op_data_pool_meta_paths'
+          output: 'scaling_op_exps_4B_trained_model_paths'
+          local:
+            extra_configs.model_name_or_path: '<internvl_home>/pretrained/InternVL2-4B'
+            conv_style_or_scale: '4B'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_train_config.yaml'
         - hook: 'TrainModelHook'
           meta_name: 'scaling_op_exps_train_26B'
+          input:
+            extra_configs.meta_paths: 'scaling_exps.generate_meta_files_for_scaling_exps.top3_multiple_op_data_pool_meta_paths'
+          output: 'scaling_op_exps_26B_trained_model_paths'
+          local:
+            extra_configs.model_name_or_path: '<internvl_home>/pretrained/InternVL2-26B'
+            conv_style_or_scale: '26B'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_train_config.yaml'
       evaluation_job_configs:
         - hook: 'EvaluateModelHook'
           meta_name: 'scaling_op_exps_eval_2B'
+          input: 'scaling_exps.scaling_op_exps_train_2B.scaling_op_exps_2B_trained_model_paths'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_eval_config.yaml'
         - hook: 'EvaluateModelHook'
           meta_name: 'scaling_op_exps_eval_4B'
+          input: 'scaling_exps.scaling_op_exps_train_4B.scaling_op_exps_4B_trained_model_paths'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_eval_config.yaml'
         - hook: 'EvaluateModelHook'
           meta_name: 'scaling_op_exps_eval_26B'
+          input: 'scaling_exps.scaling_op_exps_train_26B.scaling_op_exps_26B_trained_model_paths'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_eval_config.yaml'

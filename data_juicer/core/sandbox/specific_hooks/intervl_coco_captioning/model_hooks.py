@@ -219,6 +219,7 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
             # run the script
             cmd += f' && bash {script_path}'
             self.env.run_cmd(cmd)
+        return self.output_paths
 
     async def _watch_run(self, line, **kwargs):
         # e.g. "{'loss': 2.055, 'learning_rate': 3.0000000000000004e-05, 'epoch': 0.02}"
