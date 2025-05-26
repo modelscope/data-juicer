@@ -168,8 +168,6 @@ class BaseHook:
                     self.inited_dj_cfg = prev_inited_dj_cfg
                 else:
                     raise e
-        else:
-            self.inited_dj_cfg = get_init_configs({})
 
         # prepare extra configs
         if self.extra_cfg:

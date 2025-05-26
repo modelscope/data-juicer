@@ -93,10 +93,7 @@ def init_sandbox_configs(args=None):
         timestamp = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
         cfg.timestamp = timestamp
         logfile_name = f'sandbox_log_{project_name}_{exp_name}_time_{timestamp}.txt'
-        setup_logger(save_dir=log_dir,
-                     filename=logfile_name,
-                     level='DEBUG' if cfg.debug else 'INFO',
-                     redirect=cfg.executor_type == 'default')
+        setup_logger(save_dir=log_dir, filename=logfile_name)
 
         return cfg
     except ArgumentError:
