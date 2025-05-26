@@ -114,6 +114,8 @@ class DataPoolConstruction(BaseDataPoolManipulator):
             raise ValueError('split_ratios should be in (0, 1).')
 
         # start to construct the data pools
+        logger.info(
+            f'Constructing data pools with split ratios {split_ratios}...')
         output_paths = []
         for ds_path in existing_input_paths:
             output_paths.extend(
@@ -210,6 +212,7 @@ class DataPoolCombination(BaseDataPoolManipulator):
             ordered_data_pool_paths, export_path)
 
         # start to combine these data pools
+        logger.info('Combining data pools...')
         combined_hierarchies, dataset_records = self._combine_data_pools(
             existing_input_paths)
         # print hierarchies:
@@ -309,6 +312,9 @@ class DataPoolDuplication(BaseDataPoolManipulator):
         if any([not isinstance(r, int) or r <= 0 for r in dup_times]):
             raise ValueError('duplicating_times should be integers >= 1.')
 
+        logger.info(
+            f'Duplicating data pools for {dup_times} times with shuffle [{shuffle}]...'
+        )
         output_paths = []
         for input_dataset in input_dataset_paths:
             output_paths.extend(
@@ -379,6 +385,10 @@ class DataPoolRanking(BaseDataPoolManipulator):
             )
 
         # key func that extracts key info to rank
+        logger.info(
+            f'Ranking data pools on keys [{",".join(existing_keys)}] with '
+            f'[{"descending" if descending else "ascending"}]...')
+
         def _key_func(zipped_metric):
             return (zipped_metric[1][k] for k in existing_keys)
 
@@ -398,6 +408,7 @@ class DataPoolRanking(BaseDataPoolManipulator):
                                            reverse=descending)
         ]
         if top_n is not None:
+            logger.info(f'Select only top-{top_n} data pools...')
             ranked_paths = ranked_paths[:top_n]
         return ranked_paths
 
@@ -430,6 +441,7 @@ class DataPoolDownsampling(BaseDataPoolManipulator):
         if target_num is None:
             target_num = min(all_lengths)
 
+        logger.info(f'Downsampling data pools to {target_num} samples...')
         all_datasets = [
             ds.shuffle(seed=seed).take(min(target_num, len(ds)))
             for ds in all_datasets

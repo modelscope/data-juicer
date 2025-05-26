@@ -31,12 +31,13 @@ class COCOCaptionToDJConversion(BaseDataPoolManipulator):
             input_dataset_paths, export_path)
 
         output_paths = []
-        for src_path in existing_input_paths:
+        for src_path in tqdm(existing_input_paths,
+                             desc='Converting to Data-Juicer format'):
             basename = os.path.splitext(os.path.basename(src_path))[0]
             output_path = os.path.join(export_path, f'{basename}_dj_fmt.jsonl')
             with jl.open(src_path, 'r') as reader:
                 with jl.open(output_path, 'w') as writer:
-                    for s in tqdm(reader):
+                    for s in reader:
                         image = s['image']
                         text = s['conversations'][1]['value']
                         s['images'] = [image]
@@ -80,7 +81,8 @@ class COCOCaptionMetaGeneration(BaseDataPoolManipulator):
         }
 
         output_paths = []
-        for src_path in existing_input_paths:
+        for src_path in tqdm(existing_input_paths,
+                             desc='Generating meta files'):
             basename = os.path.basename(src_path)
             meta_key = os.path.splitext(basename)[0]
             ds = []
