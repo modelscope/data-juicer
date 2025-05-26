@@ -5,6 +5,7 @@ Welcome to the "Awesome List" for data-model co-development of Multi-Modal Large
 Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. **Please feel free to make pull requests or open issues to [contribute to](#contribution-to-this-survey) this list and add more related resources!**
 
 # News
++ [2025-05-25] We added 20 academic papers related to this survey.
 + ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-10-23] We built a [dynamic table](https://modelscope.github.io/data-juicer/_static/awesome-list.html) based on the [paper list](#paper-list) that supports filtering and searching.
 + ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-10-22] We restructured our [paper list](#paper-list) to provide more streamlined information.
 
@@ -225,6 +226,26 @@ Below is a paper list summarized based on our survey. Additionally, we have prov
 |Panda-70m: Captioning 70m videos with multiple cross-modality teachers|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|
 |Multimodal C4: An Open, Billion-scale Corpus of Images Interleaved With Text|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|
 |ChartAssisstant: A Universal Chart Multimodal Language Model via Chart-to-Table Pre-training and Multitask Instruction Tuning|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|
+|Imagebind: One embedding space to bind them all|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--CrossModalAlignment-f1db9d)|
+|UniBind: LLM-Augmented Unified and Balanced Representation Space to Bind Them All|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--CrossModalAlignment-f1db9d)|
+|FreeBind: Free Lunch in Unified Multimodal Space via Knowledge Fusion|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--CrossModalAlignment-f1db9d)|
+|LanguageBind: Extending Video-Language Pretraining to N-modality by Language-based Semantic Alignment|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--CrossModalAlignment-f1db9d)|
+|Binding Touch to Everything: Learning Unified Multimodal Tactile Representations|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--CrossModalAlignment-f1db9d)|
+|Genixer: Empowering Multimodal Large Language Model as a Powerful Data Generator|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Model4Data--Synthesis--Creator-b4d4fb)|
+|ZooProbe: A Data Engine for Evaluating, Exploring, and Evolving Large-scale Training Data for Multimodal LLMs|![](https://img.shields.io/badge/Model4Data--Synthesis--Evaluator-b4d4fb)|
+|MiniGPT-4: Enhancing Vision-Language Understanding with Advanced Large Language Models|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Condensation-f1db9d) ![](https://img.shields.io/badge/Model4Data--Synthesis--Mapper-b4d4fb) ![](https://img.shields.io/badge/Model4Data--Synthesis--Filter-b4d4fb)|
+|MMEvol: Empowering Multimodal Large Language Models with Evol-Instruct|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Diversity-f1db9d) ![](https://img.shields.io/badge/Model4Data--Synthesis--Mapper-b4d4fb)|
+|World to Code: Multi-modal Data Generation via Self-Instructed Compositional Captioning and Filtering|![](https://img.shields.io/badge/Model4Data--Synthesis--Creator-b4d4fb)|
+|Model-in-the-Loop (MILO): Accelerating Multimodal AI Data Annotation with LLMs|![](https://img.shields.io/badge/Model4Data--Synthesis--Mapper-b4d4fb)|
+|FM2DS: Few-Shot Multimodal Multihop Data Synthesis with Knowledge Distillation for Question Answering|![](https://img.shields.io/badge/Model4Data--Synthesis--Filter-b4d4fb)|
+|MiniCPM-V: A GPT-4V Level MLLM on Your Phone|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Model4Data--Synthesis--Mapper-b4d4fb)|
+|Descriptive Caption Enhancement with Visual Specialists for Multimodal Perception|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Model4Data--Synthesis--Mapper-b4d4fb)|
+|REFINESUMM: Self-Refining MLLM for Generating a Multimodal Summarization Dataset|![](https://img.shields.io/badge/Model4Data--Synthesis--Mapper-b4d4fb)|
+|FakeShield: Explainable Image Forgery Detection and Localization via Multi-modal Large Language Models|![](https://img.shields.io/badge/Model4Data--Synthesis--Evaluator-b4d4fb)|
+|A Comprehensive Study of Multimodal Large Language Models for Image Quality Assessment|![](https://img.shields.io/badge/Model4Data--Synthesis--Evaluator-b4d4fb)|
+|Inst-IT: Boosting Multimodal Instance Understanding via Explicit Visual Prompt Instruction Tuning|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Model4Data--Synthesis--Mapper-b4d4fb)|
+|LLaVA-Grounding: Grounded Visual Chat with Large Multimodal Models|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Model4Data--Synthesis--Mapper-b4d4fb)|
+|Scaling Text-Rich Image Understanding via Code-Guided Synthetic Multimodal Data Generation|![](https://img.shields.io/badge/Model4Data--Synthesis--Creator-b4d4fb)|
 
 # Contribution to This Survey
 Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. Please feel free to make pull requests or open issues to contribute to this list and add more related resources!
@@ -258,40 +279,6 @@ The collapsible list of back reference will be periodically updated based on the
 - Training Compute-Optimal Large Language Models
 
 <details>
-<summary>Sec. 3.1.1  Data Acquisition  </summary>
-
-![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)
-
-- No "Zero-Shot" Without Exponential Data: Pretraining Concept Frequency Determines Multimodal Model Performance
-- GPT4MTS: Prompt-based Large Language Model for Multimodal Time-series Forecasting
-- Large-scale Contrastive Language-Audio Pretraining with Feature Fusion and Keyword-to-Caption Augmentation
-- Audio Retrieval with WavText5K and CLAP Training
-- DataComp: In search of the next generation of multimodal datasets
-- Learning Transferable Visual Models From Natural Language Supervision
-- NExT-GPT: Any-to-Any Multimodal LLM
-- ChartThinker: A Contextual Chain-of-Thought Approach to Optimized Chart Summarization
-- ChartReformer: Natural Language-Driven Chart Image Editing
-- Multimodal Large Language Model is a Human-Aligned Annotator for Text-to-Image Generation
-- Video-ChatGPT: Towards Detailed Video Understanding via Large Vision and Language Models
-- StructChart: Perception, Structuring, Reasoning for Visual Chart Understanding
-- MMC: Advancing Multimodal Chart Understanding with Large-scale Instruction Tuning
-- List Items One by One: A New Data Source and Learning Paradigm for Multimodal LLMs
-- TextSquare: Scaling up Text-Centric Visual Instruction Tuning
-- ImplicitAVE: An Open-Source Dataset and Multimodal LLMs Benchmark for Implicit Attribute Value Extraction
-- TextHawk: Exploring Efficient Fine-Grained Perception of Multimodal Large Language Models
-- BuboGPT: Enabling Visual Grounding in Multi-Modal LLMs
-- ShareGPT4V: Improving Large Multi-Modal Models with Better Captions
-- UIClip: A Data-driven Model for Assessing User Interface Design
-- EmbodiedGPT: Vision-Language Pre-Training via Embodied Chain of Thought
-- Learn to Explain: Multimodal Reasoning via Thought Chains for Science Question Answering
-- Visual Instruction Tuning
-- ALLaVA: Harnessing GPT4V-synthesized Data for A Lite Vision-Language Model
-- Hunyuan-DiT: A Powerful Multi-Resolution Diffusion Transformer with Fine-Grained Chinese Understanding
-- Probing Multimodal LLMs as World Models for Driving
-</details>
-
-
-<details>
 <summary>Sec. 3.1.1  Data Acquisition</summary>
 
 ![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)
@@ -322,6 +309,12 @@ The collapsible list of back reference will be periodically updated based on the
 - ALLaVA: Harnessing GPT4V-synthesized Data for A Lite Vision-Language Model
 - Hunyuan-DiT: A Powerful Multi-Resolution Diffusion Transformer with Fine-Grained Chinese Understanding
 - Probing Multimodal LLMs as World Models for Driving
+- Genixer: Empowering Multimodal Large Language Model as a Powerful Data Generator
+- MiniGPT-4: Enhancing Vision-Language Understanding with Advanced Large Language Models
+- MiniCPM-V: A GPT-4V Level MLLM on Your Phone
+- Descriptive Caption Enhancement with Visual Specialists for Multimodal Perception
+- Inst-IT: Boosting Multimodal Instance Understanding via Explicit Visual Prompt Instruction Tuning
+- LLaVA-Grounding: Grounded Visual Chat with Large Multimodal Models
 </details>
 
 <details>
@@ -355,6 +348,7 @@ The collapsible list of back reference will be periodically updated based on the
 - PaLM-E: An Embodied Multimodal Language Model
 - SPHINX-X: Scaling Data and Parameters for a Family of Multi-modal Large Language Models
 - Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal LLMs
+- MMEvol: Empowering Multimodal Large Language Models with Evol-Instruct
 </details>
 
 </details>
@@ -384,6 +378,7 @@ The collapsible list of back reference will be periodically updated based on the
 - Semdedup: Data-efficient learning at web-scale through semantic deduplication
 - On the De-duplication of LAION-2B
 - Improving Multimodal Datasets with Image Captioning
+- MiniGPT-4: Enhancing Vision-Language Understanding with Advanced Large Language Models
 </details>
 
 <details>
@@ -431,6 +426,11 @@ The collapsible list of back reference will be periodically updated based on the
 - Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets
 - AlignGPT: Multi-modal Large Language Models with Adaptive Alignment Capability
 - Improving Multimodal Datasets with Image Captioning
+- Imagebind: One embedding space to bind them all
+- UniBind: LLM-Augmented Unified and Balanced Representation Space to Bind Them All
+- FreeBind: Free Lunch in Unified Multimodal Space via Knowledge Fusion
+- LanguageBind: Extending Video-Language Pretraining to N-modality by Language-based Semantic Alignment
+- Binding Touch to Everything: Learning Unified Multimodal Tactile Representations
 </details>
 
 </details>
@@ -636,6 +636,9 @@ The collapsible list of back reference will be periodically updated based on the
 - EmbodiedGPT: Vision-Language Pre-Training via Embodied Chain of Thought
 - AnyGPT: Unified Multimodal LLM with Discrete Sequence Modeling
 - InstructPix2Pix: Learning to Follow Image Editing Instructions
+- Genixer: Empowering Multimodal Large Language Model as a Powerful Data Generator
+- World to Code: Multi-modal Data Generation via Self-Instructed Compositional Captioning and Filtering
+- Scaling Text-Rich Image Understanding via Code-Guided Synthetic Multimodal Data Generation
 </details>
 
 <details>
@@ -655,6 +658,14 @@ The collapsible list of back reference will be periodically updated based on the
 - Aligning Actions and Walking to LLM-Generated Textual Descriptions
 - Unified Hallucination Detection for Multimodal Large Language Models
 - PDFChatAnnotator: A Human-LLM Collaborative Multi-Modal Data Annotation Tool for PDF-Format Catalogs
+- MiniGPT-4: Enhancing Vision-Language Understanding with Advanced Large Language Models
+- MMEvol: Empowering Multimodal Large Language Models with Evol-Instruct
+- Model-in-the-Loop (MILO): Accelerating Multimodal AI Data Annotation with LLMs
+- MiniCPM-V: A GPT-4V Level MLLM on Your Phone
+- Descriptive Caption Enhancement with Visual Specialists for Multimodal Perception
+- REFINESUMM: Self-Refining MLLM for Generating a Multimodal Summarization Dataset
+- Inst-IT: Boosting Multimodal Instance Understanding via Explicit Visual Prompt Instruction Tuning
+- LLaVA-Grounding: Grounded Visual Chat with Large Multimodal Models
 </details>
 
 <details>
@@ -668,6 +679,8 @@ The collapsible list of back reference will be periodically updated based on the
 - What If the TV Was Off? Examining Counterfactual Reasoning Abilities of Multi-modal Language Models
 - Towards a statistical theory of data selection under weak supervision
 - Visual Hallucinations of Multi-modal Large Language Models
+- MiniGPT-4: Enhancing Vision-Language Understanding with Advanced Large Language Models
+- FM2DS: Few-Shot Multimodal Multihop Data Synthesis with Knowledge Distillation for Question Answering
 </details>
 
 <details>
@@ -680,6 +693,9 @@ The collapsible list of back reference will be periodically updated based on the
 - MLLM-Bench: Evaluating Multimodal LLMs with Per-sample Criteria
 - MLLM-as-a-Judge: Assessing Multimodal LLM-as-a-Judge with Vision-Language Benchmark
 - ImgTrojan: Jailbreaking Vision-Language Models with ONE Image
+- ZooProbe: A Data Engine for Evaluating, Exploring, and Evolving Large-scale Training Data for Multimodal LLMs
+- FakeShield: Explainable Image Forgery Detection and Localization via Multi-modal Large Language Models
+- A Comprehensive Study of Multimodal Large Language Models for Image Quality Assessment
 </details>
 
 <details>
@@ -811,5 +827,5 @@ The collapsible list of back reference will be periodically updated based on the
 - M3CoT: A Novel Benchmark for Multi-Domain Multi-step Multi-modal Chain-of-Thought
 - Panda-70m: Captioning 70m videos with multiple cross-modality teachers
 - Multimodal C4: An Open, Billion-scale Corpus of Images Interleaved With Text
-- ChartAssistant: A Universal Chart Multimodal Language Model via Chart-to-Table Pre-training and Multitask Instruction Tuning
+- ChartAssisstant: A Universal Chart Multimodal Language Model via Chart-to-Table Pre-training and Multitask Instruction Tuning
 </details>
