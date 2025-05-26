@@ -175,7 +175,7 @@ class BaseHook:
         if self.extra_cfg:
             prev_extra_cfg = self.extra_cfg
             try:
-                logger.info('Parsing other configs in the job.')
+                logger.info('Parsing extra configs in the job.')
                 self.extra_cfg = prepare_side_configs(self.extra_cfg)
                 self.extra_cfg = dict_to_namespace(self.extra_cfg)
             except Exception as e:

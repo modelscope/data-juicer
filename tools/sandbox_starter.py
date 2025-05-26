@@ -1,3 +1,5 @@
+import os
+import time
 from argparse import ArgumentError
 from typing import List, Union
 
@@ -5,6 +7,7 @@ from jsonargparse import ActionConfigFile, ArgumentParser
 from loguru import logger
 
 from data_juicer.core.sandbox.pipelines import SandBoxExecutor
+from data_juicer.utils.logger_utils import setup_logger
 
 
 def init_sandbox_configs(args=None):
@@ -81,6 +84,19 @@ def init_sandbox_configs(args=None):
             logger.error(
                 'Cannot specify both pipelines and top-level job configs')
             exit(1)
+
+        project_name = cfg.project_name
+        exp_name = cfg.experiment_name
+        log_dir = os.path.join(cfg.work_dir, 'log')
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir, exist_ok=True)
+        timestamp = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
+        cfg.timestamp = timestamp
+        logfile_name = f'sandbox_log_{project_name}_{exp_name}_time_{timestamp}.txt'
+        setup_logger(save_dir=log_dir,
+                     filename=logfile_name,
+                     level='DEBUG' if cfg.debug else 'INFO',
+                     redirect=cfg.executor_type == 'default')
 
         return cfg
     except ArgumentError:
