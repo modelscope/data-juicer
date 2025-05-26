@@ -38,7 +38,7 @@ class BaseHook:
         self.local_settings = job_cfg.get(JobRequiredKeys.local.value, {})
 
         # unique meta name for this job
-        self.meta_name = job_cfg[JobRequiredKeys.meta_name.value]
+        self.meta_name = job_cfg.get(JobRequiredKeys.meta_name.value, 'anonymous_meta_name')
         # data-juicer config for some jobs based on Data-Juicer
         self.dj_cfg = job_cfg.get(JobRequiredKeys.dj_configs.value, None)
         self.inited_dj_cfg = None

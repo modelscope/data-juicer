@@ -188,7 +188,7 @@ pipelines:
             extra_configs.meta_paths: 'scaling_exps.generate_meta_files_for_scaling_exps.top3_multiple_op_data_pool_meta_paths'
           output: 'scaling_op_exps_2B_trained_model_paths'
           local:
-            extra_configs.model_name_or_path: '<internvl_home>/pretrained/InternVL2-2B'
+            extra_configs.model_name_or_path: '<internvl_home>/internvl_chat/pretrained/InternVL2-2B'
             conv_style_or_scale: '2B'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_train_config.yaml'
         - hook: 'TrainModelHook'
@@ -197,7 +197,7 @@ pipelines:
             extra_configs.meta_paths: 'scaling_exps.generate_meta_files_for_scaling_exps.top3_multiple_op_data_pool_meta_paths'
           output: 'scaling_op_exps_4B_trained_model_paths'
           local:
-            extra_configs.model_name_or_path: '<internvl_home>/pretrained/InternVL2-4B'
+            extra_configs.model_name_or_path: '<internvl_home>/internvl_chat/pretrained/InternVL2-4B'
             conv_style_or_scale: '4B'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_train_config.yaml'
         - hook: 'TrainModelHook'
@@ -206,7 +206,7 @@ pipelines:
             extra_configs.meta_paths: 'scaling_exps.generate_meta_files_for_scaling_exps.top3_multiple_op_data_pool_meta_paths'
           output: 'scaling_op_exps_26B_trained_model_paths'
           local:
-            extra_configs.model_name_or_path: '<internvl_home>/pretrained/InternVL2-26B'
+            extra_configs.model_name_or_path: '<internvl_home>/internvl_chat/pretrained/InternVL2-26B'
             conv_style_or_scale: '26B'
           extra_configs: 'configs/data_juicer_recipes/sandbox/internvl_coco_caption/internvl_train_config.yaml'
       evaluation_job_configs:

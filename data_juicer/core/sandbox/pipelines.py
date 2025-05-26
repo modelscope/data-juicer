@@ -131,20 +131,20 @@ class SandboxPipeline:
     def register_jobs(self):
 
         # register probe_jobs
-        for job_cfg in self.cfg.probe_job_configs:
+        for job_cfg in self.cfg.get('probe_job_configs', []):
             self.probe_jobs.append(register_hook(job_cfg, self.watcher))
 
         # register refine_recipe_jobs
-        for job_cfg in self.cfg.refine_recipe_job_configs:
+        for job_cfg in self.cfg.get('refine_recipe_job_configs', []):
             self.refine_recipe_jobs.append(register_hook(
                 job_cfg, self.watcher))
 
         # register execution_jobs
-        for job_cfg in self.cfg.execution_job_configs:
+        for job_cfg in self.cfg.get('execution_job_configs', []):
             self.execution_jobs.append(register_hook(job_cfg, self.watcher))
 
         # register evaluation_jobs
-        for job_cfg in self.cfg.evaluation_job_configs:
+        for job_cfg in self.cfg.get('evaluation_job_configs', []):
             self.evaluation_jobs.append(register_hook(job_cfg, self.watcher))
 
     def run(self, **pipeline_infos):
@@ -265,11 +265,13 @@ class SandBoxExecutor:
                 global_cfgs.pop(pipeline_key)
         if cfg.pipelines:
             # specify the pipelines
-            for pipeline_name, pipeline_cfg in cfg.pipelines.items():
-                pipeline_cfg = self.specify_job_configs(pipeline_cfg)
-                pipeline_cfg = merge_config(global_cfgs, pipeline_cfg)
+            for pipeline in cfg.pipelines:
+                pipeline_name, pipeline_cfg = list(pipeline.items())[0]
+                pipeline_cfg.update(global_cfgs)
                 pipelines.append(
-                    SandboxPipeline(pipeline_name, pipeline_cfg, self.watcher))
+                    SandboxPipeline(pipeline_name,
+                                    self.specify_jobs_configs(pipeline_cfg),
+                                    self.watcher))
         else:
             pipeline = SandboxPipeline(
                 pipeline_cfg=self.specify_jobs_configs(cfg),
@@ -283,9 +285,8 @@ class SandBoxExecutor:
 
         for key in JobRequiredKeys:
             if key.value not in config:
-                logger.warning(
-                    f'The key "{key.value}" is not specified in [{ori_config}]'
-                )
+                logger.debug(
+                    f'The key "{key.value}" is not specified in {ori_config}')
 
         return dict_to_namespace(config)
 
@@ -305,13 +306,20 @@ class SandBoxExecutor:
                 ]
             return job_cfgs
 
-        cfg.probe_job_configs = configs_to_job_list(cfg.probe_job_configs)
-        cfg.refine_recipe_job_configs = configs_to_job_list(
-            cfg.refine_recipe_job_configs)
-        cfg.execution_job_configs = configs_to_job_list(
-            cfg.execution_job_configs)
-        cfg.evaluation_job_configs = configs_to_job_list(
-            cfg.evaluation_job_configs)
+        if isinstance(cfg, dict):
+            cfg = dict_to_namespace(cfg)
+
+        if 'probe_job_configs' in cfg:
+            cfg.probe_job_configs = configs_to_job_list(cfg.probe_job_configs)
+        if 'refine_recipe_job_configs' in cfg:
+            cfg.refine_recipe_job_configs = configs_to_job_list(
+                cfg.refine_recipe_job_configs)
+        if 'execution_job_configs' in cfg:
+            cfg.execution_job_configs = configs_to_job_list(
+                cfg.execution_job_configs)
+        if 'evaluation_job_configs' in cfg:
+            cfg.evaluation_job_configs = configs_to_job_list(
+                cfg.evaluation_job_configs)
 
         return cfg
 

@@ -18,8 +18,8 @@ internvl_home: '<internvl_home>'
 num_gpus: 8
 batch_size_per_device: 4
 
-work_dir: '<internvl_home>/internvl_chatwork_dirs'
-model_name_or_path: '<internvl_home>/pretrained/InternVL2-1B'
+work_dir: '<internvl_home>/internvl_chat/work_dirs'
+model_name_or_path: '<internvl_home>/internvl_chat/pretrained/InternVL2-1B'
 conv_style_or_scale: '1B'
 meta_paths:
   - '<these_paths_should_be_replaced_by_the_previous_COCOCaptionMetaGeneration_hook>'
