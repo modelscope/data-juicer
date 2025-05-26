@@ -179,22 +179,46 @@ class SandboxPipeline:
         context_infos[self.name] = []
 
         # ====== Data & model probe ======
+        logger.info(
+            f'================== Pipeline [{self.name}]: Start Probe Jobs  =================='
+        )
         for probe_hook in self.probe_jobs:
+            logger.info(
+                f'======= Pipeline [{self.name}]: Start Probe Hook [{probe_hook.hook_type}] ======='
+            )
             new_job_infos = probe_hook.run(**context_infos)
             context_infos[self.name].append(new_job_infos)
 
         # ====== Data-model recipes iteration based on probe results ======
+        logger.info(
+            f'================== Pipeline [{self.name}]: Start Refinement Jobs  =================='
+        )
         for refine_hook in self.refine_recipe_jobs:
+            logger.info(
+                f'======= Pipeline [{self.name}]: Start Refine Hook [{refine_hook.hook_type}] ======='
+            )
             new_job_infos = refine_hook.run(**context_infos)
             context_infos[self.name].append(new_job_infos)
 
         # ====== Data processing & model training ======
+        logger.info(
+            f'================== Pipeline [{self.name}]: Start Execution Jobs  =================='
+        )
         for exec_hook in self.execution_jobs:
+            logger.info(
+                f'======= Pipeline [{self.name}]: Start Execution Hook [{exec_hook.hook_type}] ======='
+            )
             new_job_infos = exec_hook.run(**context_infos)
             context_infos[self.name].append(new_job_infos)
 
         # ====== Evaluation on processed data or trained model ======
+        logger.info(
+            f'================== Pipeline [{self.name}]: Start Evaluation Jobs  =================='
+        )
         for eval_hook in self.evaluation_jobs:
+            logger.info(
+                f'======= Pipeline [{self.name}]: Start Evaluation Hook [{eval_hook.hook_type}] ======='
+            )
             new_job_infos = eval_hook.run(**context_infos)
             context_infos[self.name].append(new_job_infos)
 

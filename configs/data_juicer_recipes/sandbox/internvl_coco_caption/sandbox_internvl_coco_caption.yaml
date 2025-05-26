@@ -21,8 +21,8 @@ pipelines:
           output: 'output_paths'
           extra_configs:
             type: 'coco_caption_to_dj_conversion'
-            dataset_path: '<internvl_home>/internvl_chat/data/coco/coco_karpathy_train_567k.jsonl'
-            export_path: '<internvl_home>/internvl_chat/data/coco'
+            dataset_path: '<internvl_home>/internvl_chat/data/coco/annotations/coco_karpathy_train_567k.jsonl'
+            export_path: '<internvl_home>/internvl_chat/data/coco/annotations/'
         - hook: 'GeneralDataExecutorHook'
           meta_name: 'generate_meta_file_dj_fmt'
           input:
@@ -30,8 +30,8 @@ pipelines:
           output: 'output_paths'
           extra_configs:
             type: 'coco_caption_meta_generation'
-            dataset_path: '<internvl_home>/internvl_chat/data/coco/coco_karpathy_train_567k_dj_fmt.jsonl'
-            export_path: '<internvl_home>/internvl_chat/data/coco'
+            dataset_path: '<internvl_home>/internvl_chat/data/coco/annotations/coco_karpathy_train_567k_dj_fmt.jsonl'
+            export_path: '<internvl_home>/internvl_chat/data/coco/annotations/'
             data_root_path: '<internvl_home>/internvl_chat'
 
   # Single-OP Exps:

@@ -24,7 +24,9 @@ global_cfg = None
 global_parser = None
 
 
-def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
+def init_configs(args: Optional[List[str]] = None,
+                 which_entry: object = None,
+                 display_configs=True):
     """
     initialize the jsonargparse parser and parse configs from one of:
         1. POSIX-style commands line args;
@@ -34,6 +36,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
 
     :param args: list of params, e.g., ['--config', 'cfg.yaml'], default None.
     :param which_entry: which entry to init configs (executor/analyzer)
+    :param display_configs: whether to print the table of configs
     :return: a global cfg object used by the DefaultExecutor or Analyzer
     """
     parser = ArgumentParser(default_env=True,
@@ -406,7 +409,8 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
         config_backup(cfg)
 
         # show the final config tables before the process started
-        display_config(cfg)
+        if display_configs:
+            display_config(cfg)
 
         global global_cfg, global_parser
         global_cfg = cfg
@@ -928,7 +932,8 @@ def get_init_configs(cfg: Union[Namespace, Dict]):
     # create an temp config file
     with open(temp_file, 'w') as f:
         json.dump(cfg, f)
-    inited_dj_cfg = init_configs(['--config', temp_file])
+    inited_dj_cfg = init_configs(['--config', temp_file],
+                                 display_configs=False)
     return inited_dj_cfg
 
 

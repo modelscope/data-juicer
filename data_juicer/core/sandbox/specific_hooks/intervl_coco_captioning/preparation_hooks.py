@@ -33,7 +33,7 @@ class COCOCaptionToDJConversion(BaseDataPoolManipulator):
         output_paths = []
         for src_path in existing_input_paths:
             basename = os.path.splitext(os.path.basename(src_path))[0]
-            output_path = os.path.join(export_path, f'{basename}_dj_fmt.json')
+            output_path = os.path.join(export_path, f'{basename}_dj_fmt.jsonl')
             with jl.open(src_path, 'r') as reader:
                 with jl.open(output_path, 'w') as writer:
                     for s in tqdm(reader):
