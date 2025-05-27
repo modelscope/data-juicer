@@ -247,12 +247,12 @@ Below is a paper list summarized based on our survey. Additionally, we have prov
 |LLaVA-Grounding: Grounded Visual Chat with Large Multimodal Models|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Model4Data--Synthesis--Mapper-b4d4fb)|
 |Scaling Text-Rich Image Understanding via Code-Guided Synthetic Multimodal Data Generation|![](https://img.shields.io/badge/Model4Data--Synthesis--Creator-b4d4fb)|
 
-# Contribution to This Survey
+## Contribution to This Survey
 Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. Please feel free to make pull requests or open issues to contribute to this list and add more related resources!
 **You can add the titles of relevant papers to the table above, and (optionally) provide suggested tags along with the corresponding sections if possible.**
 We will attempt to complete the remaining information and periodically update our survey based on the updated content of this document.
 
-## References
+### References
 If you find our work useful for your research or development, please kindly cite the following [paper](https://arxiv.org/abs/2407.08583).
 
 

@@ -2,7 +2,7 @@
 .. role:: raw-html-m2r(raw)
    :format: html
 
-`[中文主页] <zh-CN/index_ZH>`_ | `[DJ-Cookbook] <dj-cookbook>`_ | `[OperatorZoo] <docs/Operators>`_ | `[API] <api>`_ | `[Awesome LLM Data] <docs/awesome_llm_data>`_
+`[中文主页] <index_ZH>`_ | `[DJ-Cookbook] <dj-cookbook>`_ | `[OperatorZoo] <docs/Operators>`_ | `[API] <api>`_ | `[Awesome LLM Data] <docs/awesome_llm_data>`_
 
 Data Processing for and with Foundation Models
 ==============================================
