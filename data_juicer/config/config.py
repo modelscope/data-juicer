@@ -30,6 +30,7 @@ def timing_context(description):
     start_time = time.time()
     yield
     elapsed_time = time.time() - start_time
+    # Use a consistent format that won't be affected by logger reconfiguration
     logger.info(f'{description} took {elapsed_time:.2f} seconds')
 
 

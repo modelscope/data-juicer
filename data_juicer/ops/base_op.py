@@ -319,15 +319,11 @@ class Mapper(OP):
                 skip_op_error=self.skip_op_error,
                 op_name=self._name)
 
-    # set the process method is not allowed to be overridden
+    @classmethod
     def __init_subclass__(cls, **kwargs):
-        not_allowed_list = ['process']
-        for method_name in not_allowed_list:
-            if method_name in cls.__dict__:
-                raise TypeError(
-                    f'Method {method_name} cannot be overridden by subclass '
-                    f'{cls.__name__}. Please implement {method_name}_single '
-                    f'or {method_name}_batched.')
+        """Register the operator to the registry."""
+        super().__init_subclass__(**kwargs)
+        OPERATORS.register_module(cls.__name__.lower())(cls)
 
     def __call__(self, *args, **kwargs):
         return self.process(*args, **kwargs)
@@ -401,6 +397,7 @@ class Filter(OP):
         """
         super(Filter, self).__init__(*args, **kwargs)
         self.stats_export_path = kwargs.get('stats_export_path', None)
+        self._stats = {}
 
         # runtime wrappers
         if self.is_batched_op():
@@ -423,15 +420,12 @@ class Filter(OP):
                 skip_op_error=self.skip_op_error,
                 op_name=self._name)
 
-    # set the process method is not allowed to be overridden
+    @classmethod
     def __init_subclass__(cls, **kwargs):
-        not_allowed_list = ['compute_stats', 'process']
-        for method_name in not_allowed_list:
-            if method_name in cls.__dict__:
-                raise TypeError(
-                    f'Method {method_name} cannot be overridden by subclass '
-                    f'{cls.__name__}. Please implement {method_name}_single '
-                    f'or {method_name}_batched.')
+        """Register the filter to the registry."""
+        super().__init_subclass__(**kwargs)
+        if not hasattr(cls, '_stats'):
+            NON_STATS_FILTERS.register_module(cls.__name__.lower())(cls)
 
     def __call__(self, *args, **kwargs):
         return self.compute_stats(*args, **kwargs)
