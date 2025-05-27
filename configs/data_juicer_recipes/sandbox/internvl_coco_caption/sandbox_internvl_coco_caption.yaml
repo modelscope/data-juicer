@@ -30,7 +30,6 @@ pipelines:
           output: 'output_paths'
           extra_configs:
             type: 'coco_caption_meta_generation'
-            dataset_path: '<internvl_home>/internvl_chat/data/coco/annotations/coco_karpathy_train_567k_dj_fmt.jsonl'
             export_path: '<internvl_home>/internvl_chat/data/coco/annotations/'
             data_root_path: '<internvl_home>/internvl_chat'
 
