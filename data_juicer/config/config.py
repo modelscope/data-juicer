@@ -441,7 +441,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
                 i = 0
                 while i < len(args):
                     arg = args[i]
-                    # Always keep --help, --config, and --auto as they are required/helpful
+                    # Handle --help, --config, and --auto in first pass
                     if arg == '--help':
                         essential_args.append(arg)
                     elif arg == '--config':
@@ -452,27 +452,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
                             i += 1
                     elif arg == '--auto':
                         essential_args.append(arg)
-                    # For other essential arguments
-                    elif arg.startswith('--'):
-                        if any(
-                                arg.startswith(f'--{essential}')
-                                for essential in [
-                                    'auto_num', 'hpo_config',
-                                    'data_probe_algo', 'data_probe_ratio',
-                                    'project_name', 'executor_type',
-                                    'dataset_path', 'dataset', 'export_path',
-                                    'np', 'text_keys', 'debug', 'ray_address'
-                                ]):
-                            essential_args.append(arg)
-                            # If the next arg is not a flag, it's a value for this arg
-                            if i + 1 < len(args) and not args[
-                                    i + 1].startswith('--'):
-                                essential_args.append(args[i + 1])
-                                i += 1
                     i += 1
-
-            logger.debug(f'Args: {args}')
-            logger.debug(f'Essential arguments: {essential_args}')
 
             # Parse essential arguments first
             essential_cfg = parser.parse_args(args=essential_args)
