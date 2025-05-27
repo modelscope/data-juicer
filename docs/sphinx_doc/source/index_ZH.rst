@@ -10,6 +10,7 @@ Data Processing for and with Foundation Models
 
  :raw-html-m2r:`<img src="https://img.alicdn.com/imgextra/i1/O1CN01fUfM5A1vPclzPQ6VI_!!6000000006165-0-tps-1792-1024.jpg" width = "533" height = "300" alt="Data-Juicer"/>`
 
+.. _news:
 新消息
 ------
 .. include:: README_ZH.md
@@ -17,11 +18,12 @@ Data Processing for and with Foundation Models
     :end-before: 目录
     :parser: myst_parser.sphinx_
 
+.. _table-of-contents:
 目录
 ====
 
-* `新消息 <#id7>`_
-* `为什么选择 Data-Juicer？ <#id14>`_
+* `新消息 <#news>`_
+* `为什么选择 Data-Juicer？ <#why-data-juicer>`_
 .. toctree::
    :maxdepth: 2
    :caption: 教程
@@ -30,11 +32,12 @@ Data Processing for and with Foundation Models
    installation_ZH
    quick_start_ZH
 
-* `开源协议 <#id15>`_
-* `贡献 <#id16>`_
-* `致谢 <#id17>`_
-* `参考文献 <#id18>`_
+* `开源协议 <#license>`_
+* `贡献 <#contributing>`_
+* `致谢 <#acknowledgement>`_
+* `参考文献 <#references>`_
 
+.. _why-data-juicer?:
 为什么选择 Data-Juicer？
 ------------------------
 
@@ -43,6 +46,7 @@ Data Processing for and with Foundation Models
     :end-before: ## DJ-Cookbook
     :parser: myst_parser.sphinx_
 
+.. _license:
 开源协议
 --------
 
@@ -51,6 +55,7 @@ Data Processing for and with Foundation Models
     :end-before: ## 贡献
     :parser: myst_parser.sphinx_
 
+.. _contributing:
 贡献
 ----
 
@@ -59,6 +64,7 @@ Data Processing for and with Foundation Models
     :end-before: ## 致谢
     :parser: myst_parser.sphinx_
 
+.. _acknowledgement:
 致谢
 ----
 
@@ -67,6 +73,7 @@ Data Processing for and with Foundation Models
     :end-before: ## 参考文献
     :parser: myst_parser.sphinx_
 
+.. _references:
 参考文献
 --------
 
