@@ -139,7 +139,14 @@ class BaseHook:
             self.specify_dj_and_extra_configs()
 
     def _output_recording_hook(self, outputs):
-        if not isinstance(outputs, list):
+        if isinstance(outputs, tuple):
+            # multiple outputs
+            outputs = list(outputs)
+        else:
+            # single output
+            if isinstance(outputs, list) and len(outputs) == 1:
+                # if there is only 1 ele in the returned list, unpack it
+                outputs = outputs[0]
             outputs = [outputs]
         if self.output_keys is None:
             self.output_keys = list(range(len(outputs)))

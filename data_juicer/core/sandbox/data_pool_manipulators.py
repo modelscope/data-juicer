@@ -184,7 +184,7 @@ class DataPoolConstruction(BaseDataPoolManipulator):
                 end_idx = split_points[i + 1]
                 part_ds = ds[start_idx:end_idx]
                 curr_export_name = add_suffix_to_filename(
-                    ds_basename, f'_{i}.jsonl')
+                    ds_basename, f'_{stats_key}_{i}.jsonl')
                 output_path = os.path.join(stored_dir, curr_export_name)
                 with jl.open(output_path, 'w') as writer:
                     writer.write_all(part_ds)

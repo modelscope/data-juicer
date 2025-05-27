@@ -3,6 +3,7 @@ from copy import deepcopy
 from typing import List
 
 import yaml
+import json
 from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import dict_to_namespace, namespace_to_dict
 from loguru import logger
@@ -340,3 +341,7 @@ class SandBoxExecutor:
 
         for pipeline in self.pipelines:
             context_infos = pipeline.run(**context_infos)
+
+        # export context infos
+        with open(os.path.join(self.cfg.work_dir, 'context_infos.json'), 'w') as fout:
+            json.dump(context_infos, fout, indent=4)
