@@ -723,76 +723,75 @@ def update_op_process(cfg, parser):
     """
     Update operator process configuration with optimized performance.
     """
-    with timing_context('Updating operator process'):
-        # Extract operator keys once
-        op_keys = set(OPERATORS.modules.keys())
+    # Extract operator keys once
+    op_keys = set(OPERATORS.modules.keys())
 
-        # Get command line args for operators in one pass
-        option_in_commands = set()
-        full_option_in_commands = set()
+    # Get command line args for operators in one pass
+    option_in_commands = set()
+    full_option_in_commands = set()
 
-        for arg in parser.args:
-            if arg.startswith('--'):
-                parts = arg.split('--')[1].split('.')
-                op_name = parts[0]
-                if op_name in op_keys:
-                    option_in_commands.add(op_name)
-                    full_option_in_commands.add(arg.split('=')[0])
+    for arg in parser.args:
+        if arg.startswith('--'):
+            parts = arg.split('--')[1].split('.')
+            op_name = parts[0]
+            if op_name in op_keys:
+                option_in_commands.add(op_name)
+                full_option_in_commands.add(arg.split('=')[0])
 
-        if cfg.process is None:
-            cfg.process = []
+    if cfg.process is None:
+        cfg.process = []
 
-        # Process each operator once
-        temp_cfg = cfg
-        for i, op_in_process in enumerate(cfg.process):
-            op_name = list(op_in_process.keys())[0]
+    # Process each operator once
+    temp_cfg = cfg
+    for i, op_in_process in enumerate(cfg.process):
+        op_name = list(op_in_process.keys())[0]
 
-            if op_name not in option_in_commands:
-                # Update op params if set
+        if op_name not in option_in_commands:
+            # Update op params if set
+            if op_in_process[op_name]:
+                temp_cfg = parser.merge_config(
+                    dict_to_namespace(op_in_process), temp_cfg)
+        else:
+            # Remove args that will be overridden by command line
+            if op_in_process[op_name]:
+                for full_option in full_option_in_commands:
+                    key = full_option.split('.')[1]
+                    if key in op_in_process[op_name]:
+                        op_in_process[op_name].pop(key)
+
                 if op_in_process[op_name]:
                     temp_cfg = parser.merge_config(
                         dict_to_namespace(op_in_process), temp_cfg)
-            else:
-                # Remove args that will be overridden by command line
-                if op_in_process[op_name]:
-                    for full_option in full_option_in_commands:
-                        key = full_option.split('.')[1]
-                        if key in op_in_process[op_name]:
-                            op_in_process[op_name].pop(key)
 
-                    if op_in_process[op_name]:
-                        temp_cfg = parser.merge_config(
-                            dict_to_namespace(op_in_process), temp_cfg)
-
-            # Update op params
-            internal_op_para = temp_cfg.get(op_name)
-            cfg.process[i] = {
-                op_name:
-                None if internal_op_para is None else
-                namespace_to_dict(internal_op_para)
-            }
-
-        # Optimize type checking
-        recognized_args = {
-            action.dest
-            for action in parser._actions
-            if hasattr(action, 'dest') and isinstance(action, ActionTypeHint)
+        # Update op params
+        internal_op_para = temp_cfg.get(op_name)
+        cfg.process[i] = {
+            op_name:
+            None if internal_op_para is None else
+            namespace_to_dict(internal_op_para)
         }
 
-        # Generate args list more efficiently
-        temp_args = []
-        if temp_cfg.config:
-            temp_args.extend(['--config', temp_cfg.config[0].absolute])
-        else:
-            temp_args.append('--auto')
+    # Optimize type checking
+    recognized_args = {
+        action.dest
+        for action in parser._actions
+        if hasattr(action, 'dest') and isinstance(action, ActionTypeHint)
+    }
 
-        # Only include recognized args
-        for key, value in vars(temp_cfg).items():
-            if key in recognized_args and value is not None:
-                temp_args.extend([f'--{key}', str(value)])
+    # Generate args list more efficiently
+    temp_args = []
+    if temp_cfg.config:
+        temp_args.extend(['--config', temp_cfg.config[0].absolute])
+    else:
+        temp_args.append('--auto')
 
-        # Skip redundant parser copy and type checking
-        return cfg
+    # Only include recognized args
+    for key, value in vars(temp_cfg).items():
+        if key in recognized_args and value is not None:
+            temp_args.extend([f'--{key}', str(value)])
+
+    # Skip redundant parser copy and type checking
+    return cfg
 
 
 def config_backup(cfg: Namespace):
