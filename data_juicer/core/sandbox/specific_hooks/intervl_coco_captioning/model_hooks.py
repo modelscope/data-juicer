@@ -52,6 +52,8 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
     SCRIPT_TEMPLATE = '''
     set -x
 
+    cd %s
+
     GPUS=%d
     BATCH_SIZE=${BATCH_SIZE:-512}
     PER_DEVICE_BATCH_SIZE=%d
@@ -138,7 +140,7 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
         self.env.install_py_deps(
             os.path.join(self.internvl_home, 'requirements.txt'))
         # install flash-attn
-        self.env.install_py_deps(['flash-attn==2.3.6 --no-build-isolation'])
+        self.env.install_py_deps(['flash-attn==2.3.6 --no-build-isolation', 'datasets', 'deepspeed==0.15.4'])
 
         # training related
         num_gpus = self.model_config.get('num_gpus', cuda_device_count())
@@ -195,10 +197,11 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
         for meta_path in meta_paths:
             meta_basename = os.path.splitext(os.path.basename(meta_path))[0]
             output_dir = os.path.join(work_dir, meta_basename)
+            script_running_home = os.path.join(self.internvl_home, 'internvl_chat')
             script_path = os.path.join(script_dir, f'{meta_basename}.sh')
             with open(script_path, 'w') as f:
                 f.write(self.SCRIPT_TEMPLATE %
-                        (num_gpus, batch_size_per_device, output_dir,
+                        (script_running_home, num_gpus, batch_size_per_device, output_dir,
                          model_name_or_path, conv_style, meta_path))
 
             script_paths.append(script_path)
@@ -212,16 +215,13 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
 
         The home to run these scripts should be in "<internvl_home>/internvl_chat"
         """
-        script_running_home = os.path.join(self.internvl_home, 'internvl_chat')
         for script_path in self.running_scripts:
-            # enter the running home
-            cmd = f'cd  {script_running_home}'
             # run the script
-            cmd += f' && bash {script_path}'
+            cmd = f'bash {script_path}'
             self.env.run_cmd(cmd)
         return self.output_paths
 
-    async def _watch_run(self, line, **kwargs):
+    def _watch_run(self, line, **kwargs):
         # e.g. "{'loss': 2.055, 'learning_rate': 3.0000000000000004e-05, 'epoch': 0.02}"
         pattern = r'^\{\'loss\': (.*?), \'learning_rate\': (.*?), \'epoch\': (.*?)\}$'
         if self.watcher:
@@ -272,7 +272,7 @@ class InternVLCOCOCaptionEvaluator(BaseEvaluator):
         self.env.install_py_deps(
             os.path.join(self.internvl_home, 'requirements.txt'))
         # install flash-attn
-        self.env.install_py_deps(['flash-attn==2.3.6 --no-build-isolation'])
+        self.env.install_py_deps(['flash-attn==2.3.6 --no-build-isolation', 'datasets', 'deepspeed==0.15.4'])
 
         # eval gpus
         self.num_gpus = self.eval_config.get('num_gpus', cuda_device_count())
@@ -306,10 +306,13 @@ class InternVLCOCOCaptionEvaluator(BaseEvaluator):
         scores of each dimension will be extracted from the file, including: {"Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4",
         "METEOR", "ROUGE_L", "CIDEr"}
         """
-        results = {}
+        results = []
         for ckpt_path in self.existing_ckpt_paths:
             eval_log_path = os.path.join(ckpt_path, 'eval_log.txt')
-            cmd = f'cd {self.internvl_home}'
+            script_path = os.path.join(self.internvl_home, 'internvl_chat')
+            # need to convert to a relative path due to the script "evaluate.sh" will add the script path forcely
+            ckpt_path = os.path.relpath(ckpt_path, script_path)
+            cmd = f'cd {script_path}'
             cmd += f' && GPUS={self.num_gpus} bash evaluate.sh {ckpt_path} caption-coco --dynamic 2>&1' \
                    f' | tee -a "{eval_log_path}"'
             self.env.run_cmd(cmd)
@@ -323,8 +326,7 @@ class InternVLCOCOCaptionEvaluator(BaseEvaluator):
                 res = re.findall(pattern, content)
                 if len(res) > 0:
                     result[dim] = float(res[0])
-            results[ckpt_path] = result
-
-        results['avg_score'] = sum(results.values()) / len(results)
+            result['avg_score'] = sum(result.values()) / len(result)
+            results.append(result)
 
         return results

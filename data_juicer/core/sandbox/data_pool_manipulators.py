@@ -240,6 +240,8 @@ class DataPoolCombination(BaseDataPoolManipulator):
         for pools in combined_hierarchies:
             for cur_rank, pool in pools:
                 output_ds = [dataset_records[key] for key in pool]
+                if len(output_ds) == 0:
+                    continue
                 output_path = output_path_pattern % (cur_rank, len(pool))
                 with jl.open(output_path, 'w') as writer:
                     writer.write_all(output_ds)
@@ -359,7 +361,7 @@ class DataPoolRanking(BaseDataPoolManipulator):
         Output: A ordered list of data pool paths according to their evaluated metrics.
         """
         input_dataset_paths = self.data_pool_cfg.get('dataset_path', [])
-        metrics = self.data_pool_cfg.get('metrics', {})
+        metrics = self.data_pool_cfg.get('metrics', [])
         ranking_keys = self.data_pool_cfg.get('ranking_keys', [])
         descending = self.data_pool_cfg.get('descending', True)
         top_n = self.data_pool_cfg.get('top_n', None)
@@ -371,11 +373,12 @@ class DataPoolRanking(BaseDataPoolManipulator):
                 'dataset_path and metrics should be lists of the same length.')
 
         # check ranking keys
-        metrics = NestedQueryDict(metrics)
+        sampled_metrics = NestedQueryDict(metrics[0])
+        metrics = [NestedQueryDict(m) for m in metrics]
         existing_keys = []
         missing_keys = []
         for key in ranking_keys:
-            if metrics[key] is not None:
+            if sampled_metrics[key] is not None:
                 existing_keys.append(key)
             else:
                 missing_keys.append(key)
@@ -390,7 +393,7 @@ class DataPoolRanking(BaseDataPoolManipulator):
             f'[{"descending" if descending else "ascending"}]...')
 
         def _key_func(zipped_metric):
-            return (zipped_metric[1][k] for k in existing_keys)
+            return tuple(zipped_metric[1][k] for k in existing_keys)
 
         # default key func that uses the whole metric obj to rank
         def _default_key_func(zipped_metric):

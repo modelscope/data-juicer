@@ -76,7 +76,8 @@ class BaseHook:
             key_to_updated_parts = key_to_updated_parts[1:]
             # update the target key
             if len(key_to_updated_parts) > 0:
-                target_config = nested_query(target_config, '.'.join(key_to_updated_parts[:-1]))
+                if len(key_to_updated_parts) > 1:
+                    target_config = nested_query(target_config, '.'.join(key_to_updated_parts[:-1]))
                 target_config[key_to_updated_parts[-1]] = value
             else:
                 if cfg_type == JobRequiredKeys.dj_configs.value:

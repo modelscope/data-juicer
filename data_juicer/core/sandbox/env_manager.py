@@ -1,4 +1,5 @@
 import json
+import sys
 import os.path
 import shutil
 import subprocess
@@ -148,12 +149,15 @@ class CondaEnv(Env):
         if isinstance(deps, str):
             if os.path.exists(deps):
                 if os.path.isdir(deps):
+                    logger.info(f'Installing library code base [{deps}]...')
                     cmd = f'{self.env_manager} run -n {self.env_name} pip install -e {deps}'
                 else:
+                    logger.info(f'Installing from requirements file [{deps}]...')
                     cmd = f'{self.env_manager} run -n {self.env_name} pip install -r {deps}'
             else:
                 raise FileNotFoundError(f'deps path [{deps}] does not exist.')
         elif isinstance(deps, list):
+            logger.info(f'Installing Python dependencies [{deps}]...')
             cmd = f'{self.env_manager} run -n {self.env_name} pip install {" ".join(deps)}'
         else:
             raise TypeError(
@@ -170,8 +174,8 @@ class CondaEnv(Env):
         """
         Run a command in this environment.
         """
-        cmd = f'{self.env_manager} run -n {self.env_name} {cmd}'
-        res = subprocess.run(cmd, shell=True)
+        cmd = f'{self.env_manager} run -n {self.env_name} bash -c \'{cmd}\''
+        res = subprocess.run(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
         if res.returncode == 0:
             logger.debug(f'Command [{cmd}] executed successfully.')
             return True

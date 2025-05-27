@@ -36,8 +36,8 @@ class BaseModelExecutor(object):
         if self.watcher is None:
             run_task = asyncio.create_task(
                 self._run(run_type, run_obj, **kwargs))
-            await run_task
-            return None
+            ret = await run_task
+            return ret
         else:
             original_stdout = sys.stdout
             original_stderr = sys.stderr
@@ -53,13 +53,13 @@ class BaseModelExecutor(object):
                     sys.stderr = log_f
                     run_task = asyncio.create_task(
                         self._run(run_type, run_obj, **kwargs))
-                    await run_task
+                    ret = await run_task
                     print(self.END_OF_MODEL_EXEC, flush=True)
-                    summarized_watched_res = await watch_task
+                    await watch_task
             finally:
                 sys.stdout = original_stdout
                 sys.stderr = original_stderr
-            return summarized_watched_res
+            return ret
 
     def run_subprocess(self, script_path, run_args, working_dir, cmd='bash'):
         run_args = [str(arg) for arg in run_args]
