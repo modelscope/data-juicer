@@ -1,6 +1,6 @@
 <div class="sidebar-bottom-menu">
     <div class="current-info">
-        <span class="current-lang">{{ language }}</span>|<span class="current-version">{{ current_version.name }}</span>
+        <span class="current-lang">{{ language }}</span>|<span class="current-version">{{ current_version.name if current_version.is_released else "dev"}}</span>
     </div>
     <div class="dropdown-panel">
         {% if supported_languages %}
@@ -22,15 +22,8 @@
             <dt>Version</dt>
             <dd>
                 {%- for item in versions %}
-                {%- if item.is_released %}
-                {%- set show_version_name = item.name %}
-                {%- if latest_version and item == latest_version %}
-                {%- set show_version_name = item.name + " (stable)" %}
-                {%- endif %}
-                {%- else %}
-                {%- set show_version_name = "dev" %}
-                {%- endif %}
-                <a href="{{ item.url }}">{{ show_version_name }}</a>
+                    {%- set show_version_name = item.name if item.is_released else "dev" %}
+                    <a href="{{ item.url }}">{{ show_version_name }}</a>
                 {%- endfor %}
             </dd>
         </div>

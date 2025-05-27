@@ -36,11 +36,16 @@ extensions = [
     "myst_parser",
     "sphinx_copybutton",
     "sphinx_multiversion",
-    'sphinxcontrib.apidoc', # TODO: Replace with sphinx.ext.apidoc when sphinx>=8.2
+    "sphinxcontrib.apidoc",  # TODO: Replace with sphinx.ext.apidoc when sphinx>=8.2
 ]
 
 # -- Extension configuration ------------------------------------------------
 myst_heading_anchors = 4
+myst_enable_extensions = [
+    "colon_fence",
+    "smartquotes",
+    "tasklist",
+]
 
 # sphinx_multiversion configuration
 # smv_tag_whitelist = r"^v\d+\.\d+\.\d+$"
@@ -225,7 +230,7 @@ def update_metadata_docnames(app, config):
         )
         return
 
-    main_sourcedir = metadata["main"].get("sourcedir")
+    main_sourcedir = metadata[f"v{release}"].get("sourcedir")
     source_suffixes = config.source_suffix
     project = sphinx_project.Project(main_sourcedir, source_suffixes)
     updated_docnames = list(project.discover())
@@ -317,8 +322,8 @@ def copy_sphinx_doc_to_build(app, config):
 
 def setup(app):
     """Setup Sphinx application hooks"""
-    # current_version = app.config.smv_current_version
     current_version = app.config.smv_current_version
+    print(f"Current version: {current_version}")
     app.config.smv_latest_version = f"v{release}"
     if current_version != "main":
         app.connect("config-inited", copy_sphinx_doc_to_build)

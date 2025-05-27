@@ -124,6 +124,7 @@ dev = [
     "sphinx_copybutton",
     "sphinxcontrib-apidoc",
     "furo",
+    "sphinx_rtd_theme",
     "myst_parser",
     "recommonmark",
     "wandb<=0.19.0",
