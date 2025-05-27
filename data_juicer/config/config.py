@@ -6,6 +6,7 @@ import shutil
 import tempfile
 import time
 from argparse import ArgumentError
+from contextlib import contextmanager
 from typing import Dict, List, Optional, Union
 
 import yaml
@@ -24,6 +25,14 @@ global_cfg = None
 global_parser = None
 
 
+@contextmanager
+def timing_context(description):
+    start_time = time.time()
+    yield
+    elapsed_time = time.time() - start_time
+    logger.info(f'{description} took {elapsed_time:.2f} seconds')
+
+
 def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
     """
     initialize the jsonargparse parser and parse configs from one of:
@@ -36,371 +45,414 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
     :param which_entry: which entry to init configs (executor/analyzer)
     :return: a global cfg object used by the DefaultExecutor or Analyzer
     """
-    parser = ArgumentParser(default_env=True,
-                            default_config_files=None,
-                            usage=argparse.SUPPRESS)
+    with timing_context('Total initialization time'):
+        with timing_context('Initializing parser'):
+            parser = ArgumentParser(default_env=True,
+                                    default_config_files=None,
+                                    usage=argparse.SUPPRESS)
 
-    # required but mutually exclusive args group
-    required_group = parser.add_mutually_exclusive_group(required=True)
-    required_group.add_argument('--config',
-                                action=ActionConfigFile,
-                                help='Path to a dj basic configuration file.')
-    required_group.add_argument('--auto',
+            # required but mutually exclusive args group
+            required_group = parser.add_mutually_exclusive_group(required=True)
+            required_group.add_argument(
+                '--config',
+                action=ActionConfigFile,
+                help='Path to a dj basic configuration file.')
+            required_group.add_argument(
+                '--auto',
+                action='store_true',
+                help='Weather to use an auto analyzing '
+                'strategy instead of a specific data '
+                'recipe. If a specific config file is '
+                'given by --config arg, this arg is '
+                'disabled. Only available for Analyzer.')
+
+            parser.add_argument('--auto_num',
+                                type=PositiveInt,
+                                default=1000,
+                                help='The number of samples to be analyzed '
+                                'automatically. It\'s 1000 in default.')
+
+            parser.add_argument(
+                '--hpo_config',
+                type=str,
+                help='Path to a configuration file when using auto-HPO tool.',
+                required=False)
+            parser.add_argument(
+                '--data_probe_algo',
+                type=str,
+                default='uniform',
+                help='Sampling algorithm to use. Options are "uniform", '
+                '"frequency_specified_field_selector", or '
+                '"topk_specified_field_selector". Default is "uniform". Only '
+                'used for dataset sampling',
+                required=False)
+            parser.add_argument(
+                '--data_probe_ratio',
+                type=ClosedUnitInterval,
+                default=1.0,
+                help=  # noqa: E251
+                'The ratio of the sample size to the original dataset size. '
+                'Default is 1.0 (no sampling). Only used for dataset sampling',
+                required=False)
+
+            # basic global paras with extended type hints
+            # e.g., files can be mode include flags
+            # "fr": "path to a file that exists and is readable")
+            # "fc": "path to a file that can be created if it does not exist")
+            # "dw": "path to a directory that exists and is writeable")
+            # "dc": "path to a directory that can be created if it does not exist")
+            # "drw": "path to a directory that exists and is readable and writeable")
+            parser.add_argument('--project_name',
+                                type=str,
+                                default='hello_world',
+                                help='Name of your data process project.')
+            parser.add_argument(
+                '--executor_type',
+                type=str,
+                default='default',
+                choices=['default', 'ray'],
+                help='Type of executor, support "default" or "ray" for now.')
+            parser.add_argument(
+                '--dataset_path',
+                type=str,
+                default='',
+                help='Path to datasets with optional weights(0.0-1.0), 1.0 as '
+                'default. Accepted format:<w1> dataset1-path <w2> dataset2-path '
+                '<w3> dataset3-path ...')
+            parser.add_argument(
+                '--dataset',
+                type=Union[List[Dict], Dict],
+                default=[],
+                help=  # noqa: E251
+                'Dataset setting to define local/remote datasets; could be a '
+                'dict or a list of dicts; refer to configs/datasets for more '
+                'detailed examples')
+            parser.add_argument(
+                '--generated_dataset_config',
+                type=Dict,
+                default=None,
+                help=  # noqa: E251
+                'Configuration used to create a dataset. '
+                'The dataset will be created from this configuration if provided. '
+                'It must contain the `type` field to specify the dataset name.'
+            )
+            parser.add_argument(
+                '--validators',
+                type=List[Dict],
+                default=[],
+                help=  # noqa: E251
+                'List of validators to apply to the dataset. Each validator '
+                'must have a `type` field specifying the validator type.')
+            parser.add_argument(
+                '--export_path',
+                type=str,
+                default='./outputs/hello_world/hello_world.jsonl',
+                help=  # noqa: E251
+                'Path to export and save the output processed dataset. The '
+                'directory to store the processed dataset will be the work '
+                'directory of this process.')
+            parser.add_argument(
+                '--export_shard_size',
+                type=NonNegativeInt,
+                default=0,
+                help=  # noqa: E251
+                'Shard size of exported dataset in Byte. In default, it\'s 0, '
+                'which means export the whole dataset into only one file. If '
+                'it\'s set a positive number, the exported dataset will be split '
+                'into several sub-dataset shards, and the max size of each shard '
+                'won\'t larger than the export_shard_size')
+            parser.add_argument(
+                '--export_in_parallel',
+                type=bool,
+                default=False,
+                help=  # noqa: E251
+                'Whether to export the result dataset in parallel to a single '
+                'file, which usually takes less time. It only works when '
+                'export_shard_size is 0, and its default number of processes is '
+                'the same as the argument np. **Notice**: If it\'s True, '
+                'sometimes exporting in parallel might require much more time '
+                'due to the IO blocking, especially for very large datasets. '
+                'When this happens, False is a better choice, although it takes '
+                'more time.')
+            parser.add_argument(
+                '--keep_stats_in_res_ds',
+                type=bool,
+                default=False,
+                help=  # noqa: E251
+                'Whether to keep the computed stats in the result dataset. If '
+                'it\'s False, the intermediate fields to store the stats '
+                'computed by Filters will be removed. Default: False.')
+            parser.add_argument(
+                '--keep_hashes_in_res_ds',
+                type=bool,
+                default=False,
+                help=  # noqa: E251
+                'Whether to keep the computed hashes in the result dataset. If '
+                'it\'s False, the intermediate fields to store the hashes '
+                'computed by Deduplicators will be removed. Default: False.')
+            parser.add_argument('--np',
+                                type=PositiveInt,
+                                default=4,
+                                help='Number of processes to process dataset.')
+            parser.add_argument(
+                '--text_keys',
+                type=Union[str, List[str]],
+                default='text',
+                help=  # noqa: E251
+                'Key name of field where the sample texts to be processed, e.g., '
+                '`text`, `text.instruction`, `text.output`, ... Note: currently, '
+                'we support specify only ONE key for each op, for cases '
+                'requiring multiple keys, users can specify the op multiple '
+                'times.  We will only use the first key of `text_keys` when you '
+                'set multiple keys.')
+            parser.add_argument(
+                '--image_key',
+                type=str,
+                default='images',
+                help=  # noqa: E251
+                'Key name of field to store the list of sample image paths.')
+            parser.add_argument(
+                '--image_special_token',
+                type=str,
+                default=SpecialTokens.image,
+                help=  # noqa: E251
+                'The special token that represents an image in the text. In '
+                'default, it\'s "<__dj__image>". You can specify your own special'
+                ' token according to your input dataset.')
+            parser.add_argument(
+                '--audio_key',
+                type=str,
+                default='audios',
+                help=  # noqa: E251
+                'Key name of field to store the list of sample audio paths.')
+            parser.add_argument(
+                '--audio_special_token',
+                type=str,
+                default=SpecialTokens.audio,
+                help=  # noqa: E251
+                'The special token that represents an audio in the text. In '
+                'default, it\'s "<__dj__audio>". You can specify your own special'
+                ' token according to your input dataset.')
+            parser.add_argument(
+                '--video_key',
+                type=str,
+                default='videos',
+                help=  # noqa: E251
+                'Key name of field to store the list of sample video paths.')
+            parser.add_argument(
+                '--video_special_token',
+                type=str,
+                default=SpecialTokens.video,
+                help='The special token that represents a video in the text. In '
+                'default, it\'s "<__dj__video>". You can specify your own special'
+                ' token according to your input dataset.')
+            parser.add_argument(
+                '--eoc_special_token',
+                type=str,
+                default=SpecialTokens.eoc,
+                help=  # noqa: E251
+                'The special token that represents the end of a chunk in the '
+                'text. In default, it\'s "<|__dj__eoc|>". You can specify your '
+                'own special token according to your input dataset.')
+            parser.add_argument(
+                '--suffixes',
+                type=Union[str, List[str]],
+                default=[],
+                help=  # noqa: E251
+                'Suffixes of files that will be find and loaded. If not set, we '
+                'will find all suffix files, and select a suitable formatter '
+                'with the most files as default.')
+            parser.add_argument(
+                '--turbo',
+                type=bool,
+                default=False,
+                help=  # noqa: E251
+                'Enable Turbo mode to maximize processing speed when batch size '
+                'is 1.')
+            parser.add_argument(
+                '--skip_op_error',
+                type=bool,
+                default=True,
+                help=  # noqa: E251
+                'Skip errors in OPs caused by unexpected invalid samples.')
+            parser.add_argument(
+                '--use_cache',
+                type=bool,
+                default=True,
+                help=  # noqa: E251
+                'Whether to use the cache management of huggingface datasets. It '
+                'might take up lots of disk space when using cache')
+            parser.add_argument(
+                '--ds_cache_dir',
+                type=str,
+                default=None,
+                help=  # noqa: E251
+                'Cache dir for HuggingFace datasets. In default it\'s the same '
+                'as the environment variable `HF_DATASETS_CACHE`, whose default '
+                'value is usually "~/.cache/huggingface/datasets". If this '
+                'argument is set to a valid path by users, it will override the '
+                'default cache dir. Modifying this arg might also affect the other two'
+                ' paths to store downloaded and extracted datasets that depend on '
+                '`HF_DATASETS_CACHE`')
+            parser.add_argument(
+                '--cache_compress',
+                type=str,
+                default=None,
+                help='The compression method of the cache file, which can be'
+                'specified in ["gzip", "zstd", "lz4"]. If this parameter is'
+                'None, the cache file will not be compressed.')
+            parser.add_argument(
+                '--open_monitor',
+                type=bool,
+                default=True,
+                help=  # noqa: E251
+                'Whether to open the monitor to trace resource utilization for '
+                'each OP during data processing. It\'s True in default.')
+            parser.add_argument(
+                '--use_checkpoint',
+                type=bool,
+                default=False,
+                help=  # noqa: E251
+                'Whether to use the checkpoint management to save the latest '
+                'version of dataset to work dir when processing. Rerun the same '
+                'config will reload the checkpoint and skip ops before it. Cache '
+                'will be disabled when it is true . If args of ops before the '
+                'checkpoint are changed, all ops will be rerun from the '
+                'beginning.')
+            parser.add_argument(
+                '--temp_dir',
+                type=str,
+                default=None,
+                help=  # noqa: E251
+                'Path to the temp directory to store intermediate caches when '
+                'cache is disabled. In default it\'s None, so the temp dir will '
+                'be specified by system. NOTICE: you should be caution when '
+                'setting this argument because it might cause unexpected program '
+                'behaviors when this path is set to an unsafe directory.')
+            parser.add_argument(
+                '--open_tracer',
+                type=bool,
+                default=False,
+                help=  # noqa: E251
+                'Whether to open the tracer to trace samples changed during '
+                'process. It might take more time when opening tracer.')
+            parser.add_argument(
+                '--op_list_to_trace',
+                type=List[str],
+                default=[],
+                help=  # noqa: E251
+                'Which ops will be traced by tracer. If it\'s empty, all ops in '
+                'cfg.process will be traced. Only available when open_tracer is '
+                'true.')
+            parser.add_argument(
+                '--trace_num',
+                type=int,
+                default=10,
+                help='Number of samples extracted by tracer to show the dataset '
+                'difference before and after a op. Only available when '
+                'open_tracer is true.')
+            parser.add_argument(
+                '--open_insight_mining',
+                type=bool,
+                default=False,
+                help=  # noqa: E251
+                'Whether to open insight mining to trace the OP-wise stats/tags '
+                'changes during process. It might take more time when opening '
+                'insight mining.')
+            parser.add_argument(
+                '--op_list_to_mine',
+                type=List[str],
+                default=[],
+                help=  # noqa: E251
+                'Which OPs will be applied on the dataset to mine the insights '
+                'in their stats changes. Only those OPs that produce stats or '
+                'meta are valid. If it\'s empty, all OPs that produce stats and '
+                'meta will be involved. Only available when filter_list_to_mine '
+                'is true.')
+            parser.add_argument(
+                '--op_fusion',
+                type=bool,
+                default=False,
+                help=  # noqa: E251
+                'Whether to fuse operators that share the same intermediate '
+                'variables automatically. Op fusion might reduce the memory '
+                'requirements slightly but speed up the whole process.')
+            parser.add_argument(
+                '--fusion_strategy',
+                type=str,
+                default='probe',
+                help=  # noqa: E251
+                'OP fusion strategy. Support ["greedy", "probe"] now. "greedy" '
+                'means keep the basic OP order and put the fused OP to the last '
+                'of each fused OP group. "probe" means Data-Juicer will probe '
+                'the running speed for each OP at the beginning and reorder the '
+                'OPs and fused OPs according to their probed speed (fast to '
+                'slow). It\'s "probe" in default.')
+            parser.add_argument(
+                '--adaptive_batch_size',
+                type=bool,
+                default=False,
+                help=  # noqa: E251
+                'Whether to use adaptive batch sizes for each OP according to '
+                'the probed results. It\'s False in default.')
+            parser.add_argument(
+                '--process',
+                type=List[Dict],
+                default=[],
+                help=  # noqa: E251
+                'List of several operators with their arguments, these ops will '
+                'be applied to dataset in order')
+            parser.add_argument(
+                '--percentiles',
+                type=List[float],
+                default=[],
+                help=  # noqa: E251
+                'Percentiles to analyze the dataset distribution. Only used in '
+                'Analysis.')
+            parser.add_argument(
+                '--export_original_dataset',
+                type=bool,
+                default=False,
+                help=  # noqa: E251
+                'whether to export the original dataset with stats. If you only '
+                'need the stats of the dataset, setting it to false could speed '
+                'up the exporting..')
+            parser.add_argument(
+                '--save_stats_in_one_file',
+                type=bool,
+                default=False,
+                help='Whether to save all stats to only one file. Only used in '
+                'Analysis.')
+            parser.add_argument('--ray_address',
+                                type=str,
+                                default='auto',
+                                help='The address of the Ray cluster.')
+
+            parser.add_argument('--debug',
                                 action='store_true',
-                                help='Weather to use an auto analyzing '
-                                'strategy instead of a specific data '
-                                'recipe. If a specific config file is '
-                                'given by --config arg, this arg is '
-                                'disabled. Only available for Analyzer.')
+                                help='Whether to run in debug mode.')
 
-    parser.add_argument('--auto_num',
-                        type=PositiveInt,
-                        default=1000,
-                        help='The number of samples to be analyzed '
-                        'automatically. It\'s 1000 in default.')
+            # add all parameters of the registered ops class to the parser,
+            # and these op parameters can be modified through the command line,
+            ops_sorted_by_types = sort_op_by_types_and_names(
+                OPERATORS.modules.items())
+            _collect_config_info_from_class_docs(ops_sorted_by_types, parser)
 
-    parser.add_argument(
-        '--hpo_config',
-        type=str,
-        help='Path to a configuration file when using auto-HPO tool.',
-        required=False)
-    parser.add_argument(
-        '--data_probe_algo',
-        type=str,
-        default='uniform',
-        help='Sampling algorithm to use. Options are "uniform", '
-        '"frequency_specified_field_selector", or '
-        '"topk_specified_field_selector". Default is "uniform". Only '
-        'used for dataset sampling',
-        required=False)
-    parser.add_argument(
-        '--data_probe_ratio',
-        type=ClosedUnitInterval,
-        default=1.0,
-        help='The ratio of the sample size to the original dataset size. '
-        'Default is 1.0 (no sampling). Only used for dataset sampling',
-        required=False)
+        with timing_context('Parsing arguments'):
+            cfg = parser.parse_args(args=args)
 
-    # basic global paras with extended type hints
-    # e.g., files can be mode include flags
-    # "fr": "path to a file that exists and is readable")
-    # "fc": "path to a file that can be created if it does not exist")
-    # "dw": "path to a directory that exists and is writeable")
-    # "dc": "path to a directory that can be created if it does not exist")
-    # "drw": "path to a directory that exists and is readable and writeable")
-    parser.add_argument('--project_name',
-                        type=str,
-                        default='hello_world',
-                        help='Name of your data process project.')
-    parser.add_argument(
-        '--executor_type',
-        type=str,
-        default='default',
-        choices=['default', 'ray'],
-        help='Type of executor, support "default" or "ray" for now.')
-    parser.add_argument(
-        '--dataset_path',
-        type=str,
-        default='',
-        help='Path to datasets with optional weights(0.0-1.0), 1.0 as '
-        'default. Accepted format:<w1> dataset1-path <w2> dataset2-path '
-        '<w3> dataset3-path ...')
-    parser.add_argument(
-        '--dataset',
-        type=Union[List[Dict], Dict],
-        default=[],
-        help='Dataset setting to define local/remote datasets; could be a '
-        'dict or a list of dicts; refer to configs/datasets for more '
-        'detailed examples')
-    parser.add_argument(
-        '--generated_dataset_config',
-        type=Dict,
-        default=None,
-        help='Configuration used to create a dataset. '
-        'The dataset will be created from this configuration if provided. '
-        'It must contain the `type` field to specify the dataset name.')
-    parser.add_argument(
-        '--validators',
-        type=List[Dict],
-        default=[],
-        help='List of validators to apply to the dataset. Each validator '
-        'must have a `type` field specifying the validator type.')
-    parser.add_argument(
-        '--export_path',
-        type=str,
-        default='./outputs/hello_world/hello_world.jsonl',
-        help='Path to export and save the output processed dataset. The '
-        'directory to store the processed dataset will be the work '
-        'directory of this process.')
-    parser.add_argument(
-        '--export_shard_size',
-        type=NonNegativeInt,
-        default=0,
-        help='Shard size of exported dataset in Byte. In default, it\'s 0, '
-        'which means export the whole dataset into only one file. If '
-        'it\'s set a positive number, the exported dataset will be split '
-        'into several sub-dataset shards, and the max size of each shard '
-        'won\'t larger than the export_shard_size')
-    parser.add_argument(
-        '--export_in_parallel',
-        type=bool,
-        default=False,
-        help='Whether to export the result dataset in parallel to a single '
-        'file, which usually takes less time. It only works when '
-        'export_shard_size is 0, and its default number of processes is '
-        'the same as the argument np. **Notice**: If it\'s True, '
-        'sometimes exporting in parallel might require much more time '
-        'due to the IO blocking, especially for very large datasets. '
-        'When this happens, False is a better choice, although it takes '
-        'more time.')
-    parser.add_argument(
-        '--keep_stats_in_res_ds',
-        type=bool,
-        default=False,
-        help='Whether to keep the computed stats in the result dataset. If '
-        'it\'s False, the intermediate fields to store the stats '
-        'computed by Filters will be removed. Default: False.')
-    parser.add_argument(
-        '--keep_hashes_in_res_ds',
-        type=bool,
-        default=False,
-        help='Whether to keep the computed hashes in the result dataset. If '
-        'it\'s False, the intermediate fields to store the hashes '
-        'computed by Deduplicators will be removed. Default: False.')
-    parser.add_argument('--np',
-                        type=PositiveInt,
-                        default=4,
-                        help='Number of processes to process dataset.')
-    parser.add_argument(
-        '--text_keys',
-        type=Union[str, List[str]],
-        default='text',
-        help='Key name of field where the sample texts to be processed, e.g., '
-        '`text`, `text.instruction`, `text.output`, ... Note: currently, '
-        'we support specify only ONE key for each op, for cases '
-        'requiring multiple keys, users can specify the op multiple '
-        'times.  We will only use the first key of `text_keys` when you '
-        'set multiple keys.')
-    parser.add_argument(
-        '--image_key',
-        type=str,
-        default='images',
-        help='Key name of field to store the list of sample image paths.')
-    parser.add_argument(
-        '--image_special_token',
-        type=str,
-        default=SpecialTokens.image,
-        help='The special token that represents an image in the text. In '
-        'default, it\'s "<__dj__image>". You can specify your own special'
-        ' token according to your input dataset.')
-    parser.add_argument(
-        '--audio_key',
-        type=str,
-        default='audios',
-        help='Key name of field to store the list of sample audio paths.')
-    parser.add_argument(
-        '--audio_special_token',
-        type=str,
-        default=SpecialTokens.audio,
-        help='The special token that represents an audio in the text. In '
-        'default, it\'s "<__dj__audio>". You can specify your own special'
-        ' token according to your input dataset.')
-    parser.add_argument(
-        '--video_key',
-        type=str,
-        default='videos',
-        help='Key name of field to store the list of sample video paths.')
-    parser.add_argument(
-        '--video_special_token',
-        type=str,
-        default=SpecialTokens.video,
-        help='The special token that represents a video in the text. In '
-        'default, it\'s "<__dj__video>". You can specify your own special'
-        ' token according to your input dataset.')
-    parser.add_argument(
-        '--eoc_special_token',
-        type=str,
-        default=SpecialTokens.eoc,
-        help='The special token that represents the end of a chunk in the '
-        'text. In default, it\'s "<|__dj__eoc|>". You can specify your '
-        'own special token according to your input dataset.')
-    parser.add_argument(
-        '--suffixes',
-        type=Union[str, List[str]],
-        default=[],
-        help='Suffixes of files that will be find and loaded. If not set, we '
-        'will find all suffix files, and select a suitable formatter '
-        'with the most files as default.')
-    parser.add_argument(
-        '--turbo',
-        type=bool,
-        default=False,
-        help='Enable Turbo mode to maximize processing speed when batch size '
-        'is 1.')
-    parser.add_argument(
-        '--skip_op_error',
-        type=bool,
-        default=True,
-        help='Skip errors in OPs caused by unexpected invalid samples.')
-    parser.add_argument(
-        '--use_cache',
-        type=bool,
-        default=True,
-        help='Whether to use the cache management of huggingface datasets. It '
-        'might take up lots of disk space when using cache')
-    parser.add_argument(
-        '--ds_cache_dir',
-        type=str,
-        default=None,
-        help='Cache dir for HuggingFace datasets. In default it\'s the same '
-        'as the environment variable `HF_DATASETS_CACHE`, whose default '
-        'value is usually "~/.cache/huggingface/datasets". If this '
-        'argument is set to a valid path by users, it will override the '
-        'default cache dir. Modifying this arg might also affect the other two'
-        ' paths to store downloaded and extracted datasets that depend on '
-        '`HF_DATASETS_CACHE`')
-    parser.add_argument(
-        '--cache_compress',
-        type=str,
-        default=None,
-        help='The compression method of the cache file, which can be'
-        'specified in ["gzip", "zstd", "lz4"]. If this parameter is'
-        'None, the cache file will not be compressed.')
-    parser.add_argument(
-        '--open_monitor',
-        type=bool,
-        default=True,
-        help='Whether to open the monitor to trace resource utilization for '
-        'each OP during data processing. It\'s True in default.')
-    parser.add_argument(
-        '--use_checkpoint',
-        type=bool,
-        default=False,
-        help='Whether to use the checkpoint management to save the latest '
-        'version of dataset to work dir when processing. Rerun the same '
-        'config will reload the checkpoint and skip ops before it. Cache '
-        'will be disabled when it is true . If args of ops before the '
-        'checkpoint are changed, all ops will be rerun from the '
-        'beginning.')
-    parser.add_argument(
-        '--temp_dir',
-        type=str,
-        default=None,
-        help='Path to the temp directory to store intermediate caches when '
-        'cache is disabled. In default it\'s None, so the temp dir will '
-        'be specified by system. NOTICE: you should be caution when '
-        'setting this argument because it might cause unexpected program '
-        'behaviors when this path is set to an unsafe directory.')
-    parser.add_argument(
-        '--open_tracer',
-        type=bool,
-        default=False,
-        help='Whether to open the tracer to trace samples changed during '
-        'process. It might take more time when opening tracer.')
-    parser.add_argument(
-        '--op_list_to_trace',
-        type=List[str],
-        default=[],
-        help='Which ops will be traced by tracer. If it\'s empty, all ops in '
-        'cfg.process will be traced. Only available when open_tracer is '
-        'true.')
-    parser.add_argument(
-        '--trace_num',
-        type=int,
-        default=10,
-        help='Number of samples extracted by tracer to show the dataset '
-        'difference before and after a op. Only available when '
-        'open_tracer is true.')
-    parser.add_argument(
-        '--open_insight_mining',
-        type=bool,
-        default=False,
-        help='Whether to open insight mining to trace the OP-wise stats/tags '
-        'changes during process. It might take more time when opening '
-        'insight mining.')
-    parser.add_argument(
-        '--op_list_to_mine',
-        type=List[str],
-        default=[],
-        help='Which OPs will be applied on the dataset to mine the insights '
-        'in their stats changes. Only those OPs that produce stats or '
-        'meta are valid. If it\'s empty, all OPs that produce stats and '
-        'meta will be involved. Only available when filter_list_to_mine '
-        'is true.')
-    parser.add_argument(
-        '--op_fusion',
-        type=bool,
-        default=False,
-        help='Whether to fuse operators that share the same intermediate '
-        'variables automatically. Op fusion might reduce the memory '
-        'requirements slightly but speed up the whole process.')
-    parser.add_argument(
-        '--fusion_strategy',
-        type=str,
-        default='probe',
-        help='OP fusion strategy. Support ["greedy", "probe"] now. "greedy" '
-        'means keep the basic OP order and put the fused OP to the last '
-        'of each fused OP group. "probe" means Data-Juicer will probe '
-        'the running speed for each OP at the beginning and reorder the '
-        'OPs and fused OPs according to their probed speed (fast to '
-        'slow). It\'s "probe" in default.')
-    parser.add_argument(
-        '--adaptive_batch_size',
-        type=bool,
-        default=False,
-        help='Whether to use adaptive batch sizes for each OP according to '
-        'the probed results. It\'s False in default.')
-    parser.add_argument(
-        '--process',
-        type=List[Dict],
-        default=[],
-        help='List of several operators with their arguments, these ops will '
-        'be applied to dataset in order')
-    parser.add_argument(
-        '--percentiles',
-        type=List[float],
-        default=[],
-        help='Percentiles to analyze the dataset distribution. Only used in '
-        'Analysis.')
-    parser.add_argument(
-        '--export_original_dataset',
-        type=bool,
-        default=False,
-        help='whether to export the original dataset with stats. If you only '
-        'need the stats of the dataset, setting it to false could speed '
-        'up the exporting..')
-    parser.add_argument(
-        '--save_stats_in_one_file',
-        type=bool,
-        default=False,
-        help='Whether to save all stats to only one file. Only used in '
-        'Analysis.')
-    parser.add_argument('--ray_address',
-                        type=str,
-                        default='auto',
-                        help='The address of the Ray cluster.')
+            # check the entry
+            from data_juicer.core.analyzer import Analyzer
+            if not isinstance(which_entry, Analyzer) and cfg.auto:
+                err_msg = '--auto argument can only be used for analyzer!'
+                logger.error(err_msg)
+                raise NotImplementedError(err_msg)
 
-    parser.add_argument('--debug',
-                        action='store_true',
-                        help='Whether to run in debug mode.')
+        with timing_context('Initializing setup from config'):
+            cfg = init_setup_from_cfg(cfg)
 
-    # add all parameters of the registered ops class to the parser,
-    # and these op parameters can be modified through the command line,
-    ops_sorted_by_types = sort_op_by_types_and_names(OPERATORS.modules.items())
-    _collect_config_info_from_class_docs(ops_sorted_by_types, parser)
-
-    try:
-        cfg = parser.parse_args(args=args)
-
-        # check the entry
-        from data_juicer.core.analyzer import Analyzer
-        if not isinstance(which_entry, Analyzer) and cfg.auto:
-            err_msg = '--auto argument can only be used for analyzer!'
-            logger.error(err_msg)
-            raise NotImplementedError(err_msg)
-
-        cfg = init_setup_from_cfg(cfg)
-        cfg = update_op_process(cfg, parser)
+        with timing_context('Updating operator process'):
+            cfg = update_op_process(cfg, parser)
 
         # copy the config file into the work directory
         config_backup(cfg)
@@ -416,8 +468,6 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
             logger.debug('In DEBUG mode.')
 
         return cfg
-    except ArgumentError:
-        logger.error('Config initialization failed')
 
 
 def update_ds_cache_dir_and_related_vars(new_ds_cache_path):
@@ -622,17 +672,15 @@ def _collect_config_info_from_class_docs(configurable_ops, parser):
     :param parser: jsonargparse parser need to update
     :return: all params of each OP in a dictionary
     """
-
-    op_params = {}
-    for op_name, op_class in configurable_ops:
-        params = parser.add_class_arguments(
-            theclass=op_class,
-            nested_key=op_name,
-            fail_untyped=False,
-            instantiate=False,
-        )
-        op_params[op_name] = params
-    return op_params
+    with timing_context('Collecting operator configuration info'):
+        op_params = {}
+        for op_name, op_class in configurable_ops:
+            params = parser.add_class_arguments(theclass=op_class,
+                                                nested_key=op_name,
+                                                fail_untyped=False,
+                                                instantiate=False)
+            op_params[op_name] = params
+        return op_params
 
 
 def sort_op_by_types_and_names(op_name_classes):
@@ -644,23 +692,23 @@ def sort_op_by_types_and_names(op_name_classes):
     :return: sorted op list , each item is a pair of op_name and
         op_class
     """
-
-    mapper_ops = [(name, c) for (name, c) in op_name_classes
-                  if 'mapper' in name]
-    filter_ops = [(name, c) for (name, c) in op_name_classes
-                  if 'filter' in name]
-    deduplicator_ops = [(name, c) for (name, c) in op_name_classes
-                        if 'deduplicator' in name]
-    selector_ops = [(name, c) for (name, c) in op_name_classes
-                    if 'selector' in name]
-    grouper_ops = [(name, c) for (name, c) in op_name_classes
-                   if 'grouper' in name]
-    aggregator_ops = [(name, c) for (name, c) in op_name_classes
-                      if 'aggregator' in name]
-    ops_sorted_by_types = sorted(mapper_ops) + sorted(filter_ops) + sorted(
-        deduplicator_ops) + sorted(selector_ops) + sorted(grouper_ops) + \
-        sorted(aggregator_ops)
-    return ops_sorted_by_types
+    with timing_context('Sorting operators by types and names'):
+        mapper_ops = [(name, c) for (name, c) in op_name_classes
+                      if 'mapper' in name]
+        filter_ops = [(name, c) for (name, c) in op_name_classes
+                      if 'filter' in name]
+        deduplicator_ops = [(name, c) for (name, c) in op_name_classes
+                            if 'deduplicator' in name]
+        selector_ops = [(name, c) for (name, c) in op_name_classes
+                        if 'selector' in name]
+        grouper_ops = [(name, c) for (name, c) in op_name_classes
+                       if 'grouper' in name]
+        aggregator_ops = [(name, c) for (name, c) in op_name_classes
+                          if 'aggregator' in name]
+        ops_sorted_by_types = sorted(mapper_ops) + sorted(filter_ops) + sorted(
+            deduplicator_ops) + sorted(selector_ops) + sorted(grouper_ops) + \
+            sorted(aggregator_ops)
+        return ops_sorted_by_types
 
 
 def update_op_process(cfg, parser):
