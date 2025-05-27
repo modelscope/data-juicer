@@ -45,7 +45,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
     :param which_entry: which entry to init configs (executor/analyzer)
     :return: a global cfg object used by the DefaultExecutor or Analyzer
     """
-    with timing_context('Total initialization time'):
+    with timing_context('Total config initialization time'):
         with timing_context('Initializing parser'):
             parser = ArgumentParser(default_env=True,
                                     default_config_files=None,
@@ -432,21 +432,41 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
                                 action='store_true',
                                 help='Whether to run in debug mode.')
 
-            # add all parameters of the registered ops class to the parser,
-            # and these op parameters can be modified through the command line,
-            ops_sorted_by_types = sort_op_by_types_and_names(
-                OPERATORS.modules.items())
-            _collect_config_info_from_class_docs(ops_sorted_by_types, parser)
+            # Parse essential arguments first
+            essential_cfg = parser.parse_args(args=args, _skip_validation=True)
 
-        with timing_context('Parsing arguments'):
-            cfg = parser.parse_args(args=args)
+            # Now add remaining arguments based on essential config
+            if essential_cfg.config:
+                # Load config file to determine which operators are used
+                with open(essential_cfg.config[0].absolute) as f:
+                    config_data = yaml.safe_load(f)
+                    used_ops = set()
+                    if 'process' in config_data:
+                        for op in config_data['process']:
+                            used_ops.add(list(op.keys())[0])
 
-            # check the entry
-            from data_juicer.core.analyzer import Analyzer
-            if not isinstance(which_entry, Analyzer) and cfg.auto:
-                err_msg = '--auto argument can only be used for analyzer!'
-                logger.error(err_msg)
-                raise NotImplementedError(err_msg)
+                # Add remaining arguments
+                ops_sorted_by_types = sort_op_by_types_and_names(
+                    OPERATORS.modules.items())
+
+                # Only add arguments for used operators
+                for op_name, op_class in ops_sorted_by_types:
+                    if op_name in used_ops:
+                        parser.add_class_arguments(theclass=op_class,
+                                                   nested_key=op_name,
+                                                   fail_untyped=False,
+                                                   instantiate=False)
+
+            # Parse all arguments
+            with timing_context('Parsing arguments'):
+                cfg = parser.parse_args(args=args, _skip_validation=True)
+
+                # check the entry
+                from data_juicer.core.analyzer import Analyzer
+                if not isinstance(which_entry, Analyzer) and cfg.auto:
+                    err_msg = '--auto argument can only be used for analyzer!'
+                    logger.error(err_msg)
+                    raise NotImplementedError(err_msg)
 
         with timing_context('Initializing setup from config'):
             cfg = init_setup_from_cfg(cfg)
