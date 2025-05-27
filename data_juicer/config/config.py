@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import shutil
+import sys
 import tempfile
 import time
 from argparse import ArgumentError
@@ -45,6 +46,8 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
     :param which_entry: which entry to init configs (executor/analyzer)
     :return: a global cfg object used by the DefaultExecutor or Analyzer
     """
+    if args is None:
+        args = sys.argv[1:]
     with timing_context('Total config initialization time'):
         with timing_context('Initializing parser'):
             parser = ArgumentParser(default_env=True,
@@ -432,8 +435,47 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
                                 action='store_true',
                                 help='Whether to run in debug mode.')
 
+            # Filter out non-essential arguments for initial parsing
+            essential_args = []
+            if args:
+                i = 0
+                while i < len(args):
+                    arg = args[i]
+                    # Always keep --help, --config, and --auto as they are required/helpful
+                    if arg == '--help':
+                        essential_args.append(arg)
+                    elif arg == '--config':
+                        essential_args.append(arg)
+                        # The next argument must be the config file path
+                        if i + 1 < len(args):
+                            essential_args.append(args[i + 1])
+                            i += 1
+                    elif arg == '--auto':
+                        essential_args.append(arg)
+                    # For other essential arguments
+                    elif arg.startswith('--'):
+                        if any(
+                                arg.startswith(f'--{essential}')
+                                for essential in [
+                                    'auto_num', 'hpo_config',
+                                    'data_probe_algo', 'data_probe_ratio',
+                                    'project_name', 'executor_type',
+                                    'dataset_path', 'dataset', 'export_path',
+                                    'np', 'text_keys', 'debug', 'ray_address'
+                                ]):
+                            essential_args.append(arg)
+                            # If the next arg is not a flag, it's a value for this arg
+                            if i + 1 < len(args) and not args[
+                                    i + 1].startswith('--'):
+                                essential_args.append(args[i + 1])
+                                i += 1
+                    i += 1
+
+            logger.debug(f'Args: {args}')
+            logger.debug(f'Essential arguments: {essential_args}')
+
             # Parse essential arguments first
-            essential_cfg = parser.parse_args(args=args, _skip_validation=True)
+            essential_cfg = parser.parse_args(args=essential_args)
 
             # Now add remaining arguments based on essential config
             if essential_cfg.config:
@@ -450,16 +492,14 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
                     OPERATORS.modules.items())
 
                 # Only add arguments for used operators
-                for op_name, op_class in ops_sorted_by_types:
-                    if op_name in used_ops:
-                        parser.add_class_arguments(theclass=op_class,
-                                                   nested_key=op_name,
-                                                   fail_untyped=False,
-                                                   instantiate=False)
+                _collect_config_info_from_class_docs(
+                    [(op_name, op_class)
+                     for op_name, op_class in ops_sorted_by_types
+                     if op_name in used_ops], parser)
 
             # Parse all arguments
             with timing_context('Parsing arguments'):
-                cfg = parser.parse_args(args=args, _skip_validation=True)
+                cfg = parser.parse_args(args=args)
 
                 # check the entry
                 from data_juicer.core.analyzer import Analyzer
@@ -686,27 +726,17 @@ def update_op_attr(op_list: list, attr_dict: dict = None):
 def _collect_config_info_from_class_docs(configurable_ops, parser):
     """
     Add ops and its params to parser for command line with optimized performance.
-    Only adds arguments for operators that are actually used in the configuration.
     """
     with timing_context('Collecting operator configuration info'):
         op_params = {}
 
-        # Get used operators from command line args
-        used_ops = set()
-        for action in parser._actions:
-            if hasattr(action, 'dest') and '.' in action.dest:
-                op_name = action.dest.split('.')[0]
-                if op_name in OPERATORS.modules:
-                    used_ops.add(op_name)
-
-        # Only add arguments for used operators
+        # Add arguments for all provided operators
         for op_name, op_class in configurable_ops:
-            if not used_ops or op_name in used_ops:
-                params = parser.add_class_arguments(theclass=op_class,
-                                                    nested_key=op_name,
-                                                    fail_untyped=False,
-                                                    instantiate=False)
-                op_params[op_name] = params
+            params = parser.add_class_arguments(theclass=op_class,
+                                                nested_key=op_name,
+                                                fail_untyped=False,
+                                                instantiate=False)
+            op_params[op_name] = params
 
         return op_params
 
