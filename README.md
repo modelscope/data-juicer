@@ -61,7 +61,7 @@ Data-Juicer is being actively updated and maintained. We will periodically enhan
 - [2024-07-17] We utilized the Data-Juicer [Sandbox Laboratory Suite](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox.md) to systematically optimize data and models through a co-development workflow between data and models, achieving a new top spot on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard. The related achievements have been compiled and published in a [paper](http://arxiv.org/abs/2407.11784), and the model has been released on the [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) and [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) platforms.
 - [2024-07-12] Our *awesome list of MLLM-Data* has evolved into a systemic [survey](https://arxiv.org/abs/2407.08583) from model-data co-development perspective. Welcome to [explore](docs/awesome_llm_data.md) and contribute!
 - [2024-06-01] ModelScope-Sora "Data Directors" creative sprint—Our third data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532219) for more information.
-- [2024-03-07] We release **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)** now! 
+- [2024-03-07] We release **Data-Juicer [v0.2.0](https://github.com/modelscope/data-juicer/releases/tag/v0.2.0)** now! 
 In this new version, we support more features for **multimodal data (including video now)**, and introduce **[DJ-SORA](docs/DJ_SORA.md)** to provide open large-scale, high-quality datasets for SORA-like models.
 - [2024-02-20] We have actively maintained an *awesome list of LLM-Data*, welcome to [visit](docs/awesome_llm_data.md) and contribute!
 - [2024-02-05] Our paper has been accepted by SIGMOD'24 industrial track!
@@ -86,14 +86,14 @@ Table of Contents
   - [Coding with Data-Juicer (DJ)](#coding-with-data-juicer-dj)
   - [Use Cases \& Data Recipes](#use-cases--data-recipes)
   - [Interactive Examples](#interactive-examples)
-- [Installation](#installation)
+- [Installation Guide](#installation-guide)
   - [Prerequisites](#prerequisites)
-  - [From Source for Specific Scenarios](#from-source-for-specific-scenarios)
-  - [From Source for Specific OPs](#from-source-for-specific-ops)
-  - [Using pip](#using-pip)
-  - [Using Docker](#using-docker)
-  - [Installation check](#installation-check)
-  - [For Video-related Operators](#for-video-related-operators)
+  - [Basic DJ Installation](#basic-dj-installation)
+  - [Scenario-based Installation](#scenario-based-installation)
+  - [Common Installation Patterns](#common-installation-patterns)
+  - [Installation for Specific OPs](#installation-for-specific-ops)
+  - [Installation Using Docker](#installation-using-docker)
+  - [Notes \& Troubleshooting](#notes--troubleshooting)
 - [Quick Start](#quick-start)
   - [Dataset Configuration](#dataset-configuration)
   - [Data Processing](#data-processing)
@@ -198,43 +198,114 @@ Table of Contents
   - Data Sampling and Mixture [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_mixture/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_mixture)]
 - Data Processing Loop [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_loop/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_process_loop)]
 
-## Installation
+## Installation Guide
 
 ### Prerequisites
 
-- Recommend Python>=3.9,<=3.10
-- gcc >= 5 (at least C++14 support)
+- Python >= 3.10
+- Git (for source installation)
+- uv (recommended package installer)
 
-### From Source for Specific Scenarios
+### Basic DJ Installation
 
-- Run the following commands to install the latest basic `data_juicer` version in
-  editable mode:
-```shell
-cd <path_to_data_juicer>
-pip install -v -e .
+Data-Juicer is now available on PyPI. The minimal installation includes core data processing capabilities:
+
+```bash
+pip install py-data-juicer
 ```
 
-- Some OPs rely on some other too large or low-platform-compatibility third-party libraries. You can install optional dependencies as needed:
+This provides:
+- Data loading and manipulation
+- File system operations
+- Parallel processing
+- Basic I/O and utilities
 
-```shell
-cd <path_to_data_juicer>
-pip install -v -e .  # Install minimal dependencies, which support the basic functions
-pip install -v -e .[tools] # Install a subset of tools dependencies
+
+### Scenario-based Installation
+For component details, plz refer to [pyproject.toml](pyproject.toml).
+
+**Core ML & DL**
+```bash
+# Generic ML/DL capabilities
+pip install "py-data-juicer[generic]"
+```
+Includes: PyTorch, Transformers, VLLM, etc.
+
+**Domain-Specific Features**
+
+```bash
+# Computer Vision
+pip install "py-data-juicer[vision]"
+
+# Natural Language Processing
+pip install "py-data-juicer[nlp]"
+
+# Audio Processing
+pip install "py-data-juicer[audio]"
+
+**Additional Components**
+
+```bash
+# Distributed Computing
+pip install "py-data-juicer[distributed]"
+
+# AI Services & APIs
+pip install "py-data-juicer[ai_services]"
+
+**Development Tools**
+```bash
+# Development & Testing
+pip install "py-data-juicer[dev]"
 ```
 
-The dependency options are listed below:
+### Common Installation Patterns
 
-| Tag              | Description                                                            |
-|------------------|------------------------------------------------------------------------|
-| `.` or `.[mini]` | Install minimal dependencies for basic Data-Juicer.                    |
-| `.[all]`         | Install dependencies for all OPs except sandbox.                       |
-| `.[sci]`         | Install dependencies for OPs related to scientific usage.              |
-| `.[dist]`        | Install dependencies for additional distributed data processing.       |
-| `.[dev]`         | Install dependencies for developing the package as contributors.       |
-| `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers. |
-| `.[sandbox]`     | Install all dependencies for sandbox.                                  |
+**1. Text Processing Setup**
+```bash
+pip install "py-data-juicer[generic,nlp]"
+```
 
-### From Source for Specific OPs
+**2. Vision Processing Setup**
+```bash
+pip install "py-data-juicer[generic,vision]"
+```
+
+**3. Full Processing Pipeline**
+```bash
+pip install "py-data-juicer[generic,nlp,vision,distributed]"
+```
+
+
+**4. Complete Installation**
+```bash
+# Install all features (except sandbox)
+pip install "py-data-juicer[all]"
+```
+
+
+**5. For Development Mode**
+
+For contributors and developers:
+
+```bash
+# Clone repository
+git clone https://github.com/modelscope/data-juicer.git
+cd data-juicer
+
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Optionally, use uv for venv and dependency management
+curl -LsSf https://astral.sh/uv/install.sh | sh   # install uv
+uv venv --python 3.10                             # initialize virtual env with python 3.10
+source .venv/bin/activate                         # activate virtual env
+uv pip install -e .                               # install minimal dependencies
+
+```
+
+
+### Installation for Specific OPs
+Besides the scenarios-based installation, we also provide OP-based and recipe-based manners.
 
 - Install dependencies for specific OPs
 
@@ -252,22 +323,7 @@ we provide two alternative, lighter options:
     dj-install --config path_to_your_data-juicer_config_file
     ```
 
-### Using pip
-
-- Run the following command to install the latest released `data_juicer` using `pip`:
-
-```shell
-pip install py-data-juicer
-```
-
-- **Note**:
-  - only the basic APIs in `data_juicer` and two basic tools
-    (data [processing](#data-processing) and [analysis](#data-analysis)) are available in this way. If you want customizable
-    and complete functions, we recommend you install `data_juicer` [from source](#from-source).
-  - The release versions from pypi have a certain lag compared to the latest version from source.
-    So if you want to follow the latest functions of `data_juicer`, we recommend you install [from source](#from-source).
-
-### Using Docker
+### Installation Using Docker
 
 - You can
   - either pull our pre-built image from DockerHub:
@@ -289,19 +345,33 @@ pip install py-data-juicer
 
   - The format of `<version_tag>` is like `v0.2.0`, which is the same as the release version tag.
 
-### Installation check
+### Notes & Troubleshooting
 
+0. **installation check**
+   
 ```python
 import data_juicer as dj
 print(dj.__version__)
 ```
 
-### For Video-related Operators
-Before using video-related operators, **FFmpeg** should be installed and accessible via the $PATH environment variable.
+1. **Modular Installation**
+   - Install only what you need
+   - Combine components as required
+   - Use `all` for complete installation
 
-You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on Debian/Ubuntu, brew install ffmpeg on OS X) or visit the [official ffmpeg link](https://ffmpeg.org/download.html).
+2. **Sandbox Environment**
+   - Separate installation for experimental features
+   - Will be provided as micro-services in future
 
-Check if your environment path is set correctly by running the ffmpeg command from the terminal.
+3. **For Video-related Operators**
+   - Before using video-related operators, **FFmpeg** should be installed and accessible via the $PATH environment variable.
+   - You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on Debian/Ubuntu, brew install ffmpeg on OS X) or visit the [official ffmpeg link](https://ffmpeg.org/download.html).
+   - Check if your environment path is set correctly by running the ffmpeg command from the terminal.
+
+4. **Getting Help**  
+   - Plz check documentation/issues first
+   - Create GitHub issues when necessary
+   - Join community channels for discussions
 
 
 <p align="right"><a href="#table">🔼 back to index</a></p>

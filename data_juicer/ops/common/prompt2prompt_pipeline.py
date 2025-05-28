@@ -5,8 +5,8 @@ import numpy as np
 
 from data_juicer.utils.lazy_loader import LazyLoader
 
-diffusers = LazyLoader('diffusers', 'diffusers')
-torch = LazyLoader('torch', 'torch')
+diffusers = LazyLoader('diffusers')
+torch = LazyLoader('torch')
 
 
 # Copied from diffusers.pipelines.stable_diffusion.

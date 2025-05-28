@@ -4,13 +4,13 @@ from typing import List, Optional, Union
 
 import numpy as np
 import pyarrow as pa
-import ray
 import regex
 from loguru import logger
 from pydantic import Field, PositiveInt
 from typing_extensions import Annotated
 
 from data_juicer.utils.constant import HashKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
 
 from ..base_op import OPERATORS, Deduplicator
@@ -18,23 +18,22 @@ from ..common.helper_func import split_on_whitespace
 from .document_minhash_deduplicator import (MAX_HASH, MERSENNE_PRIME,
                                             optimal_param, sha1_hash32)
 
+ray = LazyLoader('ray')
+
 BATCH_SIZE = 1000
 
 
-@ray.remote
 class IdGenerator:
 
     def __init__(self, start_id=0):
         self.next_id = start_id
 
-    @ray.method(num_returns=2)
     def get_next_id(self, count):
         current_id = self.next_id
         self.next_id += count
         return (current_id, self.next_id)
 
 
-@ray.remote(scheduling_strategy='SPREAD')
 class EdgeBuffer:
 
     def __init__(self):
@@ -50,7 +49,6 @@ class EdgeBuffer:
         return self.edge_dict.pop(key, [])
 
 
-@ray.remote(scheduling_strategy='SPREAD')
 class BTSUnionFind:
     """
     A distributed implementation of Union-Find with load balancing.
@@ -227,6 +225,19 @@ class BTSUnionFind:
 
     def dup_idx(self, queries):
         return [idx for uid, idx in queries if uid in self.parent]
+
+
+def get_remote_classes():
+    """Get remote versions of classes with Ray decorators applied at runtime."""
+    # Apply ray.method decorator to get_next_id at runtime
+    IdGenerator.get_next_id = ray.method(num_returns=2)(
+        IdGenerator.get_next_id)
+
+    return {
+        'IdGenerator': ray.remote(IdGenerator),
+        'EdgeBuffer': ray.remote(scheduling_strategy='SPREAD')(EdgeBuffer),
+        'BTSUnionFind': ray.remote(scheduling_strategy='SPREAD')(BTSUnionFind)
+    }
 
 
 OP_NAME = 'ray_bts_minhash_deduplicator'
@@ -414,15 +425,19 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         logger.info(f'union_find_parallel_num = {union_find_parallel_num}')
         self.union_find_parallel_num = union_find_parallel_num
         self.union_threshold = union_threshold
+
+        # Get remote classes only when needed
+        remote_classes = get_remote_classes()
         self.remote_edge_buffers = [
-            EdgeBuffer.remote() for _ in range(self.union_find_parallel_num)
+            remote_classes['EdgeBuffer'].remote()
+            for _ in range(self.union_find_parallel_num)
         ]
         self.union_find_list = [
-            BTSUnionFind.remote(
+            remote_classes['BTSUnionFind'].remote(
                 self.union_threshold,
                 self.union_find_parallel_num,
                 i,
-                self.remote_edge_buffers,  # TODO: fix this
+                self.remote_edge_buffers,
                 self.max_pending_edge_buffer_task,
                 self.num_edge_buffer_task_returns,
             ) for i in range(self.union_find_parallel_num)
@@ -536,7 +551,9 @@ class RayBTSMinhashDeduplicator(Deduplicator):
     def run(self, dataset, **kwargs):
         # Ignore additional parameters like exporter, tracer, etc.
         start_time = time.time()
-        id_generator = IdGenerator.remote()
+        # Get remote IdGenerator only when needed
+        remote_classes = get_remote_classes()
+        id_generator = remote_classes['IdGenerator'].remote()
 
         def minhash_with_uid(table: pa.Table) -> pa.Table:
             num_rows = len(table)
