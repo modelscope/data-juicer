@@ -188,6 +188,8 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
             script_dir, num_gpus, batch_size_per_device, work_dir,
             model_name_or_path, conv_style, existing_meta_paths)
 
+        self.run_meta_name = 'init'
+
     def _prepare_training_script(self, script_dir, num_gpus,
                                  batch_size_per_device, work_dir,
                                  model_name_or_path, conv_style, meta_paths):
@@ -224,13 +226,19 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
     def _watch_run(self, line, **kwargs):
         # e.g. "{'loss': 2.055, 'learning_rate': 3.0000000000000004e-05, 'epoch': 0.02}"
         pattern = r'^\{\'loss\': (.*?), \'learning_rate\': (.*?), \'epoch\': (.*?)\}$'
+        run_meta_pattern = r'^run_name=\/(.*)\/(.*?),$'
         if self.watcher:
             match = re.match(pattern, line.strip())
+            match_run_meta = re.match(run_meta_pattern, line.strip())
             if match:
                 loss, lr, epoch = match.groups()
-                self.watcher.watch(float(loss), 'loss')
-                self.watcher.watch(float(lr), 'lr')
-                self.watcher.watch(float(epoch), 'epoch')
+                self.watcher.watch({
+                    'loss': float(loss),
+                    'lr': float(lr),
+                    'epoch': float(epoch)
+                }, self.run_meta_name)
+            if match_run_meta:
+                self.run_meta_name = match_run_meta.groups()[1]
 
 
 class InternVLCOCOCaptionEvaluator(BaseEvaluator):
