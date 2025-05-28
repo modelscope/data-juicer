@@ -42,8 +42,7 @@ extensions = [
 # -- Extension configuration ------------------------------------------------
 myst_heading_anchors = 4
 myst_enable_extensions = [
-    "colon_fence",
-    "smartquotes",
+    "linkify",
     "tasklist",
 ]
 
@@ -67,7 +66,7 @@ autodoc_member_order = "bysource"
 
 # -- Templates and patterns -------------------------------------------------
 templates_path = ["_templates"]
-exclude_patterns = ["build", ".venv"]
+exclude_patterns = ["build", "demos/process_video_on_ray/data/Note.md"]
 
 # -- Options for HTML output ------------------------------------------------
 # The theme to use for HTML and HTML Help pages.
@@ -186,42 +185,6 @@ def create_symlinks(source_dir):
             target.symlink_to(os.path.relpath(md_file, target.parent))
 
 
-def extract_sections(readme_path, section_titles, title_map={}, output_dir=None):
-    try:
-        with open(readme_path, "r", encoding="utf-8") as f:
-            readme_content = f.read()
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File not found at: {readme_path}")
-
-    if not output_dir:
-        output_dir = os.path.dirname(readme_path) or "."
-
-    for title in section_titles:
-        # Construct regular expression to find the section
-        #  - Starts with ## and the title
-        #  - Matches all characters until the next ## or the end of the document
-        pattern = rf"^## {title}.*(?:\n(?!## ).*)*"
-        match = re.findall(pattern, readme_content, re.MULTILINE)
-
-        if match:
-            section_content = match[0]
-
-            # Create output file name
-            title = title_map.get(title, title.replace(" ", "_").lower())
-            output_file = f"{output_dir}/{title}.md"
-
-            try:
-                with open(output_file, "w", encoding="utf-8") as outfile:
-                    outfile.write(
-                        f"{section_content}"
-                    )  # Include the title in the output file
-            except Exception as e:
-                print(f"Error writing to file '{output_file}': {e}")
-
-        else:
-            raise ValueError(f"Section title '{title}' not found in {readme_path}")
-
-
 def update_metadata_docnames(app, config):
     if hasattr(app.config, "smv_metadata"):
         metadata = app.config.smv_metadata
@@ -238,26 +201,37 @@ def update_metadata_docnames(app, config):
     for version_name, _ in metadata.items():
         app.config.smv_metadata[version_name]["docnames"] = updated_docnames
 
+def versions_a_lt_or_eq_to_b(version_a, version_b):
+
+    def is_valid_version(version):
+        return bool(re.match(r"^v\d+\.\d+\.\d+$", version))
+
+    if not is_valid_version(version_a):
+        return False
+
+    if not is_valid_version(version_b):
+        raise ValueError(f"Invalid version format for version_b: {version_b}")
+
+    try:
+        parts_a = [int(x) for x in version_a[1:].split(".")]
+        parts_b = [int(x) for x in version_b[1:].split(".")]
+
+        for i in range(3):
+            if parts_a[i] < parts_b[i]:
+                return True
+            elif parts_a[i] > parts_b[i]:
+                return False
+
+        return True
+    except ValueError:
+        raise ValueError("Version numbers must be numeric")
 
 def rebuild_source_dir(app, config):
     """Rebuild source directory for documentation"""
     source_dir = Path(app.srcdir)
     create_symlinks(source_dir)
 
-    # Extract sections from README.md
-    readme_path = source_dir / "README.md"
-    readme_zh_path = source_dir / "README_ZH.md"
-    section_titles = ["DJ-Cookbook", "Installation", "Quick Start"]
-    section_zh_titles = ["DJ-Cookbook", "安装", "快速上手"]
-    title_zh_map = {
-        "DJ-Cookbook": "dj-cookbook_ZH",
-        "安装": "installation_ZH",
-        "快速上手": "quick_start_ZH",
-    }
-    extract_sections(readme_zh_path, section_zh_titles, title_zh_map)
-    extract_sections(readme_path, section_titles)
     update_metadata_docnames(app, config)
-
     # Find Chinese translation files
     find_zh_exclusions(app, config)
 
@@ -288,18 +262,15 @@ def process_tutorial(app, docname, source):
     overview_placeholder = ""
     api_placeholder = ""
     if app.config.language == "zh_CN":
-        overview_placeholder = "- [DJ概览](README_ZH.md)"
+        overview_placeholder = "- [DJ概览](../../README_ZH.md)"
         api_placeholder = "API参考"
     else:
-        overview_placeholder = "- [Overview of DJ](README.md)"
+        overview_placeholder = "- [Overview of DJ](../../README.md)"
         api_placeholder = "API references"
     source[0] = source[0].replace(overview_placeholder, "")
     source[0] = source[0].replace(
         f"[{api_placeholder}](https://modelscope.github.io/data-juicer/)",
         f"[{api_placeholder}](api.rst)",
-    )
-    source[0] = source[0].replace(
-        '<p align="right"><a href="#table">🔼 back to index</a></p>', ""
     )
     return source[0]
 
@@ -312,8 +283,8 @@ def process_read(app, docname, source):
 
 def copy_sphinx_doc_to_build(app, config):
     """Copies the entire project directory to the Sphinx build directory."""
-    source_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-    dest_dir = app.srcdir.parent.parent.parent / "docs"
+    source_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    dest_dir = app.srcdir.parent.parent.parent / "docs/sphinx_doc"
 
     try:
         shutil.copytree(source_dir, dest_dir, dirs_exist_ok=True)

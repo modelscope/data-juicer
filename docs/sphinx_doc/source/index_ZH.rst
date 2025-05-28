@@ -3,83 +3,22 @@
    :format: html
 
 
-`[英文主页] <../index>`_ | `[DJ-Cookbook] <dj-cookbook_ZH>`_ | `[算子池] <docs/Operators>`_ | `[API] <api>`_ | `[Awesome LLM Data] <docs/awesome_llm_data>`_
+`[英文主页] <../../en/main/index>`_ | `[DJ-Cookbook] <docs/tutorial/DJ-Cookbook_ZH>`_ | `[算子池] <docs/Operators>`_ | `[API] <api>`_ | `[Awesome LLM Data] <docs/awesome_llm_data>`_
 
 Data Processing for and with Foundation Models
 ==============================================
 
- :raw-html-m2r:`<img src="https://img.alicdn.com/imgextra/i1/O1CN01fUfM5A1vPclzPQ6VI_!!6000000006165-0-tps-1792-1024.jpg" width = "533" height = "300" alt="Data-Juicer"/>`
-
-.. _news:
-新消息
-------
 .. include:: README_ZH.md
-    :start-after: ## 新消息
-    :end-before: 目录
+    :start-after: # Data Processing for and with Foundation Models
     :parser: myst_parser.sphinx_
 
-.. _table-of-contents:
-目录
-====
-
-* `新消息 <#news>`_
-* `为什么选择 Data-Juicer？ <#why-data-juicer>`_
 .. toctree::
    :maxdepth: 2
    :caption: 教程
+   :glob:
+   :hidden:
 
-   dj-cookbook_ZH
-   installation_ZH
-   quick_start_ZH
-
-* `开源协议 <#license>`_
-* `贡献 <#contributing>`_
-* `致谢 <#acknowledgement>`_
-* `参考文献 <#references>`_
-
-.. _why-data-juicer?:
-为什么选择 Data-Juicer？
-------------------------
-
-.. include:: README_ZH.md
-    :start-after: ## 为什么选择 Data-Juicer？
-    :end-before: ## DJ-Cookbook
-    :parser: myst_parser.sphinx_
-
-.. _license:
-开源协议
---------
-
-.. include:: README_ZH.md
-    :start-after: ## 开源协议
-    :end-before: ## 贡献
-    :parser: myst_parser.sphinx_
-
-.. _contributing:
-贡献
-----
-
-.. include:: README_ZH.md
-    :start-after: ## 贡献
-    :end-before: ## 致谢
-    :parser: myst_parser.sphinx_
-
-.. _acknowledgement:
-致谢
-----
-
-.. include:: README_ZH.md
-    :start-after: ## 致谢
-    :end-before: ## 参考文献
-    :parser: myst_parser.sphinx_
-
-.. _references:
-参考文献
---------
-
-.. include:: README_ZH.md
-    :start-after: ## 参考文献
-    :parser: myst_parser.sphinx_
+   docs/tutorial/*
 
 .. toctree::
    :maxdepth: 2

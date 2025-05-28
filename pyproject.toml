@@ -126,6 +126,7 @@ dev = [
     "furo",
     "sphinx_rtd_theme",
     "myst_parser",
+    "linkify-it-py",
     "recommonmark",
     "wandb<=0.19.0",
     "fire",
