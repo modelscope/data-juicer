@@ -7,6 +7,7 @@ import subprocess
 import sys
 import time
 
+import yaml
 from jsonargparse import namespace_to_dict
 
 from data_juicer.core.sandbox.env_manager import ENV_ROUTER
@@ -210,6 +211,7 @@ class ModelscopeTrainExecutor(ModelScopeExecutor):
         self.work_dir = builder_kwargs['work_dir']
         self.build_executor(**builder_kwargs)
         self.executor.train()
+        return self.work_dir
 
 
 class EasyAnimateTrainExecutor(BaseModelExecutor):
@@ -245,6 +247,7 @@ class EasyAnimateTrainExecutor(BaseModelExecutor):
             config.tracker_config.experiment_name
         ]
         self.run_subprocess(self.script_path, run_args, self.working_dir)
+        return self.working_dir
 
 
 class EasyAnimateInferExecutor(BaseModelExecutor):
@@ -270,6 +273,7 @@ class EasyAnimateInferExecutor(BaseModelExecutor):
             config.saving_config.output_video_dir
         ]
         self.run_subprocess(self.script_path, run_args, self.working_dir)
+        return self.working_dir
 
 
 class LLaVAExecutor(BaseModelExecutor):
@@ -337,6 +341,8 @@ class TrinityRFTTrainExecutor(BaseModelExecutor):
                 'trinity_config_path', None)
         cmd = f'trinity run --config {trinity_config_path}'
         self.env.run_cmd(cmd)
+        trinity_cfg = yaml.safe_load()
+        return trinity_cfg.get('checkpoint_root_dir', None)
 
     async def _watch_run(self, line, **kwargs):
         # e.g. "(Trainer pid=3839503) INFO 05-08 11:11:13 monitor.py:96] Step 12: {<a dict record>}"

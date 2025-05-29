@@ -460,8 +460,9 @@ class EvaluateModelHook(BaseHook):
         # basic routine to evaluate the given model,
         # users can customize this freely
         logger.info('Begin to evaluate the model with given evaluator config')
-        ret = model_evaluator.run(kwargs)
-        return ret
+        eval_res = model_evaluator.run(kwargs)
+        self.watcher.watch(eval_res, self.meta_name)
+        return eval_res
 
 
 HOOK_MAPPING = {
