@@ -96,7 +96,19 @@ class BaseHook:
                 if len(key_in_history_parts) <= 1:
                     raise ValueError(f'Need to specify the job result keys precisely for inputs to '
                                      f'find the target values. Only got [{key_in_history}].')
-                history_job_infos = context_infos[list(context_infos.keys())[-1]][-1]
+                # find the last non-empty job_infos
+                pipeline_keys = list(context_infos.keys())
+                if len(pipeline_keys) == 0:
+                    raise ValueError(f'Cannot find the previous non-empty job infos for [{key_in_history}].')
+                last_idx = len(pipeline_keys) - 1
+                history_job_infos = context_infos[pipeline_keys[last_idx]]
+                while len(history_job_infos) == 0:
+                    last_idx -= 1
+                    if last_idx < 0:
+                        raise ValueError(f'Cannot find the previous non-empty job infos for [{key_in_history}].')
+                    history_job_infos = context_infos[pipeline_keys[last_idx]]
+                # get the last job_infos
+                history_job_infos = history_job_infos[-1]
                 key_in_history_parts = key_in_history_parts[1:]
             else:
                 # get the target job_infos according to pipeline_name and job meta_name

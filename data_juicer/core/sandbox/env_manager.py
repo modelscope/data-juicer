@@ -170,12 +170,16 @@ class CondaEnv(Env):
         else:
             raise RuntimeError('Failed to install Python dependencies.')
 
-    def run_cmd(self, cmd: str):
+    def run_cmd(self, cmd: str, use_sys_stdio=False):
         """
         Run a command in this environment.
         """
         cmd = f'{self.env_manager} run -n {self.env_name} bash -c \'{cmd}\''
-        res = subprocess.run(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
+        if use_sys_stdio:
+            stdout, stderr = sys.stdout, sys.stderr
+        else:
+            stdout, stderr = None, None
+        res = subprocess.run(cmd, shell=True, stdout=stdout, stderr=stderr)
         if res.returncode == 0:
             logger.debug(f'Command [{cmd}] executed successfully.')
             return True

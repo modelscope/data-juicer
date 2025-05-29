@@ -198,6 +198,8 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
 
         for meta_path in meta_paths:
             meta_basename = os.path.splitext(os.path.basename(meta_path))[0]
+            base_model_name = os.path.splitext(os.path.basename(model_name_or_path))[0]
+            meta_basename = f'{meta_basename}_{base_model_name}'
             output_dir = os.path.join(work_dir, meta_basename)
             script_running_home = os.path.join(self.internvl_home, 'internvl_chat')
             script_path = os.path.join(script_dir, f'{meta_basename}.sh')
@@ -219,8 +221,10 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
         """
         for script_path in self.running_scripts:
             # run the script
+            logger.info(f'Training with script: {script_path}')
             cmd = f'bash {script_path}'
-            self.env.run_cmd(cmd)
+            # use system stdout and stderr because they are redirected by this hook
+            self.env.run_cmd(cmd, use_sys_stdio=True)
         return self.output_paths
 
     def _watch_run(self, line, **kwargs):
@@ -316,6 +320,7 @@ class InternVLCOCOCaptionEvaluator(BaseEvaluator):
         """
         results = []
         for ckpt_path in self.existing_ckpt_paths:
+            logger.info(f'Evaluating {ckpt_path}')
             eval_log_path = os.path.join(ckpt_path, 'eval_log.txt')
             script_path = os.path.join(self.internvl_home, 'internvl_chat')
             # need to convert to a relative path due to the script "evaluate.sh" will add the script path forcely
