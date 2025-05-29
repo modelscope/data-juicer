@@ -4,8 +4,7 @@ from data_juicer.core.sandbox.data_pool_manipulators import (
     DataPoolCombination, DataPoolConstruction, DataPoolDownsampling,
     DataPoolDuplication, DataPoolRanking)
 from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
-                                                 InceptionEvaluator,
-                                                 VBenchEvaluator)
+                                                 InceptionEvaluator)
 from data_juicer.core.sandbox.model_executors import (
     EasyAnimateInferExecutor, EasyAnimateTrainExecutor,
     ModelscopeInferProbeExecutor, ModelscopeTrainExecutor,
@@ -14,7 +13,7 @@ from data_juicer.core.sandbox.model_executors import (
 
 class DataExecutorFactory(object):
     """
-    Factory for Data-Juicer executor.
+    Factory for Data-Juicer executor. Require configs for Data-Juicer and return a Data-Juicer executor.
     """
 
     def __call__(self, dj_cfg: dict = None, *args, **kwargs):
@@ -29,7 +28,7 @@ data_executor_factory = DataExecutorFactory()
 
 class DataAnalyzerFactory(object):
     """
-    Factory for Data-Juicer analyzer.
+    Factory for Data-Juicer analyzer. Require configs for Data-Juicer and return a Data-Juicer analyzer.
     """
 
     def __call__(self, dj_cfg: dict = None, *args, **kwargs):
@@ -55,6 +54,8 @@ class DataEvaluatorFactory(object):
 
         evaluator = None
         if eval_cfg.type == 'vbench_video_evaluator':
+            from data_juicer.core.sandbox.specific_hooks.text_to_video.model_hooks import \
+                VBenchEvaluator
             evaluator = VBenchEvaluator(eval_cfg)
         elif eval_cfg.type == 'video_inception_evaluator':
             evaluator = InceptionEvaluator(eval_cfg)

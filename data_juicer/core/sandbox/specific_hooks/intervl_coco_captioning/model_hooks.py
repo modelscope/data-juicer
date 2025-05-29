@@ -263,7 +263,7 @@ class InternVLCOCOCaptionEvaluator(BaseEvaluator):
     4. `env_params`: a dict for other parameters of environments. Only works for conda-like environment. The
         `env_config_path` for creating the env and `env_py_version` to specify the Python version can be added.
     5. `internvl_home`: the home path of InternVL. Used to install InternVL if it's not installed in the environment.
-    6. `num_gpus`: the number of GPUs used to train. If it's not set, use all gpus.
+    6. `num_gpus`: the number of GPUs used to evaluate. If it's not set, use all gpus.
     7. `ckpt_paths`: the paths to the trained checkpoints.
     """
     DIMENSIONS = [
