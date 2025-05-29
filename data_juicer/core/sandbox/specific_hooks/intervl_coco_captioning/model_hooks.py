@@ -140,7 +140,10 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
         self.env.install_py_deps(
             os.path.join(self.internvl_home, 'requirements.txt'))
         # install flash-attn
-        self.env.install_py_deps(['flash-attn==2.3.6 --no-build-isolation', 'datasets', 'deepspeed==0.15.4'])
+        self.env.install_py_deps([
+            'flash-attn==2.3.6 --no-build-isolation', 'datasets',
+            'deepspeed==0.15.4'
+        ])
 
         # training related
         num_gpus = self.model_config.get('num_gpus', cuda_device_count())
@@ -198,15 +201,18 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
 
         for meta_path in meta_paths:
             meta_basename = os.path.splitext(os.path.basename(meta_path))[0]
-            base_model_name = os.path.splitext(os.path.basename(model_name_or_path))[0]
+            base_model_name = os.path.splitext(
+                os.path.basename(model_name_or_path))[0]
             meta_basename = f'{meta_basename}_{base_model_name}'
             output_dir = os.path.join(work_dir, meta_basename)
-            script_running_home = os.path.join(self.internvl_home, 'internvl_chat')
+            script_running_home = os.path.join(self.internvl_home,
+                                               'internvl_chat')
             script_path = os.path.join(script_dir, f'{meta_basename}.sh')
             with open(script_path, 'w') as f:
-                f.write(self.SCRIPT_TEMPLATE %
-                        (script_running_home, num_gpus, batch_size_per_device, output_dir,
-                         model_name_or_path, conv_style, meta_path))
+                f.write(
+                    self.SCRIPT_TEMPLATE %
+                    (script_running_home, num_gpus, batch_size_per_device,
+                     output_dir, model_name_or_path, conv_style, meta_path))
 
             script_paths.append(script_path)
             output_paths.append(output_dir)
@@ -236,11 +242,12 @@ class InternVLCOCOCaptionTrainExecutor(BaseModelExecutor):
             match_run_meta = re.match(run_meta_pattern, line.strip())
             if match:
                 loss, lr, epoch = match.groups()
-                self.watcher.watch({
-                    'loss': float(loss),
-                    'lr': float(lr),
-                    'epoch': float(epoch)
-                }, self.run_meta_name)
+                self.watcher.watch(
+                    {
+                        'loss': float(loss),
+                        'lr': float(lr),
+                        'epoch': float(epoch)
+                    }, self.run_meta_name)
             if match_run_meta:
                 self.run_meta_name = match_run_meta.groups()[1]
 
@@ -284,7 +291,10 @@ class InternVLCOCOCaptionEvaluator(BaseEvaluator):
         self.env.install_py_deps(
             os.path.join(self.internvl_home, 'requirements.txt'))
         # install flash-attn
-        self.env.install_py_deps(['flash-attn==2.3.6 --no-build-isolation', 'datasets', 'deepspeed==0.15.4'])
+        self.env.install_py_deps([
+            'flash-attn==2.3.6 --no-build-isolation', 'datasets',
+            'deepspeed==0.15.4'
+        ])
 
         # eval gpus
         self.num_gpus = self.eval_config.get('num_gpus', cuda_device_count())

@@ -1,14 +1,14 @@
+import json
 import os
 from copy import deepcopy
 from typing import List
 
+import wandb
 import yaml
-import json
 from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import dict_to_namespace, namespace_to_dict
 from loguru import logger
 
-import wandb
 from data_juicer.config import merge_config, prepare_side_configs
 from data_juicer.core.sandbox.hooks import register_hook
 from data_juicer.utils.constant import JobRequiredKeys
@@ -339,7 +339,8 @@ class SandBoxExecutor:
         return cfg
 
     def run(self):
-        context_infos_path = os.path.join(self.cfg.work_dir, 'context_infos.json')
+        context_infos_path = os.path.join(self.cfg.work_dir,
+                                          'context_infos.json')
         if self.resume and os.path.exists(context_infos_path):
             # load context infos from the existing one
             context_infos = json.load(open(context_infos_path, 'r'))
@@ -349,11 +350,17 @@ class SandBoxExecutor:
             for pipeline in self.pipelines:
                 # check if the pipeline is already existing in the context infos
                 if pipeline.name in finished_pipelines:
-                    # check if the number of job infos is the same as the number of all kinds of jobs, which means all jobs are finished
+                    # check if the number of job infos is the same as the number of all kinds of jobs,
+                    # which means all jobs are finished
                     num_job_infos = len(context_infos[pipeline.name])
-                    num_jobs = len(pipeline.probe_jobs) + len(pipeline.refine_recipe_jobs) + len(pipeline.execution_jobs) + len(pipeline.evaluation_jobs)
+                    num_jobs = len(pipeline.probe_jobs) + len(
+                        pipeline.refine_recipe_jobs) + len(
+                            pipeline.execution_jobs) + len(
+                                pipeline.evaluation_jobs)
                     if num_job_infos == num_jobs:
-                        logger.info(f'Pipeline {pipeline.name} is finished and loaded from the existing context infos. Skip it!')
+                        logger.info(
+                            f'Pipeline {pipeline.name} is finished and loaded from the existing context infos. Skip it!'
+                        )
                         continue
                 left_pipelines.append(pipeline)
             self.pipelines = left_pipelines

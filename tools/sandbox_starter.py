@@ -43,10 +43,11 @@ def init_sandbox_configs(args=None):
                         default='./outputs/hello_world',
                         help='Default output dir of meta information.')
 
-    parser.add_argument('--resume',
-                        type=bool,
-                        default=False,
-                        help='Whether to resume from the existing context infos.')
+    parser.add_argument(
+        '--resume',
+        type=bool,
+        default=False,
+        help='Whether to resume from the existing context infos.')
 
     parser.add_argument(
         '--hpo_config',

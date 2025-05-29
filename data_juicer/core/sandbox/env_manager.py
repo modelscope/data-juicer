@@ -1,8 +1,8 @@
 import json
-import sys
 import os.path
 import shutil
 import subprocess
+import sys
 from abc import ABC, abstractmethod
 from typing import List, Union
 
@@ -152,7 +152,8 @@ class CondaEnv(Env):
                     logger.info(f'Installing library code base [{deps}]...')
                     cmd = f'{self.env_manager} run -n {self.env_name} pip install -e {deps}'
                 else:
-                    logger.info(f'Installing from requirements file [{deps}]...')
+                    logger.info(
+                        f'Installing from requirements file [{deps}]...')
                     cmd = f'{self.env_manager} run -n {self.env_name} pip install -r {deps}'
             else:
                 raise FileNotFoundError(f'deps path [{deps}] does not exist.')
