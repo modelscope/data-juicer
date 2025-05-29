@@ -22,5 +22,5 @@ work_dir: '<internvl_home>/internvl_chat/work_dirs'
 model_name_or_path: '<internvl_home>/internvl_chat/pretrained/InternVL2-1B'
 conv_style_or_scale: '1B'
 meta_paths:
-  - '<these_paths_should_be_replaced_by_the_previous_COCOCaptionMetaGeneration_hook>'
+  - '<these_paths_should_be_updated_by_input_mapping>'
 script_dir: '<internvl_home>/internvl_chat/scripts/'

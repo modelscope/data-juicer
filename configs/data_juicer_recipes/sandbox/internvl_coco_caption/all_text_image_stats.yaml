@@ -2,7 +2,7 @@ project_name: 'all_text_image_stats'
 dataset_path: '<internvl_home>/internvl_chat/data/coco/coco_karpathy_train_567k_dj_fmt.jsonl'
 np: 16
 
-export_path: '<internvl_home>/internvl_chat/data/coco/computed_stats/coco_karpathy_train_567k_dj_fmt_with_stats.jsonl'
+export_path: '<internvl_home>/internvl_chat/data/coco/computed_stats/data_with_stats.jsonl'
 
 keep_stats_in_res_ds: true
 export_original_dataset: true
