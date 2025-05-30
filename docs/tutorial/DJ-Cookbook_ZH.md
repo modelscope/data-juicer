@@ -24,7 +24,7 @@
   - [第三方集成](../../thirdparty/LLM_ecosystems/README_ZH.md)
 
 ## 用例与数据菜谱
-* [数据菜谱Gallery](../RecipeGallery.md)
+* [数据菜谱Gallery](../RecipeGallery_ZH.md)
   - Data-Juicer 最小示例配方
   - 复现开源文本数据集
   - 改进开源文本预训练数据集

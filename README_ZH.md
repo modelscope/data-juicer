@@ -94,15 +94,15 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
   - [安装](docs/tutorial/Installation_ZH.md)
   - [快速上手](docs/tutorial/QuickStart_ZH.md)
 - 其他帮助文档
+  - [算子提要](docs/Operators.md)
+  - [数据菜谱Gallery](docs/RecipeGallery_ZH.md)
+  - [数据集配置指南](docs/DatasetCfg_ZH.md)
   - [Awesome Data-Model Co-Development of MLLMs](docs/awesome_llm_data.md)
   - [“坏”数据展览](docs/BadDataExhibition_ZH.md)
   - [DJ-SORA](docs/DJ_SORA_ZH.md)
   - [API服务化](docs/DJ_service_ZH.md)
-  - [数据集配置指南](docs/DatasetCfg_ZH.md)
   - [开发者指南](docs/DeveloperGuide_ZH.md)
   - [Data-Juicer分布式数据处理](docs/Distributed_ZH.md)
-  - [算子提要](docs/Operators.md)
-  - [数据菜谱Gallery](docs/RecipeGallery_ZH.md)
   - [沙盒实验室](docs/Sandbox_ZH.md)
 - Demos
   - [演示](demos/README_ZH.md)

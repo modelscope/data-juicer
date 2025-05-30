@@ -101,15 +101,15 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
   - [Installation](docs/tutorial/Installation.md)
   - [Quick Start](docs/tutorial/QuickStart.md)
 - Useful documents
+  - [Operator Schemas](docs/Operators.md)
+  - [Data Recipe Gallery](docs/RecipeGallery.md)
+  - [Dataset Configuration Guide](docs/DatasetCfg.md)
   - [Awesome Data-Model Co-Development of MLLMs](docs/awesome_llm_data.md)
   - ["Bad" Data Exhibition](docs/BadDataExhibition.md)
   - [DJ-SORA](docs/DJ_SORA.md)
   - [DJ_service](docs/DJ_service.md)
-  - [Dataset Configuration Guide](docs/DatasetCfg.md)
   - [How-to Guide for Developers](docs/DeveloperGuide.md)
   - [Distributed Data Processing in Data-Juicer](docs/Distributed.md)
-  - [Operator Schemas](docs/Operators.md)
-  - [Data Recipe Gallery](docs/RecipeGallery.md)
   - [Sandbox](docs/Sandbox.md)
 - Demos
   - [demos](demos/README.md)

@@ -26,6 +26,9 @@ Data Processing for and with Foundation Models
    :glob:
    :hidden:
 
+   docs/Operators
+   docs/RecipeGallery_ZH
+   docs/DatasetCfg_ZH
    docs/*
 
 .. toctree::
