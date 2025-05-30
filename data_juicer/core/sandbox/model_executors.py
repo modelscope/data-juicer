@@ -2,7 +2,6 @@ import asyncio
 import json
 import os
 import re
-import stat
 import subprocess
 import sys
 import time
@@ -212,68 +211,6 @@ class ModelscopeTrainExecutor(ModelScopeExecutor):
         self.build_executor(**builder_kwargs)
         self.executor.train()
         return self.work_dir
-
-
-class EasyAnimateTrainExecutor(BaseModelExecutor):
-
-    def __init__(self, model_config: dict, watcher=None):
-        super().__init__(model_config, watcher)
-        cur_working_dir = os.getcwd()
-        self.script_path = os.path.join(
-            cur_working_dir, 'thirdparty/models/EasyAnimate/train_lora.sh')
-        self.working_dir = os.path.join(cur_working_dir,
-                                        'thirdparty/models/EasyAnimate/')
-        # make sure executable
-        current_permissions = os.stat(self.script_path).st_mode
-        os.chmod(
-            self.script_path,
-            current_permissions | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-
-    async def _run(self, run_type, run_obj=None, **kwargs):
-        config = self.model_config.train
-        run_args = [
-            config.model_path.pretrained_model_name_or_path,
-            config.model_path.transformer_path,
-            config.dataset_path.dataset_name,
-            config.dataset_path.dataset_meta_name,
-            config.training_config.sample_size,
-            config.training_config.mixed_precision,
-            config.training_config.batch_size_per_gpu,
-            config.training_config.gradient_accumulation_steps,
-            config.training_config.num_train_epochs,
-            config.training_config.dataloader_num_workers,
-            config.training_config.seed, config.saving_config.output_dir,
-            config.tracker_config.project_name,
-            config.tracker_config.experiment_name
-        ]
-        self.run_subprocess(self.script_path, run_args, self.working_dir)
-        return self.working_dir
-
-
-class EasyAnimateInferExecutor(BaseModelExecutor):
-
-    def __init__(self, model_config: dict, watcher=None):
-        super().__init__(model_config, watcher)
-        cur_working_dir = os.getcwd()
-        self.script_path = os.path.join(
-            cur_working_dir, 'thirdparty/models/EasyAnimate/infer_lora.sh')
-        self.working_dir = os.path.join(cur_working_dir,
-                                        './thirdparty/models/EasyAnimate/')
-
-    async def _run(self, run_type, run_obj=None, **kwargs):
-        config = self.model_config.train
-        run_args = [
-            config.model_path.pretrained_model_name_or_path,
-            config.model_path.transformer_path, config.model_path.lora_path,
-            config.infer_config.image_size,
-            config.infer_config.prompt_info_path, config.infer_config.gpu_num,
-            config.infer_config.batch_size,
-            config.infer_config.mixed_precision,
-            config.infer_config.video_num_per_prompt, config.infer_config.seed,
-            config.saving_config.output_video_dir
-        ]
-        self.run_subprocess(self.script_path, run_args, self.working_dir)
-        return self.working_dir
 
 
 class LLaVAExecutor(BaseModelExecutor):

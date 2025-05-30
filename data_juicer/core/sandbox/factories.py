@@ -6,7 +6,6 @@ from data_juicer.core.sandbox.data_pool_manipulators import (
 from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
                                                  InceptionEvaluator)
 from data_juicer.core.sandbox.model_executors import (
-    EasyAnimateInferExecutor, EasyAnimateTrainExecutor,
     ModelscopeInferProbeExecutor, ModelscopeTrainExecutor,
     TrinityRFTTrainExecutor)
 
@@ -176,6 +175,8 @@ class ModelTrainExecutorFactory(object):
         if model_cfg.type == 'modelscope':
             trainer = ModelscopeTrainExecutor(model_cfg, **kwargs)
         elif model_cfg.type == 'easyanimate':
+            from data_juicer.core.sandbox.specific_hooks.text_to_video.model_hooks import \
+                EasyAnimateTrainExecutor
             trainer = EasyAnimateTrainExecutor(model_cfg, **kwargs)
         elif model_cfg.type == 'trinity-rft':
             trainer = TrinityRFTTrainExecutor(model_cfg, **kwargs)
@@ -197,6 +198,8 @@ class ModelInferExecutorFactory(object):
             return None
 
         if generate_cfg.type == 'easyanimate':
+            from data_juicer.core.sandbox.specific_hooks.text_to_video.model_hooks import \
+                EasyAnimateInferExecutor
             return EasyAnimateInferExecutor(generate_cfg, **kwargs)
 
         # add more data generation here freely

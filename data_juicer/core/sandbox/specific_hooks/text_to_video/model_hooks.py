@@ -1,12 +1,136 @@
 import json
 import os
 import re
+import stat
 
 from loguru import logger
 
 from data_juicer import cuda_device_count
 from data_juicer.core.sandbox.env_manager import ENV_ROUTER
 from data_juicer.core.sandbox.evaluators import BaseEvaluator
+from data_juicer.core.sandbox.model_executors import BaseModelExecutor
+
+
+class EasyAnimateTrainExecutor(BaseModelExecutor):
+    """
+    A training executor for text-to-video generation based on EasyAnimate.
+    The home path of EasyAnimate is set to <data-juicer>/thirdparty/models/EasyAnimate in default.
+
+    The config file for this executor should at least include the following items:
+    1. `type`: must be "easyanimate".
+    2. `env_name`: the name of the environment for EasyAnimate
+    3. `env_manager`: the environment manager. Should be one of {"conda", "mamba", "venv", "virtualenv", "uv"}.
+    4. `env_params`: a dict for other parameters of environments. Only works for conda-like environment. The
+        `env_config_path` for creating the env and `env_py_version` to specify the Python version can be added.
+    5. other items can be referred to configs/demo/bench/model_train.yaml.
+    """
+
+    def __init__(self, model_config: dict, watcher=None):
+        super().__init__(model_config, watcher)
+        # env related
+        easyanimate_env = self.model_config.get('env_name', None)
+        easyanimate_env_manager = self.model_config.get('env_manager', 'conda')
+        easyanimate_env_params = self.model_config.get('env_params', {})
+        cur_working_dir = os.getcwd()
+        self.easyanimate_home = os.path.join(cur_working_dir,
+                                             'thirdparty/models/EasyAnimate')
+        self.env = ENV_ROUTER[easyanimate_env_manager](
+            env_name=easyanimate_env,
+            env_manager=easyanimate_env_manager,
+            **easyanimate_env_params)
+        self.env.create()
+        # setup EasyAnimate
+        cmd = f'cd {self.easyanimate_home.replace("EasyAnimate", "")} && bash setup_easyanimate.sh'
+        self.env.run_cmd(cmd)
+        # install requirements
+        cmd = f'cd {self.easyanimate_home} && python install.py'
+        self.env.run_cmd(cmd)
+        # install extra deepspeed and func_timeout
+        self.env.install_py_deps(['deepspeed', 'func_timeout'])
+
+        self.script_path = os.path.join(self.easyanimate_home, 'train_lora.sh')
+        # make sure executable
+        current_permissions = os.stat(self.script_path).st_mode
+        os.chmod(
+            self.script_path,
+            current_permissions | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+    async def _run(self, run_type, run_obj=None, **kwargs):
+        config = self.model_config.train
+        run_args = [
+            config.model_path.pretrained_model_name_or_path,
+            config.model_path.transformer_path,
+            config.dataset_path.dataset_name,
+            config.dataset_path.dataset_meta_name,
+            config.training_config.sample_size,
+            config.training_config.mixed_precision,
+            config.training_config.batch_size_per_gpu,
+            config.training_config.gradient_accumulation_steps,
+            config.training_config.num_train_epochs,
+            config.training_config.dataloader_num_workers,
+            config.training_config.seed, config.saving_config.output_dir,
+            config.tracker_config.project_name,
+            config.tracker_config.experiment_name
+        ]
+        cmd = f'cd {self.easyanimate_home} && bash {self.script_path} {" ".join([str(arg) for arg in run_args])}'
+        self.env.run_cmd(cmd)
+        return os.path.abspath(config.saving_config.output_dir)
+
+
+class EasyAnimateInferExecutor(BaseModelExecutor):
+    """
+    A inference executor for text-to-video generation based on EasyAnimate.
+    The home path of EasyAnimate is set to <data-juicer>/thirdparty/models/EasyAnimate in default.
+
+    The config file for this executor should at least include the following items:
+    1. `type`: must be "easyanimate".
+    2. `env_name`: the name of the environment for EasyAnimate
+    3. `env_manager`: the environment manager. Should be one of {"conda", "mamba", "venv", "virtualenv", "uv"}.
+    4. `env_params`: a dict for other parameters of environments. Only works for conda-like environment. The
+        `env_config_path` for creating the env and `env_py_version` to specify the Python version can be added.
+    5. other items can be referred to configs/demo/bench/model_train.yaml.
+    """
+
+    def __init__(self, model_config: dict, watcher=None):
+        super().__init__(model_config, watcher)
+        # env related
+        easyanimate_env = self.model_config.get('env_name', None)
+        easyanimate_env_manager = self.model_config.get('env_manager', 'conda')
+        easyanimate_env_params = self.model_config.get('env_params', {})
+        cur_working_dir = os.getcwd()
+        self.easyanimate_home = os.path.join(cur_working_dir,
+                                             'thirdparty/models/EasyAnimate')
+        self.env = ENV_ROUTER[easyanimate_env_manager](
+            env_name=easyanimate_env,
+            env_manager=easyanimate_env_manager,
+            **easyanimate_env_params)
+        self.env.create()
+        # setup EasyAnimate
+        cmd = f'cd {self.easyanimate_home.replace("EasyAnimate", "")} && bash setup_easyanimate.sh'
+        self.env.run_cmd(cmd)
+        # install requirements
+        cmd = f'cd {self.easyanimate_home} && python install.py'
+        self.env.run_cmd(cmd)
+        # install extra deepspeed and func_timeout
+        self.env.install_py_deps(['deepspeed', 'func_timeout'])
+
+        self.script_path = os.path.join(self.easyanimate_home, 'infer_lora.sh')
+
+    async def _run(self, run_type, run_obj=None, **kwargs):
+        config = self.model_config.train
+        run_args = [
+            config.model_path.pretrained_model_name_or_path,
+            config.model_path.transformer_path, config.model_path.lora_path,
+            config.infer_config.image_size,
+            config.infer_config.prompt_info_path, config.infer_config.gpu_num,
+            config.infer_config.batch_size,
+            config.infer_config.mixed_precision,
+            config.infer_config.video_num_per_prompt, config.infer_config.seed,
+            config.saving_config.output_video_dir
+        ]
+        cmd = f'cd {self.easyanimate_home} && bash {self.script_path} {" ".join([str(arg) for arg in run_args])}'
+        self.env.run_cmd(cmd)
+        return os.path.abspath(config.saving_config.output_video_dir)
 
 
 class VBenchEvaluator(BaseEvaluator):
