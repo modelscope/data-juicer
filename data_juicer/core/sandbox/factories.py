@@ -6,8 +6,7 @@ from data_juicer.core.sandbox.data_pool_manipulators import (
 from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
                                                  InceptionEvaluator)
 from data_juicer.core.sandbox.model_executors import (
-    ModelscopeInferProbeExecutor, ModelscopeTrainExecutor,
-    TrinityRFTTrainExecutor)
+    ModelscopeInferProbeExecutor, ModelscopeTrainExecutor)
 
 
 class DataExecutorFactory(object):
@@ -179,6 +178,8 @@ class ModelTrainExecutorFactory(object):
                 EasyAnimateTrainExecutor
             trainer = EasyAnimateTrainExecutor(model_cfg, **kwargs)
         elif model_cfg.type == 'trinity-rft':
+            from data_juicer.core.sandbox.specific_hooks.rft.model_hooks import \
+                TrinityRFTTrainExecutor
             trainer = TrinityRFTTrainExecutor(model_cfg, **kwargs)
         elif model_cfg.type == 'internvl_coco_caption':
             from data_juicer.core.sandbox.specific_hooks.intervl_coco_captioning.model_hooks import \
