@@ -1,4 +1,5 @@
 import argparse
+import copy
 import json
 import os
 import shutil
@@ -808,20 +809,42 @@ def update_op_process(cfg, parser):
         if hasattr(action, 'dest') and isinstance(action, ActionTypeHint)
     }
 
-    # Generate args list more efficiently
-    temp_args = []
+    # check the op params via type hint
+    temp_parser = copy.deepcopy(parser)
+
+    temp_args = namespace_to_arg_list(temp_cfg,
+                                      includes=recognized_args,
+                                      excludes=['config'])
+
     if temp_cfg.config:
         temp_args.extend(['--config', temp_cfg.config[0].absolute])
     else:
         temp_args.append('--auto')
 
-    # Only include recognized args
-    for key, value in vars(temp_cfg).items():
-        if key in recognized_args and value is not None:
-            temp_args.extend([f'--{key}', str(value)])
+    # validate
+    temp_parser.parse_args(temp_args)
 
-    # Skip redundant parser copy and type checking
     return cfg
+
+
+def namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None):
+    arg_list = []
+
+    for key, value in vars(namespace).items():
+
+        if issubclass(type(value), Namespace):
+            nested_args = namespace_to_arg_list(value, f'{prefix}{key}.')
+            arg_list.extend(nested_args)
+        elif value is not None:
+            concat_key = f'{prefix}{key}'
+            if includes is not None and concat_key not in includes:
+                continue
+            if excludes is not None and concat_key in excludes:
+                continue
+            arg_list.append(f'--{concat_key}')
+            arg_list.append(f'{value}')
+
+    return arg_list
 
 
 def config_backup(cfg: Namespace):
