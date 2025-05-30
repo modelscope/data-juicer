@@ -132,7 +132,7 @@ def setup_logger(save_dir,
         return
 
     loguru_format = (
-        '<green>{time:YYYY-MM-DD HH:mm:ss}</green> | '
+        '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | '
         '<level>{level: <8}</level> | '
         '<cyan>{name}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>')
 
