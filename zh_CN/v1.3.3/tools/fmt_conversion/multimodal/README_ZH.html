@@ -1,0 +1,724 @@
+<!doctype html>
+<html class="no-js" lang="zh-CN" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="索引" href="../../../genindex.html" /><link rel="search" title="搜索" href="../../../search.html" /><link rel="next" title="后微调工具" href="../post_tuning_dialog/README_ZH.html" /><link rel="prev" title="格式转换工具" href="../README_ZH.html" />
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>多模态工具 - data-juicer</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sidebar-menu.css?v=dcc41d8a" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index_ZH.html"><div class="brand">data-juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index_ZH.html">
+  
+  
+  <span class="sidebar-brand-text">data-juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="搜索" name="q" aria-label="搜索">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">帮助文档</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/RecipeGallery_ZH.html">数据菜谱Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DatasetCfg_ZH.html">数据集配置指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/BadDataExhibition_ZH.html">“坏”数据展览</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_SORA_ZH.html">动机</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_SORA_ZH.html#id2">路线图</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_service_ZH.html">启动服务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_service_ZH.html#api">API调用</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_service_ZH.html#id7">演示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DeveloperGuide_ZH.html">开发者指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Sandbox.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Sandbox.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Sandbox-ZH.html">用户指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Sandbox-ZH.html#id8">开发者指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html#news">News</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html#contribution-to-this-survey">Contribution to This Survey</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html#references">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html#section-mentioned-papers-retrieval-list">"Section - Mentioned Papers" Retrieval List</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../demos/README_ZH.html">演示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../demos/auto_evaluation_helm/README_ZH.html">自动化评测：HELM 评测及可视化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../demos/role_playing_system_prompt/README_ZH.html">为LLM构造角色扮演的system prompt</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">工具</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../distributed_deduplication/README_ZH.html">分布式模糊去重工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evaluator/README_ZH.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evaluator/gpt_eval/README_ZH.html">GPT EVAL：使用 OpenAI API 评测大模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evaluator/recorder/README_ZH.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../README_ZH.html">格式转换工具</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">多模态工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../post_tuning_dialog/README_ZH.html">后微调工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hpo/README_ZH.html">数据菜谱的自动化超参优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../postprocess/README_ZH.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocess/README_ZH.html">预处理工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quality_classifier/README_ZH.html">数据打分能力</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quality_classifier/README_ZH.html#gpt3">复现GPT3的质量分类器套件</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">第三方</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../thirdparty/LLM_ecosystems/README_ZH.html">大语言模型生态</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../thirdparty/models/README_ZH.html">第三方模型库</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of data_juicer.core package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.core.data.html">data_juicer.core.data package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.core.executor.html">data_juicer.core.executor package</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of data_juicer.ops package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.aggregator.html">data_juicer.ops.aggregator package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.grouper.html">data_juicer.ops.grouper package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+    <div class="current-info">
+        <span class="current-lang">zh-CN</span>|<span class="current-version">v1.3.3</span>
+    </div>
+    <div class="dropdown-panel">
+        
+        <div class="section">
+            <dt>Language</dt>
+            <dd>
+                
+                <a href="../../../../../en/v1.3.3/tools/fmt_conversion/multimodal/README.html"
+                    >
+                    English
+                </a>
+                
+                <a href="../../../../../zh_CN/v1.3.3/tools/fmt_conversion/multimodal/README_ZH.html"
+                    >
+                    简体中文
+                </a>
+                
+            </dd>
+        </div>
+        
+
+        
+        <div class="section">
+            <dt>Version</dt>
+            <dd>
+                    <a href="README_ZH.html">v1.3.3</a>
+                    <a href="../../../../main/tools/fmt_conversion/multimodal/README_ZH.html">main</a>
+            </dd>
+        </div>
+        
+    </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../../_sources/tools/fmt_conversion/multimodal/README_ZH.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="id1">
+<h1>多模态工具<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>这个文件夹包含了一些在使用 Data-Juicer 之前和之后可以用上的多模态数据集处理脚本和工具。</p>
+<section id="id2">
+<h2>绝对路径转相对路径<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>经过Data-Juicer处理过的数据，输出的多模态数据的路径为绝对路径，并且可能是来自不同源的多模态数据，它们被存储在不同的根目录下。
+为了将绝对路径转化为相对路径，并且方便数据迁移，我们这里提供了将绝对路径转化为相对路径的工具，并且支持将相关的多源多模态数据拷贝到同一目录下。
+该工具输入和输出都是 Data-Juicer 格式的数据，如果想要转化成其他格式数据并保持相对路径，请先运行该工具再执行下一节的数据集格式转换。
+可以运行以下命令来了解绝对路径转化相对路径工具的详细用法：</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/fmt_conversion/multimodal/absolute_path_to_relative_path.py<span class="w"> </span>--help
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h2>数据集格式转换<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>由于不同多模态数据集和工作之间的数据集格式差异较大， Data-Juicer 提出了一种新颖的、中间的、
+基于文本的、交替的多模态数据格式，主要基于一些按块（chunk）组织的格式，如MMC4数据集格式。</p>
+<p>在 Data-Juicer 的格式中，一个多模态样本或者文档基于一段文本组织，其由若干个文本块组成。
+每个文本块是一个语义单元，单个文本块中包括的所有多模态信息都应该在谈论同样的事情，并且它们彼此语义上是对齐的。</p>
+<p>下面这里是一个 Data-Juicer 格式的多模态样本示例。</p>
+<ul class="simple">
+<li><p>它包括4个文本块，它们由特殊token <code class="docutils literal notranslate"><span class="pre">&lt;|__dj__eoc|&gt;</span></code> 分割开。</p></li>
+<li><p>除了文本，这个样本还包括3种其他模态：图像（images），音频（audios），视频（videos）。
+它们保存在硬盘上，而它们的硬盘路径列举在了样本中对应的一级字段的列表里。</p></li>
+<li><p>在文本中，其他模态被表示为了特殊token（例如，图像 -- <code class="docutils literal notranslate"><span class="pre">&lt;__dj__image&gt;</span></code>）。
+每种模态的特殊token所表示的数据按照它们在文本中出现的顺序对应到列表中的路径上。
+（例如，第3个文本块中的2个图像token分别对应了图像路径列表中的antarctica_map图像和europe_map图像）</p></li>
+<li><p>在单个文本块中，可以由多种模态的数据以及多个模态特殊token，它们彼此是语义上对齐的，而且它们与该文本块中的文本也是语义对齐的。
+这些模态特殊token在文本块中可以处于任意位置（通常处于文本前或者文本后）</p></li>
+<li><p>不同于纯文本样本，对于多模态样本来说，为其他模态计算的stats可能为针对多模态数据列表的一个stats列表（如例子中的image_widths）。</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;__dj__image&gt; Antarctica is Earth&#39;s southernmost and least-populated continent. &lt;|__dj__eoc|&gt; &quot;</span>
+          <span class="s2">&quot;&lt;__dj__video&gt; &lt;__dj__audio&gt; Situated almost entirely south of the Antarctic Circle and surrounded by the &quot;</span>
+          <span class="s2">&quot;Southern Ocean (also known as the Antarctic Ocean), it contains the geographic South Pole. &lt;|__dj__eoc|&gt; &quot;</span>
+          <span class="s2">&quot;Antarctica is the fifth-largest continent, being about 40</span><span class="si">% la</span><span class="s2">rger than Europe, &quot;</span>
+          <span class="s2">&quot;and has an area of 14,200,000 km2 (5,500,000 sq mi). &lt;__dj__image&gt; &lt;__dj__image&gt; &lt;|__dj__eoc|&gt; &quot;</span>
+          <span class="s2">&quot;Most of Antarctica is covered by the Antarctic ice sheet, &quot;</span>
+          <span class="s2">&quot;with an average thickness of 1.9 km (1.2 mi). &lt;|__dj__eoc|&gt;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;images&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&quot;path/to/the/image/of/antarctica_snowfield&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;path/to/the/image/of/antarctica_map&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;path/to/the/image/of/europe_map&quot;</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;audios&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&quot;path/to/the/audio/of/sound_of_waves_in_Antarctic_Ocean&quot;</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;videos&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&quot;path/to/the/video/of/remote_sensing_view_of_antarctica&quot;</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="s2">&quot;customized&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;xxx&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;stats&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;lang&quot;</span><span class="p">:</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image_widths&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">224</span><span class="p">,</span> <span class="mi">336</span><span class="p">,</span> <span class="mi">512</span><span class="p">],</span>
+    <span class="o">...</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>根据这个格式，Data-Juicer 为一些流行的多模态工作提供了若干数据集格式转换工具。</p>
+<p>这些工具分为两种类型：</p>
+<ul class="simple">
+<li><p>其他格式到 Data-Juicer 格式的转换：这些工具在 <code class="docutils literal notranslate"><span class="pre">source_format_to_data_juicer_format</span></code> 目录中。它们可以帮助将其他格式的数据集转换为 Data-Juicer 格式的目标数据集。</p></li>
+<li><p>Data-Juicer 格式到其他格式的转换：这些工具在 <code class="docutils literal notranslate"><span class="pre">data_juicer_format_to_target_format</span></code> 目录中。它们可以帮助将 Data-Juicer 格式的数据集转换为目标格式的数据集。</p></li>
+</ul>
+<p>目前，Data-Juicer 支持的数据集格式在下面表格中列出。</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>格式</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>source_format_to_data_juicer_format</p></th>
+<th class="head"><p>data_juicer_format_to_target_format</p></th>
+<th class="head"><p>格式参考</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>类LLaVA格式</p></td>
+<td><p>图像-文本</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">llava_to_dj.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dj_to_llava.py</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format">格式描述</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>类MMC4格式</p></td>
+<td><p>图像-文本</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mmc4_to_dj.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dj_to_mmc4.py</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/allenai/mmc4#documents">格式描述</a></p></td>
+</tr>
+<tr class="row-even"><td><p>类WavCaps格式</p></td>
+<td><p>音频-文本</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wavcaps_to_dj.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dj_to_wavcaps.py</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/XinhaoMei/WavCaps#table-of-contents">格式描述</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>类Video-ChatGPT格式</p></td>
+<td><p>视频-文本</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">video_chatgpt_to_dj.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dj_to_video_chatgpt.py</span></code></p></td>
+<td><p>[格式描述](<a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tools/fmt_conversion/multimodal/">https://github.com/modelscope/data-juicer/blob/main/tools/fmt_conversion/multimodal/</a> https:/github.com/mbzuai-oryx/Video-ChatGPT/tree/main/data)</p></td>
+</tr>
+<tr class="row-even"><td><p>类Youku-mPLUG格式</p></td>
+<td><p>视频-文本</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">youku_to_dj.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dj_to_youku.py</span></code></p></td>
+<td><p><a class="reference external" href="https://modelscope.cn/datasets/modelscope/Youku-AliceMind/summary">格式描述</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>类InternVid格式</p></td>
+<td><p>视频-文本</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">internvid_to_dj.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dj_to_internvid.py</span></code></p></td>
+<td><p><a class="reference external" href="https://huggingface.co/datasets/OpenGVLab/InternVid">格式描述</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>对于所有工具，您可以运行以下命令来了解它们的详细用法：</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># 例如：llava_to_dj.py</span>
+python<span class="w"> </span>tools/fmt_conversion/multimodal/source_format_to_data_juicer_format/llava_to_dj.py<span class="w"> </span>--help
+</pre></div>
+</div>
+<p>在使用这些工具之前，您可能需要查看上表中每个格式的参考资料，以更好地了解详细的格式信息，并理解每个工具的参数含义。</p>
+<section id="id4">
+<h3>注意事项<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<p>将源数据集转换为 Data-Juicer 格式并再次转换回来后，可能会有一些微小的差异。然而，这些差异几乎不会影响数据集的语义信息。下面我们将详细展示每个支持的源格式中可能存在的这些微小差异。</p>
+<section id="llava">
+<h4>类LLaVA格式<a class="headerlink" href="#llava" title="Link to this heading">¶</a></h4>
+<p>类LLaVA格式数据集的格式在 <a class="reference external" href="https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format">这里</a> 有具体的定义。尽管它很简单，但在实际场景中，某些样本可能会出现轻微的变体。</p>
+<p>这里我们以LLaVA的 <a class="reference external" href="https://huggingface.co/datasets/liuhaotian/LLaVA-Instruct-150K/blob/main/llava_v1_5_mix665k.json">视觉指令微调数据集</a> 为例，展示这些变化如何影响数据集的格式。下表显示了原始数据集和经过若干处理后数据集之间不同样本的数量。原始数据集中有665,298个样本。</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>处理过程</p></th>
+<th class="head"><p>不同样本数目</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1. 运行 <code class="docutils literal notranslate"><span class="pre">llava_to_dj.py</span></code> 和 <code class="docutils literal notranslate"><span class="pre">dj_to_llava.py</span></code></p></td>
+<td><p>113,501</p></td>
+</tr>
+<tr class="row-odd"><td><p>2. 将源数据集的id字段由整型转为字符串类型</p></td>
+<td><p>41,361</p></td>
+</tr>
+<tr class="row-even"><td><p>3. 将源数据集中对话的所有value字段前后的空格去除</p></td>
+<td><p>40,688</p></td>
+</tr>
+<tr class="row-odd"><td><p>4. 在转换后的数据集样本中添加 <code class="docutils literal notranslate"><span class="pre">'model':</span> <span class="pre">''</span></code> 字段</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>值得注意的是，处理过程 2-4 并不会影响数据集中样本对话的语义，因此我们可以认为数据集格式转换工具的转换结果能够对齐源数据集。</p>
+<p>最后，只有1个样本不同。如下所示，原因为其对话中包含一些额外的无用字段（&quot;text&quot;，&quot;markdown&quot;）。但是，原始数据集和转换后的数据集之间的&quot;from&quot;和&quot;value&quot;字段是相同的，因此可以认为这个样本也是对齐的。</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="err">#</span><span class="w"> </span><span class="err">原始对话</span>
+<span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="s2">&quot;human&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;sentry self hosted api 504&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="s2">&quot;gpt&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="s2">&quot;A 504 error when using the Sentry self-hosted API typically indicates that the API request timed out. This means that the server hosting the API did not receive a response from the client within the expected time frame.\n\nHere are a few possible reasons for a 504 error when using the Sentry self-hosted API:\n\nSlow network connection: The API request may be taking longer than expected due to a slow network connection. Check your network connection and try again.\n\nServer overload: The server hosting the API may be overloaded with requests. Try again later when the server load has decreased.\n\nLarge dataset: If you are trying to retrieve a large amount of data, the API request may take longer than expected. Try breaking up the request into smaller chunks or optimizing the query to retrieve only the necessary data.\n\nAPI endpoint issues: There may be issues with the specific API endpoint you are using. Try using a different endpoint or contact the Sentry support team for assistance.\n\nTo resolve a 504 error when using the Sentry self-hosted API, try the following:\n\nCheck your network connection and ensure that it is stable.\n\nVerify that the server hosting the API is not overloaded with requests.\n\nOptimize the query to retrieve only the necessary data.\n\nTry using a different API endpoint.\n\nIf the issue persists, contact the Sentry support team for assistance.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;A 504 error when using the Sentry self-hosted API typically indicates that the API request timed out. This means that the server hosting the API did not receive a response from the client within the expected time frame.\n\nHere are a few possible reasons for a 504 error when using the Sentry self-hosted API:\n\n1. Slow network connection: The API request may be taking longer than expected due to a slow network connection. Check your network connection and try again.\n2. Server overload: The server hosting the API may be overloaded with requests. Try again later when the server load has decreased.\n3. Large dataset: If you are trying to retrieve a large amount of data, the API request may take longer than expected. Try breaking up the request into smaller chunks or optimizing the query to retrieve only the necessary data.\n4. API endpoint issues: There may be issues with the specific API endpoint you are using. Try using a different endpoint or contact the Sentry support team for assistance.\n\nTo resolve a 504 error when using the Sentry self-hosted API, try the following:\n\n1. Check your network connection and ensure that it is stable.\n2. Verify that the server hosting the API is not overloaded with requests.\n3. Optimize the query to retrieve only the necessary data.\n4. Try using a different API endpoint.\n\nIf the issue persists, contact the Sentry support team for assistance.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;markdown&quot;</span><span class="p">:{</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;answer-markdown&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;answer&quot;</span><span class="p">:</span><span class="s2">&quot;A 504 error when using the Sentry self-hosted API typically indicates that the API request timed out. This means that the server hosting the API did not receive a response from the client within the expected time frame.\n\nHere are a few possible reasons for a 504 error when using the Sentry self-hosted API:\n\n1. Slow network connection: The API request may be taking longer than expected due to a slow network connection. Check your network connection and try again.\n\n2. Server overload: The server hosting the API may be overloaded with requests. Try again later when the server load has decreased.\n\n3. Large dataset: If you are trying to retrieve a large amount of data, the API request may take longer than expected. Try breaking up the request into smaller chunks or optimizing the query to retrieve only the necessary data.\n\n4. API endpoint issues: There may be issues with the specific API endpoint you are using. Try using a different endpoint or contact the Sentry support team for assistance.\n\nTo resolve a 504 error when using the Sentry self-hosted API, try the following:\n\n1. Check your network connection and ensure that it is stable.\n\n2. Verify that the server hosting the API is not overloaded with requests.\n\n3. Optimize the query to retrieve only the necessary data.\n\n4. Try using a different API endpoint.\n\nIf the issue persists, contact the Sentry support team for assistance.&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">]</span>
+
+<span class="err">#</span><span class="w"> </span><span class="err">转换后的对话</span>
+<span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="s2">&quot;human&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;sentry self hosted api 504&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="s2">&quot;gpt&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;A 504 error when using the Sentry self-hosted API typically indicates that the API request timed out. This means that the server hosting the API did not receive a response from the client within the expected time frame.\n\nHere are a few possible reasons for a 504 error when using the Sentry self-hosted API:\n\n1. Slow network connection: The API request may be taking longer than expected due to a slow network connection. Check your network connection and try again.\n2. Server overload: The server hosting the API may be overloaded with requests. Try again later when the server load has decreased.\n3. Large dataset: If you are trying to retrieve a large amount of data, the API request may take longer than expected. Try breaking up the request into smaller chunks or optimizing the query to retrieve only the necessary data.\n4. API endpoint issues: There may be issues with the specific API endpoint you are using. Try using a different endpoint or contact the Sentry support team for assistance.\n\nTo resolve a 504 error when using the Sentry self-hosted API, try the following:\n\n1. Check your network connection and ensure that it is stable.\n2. Verify that the server hosting the API is not overloaded with requests.\n3. Optimize the query to retrieve only the necessary data.\n4. Try using a different API endpoint.\n\nIf the issue persists, contact the Sentry support team for assistance.&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="mmc4">
+<h4>类MMC4格式<a class="headerlink" href="#mmc4" title="Link to this heading">¶</a></h4>
+<p>类MMC4数据集的格式在 <a class="reference external" href="https://github.com/allenai/mmc4#documents">这里</a> 定义。除了在转换为Data-Juicer格式时使用的<code class="docutils literal notranslate"><span class="pre">image_info</span></code>和<code class="docutils literal notranslate"><span class="pre">text_list</span></code>之外，还有一个重要的字段<code class="docutils literal notranslate"><span class="pre">similarity_matrix</span></code>，即相似度矩阵。相似度矩阵是一个形状为<code class="docutils literal notranslate"><span class="pre">len(image_info)</span> <span class="pre">x</span> <span class="pre">len(text_list)</span></code>的矩阵，这意味着它高度依赖于图像和文本句子的数量及其顺序。</p>
+<p>然而，当使用Data-Juicer处理这些数据集时，图像或句子可能会被Filter算子从样本中移除，并且它们可能会被一些Mapper算子修改。因此，在处理后，这个相似度矩阵可能无法与<code class="docutils literal notranslate"><span class="pre">image_info</span></code>或<code class="docutils literal notranslate"><span class="pre">text_list</span></code>对齐。如果用户在后续使用中需要这个矩阵，那您应该注意到这一点。</p>
+<p>除了这些额外字段外，针对类MMC4格式的工具可以完美地将类MMC4格式的数据集转换为Data-Juicer格式的数据集，并将它们转换回去~</p>
+</section>
+<section id="wavcaps">
+<h4>类WavCaps格式<a class="headerlink" href="#wavcaps" title="Link to this heading">¶</a></h4>
+<p><a class="reference external" href="https://github.com/XinhaoMei/WavCaps#dataset">WavCaps</a> 数据集由 <a class="reference external" href="https://freesound.org/">FreeSound</a>，<a class="reference external" href="https://sound-effects.bbcrewind.co.uk/">BBC Sound Effects</a>，<a class="reference external" href="https://soundbible.com/">SoundBible</a>，<a class="reference external" href="https://research.google.com/audioset/download_strong.html">AudioSet Strongly-labelled Subset</a> 四个子数据集组成，每个数据集里都有不同的字段。例如SoundBible里包含了‘description’字段，而该字段在AudioSet里并不存在。为了保证不同子数据集在转换后能够正常合并，在wavcaps_to_dj阶段使用了所有子数据集字段的并集，并在dj_to_wavcaps阶段完整保留了所有字段。</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="err">#</span><span class="w"> </span><span class="err">原始数据集</span>
+<span class="p">{</span><span class="w"> </span><span class="nt">&quot;num_captions_per_audio&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">        </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Airplane Landing Airport&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Large commercial airplane landing at an airport runway.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Daniel Simion&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;href&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2219-Airplane-Landing-Airport.html&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;caption&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;An airplane is landing.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2219&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">14.1424375</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;audio&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wav_path&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;download_link&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://soundbible.com/grab.php?id=2219&amp;type=wav&quot;</span><span class="p">}]</span>
+<span class="p">}</span>
+
+<span class="err">#</span><span class="w"> </span><span class="err">转换后数据集</span>
+<span class="p">{</span><span class="w"> </span><span class="nt">&quot;num_captions_per_audio&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">        </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Airplane Landing Airport&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Large commercial airplane landing at an airport runway.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Daniel Simion&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;href&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2219-Airplane-Landing-Airport.html&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;caption&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;An airplane is landing.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2219&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">14.1424375</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;audio&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wav_path&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;download_link&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://soundbible.com/grab.php?id=2219&amp;type=wav&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="video-chatgpt">
+<h4>类Video-ChatGPT格式<a class="headerlink" href="#video-chatgpt" title="Link to this heading">¶</a></h4>
+<p>Video-ChatGPT数据集包含3种统一格式的数据：</p>
+<ul class="simple">
+<li><p>视频摘要主题</p></li>
+<li><p>基于描述的问题答案（探索空间、时间、关系和推理概念）；</p></li>
+<li><p>以及创意/生成性问题解答。
+它们都遵循“&lt;question,answer,video_id&gt;”格式，其中“video_id”表示为YouTube视频的id：“v_youtube_id”。 我们假设用户已经下载了这些视频，在使用转换工具时需要指定相应的存储目录。</p></li>
+</ul>
+</section>
+<section id="youku-mplug">
+<h4>类Youku-mPLUG格式<a class="headerlink" href="#youku-mplug" title="Link to this heading">¶</a></h4>
+<p>Youku-mPLUG数据集中一共有4种类型的格式：pretrain，classification，
+retrieval，captioning。它们在字段名称或者其他属性上会有轻微的差异，但是所有类型都遵从 <code class="docutils literal notranslate"><span class="pre">&lt;video,</span> <span class="pre">caption&gt;</span></code> 的格式。</p>
+</section>
+<section id="internvid">
+<h4>类InternVid格式<a class="headerlink" href="#internvid" title="Link to this heading">¶</a></h4>
+<p>InternVid数据集包括4个字段：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">YoutubeID</span></code>: 样本中使用的视频的Youtube ID。我们假设用户已经下载了这些视频，
+并且这个字段已经被替换为了视频的存储路径。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Start_timestamp</span></code>: 与caption对应的视频片段的开始时间戳字符串。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">End_timestamp</span></code>: 与caption对应的视频片段的结束时间戳字符串</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Caption</span></code>: 与视频片段对应的caption。</p></li>
+</ul>
+<p>正如我们看到，该数据集中的caption对应到了一段由开始/结束时间戳指定的视频片段，而非整段视频。
+因此，如果 <code class="docutils literal notranslate"><span class="pre">cut_videos</span></code> 参数设置为 True，针对该数据集的转换工具会为您剪辑出指定的视频片段。
+您也可以在转换前自行对下载的视频进行剪辑。</p>
+</section>
+<section id="msr-vtt">
+<h4>类MSR-VTT格式<a class="headerlink" href="#msr-vtt" title="Link to this heading">¶</a></h4>
+<p>MSR-VTT数据集包含多个字段，主要用到2个字段：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">video_id</span></code>: 样本中使用的视频的文件名，未包含文件后缀。我们假设用户已经下载了这些视频。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">caption</span></code>: 与视频对应的caption。</p></li>
+</ul>
+</section>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../post_tuning_dialog/README_ZH.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">后微调工具</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../README_ZH.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">格式转换工具</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">多模态工具</a><ul>
+<li><a class="reference internal" href="#id2">绝对路径转相对路径</a></li>
+<li><a class="reference internal" href="#id3">数据集格式转换</a><ul>
+<li><a class="reference internal" href="#id4">注意事项</a><ul>
+<li><a class="reference internal" href="#llava">类LLaVA格式</a></li>
+<li><a class="reference internal" href="#mmc4">类MMC4格式</a></li>
+<li><a class="reference internal" href="#wavcaps">类WavCaps格式</a></li>
+<li><a class="reference internal" href="#video-chatgpt">类Video-ChatGPT格式</a></li>
+<li><a class="reference internal" href="#youku-mplug">类Youku-mPLUG格式</a></li>
+<li><a class="reference internal" href="#internvid">类InternVid格式</a></li>
+<li><a class="reference internal" href="#msr-vtt">类MSR-VTT格式</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="../../../_static/documentation_options.js?v=79f47a88"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/translations.js?v=beaddf03"></script>
+    </body>
+</html>

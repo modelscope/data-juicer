@@ -1,0 +1,706 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>data_juicer.core.adapter - data-juicer</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sidebar-menu.css?v=dcc41d8a" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+<p>
+  <strong>
+    
+    You're reading the documentation from the main branch.
+    For the latest released version, please have a look at <a href="../../../../v1.3.3/index.html">v1.3.3</a>.
+    
+  </strong>
+</p>
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">data-juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">data-juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial/DJ-Cookbook.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial/Installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial/QuickStart.html">Quick Start</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">docs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/RecipeGallery.html">Data Recipe Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DatasetCfg.html">Dataset Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/BadDataExhibition.html">“Bad” Data Exhibition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_SORA.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_service.html">DJ_service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DeveloperGuide.html">How-to Guide for Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Distributed.html">Distributed Data Processing in Data-Juicer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Sandbox.html">Sandbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../demos/README.html">Demos</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/distributed_deduplication/README.html">Distributed Fuzzy Deduplication Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/evaluator/README.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/evaluator/gpt_eval/README.html">GPT EVAL: Evaluate your model with OpenAI API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/evaluator/recorder/README.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/fmt_conversion/README.html">Format Conversion Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/fmt_conversion/multimodal/README.html">Multimodal Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/fmt_conversion/post_tuning_dialog/README.html">Post Tuning Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/hpo/README.html">Hyper-parameter Optimization for Data Recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/mm_eval/inception_metrics/README.html">Metrics for video generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/postprocess/README.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/preprocess/README.html">Preprocess Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/quality_classifier/README.html">Data Scoring</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">thirdparty</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../thirdparty/LLM_ecosystems/README.html">LLM Ecosystems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../thirdparty/models/README.html">Third-party Model Library</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of data_juicer.core package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.core.data.html">data_juicer.core.data package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.core.executor.html">data_juicer.core.executor package</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of data_juicer.ops package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.aggregator.html">data_juicer.ops.aggregator package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.grouper.html">data_juicer.ops.grouper package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+    <div class="current-info">
+        <span class="current-lang">en</span>|<span class="current-version">main</span>
+    </div>
+    <div class="dropdown-panel">
+        
+        <div class="section">
+            <dt>Language</dt>
+            <dd>
+                
+                <a href="../../../../../en/main/_modules/data_juicer/core/adapter.html"
+                    class="active" >
+                    English
+                </a>
+                
+                <a href="../../../../../zh_CN/main/_modules/data_juicer/core/adapter_ZH.html"
+                    >
+                    简体中文
+                </a>
+                
+            </dd>
+        </div>
+        
+
+        
+        <div class="section">
+            <dt>Version</dt>
+            <dd>
+                    <a href="../../../../v1.3.3/index.html">v1.3.3</a>
+                    <a href="adapter.html">main</a>
+            </dd>
+        </div>
+        
+    </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for data_juicer.core.adapter</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">concatenate_datasets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_MAX_BATCH_SIZE</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.analysis.measure</span><span class="w"> </span><span class="kn">import</span> <span class="n">RelatedTTestMeasure</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.monitor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Monitor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNFORKABLE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.cache_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataset_cache_control</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.process_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_mp</span>
+
+
+<div class="viewcode-block" id="Adapter">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Adapter</span><span class="p">:</span>
+
+    <span class="n">MAX_BATCH_SIZE</span> <span class="o">=</span> <span class="mi">10000</span>
+
+<div class="viewcode-block" id="Adapter.__init__">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
+
+        <span class="c1"># insight mining related</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_insight_mining</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">open_insight_mining</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">,</span> <span class="s1">&#39;open_insight_mining&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="c1"># resource probe related</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span> <span class="o">=</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">monitor_current_resources</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Adapter.execute_and_probe">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.execute_and_probe">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">execute_and_probe</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">,</span> <span class="n">sample_interval</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process the input dataset and probe related information for each OP in</span>
+<span class="sd">        the specified operator list.</span>
+
+<span class="sd">        For now, we support the following targets to probe:</span>
+<span class="sd">        &quot;resource&quot;: resource utilization for each OP.</span>
+<span class="sd">        &quot;speed&quot;: average processing speed for each OP.</span>
+
+<span class="sd">        The probe result is a list and each item in the list is the probe</span>
+<span class="sd">        result for each OP.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">operators</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">operators</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># number of test samples</span>
+        <span class="n">sample_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+        <span class="c1"># resource utilization list</span>
+        <span class="n">resource_util_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># probe for each OP</span>
+        <span class="n">unforkable_operators</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">UNFORKABLE</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">operators</span><span class="p">:</span>
+            <span class="c1"># select suitable mp method for each OP</span>
+            <span class="n">mp_context</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;forkserver&#39;</span><span class="p">,</span> <span class="s1">&#39;spawn&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">()</span> <span class="ow">or</span> <span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="n">unforkable_operators</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">setup_mp</span><span class="p">(</span><span class="n">mp_context</span><span class="p">)</span>
+            <span class="c1"># expand the test dataset according to the runtime number of</span>
+            <span class="c1"># processes to ensure enough data for a batch and probe the true</span>
+            <span class="c1"># resource utilization for each OP</span>
+            <span class="n">expanded_dataset</span> <span class="o">=</span> <span class="n">concatenate_datasets</span><span class="p">([</span><span class="n">dataset</span><span class="p">]</span> <span class="o">*</span>
+                                                    <span class="n">op</span><span class="o">.</span><span class="n">runtime_np</span><span class="p">())</span>
+
+            <span class="c1"># set the test batch size and save the old one</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">():</span>
+                <span class="n">old_batch_size</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">batch_size</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">sample_num</span>
+
+            <span class="c1"># run single op and monitor the resource utilization</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">resource_util_per_op</span> <span class="o">=</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">monitor_func</span><span class="p">(</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">run</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">expanded_dataset</span><span class="p">,</span> <span class="p">),</span>
+                <span class="n">sample_interval</span><span class="o">=</span><span class="n">sample_interval</span><span class="p">)</span>
+
+            <span class="c1"># calculate speed</span>
+            <span class="n">resource_util_per_op</span><span class="p">[</span>
+                <span class="s1">&#39;speed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_num</span> <span class="o">/</span> <span class="n">resource_util_per_op</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
+            <span class="n">resource_util_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resource_util_per_op</span><span class="p">)</span>
+
+            <span class="c1"># # restore the batch size</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">():</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">old_batch_size</span>
+
+        <span class="k">return</span> <span class="n">resource_util_list</span></div>
+
+
+<div class="viewcode-block" id="Adapter.take_batch">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.take_batch">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">take_batch</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Split the dataset into batches based on configuration and load factor.</span>
+
+<span class="sd">        :param dataset: The dataset to be split</span>
+<span class="sd">        :param config: Configuration settings, including batch size</span>
+<span class="sd">        :return: An iterator of batches</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get initial batch size</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">,</span> <span class="n">DEFAULT_MAX_BATCH_SIZE</span><span class="p">)</span>
+        <span class="c1"># should be in [1, 10000]</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">Adapter</span><span class="o">.</span><span class="n">MAX_BATCH_SIZE</span><span class="p">)</span>
+
+        <span class="c1"># check if there are enough samples</span>
+        <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">batch_size</span> <span class="o">&gt;=</span> <span class="n">num_samples</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dataset</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Adapter.adapt_workloads">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.adapt_workloads">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">adapt_workloads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Manage the scheduling and load balancing for the dataset processing.</span>
+
+<span class="sd">        :param dataset: The dataset that needs to be processed</span>
+<span class="sd">        :param operators: Operators in the data recipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: set batch size to 1 for all OPs for probing</span>
+        <span class="n">load_analysis_res</span><span class="p">,</span> <span class="n">probed_batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">probe_small_batch</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">)</span>
+
+        <span class="c1"># calculate batch size for each OP according to the analysis results</span>
+        <span class="n">bs_per_op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size_strategy</span><span class="p">(</span><span class="n">load_analysis_res</span><span class="p">,</span>
+                                             <span class="n">base_bs</span><span class="o">=</span><span class="n">probed_batch_size</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">bs_per_op</span></div>
+
+
+<div class="viewcode-block" id="Adapter.probe_small_batch">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.probe_small_batch">[docs]</a>
+    <span class="nd">@dataset_cache_control</span><span class="p">(</span><span class="n">on</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">probe_small_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform small batch pre-execution to probe available resources,</span>
+<span class="sd">        current load and estimated OP speed, returning load factors and speed</span>
+<span class="sd">        ranks for each OP.</span>
+
+<span class="sd">        Notice: the probe should be run with cache enabled to avoid removing</span>
+<span class="sd">        the cache files of the input dataset.</span>
+
+<span class="sd">        :param dataset: The dataset to pre-execute small batch on</span>
+<span class="sd">        :param operators: The OP list to be pre-execution and probe</span>
+<span class="sd">        :return: A list of probe results for each OP and the length of data</span>
+<span class="sd">            batch to probe.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># take a small batch</span>
+        <span class="n">data_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">take_batch</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="c1"># process and monitor the resource utilization</span>
+        <span class="n">resource_util_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">execute_and_probe</span><span class="p">(</span><span class="n">data_batch</span><span class="p">,</span> <span class="n">operators</span><span class="p">)</span>
+        <span class="c1"># analyze resource utilization</span>
+        <span class="n">analysis_res</span> <span class="o">=</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">analyze_resource_util_list</span><span class="p">(</span><span class="n">resource_util_list</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">analysis_res</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_batch</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Adapter.batch_size_strategy">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.batch_size_strategy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">batch_size_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_analysis_res</span><span class="p">,</span> <span class="n">base_bs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">util_th</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decide the batch size for each op according to their workload analysis</span>
+<span class="sd">        result and expected utilization threshold. We need to guarantee that</span>
+<span class="sd">        the resource utilization won&#39;t exceed the threshold. Now we only</span>
+<span class="sd">        consider the buckets effect, which means the max batch size is decided</span>
+<span class="sd">        by the max utilization of all types of resources except GPU util</span>
+<span class="sd">        (decided by num_proc).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">batch_size_per_op</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># compute left utils according to the util_th</span>
+        <span class="n">left_utils</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;util.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="s1">&#39;GPU&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">left_utils</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">util_th</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">load_analysis_res</span><span class="p">:</span>
+            <span class="n">max_util</span> <span class="o">=</span> <span class="mf">1e-5</span>
+            <span class="n">max_key</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">left_utils</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">it</span><span class="p">:</span> <span class="n">it</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">analysis_res</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;resource_analysis&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">analysis_res</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;util.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="s1">&#39;GPU&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">used_util</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="n">analysis_res</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;max&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">used_util</span> <span class="o">&gt;</span> <span class="n">max_util</span><span class="p">:</span>
+                    <span class="n">max_util</span> <span class="o">=</span> <span class="n">used_util</span>
+                    <span class="n">max_key</span> <span class="o">=</span> <span class="n">key</span>
+            <span class="n">load_factor</span> <span class="o">=</span> <span class="n">left_utils</span><span class="p">[</span><span class="n">max_key</span><span class="p">]</span> <span class="o">/</span> <span class="n">max_util</span>
+            <span class="n">bs_this_op</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">base_bs</span> <span class="o">*</span> <span class="n">load_factor</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">MAX_BATCH_SIZE</span><span class="p">)</span>
+            <span class="n">batch_size_per_op</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bs_this_op</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">batch_size_per_op</span></div>
+
+
+<div class="viewcode-block" id="Adapter.analyze_small_batch">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.analyze_small_batch">[docs]</a>
+    <span class="nd">@dataset_cache_control</span><span class="p">(</span><span class="n">on</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">analyze_small_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">current_state</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform small batch analysis to probe the current OP-wise stats/meta</span>
+<span class="sd">        distributions. The analyzed results will be stored in the directory</span>
+<span class="sd">        `{work_dir}/insight_mining`.</span>
+
+<span class="sd">        Notice: the probe should be run with cache enabled to avoid removing</span>
+<span class="sd">        the cache files of the input dataset.</span>
+
+<span class="sd">        :param dataset: The dataset to analyze small batch on</span>
+<span class="sd">        :param current_state: A string to indicate the current state of the</span>
+<span class="sd">            input dataset. It usually consists of a number of the index of the</span>
+<span class="sd">            OP processed just now and the OP name, e.g. &quot;1_text_length_filter&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># prepare analyzer config</span>
+        <span class="n">new_cfg</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="c1"># check ops to mine</span>
+        <span class="n">new_cfg</span><span class="o">.</span><span class="n">auto</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">new_cfg</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_cfg</span><span class="o">.</span><span class="n">op_list_to_mine</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">new_cfg</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="p">[{</span>
+                <span class="n">op_name</span><span class="p">:</span> <span class="p">{}</span>
+            <span class="p">}</span> <span class="k">for</span> <span class="n">op_name</span> <span class="ow">in</span> <span class="n">new_cfg</span><span class="o">.</span><span class="n">op_list_to_mine</span><span class="p">]</span>
+        <span class="c1"># update work dir</span>
+        <span class="n">new_cfg</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;insight_mining&#39;</span><span class="p">,</span>
+                                        <span class="n">current_state</span><span class="p">)</span>
+        <span class="n">new_cfg</span><span class="o">.</span><span class="n">export_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span>
+                                           <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">current_state</span><span class="si">}</span><span class="s1">.jsonl&#39;</span><span class="p">)</span>
+        <span class="c1"># close insight mining and monitor for inner analysis</span>
+        <span class="n">new_cfg</span><span class="o">.</span><span class="n">open_insight_mining</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">new_cfg</span><span class="o">.</span><span class="n">open_monitor</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># init the analyzer</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
+        <span class="n">analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">new_cfg</span><span class="p">)</span>
+
+        <span class="c1"># remove existing stats and meta in dataset</span>
+        <span class="n">target_fields</span> <span class="o">=</span> <span class="p">{</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span> <span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">}</span>
+        <span class="n">target_fields</span> <span class="o">=</span> <span class="n">target_fields</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">target_fields</span><span class="p">))</span>
+        <span class="n">analyzer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">skip_return</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Adapter.insight_mining">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.insight_mining">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">insight_mining</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pval_th</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mining the insights from the OP-wise analysis results. For now, we use</span>
+<span class="sd">        T-Test to check the significance of stats/meta changes before and after</span>
+<span class="sd">        each OP processing. If the p-value is less than a given threshold</span>
+<span class="sd">        (usually 0.05), we think the stats/meta changes are significant. The</span>
+<span class="sd">        insight mining results will be stored in the file</span>
+<span class="sd">        `{work_dir}/insight_mining/insight_mining.json`.</span>
+
+<span class="sd">        :param pval_th: the threshold of p-value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;insight_mining&#39;</span><span class="p">)</span>
+        <span class="n">res_order</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">work_dir</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+        <span class="p">]</span>
+        <span class="n">res_order</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="c1"># collect analysis results</span>
+        <span class="n">analysis_results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">res_dir</span> <span class="ow">in</span> <span class="n">res_order</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_dir</span><span class="p">,</span>
+                             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">res_dir</span><span class="si">}</span><span class="s1">_stats.jsonl&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">analysis_results</span><span class="p">[</span><span class="n">res_dir</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+
+        <span class="c1"># distribution change significance analysis</span>
+        <span class="n">ttest_measure</span> <span class="o">=</span> <span class="n">RelatedTTestMeasure</span><span class="p">()</span>
+
+        <span class="n">sig_res</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># i = 0 is the original dataset</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_order</span><span class="p">)):</span>
+            <span class="n">prev_res</span> <span class="o">=</span> <span class="n">analysis_results</span><span class="p">[</span><span class="n">res_order</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span>
+            <span class="n">curr_res</span> <span class="o">=</span> <span class="n">analysis_results</span><span class="p">[</span><span class="n">res_order</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+
+            <span class="c1"># only consider common stats and meta</span>
+            <span class="n">common_features</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">set</span><span class="p">(</span><span class="n">prev_res</span><span class="o">.</span><span class="n">features</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">curr_res</span><span class="o">.</span><span class="n">features</span><span class="p">)))</span>
+            <span class="n">curr_sig_res</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="n">common_features</span><span class="p">:</span>
+                <span class="n">ttest_res</span> <span class="o">=</span> <span class="n">ttest_measure</span><span class="p">(</span><span class="n">prev_res</span><span class="p">[</span><span class="n">feat</span><span class="p">],</span> <span class="n">curr_res</span><span class="p">[</span><span class="n">feat</span><span class="p">])</span>
+                <span class="n">curr_sig_res</span><span class="p">[</span><span class="n">feat</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;t-statistic (standardized mean difference)&#39;</span><span class="p">:</span>
+                    <span class="n">ttest_res</span><span class="o">.</span><span class="n">statistic</span><span class="p">,</span>
+                    <span class="s1">&#39;p-value&#39;</span><span class="p">:</span> <span class="n">ttest_res</span><span class="o">.</span><span class="n">pvalue</span><span class="p">,</span>
+                    <span class="s1">&#39;significant&#39;</span><span class="p">:</span>
+                    <span class="kc">True</span> <span class="k">if</span> <span class="n">ttest_res</span><span class="o">.</span><span class="n">pvalue</span> <span class="o">&lt;</span> <span class="n">pval_th</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="n">sig_res</span><span class="p">[</span><span class="n">res_order</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">curr_sig_res</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;insight_mining.json&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">sig_res</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="../../../_static/documentation_options.js?v=28d163b9"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

@@ -1,0 +1,1466 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>data_juicer.utils.model_utils - data-juicer</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sidebar-menu.css?v=dcc41d8a" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">data-juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">data-juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">docs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/RecipeGallery.html">Data Recipe Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DatasetCfg.html">Dataset Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/BadDataExhibition.html">“Bad” Data Exhibition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_SORA.html">Motivation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_SORA.html#roadmap">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_service.html">Start the Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_service.html#api-calls">API Calls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_service.html#demonstration">Demonstration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DeveloperGuide.html">How-to Guide for Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Distributed.html">Distributed Data Processing in Data-Juicer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Sandbox.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Sandbox.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Sandbox-ZH.html">用户指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Sandbox-ZH.html#id8">开发者指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html#news">News</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html#contribution-to-this-survey">Contribution to This Survey</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html#references">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html#section-mentioned-papers-retrieval-list">“Section - Mentioned Papers” Retrieval List</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../demos/README.html">Demos</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/distributed_deduplication/README.html">Distributed Fuzzy Deduplication Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/evaluator/README.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/evaluator/gpt_eval/README.html">GPT EVAL: Evaluate your model with OpenAI API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/evaluator/recorder/README.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/fmt_conversion/README.html">Format Conversion Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/fmt_conversion/multimodal/README.html">Multimodal Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/fmt_conversion/post_tuning_dialog/README.html">Post Tuning Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/hpo/README.html">Hyper-parameter Optimization for Data Recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/mm_eval/inception_metrics/README.html">Metrics for video generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/postprocess/README.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/preprocess/README.html">Preprocess Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/quality_classifier/README.html">Data Scoring Capabilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/quality_classifier/README.html#quality-classifier-toolkit-gpt-3-reproduced">Quality Classifier Toolkit (GPT-3 Reproduced)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">thirdparty</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../thirdparty/LLM_ecosystems/README.html">LLM Ecosystems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../thirdparty/models/README.html">Third-party Model Library</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of data_juicer.core package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.core.data.html">data_juicer.core.data package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.core.executor.html">data_juicer.core.executor package</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of data_juicer.ops package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.aggregator.html">data_juicer.ops.aggregator package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.grouper.html">data_juicer.ops.grouper package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+    <div class="current-info">
+        <span class="current-lang">en</span>|<span class="current-version">v1.3.3</span>
+    </div>
+    <div class="dropdown-panel">
+        
+        <div class="section">
+            <dt>Language</dt>
+            <dd>
+                
+                <a href="../../../../../en/v1.3.3/_modules/data_juicer/utils/model_utils.html"
+                    class="active" >
+                    English
+                </a>
+                
+                <a href="../../../../../zh_CN/v1.3.3/_modules/data_juicer/utils/model_utils_ZH.html"
+                    >
+                    简体中文
+                </a>
+                
+            </dd>
+        </div>
+        
+
+        
+        <div class="section">
+            <dt>Version</dt>
+            <dd>
+                    <a href="model_utils.html">v1.3.3</a>
+                    <a href="../../../../main/index.html">main</a>
+            </dd>
+        </div>
+        
+    </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for data_juicer.utils.model_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">fnmatch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pickle</span><span class="w"> </span><span class="kn">import</span> <span class="n">UnpicklingError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocess</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">wget</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer</span><span class="w"> </span><span class="kn">import</span> <span class="n">cuda_device_count</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.common_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">nested_access</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.nltk_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">ensure_nltk_resource</span><span class="p">,</span>
+                                          <span class="n">patch_nltk_pickle_security</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATA_JUICER_MODELS_CACHE</span> <span class="k">as</span> <span class="n">DJMC</span>
+
+<span class="n">torch</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;torch&#39;</span><span class="p">)</span>
+<span class="n">transformers</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;transformers&#39;</span><span class="p">)</span>
+<span class="n">nn</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;torch.nn&#39;</span><span class="p">)</span>
+<span class="n">fasttext</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;fasttext&#39;</span><span class="p">,</span> <span class="s1">&#39;fasttext-wheel&#39;</span><span class="p">)</span>
+<span class="n">sentencepiece</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;sentencepiece&#39;</span><span class="p">)</span>
+<span class="n">kenlm</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;kenlm&#39;</span><span class="p">)</span>
+<span class="n">nltk</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;nltk&#39;</span><span class="p">)</span>
+<span class="n">aes_pred</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;aesthetics_predictor&#39;</span><span class="p">,</span> <span class="s1">&#39;simple-aesthetics-predictor&#39;</span><span class="p">)</span>
+<span class="n">vllm</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;vllm&#39;</span><span class="p">)</span>
+<span class="n">diffusers</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;diffusers&#39;</span><span class="p">)</span>
+<span class="n">ram</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;ram&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;git+https://github.com/xinyu1205/recognize-anything.git&#39;</span><span class="p">)</span>
+<span class="n">cv2</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;cv2&#39;</span><span class="p">,</span> <span class="s1">&#39;opencv-python&#39;</span><span class="p">)</span>
+<span class="n">openai</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;openai&#39;</span><span class="p">)</span>
+<span class="n">ultralytics</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;ultralytics&#39;</span><span class="p">)</span>
+<span class="n">tiktoken</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;tiktoken&#39;</span><span class="p">)</span>
+<span class="n">dashscope</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;dashscope&#39;</span><span class="p">)</span>
+
+<span class="n">MODEL_ZOO</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># Default cached models links for downloading</span>
+<span class="n">MODEL_LINKS</span> <span class="o">=</span> <span class="s1">&#39;https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/&#39;</span> \
+               <span class="s1">&#39;data_juicer/models/&#39;</span>
+
+<span class="c1"># Backup cached models links for downloading</span>
+<span class="n">BACKUP_MODEL_LINKS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># language identification model from fasttext</span>
+    <span class="s1">&#39;lid.176.bin&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;https://dl.fbaipublicfiles.com/fasttext/supervised-models/&#39;</span><span class="p">,</span>
+
+    <span class="c1"># tokenizer and language model for English from sentencepiece and KenLM</span>
+    <span class="s1">&#39;*.sp.model&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;https://huggingface.co/edugp/kenlm/resolve/main/wikipedia/&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;*.arpa.bin&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;https://huggingface.co/edugp/kenlm/resolve/main/wikipedia/&#39;</span><span class="p">,</span>
+
+    <span class="c1"># sentence split model from nltk punkt</span>
+    <span class="s1">&#39;punkt.*.pickle&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/&#39;</span>
+    <span class="s1">&#39;data_juicer/models/&#39;</span><span class="p">,</span>
+
+    <span class="c1"># ram</span>
+    <span class="s1">&#39;ram_plus_swin_large_14m.pth&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/models/&#39;</span>
+    <span class="s1">&#39;ram_plus_swin_large_14m.pth&#39;</span><span class="p">,</span>
+
+    <span class="c1"># FastSAM</span>
+    <span class="s1">&#39;FastSAM-s.pt&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;https://github.com/ultralytics/assets/releases/download/v8.2.0/&#39;</span>
+    <span class="s1">&#39;FastSAM-s.pt&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;FastSAM-x.pt&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;https://github.com/ultralytics/assets/releases/download/v8.2.0/&#39;</span>
+    <span class="s1">&#39;FastSAM-x.pt&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="get_backup_model_link">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.get_backup_model_link">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_backup_model_link</span><span class="p">(</span><span class="n">model_name</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">BACKUP_MODEL_LINKS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">url</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="check_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.check_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check whether a model exists in DATA_JUICER_MODELS_CACHE.</span>
+<span class="sd">    If exists, return its full path.</span>
+<span class="sd">    Else, download it from cached models links.</span>
+
+<span class="sd">    :param model_name: a specified model name</span>
+<span class="sd">    :param force: Whether to download model forcefully or not, Sometimes</span>
+<span class="sd">        the model file maybe incomplete for some reason, so need to</span>
+<span class="sd">        download again forcefully.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check for local model</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">force</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">model_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">model_name</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DJMC</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">DJMC</span><span class="p">)</span>
+
+    <span class="c1"># check if the specified model exists. If it does not exist, download it</span>
+    <span class="n">cached_model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DJMC</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cached_model_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">cached_model_path</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Model [</span><span class="si">{</span><span class="n">cached_model_path</span><span class="si">}</span><span class="s1">] is invalid. Forcing download...&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Model [</span><span class="si">{</span><span class="n">cached_model_path</span><span class="si">}</span><span class="s1">] is not found. Downloading...&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">model_link</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODEL_LINKS</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+            <span class="n">wget</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">model_link</span><span class="p">,</span> <span class="n">cached_model_path</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">backup_model_link</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">get_backup_model_link</span><span class="p">(</span><span class="n">model_name</span><span class="p">),</span> <span class="n">model_name</span><span class="p">)</span>
+                <span class="n">wget</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">backup_model_link</span><span class="p">,</span> <span class="n">cached_model_path</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Downloading model [</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s1">] error. &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;Please retry later or download it into </span><span class="si">{</span><span class="n">DJMC</span><span class="si">}</span><span class="s1"> &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;manually from </span><span class="si">{</span><span class="n">model_link</span><span class="si">}</span><span class="s1"> or </span><span class="si">{</span><span class="n">backup_model_link</span><span class="si">}</span><span class="s1"> &#39;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cached_model_path</span></div>
+
+
+
+<div class="viewcode-block" id="APIModel">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.APIModel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">APIModel</span><span class="p">:</span>
+
+<div class="viewcode-block" id="APIModel.__init__">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.APIModel.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes an instance of the APIModel class.</span>
+
+<span class="sd">        :param model: The name of the model to be used for making API</span>
+<span class="sd">            calls. This should correspond to a valid model identifier</span>
+<span class="sd">            recognized by the API server.</span>
+<span class="sd">        :param endpoint: The URL endpoint for the API. If provided as a</span>
+<span class="sd">            relative path, it will be appended to the base URL (defined by the</span>
+<span class="sd">            `OPENAI_BASE_URL` environment variable or through an additional</span>
+<span class="sd">            `base_url` parameter). Defaults to &#39;/chat/completions&#39; for</span>
+<span class="sd">            OpenAI compatibility.</span>
+<span class="sd">        :param response_path: A dot-separated string specifying the path to</span>
+<span class="sd">            extract the desired content from the API response. The default</span>
+<span class="sd">            value is &#39;choices.0.message.content&#39;, which corresponds to the</span>
+<span class="sd">            typical structure of an OpenAI API response.</span>
+<span class="sd">        :param kwargs: Additional keyword arguments for configuring the</span>
+<span class="sd">            internal OpenAI client.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span> <span class="ow">or</span> <span class="s1">&#39;/chat/completions&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response_path</span> <span class="o">=</span> <span class="n">response_path</span> <span class="ow">or</span> <span class="s1">&#39;choices.0.message.content&#39;</span>
+
+        <span class="n">client_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_arguments</span><span class="p">(</span><span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">(</span><span class="o">**</span><span class="n">client_args</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends messages to the configured API model and returns the parsed</span>
+<span class="sd">        response content.</span>
+
+<span class="sd">        :param messages: A list of message dictionaries to send to the API.</span>
+<span class="sd">                         Each message should have a &#39;role&#39; (e.g., &#39;user&#39;,</span>
+<span class="sd">                         &#39;assistant&#39;) and &#39;content&#39; (the message text).</span>
+<span class="sd">        :param kwargs: Additional parameters for the API call.</span>
+<span class="sd">        :return: The parsed response content from the API call, or an empty</span>
+<span class="sd">            string if an error occurs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;messages&#39;</span><span class="p">:</span> <span class="n">messages</span><span class="p">,</span>
+            <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;stream&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">stream_cls</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">Stream</span><span class="p">[</span><span class="n">openai</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">ChatCompletionChunk</span><span class="p">]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span>
+                                         <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">,</span>
+                                         <span class="n">cast_to</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">,</span>
+                                         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
+                                         <span class="n">stream_cls</span><span class="o">=</span><span class="n">stream_cls</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">nested_access</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_filter_arguments</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filters and returns only the valid arguments for a given function</span>
+<span class="sd">        signature.</span>
+
+<span class="sd">        :param func: The function or callable to inspect.</span>
+<span class="sd">        :param args_dict: A dictionary of argument names and values to filter.</span>
+<span class="sd">        :return: A dictionary containing only the arguments that match the</span>
+<span class="sd">                 function&#39;s signature, preserving any **kwargs if applicable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="n">filtered_args</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># If **kwargs is found, return without change</span>
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">args_dict</span>
+            <span class="c1"># Collect valid parameters</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;self&#39;</span><span class="p">,</span> <span class="s1">&#39;cls&#39;</span><span class="p">}</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">args_dict</span><span class="p">:</span>
+                <span class="n">filtered_args</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">args_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">filtered_args</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_api_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_api_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_api_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span>
+                      <span class="o">*</span><span class="p">,</span>
+                      <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">response_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">return_processor</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">processor_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a callable API model for interacting with OpenAI-compatible API.</span>
+<span class="sd">    The callable supports custom response parsing and works with proxy servers</span>
+<span class="sd">    that may be incompatible.</span>
+
+<span class="sd">    :param model: The name of the model to interact with.</span>
+<span class="sd">    :param endpoint: The URL endpoint for the API. If provided as a relative</span>
+<span class="sd">        path, it will be appended to the base URL (defined by the</span>
+<span class="sd">        `OPENAI_BASE_URL` environment variable or through an additional</span>
+<span class="sd">        `base_url` parameter). By default, it is set to</span>
+<span class="sd">        &#39;/chat/completions&#39; for OpenAI compatibility.</span>
+<span class="sd">    :param response_path: The dot-separated  path to extract desired content</span>
+<span class="sd">        from the API response. Defaults to &#39;choices.0.message.content&#39;.</span>
+<span class="sd">    :param return_processor: A boolean flag indicating whether to return a</span>
+<span class="sd">        processor along with the model. The processor can be used for tasks</span>
+<span class="sd">        like tokenization or encoding. Defaults to False.</span>
+<span class="sd">    :param processor_config: A dictionary containing configuration parameters</span>
+<span class="sd">        for initializing a Hugging Face processor. It is only relevant if</span>
+<span class="sd">        `return_processor` is set to True.</span>
+<span class="sd">    :param model_params: Additional parameters for configuring the API model.</span>
+<span class="sd">    :return: A callable APIModel instance, and optionally a processor</span>
+<span class="sd">        if `return_processor` is True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">APIModel</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                      <span class="n">endpoint</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span>
+                      <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
+                      <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">return_processor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">client</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_processor</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">tiktoken</span><span class="o">.</span><span class="n">encoding_for_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dashscope</span><span class="o">.</span><span class="n">get_tokenizer</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">processor</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">processor_config</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">processor</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Failed to initialize the processor. Please check the following:</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># noqa: E501</span>
+            <span class="s2">&quot;- For OpenAI models: Install &#39;tiktoken&#39; via `pip install tiktoken`.</span><span class="se">\n</span><span class="s2">&quot;</span>  <span class="c1"># noqa: E501</span>
+            <span class="s2">&quot;- For DashScope models: Install both &#39;dashscope&#39; and &#39;tiktoken&#39; via `pip install dashscope tiktoken`.</span><span class="se">\n</span><span class="s2">&quot;</span>  <span class="c1"># noqa: E501</span>
+            <span class="s2">&quot;- For custom models: Use the &#39;processor_config&#39; parameter to configure a Hugging Face processor.&quot;</span>  <span class="c1"># noqa: E501</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">processor_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> \
+            <span class="s1">&#39;pretrained_model_name_or_path&#39;</span> <span class="ow">in</span> <span class="n">processor_config</span><span class="p">:</span>
+        <span class="n">processor</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="o">**</span><span class="n">processor_config</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">processor</span> <span class="o">=</span> <span class="n">get_processor</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">processor</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_diffusion_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_diffusion_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_diffusion_model</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="n">diffusion_type</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load an Diffusion model from HuggingFace.</span>
+
+<span class="sd">    :param pretrained_model_name_or_path: input Diffusion model name</span>
+<span class="sd">        or local path to the model</span>
+<span class="sd">    :param diffusion_type: the use of the diffusion model. It can be</span>
+<span class="sd">        &#39;image2image&#39;, &#39;text2image&#39;, &#39;inpainting&#39;</span>
+<span class="sd">    :return: a Diffusion model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TORCH_DTYPE_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;fp32&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+        <span class="s1">&#39;fp16&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
+        <span class="s1">&#39;bf16&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">LazyLoader</span><span class="o">.</span><span class="n">check_packages</span><span class="p">([</span><span class="s1">&#39;torch&#39;</span><span class="p">,</span> <span class="s1">&#39;transformers&#39;</span><span class="p">])</span>
+
+    <span class="n">device</span> <span class="o">=</span> <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">device</span><span class="p">:</span>
+        <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;device_map&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;balanced&#39;</span>
+    <span class="k">if</span> <span class="s1">&#39;torch_dtype&#39;</span> <span class="ow">in</span> <span class="n">model_params</span><span class="p">:</span>
+        <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;torch_dtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">TORCH_DTYPE_MAPPING</span><span class="p">[</span>
+            <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;torch_dtype&#39;</span><span class="p">]]</span>
+
+    <span class="n">diffusion_type_to_pipeline</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;image2image&#39;</span><span class="p">:</span> <span class="n">diffusers</span><span class="o">.</span><span class="n">AutoPipelineForImage2Image</span><span class="p">,</span>
+        <span class="s1">&#39;text2image&#39;</span><span class="p">:</span> <span class="n">diffusers</span><span class="o">.</span><span class="n">AutoPipelineForText2Image</span><span class="p">,</span>
+        <span class="s1">&#39;inpainting&#39;</span><span class="p">:</span> <span class="n">diffusers</span><span class="o">.</span><span class="n">AutoPipelineForInpainting</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">diffusion_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">diffusion_type_to_pipeline</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Not support </span><span class="si">{</span><span class="n">diffusion_type</span><span class="si">}</span><span class="s1"> diffusion_type for diffusion &#39;</span>
+            <span class="s1">&#39;model. Can only be one of &#39;</span>
+            <span class="s1">&#39;[&quot;image2image&quot;, &quot;text2image&quot;, &quot;inpainting&quot;].&#39;</span><span class="p">)</span>
+
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">diffusion_type_to_pipeline</span><span class="p">[</span><span class="n">diffusion_type</span><span class="p">]</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
+                                     <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">device</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_fastsam_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_fastsam_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_fastsam_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">ultralytics</span><span class="o">.</span><span class="n">FastSAM</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_fasttext_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_fasttext_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_fasttext_model</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s1">&#39;lid.176.bin&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a fasttext model.</span>
+
+<span class="sd">    :param model_name: input model name</span>
+<span class="sd">    :return: model instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading fasttext language identification model...&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ft_model</span> <span class="o">=</span> <span class="n">fasttext</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+        <span class="n">ft_model</span> <span class="o">=</span> <span class="n">fasttext</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ft_model</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_huggingface_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_huggingface_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_huggingface_model</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
+                              <span class="o">*</span><span class="p">,</span>
+                              <span class="n">return_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                              <span class="n">return_pipe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                              <span class="n">pipe_task</span><span class="o">=</span><span class="s1">&#39;text-generation&#39;</span><span class="p">,</span>
+                              <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a huggingface model.</span>
+
+<span class="sd">    :param pretrained_model_name_or_path: model name or path</span>
+<span class="sd">    :param return_model: return model or not</span>
+<span class="sd">    :param return_pipe: return pipeline or not</span>
+<span class="sd">    :param pipe_task: task for pipeline</span>
+<span class="sd">    :return: a tuple (model, processor) if `return_model` is True;</span>
+<span class="sd">        otherwise, only the processor is returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check if we need accelerate for device_map</span>
+    <span class="k">if</span> <span class="s1">&#39;device&#39;</span> <span class="ow">in</span> <span class="n">model_params</span><span class="p">:</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;device_map&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="c1"># If accelerate is not available, use device directly</span>
+                <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;device&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;accelerate not found, using device directly&#39;</span><span class="p">)</span>
+
+    <span class="n">processor</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+        <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_model</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;auto_map&#39;</span><span class="p">):</span>
+            <span class="n">class_name</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">auto_map</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;AutoModel&#39;</span><span class="p">)),</span>
+                <span class="s1">&#39;AutoModel&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># TODO: What happens if more than one</span>
+            <span class="n">class_name</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">architectures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">model_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">model_class</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
+                                            <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_pipe</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">processor</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">PreTrainedTokenizerBase</span><span class="p">):</span>
+                <span class="n">pipe_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;tokenizer&#39;</span><span class="p">:</span> <span class="n">processor</span><span class="p">}</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">processor</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">SequenceFeatureExtractor</span><span class="p">):</span>
+                <span class="n">pipe_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;feature_extractor&#39;</span><span class="p">:</span> <span class="n">processor</span><span class="p">}</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">processor</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">BaseImageProcessor</span><span class="p">):</span>
+                <span class="n">pipe_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;image_processor&#39;</span><span class="p">:</span> <span class="n">processor</span><span class="p">}</span>
+            <span class="n">pipe</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="n">pipe_task</span><span class="p">,</span>
+                                         <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                                         <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+                                         <span class="o">**</span><span class="n">pipe_params</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">pipe</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">processor</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_model</span> <span class="k">else</span> <span class="n">processor</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_kenlm_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_kenlm_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_kenlm_model</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">name_pattern</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.arpa.bin&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a kenlm model.</span>
+
+<span class="sd">    :param model_name: input model name in formatting syntax.</span>
+<span class="sd">    :param lang: language to render model name</span>
+<span class="sd">    :return: model instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">model_name</span> <span class="o">=</span> <span class="n">name_pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading kenlm language model...&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">kenlm_model</span> <span class="o">=</span> <span class="n">kenlm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">),</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+        <span class="n">kenlm_model</span> <span class="o">=</span> <span class="n">kenlm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                                  <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">kenlm_model</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_nltk_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_nltk_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_nltk_model</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">name_pattern</span><span class="o">=</span><span class="s1">&#39;punkt.</span><span class="si">{}</span><span class="s1">.pickle&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a nltk punkt model with enhanced resource handling.</span>
+
+<span class="sd">    :param model_name: input model name in formatting syntax</span>
+<span class="sd">    :param lang: language to render model name</span>
+<span class="sd">    :return: model instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># Ensure pickle security is patched</span>
+    <span class="n">patch_nltk_pickle_security</span><span class="p">()</span>
+
+    <span class="n">nltk_to_punkt</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;en&#39;</span><span class="p">:</span> <span class="s1">&#39;english&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;fr&#39;</span><span class="p">:</span> <span class="s1">&#39;french&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pt&#39;</span><span class="p">:</span> <span class="s1">&#39;portuguese&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;es&#39;</span><span class="p">:</span> <span class="s1">&#39;spanish&#39;</span>
+    <span class="p">}</span>
+    <span class="k">assert</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">nltk_to_punkt</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span>
+    <span class="p">),</span> <span class="s1">&#39;lang must be one of the following: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">nltk_to_punkt</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading nltk punkt split model...&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Resource path and fallback for the punkt model</span>
+        <span class="n">resource_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;tokenizers/punkt/</span><span class="si">{</span><span class="n">nltk_to_punkt</span><span class="p">[</span><span class="n">lang</span><span class="p">]</span><span class="si">}</span><span class="s1">.pickle&#39;</span>
+
+        <span class="c1"># Ensure the resource is available</span>
+        <span class="k">if</span> <span class="n">ensure_nltk_resource</span><span class="p">(</span><span class="n">resource_path</span><span class="p">,</span> <span class="s1">&#39;punkt&#39;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Successfully verified resource </span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Could not verify resource </span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s1">, model may not &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;work correctly&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Load the model</span>
+        <span class="n">nltk_model</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">resource_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Fallback to downloading and retrying</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error loading model: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">. Attempting to download...&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;punkt&#39;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">nltk_model</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">resource_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">download_error</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to load model after download &#39;</span>
+                         <span class="sa">f</span><span class="s1">&#39;attempt: </span><span class="si">{</span><span class="n">download_error</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+    <span class="k">return</span> <span class="n">nltk_model</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_nltk_pos_tagger">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_nltk_pos_tagger">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_nltk_pos_tagger</span><span class="p">(</span><span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load NLTK&#39;s part-of-speech tagger with enhanced resource</span>
+<span class="sd">      handling.</span>
+
+<span class="sd">    :return: The POS tagger model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># Ensure pickle security is patched</span>
+    <span class="n">patch_nltk_pickle_security</span><span class="p">()</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading NLTK POS tagger model...&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Resource path and fallback for the averaged_perceptron_tagger</span>
+        <span class="n">resource_path</span> <span class="o">=</span> <span class="s1">&#39;taggers/averaged_perceptron_tagger/english.pickle&#39;</span>
+
+        <span class="c1"># Ensure the resource is available</span>
+        <span class="k">if</span> <span class="n">ensure_nltk_resource</span><span class="p">(</span><span class="n">resource_path</span><span class="p">,</span> <span class="s1">&#39;averaged_perceptron_tagger&#39;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Successfully verified resource </span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Could not verify resource </span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s1">, model may not &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;work correctly&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Import the POS tagger</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">nltk.tag</span>
+        <span class="n">tagger</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">pos_tag</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Fallback to downloading and retrying</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Error loading POS tagger: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">. Attempting to download...&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;averaged_perceptron_tagger&#39;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">nltk.tag</span>
+            <span class="n">tagger</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">pos_tag</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">download_error</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to load POS tagger after download &#39;</span>
+                         <span class="sa">f</span><span class="s1">&#39;attempt: </span><span class="si">{</span><span class="n">download_error</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+    <span class="k">return</span> <span class="n">tagger</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_opencv_classifier">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_opencv_classifier">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_opencv_classifier</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CascadeClassifier</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_recognizeAnything_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_recognizeAnything_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_recognizeAnything_model</span><span class="p">(</span>
+        <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="s1">&#39;ram_plus_swin_large_14m.pth&#39;</span><span class="p">,</span>
+        <span class="n">input_size</span><span class="o">=</span><span class="mi">384</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load recognizeAnything model.</span>
+
+<span class="sd">    :param model_name: input model name.</span>
+<span class="sd">    :param input_size: the input size of the model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading recognizeAnything model...&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">ram</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">ram_plus</span><span class="p">(</span>
+            <span class="n">pretrained</span><span class="o">=</span><span class="n">check_model</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">),</span>
+            <span class="n">image_size</span><span class="o">=</span><span class="n">input_size</span><span class="p">,</span>
+            <span class="n">vit</span><span class="o">=</span><span class="s1">&#39;swin_l&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">UnpicklingError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">ram</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">ram_plus</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="n">check_model</span><span class="p">(</span>
+            <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                                    <span class="n">image_size</span><span class="o">=</span><span class="n">input_size</span><span class="p">,</span>
+                                    <span class="n">vit</span><span class="o">=</span><span class="s1">&#39;swin_l&#39;</span><span class="p">)</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_sdxl_prompt2prompt">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_sdxl_prompt2prompt">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_sdxl_prompt2prompt</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
+                               <span class="n">pipe_func</span><span class="p">,</span>
+                               <span class="n">torch_dtype</span><span class="o">=</span><span class="s1">&#39;fp32&#39;</span><span class="p">,</span>
+                               <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">torch_dtype</span> <span class="o">==</span> <span class="s1">&#39;fp32&#39;</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">pipe_func</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
+                                          <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                                          <span class="n">use_safetensors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">pipe_func</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
+                                          <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
+                                          <span class="n">use_safetensors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_sentencepiece_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_sentencepiece_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_sentencepiece_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a sentencepiece model.</span>
+
+<span class="sd">    :param model_path: input model path</span>
+<span class="sd">    :return: model instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading sentencepiece model...&#39;</span><span class="p">)</span>
+    <span class="n">sentencepiece_model</span> <span class="o">=</span> <span class="n">sentencepiece</span><span class="o">.</span><span class="n">SentencePieceProcessor</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sentencepiece_model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+        <span class="n">sentencepiece_model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">sentencepiece_model</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_sentencepiece_for_lang">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_sentencepiece_for_lang">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_sentencepiece_for_lang</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span>
+                                   <span class="n">name_pattern</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.sp.model&#39;</span><span class="p">,</span>
+                                   <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a sentencepiece model for specific language.</span>
+
+<span class="sd">    :param lang: language to render model name</span>
+<span class="sd">    :param name_pattern: pattern to render the model name</span>
+<span class="sd">    :return: model instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">model_name</span> <span class="o">=</span> <span class="n">name_pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">prepare_sentencepiece_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_simple_aesthetics_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_simple_aesthetics_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_simple_aesthetics_model</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
+                                    <span class="o">*</span><span class="p">,</span>
+                                    <span class="n">return_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a simple aesthetics model.</span>
+
+<span class="sd">    :param pretrained_model_name_or_path: model name or path</span>
+<span class="sd">    :param return_model: return model or not</span>
+<span class="sd">    :return: a tuple (model, input processor) if `return_model` is True;</span>
+<span class="sd">        otherwise, only the processor is returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check if we need accelerate for device_map</span>
+    <span class="k">if</span> <span class="s1">&#39;device&#39;</span> <span class="ow">in</span> <span class="n">model_params</span><span class="p">:</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;device_map&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="c1"># If accelerate is not available, use device directly</span>
+                <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;device&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;accelerate not found, using device directly&#39;</span><span class="p">)</span>
+
+    <span class="n">processor</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">CLIPProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+        <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">return_model</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">processor</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;v1&#39;</span> <span class="ow">in</span> <span class="n">pretrained_model_name_or_path</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">aes_pred</span><span class="o">.</span><span class="n">AestheticsPredictorV1</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;v2&#39;</span> <span class="ow">in</span> <span class="n">pretrained_model_name_or_path</span>
+              <span class="ow">and</span> <span class="s1">&#39;linear&#39;</span> <span class="ow">in</span> <span class="n">pretrained_model_name_or_path</span><span class="p">):</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">aes_pred</span><span class="o">.</span><span class="n">AestheticsPredictorV2Linear</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;v2&#39;</span> <span class="ow">in</span> <span class="n">pretrained_model_name_or_path</span>
+              <span class="ow">and</span> <span class="s1">&#39;relu&#39;</span> <span class="ow">in</span> <span class="n">pretrained_model_name_or_path</span><span class="p">):</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">aes_pred</span><span class="o">.</span><span class="n">AestheticsPredictorV2ReLU</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Not support </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">processor</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_spacy_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_spacy_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_spacy_model</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span>
+                        <span class="n">name_pattern</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_core_web_md-3.7.0&#39;</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare spacy model for specific language.</span>
+
+<span class="sd">    :param lang: language of sapcy model. Should be one of [&quot;zh&quot;,</span>
+<span class="sd">        &quot;en&quot;]</span>
+<span class="sd">    :return: corresponding spacy model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">spacy</span>
+
+    <span class="k">assert</span> <span class="n">lang</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;zh&#39;</span><span class="p">,</span> <span class="s1">&#39;en&#39;</span><span class="p">],</span> <span class="s1">&#39;Diversity only support zh and en&#39;</span>
+    <span class="n">model_name</span> <span class="o">=</span> <span class="n">name_pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Loading spacy model [</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s1">]...&#39;</span><span class="p">)</span>
+    <span class="n">compressed_model</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.tar.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+
+    <span class="c1"># decompress the compressed model if it&#39;s not decompressed</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decompress_model</span><span class="p">(</span><span class="n">compressed_model_path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">compressed_model_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.tar.gz&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Only .tar.gz files are supported&#39;</span><span class="p">)</span>
+
+        <span class="n">decompressed_model_path</span> <span class="o">=</span> <span class="n">compressed_model_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.tar.gz&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">decompressed_model_path</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">decompressed_model_path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">decompressed_model_path</span>
+
+        <span class="n">ver_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">decompressed_model_path</span><span class="p">)</span>
+        <span class="n">unver_name</span> <span class="o">=</span> <span class="n">ver_name</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">target_dir_in_archive</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ver_name</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">unver_name</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">ver_name</span><span class="si">}</span><span class="s1">/&#39;</span>
+
+        <span class="kn">import</span><span class="w"> </span><span class="nn">tarfile</span>
+        <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">compressed_model_path</span><span class="p">,</span> <span class="s1">&#39;r:gz&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tar</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">tar</span><span class="o">.</span><span class="n">getmembers</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">target_dir_in_archive</span><span class="p">):</span>
+                    <span class="c1"># relative path without unnecessary directory levels</span>
+                    <span class="n">relative_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span>
+                        <span class="n">member</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">target_dir_in_archive</span><span class="p">)</span>
+                    <span class="n">target_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">decompressed_model_path</span><span class="p">,</span>
+                                               <span class="n">relative_path</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">isfile</span><span class="p">():</span>
+                        <span class="c1"># ensure the directory exists</span>
+                        <span class="n">target_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">target_path</span><span class="p">)</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">target_directory</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="c1"># for files, extract to the specific location</span>
+                        <span class="k">with</span> <span class="n">tar</span><span class="o">.</span><span class="n">extractfile</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="k">as</span> <span class="n">source</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">target</span><span class="p">:</span>
+                                <span class="n">target</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">decompressed_model_path</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">diversity_model</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">decompress_model</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">compressed_model</span><span class="p">)))</span>
+    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+        <span class="n">diversity_model</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">decompress_model</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">compressed_model</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">diversity_model</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_video_blip_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_video_blip_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_video_blip_model</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
+                             <span class="o">*</span><span class="p">,</span>
+                             <span class="n">return_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a video-clip model with the corresponding processor.</span>
+
+<span class="sd">    :param pretrained_model_name_or_path: model name or path</span>
+<span class="sd">    :param return_model: return model or not</span>
+<span class="sd">    :param trust_remote_code: passed to transformers</span>
+<span class="sd">    :return: a tuple (model, input processor) if `return_model` is True;</span>
+<span class="sd">        otherwise, only the processor is returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;device&#39;</span> <span class="ow">in</span> <span class="n">model_params</span><span class="p">:</span>
+        <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;device_map&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">VideoBlipVisionModel</span><span class="p">(</span><span class="n">transformers</span><span class="o">.</span><span class="n">Blip2VisionModel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A simple, augmented version of Blip2VisionModel to handle</span>
+<span class="sd">        videos.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">pixel_values</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">output_attentions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">output_hidden_states</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">return_dict</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">interpolate_pos_encoding</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">,</span>
+                   <span class="n">transformers</span><span class="o">.</span><span class="n">modeling_outputs</span><span class="o">.</span><span class="n">BaseModelOutputWithPooling</span><span class="p">]:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Flatten `pixel_values` along the batch and time dimension,</span>
+<span class="sd">            pass it through the original vision model,</span>
+<span class="sd">            then unflatten it back.</span>
+
+<span class="sd">            :param pixel_values: a tensor of shape</span>
+<span class="sd">            (batch, channel, time, height, width)</span>
+
+<span class="sd">            :returns:</span>
+<span class="sd">                last_hidden_state: a tensor of shape</span>
+<span class="sd">                (batch, time * seq_len, hidden_size)</span>
+<span class="sd">                pooler_output: a tensor of shape</span>
+<span class="sd">                (batch, time, hidden_size)</span>
+<span class="sd">                hidden_states:</span>
+<span class="sd">                    a tuple of tensors of shape</span>
+<span class="sd">                    (batch, time * seq_len, hidden_size),</span>
+<span class="sd">                    one for the output of the embeddings +</span>
+<span class="sd">                    one for each layer</span>
+<span class="sd">                attentions:</span>
+<span class="sd">                    a tuple of tensors of shape</span>
+<span class="sd">                    (batch, time, num_heads, seq_len, seq_len),</span>
+<span class="sd">                    one for each layer</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">pixel_values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;You have to specify pixel_values&#39;</span><span class="p">)</span>
+
+            <span class="n">batch</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pixel_values</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+
+            <span class="c1"># flatten along the batch and time dimension to create a</span>
+            <span class="c1"># tensor of shape</span>
+            <span class="c1"># (batch * time, channel, height, width)</span>
+            <span class="n">flat_pixel_values</span> <span class="o">=</span> <span class="n">pixel_values</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
+                                                     <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">end_dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">vision_outputs</span><span class="p">:</span> <span class="n">transformers</span><span class="o">.</span><span class="n">modeling_outputs</span><span class="o">.</span><span class="n">BaseModelOutputWithPooling</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span>  <span class="c1"># noqa: E501</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span>
+                <span class="n">pixel_values</span><span class="o">=</span><span class="n">flat_pixel_values</span><span class="p">,</span>
+                <span class="n">output_attentions</span><span class="o">=</span><span class="n">output_attentions</span><span class="p">,</span>
+                <span class="n">output_hidden_states</span><span class="o">=</span><span class="n">output_hidden_states</span><span class="p">,</span>
+                <span class="n">return_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">interpolate_pos_encoding</span><span class="o">=</span><span class="n">interpolate_pos_encoding</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># now restore the original dimensions</span>
+            <span class="c1"># vision_outputs.last_hidden_state is of shape</span>
+            <span class="c1"># (batch * time, seq_len, hidden_size)</span>
+            <span class="n">seq_len</span> <span class="o">=</span> <span class="n">vision_outputs</span><span class="o">.</span><span class="n">last_hidden_state</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">last_hidden_state</span> <span class="o">=</span> <span class="n">vision_outputs</span><span class="o">.</span><span class="n">last_hidden_state</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+                <span class="n">batch</span><span class="p">,</span> <span class="n">time</span> <span class="o">*</span> <span class="n">seq_len</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># vision_outputs.pooler_output is of shape</span>
+            <span class="c1"># (batch * time, hidden_size)</span>
+            <span class="n">pooler_output</span> <span class="o">=</span> <span class="n">vision_outputs</span><span class="o">.</span><span class="n">pooler_output</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># hidden_states is a tuple of tensors of shape</span>
+            <span class="c1"># (batch * time, seq_len, hidden_size)</span>
+            <span class="n">hidden_states</span> <span class="o">=</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">(</span>
+                <span class="n">hidden</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">time</span> <span class="o">*</span> <span class="n">seq_len</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">hidden</span> <span class="ow">in</span> <span class="n">vision_outputs</span><span class="o">.</span><span class="n">hidden_states</span><span class="p">)</span>
+                             <span class="k">if</span> <span class="n">vision_outputs</span><span class="o">.</span><span class="n">hidden_states</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span>
+                             <span class="kc">None</span><span class="p">)</span>
+            <span class="c1"># attentions is a tuple of tensors of shape</span>
+            <span class="c1"># (batch * time, num_heads, seq_len, seq_len)</span>
+            <span class="n">attentions</span> <span class="o">=</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">(</span>
+                <span class="n">hidden</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">hidden</span> <span class="ow">in</span> <span class="n">vision_outputs</span><span class="o">.</span><span class="n">attentions</span><span class="p">)</span>
+                          <span class="k">if</span> <span class="n">vision_outputs</span><span class="o">.</span><span class="n">attentions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">return_dict</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">transformers</span><span class="o">.</span><span class="n">modeling_outputs</span><span class="o">.</span><span class="n">BaseModelOutputWithPooling</span><span class="p">(</span>  <span class="c1"># noqa: E501</span>
+                    <span class="n">last_hidden_state</span><span class="o">=</span><span class="n">last_hidden_state</span><span class="p">,</span>
+                    <span class="n">pooler_output</span><span class="o">=</span><span class="n">pooler_output</span><span class="p">,</span>
+                    <span class="n">hidden_states</span><span class="o">=</span><span class="n">hidden_states</span><span class="p">,</span>
+                    <span class="n">attentions</span><span class="o">=</span><span class="n">attentions</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">last_hidden_state</span><span class="p">,</span> <span class="n">pooler_output</span><span class="p">,</span> <span class="n">hidden_states</span><span class="p">,</span>
+                    <span class="n">attentions</span><span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">VideoBlipForConditionalGeneration</span><span class="p">(</span>
+            <span class="n">transformers</span><span class="o">.</span><span class="n">Blip2ForConditionalGeneration</span><span class="p">):</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">transformers</span><span class="o">.</span><span class="n">Blip2Config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># HACK: we call the grandparent super().__init__() to bypass</span>
+            <span class="c1"># transformers.Blip2ForConditionalGeneration.__init__() so we can</span>
+            <span class="c1"># replace self.vision_model</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">transformers</span><span class="o">.</span><span class="n">Blip2ForConditionalGeneration</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">vision_model</span> <span class="o">=</span> <span class="n">VideoBlipVisionModel</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">vision_config</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">query_tokens</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">num_query_tokens</span><span class="p">,</span>
+                            <span class="n">config</span><span class="o">.</span><span class="n">qformer_config</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">qformer</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">Blip2QFormerModel</span><span class="p">(</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">qformer_config</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">language_projection</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">qformer_config</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">text_config</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">use_decoder_only_language_model</span><span class="p">:</span>
+                <span class="n">language_model</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span>
+                    <span class="n">config</span><span class="o">.</span><span class="n">text_config</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">language_model</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoModelForSeq2SeqLM</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span>  <span class="c1"># noqa: E501</span>
+                    <span class="n">config</span><span class="o">.</span><span class="n">text_config</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">language_model</span> <span class="o">=</span> <span class="n">language_model</span>
+
+            <span class="c1"># Initialize weights and apply final processing</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">post_init</span><span class="p">()</span>
+
+    <span class="n">processor</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+        <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_model</span><span class="p">:</span>
+        <span class="n">model_class</span> <span class="o">=</span> <span class="n">VideoBlipForConditionalGeneration</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">model_class</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
+                                            <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">processor</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_model</span> <span class="k">else</span> <span class="n">processor</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_vllm_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_vllm_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_vllm_model</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a HuggingFace model with the corresponding processor.</span>
+
+<span class="sd">    :param pretrained_model_name_or_path: model name or path</span>
+<span class="sd">    :param model_params: LLM initialization parameters.</span>
+<span class="sd">    :return: a tuple of (model, tokenizer)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;VLLM_WORKER_MULTIPROC_METHOD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;spawn&#39;</span>
+
+    <span class="k">if</span> <span class="n">model_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;cuda:&#39;</span><span class="p">):</span>
+        <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;device&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">vllm</span><span class="o">.</span><span class="n">LLM</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
+                     <span class="n">generation_config</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_tokenizer</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="update_sampling_params">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.update_sampling_params">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_sampling_params</span><span class="p">(</span><span class="n">sampling_params</span><span class="p">,</span>
+                           <span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
+                           <span class="n">enable_vllm</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">enable_vllm</span><span class="p">:</span>
+        <span class="n">update_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;max_tokens&#39;</span><span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">update_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;max_new_tokens&#39;</span><span class="p">}</span>
+    <span class="n">generation_config_keys</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;max_tokens&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;max_tokens&#39;</span><span class="p">,</span> <span class="s1">&#39;max_new_tokens&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;max_new_tokens&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;max_tokens&#39;</span><span class="p">,</span> <span class="s1">&#39;max_new_tokens&#39;</span><span class="p">],</span>
+    <span class="p">}</span>
+    <span class="n">generation_config_thresholds</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;max_tokens&#39;</span><span class="p">:</span> <span class="p">(</span><span class="nb">max</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+        <span class="s1">&#39;max_new_tokens&#39;</span><span class="p">:</span> <span class="p">(</span><span class="nb">max</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="c1"># try to get the generation configs</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenerationConfig</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">model_generation_config</span> <span class="o">=</span> <span class="n">GenerationConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="n">pretrained_model_name_or_path</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No generation config found for the model &#39;</span>
+                       <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="n">pretrained_model_name_or_path</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
+        <span class="n">model_generation_config</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">update_keys</span><span class="p">:</span>
+        <span class="c1"># if there is this param in the sampling_prams, compare it with the</span>
+        <span class="c1"># thresholds and apply the specified updating function</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sampling_params</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Found param </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1"> in the input `sampling_params`.&#39;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="c1"># if not, try to find it in the generation_config of the model</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">config_key</span> <span class="ow">in</span> <span class="n">generation_config_keys</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">config_key</span> <span class="ow">in</span> <span class="n">model_generation_config</span> \
+                    <span class="ow">and</span> <span class="n">model_generation_config</span><span class="p">[</span><span class="n">config_key</span><span class="p">]:</span>
+                <span class="n">sampling_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_generation_config</span><span class="p">[</span><span class="n">config_key</span><span class="p">]</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Found param </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1"> in the generation config as &#39;</span>
+                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sampling_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="c1"># if not again, use the threshold directly</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">th</span> <span class="o">=</span> <span class="n">generation_config_thresholds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">sampling_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">th</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Use the threshold </span><span class="si">{</span><span class="n">th</span><span class="si">}</span><span class="s1"> as the sampling param </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sampling_params</span></div>
+
+
+
+<span class="n">MODEL_FUNCTION_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;api&#39;</span><span class="p">:</span> <span class="n">prepare_api_model</span><span class="p">,</span>
+    <span class="s1">&#39;diffusion&#39;</span><span class="p">:</span> <span class="n">prepare_diffusion_model</span><span class="p">,</span>
+    <span class="s1">&#39;fasttext&#39;</span><span class="p">:</span> <span class="n">prepare_fasttext_model</span><span class="p">,</span>
+    <span class="s1">&#39;fastsam&#39;</span><span class="p">:</span> <span class="n">prepare_fastsam_model</span><span class="p">,</span>
+    <span class="s1">&#39;huggingface&#39;</span><span class="p">:</span> <span class="n">prepare_huggingface_model</span><span class="p">,</span>
+    <span class="s1">&#39;kenlm&#39;</span><span class="p">:</span> <span class="n">prepare_kenlm_model</span><span class="p">,</span>
+    <span class="s1">&#39;nltk&#39;</span><span class="p">:</span> <span class="n">prepare_nltk_model</span><span class="p">,</span>
+    <span class="s1">&#39;nltk_pos_tagger&#39;</span><span class="p">:</span> <span class="n">prepare_nltk_pos_tagger</span><span class="p">,</span>
+    <span class="s1">&#39;opencv_classifier&#39;</span><span class="p">:</span> <span class="n">prepare_opencv_classifier</span><span class="p">,</span>
+    <span class="s1">&#39;recognizeAnything&#39;</span><span class="p">:</span> <span class="n">prepare_recognizeAnything_model</span><span class="p">,</span>
+    <span class="s1">&#39;sdxl-prompt-to-prompt&#39;</span><span class="p">:</span> <span class="n">prepare_sdxl_prompt2prompt</span><span class="p">,</span>
+    <span class="s1">&#39;sentencepiece&#39;</span><span class="p">:</span> <span class="n">prepare_sentencepiece_for_lang</span><span class="p">,</span>
+    <span class="s1">&#39;simple_aesthetics&#39;</span><span class="p">:</span> <span class="n">prepare_simple_aesthetics_model</span><span class="p">,</span>
+    <span class="s1">&#39;spacy&#39;</span><span class="p">:</span> <span class="n">prepare_spacy_model</span><span class="p">,</span>
+    <span class="s1">&#39;video_blip&#39;</span><span class="p">:</span> <span class="n">prepare_video_blip_model</span><span class="p">,</span>
+    <span class="s1">&#39;vllm&#39;</span><span class="p">:</span> <span class="n">prepare_vllm_model</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">_MODELS_WITHOUT_FILE_LOCK</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;fasttext&#39;</span><span class="p">,</span> <span class="s1">&#39;fastsam&#39;</span><span class="p">,</span> <span class="s1">&#39;kenlm&#39;</span><span class="p">,</span> <span class="s1">&#39;nltk&#39;</span><span class="p">,</span> <span class="s1">&#39;recognizeAnything&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sentencepiece&#39;</span><span class="p">,</span> <span class="s1">&#39;spacy&#39;</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="prepare_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="p">,</span> <span class="o">**</span><span class="n">model_kwargs</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">model_type</span> <span class="ow">in</span> <span class="n">MODEL_FUNCTION_MAPPING</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="p">),</span> <span class="s1">&#39;model_type must be one of the following: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">MODEL_FUNCTION_MAPPING</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="n">model_func</span> <span class="o">=</span> <span class="n">MODEL_FUNCTION_MAPPING</span><span class="p">[</span><span class="n">model_type</span><span class="p">]</span>
+    <span class="n">model_key</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">model_func</span><span class="p">,</span> <span class="o">**</span><span class="n">model_kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="n">_MODELS_WITHOUT_FILE_LOCK</span><span class="p">:</span>
+        <span class="c1"># initialize once in the main process to safely download model files</span>
+        <span class="n">model_key</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">model_key</span></div>
+
+
+
+<div class="viewcode-block" id="get_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.get_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">model_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">global</span> <span class="n">MODEL_ZOO</span>
+    <span class="k">if</span> <span class="n">model_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MODEL_ZOO</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model_key</span><span class="si">}</span><span class="s1"> not found in MODEL_ZOO (</span><span class="si">{</span><span class="n">mp</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">)&#39;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_cuda</span><span class="p">:</span>
+            <span class="n">rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="k">if</span> <span class="n">rank</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">%</span> <span class="n">cuda_device_count</span><span class="p">()</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;cuda:</span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;cpu&#39;</span>
+        <span class="n">MODEL_ZOO</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_key</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">MODEL_ZOO</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="free_models">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.free_models">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">free_models</span><span class="p">(</span><span class="n">clear_model_zoo</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">MODEL_ZOO</span>
+    <span class="k">for</span> <span class="n">model_key</span> <span class="ow">in</span> <span class="n">MODEL_ZOO</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">MODEL_ZOO</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">if</span> <span class="n">clear_model_zoo</span><span class="p">:</span>
+        <span class="n">MODEL_ZOO</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="../../../_static/documentation_options.js?v=28d163b9"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

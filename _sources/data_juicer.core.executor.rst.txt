@@ -1,7 +1,0 @@
-data_juicer.core.executor
-=========================
-
-.. automodule:: data_juicer.core.executor
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -1,0 +1,1119 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Operator Schemas 算子提要" href="docs/Operators.html" />
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>data-juicer</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/sidebar-menu.css?v=dcc41d8a" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="#"><div class="brand">data-juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+  
+  
+  <span class="sidebar-brand-text">data-juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">docs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/RecipeGallery.html">Data Recipe Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/DatasetCfg.html">Dataset Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/BadDataExhibition.html">“Bad” Data Exhibition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/DJ_SORA.html">Motivation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/DJ_SORA.html#roadmap">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/DJ_service.html">Start the Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/DJ_service.html#api-calls">API Calls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/DJ_service.html#demonstration">Demonstration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/DeveloperGuide.html">How-to Guide for Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/Distributed.html">Distributed Data Processing in Data-Juicer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/Sandbox.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/Sandbox.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/Sandbox-ZH.html">用户指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/Sandbox-ZH.html#id8">开发者指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/awesome_llm_data.html#news">News</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/awesome_llm_data.html#contribution-to-this-survey">Contribution to This Survey</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/awesome_llm_data.html#references">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/awesome_llm_data.html#section-mentioned-papers-retrieval-list">“Section - Mentioned Papers” Retrieval List</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="demos/README.html">Demos</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tools/distributed_deduplication/README.html">Distributed Fuzzy Deduplication Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/evaluator/README.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/evaluator/gpt_eval/README.html">GPT EVAL: Evaluate your model with OpenAI API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/evaluator/recorder/README.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/fmt_conversion/README.html">Format Conversion Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/fmt_conversion/multimodal/README.html">Multimodal Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/fmt_conversion/post_tuning_dialog/README.html">Post Tuning Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/hpo/README.html">Hyper-parameter Optimization for Data Recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/mm_eval/inception_metrics/README.html">Metrics for video generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/postprocess/README.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/preprocess/README.html">Preprocess Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/quality_classifier/README.html">Data Scoring Capabilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/quality_classifier/README.html#quality-classifier-toolkit-gpt-3-reproduced">Quality Classifier Toolkit (GPT-3 Reproduced)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">thirdparty</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="thirdparty/LLM_ecosystems/README.html">LLM Ecosystems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thirdparty/models/README.html">Third-party Model Library</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="data_juicer.core.html">data_juicer.core package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of data_juicer.core package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.data.html">data_juicer.core.data package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.executor.html">data_juicer.core.executor package</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of data_juicer.ops package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.aggregator.html">data_juicer.ops.aggregator package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.grouper.html">data_juicer.ops.grouper package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">data_juicer.format package</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+    <div class="current-info">
+        <span class="current-lang">en</span>|<span class="current-version">v1.3.3</span>
+    </div>
+    <div class="dropdown-panel">
+        
+        <div class="section">
+            <dt>Language</dt>
+            <dd>
+                
+                <a href="./../../en/v1.3.3/index.html"
+                    class="active" >
+                    English
+                </a>
+                
+                <a href="./../../zh_CN/v1.3.3/index_ZH.html"
+                    >
+                    简体中文
+                </a>
+                
+            </dd>
+        </div>
+        
+
+        
+        <div class="section">
+            <dt>Version</dt>
+            <dd>
+                    <a href="index.html">v1.3.3</a>
+                    <a href="../main/index.html">main</a>
+            </dd>
+        </div>
+        
+    </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/index.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <p id="data-processing-for-and-with-foundation-models"><a class="reference external" href="../../zh_CN/main/index_ZH">[中文主页]</a> | <a class="reference external" href="docs/tutorial/DJ-Cookbook">[DJ-Cookbook]</a> | <a class="reference external" href="docs/Operators">[OperatorZoo]</a> | <a class="reference external" href="api">[API]</a> | <a class="reference external" href="docs/awesome_llm_data">[Awesome LLM Data]</a></p>
+<section id="id2">
+<h1>Data Processing for and with Foundation Models<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h1>
+ <img src="https://img.alicdn.com/imgextra/i1/O1CN01fUfM5A1vPclzPQ6VI_!!6000000006165-0-tps-1792-1024.jpg" width = "533" height = "300" alt="Data-Juicer"/>
+<p><img alt="" src="https://img.shields.io/badge/language-Python-214870.svg" />
+<img alt="" src="https://img.shields.io/badge/license-Apache--2.0-000000.svg" />
+<a class="reference external" href="https://pypi.org/project/py-data-juicer"><img alt="pypi version" src="https://img.shields.io/pypi/v/py-data-juicer?logo=pypi&amp;color=026cad" /></a>
+<a class="reference external" href="https://hub.docker.com/r/datajuicer/data-juicer"><img alt="Docker version" src="https://img.shields.io/docker/v/datajuicer/data-juicer?logo=docker&amp;label=Docker&amp;color=498bdf" /></a>
+<a class="reference external" href="https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/docker_images/data-juicer-latest.tar.gz"><img alt="Docker on OSS" src="https://img.shields.io/badge/OSS%20latest-none?logo=docker&amp;label=Docker&amp;color=498bdf" /></a>
+<img alt="" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fgist.githubusercontent.com%2FHYLcool%2Ff856b14416f08f73d05d32fd992a9c29%2Fraw%2Ftotal_cov.json" /></p>
+<p><a class="reference internal" href="#dj-cookbook"><img alt="DataModality" src="https://img.shields.io/badge/DataModality-Text,Image,Audio,Video-brightgreen.svg" /></a>
+<a class="reference internal" href="#dj-cookbook"><img alt="Usage" src="https://img.shields.io/badge/Usage-Cleaning,Synthesis,Analysis-FFD21E.svg" /></a>
+<a class="reference external" href="https://modelscope.cn/studios?name=Data-Jiucer&amp;amp;page=1&amp;amp;sort=latest&amp;amp;type=1"><img alt="ModelScope- Demos" src="https://img.shields.io/badge/ModelScope-Demos-4e29ff.svg?logo=data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjI0IDEyMS4zMyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCTxwYXRoIGQ9Im0wIDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtOTkuMTQgNzMuNDloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xNzYuMDkgOTkuMTRoLTI1LjY1djIyLjE5aDQ3Ljg0di00Ny44NGgtMjIuMTl6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTEyNC43OSA0Ny44NGgyNS42NXYyNS42NWgtMjUuNjV6IiBmaWxsPSIjMzZjZmQxIiAvPgoJPHBhdGggZD0ibTAgMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xOTguMjggNDcuODRoMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xOTguMjggMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xNTAuNDQgMHYyMi4xOWgyNS42NXYyNS42NWgyMi4xOXYtNDcuODR6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTczLjQ5IDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiMzNmNmZDEiIC8+Cgk8cGF0aCBkPSJtNDcuODQgMjIuMTloMjUuNjV2LTIyLjE5aC00Ny44NHY0Ny44NGgyMi4xOXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtNDcuODQgNzMuNDloLTIyLjE5djQ3Ljg0aDQ3Ljg0di0yMi4xOWgtMjUuNjV6IiBmaWxsPSIjNjI0YWZmIiAvPgo8L3N2Zz4K" /></a>
+<a class="reference external" href="https://huggingface.co/spaces?&amp;amp;search=datajuicer"><img alt="HuggingFace- Demos" src="https://img.shields.io/badge/%F0%9F%A4%97HuggingFace-Demos-4e29ff.svg" /></a></p>
+<p><a class="reference internal" href="#dj-cookbook"><img alt="Document_List" src="https://img.shields.io/badge/Doc-DJ_Cookbook-blue?logo=Markdown" /></a>
+<span class="xref myst"><img alt="文档列表" src="https://img.shields.io/badge/%E6%96%87%E6%A1%A3-DJ%E6%8C%87%E5%8D%97-blue?logo=Markdown" /></span>
+<a class="reference internal" href="docs/Operators.html"><span class="std std-doc"><img alt="OpZoo" src="https://img.shields.io/badge/Doc-OperatorZoo-blue?logo=Markdown" /></span></a>
+<a class="reference external" href="https://arxiv.org/abs/2309.02033"><img alt="Paper" src="http://img.shields.io/badge/cs.LG-1.0Paper(SIGMOD'24)-B31B1B?logo=arxiv&amp;logoColor=red" /></a>
+<a class="reference external" href="https://arxiv.org/abs/2501.14755"><img alt="Paper" src="http://img.shields.io/badge/cs.AI-2.0Paper-B31B1B?logo=arxiv&amp;logoColor=red" /></a></p>
+<p>Data-Juicer is a one-stop system to process text and multimodal data for and with foundation models (typically LLMs).
+We provide a <a class="reference external" href="http://8.138.149.181/">playground</a> with a managed JupyterLab. <a class="reference external" href="http://8.138.149.181/">Try Data-Juicer</a> straight away in your browser! If you find Data-Juicer useful for your research or development, please kindly support us by starting it (then be instantly notified of our new releases) and citing our <a class="reference internal" href="#references">works</a>.</p>
+<p><a class="reference external" href="https://www.aliyun.com/product/bigdata/learn">Platform for AI of Alibaba Cloud (PAI)</a> has cited our work and integrated Data-Juicer into its data processing products. PAI is an AI Native large model and AIGC engineering platform that provides dataset management, computing power management, model tool chain, model development, model training, model deployment, and AI asset management. For documentation on data processing, please refer to: <a class="reference external" href="https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX">PAI-Data Processing for Large Models</a>.</p>
+<p>Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets.  We welcome you to join us (via issues, PRs, <a class="reference external" href="https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw">Slack</a>  channel, <a class="reference external" href="https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&amp;amp;_dt_no_comment=1&amp;amp;origin=11">DingDing</a> group, …), in promoting data-model co-development along with research and applications of foundation models!</p>
+<section id="news">
+<h2>News<a class="headerlink" href="#news" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>🎉 [2025-05-06] Our work of <a class="reference external" href="https://arxiv.org/abs/2407.11784">Data-Juicer Sandbox</a> has been accepted as a <strong>Spotlight</strong> by <em>ICML 2025</em> (top 2.6% of all submissions)!</p></li>
+<li><p><img alt="new" src="https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png" /> [2025-03-13] We propose a new data synthesis method, <em>MindGym</em>, which encourages LLMs to self-generate challenging cognitive questions, achieving superior data efficiency, cross-modality generalization, and SFT effects over SOTA baselines (e.g., <em>16%</em> gain on <a class="reference external" href="https://mathllm.github.io/mathvision/#leaderboard">MathVision</a> using only <em>400 samples</em>). See more details in  <a class="reference external" href="https://arxiv.org/abs/2503.09499">MindGym: Enhancing Vision-Language Models via Synthetic Self-Challenging Questions</a>.</p></li>
+<li><p><img alt="new" src="https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png" /> [2025-02-28] DJ has been integrated in <a class="reference external" href="https://docs.ray.io/en/latest/ray-overview/ray-libraries.html">Ray’s official Ecosystem</a> and <a class="reference external" href="https://docs.ray.io/en/latest/data/examples/data_juicer_distributed_data_processing.html">Example Gallery</a>. Besides, our patch in DJ2.0 for the streaming JSON reader has been officially integrated by <a class="reference external" href="https://github.com/apache/arrow/pull/45084">Apache Arrow</a>.</p></li>
+<li><p><img alt="new" src="https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png" /> [2025-02-27] Our work on contrastive data synthesis, <a class="reference external" href="https://arxiv.org/pdf/2408.04594">ImgDiff</a>, has been accepted by <em>CVPR 2025</em>!</p></li>
+<li><p><img alt="new" src="https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png" /> [2025-02-05] We propose a new data selection method, <em>DaaR</em>, which is theoretically informed, via treating diversity as a reward, achieves better overall performance across 7 benchmarks when post-training SOTA LLMs. See more details in <a class="reference external" href="https://www.arxiv.org/abs/2502.04380">Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data</a>.</p></li>
+<li><p><img alt="new" src="https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png" /> [2025-01-11] We release our 2.0 paper, <a class="reference external" href="https://arxiv.org/abs/2501.14755">Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models</a>. It now can process 70B data samples within 2.1h, using 6400 CPU cores on 50 Ray nodes from Alibaba Cloud cluster, and deduplicate 5TB data within 2.8h using 1280 CPU cores on 8 Ray nodes.</p></li>
+<li><p><img alt="new" src="https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png" /> [2025-01-03] We support post-tuning scenarios better, via 20+ related new <a class="reference external" href="https://github.com/modelscope/data-juicer/releases/tag/v1.0.2">OPs</a>, and via unified <a class="reference external" href="https://github.com/modelscope/data-juicer/releases/tag/v1.0.3">dataset format</a> compatible to LLaMA-Factory and ModelScope-Swift.</p></li>
+</ul>
+<details>
+<summary> History News:
+</summary>>
+<ul class="simple">
+<li><p>[2024-12-17] We propose <em>HumanVBench</em>, which comprises 16 human-centric tasks with synthetic data, benchmarking 22 video-MLLMs’ capabilities from views of inner emotion and outer manifestations. See more details in our <a class="reference external" href="https://arxiv.org/abs/2412.17574">paper</a>, and try to <a class="reference external" href="https://github.com/modelscope/data-juicer/tree/HumanVBench">evaluate</a> your models with it.</p></li>
+<li><p>[2024-11-22] We release DJ <a class="reference external" href="https://github.com/modelscope/data-juicer/releases/tag/v1.0.0">v1.0.0</a>, in which we refactored Data-Juicer’s <em>Operator</em>, <em>Dataset</em>, <em>Sandbox</em> and many other modules for better usability, such as supporting fault-tolerant, FastAPI and adaptive resource management.</p></li>
+<li><p>[2024-08-25] We give a <a class="reference external" href="https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html">tutorial</a> about data processing for multimodal LLMs in KDD’2024.</p></li>
+<li><p>[2024-08-09] We propose Img-Diff, which enhances the performance of multimodal large language models through <em>contrastive data synthesis</em>, achieving a score that is 12 points higher than GPT-4V on the <a class="reference external" href="https://tsb0601.github.io/mmvp_blog/">MMVP benchmark</a>. See more details in our <a class="reference external" href="https://arxiv.org/abs/2408.04594">paper</a>, and download the dataset from <a class="reference external" href="https://huggingface.co/datasets/datajuicer/Img-Diff">huggingface</a> and <a class="reference external" href="https://modelscope.cn/datasets/Data-Juicer/Img-Diff">modelscope</a>.</p></li>
+<li><p>[2024-07-24] “Tianchi Better Synth Data Synthesis Competition for Multimodal Large Models” — Our 4th data-centric LLM competition has kicked off! Please visit the competition’s <a class="reference external" href="https://tianchi.aliyun.com/competition/entrance/532251">official website</a> for more information.</p></li>
+<li><p>[2024-07-17] We utilized the Data-Juicer <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox.md">Sandbox Laboratory Suite</a> to systematically optimize data and models through a co-development workflow between data and models, achieving a new top spot on the <a class="reference external" href="https://huggingface.co/spaces/Vchitect/VBench_Leaderboard">VBench</a> text-to-video leaderboard. The related achievements have been compiled and published in a <a class="reference external" href="http://arxiv.org/abs/2407.11784">paper</a>, and the model has been released on the <a class="reference external" href="https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V">ModelScope</a> and <a class="reference external" href="https://huggingface.co/datajuicer/Data-Juicer-T2V">HuggingFace</a> platforms.</p></li>
+<li><p>[2024-07-12] Our <em>awesome list of MLLM-Data</em> has evolved into a systemic <a class="reference external" href="https://arxiv.org/abs/2407.08583">survey</a> from model-data co-development perspective. Welcome to <a class="reference internal" href="docs/awesome_llm_data.html"><span class="std std-doc">explore</span></a> and contribute!</p></li>
+<li><p>[2024-06-01] ModelScope-Sora “Data Directors” creative sprint—Our third data-centric LLM competition has kicked off! Please visit the competition’s <a class="reference external" href="https://tianchi.aliyun.com/competition/entrance/532219">official website</a> for more information.</p></li>
+<li><p>[2024-03-07] We release <strong>Data-Juicer <a class="reference external" href="https://github.com/alibaba/data-juicer/releases/tag/v0.2.0">v0.2.0</a></strong> now!
+In this new version, we support more features for <strong>multimodal data (including video now)</strong>, and introduce <strong><a class="reference internal" href="docs/DJ_SORA.html"><span class="std std-doc">DJ-SORA</span></a></strong> to provide open large-scale, high-quality datasets for SORA-like models.</p></li>
+<li><p>[2024-02-20] We have actively maintained an <em>awesome list of LLM-Data</em>, welcome to <a class="reference internal" href="docs/awesome_llm_data.html"><span class="std std-doc">visit</span></a> and contribute!</p></li>
+<li><p>[2024-02-05] Our paper has been accepted by SIGMOD’24 industrial track!</p></li>
+<li><p>[2024-01-10] Discover new horizons in “Data Mixture”—Our second data-centric LLM competition has kicked off! Please visit the competition’s <a class="reference external" href="https://tianchi.aliyun.com/competition/entrance/532174">official website</a> for more information.</p></li>
+<li><p>[2024-01-05] We release <strong>Data-Juicer v0.1.3</strong> now!
+In this new version, we support <strong>more Python versions</strong> (3.8-3.10), and support <strong>multimodal</strong> dataset <a class="reference internal" href="tools/fmt_conversion/multimodal/README.html"><span class="std std-doc">converting</span></a>/<a class="reference internal" href="docs/Operators.html"><span class="std std-doc">processing</span></a> (Including texts, images, and audios. More modalities will be supported in the future).
+Besides, our paper is also updated to <a class="reference external" href="https://arxiv.org/abs/2309.02033">v3</a>.</p></li>
+<li><p>[2023-10-13] Our first data-centric LLM competition begins! Please
+visit the competition’s official websites, FT-Data Ranker (<a class="reference external" href="https://tianchi.aliyun.com/competition/entrance/532157">1B Track</a>, <a class="reference external" href="https://tianchi.aliyun.com/competition/entrance/532158">7B Track</a>), for more information.</p></li>
+</ul>
+</details>
+<div id="table" align="center"></div>
+</section>
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="#news">News</a></p></li>
+<li><p><a class="reference internal" href="#why-data-juicer">Why Data-Juicer?</a></p></li>
+<li><p><a class="reference internal" href="#dj-cookbook">DJ-Cookbook</a></p>
+<ul>
+<li><p><a class="reference internal" href="#curated-resources">Curated Resources</a></p></li>
+<li><p><a class="reference internal" href="#coding-with-data-juicer-dj">Coding with Data-Juicer (DJ)</a></p></li>
+<li><p><a class="reference internal" href="#use-cases-data-recipes">Use Cases &amp; Data Recipes</a></p></li>
+<li><p><a class="reference internal" href="#interactive-examples">Interactive Examples</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#installation">Installation</a></p>
+<ul>
+<li><p><a class="reference internal" href="#prerequisites">Prerequisites</a></p></li>
+<li><p><a class="reference internal" href="#from-source-for-specific-scenarios">From Source for Specific Scenarios</a></p></li>
+<li><p><a class="reference internal" href="#from-source-for-specific-ops">From Source for Specific OPs</a></p></li>
+<li><p><a class="reference internal" href="#using-pip">Using pip</a></p></li>
+<li><p><a class="reference internal" href="#using-docker">Using Docker</a></p></li>
+<li><p><a class="reference internal" href="#installation-check">Installation check</a></p></li>
+<li><p><a class="reference internal" href="#for-video-related-operators">For Video-related Operators</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#quick-start">Quick Start</a></p>
+<ul>
+<li><p><a class="reference internal" href="#dataset-configuration">Dataset Configuration</a></p></li>
+<li><p><a class="reference internal" href="#data-processing">Data Processing</a></p></li>
+<li><p><a class="reference internal" href="#distributed-data-processing">Distributed Data Processing</a></p></li>
+<li><p><a class="reference internal" href="#data-analysis">Data Analysis</a></p></li>
+<li><p><a class="reference internal" href="#data-visualization">Data Visualization</a></p></li>
+<li><p><a class="reference internal" href="#build-up-config-files">Build Up Config Files</a></p></li>
+<li><p><a class="reference internal" href="#sandbox">Sandbox</a></p></li>
+<li><p><a class="reference internal" href="#preprocess-raw-data-optional">Preprocess Raw Data (Optional)</a></p></li>
+<li><p><a class="reference internal" href="#for-docker-users">For Docker Users</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#license">License</a></p></li>
+<li><p><a class="reference internal" href="#contributing">Contributing</a></p></li>
+<li><p><a class="reference internal" href="#acknowledgement">Acknowledgement</a></p></li>
+<li><p><a class="reference internal" href="#references">References</a></p></li>
+</ul>
+<section id="why-data-juicer">
+<h3>Why Data-Juicer?<a class="headerlink" href="#why-data-juicer" title="Link to this heading">¶</a></h3>
+<img src="https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png" align="center" width="600" />
+<ul class="simple">
+<li><p><strong>Systematic &amp; Reusable</strong>:
+Empowering users with a systematic library of 100+ core <a class="reference internal" href="docs/Operators.html"><span class="std std-doc">OPs</span></a>, and 50+ reusable config recipes and
+dedicated toolkits, designed to
+function independently of specific multimodal LLM datasets and processing pipelines. Supporting data analysis, cleaning, and synthesis in pre-training, post-tuning, en, zh, and more scenarios.</p></li>
+<li><p><strong>User-Friendly &amp; Extensible</strong>:
+Designed for simplicity and flexibility, with easy-start <a class="reference internal" href="#quick-start">guides</a>, and <a class="reference internal" href="#dj-cookbook">DJ-Cookbook</a> containing fruitful demo usages. Feel free to <a class="reference internal" href="docs/DeveloperGuide.html#build-your-own-ops"><span class="std std-ref">implement your own OPs</span></a> for customizable data processing.</p></li>
+<li><p><strong>Efficient &amp; Robust</strong>: Providing performance-optimized <a class="reference internal" href="docs/Distributed.html"><span class="std std-doc">parallel data processing</span></a> (Aliyun-PAI\Ray\CUDA\OP Fusion),
+faster with less resource usage, verified in large-scale production environments.</p></li>
+<li><p><strong>Effect-Proven &amp; Sandbox</strong>: Supporting data-model co-development, enabling rapid iteration
+through the <a class="reference internal" href="docs/Sandbox.html"><span class="std std-doc">sandbox laboratory</span></a>, and providing features such as feedback loops and visualization, so that you can better understand and improve your data and models. Many effect-proven datasets and models have been derived from DJ, in scenarios such as pre-training, text-to-video and image-to-text generation.
+<img alt="Data-in-the-loop" src="https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg" /></p></li>
+</ul>
+</section>
+<section id="dj-cookbook">
+<h3>DJ-Cookbook<a class="headerlink" href="#dj-cookbook" title="Link to this heading">¶</a></h3>
+<section id="curated-resources">
+<h4>Curated Resources<a class="headerlink" href="#curated-resources" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html">KDD-Tutorial</a></p></li>
+<li><p><a class="reference internal" href="docs/awesome_llm_data.html"><span class="std std-doc">Awesome LLM-Data</span></a></p></li>
+<li><p><a class="reference internal" href="docs/BadDataExhibition.html"><span class="std std-doc">“Bad” Data Exhibition</span></a></p></li>
+</ul>
+</section>
+<section id="coding-with-data-juicer-dj">
+<h4>Coding with Data-Juicer (DJ)<a class="headerlink" href="#coding-with-data-juicer-dj" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Basics</p>
+<ul>
+<li><p><a class="reference internal" href="README.html"><span class="std std-doc">Overview of DJ</span></a></p></li>
+<li><p><a class="reference internal" href="#quick-start">Quick Start</a></p></li>
+<li><p><a class="reference internal" href="docs/RecipeGallery.html"><span class="std std-doc">Configuration</span></a></p></li>
+<li><p><a class="reference internal" href="tools/fmt_conversion/README.html"><span class="std std-doc">Data Format Conversion</span></a></p></li>
+</ul>
+</li>
+<li><p>Lookup Materials</p>
+<ul>
+<li><p><a class="reference internal" href="docs/Operators.html"><span class="std std-doc">DJ OperatorZoo</span></a></p></li>
+<li><p><a class="reference external" href="https://modelscope.github.io/data-juicer/">API references</a></p></li>
+</ul>
+</li>
+<li><p>Advanced</p>
+<ul>
+<li><p><a class="reference internal" href="docs/DeveloperGuide.html"><span class="std std-doc">Developer Guide</span></a></p></li>
+<li><p><a class="reference internal" href="tools/preprocess/README.html"><span class="std std-doc">Preprocess Tools</span></a></p></li>
+<li><p><a class="reference internal" href="tools/postprocess/README.html"><span class="std std-doc">Postprocess Tools</span></a></p></li>
+<li><p><a class="reference internal" href="docs/Sandbox.html"><span class="std std-doc">Sandbox</span></a></p></li>
+<li><p><a class="reference internal" href="docs/DJ_service.html"><span class="std std-doc">API Service</span></a></p></li>
+<li><p><a class="reference internal" href="tools/quality_classifier/README.html"><span class="std std-doc">Data Scoring</span></a></p></li>
+<li><p><a class="reference internal" href="tools/evaluator/README.html"><span class="std std-doc">Auto Evaluation</span></a></p></li>
+<li><p><a class="reference internal" href="thirdparty/LLM_ecosystems/README.html"><span class="std std-doc">Third-parties Integration</span></a></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="use-cases-data-recipes">
+<h4>Use Cases &amp; Data Recipes<a class="headerlink" href="#use-cases-data-recipes" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="docs/RecipeGallery.html"><span class="std std-doc">Data Recipe Gallery</span></a></p>
+<ul>
+<li><p>Data-Juicer Minimal Example Recipe</p></li>
+<li><p>Reproducing Open Source Text Datasets</p></li>
+<li><p>Improving Open Source Pre-training Text Datasets</p></li>
+<li><p>Improving Open Source Post-tuning Text Datasets</p></li>
+<li><p>Synthetic Contrastive Learning Image-text Datasets</p></li>
+<li><p>Improving Open Source Image-text Datasets</p></li>
+<li><p>Basic Example Recipes for Video Data</p></li>
+<li><p>Synthesizing Human-centric Video Benchmarks</p></li>
+<li><p>Improving Existing Open Source Video Datasets</p></li>
+</ul>
+</li>
+<li><p>Data-Juicer related Competitions</p>
+<ul>
+<li><p><a class="reference external" href="https://tianchi.aliyun.com/competition/entrance/532251">Better Synth</a>, explore the impact of large model synthetic data on image understanding ability with DJ-Sandbox Lab and multimodal large models</p></li>
+<li><p><a class="reference external" href="https://tianchi.aliyun.com/competition/entrance/532219">Modelscope-Sora Challenge</a>, based on Data-Juicer and <a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a> framework,  optimize data and train SORA-like small models to generate better videos</p></li>
+<li><p><a class="reference external" href="https://tianchi.aliyun.com/competition/entrance/532174">Better Mixture</a>, only adjust data mixing and sampling strategies for given multiple candidate datasets</p></li>
+<li><p>FT-Data Ranker (<a class="reference external" href="https://tianchi.aliyun.com/competition/entrance/532157">1B Track</a>, <a class="reference external" href="https://tianchi.aliyun.com/competition/entrance/532158">7B Track</a>), For a specified candidate dataset, only adjust the data filtering and enhancement strategies</p></li>
+<li><p><a class="reference external" href="https://tianchi.aliyun.com/competition/entrance/532254">Kolors-LoRA Stylized Story Challenge</a>, based on Data-Juicer and <a class="reference external" href="https://github.com/modelscope/DiffSynth-Studio">DiffSynth-Studio</a> framework, explore Diffusion model fine-tuning</p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="docs/DJ_SORA.html"><span class="std std-doc">DJ-SORA</span></a></p></li>
+<li><p>Based on Data-Juicer and <a class="reference external" href="https://github.com/modelscope/agentscope">AgentScope</a> framework, leverage <a class="reference internal" href="#./demos/api_service/react_data_filter_process.ipynb"><span class="xref myst">agents to call DJ Filters</span></a> and <a class="reference internal" href="#./demos/api_service/react_data_mapper_process.ipynb"><span class="xref myst">call DJ Mappers</span></a></p></li>
+</ul>
+</section>
+<section id="interactive-examples">
+<h4>Interactive Examples<a class="headerlink" href="#interactive-examples" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Introduction to Data-Juicer [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/overview_scan/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/overview_scan">HuggingFace</a>]</p></li>
+<li><p>Data Visualization:</p>
+<ul>
+<li><p>Basic Statistics [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/data_visulization_statistics/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/data_visualization_statistics">HuggingFace</a>]</p></li>
+<li><p>Lexical Diversity [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/data_visulization_diversity/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/data_visualization_diversity">HuggingFace</a>]</p></li>
+<li><p>Operator Insight (Single OP) [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/data_visualization_op_insight/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/data_visualization_op_insight">HuggingFace</a>]</p></li>
+<li><p>Operator Effect (Multiple OPs) [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/data_visulization_op_effect/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/data_visualization_op_effect">HuggingFace</a>]</p></li>
+</ul>
+</li>
+<li><p>Data Processing:</p>
+<ul>
+<li><p>Scientific Literature (e.g. <a class="reference external" href="https://info.arxiv.org/help/bulk_data_s3.html">arXiv</a>) [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/process_sci_data/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/process_sci_data">HuggingFace</a>]</p></li>
+<li><p>Programming Code (e.g. <a class="reference external" href="https://huggingface.co/datasets/bigcode/the-stack">TheStack</a>) [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/process_code_data/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/process_code_data">HuggingFace</a>]</p></li>
+<li><p>Chinese Instruction Data (e.g. <a class="reference external" href="https://huggingface.co/datasets/QingyiSi/Alpaca-CoT">Alpaca-CoT</a>) [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/process_sft_zh_data/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/process_cft_zh_data">HuggingFace</a>]</p></li>
+</ul>
+</li>
+<li><p>Tool Pool:</p>
+<ul>
+<li><p>Dataset Splitting by Language [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/tool_dataset_splitting_by_language/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/tool_dataset_splitting_by_language">HuggingFace</a>]</p></li>
+<li><p>Quality Classifier for CommonCrawl [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/tool_quality_classifier/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/tool_quality_classifier">HuggingFace</a>]</p></li>
+<li><p>Auto Evaluation on <a class="reference external" href="https://github.com/stanford-crfm/helm">HELM</a> [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/auto_evaluation_helm/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/auto_evaluation_helm">HuggingFace</a>]</p></li>
+<li><p>Data Sampling and Mixture [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/data_mixture/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/data_mixture">HuggingFace</a>]</p></li>
+</ul>
+</li>
+<li><p>Data Processing Loop [<a class="reference external" href="https://modelscope.cn/studios/Data-Juicer/data_process_loop/summary">ModelScope</a>] [<a class="reference external" href="https://huggingface.co/spaces/datajuicer/data_process_loop">HuggingFace</a>]</p></li>
+</ul>
+</section>
+</section>
+<section id="installation">
+<h3>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h3>
+<section id="prerequisites">
+<h4>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Recommend Python&gt;=3.9,&lt;=3.10</p></li>
+<li><p>gcc &gt;= 5 (at least C++14 support)</p></li>
+</ul>
+</section>
+<section id="from-source-for-specific-scenarios">
+<h4>From Source for Specific Scenarios<a class="headerlink" href="#from-source-for-specific-scenarios" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Run the following commands to install the latest basic <code class="docutils literal notranslate"><span class="pre">data_juicer</span></code> version in
+editable mode:</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>&lt;path_to_data_juicer&gt;
+pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Some OPs rely on some other too large or low-platform-compatibility third-party libraries. You can install optional dependencies as needed:</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>&lt;path_to_data_juicer&gt;
+pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.<span class="w">  </span><span class="c1"># Install minimal dependencies, which support the basic functions</span>
+pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>tools<span class="o">]</span><span class="w"> </span><span class="c1"># Install a subset of tools dependencies</span>
+</pre></div>
+</div>
+<p>The dependency options are listed below:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tag</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">.</span></code> or <code class="docutils literal notranslate"><span class="pre">.[mini]</span></code></p></td>
+<td><p>Install minimal dependencies for basic Data-Juicer.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">.[all]</span></code></p></td>
+<td><p>Install dependencies for all OPs except sandbox.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">.[sci]</span></code></p></td>
+<td><p>Install dependencies for OPs related to scientific usage.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">.[dist]</span></code></p></td>
+<td><p>Install dependencies for additional distributed data processing.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">.[dev]</span></code></p></td>
+<td><p>Install dependencies for developing the package as contributors.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">.[tools]</span></code></p></td>
+<td><p>Install dependencies for dedicated tools, such as quality classifiers.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">.[sandbox]</span></code></p></td>
+<td><p>Install all dependencies for sandbox.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="from-source-for-specific-ops">
+<h4>From Source for Specific OPs<a class="headerlink" href="#from-source-for-specific-ops" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Install dependencies for specific OPs</p></li>
+</ul>
+<p>With the growth of the number of OPs, the dependencies of all OPs become very heavy. Instead of using the command <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-v</span> <span class="pre">-e</span> <span class="pre">.[all]</span></code> to install all dependencies,
+we provide two alternative, lighter options:</p>
+<ul>
+<li><p>Automatic Minimal Dependency Installation: During the execution of Data-Juicer, minimal dependencies will be automatically installed. This allows for immediate execution, but may potentially lead to dependency conflicts.</p></li>
+<li><p>Manual Minimal Dependency Installation: To manually install minimal dependencies tailored to a specific execution configuration, run the following command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># only for installation from source</span>
+python<span class="w"> </span>tools/dj_install.py<span class="w"> </span>--config<span class="w"> </span>path_to_your_data-juicer_config_file
+
+<span class="c1"># use command line tool</span>
+dj-install<span class="w"> </span>--config<span class="w"> </span>path_to_your_data-juicer_config_file
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="using-pip">
+<h4>Using pip<a class="headerlink" href="#using-pip" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Run the following command to install the latest released <code class="docutils literal notranslate"><span class="pre">data_juicer</span></code> using <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>py-data-juicer
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>Note</strong>:</p>
+<ul>
+<li><p>only the basic APIs in <code class="docutils literal notranslate"><span class="pre">data_juicer</span></code> and two basic tools
+(data <a class="reference internal" href="#data-processing">processing</a> and <a class="reference internal" href="#data-analysis">analysis</a>) are available in this way. If you want customizable
+and complete functions, we recommend you install <code class="docutils literal notranslate"><span class="pre">data_juicer</span></code> <a class="reference internal" href="#from-source"><span class="xref myst">from source</span></a>.</p></li>
+<li><p>The release versions from pypi have a certain lag compared to the latest version from source.
+So if you want to follow the latest functions of <code class="docutils literal notranslate"><span class="pre">data_juicer</span></code>, we recommend you install <a class="reference internal" href="#from-source"><span class="xref myst">from source</span></a>.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="using-docker">
+<h4>Using Docker<a class="headerlink" href="#using-docker" title="Link to this heading">¶</a></h4>
+<ul>
+<li><p>You can</p>
+<ul>
+<li><p>either pull our pre-built image from DockerHub:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>datajuicer/data-juicer:&lt;version_tag&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>if you can not connect ot DockerHub, please use other registry mirrors (you can find some from the Internet):</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>&lt;other_registry_mirror&gt;/datajuicer/data-juicer:&lt;version_tag&gt;
+</pre></div>
+</div>
+</li>
+<li><p>or run the following command to build the docker image including the
+latest <code class="docutils literal notranslate"><span class="pre">data-juicer</span></code> with provided <a class="reference internal" href="#Dockerfile"><span class="xref myst">Dockerfile</span></a>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>datajuicer/data-juicer:&lt;version_tag&gt;<span class="w"> </span>.
+</pre></div>
+</div>
+</li>
+<li><p>The format of <code class="docutils literal notranslate"><span class="pre">&lt;version_tag&gt;</span></code> is like <code class="docutils literal notranslate"><span class="pre">v0.2.0</span></code>, which is the same as the release version tag.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="installation-check">
+<h4>Installation check<a class="headerlink" href="#installation-check" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">data_juicer</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dj</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dj</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="for-video-related-operators">
+<h4>For Video-related Operators<a class="headerlink" href="#for-video-related-operators" title="Link to this heading">¶</a></h4>
+<p>Before using video-related operators, <strong>FFmpeg</strong> should be installed and accessible via the $PATH environment variable.</p>
+<p>You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on Debian/Ubuntu, brew install ffmpeg on OS X) or visit the <a class="reference external" href="https://ffmpeg.org/download.html">official ffmpeg link</a>.</p>
+<p>Check if your environment path is set correctly by running the ffmpeg command from the terminal.</p>
+<p align="right"><a href="#table">🔼 back to index</a></p>
+</section>
+</section>
+<section id="quick-start">
+<h3>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h3>
+<section id="dataset-configuration">
+<h4>Dataset Configuration<a class="headerlink" href="#dataset-configuration" title="Link to this heading">¶</a></h4>
+<p>DJ supports various dataset input types, including local files, remote datasets like huggingface; it also supports data validation and data mixture.</p>
+<p>Two ways to configure a input file</p>
+<ul class="simple">
+<li><p>Simple scenarios, single path for local/HF file</p></li>
+</ul>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">dataset_path</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;/path/to/your/dataset&#39;</span><span class="w">  </span><span class="c1"># path to your dataset directory or file</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>advanced method, supports sub-configuration items and more features</p></li>
+</ul>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">dataset</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">configs</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;local&#39;</span>
+<span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;path/to/your/dataset&#39;</span><span class="w"> </span><span class="c1"># path to your dataset directory or file</span>
+</pre></div>
+</div>
+<p>Refer to <a class="reference internal" href="docs/DatasetCfg.html"><span class="std std-doc">Dataset Configuration Guide</span></a> for more details.</p>
+</section>
+<section id="data-processing">
+<h4>Data Processing<a class="headerlink" href="#data-processing" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">process_data.py</span></code> tool or <code class="docutils literal notranslate"><span class="pre">dj-process</span></code> command line tool with your config as the argument to process
+your dataset.</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># only for installation from source</span>
+python<span class="w"> </span>tools/process_data.py<span class="w"> </span>--config<span class="w"> </span>configs/demo/process.yaml
+
+<span class="c1"># use command line tool</span>
+dj-process<span class="w"> </span>--config<span class="w"> </span>configs/demo/process.yaml
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>Note:</strong> For some operators that involve third-party models or resources that are not stored locally on your computer, it might be slow for the first running because these ops need to download corresponding resources into a directory first.
+The default download cache directory is <code class="docutils literal notranslate"><span class="pre">~/.cache/data_juicer</span></code>. Change the cache location by setting the shell environment variable, <code class="docutils literal notranslate"><span class="pre">DATA_JUICER_CACHE_HOME</span></code> to another directory, and you can also change <code class="docutils literal notranslate"><span class="pre">DATA_JUICER_MODELS_CACHE</span></code> or <code class="docutils literal notranslate"><span class="pre">DATA_JUICER_ASSETS_CACHE</span></code> in the same way:</p></li>
+<li><p><strong>Note:</strong> When using operators with third-party models, it’s necessary to declare the corresponding <code class="docutils literal notranslate"><span class="pre">mem_required</span></code> in the configuration file (you can refer to the settings in the <code class="docutils literal notranslate"><span class="pre">config_all.yaml</span></code> file). During runtime, Data-Juicer will control the number of processes based on memory availability and the memory requirements of the operator models to achieve better data processing efficiency. When running with CUDA environments, if the mem_required for an operator is not declared correctly, it could potentially lead to a CUDA Out of Memory issue.</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># cache home</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">DATA_JUICER_CACHE_HOME</span><span class="o">=</span><span class="s2">&quot;/path/to/another/directory&quot;</span>
+<span class="c1"># cache models</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">DATA_JUICER_MODELS_CACHE</span><span class="o">=</span><span class="s2">&quot;/path/to/another/directory/models&quot;</span>
+<span class="c1"># cache assets</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">DATA_JUICER_ASSETS_CACHE</span><span class="o">=</span><span class="s2">&quot;/path/to/another/directory/assets&quot;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>Flexible Programming Interface:</strong>
+We provide various simple interfaces for users to choose from as follows.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#... init op &amp; dataset ...</span>
+
+<span class="c1"># Chain call style, support single operator or operator list</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">process</span><span class="p">([</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">])</span>
+<span class="c1"># Functional programming style for quick integration or script prototype iteration</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="distributed-data-processing">
+<h4>Distributed Data Processing<a class="headerlink" href="#distributed-data-processing" title="Link to this heading">¶</a></h4>
+<p>We have now implemented multi-machine distributed data processing based on <a class="reference external" href="https://www.ray.io/">RAY</a>. The corresponding demos can be run using the following commands:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run text data processing</span>
+python<span class="w"> </span>tools/process_data.py<span class="w"> </span>--config<span class="w"> </span>./demos/process_on_ray/configs/demo.yaml
+<span class="c1"># Run video data processing</span>
+python<span class="w"> </span>tools/process_data.py<span class="w"> </span>--config<span class="w"> </span>./demos/process_video_on_ray/configs/demo.yaml
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>To run data processing across multiple machines, it is necessary to ensure that all distributed nodes can access the corresponding data paths (for example, by mounting the respective data paths on a file-sharing system such as NAS).</p></li>
+<li><p>The deduplication operators for RAY mode are different from the single-machine version, and all those operators are prefixed with <code class="docutils literal notranslate"><span class="pre">ray</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">ray_video_deduplicator</span></code> and <code class="docutils literal notranslate"><span class="pre">ray_document_deduplicator</span></code>.</p></li>
+<li><p>More details can be found in the doc for <a class="reference internal" href="docs/Distributed.html"><span class="std std-doc">distributed processing</span></a>.</p></li>
+</ul>
+<blockquote>
+<div><p>Users can also opt not to use RAY and instead split the dataset to run on a cluster with <a class="reference external" href="https://slurm.schedmd.com/">Slurm</a>. In this case, please use the default Data-Juicer without RAY.
+<a class="reference external" href="https://www.aliyun.com/activity/bigdata/pai-dlc">Aliyun PAI-DLC</a> supports the RAY framework, Slurm framework, etc. Users can directly create RAY jobs and Slurm jobs on the DLC cluster.</p>
+</div></blockquote>
+</section>
+<section id="data-analysis">
+<h4>Data Analysis<a class="headerlink" href="#data-analysis" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">analyze_data.py</span></code> tool or <code class="docutils literal notranslate"><span class="pre">dj-analyze</span></code> command line tool with your config as the argument to analyze your dataset.</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># only for installation from source</span>
+python<span class="w"> </span>tools/analyze_data.py<span class="w"> </span>--config<span class="w"> </span>configs/demo/analyzer.yaml
+
+<span class="c1"># use command line tool</span>
+dj-analyze<span class="w"> </span>--config<span class="w"> </span>configs/demo/analyzer.yaml
+
+<span class="c1"># you can also use auto mode to avoid writing a recipe. It will analyze a small</span>
+<span class="c1"># part (e.g. 1000 samples, specified by argument `auto_num`) of your dataset</span>
+<span class="c1"># with all Filters that produce stats.</span>
+dj-analyze<span class="w"> </span>--auto<span class="w"> </span>--dataset_path<span class="w"> </span>xx.jsonl<span class="w"> </span><span class="o">[</span>--auto_num<span class="w"> </span><span class="m">1000</span><span class="o">]</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>Note:</strong> Analyzer only computes stats for Filters that produce stats or other OPs that produce tags/categories in meta. So other OPs will be ignored in the analysis process. We use the following registries to decorate OPs:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">NON_STATS_FILTERS</span></code>: decorate Filters that <strong>DO NOT</strong> produce any stats.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TAGGING_OPS</span></code>: decorate OPs that <strong>DO</strong> produce tags/categories in meta field.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="data-visualization">
+<h4>Data Visualization<a class="headerlink" href="#data-visualization" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">app.py</span></code> tool to visualize your dataset in your browser.</p></li>
+<li><p><strong>Note</strong>: only available for installation from source.</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>streamlit<span class="w"> </span>run<span class="w"> </span>app.py
+</pre></div>
+</div>
+</section>
+<section id="build-up-config-files">
+<h4>Build Up Config Files<a class="headerlink" href="#build-up-config-files" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Config files specify some global arguments, and an operator list for the
+data process. You need to set:</p>
+<ul>
+<li><p>Global arguments: input/output dataset path, number of workers, etc.</p></li>
+<li><p>Operator list: list operators with their arguments used to process the dataset.</p></li>
+</ul>
+</li>
+<li><p>You can build up your own config files by:</p>
+<ul>
+<li><p>➖：Modify from our example config file <a class="reference internal" href="#configs/config_all.yaml"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">config_all.yaml</span></code></span></a> which includes <strong>all</strong> ops and default
+arguments. You just need to <strong>remove</strong> ops that you won’t use and refine
+some arguments of ops.</p></li>
+<li><p>➕：Build up your own config files <strong>from scratch</strong>. You can refer our
+example config file <a class="reference internal" href="#configs/config_all.yaml"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">config_all.yaml</span></code></span></a>, <a class="reference internal" href="docs/Operators.html"><span class="std std-doc">op documents</span></a>, and advanced <a class="reference internal" href="docs/DeveloperGuide.html#build-your-own-configs"><span class="std std-ref">Build-Up Guide for developers</span></a>.</p></li>
+<li><p>Besides the yaml files, you also have the flexibility to specify just
+one (of several) parameters on the command line, which will override
+the values in yaml files.</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>xxx.py<span class="w"> </span>--config<span class="w"> </span>configs/demo/process.yaml<span class="w"> </span>--language_id_score_filter.lang<span class="o">=</span>en
+</pre></div>
+</div>
+<ul>
+<li><p>The basic config format and definition is shown below.</p>
+<p><img alt="Basic config example of format and definition" src="https://img.alicdn.com/imgextra/i1/O1CN01uXgjgj1khWKOigYww_!!6000000004715-0-tps-1745-871.jpg" /></p>
+</li>
+</ul>
+</section>
+<section id="sandbox">
+<h4>Sandbox<a class="headerlink" href="#sandbox" title="Link to this heading">¶</a></h4>
+<p>The data sandbox laboratory (DJ-Sandbox) provides users with the best practices for continuously producing data recipes. It features low overhead, portability, and guidance.</p>
+<ul class="simple">
+<li><p>In the sandbox, users can quickly experiment, iterate, and refine data recipes based on small-scale datasets and models, before scaling up to produce high-quality data to serve large-scale models.</p></li>
+<li><p>In addition to the basic data optimization and recipe refinement features offered by Data-Juicer, users can seamlessly use configurable components such as data probe and analysis, model training and evaluation, and data and model feedback-based recipe refinement to form a complete one-stop data-model research and development pipeline.</p></li>
+</ul>
+<p>The sandbox is run using the following commands by default, and for more information and details, please refer to the <a class="reference internal" href="docs/Sandbox.html"><span class="std std-doc">sandbox documentation</span></a>.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/sandbox_starter.py<span class="w"> </span>--config<span class="w"> </span>configs/demo/sandbox/sandbox.yaml
+</pre></div>
+</div>
+</section>
+<section id="preprocess-raw-data-optional">
+<h4>Preprocess Raw Data (Optional)<a class="headerlink" href="#preprocess-raw-data-optional" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Our Formatters support some common input dataset formats for now:</p>
+<ul>
+<li><p>Multi-sample in one file: jsonl/json, parquet, csv/tsv, etc.</p></li>
+<li><p>Single-sample in one file: txt, code, docx, pdf, etc.</p></li>
+</ul>
+</li>
+<li><p>However, data from different sources are complicated and diverse. Such as:</p>
+<ul>
+<li><p><a class="reference external" href="https://info.arxiv.org/help/bulk_data_s3.html">Raw arXiv data downloaded from S3</a> include thousands of tar files and even more gzip files in them, and expected tex files are embedded in the gzip files so they are hard to obtain directly.</p></li>
+<li><p>Some crawled data include different kinds of files (pdf, html, docx, etc.). And extra information like tables, charts, and so on is hard to extract.</p></li>
+</ul>
+</li>
+<li><p>It’s impossible to handle all kinds of data in Data-Juicer, issues/PRs are welcome to contribute to processing new data types!</p></li>
+<li><p>Thus, we provide some <strong>common preprocessing tools</strong> in <a class="reference internal" href="#tools/preprocess/"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">tools/preprocess</span></code></span></a> for you to preprocess these data.</p>
+<ul>
+<li><p>You are welcome to make your contributions to new preprocessing tools for the community.</p></li>
+<li><p>We <strong>highly recommend</strong> that complicated data can be preprocessed to jsonl or parquet files.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="for-docker-users">
+<h4>For Docker Users<a class="headerlink" href="#for-docker-users" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>If you build or pull the docker image of <code class="docutils literal notranslate"><span class="pre">data-juicer</span></code>, you can run the commands or tools mentioned above using this docker image.</p></li>
+<li><p>Run directly:</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># run the data processing directly</span>
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span><span class="se">\ </span><span class="w"> </span><span class="c1"># remove container after the processing</span>
+<span class="w">  </span>--privileged<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--shm-size<span class="w"> </span>256g<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--network<span class="w"> </span>host<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--gpus<span class="w"> </span>all<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>dj<span class="w"> </span><span class="se">\ </span><span class="w"> </span><span class="c1"># name of the container</span>
+<span class="w">  </span>-v<span class="w"> </span>&lt;host_data_path&gt;:&lt;image_data_path&gt;<span class="w"> </span><span class="se">\ </span><span class="w"> </span><span class="c1"># mount data or config directory into the container</span>
+<span class="w">  </span>-v<span class="w"> </span>~/.cache/:/root/.cache/<span class="w"> </span><span class="se">\ </span><span class="w"> </span><span class="c1"># mount the cache directory into the container to reuse caches and models (recommended)</span>
+<span class="w">  </span>datajuicer/data-juicer:&lt;version_tag&gt;<span class="w"> </span><span class="se">\ </span><span class="w"> </span><span class="c1"># image to run</span>
+<span class="w">  </span>dj-process<span class="w"> </span>--config<span class="w"> </span>/path/to/config.yaml<span class="w">  </span><span class="c1"># similar data processing commands</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Or enter into the running container and run commands in editable mode:</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># start the container</span>
+docker<span class="w"> </span>run<span class="w"> </span>-dit<span class="w"> </span><span class="se">\ </span><span class="w"> </span><span class="c1"># run the container in the background</span>
+<span class="w">  </span>--privileged<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--shm-size<span class="w"> </span>256g<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--network<span class="w"> </span>host<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--gpus<span class="w"> </span>all<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--rm<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>dj<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span>&lt;host_data_path&gt;:&lt;image_data_path&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span>~/.cache/:/root/.cache/<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>datajuicer/data-juicer:latest<span class="w"> </span>/bin/bash
+
+<span class="c1"># enter into this container and then you can use data-juicer in editable mode</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>&lt;container_id&gt;<span class="w"> </span>bash
+</pre></div>
+</div>
+<p align="right"><a href="#table">🔼 back to index</a></p>
+</section>
+</section>
+<section id="license">
+<h3>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h3>
+<p>Data-Juicer is released under Apache License 2.0.</p>
+</section>
+<section id="contributing">
+<h3>Contributing<a class="headerlink" href="#contributing" title="Link to this heading">¶</a></h3>
+<p>We are in a rapidly developing field and greatly welcome contributions of new
+features, bug fixes, and better documentation. Please refer to
+<a class="reference internal" href="docs/DeveloperGuide.html"><span class="std std-doc">How-to Guide for Developers</span></a>.</p>
+</section>
+<section id="acknowledgement">
+<h3>Acknowledgement<a class="headerlink" href="#acknowledgement" title="Link to this heading">¶</a></h3>
+<p>Data-Juicer is used across various foundation model applications and research initiatives, such as industrial scenarios in Alibaba Tongyi and Alibaba Cloud’s platform for AI (PAI).
+We look forward to more of your experience, suggestions, and discussions for collaboration!</p>
+<p>Data-Juicer thanks many community <a class="reference external" href="https://github.com/modelscope/data-juicer/graphs/contributors">contributors</a> and open-source projects, such as
+<a class="reference external" href="https://github.com/huggingface/datasets">Huggingface-Datasets</a>, <a class="reference external" href="https://huggingface.co/bigscience/bloom">Bloom</a>, <a class="reference external" href="https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1">RedPajama</a>, <a class="reference external" href="https://github.com/apache/arrow">Arrow</a>, <a class="reference external" href="https://github.com/ray-project/ray">Ray</a>, ….</p>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h3>
+<p>If you find Data-Juicer useful for your research or development, please kindly cite the following works, <a class="reference external" href="https://arxiv.org/abs/2309.02033">1.0paper</a>, <a class="reference external" href="https://arxiv.org/abs/2501.14755">2.0paper</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@inproceedings</span><span class="p">{</span><span class="n">djv1</span><span class="p">,</span>
+  <span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="n">Data</span><span class="o">-</span><span class="n">Juicer</span><span class="p">:</span> <span class="n">A</span> <span class="n">One</span><span class="o">-</span><span class="n">Stop</span> <span class="n">Data</span> <span class="n">Processing</span> <span class="n">System</span> <span class="k">for</span> <span class="n">Large</span> <span class="n">Language</span> <span class="n">Models</span><span class="p">},</span>
+  <span class="n">author</span><span class="o">=</span><span class="p">{</span><span class="n">Daoyuan</span> <span class="n">Chen</span> <span class="ow">and</span> <span class="n">Yilun</span> <span class="n">Huang</span> <span class="ow">and</span> <span class="n">Zhijian</span> <span class="n">Ma</span> <span class="ow">and</span> <span class="n">Hesen</span> <span class="n">Chen</span> <span class="ow">and</span> <span class="n">Xuchen</span> <span class="n">Pan</span> <span class="ow">and</span> <span class="n">Ce</span> <span class="n">Ge</span> <span class="ow">and</span> <span class="n">Dawei</span> <span class="n">Gao</span> <span class="ow">and</span> <span class="n">Yuexiang</span> <span class="n">Xie</span> <span class="ow">and</span> <span class="n">Zhaoyang</span> <span class="n">Liu</span> <span class="ow">and</span> <span class="n">Jinyang</span> <span class="n">Gao</span> <span class="ow">and</span> <span class="n">Yaliang</span> <span class="n">Li</span> <span class="ow">and</span> <span class="n">Bolin</span> <span class="n">Ding</span> <span class="ow">and</span> <span class="n">Jingren</span> <span class="n">Zhou</span><span class="p">},</span>
+  <span class="n">booktitle</span><span class="o">=</span><span class="p">{</span><span class="n">International</span> <span class="n">Conference</span> <span class="n">on</span> <span class="n">Management</span> <span class="n">of</span> <span class="n">Data</span><span class="p">},</span>
+  <span class="n">year</span><span class="o">=</span><span class="p">{</span><span class="mi">2024</span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nd">@article</span><span class="p">{</span><span class="n">djv2</span><span class="p">,</span>
+  <span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="n">Data</span><span class="o">-</span><span class="n">Juicer</span> <span class="mf">2.0</span><span class="p">:</span> <span class="n">Cloud</span><span class="o">-</span><span class="n">Scale</span> <span class="n">Adaptive</span> <span class="n">Data</span> <span class="n">Processing</span> <span class="k">for</span> <span class="n">Foundation</span> <span class="n">Models</span><span class="p">},</span>
+  <span class="n">author</span><span class="o">=</span><span class="p">{</span><span class="n">Chen</span><span class="p">,</span> <span class="n">Daoyuan</span> <span class="ow">and</span> <span class="n">Huang</span><span class="p">,</span> <span class="n">Yilun</span> <span class="ow">and</span> <span class="n">Pan</span><span class="p">,</span> <span class="n">Xuchen</span> <span class="ow">and</span> <span class="n">Jiang</span><span class="p">,</span> <span class="n">Nana</span> <span class="ow">and</span> <span class="n">Wang</span><span class="p">,</span> <span class="n">Haibin</span> <span class="ow">and</span> <span class="n">Ge</span><span class="p">,</span> <span class="n">Ce</span> <span class="ow">and</span> <span class="n">Chen</span><span class="p">,</span> <span class="n">Yushuo</span> <span class="ow">and</span> <span class="n">Zhang</span><span class="p">,</span> <span class="n">Wenhao</span> <span class="ow">and</span> <span class="n">Ma</span><span class="p">,</span> <span class="n">Zhijian</span> <span class="ow">and</span> <span class="n">Zhang</span><span class="p">,</span> <span class="n">Yilei</span> <span class="ow">and</span> <span class="n">Huang</span><span class="p">,</span> <span class="n">Jun</span> <span class="ow">and</span> <span class="n">Lin</span><span class="p">,</span> <span class="n">Wei</span> <span class="ow">and</span> <span class="n">Li</span><span class="p">,</span> <span class="n">Yaliang</span> <span class="ow">and</span> <span class="n">Ding</span><span class="p">,</span> <span class="n">Bolin</span> <span class="ow">and</span> <span class="n">Zhou</span><span class="p">,</span> <span class="n">Jingren</span><span class="p">},</span>
+  <span class="n">journal</span><span class="o">=</span><span class="p">{</span><span class="n">arXiv</span> <span class="n">preprint</span> <span class="n">arXiv</span><span class="p">:</span><span class="mf">2501.14755</span><span class="p">},</span>
+  <span class="n">year</span><span class="o">=</span><span class="p">{</span><span class="mi">2024</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<details>
+<summary> More data-related papers from the Data-Juicer Team:
+</summary>>
+<ul class="simple">
+<li><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Data-Juicer Sandbox: A Feedback-Driven Suite for Multimodal Data-Model Co-development</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/abs/2408.04594">ImgDiff: Contrastive Data Synthesis for Vision Large Language Models</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/abs/2412.17574">HumanVBench: Exploring Human-Centric Video Understanding Capabilities of MLLMs with Synthetic Benchmark Data</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/abs/2407.08583">The Synergy between Data and Multi-Modal Large Language Models: A Survey from Co-Development Perspective</a></p></li>
+<li><p><a class="reference external" href="https://www.arxiv.org/abs/2502.04380">Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/abs/2503.09499">MindGym: Enhancing Vision-Language Models via Synthetic Self-Challenging Questions</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/abs/2405.14908">BiMix: A Bivariate Data Mixing Law for Language Model Pretraining</a></p></li>
+</ul>
+</details>
+<p align="right"><a href="#table">🔼 back to index</a></p>
+</section>
+</section>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="docs/Operators.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Operator Schemas 算子提要</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Data Processing for and with Foundation Models</a><ul>
+<li><a class="reference internal" href="#news">News</a></li>
+<li><a class="reference internal" href="#table-of-contents">Table of Contents</a><ul>
+<li><a class="reference internal" href="#why-data-juicer">Why Data-Juicer?</a></li>
+<li><a class="reference internal" href="#dj-cookbook">DJ-Cookbook</a><ul>
+<li><a class="reference internal" href="#curated-resources">Curated Resources</a></li>
+<li><a class="reference internal" href="#coding-with-data-juicer-dj">Coding with Data-Juicer (DJ)</a></li>
+<li><a class="reference internal" href="#use-cases-data-recipes">Use Cases &amp; Data Recipes</a></li>
+<li><a class="reference internal" href="#interactive-examples">Interactive Examples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#from-source-for-specific-scenarios">From Source for Specific Scenarios</a></li>
+<li><a class="reference internal" href="#from-source-for-specific-ops">From Source for Specific OPs</a></li>
+<li><a class="reference internal" href="#using-pip">Using pip</a></li>
+<li><a class="reference internal" href="#using-docker">Using Docker</a></li>
+<li><a class="reference internal" href="#installation-check">Installation check</a></li>
+<li><a class="reference internal" href="#for-video-related-operators">For Video-related Operators</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a><ul>
+<li><a class="reference internal" href="#dataset-configuration">Dataset Configuration</a></li>
+<li><a class="reference internal" href="#data-processing">Data Processing</a></li>
+<li><a class="reference internal" href="#distributed-data-processing">Distributed Data Processing</a></li>
+<li><a class="reference internal" href="#data-analysis">Data Analysis</a></li>
+<li><a class="reference internal" href="#data-visualization">Data Visualization</a></li>
+<li><a class="reference internal" href="#build-up-config-files">Build Up Config Files</a></li>
+<li><a class="reference internal" href="#sandbox">Sandbox</a></li>
+<li><a class="reference internal" href="#preprocess-raw-data-optional">Preprocess Raw Data (Optional)</a></li>
+<li><a class="reference internal" href="#for-docker-users">For Docker Users</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#contributing">Contributing</a></li>
+<li><a class="reference internal" href="#acknowledgement">Acknowledgement</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="_static/documentation_options.js?v=28d163b9"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

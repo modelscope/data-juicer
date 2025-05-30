@@ -1,7 +1,0 @@
-data_juicer.format
-==================
-
-.. automodule:: data_juicer.format
-   :members:
-   :undoc-members:
-   :show-inheritance:

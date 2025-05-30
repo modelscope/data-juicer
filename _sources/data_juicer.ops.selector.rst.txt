@@ -1,7 +1,0 @@
-data_juicer.ops.selector
-========================
-
-.. automodule:: data_juicer.ops.selector
-   :members:
-   :undoc-members:
-   :show-inheritance:

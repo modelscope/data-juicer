@@ -1,7 +1,0 @@
-data_juicer.config
-==================
-
-.. automodule:: data_juicer.config
-   :members:
-   :undoc-members:
-   :show-inheritance:
