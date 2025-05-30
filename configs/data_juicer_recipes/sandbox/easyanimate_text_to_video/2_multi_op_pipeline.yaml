@@ -43,16 +43,16 @@ execution_job_configs:
   - hook: 'TrainModelHook'
     meta_name:
     dj_configs:
-    extra_configs: './configs/demo/bench/model_train.yaml'
+    extra_configs: './configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/model_train.yaml'
   # infer model
   - hook: 'InferModelHook'
     meta_name:
     dj_configs:
-    extra_configs: './configs/demo/bench/model_infer.yaml'
+    extra_configs: './configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/model_infer.yaml'
 
 evaluation_job_configs:
   # vbench evaluation
   - hook: 'EvaluateDataHook'
     meta_name: 'vbench_eval'
     dj_configs:
-    extra_configs: './configs/demo/bench/vbench_eval.yaml'
+    extra_configs: './configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/vbench_eval.yaml'

@@ -22,7 +22,7 @@ class EasyAnimateTrainExecutor(BaseModelExecutor):
     3. `env_manager`: the environment manager. Should be one of {"conda", "mamba", "venv", "virtualenv", "uv"}.
     4. `env_params`: a dict for other parameters of environments. Only works for conda-like environment. The
         `env_config_path` for creating the env and `env_py_version` to specify the Python version can be added.
-    5. other items can be referred to configs/demo/bench/model_train.yaml.
+    5. other items can be referred to configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/model_train.yaml.
     """
 
     def __init__(self, model_config: dict, watcher=None):
@@ -88,7 +88,7 @@ class EasyAnimateInferExecutor(BaseModelExecutor):
     3. `env_manager`: the environment manager. Should be one of {"conda", "mamba", "venv", "virtualenv", "uv"}.
     4. `env_params`: a dict for other parameters of environments. Only works for conda-like environment. The
         `env_config_path` for creating the env and `env_py_version` to specify the Python version can be added.
-    5. other items can be referred to configs/demo/bench/model_train.yaml.
+    5. other items can be referred to configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/model_train.yaml.
     """
 
     def __init__(self, model_config: dict, watcher=None):
