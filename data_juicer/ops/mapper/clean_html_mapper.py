@@ -6,7 +6,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Mapper
 
-selectolax = LazyLoader('selectolax', 'selectolax')
+selectolax = LazyLoader('selectolax')
 
 OP_NAME = 'clean_html_mapper'
 

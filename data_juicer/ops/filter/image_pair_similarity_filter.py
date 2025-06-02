@@ -8,7 +8,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-torch = LazyLoader('torch', 'torch')
+torch = LazyLoader('torch')
 
 OP_NAME = 'image_pair_similarity_filter'
 
@@ -87,7 +87,8 @@ class ImagePairSimilarityFilter(Filter):
         similarity = torch.cosine_similarity(image1_batch_feature,
                                              image2_batch_feature,
                                              dim=1)
-        sample[Fields.stats][StatsKeys.image_pair_similarity] = similarity
+        sample[Fields.stats][
+            StatsKeys.image_pair_similarity] = similarity.cpu()
 
         return sample
 

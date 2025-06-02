@@ -13,10 +13,6 @@ from data_juicer.core.data.config_validator import ConfigValidator
 from data_juicer.download.downloader import validate_snapshot_format
 from data_juicer.format.formatter import unify_format
 from data_juicer.format.load import load_formatter
-from data_juicer.utils.lazy_loader import LazyLoader
-
-ray = LazyLoader('ray', 'ray')
-rd = LazyLoader('rd', 'ray.data')
 
 # based on executor type and data source type, use different
 # data load strategy to product corresponding datasets
@@ -289,6 +285,7 @@ class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
                             ['text'])  # Default to ['text']
         suffixes = getattr(self.cfg, 'suffixes', None)  # Default to None
         add_suffix = getattr(self.cfg, 'add_suffix', False)  # Default to False
+        load_data_np = kwargs.get('num_proc', 1)
 
         # use proper formatter to load data
         formatter = load_formatter(dataset_path=self.ds_config['path'],
@@ -297,7 +294,7 @@ class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
                                    add_suffix=add_suffix,
                                    **kwargs)
         # TODO more sophiscated localformatter routing
-        return formatter.load_dataset()
+        return formatter.load_dataset(load_data_np, self.cfg)
 
 
 @DataLoadStrategyRegistry.register('default', 'remote', 'huggingface')

@@ -216,7 +216,7 @@ def unify_format(
 
     # 3. convert relative paths to absolute paths
     if global_cfg:
-        ds_dir = global_cfg.dataset_dir
+        ds_dir = global_cfg.get('dataset_dir', '')
         image_key = global_cfg.image_key
         audio_key = global_cfg.audio_key
         video_key = global_cfg.video_key

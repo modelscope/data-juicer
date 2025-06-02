@@ -145,6 +145,18 @@ def create_directory_if_not_exists(directory_path):
         pass
 
 
+def transfer_data_dir(original_dir, op_name):
+    """
+    Transfer the original multimodal data dir to a new dir to store the newly
+    generated multimodal data. The pattern is
+    `{original_dir}/__dj__produced_data__/{op_name}`
+    """
+    new_dir = os.path.join(original_dir,
+                           f'{Fields.multimodal_data_output_dir}/{op_name}')
+    create_directory_if_not_exists(new_dir)
+    return new_dir
+
+
 def transfer_filename(original_filepath: Union[str, Path], op_name,
                       **op_kwargs):
     """
@@ -172,9 +184,7 @@ def transfer_filename(original_filepath: Union[str, Path], op_name,
     dir_token = f'/{Fields.multimodal_data_output_dir}/'
     if dir_token in original_dir:
         original_dir = original_dir.split(dir_token)[0]
-    new_dir = os.path.join(original_dir,
-                           f'{Fields.multimodal_data_output_dir}/{op_name}')
-    create_directory_if_not_exists(new_dir)
+    new_dir = transfer_data_dir(original_dir, op_name)
 
     # produce the unique hash code
     unique_parameters = copy.deepcopy(op_kwargs)
@@ -327,7 +337,7 @@ def read_single_partition(
         if input_meta is not None:
             read_kwargs['dtype'] \
                 = (ast.literal_eval(input_meta)
-                   if type(input_meta) == str else input_meta)
+                   if isinstance(input_meta, str) else input_meta)
 
     elif filetype == 'parquet':
         read_kwargs = {'columns': columns}

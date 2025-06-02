@@ -223,7 +223,7 @@ class ArxivExtractor(DocumentExtractor):
 
         @return: cleaned tex file as a string
         """  # noqa: E501
-        # find the first occurence of a \section-like header and replace
+        # find the first occurrence of a \section-like header and replace
         # everything before it with an empty string. This matches the
         # following pattern: \<section-type>[optional-args]{name}
         pattern = r'^(.*?)('
@@ -266,7 +266,7 @@ class ArxivExtractor(DocumentExtractor):
             flags=re.MULTILINE,
         )
 
-        # find the first occurence of either \appendix or \bibliography and
+        # find the first occurrence of either \appendix or \bibliography and
         # replace everything after it with an empty string
         pattern = r'('
         pattern += r'\\appendix|'

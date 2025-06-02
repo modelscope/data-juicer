@@ -8,6 +8,7 @@
 ![](https://img.shields.io/badge/license-Apache--2.0-000000.svg)
 [![pypi version](https://img.shields.io/pypi/v/py-data-juicer?logo=pypi&color=026cad)](https://pypi.org/project/py-data-juicer)
 [![Docker version](https://img.shields.io/docker/v/datajuicer/data-juicer?logo=docker&label=Docker&color=498bdf)](https://hub.docker.com/r/datajuicer/data-juicer)
+[![Docker on OSS](https://img.shields.io/badge/OSS%20latest-none?logo=docker&label=Docker&color=498bdf)](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/docker_images/data-juicer-latest.tar.gz)
 ![](https://img.shields.io/endpoint?url=https%3A%2F%2Fgist.githubusercontent.com%2FHYLcool%2Ff856b14416f08f73d05d32fd992a9c29%2Fraw%2Ftotal_cov.json)
 
 [![DataModality](https://img.shields.io/badge/DataModality-Text,Image,Audio,Video-brightgreen.svg)](#dj-cookbook)
@@ -33,31 +34,33 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 ----
 
 ## 新消息
+- 🎉 [2025-05-06] 我们的 [Data-Juicer Sandbox](https://arxiv.org/abs/2407.11784) 已被 *ICML 2025* 接收为 **Spotlight**（处于所有投稿中的前 2.6%）！
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-03-13] 我们提出了一种新的数据合成方法 *MindGym*，该方法鼓励 LLM 自我生成具有挑战性的认知问题，实现优于 SOTA 基线的数据效率、跨模态泛化和 SFT 效果（例如，仅使用 *400 个样本* 即可在 [MathVision](https://mathllm.github.io/mathvision/#leaderboard) 上获得 *16%* 的增益）。有关更多详细信息，请参阅[MindGym: Enhancing Vision-Language Models via Synthetic Self-Challenging Questions](https://arxiv.org/abs/2503.09499)。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-28] DJ 已被集成到 [Ray官方 Ecosystem](https://docs.ray.io/en/latest/ray-overview/ray-libraries.html) 和 [Example Gallery](https://docs.ray.io/en/latest/data/examples/data_juicer_distributed_data_processing.html)。此外，我们在 DJ2.0 中的流式 JSON 加载补丁已被 [Apache Arrow 官方集成](https://github.com/apache/arrow/pull/45084)。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-27] 我们的对比数据合成工作， [ImgDiff](https://arxiv.org/pdf/2408.04594)， 已被 *CVPR 2025* 接收！
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-05] 我们提出了一种新的数据选择方法 *DaaR*，该方法基于理论指导，将数据多样性建模为奖励信号，在 7 个基准测试中，微调 SOTA LLMs 取得了更好的整体表现。有关更多详细信息，请参阅 [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380) 。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-11] 我们发布了 2.0 版论文 [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://arxiv.org/abs/2501.14755)。DJ现在可以使用阿里云集群中 50 个 Ray 节点上的 6400 个 CPU 核心在 2.1 小时内处理 70B 数据样本，并使用 8 个 Ray 节点上的 1280 个 CPU 核心在 2.8 小时内对 5TB 数据进行重复数据删除。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-03] 我们通过 20 多个相关的新 [OP](https://github.com/modelscope/data-juicer/releases/tag/v1.0.2) 以及与 LLaMA-Factory 和 ModelScope-Swift 兼容的统一 [数据集格式](https://github.com/modelscope/data-juicer/releases/tag/v1.0.3) 更好地支持Post-Tuning场景。
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-12-17] 我们提出了 *HumanVBench*，它包含 16 个以人为中心的任务，使用合成数据，从内在情感和外在表现的角度对22个视频 MLLM 的能力进行基准测试。请参阅我们的 [论文](https://arxiv.org/abs/2412.17574) 中的更多详细信息，并尝试使用它 [评估](https://github.com/modelscope/data-juicer/tree/HumanVBench) 您的模型。
 
 <details>
 <summary> History News:
 </summary>>
+
+- [2024-12-17] 我们提出了 *HumanVBench*，它包含 16 个以人为中心的任务，使用合成数据，从内在情感和外在表现的角度对22个视频 MLLM 的能力进行基准测试。请参阅我们的 [论文](https://arxiv.org/abs/2412.17574) 中的更多详细信息，并尝试使用它 [评估](https://github.com/modelscope/data-juicer/tree/HumanVBench) 您的模型。
 
 - [2024-11-22] 我们发布 DJ [v1.0.0](https://github.com/modelscope/data-juicer/releases/tag/v1.0.0)，其中我们重构了 Data-Juicer 的 *Operator*、*Dataset*、*Sandbox* 和许多其他模块以提高可用性，例如支持容错、FastAPI 和自适应资源管理。
 
 - [2024-08-25] 我们在 KDD'2024 中提供了有关多模态 LLM 数据处理的[教程](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html)。
 
 - [2024-08-09] 我们提出了Img-Diff，它通过*对比数据合成*来增强多模态大型语言模型的性能，在[MMVP benchmark](https://tsb0601.github.io/mmvp_blog/)中比GPT-4V高出12个点。 更多细节请参阅我们的 [论文](https://arxiv.org/abs/2408.04594), 以及从 [huggingface](https://huggingface.co/datasets/datajuicer/Img-Diff) 和 [modelscope](https://modelscope.cn/datasets/Data-Juicer/Img-Diff)下载这份数据集。
-- [2024-07-24] “天池 Better Synth 多模态大模型数据合成赛”——第四届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532251)，了解赛事详情。
+- [2024-07-24] "天池 Better Synth 多模态大模型数据合成赛"——第四届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532251)，了解赛事详情。
 - [2024-07-17] 我们利用Data-Juicer[沙盒实验室套件](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox-ZH.md)，通过数据与模型间的系统性研发工作流，调优数据和模型，在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。相关成果已经整理发表在[论文](http://arxiv.org/abs/2407.11784)中，并且模型已在[ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V)和[HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V)平台发布。
 - [2024-07-12] 我们的MLLM-Data精选列表已经演化为一个模型-数据协同开发的角度系统性[综述](https://arxiv.org/abs/2407.08583)。欢迎[浏览](docs/awesome_llm_data.md)或参与贡献!
-- [2024-06-01] ModelScope-Sora“数据导演”创意竞速——第三届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532219)，了解赛事详情。
-- [2024-03-07] 我们现在发布了 **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)**! 在这个新版本中，我们支持了更多的 **多模态数据(包括视频)** 相关特性。我们还启动了 **[DJ-SORA](docs/DJ_SORA_ZH.md)** ，为SORA-like大模型构建开放的大规模高质量数据集！
+- [2024-06-01] ModelScope-Sora"数据导演"创意竞速——第三届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532219)，了解赛事详情。
+- [2024-03-07] 我们现在发布了 **Data-Juicer [v0.2.0](https://github.com/modelscope/data-juicer/releases/tag/v0.2.0)**! 在这个新版本中，我们支持了更多的 **多模态数据(包括视频)** 相关特性。我们还启动了 **[DJ-SORA](docs/DJ_SORA_ZH.md)** ，为SORA-like大模型构建开放的大规模高质量数据集！
 - [2024-02-20] 我们在积极维护一份关于LLM-Data的*精选列表*，欢迎[访问](docs/awesome_llm_data.md)并参与贡献！
 - [2024-02-05] 我们的论文被SIGMOD'24 industrial track接收！
-- [2024-01-10] 开启“数据混合”新视界——第二届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532174)，了解赛事详情。
+- [2024-01-10] 开启"数据混合"新视界——第二届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532174)，了解赛事详情。
 - [2024-01-05] **Data-Juicer v0.1.3** 版本发布了。 
 在这个新版本中，我们支持了**更多Python版本**（3.8-3.10），同时支持了**多模态**数据集的[转换](tools/fmt_conversion/multimodal/README_ZH.md)和[处理](docs/Operators.md)（包括文本、图像和音频。更多模态也将会在之后支持）！
 此外，我们的论文也更新到了[第三版](https://arxiv.org/abs/2309.02033) 。
@@ -122,7 +125,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 ### 资源合集
 - [KDD'24 相关教程](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html)
 - [Awesome LLM-Data](docs/awesome_llm_data.md)
-- [“坏”数据展览](docs/BadDataExhibition_ZH.md)
+- ["坏"数据展览](docs/BadDataExhibition_ZH.md)
 
 ### 编写Data-Juicer (DJ) 代码
 - 基础
@@ -138,7 +141,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
   - [预处理工具](tools/preprocess/README_ZH.md)
   - [后处理工具](tools/postprocess/README_ZH.md)
   - [沙盒](docs/Sandbox-ZH.md)
-  - [API服务化](docs/DJ_service_ZH.md))
+  - [API服务化](docs/DJ_service_ZH.md)
   - [给数据打分](tools/quality_classifier/README_ZH.md)
   - [自动评估](tools/evaluator/README_ZH.md)
   - [第三方集成](thirdparty/LLM_ecosystems/README_ZH.md)
@@ -188,101 +191,170 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 ### 前置条件
 
-* 推荐 Python>=3.9,<=3.10
-* gcc >= 5 (at least C++14 support)
+- Python >= 3.10
+- Git (用于源码安装)
+- uv (推荐的包安装器)
 
+### 基础安装
 
-### 从源码安装 (指定使用场景)
+Data-Juicer 现已上架 PyPI。最小安装包含核心数据处理能力：
 
-* 运行以下命令以安装 `data_juicer` 可编辑模式的最新基础版本
-
-```shell
-cd <path_to_data_juicer>
-pip install -v -e .
+```bash
+pip install py-data-juicer
 ```
 
-* 部分算子功能依赖于较大的或者平台兼容性不是很好的第三方库，因此用户可按需额外安装可选的依赖项:
+这将提供：
+- 数据加载和操作
+- 文件系统操作
+- 并行处理
+- 基础 I/O 和工具
 
-```shell
-cd <path_to_data_juicer>
-pip install -v -e .  # 安装最小依赖，支持基础功能
-pip install -v -e .[tools] # 安装部分工具库的依赖
+### 场景化安装
+组件详情请参考 [pyproject.toml](pyproject.toml)。
+
+**核心 ML & DL**
+```bash
+# 通用 ML/DL 能力
+pip install "py-data-juicer[generic]"
+```
+包括：PyTorch、Transformers、VLLM 等。
+
+**领域特定功能**
+
+```bash
+# 计算机视觉
+pip install "py-data-juicer[vision]"
+
+# 自然语言处理
+pip install "py-data-juicer[nlp]"
+
+# 音频处理
+pip install "py-data-juicer[audio]"
+
+**附加组件**
+
+```bash
+# 分布式计算
+pip install "py-data-juicer[distributed]"
+
+# AI 服务和 API
+pip install "py-data-juicer[ai_services]"
+
+**开发工具**
+```bash
+# 开发和测试
+pip install "py-data-juicer[dev]"
 ```
 
-依赖选项如下表所示:
+### 常见安装模式
 
-| 标签              | 描述 |
-|------------------|----------------------------------|
-| `.` 或 `.[mini]` | 为基本 Data-Juicer 安装最小依赖项。  |
-| `.[all]`         | 为除沙盒之外的所有 OP 安装依赖项。    |
-| `.[sci]`         | 为与科学用途相关的 OP 安装依赖项。    |
-| `.[dist]`        | 安装用于分布式数据处理的额外依赖项。   |
-| `.[dev]`         | 安装作为贡献者开发软件包的依赖项。     |
-| `.[tools]`       | 安装专用工具（例如质量分类器）的依赖项。|
-| `.[sandbox]`     | 安装沙盒的所有依赖项。               |
+**1. 文本处理设置**
+```bash
+pip install "py-data-juicer[generic,nlp]"
+```
 
-### 从源码安装 (指定部分算子)
+**2. 视觉处理设置**
+```bash
+pip install "py-data-juicer[generic,vision]"
+```
 
-* 只安装部分算子依赖
+**3. 完整处理流程**
+```bash
+pip install "py-data-juicer[generic,nlp,vision,distributed]"
+```
 
-随着OP数量的增长，全OP环境的依赖安装会变得越来越重。为此，我们提供了两个替代的、更轻量的选项，作为使用命令`pip install -v -e .[sci]`安装所有依赖的替代：
+**4. 完整安装**
+```bash
+# 安装所有功能（除沙盒外）
+pip install "py-data-juicer[all]"
+```
 
-  * 自动最小依赖安装：在执行Data-Juicer的过程中，将自动安装最小依赖。也就是说你可以安装mini后直接执行，但这种方式可能会导致一些(滞后的)依赖冲突。
+**5. 开发模式**
 
-  * 手动最小依赖安装：可以通过如下指令手动安装适合特定执行配置的最小依赖，可以提前确定依赖冲突、使其更易解决:
+对于贡献者和开发者：
+
+```bash
+# 克隆仓库
+git clone https://github.com/modelscope/data-juicer.git
+cd data-juicer
+
+# 安装开发依赖
+pip install -e ".[dev]"
+
+# 可选：使用 uv 进行虚拟环境和依赖管理
+curl -LsSf https://astral.sh/uv/install.sh | sh   # 安装 uv
+uv venv --python 3.10                             # 使用 Python 3.10 初始化虚拟环境
+source .venv/bin/activate                         # 激活虚拟环境
+uv pip install -e .                               # 安装最小依赖
+```
+
+### 特定算子安装
+除了基于场景的安装外，我们还提供基于算子和基于菜谱的安装方式。
+
+- 安装特定算子的依赖
+
+随着算子数量的增长，所有算子的依赖变得非常庞大。除了使用 `pip install -v -e .[all]` 安装所有依赖外，
+我们提供了两个更轻量级的替代方案：
+
+  - 自动最小依赖安装：在 Data-Juicer 执行过程中，将自动安装最小依赖。这允许立即执行，但可能会导致依赖冲突。
+
+  - 手动最小依赖安装：要手动安装针对特定执行配置的最小依赖，请运行以下命令：
     ```shell
-    # 从源码安装
+    # 仅适用于从源码安装
     python tools/dj_install.py --config path_to_your_data-juicer_config_file
-    
+
     # 使用命令行工具
     dj-install --config path_to_your_data-juicer_config_file
     ```
 
-### 使用 pip 安装
-
-* 运行以下命令用 `pip` 安装 `data_juicer` 的最新发布版本：
-
-```shell
-pip install py-data-juicer
-```
-
-* **注意**：
-  * 使用这种方法安装时，只有`data_juicer`中的基础的 API 和2个基础工具
-    （数据[处理](#数据处理)与[分析](#数据分析)）可以使用。如需更定制化地使用完整功能，建议[从源码进行安装](#从源码安装)。
-  * pypi 的发布版本较源码的最新版本有一定的滞后性，如需要随时跟进 `data_juicer` 的最新功能支持，建议[从源码进行安装](#从源码安装)。
-
 ### 使用 Docker 安装
 
-- 您可以选择
-  - 从DockerHub直接拉取我们的预置镜像:
+- 您可以
+  - 从 DockerHub 拉取预构建镜像：
     ```shell
     docker pull datajuicer/data-juicer:<version_tag>
     ```
-  - 或者运行如下命令用我们提供的 [Dockerfile](Dockerfile) 来构建包括最新版本的 `data-juicer` 的 docker 镜像：
+  
+    - 如果无法连接到 DockerHub，请使用其他镜像源（您可以在互联网上找到一些）：
+    ```shell
+    docker pull <other_registry_mirror>/datajuicer/data-juicer:<version_tag>
+    ```
+
+  - 或运行以下命令构建包含最新 `data-juicer` 的 docker 镜像，使用提供的 [Dockerfile](Dockerfile)：
 
     ```shell
     docker build -t datajuicer/data-juicer:<version_tag> .
     ```
 
-  - `<version_tag>`的格式类似于`v0.2.0`，与发布（Release）的版本号相同。
+  - `<version_tag>` 的格式类似于 `v0.2.0`，与发布版本标签相同。
 
-### 安装校验
+### 注意事项和故障排除
 
+0. **安装检查**
+   
 ```python
 import data_juicer as dj
 print(dj.__version__)
 ```
 
-### 使用视频相关算子
+1. **模块化安装**
+   - 只安装您需要的组件
+   - 根据需要组合组件
+   - 使用 `all` 进行完整安装
 
-在使用视频相关算子之前，应该安装 **FFmpeg** 并确保其可通过 $PATH 环境变量访问。
+2. **沙盒环境**
+   - 实验性功能的单独安装
+   - 未来将作为微服务提供
 
-你可以使用包管理器安装 FFmpeg（例如，在 Debian/Ubuntu 上使用 sudo apt install ffmpeg，在 OS X 上使用 brew install ffmpeg），或访问[官方FFmpeg链接](https://ffmpeg.org/download.html)。
+3. **视频相关算子**
+   - 在使用视频相关算子之前，需要安装 **FFmpeg** 并确保可以通过 $PATH 环境变量访问。
+   - 您可以使用包管理器安装 FFmpeg（例如在 Debian/Ubuntu 上使用 sudo apt install ffmpeg，在 OS X 上使用 brew install ffmpeg）或访问 [官方 ffmpeg 链接](https://ffmpeg.org/download.html)。
+   - 通过从终端运行 ffmpeg 命令来检查您的环境路径是否正确设置。
 
-随后在终端运行 ffmpeg 命令检查环境是否设置正确。
-
-
-<p align="right"><a href="#table">🔼 back to index</a></p>
+4. **获取帮助**  
+   - 请先查看文档/问题
+   - 必要时创建 GitHub issues
+   - 加入社区频道进行讨论
 
 ## 快速上手
 ### 数据集配置

@@ -83,6 +83,9 @@ class StreamToLoguru:
     def flush(self):
         self.buffer.flush()
 
+    def isatty(self):
+        return False  # Log streams are usually not terminal devices
+
 
 def redirect_sys_output(log_level='INFO'):
     """
@@ -182,7 +185,7 @@ def setup_logger(save_dir,
 
 def make_log_summarization(max_show_item=10):
     error_pattern = r'^An error occurred in (.*?) when ' \
-                    r'processing samples? \"(.*?)\" -- (.*?): (.*?)$'
+                    r'processing samples? \"(.*?)\" -- (.*?): (.*?) -- (.*?)$'
     log_file = get_log_file_path().replace('_ERROR', '').replace(
         '_WARNING', '').replace('_DEBUG', '')
     error_log_file = add_suffix_to_filename(log_file, '_ERROR')
@@ -196,10 +199,10 @@ def make_log_summarization(max_show_item=10):
     with jl.open(error_log_file) as reader:
         for error_log in reader:
             error_msg = error_log['record']['message']
-            find_res = re.findall(error_pattern, error_msg)
+            find_res = re.findall(error_pattern, error_msg, flags=re.DOTALL)
             if len(find_res) > 0:
-                op_name, sample, error_type, error_msg = find_res[0]
-                error = (op_name, error_type, error_msg)
+                op_name, sample, err_type, err_msg, _ = find_res[0]
+                error = (op_name, err_type, err_msg)
                 error_dict.setdefault(error, 0)
                 error_dict[error] += 1
     total_error_count = sum(error_dict.values())

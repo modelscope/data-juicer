@@ -12,26 +12,29 @@ from loguru import logger
 
 from data_juicer import cuda_device_count
 from data_juicer.utils.common_utils import nested_access
-from data_juicer.utils.lazy_loader import AUTOINSTALL, LazyLoader
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.nltk_utils import (ensure_nltk_resource,
                                           patch_nltk_pickle_security)
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
 
-torch = LazyLoader('torch', 'torch')
-transformers = LazyLoader('transformers', 'transformers')
-nn = LazyLoader('nn', 'torch.nn')
-fasttext = LazyLoader('fasttext', 'fasttext')
-sentencepiece = LazyLoader('sentencepiece', 'sentencepiece')
-kenlm = LazyLoader('kenlm', 'kenlm')
-nltk = LazyLoader('nltk', 'nltk')
-aes_pre = LazyLoader('aes_pre', 'aesthetics_predictor')
-vllm = LazyLoader('vllm', 'vllm')
-diffusers = LazyLoader('diffusers', 'diffusers')
-ram = LazyLoader('ram', 'ram.models')
-cv2 = LazyLoader('cv2', 'cv2')
-openai = LazyLoader('openai', 'openai')
-ultralytics = LazyLoader('ultralytics', 'ultralytics')
+torch = LazyLoader('torch')
+transformers = LazyLoader('transformers')
+nn = LazyLoader('torch.nn')
+fasttext = LazyLoader('fasttext', 'fasttext-wheel')
+sentencepiece = LazyLoader('sentencepiece')
+kenlm = LazyLoader('kenlm')
+nltk = LazyLoader('nltk')
+aes_pred = LazyLoader('aesthetics_predictor', 'simple-aesthetics-predictor')
+vllm = LazyLoader('vllm')
+diffusers = LazyLoader('diffusers')
+ram = LazyLoader('ram',
+                 'git+https://github.com/xinyu1205/recognize-anything.git')
+cv2 = LazyLoader('cv2', 'opencv-python')
+openai = LazyLoader('openai')
+ultralytics = LazyLoader('ultralytics')
+tiktoken = LazyLoader('tiktoken')
+dashscope = LazyLoader('dashscope')
 
 MODEL_ZOO = {}
 
@@ -68,12 +71,6 @@ BACKUP_MODEL_LINKS = {
     'FastSAM-x.pt':
     'https://github.com/ultralytics/assets/releases/download/v8.2.0/'
     'FastSAM-x.pt',
-}
-
-TORCH_DTYPE_MAPPING = {
-    'fp32': torch.float32,
-    'fp16': torch.float16,
-    'bf16': torch.bfloat16,
 }
 
 
@@ -252,13 +249,11 @@ def prepare_api_model(model,
 
     def get_processor():
         try:
-            import tiktoken
             return tiktoken.encoding_for_model(model)
         except Exception:
             pass
 
         try:
-            import dashscope
             return dashscope.get_tokenizer(model)
         except Exception:
             pass
@@ -289,15 +284,22 @@ def prepare_api_model(model,
 def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
                             **model_params):
     """
-        Prepare and load an Diffusion model from HuggingFace.
+    Prepare and load an Diffusion model from HuggingFace.
 
-        :param pretrained_model_name_or_path: input Diffusion model name
-            or local path to the model
-        :param diffusion_type: the use of the diffusion model. It can be
-            'image2image', 'text2image', 'inpainting'
-        :return: a Diffusion model.
+    :param pretrained_model_name_or_path: input Diffusion model name
+        or local path to the model
+    :param diffusion_type: the use of the diffusion model. It can be
+        'image2image', 'text2image', 'inpainting'
+    :return: a Diffusion model.
     """
-    AUTOINSTALL.check(['torch', 'transformers'])
+
+    TORCH_DTYPE_MAPPING = {
+        'fp32': torch.float32,
+        'fp16': torch.float16,
+        'bf16': torch.bfloat16,
+    }
+
+    LazyLoader.check_packages(['torch', 'transformers'])
 
     device = model_params.pop('device', None)
     if not device:
@@ -355,20 +357,25 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
                               pipe_task='text-generation',
                               **model_params):
     """
-    Prepare and load a HuggingFace model with the corresponding processor.
+    Prepare and load a huggingface model.
 
     :param pretrained_model_name_or_path: model name or path
     :param return_model: return model or not
-    :param return_pipe: whether to wrap model into pipeline
-    :param model_params: model initialization parameters.
-    :return: a tuple of (model, input processor) if `return_model` is True;
+    :param return_pipe: return pipeline or not
+    :param pipe_task: task for pipeline
+    :return: a tuple (model, processor) if `return_model` is True;
         otherwise, only the processor is returned.
     """
-    # require torch for transformer model
-    AUTOINSTALL.check(['torch'])
-
+    # Check if we need accelerate for device_map
     if 'device' in model_params:
-        model_params['device_map'] = model_params.pop('device')
+        device = model_params.pop('device')
+        if device.startswith('cuda'):
+            try:
+                model_params['device_map'] = device
+            except ImportError:
+                # If accelerate is not available, use device directly
+                model_params['device'] = device
+                logger.warning('accelerate not found, using device directly')
 
     processor = transformers.AutoProcessor.from_pretrained(
         pretrained_model_name_or_path, **model_params)
@@ -541,16 +548,16 @@ def prepare_recognizeAnything_model(
     logger.info('Loading recognizeAnything model...')
 
     try:
-        model = ram.ram_plus(
+        model = ram.models.ram_plus(
             pretrained=check_model(pretrained_model_name_or_path),
             image_size=input_size,
             vit='swin_l')
     except (RuntimeError, UnpicklingError) as e:  # noqa: E722
         logger.warning(e)
-        model = ram.ram_plus(pretrained=check_model(
+        model = ram.models.ram_plus(pretrained=check_model(
             pretrained_model_name_or_path, force=True),
-                             image_size=input_size,
-                             vit='swin_l')
+                                    image_size=input_size,
+                                    vit='swin_l')
     device = model_params.pop('device', 'cpu')
     model.to(device).eval()
     return model
@@ -614,8 +621,16 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
     :return: a tuple (model, input processor) if `return_model` is True;
         otherwise, only the processor is returned.
     """
+    # Check if we need accelerate for device_map
     if 'device' in model_params:
-        model_params['device_map'] = model_params.pop('device')
+        device = model_params.pop('device')
+        if device.startswith('cuda'):
+            try:
+                model_params['device_map'] = device
+            except ImportError:
+                # If accelerate is not available, use device directly
+                model_params['device'] = device
+                logger.warning('accelerate not found, using device directly')
 
     processor = transformers.CLIPProcessor.from_pretrained(
         pretrained_model_name_or_path, **model_params)
@@ -623,15 +638,15 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
         return processor
     else:
         if 'v1' in pretrained_model_name_or_path:
-            model = aes_pre.AestheticsPredictorV1.from_pretrained(
+            model = aes_pred.AestheticsPredictorV1.from_pretrained(
                 pretrained_model_name_or_path, **model_params)
         elif ('v2' in pretrained_model_name_or_path
               and 'linear' in pretrained_model_name_or_path):
-            model = aes_pre.AestheticsPredictorV2Linear.from_pretrained(
+            model = aes_pred.AestheticsPredictorV2Linear.from_pretrained(
                 pretrained_model_name_or_path, **model_params)
         elif ('v2' in pretrained_model_name_or_path
               and 'relu' in pretrained_model_name_or_path):
-            model = aes_pre.AestheticsPredictorV2ReLU.from_pretrained(
+            model = aes_pred.AestheticsPredictorV2ReLU.from_pretrained(
                 pretrained_model_name_or_path, **model_params)
         else:
             raise ValueError(
@@ -971,11 +986,12 @@ def get_model(model_key=None, rank=None, use_cuda=False):
     return MODEL_ZOO[model_key]
 
 
-def free_models():
+def free_models(clear_model_zoo=True):
     global MODEL_ZOO
     for model_key in MODEL_ZOO:
         try:
             MODEL_ZOO[model_key].to('cpu')
         except Exception:
             pass
-    MODEL_ZOO.clear()
+    if clear_model_zoo:
+        MODEL_ZOO.clear()

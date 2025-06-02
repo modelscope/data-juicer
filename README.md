@@ -9,6 +9,7 @@
 ![](https://img.shields.io/badge/license-Apache--2.0-000000.svg)
 [![pypi version](https://img.shields.io/pypi/v/py-data-juicer?logo=pypi&color=026cad)](https://pypi.org/project/py-data-juicer)
 [![Docker version](https://img.shields.io/docker/v/datajuicer/data-juicer?logo=docker&label=Docker&color=498bdf)](https://hub.docker.com/r/datajuicer/data-juicer)
+[![Docker on OSS](https://img.shields.io/badge/OSS%20latest-none?logo=docker&label=Docker&color=498bdf)](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/docker_images/data-juicer-latest.tar.gz)
 ![](https://img.shields.io/endpoint?url=https%3A%2F%2Fgist.githubusercontent.com%2FHYLcool%2Ff856b14416f08f73d05d32fd992a9c29%2Fraw%2Ftotal_cov.json)
 
 [![DataModality](https://img.shields.io/badge/DataModality-Text,Image,Audio,Video-brightgreen.svg)](#dj-cookbook)
@@ -37,17 +38,19 @@ Data-Juicer is being actively updated and maintained. We will periodically enhan
 
 
 ## News
+- 🎉 [2025-05-06] Our work of [Data-Juicer Sandbox](https://arxiv.org/abs/2407.11784) has been accepted as a **Spotlight** by *ICML 2025* (top 2.6% of all submissions)!
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-03-13] We propose a new data synthesis method, *MindGym*, which encourages LLMs to self-generate challenging cognitive questions, achieving superior data efficiency, cross-modality generalization, and SFT effects over SOTA baselines (e.g., *16%* gain on [MathVision](https://mathllm.github.io/mathvision/#leaderboard) using only *400 samples*). See more details in  [MindGym: Enhancing Vision-Language Models via Synthetic Self-Challenging Questions](https://arxiv.org/abs/2503.09499).
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-28] DJ has been integrated in [Ray's official Ecosystem](https://docs.ray.io/en/latest/ray-overview/ray-libraries.html) and [Example Gallery](https://docs.ray.io/en/latest/data/examples/data_juicer_distributed_data_processing.html). Besides, our patch in DJ2.0 for the streaming JSON reader has been officially integrated by [Apache Arrow](https://github.com/apache/arrow/pull/45084). 
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-27] Our work on contrastive data synthesis, [ImgDiff](https://arxiv.org/pdf/2408.04594), has been accepted by *CVPR 2025*!
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-05] We propose a new data selection method, *DaaR*, which is theoretically informed, via treating diversity as a reward, achieves better overall performance across 7 benchmarks when post-training SOTA LLMs. See more details in [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380).
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-11] We release our 2.0 paper, [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://arxiv.org/abs/2501.14755). It now can process 70B data samples within 2.1h, using 6400 CPU cores on 50 Ray nodes from Alibaba Cloud cluster, and deduplicate 5TB data within 2.8h using 1280 CPU cores on 8 Ray nodes.
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-03] We support post-tuning scenarios better, via 20+ related new [OPs](https://github.com/modelscope/data-juicer/releases/tag/v1.0.2), and via unified [dataset format](https://github.com/modelscope/data-juicer/releases/tag/v1.0.3) compatible to LLaMA-Factory and ModelScope-Swift.
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-12-17] We propose *HumanVBench*, which comprises 16 human-centric tasks with synthetic data, benchmarking 22 video-MLLMs' capabilities from views of inner emotion and outer manifestations. See more details in our [paper](https://arxiv.org/abs/2412.17574), and try to [evaluate](https://github.com/modelscope/data-juicer/tree/HumanVBench) your models with it.
 
 <details>
 <summary> History News:
 </summary>>
+
+- [2024-12-17] We propose *HumanVBench*, which comprises 16 human-centric tasks with synthetic data, benchmarking 22 video-MLLMs' capabilities from views of inner emotion and outer manifestations. See more details in our [paper](https://arxiv.org/abs/2412.17574), and try to [evaluate](https://github.com/modelscope/data-juicer/tree/HumanVBench) your models with it.
 
 - [2024-11-22] We release DJ [v1.0.0](https://github.com/modelscope/data-juicer/releases/tag/v1.0.0), in which we refactored Data-Juicer's *Operator*, *Dataset*, *Sandbox* and many other modules for better usability, such as supporting fault-tolerant, FastAPI and adaptive resource management.
 
@@ -58,7 +61,7 @@ Data-Juicer is being actively updated and maintained. We will periodically enhan
 - [2024-07-17] We utilized the Data-Juicer [Sandbox Laboratory Suite](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox.md) to systematically optimize data and models through a co-development workflow between data and models, achieving a new top spot on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard. The related achievements have been compiled and published in a [paper](http://arxiv.org/abs/2407.11784), and the model has been released on the [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) and [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) platforms.
 - [2024-07-12] Our *awesome list of MLLM-Data* has evolved into a systemic [survey](https://arxiv.org/abs/2407.08583) from model-data co-development perspective. Welcome to [explore](docs/awesome_llm_data.md) and contribute!
 - [2024-06-01] ModelScope-Sora "Data Directors" creative sprint—Our third data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532219) for more information.
-- [2024-03-07] We release **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)** now! 
+- [2024-03-07] We release **Data-Juicer [v0.2.0](https://github.com/modelscope/data-juicer/releases/tag/v0.2.0)** now! 
 In this new version, we support more features for **multimodal data (including video now)**, and introduce **[DJ-SORA](docs/DJ_SORA.md)** to provide open large-scale, high-quality datasets for SORA-like models.
 - [2024-02-20] We have actively maintained an *awesome list of LLM-Data*, welcome to [visit](docs/awesome_llm_data.md) and contribute!
 - [2024-02-05] Our paper has been accepted by SIGMOD'24 industrial track!
@@ -83,14 +86,14 @@ Table of Contents
   - [Coding with Data-Juicer (DJ)](#coding-with-data-juicer-dj)
   - [Use Cases \& Data Recipes](#use-cases--data-recipes)
   - [Interactive Examples](#interactive-examples)
-- [Installation](#installation)
+- [Installation Guide](#installation-guide)
   - [Prerequisites](#prerequisites)
-  - [From Source for Specific Scenarios](#from-source-for-specific-scenarios)
-  - [From Source for Specific OPs](#from-source-for-specific-ops)
-  - [Using pip](#using-pip)
-  - [Using Docker](#using-docker)
-  - [Installation check](#installation-check)
-  - [For Video-related Operators](#for-video-related-operators)
+  - [Basic DJ Installation](#basic-dj-installation)
+  - [Scenario-based Installation](#scenario-based-installation)
+  - [Common Installation Patterns](#common-installation-patterns)
+  - [Installation for Specific OPs](#installation-for-specific-ops)
+  - [Installation Using Docker](#installation-using-docker)
+  - [Notes \& Troubleshooting](#notes--troubleshooting)
 - [Quick Start](#quick-start)
   - [Dataset Configuration](#dataset-configuration)
   - [Data Processing](#data-processing)
@@ -195,43 +198,114 @@ Table of Contents
   - Data Sampling and Mixture [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_mixture/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_mixture)]
 - Data Processing Loop [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_loop/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_process_loop)]
 
-## Installation
+## Installation Guide
 
 ### Prerequisites
 
-- Recommend Python>=3.9,<=3.10
-- gcc >= 5 (at least C++14 support)
+- Python >= 3.10
+- Git (for source installation)
+- uv (recommended package installer)
 
-### From Source for Specific Scenarios
+### Basic DJ Installation
 
-- Run the following commands to install the latest basic `data_juicer` version in
-  editable mode:
-```shell
-cd <path_to_data_juicer>
-pip install -v -e .
+Data-Juicer is now available on PyPI. The minimal installation includes core data processing capabilities:
+
+```bash
+pip install py-data-juicer
 ```
 
-- Some OPs rely on some other too large or low-platform-compatibility third-party libraries. You can install optional dependencies as needed:
+This provides:
+- Data loading and manipulation
+- File system operations
+- Parallel processing
+- Basic I/O and utilities
 
-```shell
-cd <path_to_data_juicer>
-pip install -v -e .  # Install minimal dependencies, which support the basic functions
-pip install -v -e .[tools] # Install a subset of tools dependencies
+
+### Scenario-based Installation
+For component details, plz refer to [pyproject.toml](pyproject.toml).
+
+**Core ML & DL**
+```bash
+# Generic ML/DL capabilities
+pip install "py-data-juicer[generic]"
+```
+Includes: PyTorch, Transformers, VLLM, etc.
+
+**Domain-Specific Features**
+
+```bash
+# Computer Vision
+pip install "py-data-juicer[vision]"
+
+# Natural Language Processing
+pip install "py-data-juicer[nlp]"
+
+# Audio Processing
+pip install "py-data-juicer[audio]"
+
+**Additional Components**
+
+```bash
+# Distributed Computing
+pip install "py-data-juicer[distributed]"
+
+# AI Services & APIs
+pip install "py-data-juicer[ai_services]"
+
+**Development Tools**
+```bash
+# Development & Testing
+pip install "py-data-juicer[dev]"
 ```
 
-The dependency options are listed below:
+### Common Installation Patterns
 
-| Tag              | Description                                                            |
-|------------------|------------------------------------------------------------------------|
-| `.` or `.[mini]` | Install minimal dependencies for basic Data-Juicer.                    |
-| `.[all]`         | Install dependencies for all OPs except sandbox.                       |
-| `.[sci]`         | Install dependencies for OPs related to scientific usage.              |
-| `.[dist]`        | Install dependencies for additional distributed data processing.       |
-| `.[dev]`         | Install dependencies for developing the package as contributors.       |
-| `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers. |
-| `.[sandbox]`     | Install all dependencies for sandbox.                                  |
+**1. Text Processing Setup**
+```bash
+pip install "py-data-juicer[generic,nlp]"
+```
 
-### From Source for Specific OPs
+**2. Vision Processing Setup**
+```bash
+pip install "py-data-juicer[generic,vision]"
+```
+
+**3. Full Processing Pipeline**
+```bash
+pip install "py-data-juicer[generic,nlp,vision,distributed]"
+```
+
+
+**4. Complete Installation**
+```bash
+# Install all features (except sandbox)
+pip install "py-data-juicer[all]"
+```
+
+
+**5. For Development Mode**
+
+For contributors and developers:
+
+```bash
+# Clone repository
+git clone https://github.com/modelscope/data-juicer.git
+cd data-juicer
+
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Optionally, use uv for venv and dependency management
+curl -LsSf https://astral.sh/uv/install.sh | sh   # install uv
+uv venv --python 3.10                             # initialize virtual env with python 3.10
+source .venv/bin/activate                         # activate virtual env
+uv pip install -e .                               # install minimal dependencies
+
+```
+
+
+### Installation for Specific OPs
+Besides the scenarios-based installation, we also provide OP-based and recipe-based manners.
 
 - Install dependencies for specific OPs
 
@@ -249,27 +323,17 @@ we provide two alternative, lighter options:
     dj-install --config path_to_your_data-juicer_config_file
     ```
 
-### Using pip
-
-- Run the following command to install the latest released `data_juicer` using `pip`:
-
-```shell
-pip install py-data-juicer
-```
-
-- **Note**:
-  - only the basic APIs in `data_juicer` and two basic tools
-    (data [processing](#data-processing) and [analysis](#data-analysis)) are available in this way. If you want customizable
-    and complete functions, we recommend you install `data_juicer` [from source](#from-source).
-  - The release versions from pypi have a certain lag compared to the latest version from source.
-    So if you want to follow the latest functions of `data_juicer`, we recommend you install [from source](#from-source).
-
-### Using Docker
+### Installation Using Docker
 
 - You can
   - either pull our pre-built image from DockerHub:
     ```shell
     docker pull datajuicer/data-juicer:<version_tag>
+    ```
+  
+    - if you can not connect ot DockerHub, please use other registry mirrors (you can find some from the Internet):
+    ```shell
+    docker pull <other_registry_mirror>/datajuicer/data-juicer:<version_tag>
     ```
 
   - or run the following command to build the docker image including the
@@ -281,19 +345,33 @@ pip install py-data-juicer
 
   - The format of `<version_tag>` is like `v0.2.0`, which is the same as the release version tag.
 
-### Installation check
+### Notes & Troubleshooting
 
+0. **installation check**
+   
 ```python
 import data_juicer as dj
 print(dj.__version__)
 ```
 
-### For Video-related Operators
-Before using video-related operators, **FFmpeg** should be installed and accessible via the $PATH environment variable.
+1. **Modular Installation**
+   - Install only what you need
+   - Combine components as required
+   - Use `all` for complete installation
 
-You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on Debian/Ubuntu, brew install ffmpeg on OS X) or visit the [official ffmpeg link](https://ffmpeg.org/download.html).
+2. **Sandbox Environment**
+   - Separate installation for experimental features
+   - Will be provided as micro-services in future
 
-Check if your environment path is set correctly by running the ffmpeg command from the terminal.
+3. **For Video-related Operators**
+   - Before using video-related operators, **FFmpeg** should be installed and accessible via the $PATH environment variable.
+   - You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on Debian/Ubuntu, brew install ffmpeg on OS X) or visit the [official ffmpeg link](https://ffmpeg.org/download.html).
+   - Check if your environment path is set correctly by running the ffmpeg command from the terminal.
+
+4. **Getting Help**  
+   - Plz check documentation/issues first
+   - Create GitHub issues when necessary
+   - Join community channels for discussions
 
 
 <p align="right"><a href="#table">🔼 back to index</a></p>

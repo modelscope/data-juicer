@@ -8,9 +8,8 @@ from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-torch = LazyLoader('torch', 'torch')
-transformers = LazyLoader('transformers', 'transformers')
-torch.set_num_threads(1)
+torch = LazyLoader('torch')
+transformers = LazyLoader('transformers')
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -50,6 +49,8 @@ class TextPairSimilarityFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
+        torch.set_num_threads(1)
+
         kwargs.setdefault('mem_required', '1500MB')
         super().__init__(*args, **kwargs)
         self.min_score = min_score

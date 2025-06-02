@@ -5,7 +5,7 @@ import seaborn as sns
 
 def draw_heatmap(data,
                  xlabels,
-                 ylables='auto',
+                 ylabels='auto',
                  figsize=None,
                  triangle=False,
                  show=False):
@@ -39,7 +39,7 @@ def draw_heatmap(data,
                 linewidths=.05,
                 square=True,
                 xticklabels=xlabels,
-                yticklabels=ylables,
+                yticklabels=ylabels,
                 annot_kws={'size': 8})
     plt.subplots_adjust(left=.1, right=0.95, bottom=0.22, top=0.95)
     fig = plt.gcf()
