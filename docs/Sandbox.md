@@ -1,5 +1,6 @@
-# User Guide
-## Applications and Achievements
+# Sandbox
+## User Guide
+### Applications and Achievements
 Leveraging the Data-Juicer Sandbox Laboratory Suite, we systematically fine-tuned data and models through a dedicated research and development workflow between data and models. For more detailed information, please refer to our [paper](http://arxiv.org/abs/2407.11784). In our work, we have secured a new leading position on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard.
 ![top-1_in_vbench](https://img.alicdn.com/imgextra/i1/O1CN01I9wHW91UNnX9wtCWu_!!6000000002506-2-tps-1275-668.png)
 
@@ -25,12 +26,12 @@ Following is the case study for Data-Juicer (DJ, 228k) outputs.
 To reproduce the paper's experiments, please refer to the sandbox usage guide below, the experimental process in the following figure, the [initial dataset](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip), and the configuration file demos for the process: [1_single_op_pipeline.yaml](../configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/1_single_op_pipeline.yaml), [2_multi_op_pipeline.yaml](../configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/2_multi_op_pipeline.yaml), [3_duplicate_pipeline.yaml](../configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/3_duplicate_pipeline.yaml).
 ![bench_bottom_up](https://img.alicdn.com/imgextra/i2/O1CN01xvu2fo1HU80biR6Q5_!!6000000000760-2-tps-7756-3693.png)
 
-## What is DJ-Sandbox?
+### What is DJ-Sandbox?
 In Data-Juicer, the data sandbox laboratory provides users with the best practices for continuously producing data recipes. It features low overhead, portability, and guidance. In the sandbox, users can quickly experiment, iterate, and refine data recipes based on small-scale datasets and models, before scaling up to produce high-quality data to serve large-scale models.
 
 In addition to the basic data optimization and recipe refinement features offered by Data-Juicer, users can seamlessly use configurable components such as data probe and analysis, model training and evaluation, and data and model feedback-based recipe refinement to form a complete one-stop data-model research and development pipeline.
-## Quick Start
-### Requirements
+### Quick Start
+#### Requirements
 Before using sandbox, you might need to install sandbox-related third-party dependencies by running the command below:
 ```shell
 pip install -v -e .[sandbox]
@@ -55,7 +56,7 @@ pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7
 ```
 So if some Module-Not-Found errors are raised by these third-party libraries when running the sandbox, users need to check their docs first.
 
-### Prepare Configuration Files for Sandbox
+#### Prepare Configuration Files for Sandbox
 The sandbox will sequentially execute four types of jobs: Data/Model Probe (`probe_job_configs`), Iterative Recipe Refinement based on Probe Results(`refine_recipe_job_configs`), Dataset Processing and Model Training (`execution_job_configs`) and Data/Model Evaluation (`evaluation_job_configs`). Within each category of jobs, jobs are carried out in the order specified by the configured job list. Each task requires specifying: the hook for mounting this job (`hook`), the tag name for recording intermediate results (`meta_name`), Data-Juicer data processing parameters (`dj_configs`), as well as other specific parameters for the job (`extra_configs`). Among these parameters, hook is required, while others may be left empty. dj_configs can refer to the full Data-Juicer data processing parameters available in [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml). The `extra_configs` are task-specific parameters without restrictions. They can include parameters for model training, inference, evaluation, etc. For example, `path_k_sigma_recipe` can be used to specify the path for saving the data recipe refined using the k-sigma method. An example of a sandbox configuration file can be found at `configs/demo/sandbox/sandbox.yaml`:
 ```yaml
 # Sandbox config example
@@ -113,7 +114,7 @@ Based on this configuration file, sandbox:
 
 6. Score the data after filtering with a scorer.
 
-### Start Sandbox
+#### Start Sandbox
 The entry point for running the sandbox is `tools/sandbox_starter.py`. The usage is similar to the data processing and analysis tool, requiring specifying the sandbox configuration file:
 ```yaml
 python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
@@ -128,7 +129,7 @@ Once the run is started, the sandbox will sequentially execute each of the prede
 Once this completes one trial of the sandbox pipeline run, the user can validate the effectiveness of the experiment in data production by comparing the probes and evaluation results before and after recipe refinement and dataset processing.
 
 If the `hpo_config` is set in the configuration file and appropriate optimization objectives and OP hyperparameters to be refined are configured within it, the sandbox will perform multiple trials of pipeline runs in the form of Hyperparameter Optimization (HPO) and automatically conduct iterative refinement and optimization of the operator hyperparameters. The preparation of this configuration file can be referenced from the [HPO tool](https://github.com/modelscope/data-juicer/tree/main/tools/hpo).
-## Component Factory
+### Component Factory
 In a single trial of the sandbox pipeline, four major steps involve various configurable components. Each of these components corresponds to a factory class used to initialize them:
 
 - **Data Processing (DataExecutor)**: Executor for dataset processing, i.e., the executor of Data-Juicer
@@ -186,17 +187,17 @@ The currently supported component factories and the components supported within 
    - TBD
 
 Please refer to `data_juicer/core/sandbox/factories.py` for detailed definitions.
-# Developer Guide
+## Developer Guide
 As mentioned in the previous section, developers can develop customized configurable components and add them to the corresponding factory classes, then route to appropriate instantiation methods using the `type` parameter. Once the components are implemented, developers can encapsulate them as hooks and register the hooks into the job list. After the job list is orchestrated in the pipeline, when the sandbox pipeline is executed, each job in the job list will be executed in sequence at each step. Each of these parts - components, component factory, hooks, job lists, and the registration and execution orchestration of the pipeline - can be customized by the developer. The relationship among these parts is illustrated in the diagram below.
 ![sandbox-pipeline](https://img.alicdn.com/imgextra/i3/O1CN01ERmGre1uz3luKOn4n_!!6000000006107-2-tps-4655-1918.png)
 
-## The Internal Implementation of Components
+### The Internal Implementation of Components
 Currently, components are mainly divided into two major categories:
 
 - **Executor**: Since the data executor is already handled by the Data-Juicer's Executor, the executor here specifically refers to the model executor, including model training, inference, evaluation, etc. The code is located in `data_juicer/core/sandbox/model_executors.py`.
 - **Evaluator**: Used for evaluating the quality and performance of datasets or models. The code is located in `data_juicer/core/sandbox/evaluators.py`.
 
-### Executor
+#### Executor
 The core function of the model executor is to train, infer, or evaluate the model specified in the configuration file with the specified dataset. The model executor needs to inherit from `BaseModelExecutor` and implement several core methods:
 
 - The specific behavior of the model executor (training, inference, evaluation, etc.) needs to be defined in the `_run` method.
@@ -207,14 +208,14 @@ It is important to note that, to monitor the change of training metrics (e.g., l
 
 - `_run` method: After loading the dataset, it starts model training based on the model training configuration. Upon completion of training, it outputs a predefined task completion identifier to the standard output stream, which has been redirected to the designated log file.
 - `watch_run` method: It monitors the designated log file, reads it line by line, and calls the `_watch_run` method. The called method is customized based on the model training framework and used to parse the latest log content line, extract key metrics, and monitor them until the predefined task completion identifier is read.
-### Evaluator
+#### Evaluator
 The core function of the evaluator is to evaluate the quality and performance of the target using some specific methods and return the evaluation result, usually a numerical value. The evaluator needs to inherit from the base class `BaseEvaluator` and implement the `run` method. The `run` method typically takes two required parameters:
 
 - `eval_type`: The type of evaluation, used for internal evaluation type routine within a certain evaluator.
 - `eval_obj`: The object to be evaluated.
 
 Users can also extend the usage of these two parameters based on their implementation.
-## Pipeline Hook
+### Pipeline Hook
 As mentioned at the start of this section, in the pipeline, we need to implement several hooks to connect components with the pipeline execution steps through the job list. Activated hooks will be registered in the pipeline's job list and then executed one by one during the pipeline execution at each step. The job lists for the four corresponding steps are as follows:
 
 1. **Data/Model Probe**: Probe job list -- probe_jobs
@@ -238,10 +239,10 @@ In general, we only need to implement one type of hook function for a type of co
 
 It is worth noting that a hook can be registered in multiple job lists, as this hook can play different roles in different steps of the pipeline. For example, we can analyze and probe both the pre-processed and post-processed datasets to compare the changes in quality, diversity, and other dimensions before and after data processing.
 
-## Customized Sandbox Pipeline
+### Customized Sandbox Pipeline
 Users can directly modify the job configuration list in the parameter configuration file to achieve task modification and orchestration.
 
-## Watcher
+### Watcher
 In the above sections, the concept of "monitoring" is repeatedly mentioned. The pipeline will monitor several metrics produced in each step, and these monitoring processes are implemented by `SandboxWatcher`.
 
 `SandboxWatcher` is based on wandb library and mainly includes four methods:

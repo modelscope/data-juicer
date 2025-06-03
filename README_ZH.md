@@ -1,4 +1,4 @@
-[[英文主页]](README.md) | [[DJ-Cookbook]](#dj-cookbook) | [[算子池]](docs/Operators.md) | [[API]](https://modelscope.github.io/data-juicer) | [[Awesome LLM Data]](docs/awesome_llm_data.md)
+[[英文主页]](README.md) | [[DJ-Cookbook]](docs/tutorial/DJ-Cookbook_ZH.md) | [[算子池]](docs/Operators.md) | [[API]](https://modelscope.github.io/data-juicer/zh_CN/main/api) | [[Awesome LLM Data]](docs/awesome_llm_data.md)
 
 # Data Processing for and with Foundation Models
 
@@ -11,13 +11,13 @@
 [![Docker on OSS](https://img.shields.io/badge/OSS%20latest-none?logo=docker&label=Docker&color=498bdf)](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/docker_images/data-juicer-latest.tar.gz)
 ![](https://img.shields.io/endpoint?url=https%3A%2F%2Fgist.githubusercontent.com%2FHYLcool%2Ff856b14416f08f73d05d32fd992a9c29%2Fraw%2Ftotal_cov.json)
 
-[![DataModality](https://img.shields.io/badge/DataModality-Text,Image,Audio,Video-brightgreen.svg)](#dj-cookbook)
-[![Usage](https://img.shields.io/badge/Usage-Cleaning,Synthesis,Analysis-FFD21E.svg)](#dj-cookbook)
+[![DataModality](https://img.shields.io/badge/DataModality-Text,Image,Audio,Video-brightgreen.svg)](docs/tutorial/DJ-Cookbook_ZH.md)
+[![Usage](https://img.shields.io/badge/Usage-Cleaning,Synthesis,Analysis-FFD21E.svg)](docs/tutorial/DJ-Cookbook_ZH.md)
 [![ModelScope- Demos](https://img.shields.io/badge/ModelScope-Demos-4e29ff.svg?logo=data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjI0IDEyMS4zMyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCTxwYXRoIGQ9Im0wIDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtOTkuMTQgNzMuNDloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xNzYuMDkgOTkuMTRoLTI1LjY1djIyLjE5aDQ3Ljg0di00Ny44NGgtMjIuMTl6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTEyNC43OSA0Ny44NGgyNS42NXYyNS42NWgtMjUuNjV6IiBmaWxsPSIjMzZjZmQxIiAvPgoJPHBhdGggZD0ibTAgMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xOTguMjggNDcuODRoMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xOTguMjggMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xNTAuNDQgMHYyMi4xOWgyNS42NXYyNS42NWgyMi4xOXYtNDcuODR6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTczLjQ5IDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiMzNmNmZDEiIC8+Cgk8cGF0aCBkPSJtNDcuODQgMjIuMTloMjUuNjV2LTIyLjE5aC00Ny44NHY0Ny44NGgyMi4xOXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtNDcuODQgNzMuNDloLTIyLjE5djQ3Ljg0aDQ3Ljg0di0yMi4xOWgtMjUuNjV6IiBmaWxsPSIjNjI0YWZmIiAvPgo8L3N2Zz4K)](https://modelscope.cn/studios?name=Data-Jiucer&page=1&sort=latest&type=1)
 [![HuggingFace- Demos](https://img.shields.io/badge/🤗HuggingFace-Demos-4e29ff.svg)](https://huggingface.co/spaces?&search=datajuicer)
 
-[![Document_List](https://img.shields.io/badge/Doc-DJ_Cookbook-blue?logo=Markdown)](#dj-cookbook)
-[![文档列表](https://img.shields.io/badge/文档-DJ指南-blue?logo=Markdown)](README_ZH.md#dj-cookbook)
+[![Document_List](https://img.shields.io/badge/Doc-DJ_Cookbook-blue?logo=Markdown)](docs/tutorial/DJ-Cookbook.md)
+[![文档列表](https://img.shields.io/badge/文档-DJ指南-blue?logo=Markdown)](docs/tutorial/DJ-Cookbook_ZH.md)
 [![算子池](https://img.shields.io/badge/文档-算子池-blue?logo=Markdown)](docs/Operators.md)
 [![Paper](http://img.shields.io/badge/cs.LG-1.0Paper(SIGMOD'24)-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 [![Paper](http://img.shields.io/badge/cs.AI-2.0Paper-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2501.14755)
@@ -36,7 +36,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 ## 新消息
 - 🎉 [2025-05-06] 我们的 [Data-Juicer Sandbox](https://arxiv.org/abs/2407.11784) 已被 *ICML 2025* 接收为 **Spotlight**（处于所有投稿中的前 2.6%）！
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-03-13] 我们提出了一种新的数据合成方法 *MindGym*，该方法鼓励 LLM 自我生成具有挑战性的认知问题，实现优于 SOTA 基线的数据效率、跨模态泛化和 SFT 效果（例如，仅使用 *400 个样本* 即可在 [MathVision](https://mathllm.github.io/mathvision/#leaderboard) 上获得 *16%* 的增益）。有关更多详细信息，请参阅[MindGym: Enhancing Vision-Language Models via Synthetic Self-Challenging Questions](https://arxiv.org/abs/2503.09499)。
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-28] DJ 已被集成到 [Ray官方 Ecosystem](https://docs.ray.io/en/latest/ray-overview/ray-libraries.html) 和 [Example Gallery](https://docs.ray.io/en/latest/data/examples/data_juicer_distributed_data_processing.html)。此外，我们在 DJ2.0 中的流式 JSON 加载补丁已被 [Apache Arrow 官方集成](https://github.com/apache/arrow/pull/45084)。
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-28] DJ 已被集成到 [Ray官方 Ecosystem](https://docs.ray.io/en/latest/ray-overview/ray-libraries.html) 和 [Example Gallery](https://docs.ray.io/en/latest/ray-more-libs/data_juicer_distributed_data_processing.html)。此外，我们在 DJ2.0 中的流式 JSON 加载补丁已被 [Apache Arrow 官方集成](https://github.com/apache/arrow/pull/45084)。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-27] 我们的对比数据合成工作， [ImgDiff](https://arxiv.org/pdf/2408.04594)， 已被 *CVPR 2025* 接收！
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-05] 我们提出了一种新的数据选择方法 *DaaR*，该方法基于理论指导，将数据多样性建模为奖励信号，在 7 个基准测试中，微调 SOTA LLMs 取得了更好的整体表现。有关更多详细信息，请参阅 [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380) 。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-11] 我们发布了 2.0 版论文 [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://arxiv.org/abs/2501.14755)。DJ现在可以使用阿里云集群中 50 个 Ray 节点上的 6400 个 CPU 核心在 2.1 小时内处理 70B 数据样本，并使用 8 个 Ray 节点上的 1280 个 CPU 核心在 2.8 小时内对 5TB 数据进行重复数据删除。
@@ -69,40 +69,6 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 </details>
 
 
-<div id="table" align="center"></div>
-
-目录
-===
-- [新消息](#新消息)
-- [为什么选择 Data-Juicer？](#为什么选择-data-juicer)
-- [DJ-Cookbook](#dj-cookbook)
-  - [资源合集](#资源合集)
-  - [编写Data-Juicer (DJ) 代码](#编写data-juicer-dj-代码)
-  - [用例与数据菜谱](#用例与数据菜谱)
-  - [交互类示例](#交互类示例)
-- [安装](#安装)
-  - [前置条件](#前置条件)
-  - [从源码安装 (指定使用场景)](#从源码安装-指定使用场景)
-  - [从源码安装 (指定部分算子)](#从源码安装-指定部分算子)
-  - [使用 pip 安装](#使用-pip-安装)
-  - [使用 Docker 安装](#使用-docker-安装)
-  - [安装校验](#安装校验)
-  - [使用视频相关算子](#使用视频相关算子)
-- [快速上手](#快速上手)
-  - [数据集配置](#数据集配置)
-  - [数据处理](#数据处理)
-  - [分布式数据处理](#分布式数据处理)
-  - [数据分析](#数据分析)
-  - [数据可视化](#数据可视化)
-  - [构建配置文件](#构建配置文件)
-  - [沙盒实验室](#沙盒实验室)
-  - [预处理原始数据（可选）](#预处理原始数据可选)
-  - [对于 Docker 用户](#对于-docker-用户)
-- [开源协议](#开源协议)
-- [贡献](#贡献)
-- [致谢](#致谢)
-- [参考文献](#参考文献)
-
 
 ## 为什么选择 Data-Juicer？
 
@@ -113,445 +79,53 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 专用工具套件，旨在解耦于特定的多模态 LLM 数据集和处理管道运行。支持预训练、后训练、英语、中文等场景中的数据分析、清洗和合成。
 
 - **易用、可扩展**：
-简洁灵活，提供快速[入门指南](#快速上手)和包含丰富使用示例的[DJ-Cookbook](#dj-cookbook)。您可以灵活实现自己的OP，[自定义](docs/DeveloperGuide_ZH.md)数据处理工作流。
+简洁灵活，提供快速[入门指南](docs/tutorial/QuickStart_ZH.md)和包含丰富使用示例的[DJ-Cookbook](docs/tutorial/DJ-Cookbook_ZH.md)。您可以灵活实现自己的OP，[自定义](docs/DeveloperGuide_ZH.md)数据处理工作流。
 
 - **高效、稳定**：提供性能优化的[并行数据处理能力](docs/Distributed_ZH.md)（Aliyun-PAI\Ray\CUDA\OP Fusion），
 更快、更少资源消耗，基于大规模生产环境打磨。
 
-- **效果验证、沙盒**：支持数据模型协同开发，通过[沙盒实验室](docs/Sandbox-ZH.md)实现快速迭代，提供反馈循环、可视化等功能，让您更好地理解和改进数据和模型。已经有许多基于 DJ 衍生的数据菜谱和模型经过了效用验证，譬如在预训练、文生视频、图文生成等场景。
+- **效果验证、沙盒**：支持数据模型协同开发，通过[沙盒实验室](docs/Sandbox_ZH.md)实现快速迭代，提供反馈循环、可视化等功能，让您更好地理解和改进数据和模型。已经有许多基于 DJ 衍生的数据菜谱和模型经过了效用验证，譬如在预训练、文生视频、图文生成等场景。
 ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
-## DJ-Cookbook
-### 资源合集
-- [KDD'24 相关教程](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html)
-- [Awesome LLM-Data](docs/awesome_llm_data.md)
-- ["坏"数据展览](docs/BadDataExhibition_ZH.md)
+## 文档
 
-### 编写Data-Juicer (DJ) 代码
-- 基础
-  - [DJ概览](README_ZH.md)
-  - [快速上手](#快速上手)
-  - [配置](docs/RecipeGallery_ZH.md)
-  - [数据格式转换](tools/fmt_conversion/README_ZH.md)
-- 信息速查
-  - [算子库](docs/Operators.md)
-  - [API参考](https://modelscope.github.io/data-juicer/)
-- 进阶
-  - [开发者指南](docs/DeveloperGuide_ZH.md)
-  - [预处理工具](tools/preprocess/README_ZH.md)
-  - [后处理工具](tools/postprocess/README_ZH.md)
-  - [沙盒](docs/Sandbox-ZH.md)
+- 教程
+  - [DJ-Cookbook](docs/tutorial/DJ-Cookbook_ZH.md)
+  - [安装](docs/tutorial/Installation_ZH.md)
+  - [快速上手](docs/tutorial/QuickStart_ZH.md)
+- 其他帮助文档
+  - [算子提要](docs/Operators.md)
+  - [数据菜谱Gallery](docs/RecipeGallery_ZH.md)
+  - [数据集配置指南](docs/DatasetCfg_ZH.md)
+  - [Awesome Data-Model Co-Development of MLLMs](docs/awesome_llm_data.md)
+  - [“坏”数据展览](docs/BadDataExhibition_ZH.md)
+  - [DJ-SORA](docs/DJ_SORA_ZH.md)
   - [API服务化](docs/DJ_service_ZH.md)
+  - [开发者指南](docs/DeveloperGuide_ZH.md)
+  - [Data-Juicer分布式数据处理](docs/Distributed_ZH.md)
+  - [沙盒实验室](docs/Sandbox_ZH.md)
+- Demos
+  - [演示](demos/README_ZH.md)
+    - [自动化评测：HELM 评测及可视化](demos/auto_evaluation_helm/README_ZH.md)
+    - [为LLM构造角色扮演的system prompt](demos/role_playing_system_prompt/README_ZH.md)
+- 工具
+  - [分布式模糊去重工具](tools/distributed_deduplication/README_ZH.md)
+  - [Auto Evaluation Toolkit](tools/evaluator/README_ZH.md)
+    - [GPT EVAL: 使用OpenAI API评测大模型](tools/evaluator/gpt_eval/README_ZH.md)
+    - [Evaluation Results Recorder](tools/evaluator/recorder/README_ZH.md)
+  - [格式转换工具](tools/fmt_conversion/README_ZH.md)
+    - [多模态工具](tools/fmt_conversion/multimodal/README_ZH.md)
+    - [后微调工具](tools/fmt_conversion/post_tuning_dialog/README_ZH.md)
+  - [数据菜谱的自动化超参优化](tools/hpo/README_ZH.md)
+  - [Label Studio Service Utility](tools/humanops/README.md)
+  - [视频生成评测工具](tools/mm_eval/inception_metrics/README_ZH.md)
+  - [后处理工具](tools/postprocess/README_ZH.md)
+  - [预处理工具](tools/preprocess/README_ZH.md)
   - [给数据打分](tools/quality_classifier/README_ZH.md)
-  - [自动评估](tools/evaluator/README_ZH.md)
-  - [第三方集成](thirdparty/LLM_ecosystems/README_ZH.md)
+- 第三方
+  - [大语言模型生态](thirdparty/LLM_ecosystems/README_ZH.md)
+  - [第三方模型库](thirdparty/models/README_ZH.md)
 
-### 用例与数据菜谱
-* [数据菜谱Gallery](docs/RecipeGallery.md)
-  - Data-Juicer 最小示例配方
-  - 复现开源文本数据集
-  - 改进开源文本预训练数据集
-  - 改进开源文本后处理数据集
-  - 合成对比学习图像文本数据集
-  - 改进开源图像文本数据集
-  - 视频数据的基本示例菜谱
-  - 合成以人为中心的视频评测集
-  - 改进现有的开源视频数据集
-* Data-Juicer相关竞赛
-  - [Better Synth](https://tianchi.aliyun.com/competition/entrance/532251)，在DJ-沙盒实验室和多模态大模型上，探索大模型合成数据对图像理解能力的影响
-  - [Modelscope-Sora挑战赛](https://tianchi.aliyun.com/competition/entrance/532219)，基于Data-Juicer和[EasyAnimate](https://github.com/aigc-apps/EasyAnimate)框架，调优文本-视频数据集，在类SORA小模型上训练以生成更好的视频
-  - [Better Mixture](https://tianchi.aliyun.com/competition/entrance/532174)，针对指定多个候选数据集，仅调整数据混合和采样策略
-  - FT-Data Ranker ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157)、 [7B Track](https://tianchi.aliyun.com/competition/entrance/532158))，针对指定候选数据集，仅调整数据过滤和增强策略
-  - [可图Kolors-LoRA风格故事挑战赛](https://tianchi.aliyun.com/competition/entrance/532254)，基于Data-Juicer和[DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio)框架，探索Diffusion模型微调
-* [DJ-SORA](docs/DJ_SORA_ZH.md)
-* 基于Data-Juicer和[AgentScope](https://github.com/modelscope/agentscope)框架，通过[智能体调用DJ Filters](./demos/api_service/react_data_filter_process.ipynb)和[调用DJ Mappers](./demos/api_service/react_data_mapper_process.ipynb)
-  
-
-
-### 交互类示例
-* Data-Juicer 介绍 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/overview_scan/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/overview_scan)]
-* 数据可视化:
-  * 基础指标统计 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_statistics/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_visualization_statistics)]
-  * 词汇多样性 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_diversity/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_visualization_diversity)]
-  * 算子洞察（单OP） [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visualization_op_insight/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_visualization_op_insight)]
-  * 算子效果（多OP） [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_op_effect/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_visualization_op_effect)]
-* 数据处理:
-  * 科学文献 (例如 [arXiv](https://info.arxiv.org/help/bulk_data_s3.html)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sci_data/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/process_sci_data)]
-  * 编程代码 (例如 [TheStack](https://huggingface.co/datasets/bigcode/the-stack)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_code_data/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/process_code_data)]
-  * 中文指令数据 (例如 [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sft_zh_data/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/process_cft_zh_data)]
-* 工具池:
-  * 按语言分割数据集 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/tool_dataset_splitting_by_language/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/tool_dataset_splitting_by_language)]
-  * CommonCrawl 质量分类器 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/tool_quality_classifier/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/tool_quality_classifier)]
-  * 基于 [HELM](https://github.com/stanford-crfm/helm) 的自动评测 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/auto_evaluation_helm/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/auto_evaluation_helm)]
-  * 数据采样及混合 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_mixture/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_mixture)]
-* 数据处理回路 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_loop/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_process_loop)]
-
-
-## 安装
-
-### 前置条件
-
-- Python >= 3.10
-- Git (用于源码安装)
-- uv (推荐的包安装器)
-
-### 基础安装
-
-Data-Juicer 现已上架 PyPI。最小安装包含核心数据处理能力：
-
-```bash
-pip install py-data-juicer
-```
-
-这将提供：
-- 数据加载和操作
-- 文件系统操作
-- 并行处理
-- 基础 I/O 和工具
-
-### 场景化安装
-组件详情请参考 [pyproject.toml](pyproject.toml)。
-
-**核心 ML & DL**
-```bash
-# 通用 ML/DL 能力
-pip install "py-data-juicer[generic]"
-```
-包括：PyTorch、Transformers、VLLM 等。
-
-**领域特定功能**
-
-```bash
-# 计算机视觉
-pip install "py-data-juicer[vision]"
-
-# 自然语言处理
-pip install "py-data-juicer[nlp]"
-
-# 音频处理
-pip install "py-data-juicer[audio]"
-
-**附加组件**
-
-```bash
-# 分布式计算
-pip install "py-data-juicer[distributed]"
-
-# AI 服务和 API
-pip install "py-data-juicer[ai_services]"
-
-**开发工具**
-```bash
-# 开发和测试
-pip install "py-data-juicer[dev]"
-```
-
-### 常见安装模式
-
-**1. 文本处理设置**
-```bash
-pip install "py-data-juicer[generic,nlp]"
-```
-
-**2. 视觉处理设置**
-```bash
-pip install "py-data-juicer[generic,vision]"
-```
-
-**3. 完整处理流程**
-```bash
-pip install "py-data-juicer[generic,nlp,vision,distributed]"
-```
-
-**4. 完整安装**
-```bash
-# 安装所有功能（除沙盒外）
-pip install "py-data-juicer[all]"
-```
-
-**5. 开发模式**
-
-对于贡献者和开发者：
-
-```bash
-# 克隆仓库
-git clone https://github.com/modelscope/data-juicer.git
-cd data-juicer
-
-# 安装开发依赖
-pip install -e ".[dev]"
-
-# 可选：使用 uv 进行虚拟环境和依赖管理
-curl -LsSf https://astral.sh/uv/install.sh | sh   # 安装 uv
-uv venv --python 3.10                             # 使用 Python 3.10 初始化虚拟环境
-source .venv/bin/activate                         # 激活虚拟环境
-uv pip install -e .                               # 安装最小依赖
-```
-
-### 特定算子安装
-除了基于场景的安装外，我们还提供基于算子和基于菜谱的安装方式。
-
-- 安装特定算子的依赖
-
-随着算子数量的增长，所有算子的依赖变得非常庞大。除了使用 `pip install -v -e .[all]` 安装所有依赖外，
-我们提供了两个更轻量级的替代方案：
-
-  - 自动最小依赖安装：在 Data-Juicer 执行过程中，将自动安装最小依赖。这允许立即执行，但可能会导致依赖冲突。
-
-  - 手动最小依赖安装：要手动安装针对特定执行配置的最小依赖，请运行以下命令：
-    ```shell
-    # 仅适用于从源码安装
-    python tools/dj_install.py --config path_to_your_data-juicer_config_file
-
-    # 使用命令行工具
-    dj-install --config path_to_your_data-juicer_config_file
-    ```
-
-### 使用 Docker 安装
-
-- 您可以
-  - 从 DockerHub 拉取预构建镜像：
-    ```shell
-    docker pull datajuicer/data-juicer:<version_tag>
-    ```
-  
-    - 如果无法连接到 DockerHub，请使用其他镜像源（您可以在互联网上找到一些）：
-    ```shell
-    docker pull <other_registry_mirror>/datajuicer/data-juicer:<version_tag>
-    ```
-
-  - 或运行以下命令构建包含最新 `data-juicer` 的 docker 镜像，使用提供的 [Dockerfile](Dockerfile)：
-
-    ```shell
-    docker build -t datajuicer/data-juicer:<version_tag> .
-    ```
-
-  - `<version_tag>` 的格式类似于 `v0.2.0`，与发布版本标签相同。
-
-### 注意事项和故障排除
-
-0. **安装检查**
-   
-```python
-import data_juicer as dj
-print(dj.__version__)
-```
-
-1. **模块化安装**
-   - 只安装您需要的组件
-   - 根据需要组合组件
-   - 使用 `all` 进行完整安装
-
-2. **沙盒环境**
-   - 实验性功能的单独安装
-   - 未来将作为微服务提供
-
-3. **视频相关算子**
-   - 在使用视频相关算子之前，需要安装 **FFmpeg** 并确保可以通过 $PATH 环境变量访问。
-   - 您可以使用包管理器安装 FFmpeg（例如在 Debian/Ubuntu 上使用 sudo apt install ffmpeg，在 OS X 上使用 brew install ffmpeg）或访问 [官方 ffmpeg 链接](https://ffmpeg.org/download.html)。
-   - 通过从终端运行 ffmpeg 命令来检查您的环境路径是否正确设置。
-
-4. **获取帮助**  
-   - 请先查看文档/问题
-   - 必要时创建 GitHub issues
-   - 加入社区频道进行讨论
-
-## 快速上手
-### 数据集配置
-
-DJ 支持多种数据集输入类型，包括本地文件、远程数据集（如 huggingface）；还支持数据验证和数据混合。
-
-配置输入文件的两种方法
-- 简单场景，本地/HF 文件的单一路径
-```yaml
-dataset_path: '/path/to/your/dataset' # 数据集目录或文件的路径
-```
-- 高级方法，支持子配置项和更多功能
-```yaml
-dataset:
-configs:
-- type: 'local'
-path: 'path/to/your/dataset' # 数据集目录或文件的路径
-```
-
-更多详细信息，请参阅 [数据集配置指南](docs/DatasetCfg_ZH.md)。
-
-### 数据处理
-
-* 以配置文件路径作为参数来运行 `process_data.py` 或者 `dj-process` 命令行工具来处理数据集。
-
-```shell
-# 适用于从源码安装
-python tools/process_data.py --config configs/demo/process.yaml
-
-# 使用命令行工具
-dj-process --config configs/demo/process.yaml
-```
-
-* **注意**：使用未保存在本地的第三方模型或资源的算子第一次运行可能会很慢，因为这些算子需要将相应的资源下载到缓存目录中。默认的下载缓存目录为`~/.cache/data_juicer`。您可通过设置 shell 环境变量 `DATA_JUICER_CACHE_HOME` 更改缓存目录位置，您也可以通过同样的方式更改 `DATA_JUICER_MODELS_CACHE` 或 `DATA_JUICER_ASSETS_CACHE` 来分别修改模型缓存或资源缓存目录:
-
-* **注意**：对于使用了第三方模型的算子，在填写config文件时需要去声明其对应的`mem_required`（可以参考`config_all.yaml`文件中的设置）。Data-Juicer在运行过程中会根据内存情况和算子模型所需的memory大小来控制对应的进程数，以达成更好的数据处理的性能效率。而在使用CUDA环境运行时，如果不正确的声明算子的`mem_required`情况，则有可能导致CUDA Out of Memory。
-
-```shell
-# 缓存主目录
-export DATA_JUICER_CACHE_HOME="/path/to/another/directory"
-# 模型缓存目录
-export DATA_JUICER_MODELS_CACHE="/path/to/another/directory/models"
-# 资源缓存目录
-export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
-```
-
-- **灵活的编程接口：**
-我们提供了各种层次的简单编程接口，以供用户选择：
-```python
-# ... init op & dataset ...
-
-# 链式调用风格，支持单算子或算子列表
-dataset = dataset.process(op)
-dataset = dataset.process([op1, op2])
-# 函数式编程风格，方便快速集成或脚本原型迭代
-dataset = op(dataset)
-dataset = op.run(dataset)
-```
-
-### 分布式数据处理
-
-Data-Juicer 现在基于[RAY](https://www.ray.io/)实现了多机分布式数据处理。
-对应Demo可以通过如下命令运行：
-
-```shell
-
-# 运行文字数据处理
-python tools/process_data.py --config ./demos/process_on_ray/configs/demo.yaml
-
-# 运行视频数据处理
-python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.yaml
-
-```
-
- - 如果需要在多机上使用RAY执行数据处理，需要确保所有节点都可以访问对应的数据路径，即将对应的数据路径挂载在共享文件系统（如NAS）中。
- - RAY 模式下的去重算子与单机版本不同，所有 RAY 模式下的去重算子名称都以 `ray` 作为前缀，例如 `ray_video_deduplicator` 和 `ray_document_deduplicator`。
- - 更多细节请参考[分布式处理文档](docs/Distributed_ZH.md)。
-
-> 用户也可以不使用 RAY，拆分数据集后使用 [Slurm](https://slurm.schedmd.com/) 在集群上运行，此时使用不包含 RAY 的原版 Data-Juicer 即可。
-> [阿里云 PAI-DLC](https://www.aliyun.com/activity/bigdata/pai-dlc) 支持 RAY 框架、Slurm 框架等，用户可以直接在DLC集群上创建 RAY 作业 和 Slurm 作业。
-
-### 数据分析
-
-- 以配置文件路径为参数运行 `analyze_data.py` 或者 `dj-analyze` 命令行工具来分析数据集。
-
-```shell
-# 适用于从源码安装
-python tools/analyze_data.py --config configs/demo/analyzer.yaml
-
-# 使用命令行工具
-dj-analyze --config configs/demo/analyzer.yaml
-
-# 你也可以使用"自动"模式来避免写一个新的数据菜谱。它会使用全部可产出统计信息的 Filter 来分析
-# 你的数据集的一小部分（如1000条样本，可通过 `auto_num` 参数指定）
-dj-analyze --auto --dataset_path xx.jsonl [--auto_num 1000]
-```
-
-* **注意**：Analyzer 只用于能在 stats 字段里产出统计信息的 Filter 算子和能在 meta 字段里产出 tags 或类别标签的其他算子。除此之外的其他的算子会在分析过程中被忽略。我们使用以下两种注册器来装饰相关的算子：
-  * `NON_STATS_FILTERS`：装饰那些**不能**产出任何统计信息的 Filter 算子。
-  * `TAGGING_OPS`：装饰那些能在 meta 字段中产出 tags 或类别标签的算子。
-
-### 数据可视化
-
-* 运行 `app.py` 来在浏览器中可视化您的数据集。
-* **注意**：只可用于从源码安装的方法。
-
-```shell
-streamlit run app.py
-```
-
-
-
-
-### 构建配置文件
-
-* 配置文件包含一系列全局参数和用于数据处理的算子列表。您需要设置:
-  * 全局参数：输入/输出 数据集路径，worker 进程数量等。
-  * 算子列表：列出用于处理数据集的算子及其参数。
-* 您可以通过如下方式构建自己的配置文件:
-  * ➖：修改我们的样例配置文件 [`config_all.yaml`](configs/config_all.yaml)。该文件包含了**所有**算子以及算子对应的默认参数。您只需要**移除**不需要的算子并重新设置部分算子的参数即可。
-  * ➕：从头开始构建自己的配置文件。您可以参考我们提供的样例配置文件 [`config_all.yaml`](configs/config_all.yaml)，[算子文档](docs/Operators.md)，以及 [开发者指南](docs/DeveloperGuide_ZH.md#构建自己的算子).
-  * 除了使用 yaml 文件外，您还可以在命令行上指定一个或多个参数，这些参数将覆盖 yaml 文件中的值。
-
-```shell
-python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang=en
-```
-
-* 基础的配置项格式及定义如下图所示
-
-  ![基础配置项格式及定义样例](https://img.alicdn.com/imgextra/i4/O1CN01xPtU0t1YOwsZyuqCx_!!6000000003050-0-tps-1692-879.jpg "基础配置文件样例")
-
-### 沙盒实验室
-
-数据沙盒实验室 (DJ-Sandbox) 为用户提供了持续生产数据菜谱的最佳实践，其具有低开销、可迁移、有指导性等特点。
-- 用户在沙盒中可以基于一些小规模数据集、模型对数据菜谱进行快速实验、迭代、优化，再迁移到更大尺度上，大规模生产高质量数据以服务大模型。
-- 用户在沙盒中，除了Data-Juicer基础的数据优化与数据菜谱微调功能外，还可以便捷地使用数据洞察与分析、沙盒模型训练与评测、基于数据和模型反馈优化数据菜谱等可配置组件，共同组成完整的一站式数据-模型研发流水线。
-
-沙盒默认通过如下命令运行，更多介绍和细节请参阅[沙盒文档](docs/Sandbox-ZH.md).
-```shell
-python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
-```
-
-
-
-### 预处理原始数据（可选）
-
-* 我们的 Formatter 目前支持一些常见的输入数据集格式：
-  * 单个文件中包含多个样本：jsonl/json、parquet、csv/tsv 等。
-  * 单个文件中包含单个样本：txt、code、docx、pdf 等。
-* 但来自不同源的数据是复杂和多样化的，例如:
-  * [从 S3 下载的 arXiv 原始数据](https://info.arxiv.org/help/bulk_data_s3.html) 包括数千个 tar 文件以及更多的 gzip 文件，并且所需的 tex 文件在 gzip 文件中，很难直接获取。
-  * 一些爬取的数据包含不同类型的文件（pdf、html、docx 等），并且很难提取额外的信息，例如表格、图表等。
-* Data-Juicer 不可能处理所有类型的数据，欢迎提 Issues/PRs，贡献对新数据类型的处理能力！
-* 因此我们在 [`tools/preprocess`](tools/preprocess) 中提供了一些**常见的预处理工具**，用于预处理这些类型各异的数据。
-  * 欢迎您为社区贡献新的预处理工具。
-  * 我们**强烈建议**将复杂的数据预处理为 jsonl 或 parquet 文件。
-
-### 对于 Docker 用户
-
-- 如果您构建或者拉取了 `data-juicer` 的 docker 镜像，您可以使用这个 docker 镜像来运行上面提到的这些命令或者工具。
-- 直接运行：
-
-```shell
-# 直接运行数据处理
-docker run --rm \  # 在处理结束后将容器移除
-  --privileged \
-  --shm-size 256g \
-  --network host \
-  --gpus all \
-  --name dj \  # 容器名称
-  -v <host_data_path>:<image_data_path> \  # 将本地的数据或者配置目录挂载到容器中
-  -v ~/.cache/:/root/.cache/ \  # 将 cache 目录挂载到容器以复用 cache 和模型资源（推荐）
-  datajuicer/data-juicer:<version_tag> \  # 运行的镜像
-  dj-process --config /path/to/config.yaml  # 类似的数据处理命令
-```
-
-- 或者您可以进入正在运行的容器，然后在可编辑模式下运行命令：
-
-```shell
-# 启动容器
-docker run -dit \  # 在后台启动容器
-  --privileged \
-  --shm-size 256g \
-  --network host \
-  --gpus all \
-  --rm \
-  --name dj \
-  -v <host_data_path>:<image_data_path> \
-  -v ~/.cache/:/root/.cache/ \
-  datajuicer/data-juicer:latest /bin/bash
-
-# 进入这个容器，然后您可以在编辑模式下使用 data-juicer
-docker exec -it <container_id> bash
-```
-
-
-<p align="right"><a href="#table">🔼 back to index</a></p>
 
 ## 开源协议
 
@@ -606,7 +180,3 @@ Data-Juicer 感谢社区[贡献者](https://github.com/modelscope/data-juicer/gr
 - [BiMix: A Bivariate Data Mixing Law for Language Model Pretraining](https://arxiv.org/abs/2405.14908)
 
 </details>
-
-
-
-<p align="right"><a href="#table">🔼 back to index</a></p>

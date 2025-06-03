@@ -1,0 +1,62 @@
+.sidebar-bottom-menu {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  background: var(--color-sidebar-background);
+  border-top: 1px solid var(--color-sidebar-search-border);
+  z-index: 1000;
+}
+
+.sidebar-bottom-menu .current-info {
+  padding: var(--sidebar-item-spacing-vertical) var(--sidebar-item-spacing-horizontal);
+  text-align: center;
+  cursor: pointer;
+  color: var(--color-foreground-primary);
+}
+
+.sidebar-bottom-menu .current-info span {
+  margin: 0 0.5em;
+}
+
+.sidebar-bottom-menu .dropdown-panel {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--color-sidebar-background);
+  border-top: 1px solid var(--color-sidebar-search-border);
+}
+
+.sidebar-bottom-menu:hover .dropdown-panel {
+  display: block;
+}
+
+.sidebar-bottom-menu .section {
+  padding: var(--sidebar-item-spacing-vertical) var(--sidebar-item-spacing-horizontal);
+}
+
+.sidebar-bottom-menu .section dt {
+  color: var(--color-foreground-secondary);
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+
+.sidebar-bottom-menu .section dd {
+  margin: 0;
+}
+
+.sidebar-bottom-menu .section dd a {
+  display: block;
+  padding: 0.3em 0;
+  color: var(--color-sidebar-link-text--top-level);
+  text-decoration: none;
+}
+
+.sidebar-bottom-menu .section dd a:hover {
+  color: var(--color-sidebar-link-text--top-level--hover);
+}
+
+.sidebar-bottom-menu .section dd a.active {
+  font-weight: bold;
+}

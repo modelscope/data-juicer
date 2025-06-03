@@ -2,18 +2,19 @@
 .. role:: raw-html-m2r(raw)
    :format: html
 
-`[中文主页] <../../zh_CN/main/index_ZH>`_ | `[DJ-Cookbook] <docs/tutorial/DJ-Cookbook>`_ | `[OperatorZoo] <docs/Operators>`_ | `[API] <api>`_ | `[Awesome LLM Data] <docs/awesome_llm_data>`_
+
+`[英文主页] <../../en/main/index>`_ | `[DJ-Cookbook] <docs/tutorial/DJ-Cookbook_ZH>`_ | `[算子池] <docs/Operators>`_ | `[API] <api>`_ | `[Awesome LLM Data] <docs/awesome_llm_data>`_
 
 Data Processing for and with Foundation Models
 ==============================================
 
-.. include:: README.md
-   :start-after: # Data Processing for and with Foundation Models
-   :parser: myst_parser.sphinx_
+.. include:: README_ZH.md
+    :start-after: # Data Processing for and with Foundation Models
+    :parser: myst_parser.sphinx_
 
 .. toctree::
    :maxdepth: 2
-   :caption: Tutorial
+   :caption: 教程
    :glob:
    :hidden:
 
@@ -21,13 +22,13 @@ Data Processing for and with Foundation Models
 
 .. toctree::
    :maxdepth: 2
-   :caption: docs
+   :caption: 帮助文档
    :glob:
    :hidden:
 
    docs/Operators
-   docs/RecipeGallery
-   docs/DatasetCfg
+   docs/RecipeGallery_ZH
+   docs/DatasetCfg_ZH
    docs/*
 
 .. toctree::
@@ -41,7 +42,7 @@ Data Processing for and with Foundation Models
 
 .. toctree::
    :maxdepth: 2
-   :caption: tools
+   :caption: 工具
    :glob:
    :hidden:
 
@@ -50,7 +51,7 @@ Data Processing for and with Foundation Models
 
 .. toctree::
    :maxdepth: 2
-   :caption: thirdparty
+   :caption: 第三方
    :glob:
    :hidden:
 
@@ -59,10 +60,7 @@ Data Processing for and with Foundation Models
 
 .. toctree::
    :maxdepth: 2
-   :caption: API Reference
    :hidden:
+   :caption: API Reference
 
    api
-
-
-
