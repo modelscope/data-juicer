@@ -32,8 +32,12 @@ def check_uv_installed():
             'pip install uv')
 
 
-def generate_uv_lock():
-    """Generate uv.lock file excluding sandbox dependencies."""
+def generate_uv_lock(uv_args=None):
+    """Generate uv.lock file excluding sandbox dependencies.
+    
+    Args:
+        uv_args (list, optional): Additional arguments to pass to uv lock command.
+    """
     # Check prerequisites
     check_uv_installed()
 
@@ -56,7 +60,10 @@ def generate_uv_lock():
             f.write(toml_str)
 
         # Generate uv.lock using uv lock
-        subprocess.run(['uv', 'lock'], check=True)
+        cmd = ['uv', 'lock']
+        if uv_args:
+            cmd.extend(uv_args)
+        subprocess.run(cmd, check=True)
         print('Successfully generated uv.lock')
     except Exception as e:
         print(f'Error: {e}', file=sys.stderr)
@@ -69,8 +76,10 @@ def generate_uv_lock():
 
 def main():
     """Main entry point."""
+    # Pass all arguments after the script name to uv lock
+    uv_args = sys.argv[1:]
     try:
-        generate_uv_lock()
+        generate_uv_lock(uv_args)
     except Exception as e:
         print(f'Error: {e}', file=sys.stderr)
         sys.exit(1)

@@ -15,6 +15,7 @@ dist
 wandb/
 __pycache__
 .vscode/
+.ipynb_checkpoints/
 
 # label studio related
 label_studio_data/
