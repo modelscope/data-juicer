@@ -127,7 +127,27 @@ def check_model(model_name, force=False):
     return cached_model_path
 
 
-class APIModel:
+def filter_arguments(func, args_dict):
+    """
+    Filters and returns only the valid arguments for a given function
+    signature.
+
+    :param func: The function or callable to inspect.
+    :param args_dict: A dictionary of argument names and values to filter.
+    :return: A dictionary containing only the arguments that match the
+                function's signature, preserving any **kwargs if applicable.
+    """
+    params = inspect.signature(func).parameters
+    filtered_args = {}
+    for name, param in params.items():
+        if param.kind == inspect.Parameter.VAR_KEYWORD:
+            return args_dict
+        if name not in {'self', 'cls'} and name in args_dict:
+            filtered_args[name] = args_dict[name]
+    return filtered_args
+
+
+class ChatAPIModel:
 
     def __init__(self, model, endpoint=None, response_path=None, **kwargs):
         """
@@ -152,7 +172,7 @@ class APIModel:
         self.endpoint = endpoint or '/chat/completions'
         self.response_path = response_path or 'choices.0.message.content'
 
-        client_args = self._filter_arguments(openai.OpenAI, kwargs)
+        client_args = filter_arguments(openai.OpenAI, kwargs)
         self._client = openai.OpenAI(**client_args)
 
     def __call__(self, messages, **kwargs):
@@ -187,27 +207,49 @@ class APIModel:
             logger.exception(e)
             return ''
 
-    @staticmethod
-    def _filter_arguments(func, args_dict):
-        """
-        Filters and returns only the valid arguments for a given function
-        signature.
 
-        :param func: The function or callable to inspect.
-        :param args_dict: A dictionary of argument names and values to filter.
-        :return: A dictionary containing only the arguments that match the
-                 function's signature, preserving any **kwargs if applicable.
+class EmbeddingAPIModel:
+
+    def __init__(self, model, endpoint=None, response_path=None, **kwargs):
         """
-        params = inspect.signature(func).parameters
-        filtered_args = {}
-        for name, param in params.items():
-            # If **kwargs is found, return without change
-            if param.kind == inspect.Parameter.VAR_KEYWORD:
-                return args_dict
-            # Collect valid parameters
-            if name not in {'self', 'cls'} and name in args_dict:
-                filtered_args[name] = args_dict[name]
-        return filtered_args
+        Initializes an instance specialized for embedding APIs.
+
+        :param model: The model identifier for embedding API calls.
+        :param endpoint: API endpoint URL. Defaults to '/embeddings'.
+        :param response_path: Path to extract embeddings from response.
+            Defaults to 'data.0.embedding'.
+        :param kwargs: Configuration for the OpenAI client.
+        """
+        self.model = model
+        self.endpoint = endpoint or '/embeddings'
+        self.response_path = response_path or 'data.0.embedding'
+
+        client_args = filter_arguments(openai.OpenAI, kwargs)
+        self._client = openai.OpenAI(**client_args)
+
+    def __call__(self, input, **kwargs):
+        """
+        Processes input text and returns embeddings.
+
+        :param input: Input text or list of texts to embed.
+        :param kwargs: Additional API parameters.
+        :return: Extracted embeddings or empty list on error.
+        """
+        body = {
+            'model': self.model,
+            'input': input,
+        }
+        body.update(kwargs)
+
+        try:
+            response = self._client.post(self.endpoint,
+                                         body=body,
+                                         cast_to=httpx.Response)
+            result = response.json()
+            return nested_access(result, self.response_path) or []
+        except Exception as e:
+            logger.exception(f'Embedding API error: {e}')
+            return []
 
 
 def prepare_api_model(model,
@@ -225,10 +267,13 @@ def prepare_api_model(model,
     :param endpoint: The URL endpoint for the API. If provided as a relative
         path, it will be appended to the base URL (defined by the
         `OPENAI_BASE_URL` environment variable or through an additional
-        `base_url` parameter). By default, it is set to
-        '/chat/completions' for OpenAI compatibility.
+        `base_url` parameter). Supported endpoints include:
+        - '/chat/completions' for chat models
+        - '/embeddings' for embedding models
+        Defaults to `/chat/completions` for OpenAI compatibility.
     :param response_path: The dot-separated  path to extract desired content
-        from the API response. Defaults to 'choices.0.message.content'.
+        from the API response. Defaults to 'choices.0.message.content'
+        for chat models and 'data.0.embedding' for embedding models.
     :param return_processor: A boolean flag indicating whether to return a
         processor along with the model. The processor can be used for tasks
         like tokenization or encoding. Defaults to False.
@@ -239,10 +284,23 @@ def prepare_api_model(model,
     :return: A callable APIModel instance, and optionally a processor
         if `return_processor` is True.
     """
-    client = APIModel(model=model,
-                      endpoint=endpoint,
-                      response_path=response_path,
-                      **model_params)
+    endpoint = endpoint or '/chat/completions'
+
+    ENDPOINT_CLASS_MAP = {
+        'chat': ChatAPIModel,
+        'embeddings': EmbeddingAPIModel,
+    }
+
+    API_Class = next((cls for keyword, cls in ENDPOINT_CLASS_MAP.items()
+                      if keyword in endpoint.lower()), None)
+
+    if API_Class is None:
+        raise ValueError(f'Unsupported endpoint: {endpoint}')
+
+    client = API_Class(model=model,
+                       endpoint=endpoint,
+                       response_path=response_path,
+                       **model_params)
 
     if not return_processor:
         return client
@@ -879,6 +937,56 @@ def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
     return (model, tokenizer)
 
 
+def prepare_embedding_model(model_path, **model_params):
+    """
+    Prepare and load an embedding model using transformers.
+
+    :param model_path: Path to the embedding model.
+    :param model_params: Optional model parameters.
+    :return: Model with encode() returning embedding list.
+    """
+    logger.info('Loading embedding model using transformers...')
+    if 'device' in model_params:
+        device = model_params.pop('device')
+
+    tokenizer = transformers.AutoTokenizer.from_pretrained(
+        model_path, trust_remote_code=True)
+    model = transformers.AutoModel.from_pretrained(
+        model_path, trust_remote_code=True).to(device).eval()
+
+    def last_token_pool(last_hidden_states: torch.Tensor,
+                        attention_mask: torch.Tensor) -> torch.Tensor:
+        left_padding = (attention_mask[:, -1].sum() == attention_mask.shape[0])
+        if left_padding:
+            return last_hidden_states[:, -1]
+        else:
+            sequence_lengths = attention_mask.sum(dim=1) - 1
+            batch_size = last_hidden_states.shape[0]
+            return last_hidden_states[
+                torch.arange(batch_size, device=last_hidden_states.device),
+                sequence_lengths]
+
+    def encode(text, prompt_name=None, max_len=4096):
+        if prompt_name:
+            text = f'{prompt_name}: {text}'
+
+        input_dict = tokenizer(text,
+                               padding=True,
+                               truncation=True,
+                               return_tensors='pt',
+                               max_length=max_len).to(device)
+
+        with torch.no_grad():
+            outputs = model(**input_dict)
+
+        embedding = last_token_pool(outputs.last_hidden_state,
+                                    input_dict['attention_mask'])
+        embedding = nn.functional.normalize(embedding, p=2, dim=1)
+        return embedding[0].tolist()
+
+    return type('EmbeddingModel', (), {'encode': encode})()
+
+
 def update_sampling_params(sampling_params,
                            pretrained_model_name_or_path,
                            enable_vllm=False):
@@ -947,6 +1055,7 @@ MODEL_FUNCTION_MAPPING = {
     'spacy': prepare_spacy_model,
     'video_blip': prepare_video_blip_model,
     'vllm': prepare_vllm_model,
+    'embedding': prepare_embedding_model,
 }
 
 _MODELS_WITHOUT_FILE_LOCK = {
