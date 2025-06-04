@@ -1,14 +1,14 @@
 # Process config example for dataset
 
 # global parameters
-project_name: 'demo-dedup-ray-bts'
+project_name: 'demo-dedup-ray-bts-gpu'
 dataset_path: '/mnt/data/shared/dataset/redpajama-simplify/github'  # path to your dataset directory or file
 np: 4  # number of subprocess to process your dataset
 
 open_tracer: true
 executor_type: ray
 
-export_path: './outputs/demo-dedup-ray-bts/processed.jsonl'
+export_path: './outputs/demo-dedup-ray-bts-gpu/processed.jsonl'
 
 # process schedule
 # a list of several process operators with their arguments
@@ -19,4 +19,6 @@ process:
   - ray_bts_minhash_deduplicator:
       tokenization: 'character'
       lowercase: true
+      use_gpu: true
       union_find_parallel_num: 2
+      minhash_batch_size: 50_000
