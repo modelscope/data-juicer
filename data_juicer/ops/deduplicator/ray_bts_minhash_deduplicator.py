@@ -8,8 +8,7 @@ import regex
 from loguru import logger
 from pydantic import Field, PositiveInt
 from typing_extensions import Annotated
-import time
-import pickle
+
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
@@ -243,9 +242,15 @@ def get_remote_classes():
 
 OP_NAME = 'ray_bts_minhash_deduplicator'
 
-#@ray.remote
+
+@ray.remote
 class GPUMinHashActor:
-    def __init__(self, width: int = 5, perm_a: np.ndarray = None, perm_b: np.ndarray = None, lowercase: bool = True):
+
+    def __init__(self,
+                 width: int = 5,
+                 perm_a: np.ndarray = None,
+                 perm_b: np.ndarray = None,
+                 lowercase: bool = True):
         import cudf
         import rmm
         rmm.reinitialize(pool_allocator=True)
@@ -259,8 +264,8 @@ class GPUMinHashActor:
                 ) for _ in range(256)],
                 dtype=np.uint64,
             ).T
-        self.perm_a = cudf.Series(perm_a).astype("uint32")
-        self.perm_b = cudf.Series(perm_b).astype("uint32")
+        self.perm_a = cudf.Series(perm_a).astype('uint32')
+        self.perm_b = cudf.Series(perm_b).astype('uint32')
         self.lowercase = lowercase
 
     def compute_minhash(self, text_arr: pa.Array) -> pa.Array:
@@ -271,15 +276,18 @@ class GPUMinHashActor:
         text_df = cudf.Series.from_arrow(text_arr)
         if self.lowercase:
             text_df = text_df.str.lower()
-        minhashes = text_df.str.minhash(seed=0, a=self.perm_a, b=self.perm_b, width=self.width)
+        minhashes = text_df.str.minhash(seed=0,
+                                        a=self.perm_a,
+                                        b=self.perm_b,
+                                        width=self.width)
         del text_df
         arrow_minhashes = minhashes.to_arrow()
-        del(minhashes)
+        del (minhashes)
         return arrow_minhashes
 
-    def __call__(self, table: pa.Table, text_key: str = "text") -> pa.Table:
+    def __call__(self, table: pa.Table, text_key: str = 'text') -> pa.Table:
         minhashes = self.compute_minhash(table[text_key])
-        new_table = table.append_column("_minhash", minhashes)
+        new_table = table.append_column('_minhash', minhashes)
         return new_table
 
 
@@ -312,7 +320,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         max_pending_filter_tasks: Optional[int] = 20,
         num_filter_task_returns: Optional[int] = 10,
         merge_batch_size: Optional[int] = 1000,
-        minhash_batch_size: Optional[int] = "auto",
+        minhash_batch_size: Optional[int] = 'auto',
         *args,
         **kwargs,
     ):
@@ -364,10 +372,10 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         :param merge_batch_size: batch size for BTS operations. Default
             it's 1000.
         :param minhash_batch_size: batch size for MinHash computation. If "auto",
-            it will be set based on default values per CPU or GPU. 
+            it will be set based on default values per CPU or GPU.
             CPU default 1024, GPU default 200_000
         """
-        
+
         super().__init__(*args, **kwargs)
 
         self.tokenization = tokenization
@@ -375,7 +383,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         self.lowercase = lowercase
         self.ignore_pattern = ignore_pattern
         self.use_gpu = use_gpu
-        if minhash_batch_size == "auto":
+        if minhash_batch_size == 'auto':
             if self.use_gpu:
                 self.minhash_batch_size = 200_000
             else:
@@ -385,7 +393,9 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         if self.ignore_pattern:
             self.ignore_pattern = regex.compile(self.ignore_pattern)
         if self.use_gpu and self.tokenization != 'character':
-            raise ValueError("GPU MinHash computation is only supported for character tokenization")
+            raise ValueError(
+                'GPU MinHash computation is only supported for character tokenization'
+            )
 
         # check parameters
         if self.ignore_pattern and self.tokenization == 'punctuation':
@@ -506,7 +516,6 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         self.empty_hash_value = b'\x00\x00\x00\x00' \
             + empty_hash_value.tobytes()
         self.empty_hash_table_id = int(MAX_HASH % self.union_find_parallel_num)
-
 
     def band_minhash(self, minhash_list, uid_list):
         """
@@ -639,14 +648,14 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         remote_classes = get_remote_classes()
         id_generator = remote_classes['IdGenerator'].remote()
 
-
         def band_with_uid(table: pa.Table) -> pa.Table:
             num_rows = len(table)
             min_id, max_id = ray.get(id_generator.get_next_id.remote(num_rows))
             uid_list = range(min_id, max_id)
-            self.band_minhash(table["_minhash"], uid_list)
-            new_table = table.append_column(HashKeys.uid, pa.array(list(uid_list)))
-            new_table = new_table.drop_columns(["_minhash"])
+            self.band_minhash(table['_minhash'], uid_list)
+            new_table = table.append_column(HashKeys.uid,
+                                            pa.array(list(uid_list)))
+            new_table = new_table.drop_columns(['_minhash'])
             return new_table
 
         def minhash_with_uid(table: pa.Table) -> pa.Table:
