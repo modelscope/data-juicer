@@ -1,0 +1,140 @@
+import os
+
+from loguru import logger
+
+from data_juicer.utils.constant import Fields, HashKeys
+
+
+class RayExporter:
+    """The Exporter class is used to export a ray dataset to files of specific
+    format."""
+
+    def __init__(self,
+                 export_path,
+                 keep_stats_in_res_ds=True,
+                 keep_hashes_in_res_ds=False):
+        """
+        Initialization method.
+
+        :param export_path: the path to export datasets.
+        :param keep_stats_in_res_ds: whether to keep stats in the result
+            dataset.
+        :param keep_hashes_in_res_ds: whether to keep hashes in the result
+            dataset.
+        """
+        self.export_path = export_path
+        self.keep_stats_in_res_ds = keep_stats_in_res_ds
+        self.keep_hashes_in_res_ds = keep_hashes_in_res_ds
+        self.export_format = self._get_export_format(export_path)
+
+    def _get_export_format(self, export_path):
+        """
+        Get the suffix of export path and check if it's supported.
+        We only support ["jsonl", "json", "parquet"] for now.
+
+        :param export_path: the path to export datasets.
+        :return: the export data format.
+        """
+        support_dict = self._router()
+
+        suffix = os.path.splitext(export_path)[-1].strip('.')
+        if not suffix:
+            logger.warning(
+                f'export_path "{export_path}" does not have a suffix. '
+                f'We will use "jsonl" as the default export type.')
+            suffix = 'jsonl'
+
+        export_format = suffix
+        if export_format not in support_dict:
+            raise NotImplementedError(
+                f'export data format "{export_format}" is not supported '
+                f'for now. Only support {list(support_dict.keys())}.')
+        return export_format
+
+    def _export_impl(self, dataset, export_path):
+        """
+        Export a dataset to specific path.
+
+        :param dataset: the dataset to export.
+        :param export_path: the path to export the dataset.
+        :return:
+        """
+        # fetch the corresponding export method according to the suffix
+        if not self.keep_stats_in_res_ds:
+            extra_fields = {Fields.stats, Fields.meta}
+            feature_fields = set(dataset.columns())
+            removed_fields = extra_fields.intersection(feature_fields)
+            dataset = dataset.drop_columns(removed_fields)
+        if not self.keep_hashes_in_res_ds:
+            extra_fields = {
+                HashKeys.hash,
+                HashKeys.minhash,
+                HashKeys.simhash,
+                HashKeys.imagehash,
+                HashKeys.videohash,
+            }
+            feature_fields = set(dataset.columns())
+            removed_fields = extra_fields.intersection(feature_fields)
+            dataset = dataset.drop_columns(removed_fields)
+
+        export_method = RayExporter._router()[self.export_format]
+        export_method(dataset, export_path)
+
+    def export(self, dataset):
+        """
+        Export method for a dataset.
+
+        :param dataset: the dataset to export.
+        :return:
+        """
+        self._export_impl(dataset, self.export_path)
+
+    @staticmethod
+    def to_json(dataset, export_path, **kwargs):
+        """
+        Export method for json target files.
+
+        :param dataset: the dataset to export.
+        :param export_path: the path to store the exported dataset.
+        :param kwargs: extra arguments.
+        :return:
+        """
+        dataset.write_json(export_path, force_ascii=False)
+
+    @staticmethod
+    def to_lance(dataset, export_path, **kwargs):
+        """
+        Export method for lance target files.
+
+        :param dataset: the dataset to export.
+        :param export_path: the path to store the exported dataset.
+        :param kwargs: extra arguments.
+        :return:
+        """
+        dataset.write_lance(export_path)
+
+    @staticmethod
+    def to_parquet(dataset, export_path, **kwargs):
+        """
+        Export method for parquet target files.
+
+        :param dataset: the dataset to export.
+        :param export_path: the path to store the exported dataset.
+        :param kwargs: extra arguments.
+        :return:
+        """
+        dataset.write_parquet(export_path)
+
+    @staticmethod
+    def _router():
+        """
+        A router from different export type to corresponding export methods.
+
+        :return: A dict router.
+        """
+        return {
+            'json': RayExporter.to_json,
+            'jsonl': RayExporter.to_json,
+            'lance': RayExporter.to_lance,
+            'parquet': RayExporter.to_parquet,
+        }
