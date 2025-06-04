@@ -1,6 +1,9 @@
 # 沙盒实验室
+
 ## 用户指南
+
 ### 应用和成果
+
 我们利用Data-Juicer沙盒实验室套件，通过数据与模型间的系统性研发工作流，调优数据和模型，相关工作请参考[论文](http://arxiv.org/abs/2407.11784)。在本工作中，我们在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。
 ![top-1_in_vbench](https://img.alicdn.com/imgextra/i1/O1CN01I9wHW91UNnX9wtCWu_!!6000000002506-2-tps-1275-668.png)
 
@@ -27,36 +30,38 @@ Data-Juicer (DJ, 228k)模型输出样例如下表所示。
 ![bench_bottom_up](https://img.alicdn.com/imgextra/i2/O1CN01xvu2fo1HU80biR6Q5_!!6000000000760-2-tps-7756-3693.png)
 
 ### 什么是沙盒实验室（DJ-Sandbox）？
+
 在Data-Juicer中，数据沙盒实验室为用户提供了持续生产数据菜谱的最佳实践，其具有低开销、可迁移、有指导性等特点，用户在沙盒中基于一些小规模数据集、模型对数据菜谱进行快速实验、迭代、优化，再迁移到更大尺度上，大规模生产高质量数据以服务大模型。
 
 用户在沙盒中，除了Data-Juicer基础的数据优化与数据菜谱微调功能外，还可以便捷地使用数据洞察与分析、沙盒模型训练与评测、基于数据和模型反馈优化数据菜谱等可配置组件，共同组成完整的一站式数据-模型研发流水线。
+
 ### 快速上手
+
 #### 依赖准备
-在使用沙盒实验室前，你可能需要使用如下命令安装沙盒相关的第三方依赖：
+
+在使用沙盒实验室前，你可能需要使用如下命令安装沙盒相关的依赖：
+
 ```shell
 pip install -v -e .[sandbox]
 ```
 
+并根据官方说明准备好沙盒中使用的第三方库（例如 EasyAnimate 、 VBench 、 InternVL 等），或者您也可以简单地从 GitHub 克隆第三方存储库，并在沙盒运行期间将安装过程留给我们的 `EnvManager` 完成。
+
 **注意**：一些沙盒的依赖还需要额外的领域依赖。
 
-1. 如果用户想要在沙盒中训练一个 ModelScope 平台的NLP模型，那可能需要为 `modelscope` 库
-安装额外的 `nlp` 领域依赖（参考其[安装文档](https://modelscope.cn/docs/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85) ）。
-
-2. 要使用[EasyAnimate](https://github.com/aigc-apps/EasyAnimate)时需要执行如下安装脚本：
+1. 要使用[EasyAnimate](https://github.com/aigc-apps/EasyAnimate)时需要执行如下安装脚本：
 ```shell
 cd thirdparty/models/
 bash setup_easyanimate.sh
 cd ../../
 ```
 
-3. 使用VBench测评视频时需要安装Detectron2，推荐安装如下分支。
-```shell
-pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
-```
-因此如果使用沙盒过程中，这些第三方依赖抛出了一些"未找到模块（Module-Not-Found）"的报错时，用户需要先检查这些库的文档以寻求帮助。
+如果使用沙盒过程中，这些第三方依赖抛出了一些"未找到模块（Module-Not-Found）"的报错时，用户需要先检查这些库的文档以寻求帮助。
 
 #### 准备沙盒配置文件
-沙河实验总共会依次执行四类任务：数据/模型洞察（`probe_job_configs`）、基于洞察结果的数据菜谱微调迭代（`refine_recipe_job_configs`）、数据处理与模型训练（`execution_job_configs`）和数据/模型评估（`evaluation_job_configs`）。每类任务中，任务按照配置的任务列表依次执行。每个任务需要指定：挂载这个任务的钩子（`hook`），记录中间结果的标记名(`meta_name`)，Data-Juicer数据处理参数（`dj_configs`），以及该任务其他的特定参数（`extra_configs`）。这些参数中`hook`是必须指定的，其他允许置空。`dj_configs`可以参考完整的Data-Juicer数据处理参数 [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml)。`extra_configs`为任务特定的参数，没有限定，可以是模型训练、推理、评测等参数，比如用`path_k_sigma_recipe`指定利用k-sigma方法微调后的数据菜谱保存路径。一个sandbox的配置文件示例可参考`configs/demo/sandbox/sandbox.yaml`：
+
+沙盒实验总共会依次执行四类任务：数据/模型洞察（`probe_job_configs`）、基于洞察结果的数据菜谱微调迭代（`refine_recipe_job_configs`）、数据处理与模型训练（`execution_job_configs`）和数据/模型评估（`evaluation_job_configs`）。每类任务中，任务按照配置的任务列表依次执行。每个任务需要指定：挂载这个任务的钩子（`hook`），用于识别钩子的标记名(`meta_name`)，Data-Juicer数据处理参数（`dj_configs`），以及该任务其他的特定参数（`extra_configs`）。这些参数中`hook`是必须指定的，其他允许置空。`dj_configs`可以参考完整的Data-Juicer数据处理参数 [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml)。`extra_configs`为任务特定的参数，没有限定，可以是模型训练、推理、评测等参数，比如用`path_k_sigma_recipe`指定利用k-sigma方法微调后的数据菜谱保存路径。一个sandbox的配置文件示例可参考`configs/demo/sandbox/sandbox.yaml`：
+
 ```yaml
 # Sandbox config example
 
@@ -103,7 +108,7 @@ evaluation_job_configs:
 
 1. 先执行Data-Juicer数据分析功能，计算每条数据的指定指标，比如`configs/demo/process.yaml`中，指定`language_id_score_filter`计算了语言分。
 
-2. 利用Data-Juicer数据分析的结果，用k-sigma方法微调数据菜谱。注意这里需要设置`meta_name`与数据分析时的`meta_name`相同才能利用到分析结果。
+2. 利用Data-Juicer数据分析的结果，用k-sigma方法微调数据菜谱。注意这里设置`meta_name`与数据分析时的`meta_name`相同才能利用到分析结果。
 
 3. 用k-sigma方法微调后的菜谱执行Data-Juicer的数据筛选功能。
 
@@ -113,11 +118,47 @@ evaluation_job_configs:
 
 6. 用打分器给筛选后的数据打分。
 
+如果您的配置文件中需要多个 pipeline ，您可以为每个管道命名，并将它们组织在 `pipelines` 字段中：
+
+```yaml
+# Sandbox config example
+
+# global parameters
+project_name: 'demo-sandbox'
+experiment_name: 'demo-sandbox-run0'              # for wandb tracer name
+hpo_config: null                                  # path to a configuration file when using auto-HPO tool.
+
+pipelines:
+  pipeline_1:
+      probe_job_configs:
+        xxx
+  pipeline_2:
+      probe_job_configs:
+        xxx
+      refine_recipe_job_configs:
+        xxx
+  pipeline_3:
+      probe_job_configs:
+        xxx
+      execution_job_configs:
+        xxx
+```
+
+在本例中，`pipelines` 字段包括 3 个 pipeline，分别名为 `pipeline_1`、`pipeline_2` 和 `pipeline_3`。它们各自都有不同类型的作业。您可以在 `configs/data_juicer_recipes/sandbox/internvl_coco_caption/sandbox_internvl_coco_caption.yaml` 中找到 InternVL 沙盒实验的此类配置文件的实际示例。
+
+> [!Important]
+> 
+> 不包含 `pipelines` 字段的单 pipeline 格式和包含 `pipelines` 字段的多 pipeline 格式均受支持，但不能同时使用。
+
+
 #### 运行沙盒
+
 沙盒的运行入口为`tools/sandbox_starter.py`，使用方法和数据处理与分析工具类似，需要指定沙盒配置文件：
+
 ```yaml
 python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 ```
+
 运行开始后，沙盒会根据预定义好的流水线以及配置文件依次运行各个步骤。流水线默认的单次运行主要包括4个大步骤：
 
 1. **数据/模型洞察**：该步骤会对输入的原始数据集/模型进行洞察，如对数据集进行分析或者对模型推理产出的数据进行分析，作为后续步骤的指导
@@ -128,12 +169,17 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 如此便完成了一轮沙盒流水线运行，最终用户只需比较数据菜谱微调以及数据集处理前后的洞察结果和评估结果，即可验证该轮实验对于数据生产的有效性。
 
 如果在配置文件里设置了`hpo_config`，并在其中配置了合适的优化目标以及待优化的算子超参，则沙盒会以HPO的形式进行多轮的流水线运行，并自动进行算子超参的多轮迭代微调优化。该配置文件的准备可参考 [hpo工具](https://github.com/modelscope/data-juicer/tree/main/tools/hpo) 。
+
 ### 组件工厂
+
 在沙盒流水线的单次运行中，包括了四个大的步骤，其中涉及到如下一些可配置组件，他们分别对应了一个用于初始化这些组件的工厂类：
 
-- **数据处理（DataExecutor）**：数据处理的执行器，即Data-Juicer的executor
+- **数据处理（DataExecutor）**：数据处理的执行器，即Data-Juicer的Executor
+- **数据池操作（DataPoolManipulator）**：数据池的操作，例如构建、组合
+- **通用数据处理（GeneralDataExecutor）**：数据集处理的通用执行器，例如数据集格式转换
 - **数据分析（DataAnalyzer）**：数据分析器，即Data-Juicer的analyzer
 - **数据评估（DataEvaluator）**：数据集质量的评估器
+- **通用数据探测（GeneralProbe）**：数据集的通用探测组件
 - **模型数据评估（ModelInferEvaluator）**：利用模型推理结果的数据集质量的评估器
 - **模型训练（ModelTrainExecutor）**：模型训练执行器
 - **模型推理（ModelInferExecutor）**：模型推理执行器
@@ -149,6 +195,23 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 | --- | --- | --- | --- |
 | `DJExecutor` | Data-Juicer数据处理模块 | - | - |
 
+- 数据池操作工厂 -- DataPoolManipulatorFactory
+
+| 组件                     | 功能               | `run`方法说明              | 参考材料                                               |
+|------------------------|------------------|------------------------|----------------------------------------------------|
+| `DataPoolConstruction` | 从指定的已分析数据源构建数据池  | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
+| `DataPoolCombination`  | 组合指定的数据池         | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
+| `DataPoolDuplication`  | 按指定次数复制数据池       | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
+| `DataPoolDownsampling` | 将数据池随机下采样到指定规模   | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
+
+- 通用数据处理工厂 -- GeneralDataExecutorFactory
+
+| 组件                            | 功能                                                         | `run`方法说明              | 参考材料                                                                                                     |
+|-------------------------------|------------------------------------------------------------|------------------------|----------------------------------------------------------------------------------------------------------|
+| `COCOCaptionToDJConversion`   | 将 InternVL COCO Caption 数据集转换为 DJ 格式                       | -                      | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html)  |
+| `COCOCaptionMetaGeneration`   | 为 InternVL COCO Caption 数据集生成 meta 文件                      | -                      | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html)  |
+
+
 - 数据分析工厂 -- DataAnalyzerFactory
 
 | 组件 | 功能 | `run`方法说明 | 参考材料 |
@@ -163,6 +226,13 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 | `VBenchEvaluator` | 使用VBench对基于prompt生成的视频进行多维度的评估 | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：待评生成视频集各维度打分均值<br /> | [VBench论文](https://arxiv.org/abs/2311.17982) |
 | `InceptionEvaluator` | 通过视频分类模型抽取特征测评生成的视频 | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：根据给定的metric返回对应的字典<br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
 
+- 通用数据探测工厂 -- GeneralProbeFactory
+
+| 组件                 | 功能                                                                          | `run`方法说明              | 参考材料                                               |
+|--------------------|-----------------------------------------------------------------------------|------------------------|----------------------------------------------------|
+| `DataPoolRanking`  | 根据指定的评估指标对数据池进行排序                                                           | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
+
+
 - 模型数据评估工厂 -- ModelInferEvaluatorFactory
 
 | 组件 | 功能 | `run`方法说明 | 参考材料 |
@@ -171,10 +241,13 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 - 模型训练工厂 -- ModelTrainExecutorFactory
 
-| 组件 | 功能 | `run`方法说明 | 参考材料 |
-| --- | --- | --- | --- |
-| `ModelscopeTrainExecutor` | 用Data-Juicer产出的数据集训练ModelScope平台上的模型，并监测loss变化信息 | <br />- `run_type`：训练模型类型。需要在组件配置文件中设置`type`参数为`"modelscope"`来激活该组件<br />- `run_obj`：未使用的参数<br /> | [ModelScope模型训练文档](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%AE%AD%E7%BB%83Train) |
-| `EasyAnimateTrainExecutor` | 用Data-Juicer产出的数据集训练文生视频模型EasyAnimate的LoRA模型，并监测loss变化信息  | <br />- `run_type`：训练模型类型。需要在组件配置文件中设置`type`参数为`"easyanimate"`来激活该组件<br />- `run_obj`：未使用的参数<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
+| 组件                                 | 功能                                                                             | `run`方法说明                                                                                           | 参考材料                                                                                                    |
+|------------------------------------|--------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| `ModelscopeTrainExecutor`          | 用Data-Juicer产出的数据集训练ModelScope平台上的模型，并监测loss变化信息                               | <br />- `run_type`：训练模型类型。需要在组件配置文件中设置`type`参数为`"modelscope"`来激活该组件<br />- `run_obj`：未使用的参数<br />   | [ModelScope模型训练文档](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%AE%AD%E7%BB%83Train)       |
+| `EasyAnimateTrainExecutor`         | 用Data-Juicer产出的数据集训练文生视频模型EasyAnimate的LoRA模型，并监测loss变化信息                       | <br />- `run_type`：训练模型类型。需要在组件配置文件中设置`type`参数为`"easyanimate"`来激活该组件<br />- `run_obj`：未使用的参数<br />  | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate)                                                 |
+| `TrinityRFTTrainExecutor`          | 基于 Trinity-RFT 框架进行强化微调任务，并监测训练状态变化信息                                          | - `run_obj`: 可以是 Trinity 配置文件的路径                                                                    | [Trinity-RFT](https://github.com/modelscope/Trinity-RFT)                                                |
+| `InternVLCOCOCaptionTrainExecutor` | 针对 COCO Caption 任务微调 InternVL2 的 LoRA 模型，并监测训练loss和学习率的变化信息                    | -                                                                                                   | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html) |
+
 
 - 模型推理工厂 -- ModelInferExecutorFactory
 
@@ -183,20 +256,83 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 | `EasyAnimateInferExecutor` | 用VBench的prompt数据集对EasyAnimate模型进行推理，并存储生成的视频 | <br />- `run_type`：推理类型。需要在组件配置文件中设置`type`参数为`"easyanimate"`来激活该组件<br />- `run_obj`：未使用的参数<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
 
 - 模型评估工厂 -- ModelEvaluatorFactory
-   - TBD
+
+| 组件                              | 功能                                                                      | `run`方法说明              | 参考材料                                                                                                                                     |
+|---------------------------------|-------------------------------------------------------------------------|------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| `InternVLCOCOCaptionEvaluator`  | 为 InternVL COCO Caption 任务评测 Bleu-1/2/3/4 ，METOR ， ROUGE_L ， 和 CIDEr 指标 | -                      | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model)  |
+
 
 详细定义可参考`data_juicer/core/sandbox/factories.py`。
+
+### 上下文共享
+
+有时不同的 hook 之间需要共享信息。例如，`TrainModelHook` 需要与 `EvaluateModelHook` 共享模型检查点路径，以便在训练后对模型进行评估。
+
+为了实现这一点，我们集成了一个全局的、跨 hook 和跨 pipeline 的信息容器，名为 `context_infos `，用于存储每个 pipeline 中 hook 的执行结果。`context_infos` 会在管道执行时自动构建。
+
+#### Resume 模式
+
+每个 pipeline 完成后，`context_infos` 都会保存在磁盘上。基于此，Sandbox 允许 pipeline 级别的 Resume 模式，从上一个 pipeline 的检查点继续执行沙盒。我们只需在沙盒配置文件中将 `resume` 参数设置为 `true` 即可。
+
+#### Hooks 的输入、输出和本地参数
+
+为了获取上下文信息，Hooks 新增了三个参数：
+- `input`：用于获取存储在上下文信息中之前的 Hook 的执行结果，并将其更新到当前 hook 的配置中。
+  - 基本用法：`<key_to_updated>: <key_in_context_infos>`，其中 `<key_to_updated>` 是当前 Hook 配置中需要更新的键，`<key_in_context_infos>` 是存储在上下文信息中的所需结果的键。
+  - 每对 input 参数都会将 `<key_to_updated>` 中的值替换为上下文信息中键为 `<key_in_context_infos>` 的值。它们都支持使用点 (`.`) 操作符的嵌套键。
+  - 如果只需要上一个 hook 的结果，可以在 `<key_in_context_infos>` 中简单地使用 `-1` 作为 hook 的键。
+- `output`：用于将当前 hook 的结果存储在 `context_infos ` 中。
+  - 基本用法：`[<res_1_name>, <res_2_name>, ...]`，其中 `<res_i_name>` 表示当前 hook 的第 `i` 个输出结果。如果未指定 `output` 参数，则自动使用简单的 "res_i" 作为第 `i` 个输出结果的名称。
+  - hook 执行后，当前 hook 的结果将以字典形式存储在 `context_infos ` 中，并使用 `output` 参数中的名称作为键。
+- `local`：用于将指定的值更新到当前 hook 的配置中。
+  - 基本用法：`<key_to_updated>: <value>`，其中 `<key_to_updated>` 是当前钩子配置中待更新的键，`<value>` 是目标值。
+  - 每对 local 参数都会将 `<key_to_updated>` 中的值替换为 `<value>` 中指定的值。支持使用点 (`.`) 符号的嵌套键。
+
+使用这些参数的一个钩子示例如下：
+
+```yaml
+xxx_hook:
+  meta_name: job_xxx
+  input:
+    dj_configs.dataset_path: pipeline1.name3.res4_key
+    extra_configs.meta_paths: -1.res5_key
+  output: ['res6_key', 'res7_key']
+  local:
+    extra_configs.arg2: 42
+  dj_configs: '/path/to/dj_configs.yaml'
+  extra_configs:
+    arg1: "arg1_val"
+    arg2: 404
+    meta_paths: "<placeholder>"
+```
+
+此钩子使用了所有的三个参数：
+- 在 `input` 中，此钩子将 YAML 格式的 `dj_configs` 中的 `dataset_path` 替换为之前钩子上下文信息中 pipeline1 中 `meta_name` 为 "name3" 的钩子存储名称为 `res4_key` 的值。此外，它会将 `extra_configs` 中的 `meta_paths` 替换为上一个钩子（由"-1"指定）上下文信息中存储的 `res5_key` 的值。
+- 在 `output` 中，该钩子输出两个结果，分别命名为 `res6_key` 和 `res7_key`，它们将存储在上下文信息中，如下所示：
+```python
+{
+  'meta_name': 'job_xxx',
+  'res6_key': <output_1>,
+  'res7_key': <output_2>,
+}
+```
+- 在 `local` 中，该钩子将 `extra_configs` 中 `arg2` 的原始值（为 404）替换为目标值 42。
+
 ## 开发者指南
+
 正如上一章节所说，开发者可开发更多的可配置组件并将它们添加到对应的工厂类中，并用参数`type`进行实例化方法分配。实现了组件后，开发者可以将它们封装为钩子，并将钩子注册到工作列表中，工作列表在流水线中进行编排后，沙盒流水线执行时，会依次在每个步骤执行每个工作列表中的工作。这其中的每一个部分：组件、组件工厂、钩子、工作列表、流水线注册与执行流程编排，都可以由开发者自定义。各个部分的关系由下图示意。
 ![sandbox-pipeline](https://img.alicdn.com/imgextra/i3/O1CN01ERmGre1uz3luKOn4n_!!6000000006107-2-tps-4655-1918.png)
 
 ### 组件内部实现
-目前组件主要分为两个大类：
+
+目前组件主要分为三个大类：
 
 - **执行器（Executor）**：由于数据执行器已经由Data-Juicer的Executor承担，因此此处的执行器特指模型的执行器，包括模型训练、推理、评估等执行器。代码位于`data_juicer/core/sandbox/model_executors.py`
 - **评估器（Evaluator）**：用于对数据集或者模型进行质量以及性能的评估。代码位于`data_juicer/core/sandbox/evaluators.py`
+- **数据池操作器（DataPoolManipulator）**：用于操作数据池，例如构建、组合、采样等。代码位于 `data_juicer/core/sandbox/data_pool_manipulators.py`
 
 #### 执行器
+
 模型执行器核心功能为对配置文件中指定的模型用指定的数据集进行训练、推理或评测。模型执行器需继承`BaseModelExecutor`并实现若干核心方法：
 
 - 模型执行器的具体行为（训练、推理、评测等）需要在`_run`方法中进行定义
@@ -207,14 +343,24 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 - `_run`方法：读入数据集后，根据模型训练配置开始进行模型训练，训练结束后向标准输出流（已重定向到指定的日志文件）输出一个预定义的任务执行结束标识符
 - `watch_run`方法：监控指定的日志文件，逐行读取，并调用根据模型训练框架自定义的`_watch_run`方法解析最新的日志内容行，提取关键指标并进行监测，直到读取到预定义的任务结束标识符
+
 #### 评估器
+
 评估器核心功能为对待评估对象使用某种方法进行质量、性能等维度的评估，并最终返回一个评估结果，通常为数值型结果。评估器需继承基类`BaseEvaluator`并实现`run`方法。`run`方法默认接受两个必要参数：
 
 - `eval_type`：评估类型，用于在某种评估器内部进行评估类型选择
 - `eval_obj`：待评估的对象
 
 用户也可根据自己的实现方式对这两个参数进行扩展使用。
+
+#### 数据池操作器
+
+数据池操作器的核心功能是操作数据池，例如构造、组合、采样等。数据池操作器需要继承自基类 `BaseDataPoolManipulator`，并实现 `run` 方法。`run` 方法所需的参数通常来自 `__init__` 方法中的输入数据池配置，涵盖输入数据池、导出路径以及每种操作器的具体参数。
+
+用户可以参考 `data_juicer/core/sandbox/data_pool_manipulators.py` 中每种操作器的 `run` 方法的 doc string 了解更多详细信息。
+
 ### 流水线钩子
+
 正如章节开始部分所说，在流水线中，我们需要实现若干钩子将组件与流水线执行步骤通过工作列表连接起来。被激活的钩子会在流水线的工作列表中进行注册，然后在流水线执行时依次对各个步骤工作列表中的钩子执行。四个步骤对应的工作列表分别如下：
 
 1. **数据/模型洞察**：洞察工作列表 -- probe_jobs
@@ -224,24 +370,29 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 通常情况下，我们只需要为一类组件工厂实现一种钩子函数即可。而除了依赖于组件的钩子外，还有一些依赖于Data-Juicer已有功能或工具以及其他第三方库的钩子。这些钩子与依赖的组件、工具以及工作列表的对应关系如下：
 
-| 钩子 | 功能 | 依赖的组件工厂 | 依赖的工具或库 | 注册工作列表 |
-| --- | --- | --- | --- | --- |
-| `ProbeViaAnalyzerHook` | 分析与洞察数据集质量、多样性等维度分布 | 数据分析工厂（DataAnalyzerFactory） | Data-Juicer分析器Analyzer | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
-| `ProbeViaModelInferHook` | 分析与洞察数据集对于模型的影响，挖掘与洞察“难”数据与“脏”数据 | 数据处理工厂（DataExecutorFactor）<br />模型数据评估工厂（ModelInferEvaluatorFactory） | Data-Juicer数据处理器Executor | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
-| `RefineRecipeViaKSigmaHook` | 根据数据集洞察结果，利用k-sigma方法对数据菜谱超参进行微调 | - | Data-Juicer超参优化工具HPO中的k-sigma菜谱微调工具 | 菜谱微调工作列表（refine_recipe_jobs） |
-| `RefineRecipeViaModelFeedbackHook` | 利用模型洞察与反馈结果对数据菜谱超参进行微调 | TODO | - | 菜谱微调工作列表（refine_recipe_jobs） |
-| `ProcessDataHook` | 基于当前数据菜谱对数据集进行处理与清洗 | 数据处理工厂（DataExecutorFactor） | Data-Juicer数据处理器Executor | 执行工作列表（execution_jobs） |
-| `TrainModelHook` | 基于当前数据集训练一个模型 | 模型训练工厂（ModelTrainExecutorFactory） | [EasyAnimate](../thirdparty//easy_animate/README.md) | 执行工作列表（execution_jobs） |
-| `InferModelHook` | 模型基于给定输入让模型产生输出 | 模型推理工厂（ModelInferExecutorFactory） | [EasyAnimate](../thirdparty//easy_animate/README.md) | 执行工作列表（execution_jobs） |
-| `EvaluateDataHook` | 对当前数据集进行数据质量等维度的评估 | 数据评估工厂（DataEvaluatorFactory） | 图像或视频的[inception metrics](../tools/mm_eval/inception_metrics/README_ZH.md)，如FID、FVD <br /> [VBench](../tools/mm_eval/vbench_metrics/README_ZH.md) | 评估工作列表（evaluation_jobs） |
-| `EvaluateModelHook` | 对当前训练后的模型进行评估 | 模型评估工厂（ModelEvaluatorFactory） | - | 评估工作列表（evaluation_jobs） |
+| 钩子                                 | 功能                                | 依赖的组件工厂                                                               | 依赖的工具或库                                                                                                                                           | 注册工作列表                                          |
+|------------------------------------|-----------------------------------|-----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
+| `ProbeViaAnalyzerHook`             | 分析与洞察数据集质量、多样性等维度分布               | 数据分析工厂（DataAnalyzerFactory）                                           | Data-Juicer分析器Analyzer                                                                                                                            | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
+| `ProbeViaModelInferHook`           | 分析与洞察数据集对于模型的影响，挖掘与洞察“难”数据与“脏”数据  | 数据处理工厂（DataExecutorFactor）<br />模型数据评估工厂（ModelInferEvaluatorFactory）  | Data-Juicer数据处理器Executor                                                                                                                          | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
+| `GeneralProbeHook`                 | 提供通用的数据集探测能力，包括数据集排序等             | 通用数据探测工厂（GeneralProbeFactory）                                         | -                                                                                                                                                 | 洞察工作列表（probe_jobs）                              |
+| `RefineRecipeViaKSigmaHook`        | 根据数据集洞察结果，利用k-sigma方法对数据菜谱超参进行微调  | -                                                                     | Data-Juicer超参优化工具HPO中的k-sigma菜谱微调工具                                                                                                               | 菜谱微调工作列表（refine_recipe_jobs）                    |
+| `RefineRecipeViaModelFeedbackHook` | 利用模型洞察与反馈结果对数据菜谱超参进行微调            | TODO                                                                  | -                                                                                                                                                 | 菜谱微调工作列表（refine_recipe_jobs）                    |
+| `ProcessDataHook`                  | 基于当前数据菜谱对数据集进行处理与清洗               | 数据处理工厂（DataExecutorFactor）                                            | Data-Juicer数据处理器Executor                                                                                                                          | 执行工作列表（execution_jobs）                          |
+| `DataPoolManipulationHook`         | 操作数据池，包括构造，组合，采样等                 | 数据池操作工厂（DataPoolManipulatorFactory）                                   | -                                                                                                                                                 | 执行工作列表（execution_jobs）                          |
+| `GeneralDataExecutorHook`          | 通用数据集处理能力，包括格式转换等                 | 通用数据处理工厂（GeneralDataExecutorFactory）                                  | -                                                                                                                                                 | 执行工作列表（execution_jobs）                          |
+| `TrainModelHook`                   | 基于当前数据集训练一个模型                     | 模型训练工厂（ModelTrainExecutorFactory）                                     | [EasyAnimate](../thirdparty//easy_animate/README.md) <br/> [InternVL](https://internvl.readthedocs.io/en/latest/index.html)                       | 执行工作列表（execution_jobs）                          |
+| `InferModelHook`                   | 模型基于给定输入让模型产生输出                   | 模型推理工厂（ModelInferExecutorFactory）                                     | [EasyAnimate](../thirdparty//easy_animate/README.md)                                                                                              | 执行工作列表（execution_jobs）                          |
+| `EvaluateDataHook`                 | 对当前数据集进行数据质量等维度的评估                | 数据评估工厂（DataEvaluatorFactory）                                          | 图像或视频的[inception metrics](../tools/mm_eval/inception_metrics/README_ZH.md)，如FID、FVD <br /> [VBench](../tools/mm_eval/vbench_metrics/README_ZH.md) | 评估工作列表（evaluation_jobs）                         |
+| `EvaluateModelHook`                | 对当前训练后的模型进行评估                     | 模型评估工厂（ModelEvaluatorFactory）                                         | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model)           | 评估工作列表（evaluation_jobs）                         |
 
 值得注意的是，一个钩子可以在多个工作列表进行注册，因为这个钩子在不同的流水线阶段可以扮演不同的角色，比如我们可以对处理前后的数据集都进行分析，以比较数据集处理前后的质量、多样性等维度的变化情况。
 
 ### 自定义沙盒流水线
+
 用户直接在参数配置文件中修改任务配置列表即可实现任务修改和编排。
 
 ### 监测器
+
 在上述章节中，反复提到“监测”这个概念。流水线会对各个步骤中产生的若干指标都进行监测，这些监测过程都依靠沙盒监测器`SandboxWatcher`实现的。
 
 `SandboxWatcher`基于wandb实现，主要包括4个方法：
@@ -250,3 +401,167 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 - `watch_cfgs`：对sandbox实验以及各个组件的配置文件进行监测与更新
 - `watch`：对某个具体指标或实验结果进行监测，并记录到wandb日志
 - `query`：对某个具体指标或实验结果从wandb日志中进行查询
+
+### 上下文信息实现细节
+
+`context_infos` 包含两个级别：
+
+- pipeline 级别：它是 `context_infos` 的第一级，它是一个字典，键是 pipeline 名称，值是该 pipeline 中每个 job 的上下文信息列表。
+- job 级别：它是 `context_infos` 的第二级，它是一个字典列表，每个字典代表特定 job 的上下文信息，其中 `meta_name` 用于标识 job，其他键值对的键是该 job 的输出名称，值是输出值。
+
+以下是 `context_infos` 的一个示例：
+
+```python
+{
+    'pipeline_0': [
+        {
+            'meta_name': 'name1',
+            'res1_key': 'res1_value',
+            'res2_key': <res2_value>,
+        },
+        {
+            'meta_name': 'name2',
+            'res3_key': 'res3_value',
+        },
+    ],
+    'pipeline_1': [
+        {
+            'meta_name': 'name3',
+            'res4_key': <res4_value>,
+        },
+    ],
+    'pipeline_2': [
+        {
+            'meta_name': 'name4',
+            'res5_key': ['res5_1_value', 'res5_2_value'],
+        },
+    ],
+}
+```
+
+### 环境管理器
+
+Sandbox 支持不同类型的第三方库，用于训练、评估等。如果将它们全部放在一个环境中，一些重要且复杂的依赖项可能会发生版本冲突。因此，我们提供了一个易于使用的环境管理器，用于将不同第三方库在不同环境中分别进行管理，允许用户在独立的环境中运行命令。
+
+环境的基本类是 `Env`，位于 `data_juicer/core/sandbox/env_manager.py` 中，其实现如下：
+
+```python
+class Env(ABC):
+  
+    @abstractmethod
+    def create(self):
+        """
+        创建一个环境
+        """
+        raise NotImplementedError(
+            'This method must be implemented in subclass.')
+
+    @abstractmethod
+    def check_availability(self):
+        """
+        检查环境管理器的可用性
+        """
+        raise NotImplementedError(
+            'This method must be implemented in subclass.')
+
+    @abstractmethod
+    def exists(self):
+        """
+        检查环境是否存在
+        """
+        raise NotImplementedError(
+            'This method must be implemented in subclass.')
+
+    @abstractmethod
+    def install_py_deps(self):
+        """
+        安装 Python 依赖项
+        """
+        raise NotImplementedError(
+            'This method must be implemented in subclass.')
+
+    @abstractmethod
+    def run_cmd(self):
+        """
+        在该环境中运行命令
+        """
+        raise NotImplementedError(
+            'This method must be implemented in subclass.')
+```
+
+它包含五个主要的抽象方法：
+- `create`：如果环境不存在，则创建环境。
+- `check_availability`：检查环境管理器（例如 `conda`、`venv`）的可用性。
+- `exists`：检查环境是否存在。
+- `install_py_deps`：安装 Python 依赖项。通常支持三种方式：通过“requirements.txt”文件路径、依赖项列表、或指向库代码库的目录路径。
+- `run_cmd`：在此环境中运行命令。
+
+现在我们提供了两种 `Env` 的具体实现：
+- `CondaEnv`：使用 `conda` 或 `mamba` 管理环境。
+- `VitualEnv`：使用 `venv`、`virtualenv` 或 `uv venv` 管理环境。
+
+在初始化环境管理器时，我们可以通过设置配置文件中的 `env_manager` 参数来指定要使用的环境管理器，并通过设置 `env_name` 参数来指定环境的名称。基本用法示例如下：
+
+```python
+from data_juicer.core.sandbox.env_manager import ENV_ROUTER
+
+env_manager = 'conda'
+env_name = 'new_conda_env'
+
+# 创建一个环境
+env =  ENV_ROUTER[env_manager](
+  env_name=env_name,
+  env_manager=env_manager)
+# 检查环境管理器可用性
+if not env.check_availability():
+    # 该环境管理器不可用
+    exit()
+# 创建一个新环境。如果环境已存在，则使用已存在的环境
+env.create()
+
+# 安装额外的依赖项
+# 使用 "requirements.txt" 文件
+env.install_py_deps("/path/to/requirements.txt")
+# 使用依赖项列表
+env.install_py_deps(["torch", "torchvision"])
+# 使用指向库代码库的目录路径，如 InternVL
+env.install_py_deps("/path/to/a/third-party/library")
+
+# 在该环境中运行一条命令
+cmd = "python train.py"
+env.run_cmd(cmd)
+```
+
+`data_juicer/core/sandbox/specific_hooks/intervl_coco_captioning/model_hooks.py` 中的 `InternVLCOCOCaptionEvaluator` 类提供了在钩子中使用环境管理器的完整示例。
+
+## Q&A
+
+1. 训练 InternVL 时发生 `RuntimeError`：
+
+```text
+RuntimeError: 
+        CUDA Setup failed despite GPU being available. Please run the following command to get more information:
+
+        python -m bitsandbytes
+
+        Inspect the output of the command and see if you can locate CUDA libraries. You might need to add them
+        to your LD_LIBRARY_PATH. If you suspect a bug, please take the information from python -m bitsandbytes
+        and open an issue at: https://github.com/TimDettmers/bitsandbytes/issues
+```
+- 原因：这可能是由于 CUDA、PyTorch 和 bitsandbytes 不兼容造成的。运行 `python -m bitsandbytes` 获取更多详细信息。
+- 解决方案：
+  - 移除 InternVL 主目录下 `requirements/internvl_chat.txt` 中对 bitsandbytes 的版本限制，以避免在启动环境时再次安装错误版本。然后使用 `pip uninstall bitsandbytes && pip install bitsandbytes` 重新安装。
+  - 如果上述解决方案无效，请重新安装与您的 GPU 的 CUDA 版本兼容的 PyTorch，并重复上述步骤，直到 `python -m bitsandbytes` 命令输出 SUCCESS。
+  - 然后，还需要重新安装 `flash-attn`。
+
+2. 在训练 InternVL 时发生 `AssertionError`：
+
+```text
+AssertionError: It is illegal to call Engine.step() inside no_sync context manager
+```
+
+- 解决方案：将 `deepspeed` 版本降级至 `0.15.4`，并在 InternVL 主目录中的 `requirements/internvl_chat.txt` 和 `pyproject.toml` 中移除 `deepspeed` 的版本限制。
+
+3. 评测 InternVL 时报错 `java not found`：
+- 解决方案：安装 java。
+

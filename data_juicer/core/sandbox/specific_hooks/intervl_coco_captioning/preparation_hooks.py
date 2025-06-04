@@ -13,7 +13,7 @@ class COCOCaptionToDJConversion(BaseDataPoolManipulator):
 
     def run(self):
         """
-        Generate meta file for InternVL COCO Caption datasets.
+        Convert InternVL COCO Caption datasets to DJ format.
 
         Input:
             - dataset_path: N InternVL COCO Caption datasets

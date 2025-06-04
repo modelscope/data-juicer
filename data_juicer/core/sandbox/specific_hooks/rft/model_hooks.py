@@ -9,7 +9,7 @@ from data_juicer.core.sandbox.model_executors import BaseModelExecutor
 
 class TrinityRFTTrainExecutor(BaseModelExecutor):
     """
-    A training executor for (Trinity-RFT)(https://github.com/modelscope/Trinity-RFT).
+    A training executor for [Trinity-RFT](https://github.com/modelscope/Trinity-RFT).
 
     The config file for this executor should at least include the following items:
     1. `type`: must be "trinity-rft". Otherwise, this executor won't be returned.

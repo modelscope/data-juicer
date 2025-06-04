@@ -322,7 +322,7 @@ class InternVLCOCOCaptionEvaluator(BaseEvaluator):
                 f'Input paths [{",".join(missing_paths)}] does not exist. Skipped!'
             )
 
-    def run(self, eval_type, eval_obj=None, **kwargs) -> dict:
+    def run(self, eval_type, eval_obj=None, **kwargs):
         """
         The evaluated results will be exported to the file "eval_log.txt" in the corresponding checkpoint dir. Then the
         scores of each dimension will be extracted from the file, including: {"Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4",
