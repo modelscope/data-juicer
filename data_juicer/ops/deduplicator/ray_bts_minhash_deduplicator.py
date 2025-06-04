@@ -79,9 +79,6 @@ class BTSUnionFind:
         self.max_pending_edge_buffer_task = max_pending_edge_buffer_task
         self.num_edge_buffer_task_returns = num_edge_buffer_task_returns
 
-    def get_hash_table(self):
-        return self.hash_table
-
     def add_key_value_pairs(self, pairs):
         for key, value in pairs:
             if key not in self.hash_table:
@@ -260,7 +257,7 @@ class GPUMinHashActor:
                     gen.randint(1, MERSENNE_PRIME, dtype=np.uint64),
                     gen.randint(0, MERSENNE_PRIME, dtype=np.uint64),
                 ) for _ in range(256)],
-                dtype=np.uint32,
+                dtype=np.uint64,
             ).T
         self.perm_a = cudf.Series(perm_a).astype("uint32")
         self.perm_b = cudf.Series(perm_b).astype("uint32")
@@ -329,6 +326,8 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             to use 'character', and for multiple languages, we recommend
             to use 'sentencepiece'. If using 'sentencepiece', please
             provided the model path in the 'tokenizer_model' field.
+        :param use_gpu: whether to use GPU for MinHash computation. If True,
+            GPU will be used for faster processing. Default is False.
         :param window_size: window size of shingling
         :param lowercase: whether to convert text to lower case first
         :param ignore_pattern: whether to ignore sub-strings with
@@ -364,8 +363,11 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             to return. Default it's 10.
         :param merge_batch_size: batch size for BTS operations. Default
             it's 1000.
-        :param tmp_file_name: the temporary folder name for deduplication.
+        :param minhash_batch_size: batch size for MinHash computation. If "auto",
+            it will be set based on default values per CPU or GPU. 
+            CPU default 1024, GPU default 200_000
         """
+        
         super().__init__(*args, **kwargs)
 
         self.tokenization = tokenization
@@ -462,7 +464,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                 gen.randint(1, MERSENNE_PRIME, dtype=np.uint64),
                 gen.randint(0, MERSENNE_PRIME, dtype=np.uint64),
             ) for _ in range(self.num_permutation)],
-            dtype=np.uint32,
+            dtype=np.uint64,
         ).T
 
         if union_find_parallel_num == 'auto':
