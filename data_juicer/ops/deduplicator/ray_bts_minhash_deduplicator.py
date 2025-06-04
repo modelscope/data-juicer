@@ -236,14 +236,14 @@ def get_remote_classes():
     return {
         'IdGenerator': ray.remote(IdGenerator),
         'EdgeBuffer': ray.remote(scheduling_strategy='SPREAD')(EdgeBuffer),
-        'BTSUnionFind': ray.remote(scheduling_strategy='SPREAD')(BTSUnionFind)
+        'BTSUnionFind': ray.remote(scheduling_strategy='SPREAD')(BTSUnionFind),
+        'GPUMinHashActor': ray.remote(GPUMinHashActor)
     }
 
 
 OP_NAME = 'ray_bts_minhash_deduplicator'
 
 
-@ray.remote
 class GPUMinHashActor:
 
     def __init__(self,
@@ -671,7 +671,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                                ray.get_runtime_context().get_job_id())
         if self.use_gpu:
             dataset = dataset.map_batches(
-                GPUMinHashActor,
+                get_remote_classes()['GPUMinHashActor'],
                 batch_format='pyarrow',
                 zero_copy_batch=True,
                 num_gpus=1,
