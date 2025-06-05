@@ -12,7 +12,7 @@ In addition to the basic data optimization and recipe refinement features offere
 For more detailed information, please refer to our [paper](http://arxiv.org/abs/2407.11784) (ICML'25 spotlight).
 
 ### Applications and Use-Cases
-We apply the sandbox to many cutting-edge models, such as Mini-Gemini and InternVL-2.0, two LLaVA-inspired models for image-to-text generation, EasyAnimate and T2V-Turbo, two Diffusion Transformer-based models for text-to-video generation, and a CLIP model for image-text pre-training. Among these, we have secured a new leading position on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard.
+We apply the sandbox to many cutting-edge models, such as Mini-Gemini and InternVL-2.0 (two LLaVA-inspired models for image-to-text generation), EasyAnimate and T2V-Turbo (two Diffusion Transformer-based models for text-to-video generation), and a CLIP model for image-text pre-training. Among these, we have secured a new leading position on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard.
 ![top-1_in_vbench](https://img.alicdn.com/imgextra/i1/O1CN01I9wHW91UNnX9wtCWu_!!6000000002506-2-tps-1275-668.png)
 
 The model is now publicly available on the ModelScope and HuggingFace platforms, and the training dataset has also been available.

@@ -12,7 +12,7 @@ Data-Juicer 中的 DJ-Sandbox 是一个连接数据和模型反馈的中间件�
 
 
 ### 应用
-我们将沙盒应用于到了众多前沿模型，例如 Mini-Gemini 和 InternVL-2.0 （两个受 LLaVA 启发的图像转文本生成模型EasyAnimate 和 T2V-Turbo）、两个基于 Diffusion Transformer 的文本转视频生成模型，以及一个用于图文预训练的 CLIP 模型。在此之上，我们曾在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜一。
+我们将沙盒应用于到了众多前沿模型，例如 Mini-Gemini 和 InternVL-2.0（两个受 LLaVA 启发的图像转文本生成模型），EasyAnimate 和 T2V-Turbo（两个基于 Diffusion Transformer 的文本转视频生成模型），以及一个用于图文预训练的 CLIP 模型。在此之上，我们曾在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜一。
 ![top-1_in_vbench](https://img.alicdn.com/imgextra/i1/O1CN01I9wHW91UNnX9wtCWu_!!6000000002506-2-tps-1275-668.png)
 
 相关模型已在ModelScope和HuggingFace平台发布，训练模型的数据集也已开源。
