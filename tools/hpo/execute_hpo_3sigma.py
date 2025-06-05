@@ -76,6 +76,8 @@ def modify_recipe_k_sigma(cfg, df, path_k_sigma_recipe, k=3):
                                     f'{arg_name}={new_val}')
                         args[arg_name] = new_val
     if path_k_sigma_recipe:
+        if 'config' in cfg:
+            cfg['config'] = [str(p) for p in cfg['config']]
         if path_k_sigma_recipe.endswith(
                 '.yaml') or path_k_sigma_recipe.endswith('.yml'):
             with open(path_k_sigma_recipe, 'w') as fout:

@@ -284,7 +284,13 @@ class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
         text_keys = getattr(self.cfg, 'text_keys',
                             ['text'])  # Default to ['text']
         suffixes = getattr(self.cfg, 'suffixes', None)  # Default to None
-        add_suffix = getattr(self.cfg, 'add_suffix', False)  # Default to False
+        # if there is suffix_filter op, turn on the add_suffix flag
+        add_suffix = False
+        for op in self.cfg.process:
+            op_name, _ = list(op.items())[0]
+            if op_name == 'suffix_filter':
+                add_suffix = True
+                break
         load_data_np = kwargs.get('num_proc', 1)
 
         # use proper formatter to load data
