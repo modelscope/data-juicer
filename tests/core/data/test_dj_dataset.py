@@ -1,5 +1,7 @@
 import unittest
 from datasets import Dataset
+from typing import List
+from data_juicer.core.data.schema import Schema
 from data_juicer.core.data import NestedDataset
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
@@ -182,9 +184,9 @@ class TestNestedDataset(DataJuicerTestCaseBase):
         self.assertEqual(schema.column_types['int_value'], int)
         self.assertEqual(schema.column_types['float_value'], float)
         self.assertEqual(schema.column_types['bool_value'], bool)
-        self.assertEqual(schema.column_types['metadata'], dict)
-        self.assertEqual(schema.column_types['tags'], list)
-        self.assertEqual(schema.column_types['nested'], dict)
+        self.assertIsInstance(schema.column_types['metadata'], Schema)
+        self.assertEqual(schema.column_types['tags'], List[str])
+        self.assertIsInstance(schema.column_types['nested'], Schema)
 
     def test_schema_empty_dataset(self):
         """Test schema with empty dataset"""
