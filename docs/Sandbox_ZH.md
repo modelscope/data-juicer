@@ -146,6 +146,8 @@ pipelines:
 
 在本例中，`pipelines` 字段包括 3 个 pipeline，分别名为 `pipeline_1`、`pipeline_2` 和 `pipeline_3`。它们各自都有不同类型的作业。您可以在 `configs/data_juicer_recipes/sandbox/internvl_coco_caption/sandbox_internvl_coco_caption.yaml` 中找到 InternVL 沙盒实验的此类配置文件的实际示例。
 
+对于单 pipeline 格式，这个唯一的 pipeline 会默认命名为 "anonymous"。
+
 > [!Important]
 > 
 > 不包含 `pipelines` 字段的单 pipeline 格式和包含 `pipelines` 字段的多 pipeline 格式均受支持，但不能同时使用。

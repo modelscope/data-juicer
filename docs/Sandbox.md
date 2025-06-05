@@ -144,6 +144,8 @@ pipelines:
 
 In this example, there are 3 pipelines organized in the `pipelines` field, named `pipeline_1`, `pipeline_2`, and `pipeline_3`. Each of them has their own different types of jobs. You can find a practical example of such config file for InternVL sandbox experiments in `configs/data_juicer_recipes/sandbox/internvl_coco_caption/sandbox_internvl_coco_caption.yaml`.
 
+For the single-pipeline format, the only pipeline is named "anonymous" in default.
+
 > [!Important]
 > 
 > The single pipeline format without `pipelines` field and the multi-pipeline format with `pipelines` field are both supported but can not be used at the same time.

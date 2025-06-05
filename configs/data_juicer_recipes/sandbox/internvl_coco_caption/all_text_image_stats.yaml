@@ -1,3 +1,5 @@
+# You need to replace all "<internvl_home>" in the config files with your own real path to InternVL home on you machine.
+
 project_name: 'all_text_image_stats'
 dataset_path: '<internvl_home>/internvl_chat/data/coco/coco_karpathy_train_567k_dj_fmt.jsonl'
 np: 16

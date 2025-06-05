@@ -4,6 +4,7 @@
 # You should clone the repo to your own <internvl_home> path and replace it with the real path.
 # You can follow the doc [here](https://internvl.readthedocs.io/en/latest/get_started/installation.html) to install
 # the InternVL or you can only need to clone and let the sandbox create and install the environment automatically.
+# And you need to replace all "<internvl_home>" in the config files with your own real path to InternVL home on you machine.
 
 type: internvl_coco_caption
 

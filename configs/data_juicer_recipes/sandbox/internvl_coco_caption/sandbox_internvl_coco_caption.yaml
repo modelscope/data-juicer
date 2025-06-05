@@ -4,6 +4,7 @@
 # the InternVL before starting it, or you can only need to clone and let the sandbox create and install the environment
 # automatically.
 # Then you need to prepare the model and dataset following this doc [here](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#).
+# And you need to replace all "<internvl_home>" in the config files with your own real path to InternVL home on you machine.
 
 # global parameters
 project_name: 'sandbox-internvl-coco-caption'
