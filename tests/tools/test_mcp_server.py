@@ -194,7 +194,7 @@ class MCPServerTest(DataJuicerTestCaseBase):
         client = MCPClient(self.api_model)
 
         try:
-            await client.connect_to_server('./data_juicer/tools/mcp_server.py')
+            await client.connect_to_server('./data_juicer/tools/single_op_mcp_server.py')
             response, tool_call = await client.one_chat(query)
             logger.info(str(response))
             self.assertIsNotNone(tool_call)
