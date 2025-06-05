@@ -2,10 +2,12 @@ import datetime
 import inspect
 import os
 import re
-from typing import Dict
+import sys
+from typing import Annotated, Dict, Optional
 
 from loguru import logger
 from mcp.server.fastmcp import FastMCP
+from pydantic import Field
 
 from data_juicer.config import get_init_configs
 from data_juicer.core import DefaultExecutor
@@ -17,12 +19,11 @@ mcp = FastMCP('Data-Juicer Server')
 
 # Operator Management
 ops_list_path = os.getenv('DJ_OPS_LIST_PATH', None)
-if ops_list_path is None:
-    abs_dir = os.path.abspath(os.path.dirname(__file__))
-    ops_list_path = os.path.join(abs_dir, 'dj_ops_19.txt')
-
-with open(ops_list_path, 'r', encoding='utf-8') as file:
-    ops_list = [line.strip() for line in file if line.strip()]
+if ops_list_path:
+    with open(ops_list_path, 'r', encoding='utf-8') as file:
+        ops_list = [line.strip() for line in file if line.strip()]
+else:
+    ops_list = list(OPERATORS.modules.keys())
 
 
 # Dynamic MCP Tool Creation
@@ -38,6 +39,21 @@ def extract_param_docstring(docstring):
     for match in matches:
         params.append(match[0])
     return params
+
+
+def process_parameter(name: str,
+                      param: inspect.Parameter) -> inspect.Parameter:
+    """
+    Processes a function parameter:
+    - Converts jsonargparse.typing.ClosedUnitInterval to a local equivalent annotation.
+    """
+    ClosedUnitInterval = Annotated[
+        float,
+        Field(ge=0.0, le=1.0, description='float restricted to be ≥0 and ≤1')]
+    if param.annotation == getattr(sys.modules.get('jsonargparse.typing'),
+                                   'ClosedUnitInterval', None):
+        return param.replace(annotation=ClosedUnitInterval)
+    return param
 
 
 def create_operator_function(op_name, op_cls):
@@ -62,9 +78,16 @@ def create_operator_function(op_name, op_cls):
     new_parameters = [
         inspect.Parameter('dataset_path',
                           inspect.Parameter.POSITIONAL_OR_KEYWORD,
-                          annotation=str)
+                          annotation=str),
+        inspect.Parameter(
+            'export_path',
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            annotation=Optional[str],
+            default=None,
+        ),
     ] + [
-        param for name, param in sig.parameters.items()
+        process_parameter(name, param)
+        for name, param in sig.parameters.items()
         if name not in ('args', 'kwargs', 'self')
     ]
     new_signature = sig.replace(parameters=new_parameters,
@@ -75,14 +98,16 @@ def create_operator_function(op_name, op_cls):
         bound_arguments = new_signature.bind(*args, **kwargs)
         bound_arguments.apply_defaults()
 
+        export_path = bound_arguments.arguments.pop('export_path')
+        dataset_path = bound_arguments.arguments.pop('dataset_path')
         args_dict = {k: v for k, v in bound_arguments.arguments.items() if v}
-        dataset_path = args_dict.pop('dataset_path')
 
         dj_cfg = {
             'dataset_path': dataset_path,
+            'export_path': export_path,
             'process': [{
                 op_name: args_dict
-            }]
+            }],
         }
         return execute_op(dj_cfg)
 
@@ -106,9 +131,11 @@ for op_name in ops_list:
 # Execution Pipeline
 def add_extra_cfg(dj_cfg: Dict) -> Dict:
     """Add extra dj config."""
-    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-    dj_cfg['export_path'] = os.path.join(DEFAULT_OUTPUT_DIR, timestamp,
-                                         'processed_data.jsonl')
+    if not dj_cfg.get('export_path'):
+        logger.info('export_path is not set, use default export_path')
+        timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        dj_cfg['export_path'] = os.path.join(DEFAULT_OUTPUT_DIR, timestamp,
+                                             'processed_data.jsonl')
 
     # Problem: It will holding when use multi threads/procs
     # Can't multithreading and multiprocessing be used in a coroutine?
