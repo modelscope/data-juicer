@@ -2,9 +2,17 @@
 
 ## User Guide
 
-### Applications and Achievements
 
-Leveraging the Data-Juicer Sandbox Laboratory Suite, we systematically fine-tuned data and models through a dedicated research and development workflow between data and models. For more detailed information, please refer to our [paper](http://arxiv.org/abs/2407.11784). In our work, we have secured a new leading position on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard.
+### What is DJ-Sandbox?
+
+In Data-Juicer, the DJ-Sandbox is a middleware that links data and model feedback, enabling high performance and low-cost verification across a wide range of tasks. It aims to provide users with the best practices for continuously enhancing data-model recipes, featuring low overhead, portability, and guidance. In the sandbox, users can quickly experiment, iterate, and refine recipes based on small-scale datasets and models before scaling up to produce high-quality data to serve large-scale models.
+
+In addition to the basic data optimization and recipe refinement features offered by Data-Juicer, users can seamlessly use configurable components such as data probing and analysis, model training and evaluation, and data and model feedback-based recipe refinement to form preferred pipelines for data-model research and development.
+
+For more detailed information, please refer to our [paper](http://arxiv.org/abs/2407.11784) (ICML'25 spotlight).
+
+### Applications and Use-Cases
+We apply the sandbox to many cutting-edge models, such as Mini-Gemini and InternVL-2.0, two LLaVA-inspired models for image-to-text generation, EasyAnimate and T2V-Turbo, two Diffusion Transformer-based models for text-to-video generation, and a CLIP model for image-text pre-training. Among these, we have secured a new leading position on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard.
 ![top-1_in_vbench](https://img.alicdn.com/imgextra/i1/O1CN01I9wHW91UNnX9wtCWu_!!6000000002506-2-tps-1275-668.png)
 
 The model is now publicly available on the ModelScope and HuggingFace platforms, and the training dataset has also been available.
@@ -29,11 +37,6 @@ Following is the case study for Data-Juicer (DJ, 228k) outputs.
 To reproduce the paper's experiments, please refer to the sandbox usage guide below, the experimental process in the following figure, the [initial dataset](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip), and the configuration file demos for the process: [1_single_op_pipeline.yaml](../configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/1_single_op_pipeline.yaml), [2_multi_op_pipeline.yaml](../configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/2_multi_op_pipeline.yaml), [3_duplicate_pipeline.yaml](../configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/3_duplicate_pipeline.yaml).
 ![bench_bottom_up](https://img.alicdn.com/imgextra/i2/O1CN01xvu2fo1HU80biR6Q5_!!6000000000760-2-tps-7756-3693.png)
 
-### What is DJ-Sandbox?
-
-In Data-Juicer, the data sandbox laboratory provides users with the best practices for continuously producing data recipes. It features low overhead, portability, and guidance. In the sandbox, users can quickly experiment, iterate, and refine data recipes based on small-scale datasets and models, before scaling up to produce high-quality data to serve large-scale models.
-
-In addition to the basic data optimization and recipe refinement features offered by Data-Juicer, users can seamlessly use configurable components such as data probe and analysis, model training and evaluation, and data and model feedback-based recipe refinement to form a complete one-stop data-model research and development pipeline.
 
 ### Quick Start
 

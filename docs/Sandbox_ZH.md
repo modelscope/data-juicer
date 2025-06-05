@@ -2,12 +2,20 @@
 
 ## 用户指南
 
-### 应用和成果
+### 什么是沙盒实验室（DJ-Sandbox）？
 
-我们利用Data-Juicer沙盒实验室套件，通过数据与模型间的系统性研发工作流，调优数据和模型，相关工作请参考[论文](http://arxiv.org/abs/2407.11784)。在本工作中，我们在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。
+Data-Juicer 中的 DJ-Sandbox 是一个连接数据和模型反馈的中间件，能够在各种任务中实现高性能和低成本的验证。它旨在为用户提供持续增强数据模型方案的最佳实践，具有低开销、可移植性和指导性等特点。在沙盒中，用户可以基于小规模数据集和模型快速实验、迭代和优化方案，然后迁移到更大尺度上，以生成高质量数据，服务于大规模模型。
+
+除了 Data-Juicer 提供的基本数据优化和方案优化功能外，用户还可以无缝使用可配置组件，例如数据探测和分析、模型训练和评估以及基于数据和模型反馈的方案优化，从而形成数据模型研发的最佳流水线。
+
+更多详细信息，请参阅我们的[论文](http://arxiv.org/abs/2407.11784)（ICML'25 Spotlight）。
+
+
+### 应用
+我们将沙盒应用于到了众多前沿模型，例如 Mini-Gemini 和 InternVL-2.0 （两个受 LLaVA 启发的图像转文本生成模型EasyAnimate 和 T2V-Turbo）、两个基于 Diffusion Transformer 的文本转视频生成模型，以及一个用于图文预训练的 CLIP 模型。在此之上，我们曾在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜一。
 ![top-1_in_vbench](https://img.alicdn.com/imgextra/i1/O1CN01I9wHW91UNnX9wtCWu_!!6000000002506-2-tps-1275-668.png)
 
-模型已在ModelScope和HuggingFace平台发布，训练模型的数据集也已开源。
+相关模型已在ModelScope和HuggingFace平台发布，训练模型的数据集也已开源。
 
 | 开源模型或数据集 | 链接 | 说明 |
 | ------------ | --- | --- |
@@ -28,12 +36,6 @@ Data-Juicer (DJ, 228k)模型输出样例如下表所示。
 
 复现论文实验请参考下面的sandbox使用指南，下图的实验流程，[初始数据集](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip)，以及该流程的工作流的配置文件demo： [1_single_op_pipeline.yaml](../configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/1_single_op_pipeline.yaml) 、[2_multi_op_pipeline.yaml](../configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/2_multi_op_pipeline.yaml)、[3_duplicate_pipeline.yaml](../configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/3_duplicate_pipeline.yaml)。
 ![bench_bottom_up](https://img.alicdn.com/imgextra/i2/O1CN01xvu2fo1HU80biR6Q5_!!6000000000760-2-tps-7756-3693.png)
-
-### 什么是沙盒实验室（DJ-Sandbox）？
-
-在Data-Juicer中，数据沙盒实验室为用户提供了持续生产数据菜谱的最佳实践，其具有低开销、可迁移、有指导性等特点，用户在沙盒中基于一些小规模数据集、模型对数据菜谱进行快速实验、迭代、优化，再迁移到更大尺度上，大规模生产高质量数据以服务大模型。
-
-用户在沙盒中，除了Data-Juicer基础的数据优化与数据菜谱微调功能外，还可以便捷地使用数据洞察与分析、沙盒模型训练与评测、基于数据和模型反馈优化数据菜谱等可配置组件，共同组成完整的一站式数据-模型研发流水线。
 
 ### 快速上手
 
