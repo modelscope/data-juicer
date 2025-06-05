@@ -12,7 +12,7 @@ The model is now publicly available on the ModelScope and HuggingFace platforms,
 | Open-source model or dataset | Link | Description |
 | ------------ | --- | --- |
 | Data-Juicer (T2V, 147k) |  [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) <br> [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) | Corresponding to Data-Juicer (T2V-Turbo) model in VBench leaderboard |
-| Data-Juicer (DJ, 228k) | [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) <br> [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) | Corresponding to Data-Juicer (2024-09-23, T2V-Turbo) model in VBench leaderboard |
+| Data-Juicer (DJ, 228k) | [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V-v2) <br> [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V-v2) | Corresponding to Data-Juicer (2024-09-23, T2V-Turbo) model in VBench leaderboard |
 | data_juicer_t2v_optimal_data_pool | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-optimal-data-pool)  <br> [HuggingFace](https://huggingface.co/datasets/datajuicer/data-juicer-t2v-optimal-data-pool) | The training dataset of Data-Juicer (T2V, 147k) |
 | data_juicer_t2v_evolution_data_pool | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool_s2.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-evolution-data-pool) | The training dataset of Data-Juicer (2024-09-23, T2V-Turbo) |
 
@@ -128,18 +128,18 @@ hpo_config: null                                  # path to a configuration file
 
 pipelines:
   pipeline_1:
-      probe_job_configs:
-        xxx
+    probe_job_configs:
+      xxx
   pipeline_2:
-      probe_job_configs:
-        xxx
-      refine_recipe_job_configs:
-        xxx
+    probe_job_configs:
+      xxx
+    refine_recipe_job_configs:
+      xxx
   pipeline_3:
-      probe_job_configs:
-        xxx
-      execution_job_configs:
-        xxx
+    probe_job_configs:
+      xxx
+    execution_job_configs:
+      xxx
 ```
 
 In this example, there are 3 pipelines organized in the `pipelines` field, named `pipeline_1`, `pipeline_2`, and `pipeline_3`. Each of them has their own different types of jobs. You can find a practical example of such config file for InternVL sandbox experiments in `configs/data_juicer_recipes/sandbox/internvl_coco_caption/sandbox_internvl_coco_caption.yaml`.
@@ -220,9 +220,9 @@ The currently supported component factories and the components supported within 
 
 | Component | Function | Desc. of Method `run` | Reference Materials |
 | --- | --- | --- | --- |
-| `Gpt3QualityEvaluator` | Evaluate the quality of a dataset using the GPT-3 text quality classifier reproduced by Data-Juicer. | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`.<br />- `eval_obj`: An useless parameter.<br /> | [Data-Juicer Quality Classifier Toolkit](https://github.com/modelscope/data-juicer/tree/main/tools/quality_classifier) |
-| `VBenchEvaluator` | Evaluate the generated videos according to given prompts in multi dimensions | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`<br />- `eval_obj`: An useless parameter.<br />- Return: The average score of generated videos in multi dimensions.<br /> | [VBench paper](https://arxiv.org/abs/2311.17982) |
-| `InceptionEvaluator` | Evaluate the generated videos by features extracted from video classification models. | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`<br />- `eval_obj`: An useless parameter.<br />- Return: A dictionary of scores in the given metric. <br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
+| `Gpt3QualityEvaluator` | Evaluate the quality of a dataset using the GPT-3 text quality classifier reproduced by Data-Juicer. | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`.<br />- `eval_obj`: A useless parameter.<br /> | [Data-Juicer Quality Classifier Toolkit](https://github.com/modelscope/data-juicer/tree/main/tools/quality_classifier) |
+| `VBenchEvaluator` | Evaluate the generated videos according to given prompts in multi dimensions | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`<br />- `eval_obj`: A useless parameter.<br />- Return: The average score of generated videos in multi dimensions.<br /> | [VBench paper](https://arxiv.org/abs/2311.17982) |
+| `InceptionEvaluator` | Evaluate the generated videos by features extracted from video classification models. | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`<br />- `eval_obj`: A useless parameter.<br />- Return: A dictionary of scores in the given metric. <br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
 
 - GeneralProbeFactory
 
@@ -240,8 +240,8 @@ The currently supported component factories and the components supported within 
 
 | Component                          | Function                                                                                                                           | Desc. of Method `run`                                                                                                                                                                                   | Reference Materials                                                                                                |
 |------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
-| `ModelscopeTrainExecutor`          | Perform a training task on a model from the ModelScope platform using specified datasets, and monitor the change in training loss. | <br />- `run_type`: Type of model training. We need to set `type`  arg as `"modelscope"` in the component configuration file to activate this component.<br />- `run_obj`: An useless parameter.<br />  | [ModelScope Docs of Model Training](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%AE%AD%E7%BB%83Train) |
-| `EasyAnimateTrainExecutor`         | Perform a LoRA training task on EasyAnimate text-to-video model, and monitor the change in training loss.                          | <br />- `run_type`: Type of model training. We need to set `type`  arg as `"easyanimate"` in the component configuration file to activate this component.<br />- `run_obj`: An useless parameter.<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate)                                                            |
+| `ModelscopeTrainExecutor`          | Perform a training task on a model from the ModelScope platform using specified datasets, and monitor the change in training loss. | <br />- `run_type`: Type of model training. We need to set `type`  arg as `"modelscope"` in the component configuration file to activate this component.<br />- `run_obj`: A useless parameter.<br />  | [ModelScope Docs of Model Training](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%AE%AD%E7%BB%83Train) |
+| `EasyAnimateTrainExecutor`         | Perform a LoRA training task on EasyAnimate text-to-video model, and monitor the change in training loss.                          | <br />- `run_type`: Type of model training. We need to set `type`  arg as `"easyanimate"` in the component configuration file to activate this component.<br />- `run_obj`: A useless parameter.<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate)                                                            |
 | `TrinityRFTTrainExecutor`          | Perform a reinforcement fine-tuning task based on Trinity-RFT framework, and monitor the change in training states.                | - `run_obj`: Could be the path to Trinity configs.                                                                                                                                                      | [Trinity-RFT](https://github.com/modelscope/Trinity-RFT)                                                           |
 | `InternVLCOCOCaptionTrainExecutor` | Perform a LoRA fine-tuning task on InternVL2 for COCO Caption task, and monitor the change in training loss and learning rate.     | -                                                                                                                                                                                                       | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html)            |
 
@@ -250,13 +250,13 @@ The currently supported component factories and the components supported within 
 
 | Component | Function | Desc. of Method `run` | Reference Materials |
 | --- | --- | --- | --- |
-| `EasyAnimateInferExecutor` | Perform inference on EasyAnimate text-to-video model with the prompts from VBench, and save the generated videos. | <br />- `run_type`: Type of model inference. We need to set `type`  arg as `"easyanimate"` in the component configuration file to activate this component.<br />- `run_obj`: An useless parameter.<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
+| `EasyAnimateInferExecutor` | Perform inference on EasyAnimate text-to-video model with the prompts from VBench, and save the generated videos. | <br />- `run_type`: Type of model inference. We need to set `type`  arg as `"easyanimate"` in the component configuration file to activate this component.<br />- `run_obj`: A useless parameter.<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
 
 - ModelEvaluatorFactory
 
 | Component                      | Function                                                                         | Desc. of Method `run` | Reference Materials                                                                                                                     |
 |--------------------------------|----------------------------------------------------------------------------------|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| `InternVLCOCOCaptionEvaluator` | Evaluate Bleu-1/2/3/4, METOR, ROUGE_L, and CIDEr for InternVL COCO Caption task  | -                     | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model) |
+| `InternVLCOCOCaptionEvaluator` | Evaluate Bleu-1/2/3/4, METEOR, ROUGE_L, and CIDEr for InternVL COCO Caption task | -                     | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model) |
 
 Please refer to `data_juicer/core/sandbox/factories.py` for detailed definitions.
 
@@ -364,20 +364,20 @@ As mentioned at the start of this section, in the pipeline, we need to implement
 
 In general, we only need to implement one type of hook function for a type of component factory. In addition to hooks that depend on components, some hooks depend on the existing functionality and tools of Data-Juicer or other third-party libraries. The correspondence among these hooks, dependent components, tools, and job lists is as follows:
 
-| Hook | Function                                                                                                      | Dependent Component Factory | Dependent Tool or Library                                                                                                                                               | Registered Job List |
-| --- |---------------------------------------------------------------------------------------------------------------| --- |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------| --- |
-| `ProbeViaAnalyzerHook` | Analyze and probe the quality and diversity distribution of the dataset                                       | DataAnalyzerFactory | Data-Juicer Analyzer                                                                                                                                                    | - probe_jobs<br />- evaluation_jobs |
-| `ProbeViaModelInferHook` | Analyze and understand the impact of the dataset on the model, explore and probe "difficult" and "dirty" data | DataExecutorFactor <br />ModelInferEvaluatorFactory | Data-Juicer Executor                                                                                                                                                    | - probe_jobs<br />- evaluation_jobs |
-| `GeneralProbeHook` | General hook for probing the dataset, including ranking the datasets and so on                                | GeneralProbeFactory | -                                                                                                                                                                       | - probe_jobs |
-| `RefineRecipeViaKSigmaHook` | Refine data recipe hyperparameters using the k-sigma method based on the probe results of the dataset         | - | k-sigma recipe refinement tool of Data-Juicer Hyperparameter Optimization (HPO) toolkit                                                                                 | - refine_recipe_jobs |
-| `RefineRecipeViaModelFeedbackHook` | Refine data recipe hyperparameters using model probe and feedback results                                     | TODO | -                                                                                                                                                                       | - refine_recipe_jobs |
-| `ProcessDataHook` | Process and clean the dataset based on the current data recipe                                                | DataExecutorFactor | Data-Juicer Executor                                                                                                                                                    | - execution_jobs |
-| `DataPoolManipulationHook` | Data pool manipulation,  including construction, combination, sampling, etc.                                  | DataPoolManipulatorFactory | -                                                                                                                                                                       | - execution_jobs |
-| `GeneralDataExecutorHook` | General data processing for dataset, including format conversion, etc.                                        | GeneralDataExecutorFactory | -                                                                                                                                                                       | - execution_jobs |
-| `TrainModelHook` | Train a model based on the current dataset                                                                    | ModelTrainExecutorFactory | [EasyAnimate](../thirdparty//easy_animate/README.md) <br/> [InternVL](https://internvl.readthedocs.io/en/latest/index.html)                                                                                                 | - execution_jobs |
-| `InferModelHook` | The model generates output based on the given input                                                           | ModelInferExecutorFactory | [EasyAnimate](../thirdparty//easy_animate/README.md)                                                                                                                    | - execution_jobs |
-| `EvaluateDataHook` | Evaluate the dataset in terms of data quality and other dimensions                                            | DataEvaluatorFactory | [inception metrics](../tools/mm_eval/inception_metrics/README.md) for images and videos, such as FID and FVD <br /> [VBench](../tools/mm_eval/vbench_metrics/README.md) | - evaluation_jobs |
-| `EvaluateModelHook` | Evaluate the trained model                                                                                    | ModelEvaluatorFactory | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model)                                                                                                                                                                       | - evaluation_jobs |
+| Hook | Function                                                                                                      | Dependent Component Factory                          | Dependent Tool or Library                                                                                                                                               | Registered Job List |
+| --- |---------------------------------------------------------------------------------------------------------------|------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------| --- |
+| `ProbeViaAnalyzerHook` | Analyze and probe the quality and diversity distribution of the dataset                                       | DataAnalyzerFactory                                  | Data-Juicer Analyzer                                                                                                                                                    | - probe_jobs<br />- evaluation_jobs |
+| `ProbeViaModelInferHook` | Analyze and understand the impact of the dataset on the model, explore and probe "difficult" and "dirty" data | DataExecutorFactory <br />ModelInferEvaluatorFactory | Data-Juicer Executor                                                                                                                                                    | - probe_jobs<br />- evaluation_jobs |
+| `GeneralProbeHook` | General hook for probing the dataset, including ranking the datasets and so on                                | GeneralProbeFactory                                  | -                                                                                                                                                                       | - probe_jobs |
+| `RefineRecipeViaKSigmaHook` | Refine data recipe hyperparameters using the k-sigma method based on the probe results of the dataset         | -                                                    | k-sigma recipe refinement tool of Data-Juicer Hyperparameter Optimization (HPO) toolkit                                                                                 | - refine_recipe_jobs |
+| `RefineRecipeViaModelFeedbackHook` | Refine data recipe hyperparameters using model probe and feedback results                                     | TODO                                                 | -                                                                                                                                                                       | - refine_recipe_jobs |
+| `ProcessDataHook` | Process and clean the dataset based on the current data recipe                                                | DataExecutorFactory                                  | Data-Juicer Executor                                                                                                                                                    | - execution_jobs |
+| `DataPoolManipulationHook` | Data pool manipulation,  including construction, combination, sampling, etc.                                  | DataPoolManipulatorFactory                           | -                                                                                                                                                                       | - execution_jobs |
+| `GeneralDataExecutorHook` | General data processing for dataset, including format conversion, etc.                                        | GeneralDataExecutorFactory                           | -                                                                                                                                                                       | - execution_jobs |
+| `TrainModelHook` | Train a model based on the current dataset                                                                    | ModelTrainExecutorFactory                            | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) <br/> [InternVL](https://internvl.readthedocs.io/en/latest/index.html)                                                                                                 | - execution_jobs |
+| `InferModelHook` | The model generates output based on the given input                                                           | ModelInferExecutorFactory                            | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate)                                                                                                                    | - execution_jobs |
+| `EvaluateDataHook` | Evaluate the dataset in terms of data quality and other dimensions                                            | DataEvaluatorFactory                                 | [inception metrics](../tools/mm_eval/inception_metrics/README.md) for images and videos, such as FID and FVD <br /> [VBench](../tools/mm_eval/vbench_metrics/README.md) | - evaluation_jobs |
+| `EvaluateModelHook` | Evaluate the trained model                                                                                    | ModelEvaluatorFactory                                | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model)                                                                                                                                                                       | - evaluation_jobs |
 
 It is worth noting that a hook can be registered in multiple job lists, as this hook can play different roles in different steps of the pipeline. For example, we can analyze and probe both the pre-processed and post-processed datasets to compare the changes in quality, diversity, and other dimensions before and after data processing.
 
@@ -492,7 +492,7 @@ It consists of five main abstract methods:
 
 Now we provide two concrete implementations of `Env`:
 - `CondaEnv`: use `conda` or `mamba` to manage environments.
-- `VitualEnv`: use `venv`, `virtualenv`, or `uv venv` to manage environments.
+- `VirtualEnv`: use `venv`, `virtualenv`, or `uv venv` to manage environments.
 
 When initializing the environment manager, we can specify the environment manager to use by setting the `env_manager` parameter in the configuration file and the name of the environment by setting the `env_name` parameter. An example of the basic usage is as follows:
 ```python

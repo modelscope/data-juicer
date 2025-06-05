@@ -12,7 +12,7 @@
 | 开源模型或数据集 | 链接 | 说明 |
 | ------------ | --- | --- |
 | Data-Juicer (T2V, 147k) |  [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) <br> [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) | 对应榜单中 Data-Juicer (T2V-Turbo) 模型 |
-| Data-Juicer (DJ, 228k) | [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) <br> [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) | 对应榜单中 Data-Juicer (2024-09-23, T2V-Turbo) 模型 |
+| Data-Juicer (DJ, 228k) | [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V-v2) <br> [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V-v2) | 对应榜单中 Data-Juicer (2024-09-23, T2V-Turbo) 模型 |
 | data_juicer_t2v_optimal_data_pool | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-optimal-data-pool)  <br> [HuggingFace](https://huggingface.co/datasets/datajuicer/data-juicer-t2v-optimal-data-pool) | Data-Juicer (T2V, 147k) 的训练集 |
 | data_juicer_t2v_evolution_data_pool | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool_s2.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-evolution-data-pool) | Data-Juicer (2024-09-23, T2V-Turbo) 的训练集 |
 
@@ -130,18 +130,18 @@ hpo_config: null                                  # path to a configuration file
 
 pipelines:
   pipeline_1:
-      probe_job_configs:
-        xxx
+    probe_job_configs:
+      xxx
   pipeline_2:
-      probe_job_configs:
-        xxx
-      refine_recipe_job_configs:
-        xxx
+    probe_job_configs:
+      xxx
+    refine_recipe_job_configs:
+      xxx
   pipeline_3:
-      probe_job_configs:
-        xxx
-      execution_job_configs:
-        xxx
+    probe_job_configs:
+      xxx
+    execution_job_configs:
+      xxx
 ```
 
 在本例中，`pipelines` 字段包括 3 个 pipeline，分别名为 `pipeline_1`、`pipeline_2` 和 `pipeline_3`。它们各自都有不同类型的作业。您可以在 `configs/data_juicer_recipes/sandbox/internvl_coco_caption/sandbox_internvl_coco_caption.yaml` 中找到 InternVL 沙盒实验的此类配置文件的实际示例。
@@ -259,9 +259,9 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 - 模型评估工厂 -- ModelEvaluatorFactory
 
-| 组件                              | 功能                                                                      | `run`方法说明              | 参考材料                                                                                                                                     |
-|---------------------------------|-------------------------------------------------------------------------|------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
-| `InternVLCOCOCaptionEvaluator`  | 为 InternVL COCO Caption 任务评测 Bleu-1/2/3/4 ，METOR ， ROUGE_L ， 和 CIDEr 指标 | -                      | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model)  |
+| 组件                              | 功能                                                                       | `run`方法说明              | 参考材料                                                                                                                                     |
+|---------------------------------|--------------------------------------------------------------------------|------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| `InternVLCOCOCaptionEvaluator`  | 为 InternVL COCO Caption 任务评测 Bleu-1/2/3/4 ，METEOR ， ROUGE_L ， 和 CIDEr 指标 | -                      | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model)  |
 
 
 详细定义可参考`data_juicer/core/sandbox/factories.py`。
@@ -270,7 +270,7 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 有时不同的 hook 之间需要共享信息。例如，`TrainModelHook` 需要与 `EvaluateModelHook` 共享模型检查点路径，以便在训练后对模型进行评估。
 
-为了实现这一点，我们集成了一个全局的、跨 hook 和跨 pipeline 的信息容器，名为 `context_infos `，用于存储每个 pipeline 中 hook 的执行结果。`context_infos` 会在管道执行时自动构建。
+为了实现这一点，我们集成了一个全局的、跨 hook 和跨 pipeline 的信息容器，名为 `context_infos`，用于存储每个 pipeline 中 hook 的执行结果。`context_infos` 会在管道执行时自动构建。
 
 #### Resume 模式
 
@@ -375,15 +375,15 @@ xxx_hook:
 | 钩子                                 | 功能                                | 依赖的组件工厂                                                               | 依赖的工具或库                                                                                                                                           | 注册工作列表                                          |
 |------------------------------------|-----------------------------------|-----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
 | `ProbeViaAnalyzerHook`             | 分析与洞察数据集质量、多样性等维度分布               | 数据分析工厂（DataAnalyzerFactory）                                           | Data-Juicer分析器Analyzer                                                                                                                            | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
-| `ProbeViaModelInferHook`           | 分析与洞察数据集对于模型的影响，挖掘与洞察“难”数据与“脏”数据  | 数据处理工厂（DataExecutorFactor）<br />模型数据评估工厂（ModelInferEvaluatorFactory）  | Data-Juicer数据处理器Executor                                                                                                                          | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
+| `ProbeViaModelInferHook`           | 分析与洞察数据集对于模型的影响，挖掘与洞察“难”数据与“脏”数据  | 数据处理工厂（DataExecutorFactory）<br />模型数据评估工厂（ModelInferEvaluatorFactory） | Data-Juicer数据处理器Executor                                                                                                                          | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
 | `GeneralProbeHook`                 | 提供通用的数据集探测能力，包括数据集排序等             | 通用数据探测工厂（GeneralProbeFactory）                                         | -                                                                                                                                                 | 洞察工作列表（probe_jobs）                              |
 | `RefineRecipeViaKSigmaHook`        | 根据数据集洞察结果，利用k-sigma方法对数据菜谱超参进行微调  | -                                                                     | Data-Juicer超参优化工具HPO中的k-sigma菜谱微调工具                                                                                                               | 菜谱微调工作列表（refine_recipe_jobs）                    |
 | `RefineRecipeViaModelFeedbackHook` | 利用模型洞察与反馈结果对数据菜谱超参进行微调            | TODO                                                                  | -                                                                                                                                                 | 菜谱微调工作列表（refine_recipe_jobs）                    |
-| `ProcessDataHook`                  | 基于当前数据菜谱对数据集进行处理与清洗               | 数据处理工厂（DataExecutorFactor）                                            | Data-Juicer数据处理器Executor                                                                                                                          | 执行工作列表（execution_jobs）                          |
+| `ProcessDataHook`                  | 基于当前数据菜谱对数据集进行处理与清洗               | 数据处理工厂（DataExecutorFactory）                                           | Data-Juicer数据处理器Executor                                                                                                                          | 执行工作列表（execution_jobs）                          |
 | `DataPoolManipulationHook`         | 操作数据池，包括构造，组合，采样等                 | 数据池操作工厂（DataPoolManipulatorFactory）                                   | -                                                                                                                                                 | 执行工作列表（execution_jobs）                          |
 | `GeneralDataExecutorHook`          | 通用数据集处理能力，包括格式转换等                 | 通用数据处理工厂（GeneralDataExecutorFactory）                                  | -                                                                                                                                                 | 执行工作列表（execution_jobs）                          |
-| `TrainModelHook`                   | 基于当前数据集训练一个模型                     | 模型训练工厂（ModelTrainExecutorFactory）                                     | [EasyAnimate](../thirdparty//easy_animate/README.md) <br/> [InternVL](https://internvl.readthedocs.io/en/latest/index.html)                       | 执行工作列表（execution_jobs）                          |
-| `InferModelHook`                   | 模型基于给定输入让模型产生输出                   | 模型推理工厂（ModelInferExecutorFactory）                                     | [EasyAnimate](../thirdparty//easy_animate/README.md)                                                                                              | 执行工作列表（execution_jobs）                          |
+| `TrainModelHook`                   | 基于当前数据集训练一个模型                     | 模型训练工厂（ModelTrainExecutorFactory）                                     | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) <br/> [InternVL](https://internvl.readthedocs.io/en/latest/index.html)                       | 执行工作列表（execution_jobs）                          |
+| `InferModelHook`                   | 模型基于给定输入让模型产生输出                   | 模型推理工厂（ModelInferExecutorFactory）                                     | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate)                                                                                              | 执行工作列表（execution_jobs）                          |
 | `EvaluateDataHook`                 | 对当前数据集进行数据质量等维度的评估                | 数据评估工厂（DataEvaluatorFactory）                                          | 图像或视频的[inception metrics](../tools/mm_eval/inception_metrics/README_ZH.md)，如FID、FVD <br /> [VBench](../tools/mm_eval/vbench_metrics/README_ZH.md) | 评估工作列表（evaluation_jobs）                         |
 | `EvaluateModelHook`                | 对当前训练后的模型进行评估                     | 模型评估工厂（ModelEvaluatorFactory）                                         | [InternVL COCO Caption](https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model)           | 评估工作列表（evaluation_jobs）                         |
 
@@ -500,7 +500,7 @@ class Env(ABC):
 
 现在我们提供了两种 `Env` 的具体实现：
 - `CondaEnv`：使用 `conda` 或 `mamba` 管理环境。
-- `VitualEnv`：使用 `venv`、`virtualenv` 或 `uv venv` 管理环境。
+- `VirtualEnv`：使用 `venv`、`virtualenv` 或 `uv venv` 管理环境。
 
 在初始化环境管理器时，我们可以通过设置配置文件中的 `env_manager` 参数来指定要使用的环境管理器，并通过设置 `env_name` 参数来指定环境的名称。基本用法示例如下：
 
