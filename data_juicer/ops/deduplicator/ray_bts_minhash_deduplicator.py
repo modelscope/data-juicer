@@ -304,7 +304,6 @@ class RayBTSMinhashDeduplicator(Deduplicator):
     def __init__(
         self,
         tokenization: str = 'space',
-        use_gpu: bool = False,
         window_size: PositiveInt = 5,
         lowercase: bool = True,
         ignore_pattern: Optional[str] = None,
@@ -334,8 +333,6 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             to use 'character', and for multiple languages, we recommend
             to use 'sentencepiece'. If using 'sentencepiece', please
             provided the model path in the 'tokenizer_model' field.
-        :param use_gpu: whether to use GPU for MinHash computation. If True,
-            GPU will be used for faster processing. Default is False.
         :param window_size: window size of shingling
         :param lowercase: whether to convert text to lower case first
         :param ignore_pattern: whether to ignore sub-strings with
@@ -382,9 +379,8 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         self.window_size = window_size
         self.lowercase = lowercase
         self.ignore_pattern = ignore_pattern
-        self.use_gpu = use_gpu
         if minhash_batch_size == 'auto':
-            if self.use_gpu:
+            if self.use_cuda():
                 self.minhash_batch_size = 200_000
             else:
                 self.minhash_batch_size = 1024
@@ -392,7 +388,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             self.minhash_batch_size = minhash_batch_size
         if self.ignore_pattern:
             self.ignore_pattern = regex.compile(self.ignore_pattern)
-        if self.use_gpu and self.tokenization != 'character':
+        if self.use_cuda() and self.tokenization != 'character':
             raise ValueError(
                 'GPU MinHash computation is only supported for character tokenization'
             )
@@ -669,7 +665,8 @@ class RayBTSMinhashDeduplicator(Deduplicator):
 
         tmp_dir = os.path.join(self.work_dir, '.tmp',
                                ray.get_runtime_context().get_job_id())
-        if self.use_gpu:
+        if self.use_cuda():
+            logger.info('Using GPU for MinHash computation')
             dataset = dataset.map_batches(
                 get_remote_classes()['GPUMinHashActor'],
                 batch_format='pyarrow',
@@ -685,6 +682,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             ).write_parquet(tmp_dir)
             del dataset
         else:
+            logger.info('Using CPU for MinHash computation')
             dataset.map_batches(
                 minhash_with_uid,
                 batch_format='pyarrow',

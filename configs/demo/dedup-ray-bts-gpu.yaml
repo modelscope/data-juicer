@@ -19,6 +19,6 @@ process:
   - ray_bts_minhash_deduplicator:
       tokenization: 'character'
       lowercase: true
-      use_gpu: true
+      accelerator: 'cuda'
       union_find_parallel_num: 2
       minhash_batch_size: 50_000
