@@ -297,5 +297,68 @@ class ConfigTest(DataJuicerTestCaseBase):
         self.assertIsInstance(cfg.add_suffix, bool)
         self.assertIsInstance(cfg.export_path, str)
 
+    def test_cli_override(self):
+        """Test that command line arguments correctly override YAML config values."""
+        out = StringIO()
+        with redirect_stdout(out):
+            # Test with multiple operators and nested parameters
+            cfg = init_configs(args=[
+                '--config', test_yaml_path,
+                '--language_id_score_filter.lang', 'en',
+                '--language_id_score_filter.min_score', '0.5',
+                '--whitespace_normalization_mapper.batch_size', '2000',
+                '--remove_table_text_mapper.min_col', '3'
+            ])
+
+            # Verify language_id_score_filter overrides
+            lang_filter = next(op for op in cfg.process if 'language_id_score_filter' in op)
+            self.assertEqual(lang_filter['language_id_score_filter']['lang'], 'en')
+            self.assertEqual(lang_filter['language_id_score_filter']['min_score'], 0.5)
+
+            # Verify whitespace_normalization_mapper override
+            whitespace_mapper = next(op for op in cfg.process if 'whitespace_normalization_mapper' in op)
+            self.assertEqual(whitespace_mapper['whitespace_normalization_mapper']['batch_size'], 2000)
+
+            # Verify remove_table_text_mapper override
+            table_mapper = next(op for op in cfg.process if 'remove_table_text_mapper' in op)
+            self.assertEqual(table_mapper['remove_table_text_mapper']['min_col'], 3)
+
+            # Verify other parameters remain unchanged
+            self.assertEqual(whitespace_mapper['whitespace_normalization_mapper']['text_key'], 'text')
+            self.assertEqual(lang_filter['language_id_score_filter']['text_key'], 'text')
+
+    def test_cli_override_with_equals(self):
+        """Test command line overrides using equals sign syntax."""
+        out = StringIO()
+        with redirect_stdout(out):
+            cfg = init_configs(args=[
+                '--config', test_yaml_path,
+                '--language_id_score_filter.lang=en',
+                '--language_id_score_filter.min_score=0.5',
+                '--whitespace_normalization_mapper.batch_size=2000'
+            ])
+
+            # Verify overrides
+            lang_filter = next(op for op in cfg.process if 'language_id_score_filter' in op)
+            self.assertEqual(lang_filter['language_id_score_filter']['lang'], 'en')
+            self.assertEqual(lang_filter['language_id_score_filter']['min_score'], 0.5)
+
+            whitespace_mapper = next(op for op in cfg.process if 'whitespace_normalization_mapper' in op)
+            self.assertEqual(whitespace_mapper['whitespace_normalization_mapper']['batch_size'], 2000)
+
+    def test_cli_override_invalid_value(self):
+        """Test that invalid command line override values are properly caught."""
+        out = StringIO()
+        with redirect_stdout(out), redirect_stderr(out):
+            with self.assertRaises(SystemExit) as cm:
+                init_configs(args=[
+                    '--config', test_yaml_path,
+                    '--language_id_score_filter.min_score', 'invalid'  # Should be a float
+                ])
+            self.assertEqual(cm.exception.code, 2)
+            out_str = out.getvalue()
+            self.assertIn('language_id_score_filter.min_score', out_str)
+            self.assertIn('float', out_str)
+
 if __name__ == '__main__':
     unittest.main()

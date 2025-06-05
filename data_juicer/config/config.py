@@ -482,6 +482,8 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
             with timing_context('Parsing arguments'):
                 cfg = parser.parse_args(args=args)
 
+                logger.info(f'cfg: {cfg}')
+
                 # check the entry
                 from data_juicer.core.analyzer import Analyzer
                 if not isinstance(which_entry, Analyzer) and cfg.auto:
@@ -493,7 +495,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
             cfg = init_setup_from_cfg(cfg)
 
         with timing_context('Updating operator process'):
-            cfg = update_op_process(cfg, parser)
+            cfg = update_op_process(cfg, parser, used_ops)
 
         # copy the config file into the work directory
         config_backup(cfg)
@@ -750,12 +752,17 @@ def sort_op_by_types_and_names(op_name_classes):
         return ops_sorted_by_types
 
 
-def update_op_process(cfg, parser):
+def update_op_process(cfg, parser, used_ops=None):
     """
     Update operator process configuration with optimized performance.
+
+    Args:
+        cfg: Configuration namespace
+        parser: Argument parser
+        used_ops: Set of operator names that are actually used in the config
     """
-    # Extract operator keys once
-    op_keys = set(OPERATORS.modules.keys())
+    if used_ops is None:
+        used_ops = set(OPERATORS.modules.keys())
 
     # Get command line args for operators in one pass
     option_in_commands = set()
@@ -765,42 +772,61 @@ def update_op_process(cfg, parser):
         if arg.startswith('--'):
             parts = arg.split('--')[1].split('.')
             op_name = parts[0]
-            if op_name in op_keys:
+            if op_name in used_ops:
                 option_in_commands.add(op_name)
                 full_option_in_commands.add(arg.split('=')[0])
 
     if cfg.process is None:
         cfg.process = []
 
-    # Process each operator once
+    # Create direct mapping of operator names to their configs
+    op_configs = {
+        list(op.keys())[0]: op[list(op.keys())[0]]
+        for op in cfg.process
+    }
+
+    # Process each used operator
     temp_cfg = cfg
-    for i, op_in_process in enumerate(cfg.process):
-        op_name = list(op_in_process.keys())[0]
+    for op_name in used_ops:
+        op_config = op_configs.get(op_name)
 
         if op_name not in option_in_commands:
             # Update op params if set
-            if op_in_process[op_name]:
+            if op_config:
                 temp_cfg = parser.merge_config(
-                    dict_to_namespace(op_in_process), temp_cfg)
+                    dict_to_namespace({op_name: op_config}), temp_cfg)
         else:
             # Remove args that will be overridden by command line
-            if op_in_process[op_name]:
+            if op_config:
                 for full_option in full_option_in_commands:
                     key = full_option.split('.')[1]
-                    if key in op_in_process[op_name]:
-                        op_in_process[op_name].pop(key)
+                    if key in op_config:
+                        op_config.pop(key)
 
-                if op_in_process[op_name]:
+                if op_config:
                     temp_cfg = parser.merge_config(
-                        dict_to_namespace(op_in_process), temp_cfg)
+                        dict_to_namespace({op_name: op_config}), temp_cfg)
 
         # Update op params
         internal_op_para = temp_cfg.get(op_name)
-        cfg.process[i] = {
-            op_name:
-            None if internal_op_para is None else
-            namespace_to_dict(internal_op_para)
-        }
+        # Update or add the operator to process list
+        if op_name in op_configs:
+            # Update existing operator
+            for i, op_in_process in enumerate(cfg.process):
+                if list(op_in_process.keys())[0] == op_name:
+                    cfg.process[i] = {
+                        op_name:
+                        None if internal_op_para is None else
+                        namespace_to_dict(internal_op_para)
+                    }
+                    break
+        else:
+            # Add new operator
+            cfg.process.append({
+                op_name:
+                None if internal_op_para is None else
+                namespace_to_dict(internal_op_para)
+            })
 
     # Optimize type checking
     recognized_args = {
