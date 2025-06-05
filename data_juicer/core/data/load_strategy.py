@@ -286,7 +286,8 @@ class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
         suffixes = getattr(self.cfg, 'suffixes', None)  # Default to None
         # if there is suffix_filter op, turn on the add_suffix flag
         add_suffix = False
-        for op in self.cfg.process:
+        process_list = self.cfg.get('process', [])
+        for op in process_list:
             op_name, _ = list(op.items())[0]
             if op_name == 'suffix_filter':
                 add_suffix = True
