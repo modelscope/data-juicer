@@ -1,24 +1,15 @@
-import datetime
-import json
-import os
-from typing import Dict
+from typing import Dict, List, Optional
 
-from loguru import logger
 from mcp.server.fastmcp import FastMCP
 
-from data_juicer.config import get_init_configs
-from data_juicer.core import DefaultExecutor
+from data_juicer.tools.mcp_tool import execute_op
+from data_juicer.tools.op_search import OPSearcher
 
 # Server configuration
-DEFAULT_OUTPUT_DIR = './outputs'
 mcp = FastMCP('Data-Juicer Server')
 
-# Load operator modality mapping
-abs_path = os.path.abspath(os.path.dirname(__file__))
-ops_mapping_path = os.path.join(abs_path, 'ops_modality_mapping.json')
-
-with open(ops_mapping_path, 'r') as f:
-    op_modality_mapping = json.load(f)
+# Operator Management
+searcher = OPSearcher()
 
 
 @mcp.prompt()
@@ -47,14 +38,17 @@ def data_processing(requirements: str) -> list:
 
 # Operator Management
 @mcp.tool()
-def get_data_processing_ops(ops_type: str = '', modality: str = '') -> dict:
+def get_data_processing_ops(op_type: str = '',
+                            tags: Optional[List[str]] = None,
+                            match_all: bool = True) -> dict:
     """
-    Retrieves a list of available data processing operators based on
-    the specified type and data modality, with specific parameters.
-
+    Retrieves a list of available data processing operators based on the specified type and tags.
     Operators are a collection of basic processes that assist in data modification,
     cleaning, filtering, deduplication, etc.
-    The following `ops_type` values are supported:
+
+    If both tags and ops_type are None, return a list of all operators.
+
+    The following `op_type` values are supported:
     - aggregator: Aggregate for batched samples, such as summary or conclusion.
     - deduplicator: Detects and removes duplicate samples.
     - filter: Filters out low-quality samples.
@@ -62,85 +56,71 @@ def get_data_processing_ops(ops_type: str = '', modality: str = '') -> dict:
     - grouper: Group samples to batched samples.
     - mapper: Edits and transforms samples.
     - selector: Selects top samples based on ranking.
-    The `modality` parameter specifies the type of data being processed.
-    The following values are supported:
-    - text: process text data specifically.
-    - image: process image data specifically.
-    - video: process video data specifically.
-    - audio: process audio data specifically.
-    - multimodal: process multimodal data.
-    - unknow: Used for data types that are not clearly defined or do not fit into the other modality categories.
-    If a matching operator is not found under other modality modes,
-    consider checking this category to see if a suitable general-purpose operator is available.
 
-    :param ops_type: The type of data processing operator to retrieve.
-                     If empty, all operators under the specified modality are returned.
-                     If specified, must be one of the values listed above with their descriptions. Defaults to None.
-    :param modality: The modality of the data. If empty, all operators under the specified ops_type are returned.
-                     If specified, must be one of the values listed above with their descriptions. Defaults to None.
-    :returns: A dict of dictionaries, where each dictionary represents an available data processing operator.
+    The `tags` parameter specifies the characteristics of the data or the required resources.
+    Available tags are:
+
+    Modality Tags:
+        - text: process text data specifically.
+        - image: process image data specifically.
+        - audio: process audio data specifically.
+        - video: process video data specifically.
+        - multimodal: process multimodal data.
+
+    Resource Tags:
+        - cpu: only requires CPU resource.
+        - gpu: requires GPU/CUDA resource as well.
+
+    Model Tags:
+        - api: equipped with API-based models (e.g. ChatGPT, GPT-4o).
+        - vllm: equipped with models supported by vLLM.
+        - hf: equipped with models from HuggingFace Hub.
+
+    Tags are used to refine the search for suitable operators based on specific data processing needs.
+
+    :param op_type: The type of data processing operator to retrieve.
+                     If None, no ops_type-based filtering is applied.
+                     If specified, must be one of the values listed. Defaults to None.
+    :param tags: An optional list of tags to filter operators.  See the tag list above for options.
+                 If None, no tag-based filtering is applied. Defaults to None.
+    :param match_all: If True, only operators matching all specified tags are returned.
+                      If False, operators matching any of the specified tags are returned. Defaults to True.
+    :returns: A dict containing detailed information about the available operators
     """
+    op_results = searcher.search(tags=tags,
+                                 op_type=op_type,
+                                 match_all=match_all)
 
-    if modality:
-        ops_dict = op_modality_mapping[modality]
-    else:
-        ops_dict = {}
-        for _, ops in op_modality_mapping.items():
-            ops_dict.update(ops)
-
-    if ops_type:
-        ops_dict = {
-            ops_name: ops_info
-            for ops_name, ops_info in ops_dict.items() if ops_type in ops_name
-        }
+    ops_dict = dict()
+    for op in op_results:
+        ops_dict[op['name']] = '\n'.join([
+            op['description'], op['param_desc'], 'Parameters: ',
+            str(op['signature'])
+        ])
 
     return ops_dict
 
 
 @mcp.tool()
-def run_data_recipe(dataset_path: str, process: list[Dict]) -> str:
+def run_data_recipe(dataset_path: str, export_path: str,
+                    process: list[Dict]) -> str:
     """
     Run data recipe.
 
     :param dataset_path: Path to the dataset to be processed.
+    :param export_path: Path to the exported dataset.
     :param process: List of process to be executed,
                     dictionary containing operator names as keys and operator parameter dictionaries as values
     """
     args_dict = dict(locals())
     args_dict.pop('dataset_path')
+    args_dict.pop('export_path')
     dj_cfg = {
         'dataset_path': dataset_path,
+        'export_path': export_path,
         'process': process,
     }
     return execute_op(dj_cfg)
-
-
-# Execution Pipeline
-def add_extra_cfg(dj_cfg: Dict) -> Dict:
-    """Add extra dj config."""
-    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-    dj_cfg['export_path'] = os.path.join(DEFAULT_OUTPUT_DIR, timestamp,
-                                         'processed_data.jsonl')
-
-    # Problem: It will holding when use multi threads/procs
-    # Can't multithreading and multiprocessing be used in a coroutine?
-    dj_cfg['np'] = 1  # set num proc to be 1
-    dj_cfg['open_monitor'] = False  # unable monitor to avoid multi proc
-
-    return dj_cfg
-
-
-def execute_op(dj_cfg: Dict):
-
-    try:
-        dj_cfg = add_extra_cfg(dj_cfg)
-        logger.info(f'DJ config in MCP server: {str(dj_cfg)}')
-        dj_cfg = get_init_configs(dj_cfg)
-        executor = DefaultExecutor(dj_cfg)
-        executor.run()
-        return f"Result dataset is saved in: {dj_cfg['export_path']}"
-    except Exception as e:
-        return f'Occur error when executing Data-Juicer: {e}'
 
 
 if __name__ == '__main__':
