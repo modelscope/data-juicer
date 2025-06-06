@@ -482,8 +482,6 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
             with timing_context('Parsing arguments'):
                 cfg = parser.parse_args(args=args)
 
-                logger.info(f'cfg: {cfg}')
-
                 # check the entry
                 from data_juicer.core.analyzer import Analyzer
                 if not isinstance(which_entry, Analyzer) and cfg.auto:
