@@ -23,12 +23,10 @@ def data_processing(requirements: str) -> list:
 2. 使用get_data_processing_ops工具获取可用的ops列表
 3. 选择 ops 组合：
     尝试在可用 ops 列表中寻找完全匹配需求的一组 ops。
-    如果未找到完全匹配的 ops，则尝试使用 Unknown 模态再次寻找。 这可能意味着某些算子属于通用类，或暂未进行明确的模态标识，因此在 Unknown 模态下可能存在符合需求的 ops。
     如果最终未找到完全匹配需求的 ops，则跳过该需求。
 4. 使用run_data_recipe工具执行"""
 
     return [
-        # {"role": "system", "content": system_message},
         {
             'role': 'user',
             'content': user_message
@@ -38,7 +36,7 @@ def data_processing(requirements: str) -> list:
 
 # Operator Management
 @mcp.tool()
-def get_data_processing_ops(op_type: str = '',
+def get_data_processing_ops(op_type: Optional[str] = None,
                             tags: Optional[List[str]] = None,
                             match_all: bool = True) -> dict:
     """
@@ -52,7 +50,6 @@ def get_data_processing_ops(op_type: str = '',
     - aggregator: Aggregate for batched samples, such as summary or conclusion.
     - deduplicator: Detects and removes duplicate samples.
     - filter: Filters out low-quality samples.
-    - formatter: Discovers, loads, and canonicalizes source data.
     - grouper: Group samples to batched samples.
     - mapper: Edits and transforms samples.
     - selector: Selects top samples based on ranking.
@@ -102,15 +99,17 @@ def get_data_processing_ops(op_type: str = '',
 
 
 @mcp.tool()
-def run_data_recipe(dataset_path: str, export_path: str,
-                    process: list[Dict]) -> str:
+def run_data_recipe(dataset_path: str,
+                    process: list[Dict],
+                    export_path: Optional[str] = None) -> str:
     """
     Run data recipe.
 
     :param dataset_path: Path to the dataset to be processed.
-    :param export_path: Path to the exported dataset.
     :param process: List of process to be executed,
                     dictionary containing operator names as keys and operator parameter dictionaries as values
+    :param export_path: Path to the exported dataset.
+                    Defaults to None, which means the dataset will be exported to './outputs'.
     """
     args_dict = dict(locals())
     args_dict.pop('dataset_path')
