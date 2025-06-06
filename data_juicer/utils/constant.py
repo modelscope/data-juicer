@@ -139,8 +139,9 @@ class StatsKeysMeta(type):
             tmp_dj_cfg.use_cache = False
             tmp_dj_cfg.use_checkpoint = False
 
+            from data_juicer.config import get_init_configs
             from data_juicer.core import Analyzer
-            tmp_analyzer = Analyzer(tmp_dj_cfg)
+            tmp_analyzer = Analyzer(get_init_configs(tmp_dj_cfg))
 
             dataset = dataset.take(1)
             # do not overwrite the true analysis results
@@ -189,8 +190,9 @@ class StatsKeysMeta(type):
                 tmp_dj_cfg.use_cache = False
                 tmp_dj_cfg.use_checkpoint = False
 
+                from data_juicer.config import get_init_configs
                 from data_juicer.core import Analyzer
-                tmp_analyzer = Analyzer(tmp_dj_cfg)
+                tmp_analyzer = Analyzer(get_init_configs(tmp_dj_cfg))
                 # do not overwrite the true analysis results
                 tmp_analyzer.run(skip_export=True)
 
@@ -316,6 +318,9 @@ class InterVars(object):
 
 class JobRequiredKeys(Enum):
     hook = 'hook'
-    dj_configs = 'dj_configs'
     meta_name = 'meta_name'
+    input = 'input'
+    output = 'output'
+    local = 'local'
+    dj_configs = 'dj_configs'
     extra_configs = 'extra_configs'

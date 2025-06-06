@@ -10,5 +10,7 @@ omit =
     # avoid measuring code of unittest
     tests/*
 
+relative_files = True
+
 [report]
 ignore_errors = True

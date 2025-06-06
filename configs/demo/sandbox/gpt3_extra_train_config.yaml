@@ -1,5 +1,5 @@
 type: modelscope
-dataset_path: './outputs/demo-process/demo-processed.jsonl'
+train_dataset: './outputs/demo-process/demo-processed.jsonl'
 work_dir: './outputs/sandbox-train/'
 model_name: "iic/nlp_gpt3_text-generation_chinese-base"
 trainer_name: "nlp-base-trainer"

@@ -78,6 +78,22 @@ class DJDataset(ABC):
         """
         pass
 
+    @abstractmethod
+    def to_list(self) -> list:
+        """Convert the current dataset to a Python list."""
+        pass
+
+    def contain_column(self, column: str) -> bool:
+        """Check whether the dataset contains a specific column/field.
+
+        Args:
+            column: Name of the column to check
+
+        Returns:
+            bool: True if the dataset contains the column, False otherwise
+        """
+        return column in self.schema().columns
+
 
 def wrap_func_with_nested_access(f):
     """
@@ -209,16 +225,7 @@ class NestedDataset(Dataset, DJDataset):
         # Get features dictionary from HF dataset
         features = self.features
 
-        # Convert features to schema dict
-        column_types = {}
-        for name, feature in features.items():
-            # Map HF feature types to Python types
-            column_types[name] = Schema.map_hf_type_to_python(feature)
-
-        # Get column names
-        columns = self.column_names
-
-        return Schema(column_types=column_types, columns=columns)
+        return Schema.from_hf_features(features)
 
     def get(self, k: int) -> List[Dict[str, Any]]:
         """Get k rows from the dataset."""
@@ -462,6 +469,9 @@ class NestedDataset(Dataset, DJDataset):
         """Override the select func, such that selected samples can be accessed
         by nested manner."""
         return nested_obj_factory(super().select(*args, **kargs))
+
+    def to_list(self) -> list:
+        return Dataset.to_list(self)
 
     @classmethod
     def from_dict(cls, *args, **kargs):

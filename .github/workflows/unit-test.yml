@@ -52,7 +52,7 @@ jobs:
       with:
         name: coverage_report_standalone
         include-hidden-files: true
-        path: dj-${{ github.run_id }}/coverage_report_standalone
+        path: dj-${{ github.run_id }}/.coverage
 
     - name: Get Total Coverage Result
       id: total
@@ -105,7 +105,7 @@ jobs:
       with:
         name: coverage_report_ray
         include-hidden-files: true
-        path: dj-${{ github.run_id }}/coverage_report_ray
+        path: dj-${{ github.run_id }}/.coverage
 
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
