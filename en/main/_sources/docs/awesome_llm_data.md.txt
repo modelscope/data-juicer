@@ -2,10 +2,10 @@
 Welcome to the "Awesome List" for data-model co-development of Multi-Modal Large Language Models (MLLMs), a continually updated resource tailored for the open-source community. This compilation features cutting-edge research, insightful articles focusing on improving MLLMs involving with the data-model co-development of MLLMs, and  tagged based on the proposed **taxonomy** from our data-model co-development [survey](https://arxiv.org/abs/2407.08583), as illustrated below.
 
 ![Overview of Our Taxonomy](https://img.alicdn.com/imgextra/i1/O1CN01aN3TVo1mgGZAuSHJ4_!!6000000004983-2-tps-3255-1327.png)
-Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. **Please feel free to make pull requests or open issues to [contribute to](#contribution-to-this-survey) this list and add more related resources!**
+Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. **Please feel free to make pull requests or open issues to [contribute to](#contribution-to-this-survey) this list and add more related resources!** We will periodically update our [arXiv version](https://arxiv.org/abs/2407.08583) according to this repository.
 
 ## News
-+ 🎉 [2025-06-04] Our [Data-Model Co-development Survey](https://arxiv.org/abs/2407.08583) has been accepted by IEEE Transactions on Pattern Analysis and Machine Intelligence (**TPAMI**)! Welcome to explore and contribute this awesome-list.
++ 🎉 [2025-06-04] Our [Data-Model Co-development Survey](hhttps://ieeexplore.ieee.org/document/11027559) has been accepted by IEEE Transactions on Pattern Analysis and Machine Intelligence (**TPAMI**)! Welcome to explore and contribute this awesome-list.
 + [2025-05-25] We added 20 academic papers related to this survey.
 + ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-10-23] We built a [dynamic table](https://modelscope.github.io/data-juicer/_static/awesome-list.html) based on the [paper list](#paper-list) that supports filtering and searching.
 + ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-10-22] We restructured our [paper list](#paper-list) to provide more streamlined information.
