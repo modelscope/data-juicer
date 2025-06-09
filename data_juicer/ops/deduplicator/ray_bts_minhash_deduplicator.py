@@ -12,7 +12,8 @@ from typing_extensions import Annotated
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
-from data_juicer.utils.resource_utils import get_ray_gpu_count
+from data_juicer.utils.resource_utils import (get_ray_gpu_count,
+                                              get_ray_gpu_memory)
 
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
@@ -320,6 +321,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         num_filter_task_returns: Optional[int] = 10,
         merge_batch_size: Optional[int] = 1000,
         minhash_batch_size: Optional[int] = 'auto',
+        memory_per_sample: Optional[float] = 0.1,  # MB per sample
         *args,
         **kwargs,
     ):
@@ -371,6 +373,9 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         :param minhash_batch_size: batch size for MinHash computation. If "auto",
             it will be set based on default values per CPU or GPU.
             CPU default 1024, GPU default 200_000
+        :param memory_per_sample: estimated memory needed per sample in MB.
+            Used to calculate batch size based on available GPU memory.
+            Default is 0.1 MB per sample.
         """
 
         super().__init__(*args, **kwargs)
@@ -379,6 +384,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         self.window_size = window_size
         self.lowercase = lowercase
         self.ignore_pattern = ignore_pattern
+        self.memory_per_sample = memory_per_sample
         if minhash_batch_size == 'auto':
             if self.use_cuda():
                 self.minhash_batch_size = 200_000
@@ -679,13 +685,28 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                 f'Setting GPU concurrency to {concurrency} based on available GPUs'
             )
 
+            # Get available GPU memory and set batch size
+            gpu_memory = get_ray_gpu_memory()
+            if gpu_memory:
+                min_memory = min(gpu_memory.values())
+                estimated_batch_size = int(min_memory / self.memory_per_sample)
+                # Cap batch size between 10k and 500k
+                batch_size = max(10_000, min(estimated_batch_size, 500_000))
+                logger.info(
+                    f'Setting batch size to {batch_size} based on available GPU memory '
+                    f'({min_memory}MB) and memory per sample ({self.memory_per_sample}MB)'
+                )
+            else:
+                batch_size = self.minhash_batch_size
+                logger.info(f'Using default batch size of {batch_size}')
+
             dataset = dataset.map_batches(
                 GPUMinHashActor,
                 batch_format='pyarrow',
                 zero_copy_batch=True,
                 num_gpus=1,
                 concurrency=concurrency,
-                batch_size=self.minhash_batch_size,
+                batch_size=batch_size,
             )
             dataset.map_batches(
                 band_with_uid,

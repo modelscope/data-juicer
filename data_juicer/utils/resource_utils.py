@@ -78,3 +78,39 @@ def get_ray_gpu_count():
     except Exception as e:
         logger.error(f'Error getting Ray GPU count: {str(e)}')
         return 0
+
+
+def get_ray_gpu_memory():
+    """
+    Get the available GPU memory in the Ray cluster.
+
+    Returns:
+        dict: Dictionary mapping GPU indices to available memory in MB, or empty dict if no GPUs available
+    """
+    try:
+        if not ray.is_initialized():
+            logger.warning('Ray is not initialized. Call ray.init() first.')
+            return {}
+
+        # Get available resources
+        resources = ray.available_resources()
+        gpu_count = int(resources.get('GPU', 0))
+
+        if gpu_count == 0:
+            logger.warning('No GPUs available in Ray cluster')
+            return {}
+
+        # Get memory info for each GPU
+        gpu_memory = {}
+        for i in range(gpu_count):
+            memory = query_cuda_info('memory.free')
+            if memory is not None and i < len(memory):
+                gpu_memory[i] = memory[i]
+                logger.info(f'GPU {i} has {memory[i]}MB free memory')
+            else:
+                logger.warning(f'Could not get memory info for GPU {i}')
+
+        return gpu_memory
+    except Exception as e:
+        logger.error(f'Error getting Ray GPU memory: {str(e)}')
+        return {}

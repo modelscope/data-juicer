@@ -22,4 +22,4 @@ process:
       lowercase: true
       accelerator: 'cuda'
       union_find_parallel_num: 2
-      minhash_batch_size: 25_000
+      memory_per_sample: 0.1
