@@ -2,11 +2,12 @@
 
 # global parameters
 project_name: 'demo-dedup-ray-bts-gpu'
-dataset_path: '/mnt/data/shared/dataset/redpajama-simplify/github'  # path to your dataset directory or file
+dataset_path: '/mnt/data/shared/dataset/redpajama-simplify/github.sample'  # path to your dataset directory or file
 np: 4  # number of subprocess to process your dataset
 
 open_tracer: true
 executor_type: ray
+open_monitor: true
 
 export_path: './outputs/demo-dedup-ray-bts-gpu/processed.jsonl'
 
@@ -21,4 +22,4 @@ process:
       lowercase: true
       accelerator: 'cuda'
       union_find_parallel_num: 2
-      minhash_batch_size: 50_000
+      minhash_batch_size: 25_000
