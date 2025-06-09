@@ -34,7 +34,7 @@ def check_uv_installed():
 
 def generate_uv_lock(uv_args=None):
     """Generate uv.lock file excluding sandbox dependencies.
-    
+
     Args:
         uv_args (list, optional): Additional arguments to pass to uv lock command.
     """
