@@ -689,13 +689,21 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             gpu_memory = get_ray_gpu_memory()
             if gpu_memory:
                 min_memory = min(gpu_memory.values())
-                estimated_batch_size = int(min_memory / self.memory_per_sample)
-                # Cap batch size between 10k and 500k
-                batch_size = max(10_000, min(estimated_batch_size, 500_000))
+                # Use 80% of available memory to leave room for overhead
+                safe_memory = min_memory * 0.8
+                estimated_batch_size = int(safe_memory /
+                                           self.memory_per_sample)
+
+                # For very large GPUs, cap at 2M samples to maintain reasonable processing time
+                # This is a soft cap - can be adjusted based on performance testing
+                max_reasonable_batch = 2_000_000
+                batch_size = max(
+                    10_000, min(estimated_batch_size, max_reasonable_batch))
+
                 logger.info(
                     f'Setting batch size to {batch_size} based on available GPU memory '
-                    f'({min_memory}MB) and memory per sample ({self.memory_per_sample}MB)'
-                )
+                    f'({min_memory}MB), memory per sample ({self.memory_per_sample}MB), '
+                    f'and safe memory limit ({safe_memory}MB)')
             else:
                 batch_size = self.minhash_batch_size
                 logger.info(f'Using default batch size of {batch_size}')
