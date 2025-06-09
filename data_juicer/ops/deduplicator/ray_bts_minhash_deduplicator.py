@@ -371,8 +371,8 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         :param merge_batch_size: batch size for BTS operations. Default
             it's 1000.
         :param minhash_batch_size: batch size for MinHash computation. If "auto",
-            it will be set based on default values per CPU or GPU.
-            CPU default 1024, GPU default 200_000
+            it will be set to default value on CPU(1024), or auto calculated per
+            available GPU memory and memory_per_sample setting for GPU.
         :param memory_per_sample: estimated memory needed per sample in MB.
             Used to calculate batch size based on available GPU memory.
             Default is 0.1 MB per sample.
