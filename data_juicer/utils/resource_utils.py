@@ -1,6 +1,7 @@
 import subprocess
 
 import psutil
+import ray
 from loguru import logger
 
 NVSMI_REPORT = True
@@ -50,3 +51,30 @@ def query_mem_info(query_key):
         return None
     val = round(mem.__getattribute__(query_key) / (2**20), 2)  # in MB
     return val
+
+
+def get_ray_gpu_count():
+    """
+    Get the number of available GPUs in the Ray cluster.
+
+    Returns:
+        int: Number of available GPUs, or 0 if no GPUs are available or Ray is not initialized
+    """
+    try:
+        if not ray.is_initialized():
+            logger.warning('Ray is not initialized. Call ray.init() first.')
+            return 0
+
+        # Get available resources
+        resources = ray.available_resources()
+        gpu_count = int(resources.get('GPU', 0))
+
+        if gpu_count == 0:
+            logger.warning('No GPUs available in Ray cluster')
+        else:
+            logger.info(f'Found {gpu_count} GPUs in Ray cluster')
+
+        return gpu_count
+    except Exception as e:
+        logger.error(f'Error getting Ray GPU count: {str(e)}')
+        return 0
