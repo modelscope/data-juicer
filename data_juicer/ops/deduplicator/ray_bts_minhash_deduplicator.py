@@ -237,7 +237,6 @@ def get_remote_classes():
         'IdGenerator': ray.remote(IdGenerator),
         'EdgeBuffer': ray.remote(scheduling_strategy='SPREAD')(EdgeBuffer),
         'BTSUnionFind': ray.remote(scheduling_strategy='SPREAD')(BTSUnionFind),
-        'GPUMinHashActor': ray.remote(GPUMinHashActor)
     }
 
 
@@ -668,7 +667,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         if self.use_cuda():
             logger.info('Using GPU for MinHash computation')
             dataset = dataset.map_batches(
-                get_remote_classes()['GPUMinHashActor'],
+                GPUMinHashActor,
                 batch_format='pyarrow',
                 zero_copy_batch=True,
                 num_gpus=1,
