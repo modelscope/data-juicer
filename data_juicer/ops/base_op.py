@@ -320,6 +320,7 @@ class Mapper(OP):
                 op_name=self._name)
 
     # set the process method is not allowed to be overridden
+    @classmethod
     def __init_subclass__(cls, **kwargs):
         not_allowed_list = ['process']
         for method_name in not_allowed_list:
@@ -424,6 +425,7 @@ class Filter(OP):
                 op_name=self._name)
 
     # set the process method is not allowed to be overridden
+    @classmethod
     def __init_subclass__(cls, **kwargs):
         not_allowed_list = ['compute_stats', 'process']
         for method_name in not_allowed_list:

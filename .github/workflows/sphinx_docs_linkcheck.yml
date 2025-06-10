@@ -1,0 +1,40 @@
+name: Sphinx Docs LinkCheck
+
+on:
+    schedule:
+      - cron: "0 5 * * 0" # Runs at 05:00 on Sunday.
+    workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linkcheck:
+    name: Check Links
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          python-version: [ "3.10" ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@master
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -v -e .[dev]
+      - name: Run Sphinx linkcheck
+        run: |
+          cd docs/sphinx_doc
+          sphinx-apidoc -f -o source ../../data_juicer -t _templates
+          python ./create_symlinks.py
+          sphinx-build -b linkcheck -j 4 source build/linkcheck || true
+      - name: Upload Linkcheck Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: LinkcheckResults
+          path: "docs/sphinx_doc/build/linkcheck"

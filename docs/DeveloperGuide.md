@@ -10,6 +10,13 @@
   - [3. Build Your Own Data Recipes and Configs](#3-build-your-own-data-recipes-and-configs)
     - [3.1 Fruitful Config Sources \& Type Hints](#31-fruitful-config-sources--type-hints)
     - [3.2 Hierarchical Configs and Helps](#32-hierarchical-configs-and-helps)
+  - [4. Dependency Management](#4-dependency-management)
+    - [4.1 Installing uv](#41-installing-uv)
+    - [4.2 Virtual Environment Management](#42-virtual-environment-management)
+    - [4.3 Adding New Dependencies](#43-adding-new-dependencies)
+    - [4.4 Development Setup](#44-development-setup)
+    - [4.5 Lazy Loading](#45-lazy-loading)
+  - [5. Documentation Style](#5-documentation-style)
 
 ## 1. Coding Style
 
@@ -400,91 +407,6 @@ class PerplexityFilter(Filter):
         # ... (some codes)
 ```
 
-## Dependency Management
-
-Data-Juicer uses a modern dependency management system based on `uv` and `pyproject.toml`. Dependencies are managed through the standard Python packaging format (PEP 621) and installed on-demand using a lazy loading system.
-
-### Installing uv
-
-`uv` is a fast Python package installer and resolver, as a better drop-in replacement for pip. You can install it using:
-
-```bash
-# Using curl
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Or using pip
-pip install uv
-```
-
-After installation, verify it's working by running `uv --version`.
-
-### Virtual Environment Management
-
-`uv` provides virtual environment management capabilities that replaces `venv` and `virtualenv`. Here are the common commands:
-
-```bash
-# Create a new virtual environment
-uv venv
-
-# Or create a virtual environment with a specific Python version
-uv venv --python 3.10
-
-# Activate the virtual environment
-# On Unix/macOS
-source .venv/bin/activate
-# On Windows
-.venv\Scripts\activate
-
-# Install minimal dependencies in the virtual environment
-uv pip install -e .
-
-```
-
-### Adding New Dependencies
-
-To add new dependencies:
-
-1. Add them to the appropriate section in `pyproject.toml`:
-   - Core dependencies go in `[project.dependencies]`
-   - Optional dependencies go in `[project.optional-dependencies]` under the appropriate group (generic, dev, audio, video, etc.)
-
-2. The lazy loading system will automatically handle installation when the dependencies are first used.
-
-Example:
-```toml
-[project.dependencies]
-# Core dependencies
-numpy = ">=1.26.4,<2.0.0"
-
-[project.optional-dependencies]
-generic = [
-    "torch>=1.11.0",
-    "transformers>=4.47.0,<4.48.0",
-    ...
-]
-```
-
-### Development Setup
-
-1. Install the package with all dependencies:
-```bash
-uv pip install -e ".[all]"
-```
-
-2. Or install with specific groups:
-```bash
-uv pip install -e ".[generic]"      # Generic dependencies
-uv pip install -e ".[dev]"          # Development tools
-uv pip install -e ".[ai_services]"  # Services dependencies
-```
-
-### Lazy Loading
-
-The lazy loading system automatically installs dependencies when they are first used. This means:
-- Initial installation is faster
-- Only required dependencies are installed
-- Dependencies are installed on-demand
-- Uses `uv` for fast installation when available
 
 ## 3. Build Your Own Data Recipes and Configs
 - We provide easy configuration based on [jsonargparse](https://github.com/omni-us/jsonargparse/) to reduce cost for boilerplate codes.
@@ -569,3 +491,102 @@ optional arguments:
 ......
 
 ```
+
+## 4. Dependency Management
+
+Data-Juicer uses a modern dependency management system based on `uv` and `pyproject.toml`. Dependencies are managed through the standard Python packaging format (PEP 621) and installed on-demand using a lazy loading system.
+
+### 4.1 Installing uv
+
+`uv` is a fast Python package installer and resolver, as a better drop-in replacement for pip. You can install it using:
+
+```bash
+# Using curl
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Or using pip
+pip install uv
+```
+
+After installation, verify it's working by running `uv --version`.
+
+### 4.2 Virtual Environment Management
+
+`uv` provides virtual environment management capabilities that replaces `venv` and `virtualenv`. Here are the common commands:
+
+```bash
+# Create a new virtual environment
+uv venv
+
+# Or create a virtual environment with a specific Python version
+uv venv --python 3.10
+
+# Activate the virtual environment
+# On Unix/macOS
+source .venv/bin/activate
+# On Windows
+.venv\Scripts\activate
+
+# Install minimal dependencies in the virtual environment
+uv pip install -e .
+
+```
+
+### 4.3 Adding New Dependencies
+
+To add new dependencies:
+
+1. Add them to the appropriate section in `pyproject.toml`:
+   - Core dependencies go in `[project.dependencies]`
+   - Optional dependencies go in `[project.optional-dependencies]` under the appropriate group (generic, dev, audio, video, etc.)
+
+2. The lazy loading system will automatically handle installation when the dependencies are first used.
+
+Example:
+```toml
+[project.dependencies]
+# Core dependencies
+numpy = ">=1.26.4,<2.0.0"
+
+[project.optional-dependencies]
+generic = [
+    "torch>=1.11.0",
+    "transformers>=4.47.0,<4.48.0",
+    ...
+]
+```
+
+### 4.4 Development Setup
+
+1. Install the package with all dependencies:
+```bash
+uv pip install -e ".[all]"
+```
+
+2. Or install with specific groups:
+```bash
+uv pip install -e ".[generic]"      # Generic dependencies
+uv pip install -e ".[dev]"          # Development tools
+uv pip install -e ".[ai_services]"  # Services dependencies
+```
+
+### 4.5 Lazy Loading
+
+The lazy loading system automatically installs dependencies when they are first used. This means:
+- Initial installation is faster
+- Only required dependencies are installed
+- Dependencies are installed on-demand
+- Uses `uv` for fast installation when available
+
+## 5. Documentation Style
+
+We use Sphinx for document management. To ensure the smooth integration of development documents into the Sphinx documentation system, please pay attention to the following guidelines when writing:
+
+1.  Heading Hierarchy
+
+    - Level 1 Heading (`#`): Each document **must and can only** contain one Level 1 heading, which serves as the overall title of the document.
+    - Ensure the heading hierarchy is correct and avoid skipping heading levels. For example, a Level 1 heading should be followed by a Level 2 heading, not a Level 3 heading.
+
+2.  File Naming Conventions
+
+    - Chinese Documents: Chinese Markdown files must be named with the suffix `_ZH`. For example: `README_ZH.md`
