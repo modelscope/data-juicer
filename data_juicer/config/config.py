@@ -473,7 +473,7 @@ def init_configs(args: Optional[List[str]] = None,
             # Now add remaining arguments based on essential config
             if essential_cfg.config:
                 # Load config file to determine which operators are used
-                with open(essential_cfg.config[0].absolute) as f:
+                with open(os.path.abspath(essential_cfg.config[0])) as f:
                     config_data = yaml.safe_load(f)
                     used_ops = set()
                     if 'process' in config_data:
@@ -925,8 +925,7 @@ def export_config(cfg: Namespace,
     """
     # remove ops outside the process list for better displaying
     cfg_to_export = cfg.clone()
-    for op in OPERATORS.modules.keys():
-        _ = cfg_to_export.pop(op)
+    cfg_to_export = prepare_cfgs_for_export(cfg_to_export)
 
     global global_parser
     if not global_parser:
@@ -1043,10 +1042,8 @@ def get_init_configs(cfg: Union[Namespace, Dict]):
     if isinstance(cfg, Namespace):
         cfg = namespace_to_dict(cfg)
     # create a temp config file
-    if 'config' in cfg:
-        cfg['config'] = [str(p) for p in cfg['config']]
     with open(temp_file, 'w') as f:
-        json.dump(cfg, f)
+        json.dump(prepare_cfgs_for_export(cfg), f)
     inited_dj_cfg = init_configs(['--config', temp_file],
                                  load_configs_only=True)
     return inited_dj_cfg
@@ -1076,4 +1073,15 @@ def get_default_cfg():
         if not hasattr(cfg, key):
             setattr(cfg, key, value)
 
+    return cfg
+
+
+def prepare_cfgs_for_export(cfg):
+    # 1. convert Path to str
+    if 'config' in cfg:
+        cfg['config'] = [str(p) for p in cfg['config']]
+    # 2. remove level-1 op cfgs outside the process list
+    for op in OPERATORS.modules.keys():
+        if op in cfg:
+            _ = cfg.pop(op)
     return cfg
