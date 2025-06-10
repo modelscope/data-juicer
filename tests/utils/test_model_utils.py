@@ -1,5 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
+import os
+import numpy as np
 
 from data_juicer.utils.model_utils import (
     get_backup_model_link,
@@ -156,12 +158,66 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
             prepare_diffusion_model('test_model', 'invalid_type')
 
     @patch('data_juicer.utils.model_utils.fasttext')
-    def test_prepare_fasttext_model(self, mock_fasttext):
+    def test_prepare_fasttext_model_mock(self, mock_fasttext):
         mock_model = MagicMock()
         mock_fasttext.load_model.return_value = mock_model
 
         model = prepare_fasttext_model('test_model')
         self.assertEqual(model, mock_model)
+
+    def test_prepare_fasttext_model_real(self):
+        """Test FastText model loading and prediction functionality with real model."""
+        # Test with default language identification model
+        model = prepare_fasttext_model()
+        
+        # Test basic prediction functionality
+        test_texts = [
+            "Hello, this is an English text.",
+            "Bonjour, ceci est un texte français.",
+            "你好，这是一段中文文本。"
+        ]
+        
+        for text in test_texts:
+            predictions = model.predict(text)
+            # FastText predict returns a tuple of (labels, scores)
+            self.assertIsInstance(predictions, tuple, "Predictions should be a tuple")
+            self.assertEqual(len(predictions), 2, "Predictions should contain labels and scores")
+            
+            labels, scores = predictions
+            self.assertIsInstance(labels, tuple, "Labels should be a tuple")
+            self.assertIsInstance(scores, np.ndarray, "Scores should be a numpy array")
+            self.assertEqual(len(labels), len(scores), "Number of labels should match number of scores")
+            
+            # Check first prediction
+            self.assertTrue(labels[0].startswith('__label__'), 
+                          "Label should start with __label__")
+            self.assertIsInstance(scores[0], (float, np.floating), "Score should be a float")
+
+    def test_prepare_fasttext_model_invalid(self):
+        """Test FastText model with invalid model file."""
+        with self.assertRaises(Exception):
+            prepare_fasttext_model("invalid_model.bin")
+
+    def test_prepare_fasttext_model_force_download(self):
+        """Test FastText model with force download."""
+        # First remove the model file if it exists
+        from data_juicer.utils.cache_utils import DATA_JUICER_MODELS_CACHE
+        from data_juicer.utils.model_utils import prepare_fasttext_model
+        
+        # Get the default model name from the function's default parameter
+        default_model_name = prepare_fasttext_model.__defaults__[0]
+        model_path = os.path.join(DATA_JUICER_MODELS_CACHE, default_model_name)
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
+        if os.path.exists(model_path):
+            os.remove(model_path)
+        
+        # Test loading with force download
+        model = prepare_fasttext_model(force=True)
+        self.assertIsNotNone(model, "Model should be loaded after force download")
+        
+        # Test prediction after force download
+        predictions = model.predict("This is a test.")
+        self.assertGreater(len(predictions), 0, "Model should return predictions after force download")
 
     @patch('data_juicer.utils.model_utils.kenlm')
     def test_prepare_kenlm_model(self, mock_kenlm):

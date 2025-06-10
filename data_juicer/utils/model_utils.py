@@ -1,6 +1,8 @@
 import fnmatch
 import inspect
+import io
 import os
+from contextlib import redirect_stderr
 from functools import partial
 from pickle import UnpicklingError
 from typing import Optional, Union
@@ -344,9 +346,25 @@ def prepare_fasttext_model(model_name='lid.176.bin', **model_params):
     """
     logger.info('Loading fasttext language identification model...')
     try:
-        ft_model = fasttext.load_model(check_model(model_name))
-    except:  # noqa: E722
-        ft_model = fasttext.load_model(check_model(model_name, force=True))
+        # Suppress FastText warnings by redirecting stderr
+        with redirect_stderr(io.StringIO()):
+            ft_model = fasttext.load_model(check_model(model_name))
+        # Verify the model has the predict method (for language identification)
+        if not hasattr(ft_model, 'predict'):
+            raise AttributeError('Loaded model does not support prediction')
+    except Exception as e:
+        logger.warning(
+            f'Error loading model: {e}. Attempting to force download...')
+        try:
+            with redirect_stderr(io.StringIO()):
+                ft_model = fasttext.load_model(
+                    check_model(model_name, force=True))
+            if not hasattr(ft_model, 'predict'):
+                raise AttributeError(
+                    'Loaded model does not support prediction')
+        except Exception as e:
+            logger.error(f'Failed to load model after download attempt: {e}')
+            raise
     return ft_model
 
 

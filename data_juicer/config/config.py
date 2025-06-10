@@ -32,7 +32,7 @@ def timing_context(description):
     yield
     elapsed_time = time.time() - start_time
     # Use a consistent format that won't be affected by logger reconfiguration
-    logger.info(f'{description} took {elapsed_time:.2f} seconds')
+    logger.debug(f'{description} took {elapsed_time:.2f} seconds')
 
 
 def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
