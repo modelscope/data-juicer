@@ -727,6 +727,7 @@
 
 
     <span class="c1"># set the process method is not allowed to be overridden</span>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">not_allowed_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;process&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">method_name</span> <span class="ow">in</span> <span class="n">not_allowed_list</span><span class="p">:</span>
@@ -846,6 +847,7 @@
 
 
     <span class="c1"># set the process method is not allowed to be overridden</span>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">not_allowed_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;compute_stats&#39;</span><span class="p">,</span> <span class="s1">&#39;process&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">method_name</span> <span class="ow">in</span> <span class="n">not_allowed_list</span><span class="p">:</span>
