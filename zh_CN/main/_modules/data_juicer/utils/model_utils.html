@@ -492,12 +492,35 @@
 
 
 
-<div class="viewcode-block" id="APIModel">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.APIModel">[文档]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">APIModel</span><span class="p">:</span>
+<div class="viewcode-block" id="filter_arguments">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.filter_arguments">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">filter_arguments</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Filters and returns only the valid arguments for a given function</span>
+<span class="sd">    signature.</span>
 
-<div class="viewcode-block" id="APIModel.__init__">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.APIModel.__init__">[文档]</a>
+<span class="sd">    :param func: The function or callable to inspect.</span>
+<span class="sd">    :param args_dict: A dictionary of argument names and values to filter.</span>
+<span class="sd">    :return: A dictionary containing only the arguments that match the</span>
+<span class="sd">                function&#39;s signature, preserving any **kwargs if applicable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+    <span class="n">filtered_args</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">args_dict</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;self&#39;</span><span class="p">,</span> <span class="s1">&#39;cls&#39;</span><span class="p">}</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">args_dict</span><span class="p">:</span>
+            <span class="n">filtered_args</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">args_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">filtered_args</span></div>
+
+
+
+<div class="viewcode-block" id="ChatAPIModel">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.ChatAPIModel">[文档]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatAPIModel</span><span class="p">:</span>
+
+<div class="viewcode-block" id="ChatAPIModel.__init__">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.ChatAPIModel.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes an instance of the APIModel class.</span>
@@ -521,7 +544,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span> <span class="ow">or</span> <span class="s1">&#39;/chat/completions&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_path</span> <span class="o">=</span> <span class="n">response_path</span> <span class="ow">or</span> <span class="s1">&#39;choices.0.message.content&#39;</span>
 
-        <span class="n">client_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_arguments</span><span class="p">(</span><span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">client_args</span> <span class="o">=</span> <span class="n">filter_arguments</span><span class="p">(</span><span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">(</span><span class="o">**</span><span class="n">client_args</span><span class="p">)</span></div>
 
 
@@ -555,29 +578,57 @@
             <span class="k">return</span> <span class="n">nested_access</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_path</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_filter_arguments</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args_dict</span><span class="p">):</span>
+
+
+<div class="viewcode-block" id="EmbeddingAPIModel">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.EmbeddingAPIModel">[文档]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EmbeddingAPIModel</span><span class="p">:</span>
+
+<div class="viewcode-block" id="EmbeddingAPIModel.__init__">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.EmbeddingAPIModel.__init__">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Filters and returns only the valid arguments for a given function</span>
-<span class="sd">        signature.</span>
+<span class="sd">        Initializes an instance specialized for embedding APIs.</span>
 
-<span class="sd">        :param func: The function or callable to inspect.</span>
-<span class="sd">        :param args_dict: A dictionary of argument names and values to filter.</span>
-<span class="sd">        :return: A dictionary containing only the arguments that match the</span>
-<span class="sd">                 function&#39;s signature, preserving any **kwargs if applicable.</span>
+<span class="sd">        :param model: The model identifier for embedding API calls.</span>
+<span class="sd">        :param endpoint: API endpoint URL. Defaults to &#39;/embeddings&#39;.</span>
+<span class="sd">        :param response_path: Path to extract embeddings from response.</span>
+<span class="sd">            Defaults to &#39;data.0.embedding&#39;.</span>
+<span class="sd">        :param kwargs: Configuration for the OpenAI client.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
-        <span class="n">filtered_args</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="c1"># If **kwargs is found, return without change</span>
-            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">args_dict</span>
-            <span class="c1"># Collect valid parameters</span>
-            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;self&#39;</span><span class="p">,</span> <span class="s1">&#39;cls&#39;</span><span class="p">}</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">args_dict</span><span class="p">:</span>
-                <span class="n">filtered_args</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">args_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">filtered_args</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span> <span class="ow">or</span> <span class="s1">&#39;/embeddings&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response_path</span> <span class="o">=</span> <span class="n">response_path</span> <span class="ow">or</span> <span class="s1">&#39;data.0.embedding&#39;</span>
+
+        <span class="n">client_args</span> <span class="o">=</span> <span class="n">filter_arguments</span><span class="p">(</span><span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">(</span><span class="o">**</span><span class="n">client_args</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes input text and returns embeddings.</span>
+
+<span class="sd">        :param input: Input text or list of texts to embed.</span>
+<span class="sd">        :param kwargs: Additional API parameters.</span>
+<span class="sd">        :return: Extracted embeddings or empty list on error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="nb">input</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span>
+                                         <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">,</span>
+                                         <span class="n">cast_to</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">nested_access</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_path</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Embedding API error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
 
 
 
@@ -598,10 +649,13 @@
 <span class="sd">    :param endpoint: The URL endpoint for the API. If provided as a relative</span>
 <span class="sd">        path, it will be appended to the base URL (defined by the</span>
 <span class="sd">        `OPENAI_BASE_URL` environment variable or through an additional</span>
-<span class="sd">        `base_url` parameter). By default, it is set to</span>
-<span class="sd">        &#39;/chat/completions&#39; for OpenAI compatibility.</span>
+<span class="sd">        `base_url` parameter). Supported endpoints include:</span>
+<span class="sd">        - &#39;/chat/completions&#39; for chat models</span>
+<span class="sd">        - &#39;/embeddings&#39; for embedding models</span>
+<span class="sd">        Defaults to `/chat/completions` for OpenAI compatibility.</span>
 <span class="sd">    :param response_path: The dot-separated  path to extract desired content</span>
-<span class="sd">        from the API response. Defaults to &#39;choices.0.message.content&#39;.</span>
+<span class="sd">        from the API response. Defaults to &#39;choices.0.message.content&#39;</span>
+<span class="sd">        for chat models and &#39;data.0.embedding&#39; for embedding models.</span>
 <span class="sd">    :param return_processor: A boolean flag indicating whether to return a</span>
 <span class="sd">        processor along with the model. The processor can be used for tasks</span>
 <span class="sd">        like tokenization or encoding. Defaults to False.</span>
@@ -612,10 +666,23 @@
 <span class="sd">    :return: A callable APIModel instance, and optionally a processor</span>
 <span class="sd">        if `return_processor` is True.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">client</span> <span class="o">=</span> <span class="n">APIModel</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-                      <span class="n">endpoint</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span>
-                      <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
-                      <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span> <span class="ow">or</span> <span class="s1">&#39;/chat/completions&#39;</span>
+
+    <span class="n">ENDPOINT_CLASS_MAP</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;chat&#39;</span><span class="p">:</span> <span class="n">ChatAPIModel</span><span class="p">,</span>
+        <span class="s1">&#39;embeddings&#39;</span><span class="p">:</span> <span class="n">EmbeddingAPIModel</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">API_Class</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="bp">cls</span> <span class="k">for</span> <span class="n">keyword</span><span class="p">,</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">ENDPOINT_CLASS_MAP</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                      <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">lower</span><span class="p">()),</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">API_Class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported endpoint: </span><span class="si">{</span><span class="n">endpoint</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">API_Class</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                       <span class="n">endpoint</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span>
+                       <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
+                       <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">return_processor</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">client</span>
@@ -1301,6 +1368,59 @@
 
 
 
+<div class="viewcode-block" id="prepare_embedding_model">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_embedding_model">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_embedding_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load an embedding model using transformers.</span>
+
+<span class="sd">    :param model_path: Path to the embedding model.</span>
+<span class="sd">    :param model_params: Optional model parameters.</span>
+<span class="sd">    :return: Model with encode() returning embedding list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading embedding model using transformers...&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;device&#39;</span> <span class="ow">in</span> <span class="n">model_params</span><span class="p">:</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">)</span>
+
+    <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+        <span class="n">model_path</span><span class="p">,</span> <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+        <span class="n">model_path</span><span class="p">,</span> <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">last_token_pool</span><span class="p">(</span><span class="n">last_hidden_states</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+                        <span class="n">attention_mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">left_padding</span> <span class="o">=</span> <span class="p">(</span><span class="n">attention_mask</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="n">attention_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">left_padding</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">last_hidden_states</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sequence_lengths</span> <span class="o">=</span> <span class="n">attention_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">batch_size</span> <span class="o">=</span> <span class="n">last_hidden_states</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">last_hidden_states</span><span class="p">[</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">last_hidden_states</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+                <span class="n">sequence_lengths</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">prompt_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="mi">4096</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">prompt_name</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">prompt_name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="n">input_dict</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">text</span><span class="p">,</span>
+                               <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                               <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                               <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">,</span>
+                               <span class="n">max_length</span><span class="o">=</span><span class="n">max_len</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">input_dict</span><span class="p">)</span>
+
+        <span class="n">embedding</span> <span class="o">=</span> <span class="n">last_token_pool</span><span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">last_hidden_state</span><span class="p">,</span>
+                                    <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">])</span>
+        <span class="n">embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">embedding</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;EmbeddingModel&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{</span><span class="s1">&#39;encode&#39;</span><span class="p">:</span> <span class="n">encode</span><span class="p">})()</span></div>
+
+
+
 <div class="viewcode-block" id="update_sampling_params">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.update_sampling_params">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">update_sampling_params</span><span class="p">(</span><span class="n">sampling_params</span><span class="p">,</span>
@@ -1372,6 +1492,7 @@
     <span class="s1">&#39;spacy&#39;</span><span class="p">:</span> <span class="n">prepare_spacy_model</span><span class="p">,</span>
     <span class="s1">&#39;video_blip&#39;</span><span class="p">:</span> <span class="n">prepare_video_blip_model</span><span class="p">,</span>
     <span class="s1">&#39;vllm&#39;</span><span class="p">:</span> <span class="n">prepare_vllm_model</span><span class="p">,</span>
+    <span class="s1">&#39;embedding&#39;</span><span class="p">:</span> <span class="n">prepare_embedding_model</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">_MODELS_WITHOUT_FILE_LOCK</span> <span class="o">=</span> <span class="p">{</span>

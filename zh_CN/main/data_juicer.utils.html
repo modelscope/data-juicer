@@ -2421,13 +2421,32 @@ download again forcefully.</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.filter_arguments">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">filter_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#filter_arguments"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.filter_arguments" title="Link to this definition">¶</a></dt>
+<dd><p>Filters and returns only the valid arguments for a given function
+signature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> -- The function or callable to inspect.</p></li>
+<li><p><strong>args_dict</strong> -- A dictionary of argument names and values to filter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing only the arguments that match the
+function's signature, preserving any <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs if applicable.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.utils.model_utils.APIModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">APIModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#APIModel"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.APIModel" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.ChatAPIModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">ChatAPIModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#ChatAPIModel"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.ChatAPIModel" title="Link to this definition">¶</a></dt>
 <dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.utils.model_utils.APIModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#APIModel.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.APIModel.__init__" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.ChatAPIModel.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#ChatAPIModel.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.ChatAPIModel.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Initializes an instance of the APIModel class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">参数<span class="colon">:</span></dt>
@@ -2453,6 +2472,29 @@ internal OpenAI client.</p></li>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.EmbeddingAPIModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">EmbeddingAPIModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#EmbeddingAPIModel"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.EmbeddingAPIModel" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.EmbeddingAPIModel.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#EmbeddingAPIModel.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.EmbeddingAPIModel.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initializes an instance specialized for embedding APIs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> -- The model identifier for embedding API calls.</p></li>
+<li><p><strong>endpoint</strong> -- API endpoint URL. Defaults to '/embeddings'.</p></li>
+<li><p><strong>response_path</strong> -- Path to extract embeddings from response.
+Defaults to 'data.0.embedding'.</p></li>
+<li><p><strong>kwargs</strong> -- Configuration for the OpenAI client.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_api_model">
 <span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_api_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_processor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processor_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">model_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_api_model"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_api_model" title="Link to this definition">¶</a></dt>
@@ -2466,10 +2508,13 @@ that may be incompatible.</p>
 <li><p><strong>endpoint</strong> -- The URL endpoint for the API. If provided as a relative
 path, it will be appended to the base URL (defined by the
 <cite>OPENAI_BASE_URL</cite> environment variable or through an additional
-<cite>base_url</cite> parameter). By default, it is set to
-'/chat/completions' for OpenAI compatibility.</p></li>
+<cite>base_url</cite> parameter). Supported endpoints include:
+- '/chat/completions' for chat models
+- '/embeddings' for embedding models
+Defaults to <cite>/chat/completions</cite> for OpenAI compatibility.</p></li>
 <li><p><strong>response_path</strong> -- The dot-separated  path to extract desired content
-from the API response. Defaults to 'choices.0.message.content'.</p></li>
+from the API response. Defaults to 'choices.0.message.content'
+for chat models and 'data.0.embedding' for embedding models.</p></li>
 <li><p><strong>return_processor</strong> -- A boolean flag indicating whether to return a
 processor along with the model. The processor can be used for tasks
 like tokenization or encoding. Defaults to False.</p></li>
@@ -2712,6 +2757,23 @@ otherwise, only the processor is returned.</p>
 </dd>
 <dt class="field-even">返回<span class="colon">:</span></dt>
 <dd class="field-even"><p>a tuple of (model, tokenizer)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_embedding_model">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_embedding_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">model_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_embedding_model"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_embedding_model" title="Link to this definition">¶</a></dt>
+<dd><p>Prepare and load an embedding model using transformers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_path</strong> -- Path to the embedding model.</p></li>
+<li><p><strong>model_params</strong> -- Optional model parameters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>Model with encode() returning embedding list.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3438,8 +3500,13 @@ Currently, <cite>standalone</cite>, <cite>ray</cite> are supported.</p>
 <li><a class="reference internal" href="#module-data_juicer.utils.model_utils">data_juicer.utils.model_utils module</a><ul>
 <li><a class="reference internal" href="#data_juicer.utils.model_utils.get_backup_model_link"><code class="docutils literal notranslate"><span class="pre">get_backup_model_link()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.model_utils.check_model"><code class="docutils literal notranslate"><span class="pre">check_model()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.utils.model_utils.APIModel"><code class="docutils literal notranslate"><span class="pre">APIModel</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.utils.model_utils.APIModel.__init__"><code class="docutils literal notranslate"><span class="pre">APIModel.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.model_utils.filter_arguments"><code class="docutils literal notranslate"><span class="pre">filter_arguments()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.model_utils.ChatAPIModel"><code class="docutils literal notranslate"><span class="pre">ChatAPIModel</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.utils.model_utils.ChatAPIModel.__init__"><code class="docutils literal notranslate"><span class="pre">ChatAPIModel.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.utils.model_utils.EmbeddingAPIModel"><code class="docutils literal notranslate"><span class="pre">EmbeddingAPIModel</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.utils.model_utils.EmbeddingAPIModel.__init__"><code class="docutils literal notranslate"><span class="pre">EmbeddingAPIModel.__init__()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_api_model"><code class="docutils literal notranslate"><span class="pre">prepare_api_model()</span></code></a></li>
@@ -3459,6 +3526,7 @@ Currently, <cite>standalone</cite>, <cite>ray</cite> are supported.</p>
 <li><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_spacy_model"><code class="docutils literal notranslate"><span class="pre">prepare_spacy_model()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_video_blip_model"><code class="docutils literal notranslate"><span class="pre">prepare_video_blip_model()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_vllm_model"><code class="docutils literal notranslate"><span class="pre">prepare_vllm_model()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_embedding_model"><code class="docutils literal notranslate"><span class="pre">prepare_embedding_model()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.model_utils.update_sampling_params"><code class="docutils literal notranslate"><span class="pre">update_sampling_params()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_model"><code class="docutils literal notranslate"><span class="pre">prepare_model()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.model_utils.get_model"><code class="docutils literal notranslate"><span class="pre">get_model()</span></code></a></li>

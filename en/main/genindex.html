@@ -1161,7 +1161,9 @@
 </li>
           <li><a href="data_juicer.utils.html#data_juicer.utils.logger_utils.StreamToLoguru.__init__">(data_juicer.utils.logger_utils.StreamToLoguru method)</a>
 </li>
-          <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.APIModel.__init__">(data_juicer.utils.model_utils.APIModel method)</a>
+          <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.ChatAPIModel.__init__">(data_juicer.utils.model_utils.ChatAPIModel method)</a>
+</li>
+          <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.EmbeddingAPIModel.__init__">(data_juicer.utils.model_utils.EmbeddingAPIModel method)</a>
 </li>
           <li><a href="data_juicer.utils.html#data_juicer.utils.registry.Registry.__init__">(data_juicer.utils.registry.Registry method)</a>
 </li>
@@ -1272,8 +1274,6 @@
         </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.APIModel">APIModel (class in data_juicer.utils.model_utils)</a>
-</li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.aspect_ratios">aspect_ratios (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.assertDatasetEqual">assertDatasetEqual() (data_juicer.utils.unittest_utils.DataJuicerTestCaseBase method)</a>
@@ -1512,6 +1512,8 @@
           <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.character_repetition_filter.CharacterRepetitionFilter">(class in data_juicer.ops.filter.character_repetition_filter)</a>
 </li>
         </ul></li>
+        <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.ChatAPIModel">ChatAPIModel (class in data_juicer.utils.model_utils)</a>
+</li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.ckpt_utils.CheckpointManager.check_ckpt">check_ckpt() (data_juicer.utils.ckpt_utils.CheckpointManager method)</a>
 </li>
         <li><a href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline.check_inputs">check_inputs() (data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline method)</a>
@@ -4257,6 +4259,8 @@
 </li>
         <li><a href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.EdgeBuffer">EdgeBuffer (class in data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator)</a>
 </li>
+        <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.EmbeddingAPIModel">EmbeddingAPIModel (class in data_juicer.utils.model_utils)</a>
+</li>
         <li><a href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_basic_deduplicator.RayBasicDeduplicator.EMPTY_HASH_VALUE">EMPTY_HASH_VALUE (data_juicer.ops.deduplicator.ray_basic_deduplicator.RayBasicDeduplicator attribute)</a>
 
         <ul>
@@ -4331,14 +4335,14 @@
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper">ExpandMacroMapper (class in data_juicer.ops.mapper.expand_macro_mapper)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="data_juicer.core.html#data_juicer.core.Exporter.export">export() (data_juicer.core.Exporter method)</a>
 
         <ul>
           <li><a href="data_juicer.core.html#data_juicer.core.exporter.Exporter.export">(data_juicer.core.exporter.Exporter method)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="data_juicer.core.html#data_juicer.core.Exporter.export_compute_stats">export_compute_stats() (data_juicer.core.Exporter method)</a>
 
         <ul>
@@ -4461,6 +4465,8 @@
           <li><a href="data_juicer.core.html#data_juicer.core.NestedDataset.filter">(data_juicer.core.NestedDataset method)</a>
 </li>
         </ul></li>
+        <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.filter_arguments">filter_arguments() (in module data_juicer.utils.model_utils)</a>
+</li>
         <li><a href="data_juicer.core.data.html#data_juicer.core.data.ray_dataset.filter_batch">filter_batch() (in module data_juicer.core.data.ray_dataset)</a>
 </li>
         <li><a href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.RayBTSMinhashDeduplicator.filter_with_union_find">filter_with_union_find() (data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.RayBTSMinhashDeduplicator method)</a>
@@ -6149,6 +6155,8 @@
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.chinese_convert_mapper.prepare_converter">prepare_converter() (in module data_juicer.ops.mapper.chinese_convert_mapper)</a>
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_diffusion_model">prepare_diffusion_model() (in module data_juicer.utils.model_utils)</a>
+</li>
+        <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_embedding_model">prepare_embedding_model() (in module data_juicer.utils.model_utils)</a>
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_fastsam_model">prepare_fastsam_model() (in module data_juicer.utils.model_utils)</a>
 </li>
