@@ -10,7 +10,7 @@ Data-Juicer 支持基于 [Ray](https://github.com/ray-project/ray) 和阿里巴�
 
 更多细节请参考我们的论文：[Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://arxiv.org/abs/2501.14755) 。
 
-<img src="https://img.alicdn.com/imgextra/i4/O1CN015URK6i21KU3XdkUpK_!!6000000006966-2-tps-3994-3956.png" align="center" width="500" />
+<img src="https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png" align="center" width="600" />
 
 ## 实现与优化
 

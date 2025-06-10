@@ -75,7 +75,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 ## 为什么选择 Data-Juicer？
 
-<img src="https://img.alicdn.com/imgextra/i4/O1CN015URK6i21KU3XdkUpK_!!6000000006966-2-tps-3994-3956.png" align="center" width="500" />
+<img src="https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png" align="center" width="600" />
 
 - **系统化和可重用**：
 系统化地为用户提供 100 多个核心 [算子](docs/Operators.md) 和 50 多个可重用的数据菜谱和

@@ -76,7 +76,7 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 
 ## Why Data-Juicer?
 
-<img src="https://img.alicdn.com/imgextra/i4/O1CN015URK6i21KU3XdkUpK_!!6000000006966-2-tps-3994-3956.png" align="center" width="500" />
+<img src="https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png" align="center" width="600" />
 
 - **Systematic & Reusable**:
   Empowering users with a systematic library of 100+ core [OPs](docs/Operators.md), and 50+ reusable config recipes and 
