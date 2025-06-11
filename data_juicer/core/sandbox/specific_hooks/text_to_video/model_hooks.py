@@ -72,7 +72,8 @@ class EasyAnimateTrainExecutor(BaseModelExecutor):
             config.tracker_config.project_name,
             config.tracker_config.experiment_name
         ]
-        cmd = f'cd {self.easyanimate_home} && bash {self.script_path} {" ".join([str(arg) for arg in run_args])}'
+        str_run_args = [f'"{str(arg)}"' for arg in run_args]
+        cmd = f'cd {self.easyanimate_home} && bash {self.script_path} {" ".join(str_run_args)}'
         self.env.run_cmd(cmd)
         return os.path.abspath(config.saving_config.output_dir)
 
@@ -128,7 +129,8 @@ class EasyAnimateInferExecutor(BaseModelExecutor):
             config.infer_config.video_num_per_prompt, config.infer_config.seed,
             config.saving_config.output_video_dir
         ]
-        cmd = f'cd {self.easyanimate_home} && bash {self.script_path} {" ".join([str(arg) for arg in run_args])}'
+        str_run_args = [f'"{str(arg)}"' for arg in run_args]
+        cmd = f'cd {self.easyanimate_home} && bash {self.script_path} {" ".join(str_run_args)}'
         self.env.run_cmd(cmd)
         return os.path.abspath(config.saving_config.output_video_dir)
 
