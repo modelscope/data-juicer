@@ -69,7 +69,7 @@ class CondaEnv(Env):
         self.env_manager = env_manager
         self.env_config_path = env_config_path
         self.env_name = env_name
-        self.env_py_version = env_py_version
+        self.env_py_version = env_py_version or '3.10'
 
         self.check_availability()
 
@@ -101,8 +101,7 @@ class CondaEnv(Env):
             cmd = f'{self.env_manager} env create -f {self.env_config_path}'
         elif self.env_name is not None:
             cmd = f'{self.env_manager} create -n {self.env_name} -y'
-            if self.env_py_version is not None:
-                cmd += f' python={self.env_py_version}'
+            cmd += f' python={self.env_py_version}'
         else:
             raise ValueError(
                 'Either env_config_path or env_name must be specified.')
