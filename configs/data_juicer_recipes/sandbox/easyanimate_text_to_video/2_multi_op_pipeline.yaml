@@ -34,7 +34,7 @@ execution_job_configs:
     dj_configs:
       project_name: 'demo-bench'
       dataset_path: './outputs/demo-bench/demo-dataset-with-multi-op-stats.jsonl'
-      export_path: './outputs/demo-bench/demo-dataset-for-train.jsonl'
+      export_path: './outputs/demo-bench/demo-dataset-for-train.json'
       process:
         - random_selector:
             select_num: 16
