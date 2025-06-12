@@ -23,6 +23,15 @@ logger.add(sys.stderr, level='INFO')
 def _cuda_device_count():
     _torch_available = _is_package_available('torch')
 
+    # TODO: optimize executor_type == 'ray'
+    is_ray_enabled = False
+
+    if is_ray_enabled:
+        import ray
+        available_resources = ray.available_resources()
+        available_gpu = available_resources.get('GPU', 0)
+        return available_gpu
+
     if _torch_available:
         return torch.cuda.device_count()
 
