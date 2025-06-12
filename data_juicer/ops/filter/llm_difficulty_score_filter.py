@@ -100,6 +100,7 @@ json
         :param api_or_hf_model: API or huggingface model name.
         :param min_score: The lowest difficulty score threshold to keep
             the sample.
+        :param is_hf_model: Indicates if the model is from Hugging Face.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
