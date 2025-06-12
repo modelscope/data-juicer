@@ -365,6 +365,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_files_with_suffix</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecialTokens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Registry</span>
 
 <span class="n">FORMATTERS</span> <span class="o">=</span> <span class="n">Registry</span><span class="p">(</span><span class="s1">&#39;Formatters&#39;</span><span class="p">)</span>
@@ -604,10 +605,18 @@
 
     <span class="c1"># 3. convert relative paths to absolute paths</span>
     <span class="k">if</span> <span class="n">global_cfg</span><span class="p">:</span>
-        <span class="n">ds_dir</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dataset_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="n">image_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">image_key</span>
-        <span class="n">audio_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">audio_key</span>
-        <span class="n">video_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">video_key</span>
+        <span class="c1"># check and get dataset dir</span>
+        <span class="k">if</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dataset_path&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
+                <span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
+                <span class="n">ds_dir</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ds_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ds_dir</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">image_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;image_key&#39;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">audio_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;audio_key&#39;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">audio</span><span class="p">)</span>
+        <span class="n">video_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;video_key&#39;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="p">)</span>
 
         <span class="n">data_path_keys</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">image_key</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>

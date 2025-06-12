@@ -691,7 +691,14 @@
         <span class="n">text_keys</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">,</span> <span class="s1">&#39;text_keys&#39;</span><span class="p">,</span>
                             <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>  <span class="c1"># Default to [&#39;text&#39;]</span>
         <span class="n">suffixes</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">,</span> <span class="s1">&#39;suffixes&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># Default to None</span>
-        <span class="n">add_suffix</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">,</span> <span class="s1">&#39;add_suffix&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>  <span class="c1"># Default to False</span>
+        <span class="c1"># if there is suffix_filter op, turn on the add_suffix flag</span>
+        <span class="n">add_suffix</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">process_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;process&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">process_list</span><span class="p">:</span>
+            <span class="n">op_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">op_name</span> <span class="o">==</span> <span class="s1">&#39;suffix_filter&#39;</span><span class="p">:</span>
+                <span class="n">add_suffix</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
         <span class="n">load_data_np</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_proc&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># use proper formatter to load data</span>

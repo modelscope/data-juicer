@@ -373,7 +373,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.config.config.init_configs">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">init_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">which_entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#init_configs"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.config.config.init_configs" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">init_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">which_entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_configs_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#init_configs"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.config.config.init_configs" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>initialize the jsonargparse parser and parse configs from one of:</dt><dd><ol class="arabic simple">
 <li><p>POSIX-style commands line args;</p></li>
@@ -388,6 +388,8 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>args</strong> -- list of params, e.g., ['--config', 'cfg.yaml'], default None.</p></li>
 <li><p><strong>which_entry</strong> -- which entry to init configs (executor/analyzer)</p></li>
+<li><p><strong>load_configs_only</strong> -- whether to load the configs only, not including backing up config files, display them, and
+setting up logger.</p></li>
 </ul>
 </dd>
 <dt class="field-even">返回<span class="colon">:</span></dt>
@@ -403,7 +405,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.config.config.init_setup_from_cfg">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">init_setup_from_cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#init_setup_from_cfg"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.config.config.init_setup_from_cfg" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">init_setup_from_cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_configs_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#init_setup_from_cfg"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.config.config.init_setup_from_cfg" title="Link to this definition">¶</a></dt>
 <dd><p>Do some extra setup tasks after parsing config file or command line.</p>
 <ol class="arabic simple">
 <li><p>create working directory and a log directory</p></li>
@@ -548,12 +550,17 @@ yaml, yml or json format</p>
 <dd><p>Get default config values from config_all.yaml</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.prepare_cfgs_for_export">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">prepare_cfgs_for_export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#prepare_cfgs_for_export"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.config.config.prepare_cfgs_for_export" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-data_juicer.config">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-data_juicer.config" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.config.init_configs">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.config.</span></span><span class="sig-name descname"><span class="pre">init_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">which_entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#init_configs"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.config.init_configs" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.</span></span><span class="sig-name descname"><span class="pre">init_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">which_entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_configs_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#init_configs"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.config.init_configs" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>initialize the jsonargparse parser and parse configs from one of:</dt><dd><ol class="arabic simple">
 <li><p>POSIX-style commands line args;</p></li>
@@ -568,6 +575,8 @@ yaml, yml or json format</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>args</strong> -- list of params, e.g., ['--config', 'cfg.yaml'], default None.</p></li>
 <li><p><strong>which_entry</strong> -- which entry to init configs (executor/analyzer)</p></li>
+<li><p><strong>load_configs_only</strong> -- whether to load the configs only, not including backing up config files, display them, and
+setting up logger.</p></li>
 </ul>
 </dd>
 <dt class="field-even">返回<span class="colon">:</span></dt>
@@ -648,6 +657,11 @@ yaml, yml or json format</p>
 <dd><p>Get default config values from config_all.yaml</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.prepare_cfgs_for_export">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.</span></span><span class="sig-name descname"><span class="pre">prepare_cfgs_for_export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#prepare_cfgs_for_export"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.config.prepare_cfgs_for_export" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 </section>
 
@@ -725,6 +739,7 @@ yaml, yml or json format</p>
 <li><a class="reference internal" href="#data_juicer.config.config.prepare_side_configs"><code class="docutils literal notranslate"><span class="pre">prepare_side_configs()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.config.config.get_init_configs"><code class="docutils literal notranslate"><span class="pre">get_init_configs()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.config.config.get_default_cfg"><code class="docutils literal notranslate"><span class="pre">get_default_cfg()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.config.config.prepare_cfgs_for_export"><code class="docutils literal notranslate"><span class="pre">prepare_cfgs_for_export()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-data_juicer.config">Module contents</a><ul>
@@ -734,6 +749,7 @@ yaml, yml or json format</p>
 <li><a class="reference internal" href="#data_juicer.config.merge_config"><code class="docutils literal notranslate"><span class="pre">merge_config()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.config.prepare_side_configs"><code class="docutils literal notranslate"><span class="pre">prepare_side_configs()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.config.get_default_cfg"><code class="docutils literal notranslate"><span class="pre">get_default_cfg()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.config.prepare_cfgs_for_export"><code class="docutils literal notranslate"><span class="pre">prepare_cfgs_for_export()</span></code></a></li>
 </ul>
 </li>
 </ul>

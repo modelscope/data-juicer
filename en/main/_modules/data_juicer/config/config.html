@@ -397,7 +397,9 @@
 
 <div class="viewcode-block" id="init_configs">
 <a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.init_configs">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">init_configs</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">which_entry</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">init_configs</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">which_entry</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">load_configs_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    initialize the jsonargparse parser and parse configs from one of:</span>
 <span class="sd">        1. POSIX-style commands line args;</span>
@@ -407,6 +409,8 @@
 
 <span class="sd">    :param args: list of params, e.g., [&#39;--config&#39;, &#39;cfg.yaml&#39;], default None.</span>
 <span class="sd">    :param which_entry: which entry to init configs (executor/analyzer)</span>
+<span class="sd">    :param load_configs_only: whether to load the configs only, not including backing up config files, display them, and</span>
+<span class="sd">        setting up logger.</span>
 <span class="sd">    :return: a global cfg object used by the DefaultExecutor or Analyzer</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -509,6 +513,14 @@
                 <span class="n">help</span><span class="o">=</span>  <span class="c1"># noqa: E251</span>
                 <span class="s1">&#39;List of validators to apply to the dataset. Each validator &#39;</span>
                 <span class="s1">&#39;must have a `type` field specifying the validator type.&#39;</span><span class="p">)</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+                <span class="s1">&#39;--work_dir&#39;</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">help</span><span class="o">=</span>  <span class="c1"># noqa: E251</span>
+                <span class="s1">&#39;Path to a work directory to store outputs during Data-Juicer &#39;</span>
+                <span class="s1">&#39;running. It</span><span class="se">\&#39;</span><span class="s1">s the directory where export_path is at in default.&#39;</span>
+            <span class="p">)</span>
             <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
                 <span class="s1">&#39;--export_path&#39;</span><span class="p">,</span>
                 <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
@@ -823,7 +835,7 @@
             <span class="c1"># Now add remaining arguments based on essential config</span>
             <span class="k">if</span> <span class="n">essential_cfg</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
                 <span class="c1"># Load config file to determine which operators are used</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">essential_cfg</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">absolute</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">essential_cfg</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">config_data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
                     <span class="n">used_ops</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
                     <span class="k">if</span> <span class="s1">&#39;process&#39;</span> <span class="ow">in</span> <span class="n">config_data</span><span class="p">:</span>
@@ -852,16 +864,18 @@
                     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="n">timing_context</span><span class="p">(</span><span class="s1">&#39;Initializing setup from config&#39;</span><span class="p">):</span>
-            <span class="n">cfg</span> <span class="o">=</span> <span class="n">init_setup_from_cfg</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+            <span class="n">cfg</span> <span class="o">=</span> <span class="n">init_setup_from_cfg</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">load_configs_only</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="n">timing_context</span><span class="p">(</span><span class="s1">&#39;Updating operator process&#39;</span><span class="p">):</span>
             <span class="n">cfg</span> <span class="o">=</span> <span class="n">update_op_process</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">used_ops</span><span class="p">)</span>
 
         <span class="c1"># copy the config file into the work directory</span>
-        <span class="n">config_backup</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">load_configs_only</span><span class="p">:</span>
+            <span class="n">config_backup</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 
         <span class="c1"># show the final config tables before the process started</span>
-        <span class="n">display_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">load_configs_only</span><span class="p">:</span>
+            <span class="n">display_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 
         <span class="k">global</span> <span class="n">global_cfg</span><span class="p">,</span> <span class="n">global_parser</span>
         <span class="n">global_cfg</span> <span class="o">=</span> <span class="n">cfg</span>
@@ -899,7 +913,7 @@
 
 <div class="viewcode-block" id="init_setup_from_cfg">
 <a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.init_setup_from_cfg">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">init_setup_from_cfg</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">init_setup_from_cfg</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">load_configs_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Do some extra setup tasks after parsing config file or command line.</span>
 
@@ -912,38 +926,32 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">cfg</span><span class="o">.</span><span class="n">export_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">export_path</span><span class="p">)</span>
-    <span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">export_path</span><span class="p">)</span>
-    <span class="n">export_rel_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">export_path</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">)</span>
-    <span class="n">log_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">log_dir</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">log_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">export_path</span><span class="p">)</span>
     <span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">%H%M%S&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span>
-    <span class="n">cfg</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">timestamp</span>
-    <span class="n">logfile_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;export_</span><span class="si">{</span><span class="n">export_rel_path</span><span class="si">}</span><span class="s1">_time_</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s1">.txt&#39;</span>
-    <span class="n">setup_logger</span><span class="p">(</span><span class="n">save_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
-                 <span class="n">filename</span><span class="o">=</span><span class="n">logfile_name</span><span class="p">,</span>
-                 <span class="n">level</span><span class="o">=</span><span class="s1">&#39;DEBUG&#39;</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="s1">&#39;INFO&#39;</span><span class="p">,</span>
-                 <span class="n">redirect</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">executor_type</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">load_configs_only</span><span class="p">:</span>
+        <span class="n">export_rel_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">export_path</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">)</span>
+        <span class="n">log_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">log_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">log_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">logfile_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;export_</span><span class="si">{</span><span class="n">export_rel_path</span><span class="si">}</span><span class="s1">_time_</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s1">.txt&#39;</span>
+        <span class="n">setup_logger</span><span class="p">(</span><span class="n">save_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
+                     <span class="n">filename</span><span class="o">=</span><span class="n">logfile_name</span><span class="p">,</span>
+                     <span class="n">level</span><span class="o">=</span><span class="s1">&#39;DEBUG&#39;</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="s1">&#39;INFO&#39;</span><span class="p">,</span>
+                     <span class="n">redirect</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">executor_type</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
 
     <span class="c1"># check and get dataset dir</span>
     <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dataset_path&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;dataset_path config is set and a valid local path&#39;</span><span class="p">)</span>
         <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
-            <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_dir</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dataset&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;dataset_path config is empty; dataset is present&#39;</span><span class="p">)</span>
-        <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_dir</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;dataset_path [</span><span class="si">{</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="si">}</span><span class="s1">] is not a valid &#39;</span>
                        <span class="sa">f</span><span class="s1">&#39;local path, AND dataset is not present. &#39;</span>
                        <span class="sa">f</span><span class="s1">&#39;Please check and retry, otherwise we &#39;</span>
                        <span class="sa">f</span><span class="s1">&#39;will treat dataset_path as a remote dataset or a &#39;</span>
                        <span class="sa">f</span><span class="s1">&#39;mixture of several datasets.&#39;</span><span class="p">)</span>
-
-        <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_dir</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
     <span class="c1"># check number of processes np</span>
     <span class="n">sys_cpu_count</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
@@ -1002,14 +1010,6 @@
         <span class="n">update_ds_cache_dir_and_related_vars</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">ds_cache_dir</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">cfg</span><span class="o">.</span><span class="n">ds_cache_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">HF_DATASETS_CACHE</span><span class="p">)</span>
-
-    <span class="c1"># if there is suffix_filter op, turn on the add_suffix flag</span>
-    <span class="n">cfg</span><span class="o">.</span><span class="n">add_suffix</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">:</span>
-        <span class="n">op_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">op_name</span> <span class="o">==</span> <span class="s1">&#39;suffix_filter&#39;</span><span class="p">:</span>
-            <span class="n">cfg</span><span class="o">.</span><span class="n">add_suffix</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">break</span>
 
     <span class="c1"># update special tokens</span>
     <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">image_special_token</span>
@@ -1221,7 +1221,7 @@
                                       <span class="n">excludes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">])</span>
 
     <span class="k">if</span> <span class="n">temp_cfg</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
-        <span class="n">temp_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--config&#39;</span><span class="p">,</span> <span class="n">temp_cfg</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">absolute</span><span class="p">])</span>
+        <span class="n">temp_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--config&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">temp_cfg</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">temp_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--auto&#39;</span><span class="p">)</span>
 
@@ -1248,8 +1248,7 @@
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">excludes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">concat_key</span> <span class="ow">in</span> <span class="n">excludes</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">arg_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;--</span><span class="si">{</span><span class="n">concat_key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">arg_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">arg_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;--</span><span class="si">{</span><span class="n">concat_key</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">arg_list</span></div>
 
@@ -1260,7 +1259,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">config_backup</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
         <span class="k">return</span>
-    <span class="n">cfg_path</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">absolute</span>
+    <span class="n">cfg_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">work_dir</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span>
     <span class="n">target_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">))</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Back up the input config file [</span><span class="si">{</span><span class="n">cfg_path</span><span class="si">}</span><span class="s1">] into the &#39;</span>
@@ -1318,8 +1317,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># remove ops outside the process list for better displaying</span>
     <span class="n">cfg_to_export</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">OPERATORS</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">_</span> <span class="o">=</span> <span class="n">cfg_to_export</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+    <span class="n">cfg_to_export</span> <span class="o">=</span> <span class="n">prepare_cfgs_for_export</span><span class="p">(</span><span class="n">cfg_to_export</span><span class="p">)</span>
 
     <span class="k">global</span> <span class="n">global_parser</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">global_parser</span><span class="p">:</span>
@@ -1444,10 +1442,11 @@
     <span class="n">temp_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="s1">&#39;job_dj_config.json&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">Namespace</span><span class="p">):</span>
         <span class="n">cfg</span> <span class="o">=</span> <span class="n">namespace_to_dict</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
-    <span class="c1"># create an temp config file</span>
+    <span class="c1"># create a temp config file</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-    <span class="n">inited_dj_cfg</span> <span class="o">=</span> <span class="n">init_configs</span><span class="p">([</span><span class="s1">&#39;--config&#39;</span><span class="p">,</span> <span class="n">temp_file</span><span class="p">])</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">prepare_cfgs_for_export</span><span class="p">(</span><span class="n">cfg</span><span class="p">),</span> <span class="n">f</span><span class="p">)</span>
+    <span class="n">inited_dj_cfg</span> <span class="o">=</span> <span class="n">init_configs</span><span class="p">([</span><span class="s1">&#39;--config&#39;</span><span class="p">,</span> <span class="n">temp_file</span><span class="p">],</span>
+                                 <span class="n">load_configs_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">inited_dj_cfg</span></div>
 
 
@@ -1478,6 +1477,20 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
+    <span class="k">return</span> <span class="n">cfg</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_cfgs_for_export">
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.prepare_cfgs_for_export">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_cfgs_for_export</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="c1"># 1. convert Path to str</span>
+    <span class="k">if</span> <span class="s1">&#39;config&#39;</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">:</span>
+        <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]]</span>
+    <span class="c1"># 2. remove level-1 op cfgs outside the process list</span>
+    <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">OPERATORS</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">:</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cfg</span></div>
 
 </pre></div>

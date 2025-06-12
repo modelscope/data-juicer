@@ -808,6 +808,29 @@ them, e.g. <cite>&lt;w1&gt; ds1.jsonl &lt;w2&gt; ds2_dir &lt;w3&gt; ds3_file.jso
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.DJDataset.to_list">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/data_juicer/core/data/dj_dataset.html#DJDataset.to_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.DJDataset.to_list" title="Link to this definition">¶</a></dt>
+<dd><p>Convert the current dataset to a Python list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.DJDataset.contain_column">
+<span class="sig-name descname"><span class="pre">contain_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/data_juicer/core/data/dj_dataset.html#DJDataset.contain_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.DJDataset.contain_column" title="Link to this definition">¶</a></dt>
+<dd><p>Check whether the dataset contains a specific column/field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>column</strong> – Name of the column to check</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the dataset contains the column, False otherwise</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py function">
@@ -945,6 +968,21 @@ such that the processed samples can be accessed by nested manner.</p>
 <span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.select" title="Link to this definition">¶</a></dt>
 <dd><p>Override the select func, such that selected samples can be accessed
 by nested manner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.to_list">
+<span class="sig-name descname"><span class="pre">to_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.to_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.to_list" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the dataset as a Python list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>list</cite></p>
+</dd>
+</dl>
+<p>Example:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`py</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">ds.to_list()</span>
+<span class="pre">`</span></code></p>
 </dd></dl>
 
 <dl class="py method">
@@ -1394,6 +1432,12 @@ Checks dataset_dir and project_dir for valid paths.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#data_juicer.core.data.ray_dataset.RayDataset" title="data_juicer.core.data.ray_dataset.RayDataset"><span class="pre">RayDataset</span></a></span></span><a class="reference internal" href="_modules/data_juicer/core/data/ray_dataset.html#RayDataset.read_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.ray_dataset.RayDataset.read_json" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.ray_dataset.RayDataset.to_list">
+<span class="sig-name descname"><span class="pre">to_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/data_juicer/core/data/ray_dataset.html#RayDataset.to_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.ray_dataset.RayDataset.to_list" title="Link to this definition">¶</a></dt>
+<dd><p>Convert the current dataset to a Python list.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -1453,6 +1497,16 @@ Checks dataset_dir and project_dir for valid paths.</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.schema.Schema.from_hf_features">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_hf_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Features</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data/schema.html#Schema.from_hf_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.schema.Schema.from_hf_features" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.schema.Schema.from_ray_schema">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_ray_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data/schema.html#Schema.from_ray_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.schema.Schema.from_ray_schema" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.data.schema.Schema.map_hf_type_to_python">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">map_hf_type_to_python</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data/schema.html#Schema.map_hf_type_to_python"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.schema.Schema.map_hf_type_to_python" title="Link to this definition">¶</a></dt>
 <dd><p>Map HuggingFace feature type to Python type.</p>
@@ -1473,7 +1527,7 @@ Dict({‘text’: Value(‘string’)}) -&gt; Dict[str, Any]</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.data.schema.Schema.map_ray_type_to_python">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">map_ray_type_to_python</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ray_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataType</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span></span></span><a class="reference internal" href="_modules/data_juicer/core/data/schema.html#Schema.map_ray_type_to_python"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.schema.Schema.map_ray_type_to_python" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">map_ray_type_to_python</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ray_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataType</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data/schema.html#Schema.map_ray_type_to_python"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.schema.Schema.map_ray_type_to_python" title="Link to this definition">¶</a></dt>
 <dd><p>Map Ray/Arrow data type to Python type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1560,6 +1614,29 @@ Dict({‘text’: Value(‘string’)}) -&gt; Dict[str, Any]</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.DJDataset.to_list">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/data_juicer/core/data/dj_dataset.html#DJDataset.to_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.DJDataset.to_list" title="Link to this definition">¶</a></dt>
+<dd><p>Convert the current dataset to a Python list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.DJDataset.contain_column">
+<span class="sig-name descname"><span class="pre">contain_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/data_juicer/core/data/dj_dataset.html#DJDataset.contain_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.DJDataset.contain_column" title="Link to this definition">¶</a></dt>
+<dd><p>Check whether the dataset contains a specific column/field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>column</strong> – Name of the column to check</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the dataset contains the column, False otherwise</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -1637,6 +1714,21 @@ such that the processed samples can be accessed by nested manner.</p>
 <span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.NestedDataset.select" title="Link to this definition">¶</a></dt>
 <dd><p>Override the select func, such that selected samples can be accessed
 by nested manner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.NestedDataset.to_list">
+<span class="sig-name descname"><span class="pre">to_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.to_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.NestedDataset.to_list" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the dataset as a Python list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>list</cite></p>
+</dd>
+</dl>
+<p>Example:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`py</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">ds.to_list()</span>
+<span class="pre">`</span></code></p>
 </dd></dl>
 
 <dl class="py method">
@@ -1863,6 +1955,8 @@ function in parallel instead of using add_column.
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset.schema"><code class="docutils literal notranslate"><span class="pre">DJDataset.schema()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset.get"><code class="docutils literal notranslate"><span class="pre">DJDataset.get()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset.get_column"><code class="docutils literal notranslate"><span class="pre">DJDataset.get_column()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset.to_list"><code class="docutils literal notranslate"><span class="pre">DJDataset.to_list()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset.contain_column"><code class="docutils literal notranslate"><span class="pre">DJDataset.contain_column()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.wrap_func_with_nested_access"><code class="docutils literal notranslate"><span class="pre">wrap_func_with_nested_access()</span></code></a></li>
@@ -1886,6 +1980,7 @@ function in parallel instead of using add_column.
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.map"><code class="docutils literal notranslate"><span class="pre">NestedDataset.map()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.filter"><code class="docutils literal notranslate"><span class="pre">NestedDataset.filter()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.select"><code class="docutils literal notranslate"><span class="pre">NestedDataset.select()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.to_list"><code class="docutils literal notranslate"><span class="pre">NestedDataset.to_list()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.from_dict"><code class="docutils literal notranslate"><span class="pre">NestedDataset.from_dict()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.add_column"><code class="docutils literal notranslate"><span class="pre">NestedDataset.add_column()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.select_columns"><code class="docutils literal notranslate"><span class="pre">NestedDataset.select_columns()</span></code></a></li>
@@ -1980,6 +2075,7 @@ function in parallel instead of using add_column.
 <li><a class="reference internal" href="#data_juicer.core.data.ray_dataset.RayDataset.get_column"><code class="docutils literal notranslate"><span class="pre">RayDataset.get_column()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.ray_dataset.RayDataset.process"><code class="docutils literal notranslate"><span class="pre">RayDataset.process()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.ray_dataset.RayDataset.read_json"><code class="docutils literal notranslate"><span class="pre">RayDataset.read_json()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.ray_dataset.RayDataset.to_list"><code class="docutils literal notranslate"><span class="pre">RayDataset.to_list()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#data_juicer.core.data.ray_dataset.JSONStreamDatasource"><code class="docutils literal notranslate"><span class="pre">JSONStreamDatasource</span></code></a></li>
@@ -1992,6 +2088,8 @@ function in parallel instead of using add_column.
 <li><a class="reference internal" href="#data_juicer.core.data.schema.Schema.columns"><code class="docutils literal notranslate"><span class="pre">Schema.columns</span></code></a></li>
 <li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Schema.column_types</span></code></a></li>
 <li><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">Schema.columns</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.schema.Schema.from_hf_features"><code class="docutils literal notranslate"><span class="pre">Schema.from_hf_features()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.schema.Schema.from_ray_schema"><code class="docutils literal notranslate"><span class="pre">Schema.from_ray_schema()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.schema.Schema.map_hf_type_to_python"><code class="docutils literal notranslate"><span class="pre">Schema.map_hf_type_to_python()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.schema.Schema.map_ray_type_to_python"><code class="docutils literal notranslate"><span class="pre">Schema.map_ray_type_to_python()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.schema.Schema.__init__"><code class="docutils literal notranslate"><span class="pre">Schema.__init__()</span></code></a></li>
@@ -2005,6 +2103,8 @@ function in parallel instead of using add_column.
 <li><a class="reference internal" href="#data_juicer.core.data.DJDataset.schema"><code class="docutils literal notranslate"><span class="pre">DJDataset.schema()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.DJDataset.get"><code class="docutils literal notranslate"><span class="pre">DJDataset.get()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.DJDataset.get_column"><code class="docutils literal notranslate"><span class="pre">DJDataset.get_column()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.DJDataset.to_list"><code class="docutils literal notranslate"><span class="pre">DJDataset.to_list()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.DJDataset.contain_column"><code class="docutils literal notranslate"><span class="pre">DJDataset.contain_column()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#data_juicer.core.data.NestedDataset"><code class="docutils literal notranslate"><span class="pre">NestedDataset</span></code></a><ul>
@@ -2017,6 +2117,7 @@ function in parallel instead of using add_column.
 <li><a class="reference internal" href="#data_juicer.core.data.NestedDataset.map"><code class="docutils literal notranslate"><span class="pre">NestedDataset.map()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.NestedDataset.filter"><code class="docutils literal notranslate"><span class="pre">NestedDataset.filter()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.NestedDataset.select"><code class="docutils literal notranslate"><span class="pre">NestedDataset.select()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.NestedDataset.to_list"><code class="docutils literal notranslate"><span class="pre">NestedDataset.to_list()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.NestedDataset.from_dict"><code class="docutils literal notranslate"><span class="pre">NestedDataset.from_dict()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.NestedDataset.add_column"><code class="docutils literal notranslate"><span class="pre">NestedDataset.add_column()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.NestedDataset.select_columns"><code class="docutils literal notranslate"><span class="pre">NestedDataset.select_columns()</span></code></a></li>

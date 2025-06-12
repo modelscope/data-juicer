@@ -367,11 +367,17 @@
 <h1>沙盒实验室<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
 <section id="id2">
 <h2>用户指南<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="dj-sandbox">
+<h3>什么是沙盒实验室（DJ-Sandbox）？<a class="headerlink" href="#dj-sandbox" title="Link to this heading">¶</a></h3>
+<p>Data-Juicer 中的 DJ-Sandbox 是一个连接数据和模型反馈的中间件，能够在各种任务中实现高性能和低成本的验证。它旨在为用户提供持续增强数据模型方案的最佳实践，具有低开销、可移植性和指导性等特点。在沙盒中，用户可以基于小规模数据集和模型快速实验、迭代和优化方案，然后迁移到更大尺度上，以生成高质量数据，服务于大规模模型。</p>
+<p>除了 Data-Juicer 提供的基本数据优化和方案优化功能外，用户还可以无缝使用可配置组件，例如数据探测和分析、模型训练和评估以及基于数据和模型反馈的方案优化，从而形成数据模型研发的最佳流水线。</p>
+<p>更多详细信息，请参阅我们的<a class="reference external" href="http://arxiv.org/abs/2407.11784">论文</a>（ICML'25 Spotlight）。</p>
+</section>
 <section id="id3">
-<h3>应用和成果<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
-<p>我们利用Data-Juicer沙盒实验室套件，通过数据与模型间的系统性研发工作流，调优数据和模型，相关工作请参考<a class="reference external" href="http://arxiv.org/abs/2407.11784">论文</a>。在本工作中，我们在<a class="reference external" href="https://huggingface.co/spaces/Vchitect/VBench_Leaderboard">VBench</a>文生视频排行榜取得了新的榜首。
+<h3>应用<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<p>我们将沙盒应用于到了众多前沿模型，例如 Mini-Gemini 和 InternVL-2.0（两个受 LLaVA 启发的图像转文本生成模型），EasyAnimate 和 T2V-Turbo（两个基于 Diffusion Transformer 的文本转视频生成模型），以及一个用于图文预训练的 CLIP 模型。在此之上，我们曾在<a class="reference external" href="https://huggingface.co/spaces/Vchitect/VBench_Leaderboard">VBench</a>文生视频排行榜取得了新的榜一。
 <img alt="top-1_in_vbench" src="https://img.alicdn.com/imgextra/i1/O1CN01I9wHW91UNnX9wtCWu_!!6000000002506-2-tps-1275-668.png" /></p>
-<p>模型已在ModelScope和HuggingFace平台发布，训练模型的数据集也已开源。</p>
+<p>相关模型已在ModelScope和HuggingFace平台发布，训练模型的数据集也已开源。</p>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -386,7 +392,7 @@
 <td><p>对应榜单中 Data-Juicer (T2V-Turbo) 模型</p></td>
 </tr>
 <tr class="row-odd"><td><p>Data-Juicer (DJ, 228k)</p></td>
-<td><p><a class="reference external" href="https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V">ModelScope</a> <br> <a class="reference external" href="https://huggingface.co/datajuicer/Data-Juicer-T2V">HuggingFace</a></p></td>
+<td><p><a class="reference external" href="https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V-v2">ModelScope</a> <br> <a class="reference external" href="https://huggingface.co/datajuicer/Data-Juicer-T2V-v2">HuggingFace</a></p></td>
 <td><p>对应榜单中 Data-Juicer (2024-09-23, T2V-Turbo) 模型</p></td>
 </tr>
 <tr class="row-even"><td><p>data_juicer_t2v_optimal_data_pool</p></td>
@@ -430,26 +436,20 @@
 </tbody>
 </table>
 </div>
-<p>复现论文实验请参考下面的sandbox使用指南，下图的实验流程，<a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip">初始数据集</a>，以及该流程的工作流的配置文件demo：<a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/demo/bench/1_single_op_pipeline.yaml">1_single_op_pipeline.yaml</a>、<a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/demo/bench/2_multi_op_pipeline.yaml">2_multi_op_pipeline.yaml</a>、<a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/demo/bench/3_duplicate_pipeline.yaml">3_duplicate_pipeline.yaml</a>。
+<p>复现论文实验请参考下面的sandbox使用指南，下图的实验流程，<a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip">初始数据集</a>，以及该流程的工作流的配置文件demo： <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/1_single_op_pipeline.yaml">1_single_op_pipeline.yaml</a> 、<a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/2_multi_op_pipeline.yaml">2_multi_op_pipeline.yaml</a>、<a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/3_duplicate_pipeline.yaml">3_duplicate_pipeline.yaml</a>。
 <img alt="bench_bottom_up" src="https://img.alicdn.com/imgextra/i2/O1CN01xvu2fo1HU80biR6Q5_!!6000000000760-2-tps-7756-3693.png" /></p>
-</section>
-<section id="dj-sandbox">
-<h3>什么是沙盒实验室（DJ-Sandbox）？<a class="headerlink" href="#dj-sandbox" title="Link to this heading">¶</a></h3>
-<p>在Data-Juicer中，数据沙盒实验室为用户提供了持续生产数据菜谱的最佳实践，其具有低开销、可迁移、有指导性等特点，用户在沙盒中基于一些小规模数据集、模型对数据菜谱进行快速实验、迭代、优化，再迁移到更大尺度上，大规模生产高质量数据以服务大模型。</p>
-<p>用户在沙盒中，除了Data-Juicer基础的数据优化与数据菜谱微调功能外，还可以便捷地使用数据洞察与分析、沙盒模型训练与评测、基于数据和模型反馈优化数据菜谱等可配置组件，共同组成完整的一站式数据-模型研发流水线。</p>
 </section>
 <section id="id4">
 <h3>快速上手<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
 <section id="id5">
 <h4>依赖准备<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h4>
-<p>在使用沙盒实验室前，你可能需要使用如下命令安装沙盒相关的第三方依赖：</p>
+<p>在使用沙盒实验室前，你可能需要使用如下命令安装沙盒相关的依赖：</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>sandbox<span class="o">]</span>
 </pre></div>
 </div>
+<p>并根据官方说明准备好沙盒中使用的第三方库（例如 EasyAnimate 、 VBench 、 InternVL 等），或者您也可以简单地从 GitHub 克隆第三方存储库，并在沙盒运行期间将安装过程留给我们的 <code class="docutils literal notranslate"><span class="pre">EnvManager</span></code> 完成。</p>
 <p><strong>注意</strong>：一些沙盒的依赖还需要额外的领域依赖。</p>
 <ol class="arabic simple">
-<li><p>如果用户想要在沙盒中训练一个 ModelScope 平台的NLP模型，那可能需要为 <code class="docutils literal notranslate"><span class="pre">modelscope</span></code> 库
-安装额外的 <code class="docutils literal notranslate"><span class="pre">nlp</span></code> 领域依赖（参考其<a class="reference external" href="https://modelscope.cn/docs/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85">安装文档</a> ）。</p></li>
 <li><p>要使用<a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a>时需要执行如下安装脚本：</p></li>
 </ol>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>thirdparty/models/
@@ -457,17 +457,11 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <span class="nb">cd</span><span class="w"> </span>../../
 </pre></div>
 </div>
-<ol class="arabic simple" start="3">
-<li><p>使用VBench测评视频时需要安装Detectron2，推荐安装如下分支。</p></li>
-</ol>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
-</pre></div>
-</div>
-<p>因此如果使用沙盒过程中，这些第三方依赖抛出了一些&quot;未找到模块（Module-Not-Found）&quot;的报错时，用户需要先检查这些库的文档以寻求帮助。</p>
+<p>如果使用沙盒过程中，这些第三方依赖抛出了一些&quot;未找到模块（Module-Not-Found）&quot;的报错时，用户需要先检查这些库的文档以寻求帮助。</p>
 </section>
 <section id="id6">
 <h4>准备沙盒配置文件<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h4>
-<p>沙河实验总共会依次执行四类任务：数据/模型洞察（<code class="docutils literal notranslate"><span class="pre">probe_job_configs</span></code>）、基于洞察结果的数据菜谱微调迭代（<code class="docutils literal notranslate"><span class="pre">refine_recipe_job_configs</span></code>）、数据处理与模型训练（<code class="docutils literal notranslate"><span class="pre">execution_job_configs</span></code>）和数据/模型评估（<code class="docutils literal notranslate"><span class="pre">evaluation_job_configs</span></code>）。每类任务中，任务按照配置的任务列表依次执行。每个任务需要指定：挂载这个任务的钩子（<code class="docutils literal notranslate"><span class="pre">hook</span></code>），记录中间结果的标记名(<code class="docutils literal notranslate"><span class="pre">meta_name</span></code>)，Data-Juicer数据处理参数（<code class="docutils literal notranslate"><span class="pre">dj_configs</span></code>），以及该任务其他的特定参数（<code class="docutils literal notranslate"><span class="pre">extra_configs</span></code>）。这些参数中<code class="docutils literal notranslate"><span class="pre">hook</span></code>是必须指定的，其他允许置空。<code class="docutils literal notranslate"><span class="pre">dj_configs</span></code>可以参考完整的Data-Juicer数据处理参数 <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml">config_all.yaml</a>。<code class="docutils literal notranslate"><span class="pre">extra_configs</span></code>为任务特定的参数，没有限定，可以是模型训练、推理、评测等参数，比如用<code class="docutils literal notranslate"><span class="pre">path_k_sigma_recipe</span></code>指定利用k-sigma方法微调后的数据菜谱保存路径。一个sandbox的配置文件示例可参考<code class="docutils literal notranslate"><span class="pre">configs/demo/sandbox/sandbox.yaml</span></code>：</p>
+<p>沙盒实验总共会依次执行四类任务：数据/模型洞察（<code class="docutils literal notranslate"><span class="pre">probe_job_configs</span></code>）、基于洞察结果的数据菜谱微调迭代（<code class="docutils literal notranslate"><span class="pre">refine_recipe_job_configs</span></code>）、数据处理与模型训练（<code class="docutils literal notranslate"><span class="pre">execution_job_configs</span></code>）和数据/模型评估（<code class="docutils literal notranslate"><span class="pre">evaluation_job_configs</span></code>）。每类任务中，任务按照配置的任务列表依次执行。每个任务需要指定：挂载这个任务的钩子（<code class="docutils literal notranslate"><span class="pre">hook</span></code>），用于识别钩子的标记名(<code class="docutils literal notranslate"><span class="pre">meta_name</span></code>)，Data-Juicer数据处理参数（<code class="docutils literal notranslate"><span class="pre">dj_configs</span></code>），以及该任务其他的特定参数（<code class="docutils literal notranslate"><span class="pre">extra_configs</span></code>）。这些参数中<code class="docutils literal notranslate"><span class="pre">hook</span></code>是必须指定的，其他允许置空。<code class="docutils literal notranslate"><span class="pre">dj_configs</span></code>可以参考完整的Data-Juicer数据处理参数 <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml">config_all.yaml</a>。<code class="docutils literal notranslate"><span class="pre">extra_configs</span></code>为任务特定的参数，没有限定，可以是模型训练、推理、评测等参数，比如用<code class="docutils literal notranslate"><span class="pre">path_k_sigma_recipe</span></code>指定利用k-sigma方法微调后的数据菜谱保存路径。一个sandbox的配置文件示例可参考<code class="docutils literal notranslate"><span class="pre">configs/demo/sandbox/sandbox.yaml</span></code>：</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sandbox config example</span>
 
 <span class="c1"># global parameters</span>
@@ -513,12 +507,42 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <p>根据这个配置文件，sandbox：</p>
 <ol class="arabic simple">
 <li><p>先执行Data-Juicer数据分析功能，计算每条数据的指定指标，比如<code class="docutils literal notranslate"><span class="pre">configs/demo/process.yaml</span></code>中，指定<code class="docutils literal notranslate"><span class="pre">language_id_score_filter</span></code>计算了语言分。</p></li>
-<li><p>利用Data-Juicer数据分析的结果，用k-sigma方法微调数据菜谱。注意这里需要设置<code class="docutils literal notranslate"><span class="pre">meta_name</span></code>与数据分析时的<code class="docutils literal notranslate"><span class="pre">meta_name</span></code>相同才能利用到分析结果。</p></li>
+<li><p>利用Data-Juicer数据分析的结果，用k-sigma方法微调数据菜谱。注意这里设置<code class="docutils literal notranslate"><span class="pre">meta_name</span></code>与数据分析时的<code class="docutils literal notranslate"><span class="pre">meta_name</span></code>相同才能利用到分析结果。</p></li>
 <li><p>用k-sigma方法微调后的菜谱执行Data-Juicer的数据筛选功能。</p></li>
 <li><p>用筛选后的数据训练模型。</p></li>
 <li><p>分析筛选后的数据。</p></li>
 <li><p>用打分器给筛选后的数据打分。</p></li>
 </ol>
+<p>如果您的配置文件中需要多个 pipeline ，您可以为每个管道命名，并将它们组织在 <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> 字段中：</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sandbox config example</span>
+
+<span class="c1"># global parameters</span>
+<span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;demo-sandbox&#39;</span>
+<span class="nt">experiment_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;demo-sandbox-run0&#39;</span><span class="w">              </span><span class="c1"># for wandb tracer name</span>
+<span class="nt">hpo_config</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">                                  </span><span class="c1"># path to a configuration file when using auto-HPO tool.</span>
+
+<span class="nt">pipelines</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pipeline_1</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">probe_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">  </span><span class="nt">pipeline_2</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">probe_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">    </span><span class="nt">refine_recipe_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">  </span><span class="nt">pipeline_3</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">probe_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">    </span><span class="nt">execution_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+</pre></div>
+</div>
+<p>在本例中，<code class="docutils literal notranslate"><span class="pre">pipelines</span></code> 字段包括 3 个 pipeline，分别名为 <code class="docutils literal notranslate"><span class="pre">pipeline_1</span></code>、<code class="docutils literal notranslate"><span class="pre">pipeline_2</span></code> 和 <code class="docutils literal notranslate"><span class="pre">pipeline_3</span></code>。它们各自都有不同类型的作业。您可以在 <code class="docutils literal notranslate"><span class="pre">configs/data_juicer_recipes/sandbox/internvl_coco_caption/sandbox_internvl_coco_caption.yaml</span></code> 中找到 InternVL 沙盒实验的此类配置文件的实际示例。</p>
+<p>对于单 pipeline 格式，这个唯一的 pipeline 会默认命名为 &quot;anonymous&quot;。</p>
+<blockquote>
+<div><p>[!Important]</p>
+<p>不包含 <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> 字段的单 pipeline 格式和包含 <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> 字段的多 pipeline 格式均受支持，但不能同时使用。</p>
+</div></blockquote>
 </section>
 <section id="id7">
 <h4>运行沙盒<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h4>
@@ -541,9 +565,12 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <h3>组件工厂<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
 <p>在沙盒流水线的单次运行中，包括了四个大的步骤，其中涉及到如下一些可配置组件，他们分别对应了一个用于初始化这些组件的工厂类：</p>
 <ul class="simple">
-<li><p><strong>数据处理（DataExecutor）</strong>：数据处理的执行器，即Data-Juicer的executor</p></li>
+<li><p><strong>数据处理（DataExecutor）</strong>：数据处理的执行器，即Data-Juicer的Executor</p></li>
+<li><p><strong>数据池操作（DataPoolManipulator）</strong>：数据池的操作，例如构建、组合</p></li>
+<li><p><strong>通用数据处理（GeneralDataExecutor）</strong>：数据集处理的通用执行器，例如数据集格式转换</p></li>
 <li><p><strong>数据分析（DataAnalyzer）</strong>：数据分析器，即Data-Juicer的analyzer</p></li>
 <li><p><strong>数据评估（DataEvaluator）</strong>：数据集质量的评估器</p></li>
+<li><p><strong>通用数据探测（GeneralProbe）</strong>：数据集的通用探测组件</p></li>
 <li><p><strong>模型数据评估（ModelInferEvaluator）</strong>：利用模型推理结果的数据集质量的评估器</p></li>
 <li><p><strong>模型训练（ModelTrainExecutor）</strong>：模型训练执行器</p></li>
 <li><p><strong>模型推理（ModelInferExecutor）</strong>：模型推理执行器</p></li>
@@ -568,6 +595,68 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <td><p>Data-Juicer数据处理模块</p></td>
 <td><p>-</p></td>
 <td><p>-</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>数据池操作工厂 -- DataPoolManipulatorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>组件</p></th>
+<th class="head"><p>功能</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">run</span></code>方法说明</p></th>
+<th class="head"><p>参考材料</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolConstruction</span></code></p></td>
+<td><p>从指定的已分析数据源构建数据池</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolCombination</span></code></p></td>
+<td><p>组合指定的数据池</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolDuplication</span></code></p></td>
+<td><p>按指定次数复制数据池</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolDownsampling</span></code></p></td>
+<td><p>将数据池随机下采样到指定规模</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>通用数据处理工厂 -- GeneralDataExecutorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>组件</p></th>
+<th class="head"><p>功能</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">run</span></code>方法说明</p></th>
+<th class="head"><p>参考材料</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">COCOCaptionToDJConversion</span></code></p></td>
+<td><p>将 InternVL COCO Caption 数据集转换为 DJ 格式</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html">InternVL COCO Caption</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">COCOCaptionMetaGeneration</span></code></p></td>
+<td><p>为 InternVL COCO Caption 数据集生成 meta 文件</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html">InternVL COCO Caption</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -625,6 +714,27 @@ bash<span class="w"> </span>setup_easyanimate.sh
 </table>
 </div>
 <ul class="simple">
+<li><p>通用数据探测工厂 -- GeneralProbeFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>组件</p></th>
+<th class="head"><p>功能</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">run</span></code>方法说明</p></th>
+<th class="head"><p>参考材料</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolRanking</span></code></p></td>
+<td><p>根据指定的评估指标对数据池进行排序</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
 <li><p>模型数据评估工厂 -- ModelInferEvaluatorFactory</p></li>
 </ul>
 <div class="table-wrapper colwidths-auto docutils container">
@@ -668,6 +778,16 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>：训练模型类型。需要在组件配置文件中设置<code class="docutils literal notranslate"><span class="pre">type</span></code>参数为<code class="docutils literal notranslate"><span class="pre">&quot;easyanimate&quot;</span></code>来激活该组件<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>：未使用的参数<br /></p></td>
 <td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a></p></td>
 </tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TrinityRFTTrainExecutor</span></code></p></td>
+<td><p>基于 Trinity-RFT 框架进行强化微调任务，并监测训练状态变化信息</p></td>
+<td><p>- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: 可以是 Trinity 配置文件的路径</p></td>
+<td><p><a class="reference external" href="https://github.com/modelscope/Trinity-RFT">Trinity-RFT</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">InternVLCOCOCaptionTrainExecutor</span></code></p></td>
+<td><p>针对 COCO Caption 任务微调 InternVL2 的 LoRA 模型，并监测训练loss和学习率的变化信息</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html">InternVL COCO Caption</a></p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -693,28 +813,108 @@ bash<span class="w"> </span>setup_easyanimate.sh
 </table>
 </div>
 <ul class="simple">
-<li><p>模型评估工厂 -- ModelEvaluatorFactory</p>
+<li><p>模型评估工厂 -- ModelEvaluatorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>组件</p></th>
+<th class="head"><p>功能</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">run</span></code>方法说明</p></th>
+<th class="head"><p>参考材料</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InternVLCOCOCaptionEvaluator</span></code></p></td>
+<td><p>为 InternVL COCO Caption 任务评测 Bleu-1/2/3/4 ，METEOR ， ROUGE_L ， 和 CIDEr 指标</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model">InternVL COCO Caption</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>详细定义可参考<code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/factories.py</span></code>。</p>
+</section>
+<section id="id9">
+<h3>上下文共享<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<p>有时不同的 hook 之间需要共享信息。例如，<code class="docutils literal notranslate"><span class="pre">TrainModelHook</span></code> 需要与 <code class="docutils literal notranslate"><span class="pre">EvaluateModelHook</span></code> 共享模型检查点路径，以便在训练后对模型进行评估。</p>
+<p>为了实现这一点，我们集成了一个全局的、跨 hook 和跨 pipeline 的信息容器，名为 <code class="docutils literal notranslate"><span class="pre">context_infos</span></code>，用于存储每个 pipeline 中 hook 的执行结果。<code class="docutils literal notranslate"><span class="pre">context_infos</span></code> 会在管道执行时自动构建。</p>
+<section id="resume">
+<h4>Resume 模式<a class="headerlink" href="#resume" title="Link to this heading">¶</a></h4>
+<p>每个 pipeline 完成后，<code class="docutils literal notranslate"><span class="pre">context_infos</span></code> 都会保存在磁盘上。基于此，Sandbox 允许 pipeline 级别的 Resume 模式，从上一个 pipeline 的检查点继续执行沙盒。我们只需在沙盒配置文件中将 <code class="docutils literal notranslate"><span class="pre">resume</span></code> 参数设置为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 即可。</p>
+</section>
+<section id="hooks">
+<h4>Hooks 的输入、输出和本地参数<a class="headerlink" href="#hooks" title="Link to this heading">¶</a></h4>
+<p>为了获取上下文信息，Hooks 新增了三个参数：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">input</span></code>：用于获取存储在上下文信息中之前的 Hook 的执行结果，并将其更新到当前 hook 的配置中。</p>
 <ul>
-<li><p>TBD</p></li>
+<li><p>基本用法：<code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;:</span> <span class="pre">&lt;key_in_context_infos&gt;</span></code>，其中 <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;</span></code> 是当前 Hook 配置中需要更新的键，<code class="docutils literal notranslate"><span class="pre">&lt;key_in_context_infos&gt;</span></code> 是存储在上下文信息中的所需结果的键。</p></li>
+<li><p>每对 input 参数都会将 <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;</span></code> 中的值替换为上下文信息中键为 <code class="docutils literal notranslate"><span class="pre">&lt;key_in_context_infos&gt;</span></code> 的值。它们都支持使用点 (<code class="docutils literal notranslate"><span class="pre">.</span></code>) 操作符的嵌套键。</p></li>
+<li><p>如果只需要上一个 hook 的结果，可以在 <code class="docutils literal notranslate"><span class="pre">&lt;key_in_context_infos&gt;</span></code> 中简单地使用 <code class="docutils literal notranslate"><span class="pre">-1</span></code> 作为 hook 的键。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output</span></code>：用于将当前 hook 的结果存储在 <code class="docutils literal notranslate"><span class="pre">context_infos</span> </code> 中。</p>
+<ul>
+<li><p>基本用法：<code class="docutils literal notranslate"><span class="pre">[&lt;res_1_name&gt;,</span> <span class="pre">&lt;res_2_name&gt;,</span> <span class="pre">...]</span></code>，其中 <code class="docutils literal notranslate"><span class="pre">&lt;res_i_name&gt;</span></code> 表示当前 hook 的第 <code class="docutils literal notranslate"><span class="pre">i</span></code> 个输出结果。如果未指定 <code class="docutils literal notranslate"><span class="pre">output</span></code> 参数，则自动使用简单的 &quot;res_i&quot; 作为第 <code class="docutils literal notranslate"><span class="pre">i</span></code> 个输出结果的名称。</p></li>
+<li><p>hook 执行后，当前 hook 的结果将以字典形式存储在 <code class="docutils literal notranslate"><span class="pre">context_infos</span> </code> 中，并使用 <code class="docutils literal notranslate"><span class="pre">output</span></code> 参数中的名称作为键。</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">local</span></code>：用于将指定的值更新到当前 hook 的配置中。</p>
+<ul>
+<li><p>基本用法：<code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;:</span> <span class="pre">&lt;value&gt;</span></code>，其中 <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;</span></code> 是当前钩子配置中待更新的键，<code class="docutils literal notranslate"><span class="pre">&lt;value&gt;</span></code> 是目标值。</p></li>
+<li><p>每对 local 参数都会将 <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;</span></code> 中的值替换为 <code class="docutils literal notranslate"><span class="pre">&lt;value&gt;</span></code> 中指定的值。支持使用点 (<code class="docutils literal notranslate"><span class="pre">.</span></code>) 符号的嵌套键。</p></li>
 </ul>
 </li>
 </ul>
-<p>详细定义可参考<code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/factories.py</span></code>。</p>
+<p>使用这些参数的一个钩子示例如下：</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">xxx_hook</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">meta_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">job_xxx</span>
+<span class="w">  </span><span class="nt">input</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">dj_configs.dataset_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pipeline1.name3.res4_key</span>
+<span class="w">    </span><span class="nt">extra_configs.meta_paths</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-1.res5_key</span>
+<span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;res6_key&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;res7_key&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">local</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">extra_configs.arg2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">42</span>
+<span class="w">  </span><span class="nt">dj_configs</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;/path/to/dj_configs.yaml&#39;</span>
+<span class="w">  </span><span class="nt">extra_configs</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">arg1</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;arg1_val&quot;</span>
+<span class="w">    </span><span class="nt">arg2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">404</span>
+<span class="w">    </span><span class="nt">meta_paths</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&lt;placeholder&gt;&quot;</span>
+</pre></div>
+</div>
+<p>此钩子使用了所有的三个参数：</p>
+<ul class="simple">
+<li><p>在 <code class="docutils literal notranslate"><span class="pre">input</span></code> 中，此钩子将 YAML 格式的 <code class="docutils literal notranslate"><span class="pre">dj_configs</span></code> 中的 <code class="docutils literal notranslate"><span class="pre">dataset_path</span></code> 替换为之前钩子上下文信息中 pipeline1 中 <code class="docutils literal notranslate"><span class="pre">meta_name</span></code> 为 &quot;name3&quot; 的钩子存储名称为 <code class="docutils literal notranslate"><span class="pre">res4_key</span></code> 的值。此外，它会将 <code class="docutils literal notranslate"><span class="pre">extra_configs</span></code> 中的 <code class="docutils literal notranslate"><span class="pre">meta_paths</span></code> 替换为上一个钩子（由&quot;-1&quot;指定）上下文信息中存储的 <code class="docutils literal notranslate"><span class="pre">res5_key</span></code> 的值。</p></li>
+<li><p>在 <code class="docutils literal notranslate"><span class="pre">output</span></code> 中，该钩子输出两个结果，分别命名为 <code class="docutils literal notranslate"><span class="pre">res6_key</span></code> 和 <code class="docutils literal notranslate"><span class="pre">res7_key</span></code>，它们将存储在上下文信息中，如下所示：</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;job_xxx&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;res6_key&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">output_1</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s1">&#39;res7_key&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">output_2</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>在 <code class="docutils literal notranslate"><span class="pre">local</span></code> 中，该钩子将 <code class="docutils literal notranslate"><span class="pre">extra_configs</span></code> 中 <code class="docutils literal notranslate"><span class="pre">arg2</span></code> 的原始值（为 404）替换为目标值 42。</p></li>
+</ul>
 </section>
 </section>
-<section id="id9">
-<h2>开发者指南<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
+</section>
+<section id="id10">
+<h2>开发者指南<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h2>
 <p>正如上一章节所说，开发者可开发更多的可配置组件并将它们添加到对应的工厂类中，并用参数<code class="docutils literal notranslate"><span class="pre">type</span></code>进行实例化方法分配。实现了组件后，开发者可以将它们封装为钩子，并将钩子注册到工作列表中，工作列表在流水线中进行编排后，沙盒流水线执行时，会依次在每个步骤执行每个工作列表中的工作。这其中的每一个部分：组件、组件工厂、钩子、工作列表、流水线注册与执行流程编排，都可以由开发者自定义。各个部分的关系由下图示意。
 <img alt="sandbox-pipeline" src="https://img.alicdn.com/imgextra/i3/O1CN01ERmGre1uz3luKOn4n_!!6000000006107-2-tps-4655-1918.png" /></p>
-<section id="id10">
-<h3>组件内部实现<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h3>
-<p>目前组件主要分为两个大类：</p>
+<section id="id11">
+<h3>组件内部实现<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
+<p>目前组件主要分为三个大类：</p>
 <ul class="simple">
 <li><p><strong>执行器（Executor）</strong>：由于数据执行器已经由Data-Juicer的Executor承担，因此此处的执行器特指模型的执行器，包括模型训练、推理、评估等执行器。代码位于<code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/model_executors.py</span></code></p></li>
 <li><p><strong>评估器（Evaluator）</strong>：用于对数据集或者模型进行质量以及性能的评估。代码位于<code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/evaluators.py</span></code></p></li>
+<li><p><strong>数据池操作器（DataPoolManipulator）</strong>：用于操作数据池，例如构建、组合、采样等。代码位于 <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/data_pool_manipulators.py</span></code></p></li>
 </ul>
-<section id="id11">
-<h4>执行器<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h4>
+<section id="id12">
+<h4>执行器<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h4>
 <p>模型执行器核心功能为对配置文件中指定的模型用指定的数据集进行训练、推理或评测。模型执行器需继承<code class="docutils literal notranslate"><span class="pre">BaseModelExecutor</span></code>并实现若干核心方法：</p>
 <ul class="simple">
 <li><p>模型执行器的具体行为（训练、推理、评测等）需要在<code class="docutils literal notranslate"><span class="pre">_run</span></code>方法中进行定义</p></li>
@@ -727,8 +927,8 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <li><p><code class="docutils literal notranslate"><span class="pre">watch_run</span></code>方法：监控指定的日志文件，逐行读取，并调用根据模型训练框架自定义的<code class="docutils literal notranslate"><span class="pre">_watch_run</span></code>方法解析最新的日志内容行，提取关键指标并进行监测，直到读取到预定义的任务结束标识符</p></li>
 </ul>
 </section>
-<section id="id12">
-<h4>评估器<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h4>
+<section id="id13">
+<h4>评估器<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h4>
 <p>评估器核心功能为对待评估对象使用某种方法进行质量、性能等维度的评估，并最终返回一个评估结果，通常为数值型结果。评估器需继承基类<code class="docutils literal notranslate"><span class="pre">BaseEvaluator</span></code>并实现<code class="docutils literal notranslate"><span class="pre">run</span></code>方法。<code class="docutils literal notranslate"><span class="pre">run</span></code>方法默认接受两个必要参数：</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">eval_type</span></code>：评估类型，用于在某种评估器内部进行评估类型选择</p></li>
@@ -736,9 +936,14 @@ bash<span class="w"> </span>setup_easyanimate.sh
 </ul>
 <p>用户也可根据自己的实现方式对这两个参数进行扩展使用。</p>
 </section>
+<section id="id14">
+<h4>数据池操作器<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h4>
+<p>数据池操作器的核心功能是操作数据池，例如构造、组合、采样等。数据池操作器需要继承自基类 <code class="docutils literal notranslate"><span class="pre">BaseDataPoolManipulator</span></code>，并实现 <code class="docutils literal notranslate"><span class="pre">run</span></code> 方法。<code class="docutils literal notranslate"><span class="pre">run</span></code> 方法所需的参数通常来自 <code class="docutils literal notranslate"><span class="pre">__init__</span></code> 方法中的输入数据池配置，涵盖输入数据池、导出路径以及每种操作器的具体参数。</p>
+<p>用户可以参考 <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/data_pool_manipulators.py</span></code> 中每种操作器的 <code class="docutils literal notranslate"><span class="pre">run</span></code> 方法的 doc string 了解更多详细信息。</p>
 </section>
-<section id="id13">
-<h3>流水线钩子<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h3>
+</section>
+<section id="id15">
+<h3>流水线钩子<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
 <p>正如章节开始部分所说，在流水线中，我们需要实现若干钩子将组件与流水线执行步骤通过工作列表连接起来。被激活的钩子会在流水线的工作列表中进行注册，然后在流水线执行时依次对各个步骤工作列表中的钩子执行。四个步骤对应的工作列表分别如下：</p>
 <ol class="arabic simple">
 <li><p><strong>数据/模型洞察</strong>：洞察工作列表 -- probe_jobs</p></li>
@@ -766,50 +971,68 @@ bash<span class="w"> </span>setup_easyanimate.sh
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ProbeViaModelInferHook</span></code></p></td>
 <td><p>分析与洞察数据集对于模型的影响，挖掘与洞察“难”数据与“脏”数据</p></td>
-<td><p>数据处理工厂（DataExecutorFactor）<br />模型数据评估工厂（ModelInferEvaluatorFactory）</p></td>
+<td><p>数据处理工厂（DataExecutorFactory）<br />模型数据评估工厂（ModelInferEvaluatorFactory）</p></td>
 <td><p>Data-Juicer数据处理器Executor</p></td>
 <td><p>洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs）</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RefineRecipeViaKSigmaHook</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GeneralProbeHook</span></code></p></td>
+<td><p>提供通用的数据集探测能力，包括数据集排序等</p></td>
+<td><p>通用数据探测工厂（GeneralProbeFactory）</p></td>
+<td><p>-</p></td>
+<td><p>洞察工作列表（probe_jobs）</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RefineRecipeViaKSigmaHook</span></code></p></td>
 <td><p>根据数据集洞察结果，利用k-sigma方法对数据菜谱超参进行微调</p></td>
 <td><p>-</p></td>
 <td><p>Data-Juicer超参优化工具HPO中的k-sigma菜谱微调工具</p></td>
 <td><p>菜谱微调工作列表（refine_recipe_jobs）</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RefineRecipeViaModelFeedbackHook</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RefineRecipeViaModelFeedbackHook</span></code></p></td>
 <td><p>利用模型洞察与反馈结果对数据菜谱超参进行微调</p></td>
 <td><p>TODO</p></td>
 <td><p>-</p></td>
 <td><p>菜谱微调工作列表（refine_recipe_jobs）</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ProcessDataHook</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ProcessDataHook</span></code></p></td>
 <td><p>基于当前数据菜谱对数据集进行处理与清洗</p></td>
-<td><p>数据处理工厂（DataExecutorFactor）</p></td>
+<td><p>数据处理工厂（DataExecutorFactory）</p></td>
 <td><p>Data-Juicer数据处理器Executor</p></td>
 <td><p>执行工作列表（execution_jobs）</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TrainModelHook</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolManipulationHook</span></code></p></td>
+<td><p>操作数据池，包括构造，组合，采样等</p></td>
+<td><p>数据池操作工厂（DataPoolManipulatorFactory）</p></td>
+<td><p>-</p></td>
+<td><p>执行工作列表（execution_jobs）</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GeneralDataExecutorHook</span></code></p></td>
+<td><p>通用数据集处理能力，包括格式转换等</p></td>
+<td><p>通用数据处理工厂（GeneralDataExecutorFactory）</p></td>
+<td><p>-</p></td>
+<td><p>执行工作列表（execution_jobs）</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TrainModelHook</span></code></p></td>
 <td><p>基于当前数据集训练一个模型</p></td>
 <td><p>模型训练工厂（ModelTrainExecutorFactory）</p></td>
-<td><p><a class="reference internal" href="#../thirdparty//easy_animate/README.md"><span class="xref myst">EasyAnimate</span></a></p></td>
+<td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a> <br/> <a class="reference external" href="https://internvl.readthedocs.io/en/latest/index.html">InternVL</a></p></td>
 <td><p>执行工作列表（execution_jobs）</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InferModelHook</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">InferModelHook</span></code></p></td>
 <td><p>模型基于给定输入让模型产生输出</p></td>
 <td><p>模型推理工厂（ModelInferExecutorFactory）</p></td>
-<td><p><a class="reference internal" href="#../thirdparty//easy_animate/README.md"><span class="xref myst">EasyAnimate</span></a></p></td>
+<td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a></p></td>
 <td><p>执行工作列表（execution_jobs）</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EvaluateDataHook</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EvaluateDataHook</span></code></p></td>
 <td><p>对当前数据集进行数据质量等维度的评估</p></td>
 <td><p>数据评估工厂（DataEvaluatorFactory）</p></td>
 <td><p>图像或视频的<a class="reference internal" href="../tools/mm_eval/inception_metrics/README_ZH.html"><span class="std std-doc">inception metrics</span></a>，如FID、FVD <br /> <a class="reference internal" href="../tools/mm_eval/vbench_metrics/README_ZH.html"><span class="std std-doc">VBench</span></a></p></td>
 <td><p>评估工作列表（evaluation_jobs）</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EvaluateModelHook</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EvaluateModelHook</span></code></p></td>
 <td><p>对当前训练后的模型进行评估</p></td>
 <td><p>模型评估工厂（ModelEvaluatorFactory）</p></td>
-<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model">InternVL COCO Caption</a></p></td>
 <td><p>评估工作列表（evaluation_jobs）</p></td>
 </tr>
 </tbody>
@@ -817,12 +1040,12 @@ bash<span class="w"> </span>setup_easyanimate.sh
 </div>
 <p>值得注意的是，一个钩子可以在多个工作列表进行注册，因为这个钩子在不同的流水线阶段可以扮演不同的角色，比如我们可以对处理前后的数据集都进行分析，以比较数据集处理前后的质量、多样性等维度的变化情况。</p>
 </section>
-<section id="id14">
-<h3>自定义沙盒流水线<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h3>
+<section id="id16">
+<h3>自定义沙盒流水线<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h3>
 <p>用户直接在参数配置文件中修改任务配置列表即可实现任务修改和编排。</p>
 </section>
-<section id="id15">
-<h3>监测器<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
+<section id="id17">
+<h3>监测器<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h3>
 <p>在上述章节中，反复提到“监测”这个概念。流水线会对各个步骤中产生的若干指标都进行监测，这些监测过程都依靠沙盒监测器<code class="docutils literal notranslate"><span class="pre">SandboxWatcher</span></code>实现的。</p>
 <p><code class="docutils literal notranslate"><span class="pre">SandboxWatcher</span></code>基于wandb实现，主要包括4个方法：</p>
 <ul class="simple">
@@ -832,6 +1055,175 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <li><p><code class="docutils literal notranslate"><span class="pre">query</span></code>：对某个具体指标或实验结果从wandb日志中进行查询</p></li>
 </ul>
 </section>
+<section id="id18">
+<h3>上下文信息实现细节<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">context_infos</span></code> 包含两个级别：</p>
+<ul class="simple">
+<li><p>pipeline 级别：它是 <code class="docutils literal notranslate"><span class="pre">context_infos</span></code> 的第一级，它是一个字典，键是 pipeline 名称，值是该 pipeline 中每个 job 的上下文信息列表。</p></li>
+<li><p>job 级别：它是 <code class="docutils literal notranslate"><span class="pre">context_infos</span></code> 的第二级，它是一个字典列表，每个字典代表特定 job 的上下文信息，其中 <code class="docutils literal notranslate"><span class="pre">meta_name</span></code> 用于标识 job，其他键值对的键是该 job 的输出名称，值是输出值。</p></li>
+</ul>
+<p>以下是 <code class="docutils literal notranslate"><span class="pre">context_infos</span></code> 的一个示例：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;pipeline_0&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;name1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res1_key&#39;</span><span class="p">:</span> <span class="s1">&#39;res1_value&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res2_key&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">res2_value</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;name2&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res3_key&#39;</span><span class="p">:</span> <span class="s1">&#39;res3_value&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;pipeline_1&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;name3&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res4_key&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">res4_value</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;pipeline_2&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;name4&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res5_key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;res5_1_value&#39;</span><span class="p">,</span> <span class="s1">&#39;res5_2_value&#39;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="id19">
+<h3>环境管理器<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h3>
+<p>Sandbox 支持不同类型的第三方库，用于训练、评估等。如果将它们全部放在一个环境中，一些重要且复杂的依赖项可能会发生版本冲突。因此，我们提供了一个易于使用的环境管理器，用于将不同第三方库在不同环境中分别进行管理，允许用户在独立的环境中运行命令。</p>
+<p>环境的基本类是 <code class="docutils literal notranslate"><span class="pre">Env</span></code>，位于 <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/env_manager.py</span></code> 中，其实现如下：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Env</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+  
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        创建一个环境</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_availability</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        检查环境管理器的可用性</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        检查环境是否存在</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">install_py_deps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        安装 Python 依赖项</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        在该环境中运行命令</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>它包含五个主要的抽象方法：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">create</span></code>：如果环境不存在，则创建环境。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">check_availability</span></code>：检查环境管理器（例如 <code class="docutils literal notranslate"><span class="pre">conda</span></code>、<code class="docutils literal notranslate"><span class="pre">venv</span></code>）的可用性。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">exists</span></code>：检查环境是否存在。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">install_py_deps</span></code>：安装 Python 依赖项。通常支持三种方式：通过“requirements.txt”文件路径、依赖项列表、或指向库代码库的目录路径。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_cmd</span></code>：在此环境中运行命令。</p></li>
+</ul>
+<p>现在我们提供了两种 <code class="docutils literal notranslate"><span class="pre">Env</span></code> 的具体实现：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CondaEnv</span></code>：使用 <code class="docutils literal notranslate"><span class="pre">conda</span></code> 或 <code class="docutils literal notranslate"><span class="pre">mamba</span></code> 管理环境。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VirtualEnv</span></code>：使用 <code class="docutils literal notranslate"><span class="pre">venv</span></code>、<code class="docutils literal notranslate"><span class="pre">virtualenv</span></code> 或 <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">venv</span></code> 管理环境。</p></li>
+</ul>
+<p>在初始化环境管理器时，我们可以通过设置配置文件中的 <code class="docutils literal notranslate"><span class="pre">env_manager</span></code> 参数来指定要使用的环境管理器，并通过设置 <code class="docutils literal notranslate"><span class="pre">env_name</span></code> 参数来指定环境的名称。基本用法示例如下：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.sandbox.env_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ENV_ROUTER</span>
+
+<span class="n">env_manager</span> <span class="o">=</span> <span class="s1">&#39;conda&#39;</span>
+<span class="n">env_name</span> <span class="o">=</span> <span class="s1">&#39;new_conda_env&#39;</span>
+
+<span class="c1"># 创建一个环境</span>
+<span class="n">env</span> <span class="o">=</span>  <span class="n">ENV_ROUTER</span><span class="p">[</span><span class="n">env_manager</span><span class="p">](</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">modelscope</span><span class="o">/</span><span class="n">data</span><span class="o">-</span><span class="n">juicer</span><span class="o">/</span><span class="n">blob</span><span class="o">/</span><span class="n">main</span><span class="o">/</span><span class="n">docs</span><span class="o">/</span>
+  <span class="n">env_name</span><span class="o">=</span><span class="n">env_name</span><span class="p">,</span>
+  <span class="n">env_manager</span><span class="o">=</span><span class="n">env_manager</span><span class="p">)</span>
+<span class="c1"># 检查环境管理器可用性</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">env</span><span class="o">.</span><span class="n">check_availability</span><span class="p">():</span>
+    <span class="c1"># 该环境管理器不可用</span>
+    <span class="n">exit</span><span class="p">()</span>
+<span class="c1"># 创建一个新环境。如果环境已存在，则使用已存在的环境</span>
+<span class="n">env</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+<span class="c1"># 安装额外的依赖项</span>
+<span class="c1"># 使用 &quot;requirements.txt&quot; 文件</span>
+<span class="n">env</span><span class="o">.</span><span class="n">install_py_deps</span><span class="p">(</span><span class="s2">&quot;/path/to/requirements.txt&quot;</span><span class="p">)</span>
+<span class="c1"># 使用依赖项列表</span>
+<span class="n">env</span><span class="o">.</span><span class="n">install_py_deps</span><span class="p">([</span><span class="s2">&quot;torch&quot;</span><span class="p">,</span> <span class="s2">&quot;torchvision&quot;</span><span class="p">])</span>
+<span class="c1"># 使用指向库代码库的目录路径，如 InternVL</span>
+<span class="n">env</span><span class="o">.</span><span class="n">install_py_deps</span><span class="p">(</span><span class="s2">&quot;/path/to/a/third-party/library&quot;</span><span class="p">)</span>
+
+<span class="c1"># 在该环境中运行一条命令</span>
+<span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;python train.py&quot;</span>
+<span class="n">env</span><span class="o">.</span><span class="n">run_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/specific_hooks/intervl_coco_captioning/model_hooks.py</span></code> 中的 <code class="docutils literal notranslate"><span class="pre">InternVLCOCOCaptionEvaluator</span></code> 类提供了在钩子中使用环境管理器的完整示例。</p>
+</section>
+</section>
+<section id="q-a">
+<h2>Q&amp;A<a class="headerlink" href="#q-a" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>训练 InternVL 时发生 <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code>：</p></li>
+</ol>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>RuntimeError: 
+        CUDA Setup failed despite GPU being available. Please run the following command to get more information:
+
+        python -m bitsandbytes
+
+        Inspect the output of the command and see if you can locate CUDA libraries. You might need to add them
+        to your LD_LIBRARY_PATH. If you suspect a bug, please take the information from python -m bitsandbytes
+        and open an issue at: https://github.com/TimDettmers/bitsandbytes/issues
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>原因：这可能是由于 CUDA、PyTorch 和 bitsandbytes 不兼容造成的。运行 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">bitsandbytes</span></code> 获取更多详细信息。</p></li>
+<li><p>解决方案：</p>
+<ul>
+<li><p>移除 InternVL 主目录下 <code class="docutils literal notranslate"><span class="pre">requirements/internvl_chat.txt</span></code> 中对 bitsandbytes 的版本限制，以避免在启动环境时再次安装错误版本。然后使用 <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">uninstall</span> <span class="pre">bitsandbytes</span> <span class="pre">&amp;&amp;</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">bitsandbytes</span></code> 重新安装。</p></li>
+<li><p>如果上述解决方案无效，请重新安装与您的 GPU 的 CUDA 版本兼容的 PyTorch，并重复上述步骤，直到 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">bitsandbytes</span></code> 命令输出 SUCCESS。</p></li>
+<li><p>然后，还需要重新安装 <code class="docutils literal notranslate"><span class="pre">flash-attn</span></code>。</p></li>
+</ul>
+</li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p>在训练 InternVL 时发生 <code class="docutils literal notranslate"><span class="pre">AssertionError</span></code>：</p></li>
+</ol>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>AssertionError: It is illegal to call Engine.step() inside no_sync context manager
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>解决方案：将 <code class="docutils literal notranslate"><span class="pre">deepspeed</span></code> 版本降级至 <code class="docutils literal notranslate"><span class="pre">0.15.4</span></code>，并在 InternVL 主目录中的 <code class="docutils literal notranslate"><span class="pre">requirements/internvl_chat.txt</span></code> 和 <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> 中移除 <code class="docutils literal notranslate"><span class="pre">deepspeed</span></code> 的版本限制。</p></li>
+</ul>
+<ol class="arabic simple" start="3">
+<li><p>评测 InternVL 时报错 <code class="docutils literal notranslate"><span class="pre">java</span> <span class="pre">not</span> <span class="pre">found</span></code>：</p></li>
+</ol>
+<ul class="simple">
+<li><p>解决方案：安装 java。</p></li>
+</ul>
 </section>
 </section>
 
@@ -892,8 +1284,8 @@ bash<span class="w"> </span>setup_easyanimate.sh
             <ul>
 <li><a class="reference internal" href="#">沙盒实验室</a><ul>
 <li><a class="reference internal" href="#id2">用户指南</a><ul>
-<li><a class="reference internal" href="#id3">应用和成果</a></li>
 <li><a class="reference internal" href="#dj-sandbox">什么是沙盒实验室（DJ-Sandbox）？</a></li>
+<li><a class="reference internal" href="#id3">应用</a></li>
 <li><a class="reference internal" href="#id4">快速上手</a><ul>
 <li><a class="reference internal" href="#id5">依赖准备</a></li>
 <li><a class="reference internal" href="#id6">准备沙盒配置文件</a></li>
@@ -901,19 +1293,28 @@ bash<span class="w"> </span>setup_easyanimate.sh
 </ul>
 </li>
 <li><a class="reference internal" href="#id8">组件工厂</a></li>
+<li><a class="reference internal" href="#id9">上下文共享</a><ul>
+<li><a class="reference internal" href="#resume">Resume 模式</a></li>
+<li><a class="reference internal" href="#hooks">Hooks 的输入、输出和本地参数</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id9">开发者指南</a><ul>
-<li><a class="reference internal" href="#id10">组件内部实现</a><ul>
-<li><a class="reference internal" href="#id11">执行器</a></li>
-<li><a class="reference internal" href="#id12">评估器</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id13">流水线钩子</a></li>
-<li><a class="reference internal" href="#id14">自定义沙盒流水线</a></li>
-<li><a class="reference internal" href="#id15">监测器</a></li>
+<li><a class="reference internal" href="#id10">开发者指南</a><ul>
+<li><a class="reference internal" href="#id11">组件内部实现</a><ul>
+<li><a class="reference internal" href="#id12">执行器</a></li>
+<li><a class="reference internal" href="#id13">评估器</a></li>
+<li><a class="reference internal" href="#id14">数据池操作器</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#id15">流水线钩子</a></li>
+<li><a class="reference internal" href="#id16">自定义沙盒流水线</a></li>
+<li><a class="reference internal" href="#id17">监测器</a></li>
+<li><a class="reference internal" href="#id18">上下文信息实现细节</a></li>
+<li><a class="reference internal" href="#id19">环境管理器</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#q-a">Q&amp;A</a></li>
 </ul>
 </li>
 </ul>

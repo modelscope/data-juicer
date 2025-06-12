@@ -359,7 +359,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Array2D</span><span class="p">,</span> <span class="n">Array3D</span><span class="p">,</span> <span class="n">ClassLabel</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Value</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Array2D</span><span class="p">,</span> <span class="n">Array3D</span><span class="p">,</span> <span class="n">ClassLabel</span><span class="p">,</span> <span class="n">Features</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Value</span>
 
 
 <div class="viewcode-block" id="Schema">
@@ -374,6 +374,35 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">column_types</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Schema.from_hf_features">
+<a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.schema.Schema.from_hf_features">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_hf_features</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">features</span><span class="p">:</span> <span class="n">Features</span><span class="p">):</span>
+        <span class="c1"># Convert features to schema dict</span>
+        <span class="n">column_types</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Map HF feature types to Python types</span>
+            <span class="n">column_types</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Schema</span><span class="o">.</span><span class="n">map_hf_type_to_python</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+
+        <span class="c1"># Get column names</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">Schema</span><span class="p">(</span><span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Schema.from_ray_schema">
+<a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.schema.Schema.from_ray_schema">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_ray_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+        <span class="c1"># convert schema to proper list and dict</span>
+        <span class="n">column_types</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">Schema</span><span class="o">.</span><span class="n">map_ray_type_to_python</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">names</span><span class="p">,</span> <span class="n">schema</span><span class="o">.</span><span class="n">types</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">Schema</span><span class="p">(</span><span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
+                      <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">column_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span></div>
+
 
 <div class="viewcode-block" id="Schema.map_hf_type_to_python">
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.schema.Schema.map_hf_type_to_python">[docs]</a>
@@ -394,26 +423,28 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Corresponding Python type</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">type_mapping</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;string&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s1">&#39;int32&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s1">&#39;int64&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s1">&#39;float32&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s1">&#39;float64&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="s1">&#39;binary&#39;</span><span class="p">:</span> <span class="nb">bytes</span>
+        <span class="p">}</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">Value</span><span class="p">):</span>
             <span class="c1"># Map Value types</span>
-            <span class="n">type_mapping</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;string&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                <span class="s1">&#39;int32&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                <span class="s1">&#39;int64&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                <span class="s1">&#39;float32&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                <span class="s1">&#39;float64&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                <span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-                <span class="s1">&#39;binary&#39;</span><span class="p">:</span> <span class="nb">bytes</span>
-            <span class="p">}</span>
             <span class="k">return</span> <span class="n">type_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Any</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="p">(</span><span class="n">Sequence</span><span class="p">,</span> <span class="n">Array2D</span><span class="p">,</span> <span class="n">Array3D</span><span class="p">)):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">List</span><span class="p">[</span><span class="n">Schema</span><span class="o">.</span><span class="n">map_hf_type_to_python</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">feature</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="p">(</span><span class="n">Array2D</span><span class="p">,</span> <span class="n">Array3D</span><span class="p">)):</span>
             <span class="c1"># Handle sequences/lists</span>
-            <span class="k">return</span> <span class="nb">list</span>
+            <span class="k">return</span> <span class="n">List</span><span class="p">[</span><span class="n">type_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Any</span><span class="p">)]</span>
 
         <span class="c1"># Dictionary types - check if it&#39;s a dictionary feature</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">feature</span><span class="p">))</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Dict&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">dict</span>
+            <span class="k">return</span> <span class="n">Schema</span><span class="o">.</span><span class="n">from_hf_features</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">ClassLabel</span><span class="p">):</span>
             <span class="c1"># Handle class labels</span>
@@ -427,7 +458,7 @@
 <div class="viewcode-block" id="Schema.map_ray_type_to_python">
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.schema.Schema.map_ray_type_to_python">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">map_ray_type_to_python</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ray_type</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">DataType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">map_ray_type_to_python</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ray_type</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">DataType</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Map Ray/Arrow data type to Python type.</span>
 
 <span class="sd">        Args:</span>
@@ -455,10 +486,17 @@
 
         <span class="c1"># List/Array types</span>
         <span class="k">if</span> <span class="n">pa</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_list</span><span class="p">(</span><span class="n">ray_type</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">list</span>
+            <span class="k">return</span> <span class="n">List</span><span class="p">[</span><span class="n">Schema</span><span class="o">.</span><span class="n">map_ray_type_to_python</span><span class="p">(</span><span class="n">ray_type</span><span class="o">.</span><span class="n">value_type</span><span class="p">)]</span>
 
         <span class="c1"># Dictionary/Struct types</span>
-        <span class="k">if</span> <span class="n">pa</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_struct</span><span class="p">(</span><span class="n">ray_type</span><span class="p">)</span> <span class="ow">or</span> <span class="n">pa</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_map</span><span class="p">(</span><span class="n">ray_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pa</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_struct</span><span class="p">(</span><span class="n">ray_type</span><span class="p">):</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="n">ray_type</span><span class="o">.</span><span class="n">names</span>
+            <span class="n">types</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">Schema</span><span class="o">.</span><span class="n">map_ray_type_to_python</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ray_type</span><span class="o">.</span><span class="n">fields</span>
+            <span class="p">]</span>
+            <span class="k">return</span> <span class="n">Schema</span><span class="p">(</span><span class="n">column_types</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">types</span><span class="p">)),</span> <span class="n">columns</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pa</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_map</span><span class="p">(</span><span class="n">ray_type</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">dict</span>
 
         <span class="c1"># Fallback</span>

@@ -449,6 +449,28 @@
 <span class="sd">            ValueError: If k is negative</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DJDataset.to_list">
+<a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.DJDataset.to_list">[文档]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the current dataset to a Python list.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DJDataset.contain_column">
+<a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.DJDataset.contain_column">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">contain_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check whether the dataset contains a specific column/field.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            column: Name of the column to check</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the dataset contains the column, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">()</span><span class="o">.</span><span class="n">columns</span></div>
 </div>
 
 
@@ -611,16 +633,7 @@
         <span class="c1"># Get features dictionary from HF dataset</span>
         <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span>
 
-        <span class="c1"># Convert features to schema dict</span>
-        <span class="n">column_types</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="c1"># Map HF feature types to Python types</span>
-            <span class="n">column_types</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Schema</span><span class="o">.</span><span class="n">map_hf_type_to_python</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
-
-        <span class="c1"># Get column names</span>
-        <span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span>
-
-        <span class="k">return</span> <span class="n">Schema</span><span class="p">(</span><span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Schema</span><span class="o">.</span><span class="n">from_hf_features</span><span class="p">(</span><span class="n">features</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="NestedDataset.get">
@@ -885,6 +898,12 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the select func, such that selected samples can be accessed</span>
 <span class="sd">        by nested manner.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="NestedDataset.to_list">
+<a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.NestedDataset.to_list">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="NestedDataset.from_dict">

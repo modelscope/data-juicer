@@ -365,9 +365,15 @@
 <h1>Sandbox<a class="headerlink" href="#sandbox" title="Link to this heading">¶</a></h1>
 <section id="user-guide">
 <h2>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading">¶</a></h2>
-<section id="applications-and-achievements">
-<h3>Applications and Achievements<a class="headerlink" href="#applications-and-achievements" title="Link to this heading">¶</a></h3>
-<p>Leveraging the Data-Juicer Sandbox Laboratory Suite, we systematically fine-tuned data and models through a dedicated research and development workflow between data and models. For more detailed information, please refer to our <a class="reference external" href="http://arxiv.org/abs/2407.11784">paper</a>. In our work, we have secured a new leading position on the <a class="reference external" href="https://huggingface.co/spaces/Vchitect/VBench_Leaderboard">VBench</a> text-to-video leaderboard.
+<section id="what-is-dj-sandbox">
+<h3>What is DJ-Sandbox?<a class="headerlink" href="#what-is-dj-sandbox" title="Link to this heading">¶</a></h3>
+<p>In Data-Juicer, the DJ-Sandbox is a middleware that links data and model feedback, enabling high performance and low-cost verification across a wide range of tasks. It aims to provide users with the best practices for continuously enhancing data-model recipes, featuring low overhead, portability, and guidance. In the sandbox, users can quickly experiment, iterate, and refine recipes based on small-scale datasets and models before scaling up to produce high-quality data to serve large-scale models.</p>
+<p>In addition to the basic data optimization and recipe refinement features offered by Data-Juicer, users can seamlessly use configurable components such as data probing and analysis, model training and evaluation, and data and model feedback-based recipe refinement to form preferred pipelines for data-model research and development.</p>
+<p>For more detailed information, please refer to our <a class="reference external" href="http://arxiv.org/abs/2407.11784">paper</a> (ICML’25 spotlight).</p>
+</section>
+<section id="applications-and-use-cases">
+<h3>Applications and Use-Cases<a class="headerlink" href="#applications-and-use-cases" title="Link to this heading">¶</a></h3>
+<p>We apply the sandbox to many cutting-edge models, such as Mini-Gemini and InternVL-2.0 (two LLaVA-inspired models for image-to-text generation), EasyAnimate and T2V-Turbo (two Diffusion Transformer-based models for text-to-video generation), and a CLIP model for image-text pre-training. Among these, we have secured a new leading position on the <a class="reference external" href="https://huggingface.co/spaces/Vchitect/VBench_Leaderboard">VBench</a> text-to-video leaderboard.
 <img alt="top-1_in_vbench" src="https://img.alicdn.com/imgextra/i1/O1CN01I9wHW91UNnX9wtCWu_!!6000000002506-2-tps-1275-668.png" /></p>
 <p>The model is now publicly available on the ModelScope and HuggingFace platforms, and the training dataset has also been available.</p>
 <div class="table-wrapper colwidths-auto docutils container">
@@ -384,7 +390,7 @@
 <td><p>Corresponding to Data-Juicer (T2V-Turbo) model in VBench leaderboard</p></td>
 </tr>
 <tr class="row-odd"><td><p>Data-Juicer (DJ, 228k)</p></td>
-<td><p><a class="reference external" href="https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V">ModelScope</a> <br> <a class="reference external" href="https://huggingface.co/datajuicer/Data-Juicer-T2V">HuggingFace</a></p></td>
+<td><p><a class="reference external" href="https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V-v2">ModelScope</a> <br> <a class="reference external" href="https://huggingface.co/datajuicer/Data-Juicer-T2V-v2">HuggingFace</a></p></td>
 <td><p>Corresponding to Data-Juicer (2024-09-23, T2V-Turbo) model in VBench leaderboard</p></td>
 </tr>
 <tr class="row-even"><td><p>data_juicer_t2v_optimal_data_pool</p></td>
@@ -428,26 +434,20 @@
 </tbody>
 </table>
 </div>
-<p>To reproduce the paper’s experiments, please refer to the sandbox usage guide below, the experimental process in the following figure, the <a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip">initial dataset</a>, and the configuration file demos for the process: <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/demo/bench/1_single_op_pipeline.yaml">1_single_op_pipeline.yaml</a>, <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/demo/bench/2_multi_op_pipeline.yaml">2_multi_op_pipeline.yaml</a>, <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/demo/bench/3_duplicate_pipeline.yaml">3_duplicate_pipeline.yaml</a>.
+<p>To reproduce the paper’s experiments, please refer to the sandbox usage guide below, the experimental process in the following figure, the <a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip">initial dataset</a>, and the configuration file demos for the process: <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/1_single_op_pipeline.yaml">1_single_op_pipeline.yaml</a>, <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/2_multi_op_pipeline.yaml">2_multi_op_pipeline.yaml</a>, <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/3_duplicate_pipeline.yaml">3_duplicate_pipeline.yaml</a>.
 <img alt="bench_bottom_up" src="https://img.alicdn.com/imgextra/i2/O1CN01xvu2fo1HU80biR6Q5_!!6000000000760-2-tps-7756-3693.png" /></p>
-</section>
-<section id="what-is-dj-sandbox">
-<h3>What is DJ-Sandbox?<a class="headerlink" href="#what-is-dj-sandbox" title="Link to this heading">¶</a></h3>
-<p>In Data-Juicer, the data sandbox laboratory provides users with the best practices for continuously producing data recipes. It features low overhead, portability, and guidance. In the sandbox, users can quickly experiment, iterate, and refine data recipes based on small-scale datasets and models, before scaling up to produce high-quality data to serve large-scale models.</p>
-<p>In addition to the basic data optimization and recipe refinement features offered by Data-Juicer, users can seamlessly use configurable components such as data probe and analysis, model training and evaluation, and data and model feedback-based recipe refinement to form a complete one-stop data-model research and development pipeline.</p>
 </section>
 <section id="quick-start">
 <h3>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h3>
 <section id="requirements">
 <h4>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">¶</a></h4>
-<p>Before using sandbox, you might need to install sandbox-related third-party dependencies by running the command below:</p>
+<p>Before using sandbox, you might need to install sandbox-related dependencies by running the command below:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>sandbox<span class="o">]</span>
 </pre></div>
 </div>
+<p>And prepare third-party libraries used in sandbox (e.g., EasyAnimate, VBench, InternVL, etc.) according to their official instructions, or you can simply clone the third-party repositories from GitHub and leave the installation process to our <code class="docutils literal notranslate"><span class="pre">EnvManager</span></code> during sandbox running.</p>
 <p><strong>NOTICE</strong>: some sandbox-related dependencies require extra domain dependencies.</p>
 <ol class="arabic simple">
-<li><p>If users want to train an NLP model from ModelScope
-in the sandbox, you might need to install extra <code class="docutils literal notranslate"><span class="pre">nlp</span></code> dependencies for <code class="docutils literal notranslate"><span class="pre">modelscope</span></code> library (see the <a class="reference external" href="https://modelscope.cn/docs/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85">installation docs</a>).</p></li>
 <li><p>To use <a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a>, you need to execute the following installation script:</p></li>
 </ol>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>thirdparty/models/
@@ -455,17 +455,11 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <span class="nb">cd</span><span class="w"> </span>../../
 </pre></div>
 </div>
-<ol class="arabic simple" start="3">
-<li><p>When using VBench to benchmark videos, it is necessary to install Detectron2. The following branch is recommended for installation.</p></li>
-</ol>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
-</pre></div>
-</div>
-<p>So if some Module-Not-Found errors are raised by these third-party libraries when running the sandbox, users need to check their docs first.</p>
+<p>If some Module-Not-Found errors are raised by these third-party libraries when running the sandbox, users need to check their docs first.</p>
 </section>
 <section id="prepare-configuration-files-for-sandbox">
 <h4>Prepare Configuration Files for Sandbox<a class="headerlink" href="#prepare-configuration-files-for-sandbox" title="Link to this heading">¶</a></h4>
-<p>The sandbox will sequentially execute four types of jobs: Data/Model Probe (<code class="docutils literal notranslate"><span class="pre">probe_job_configs</span></code>), Iterative Recipe Refinement based on Probe Results(<code class="docutils literal notranslate"><span class="pre">refine_recipe_job_configs</span></code>), Dataset Processing and Model Training (<code class="docutils literal notranslate"><span class="pre">execution_job_configs</span></code>) and Data/Model Evaluation (<code class="docutils literal notranslate"><span class="pre">evaluation_job_configs</span></code>). Within each category of jobs, jobs are carried out in the order specified by the configured job list. Each task requires specifying: the hook for mounting this job (<code class="docutils literal notranslate"><span class="pre">hook</span></code>), the tag name for recording intermediate results (<code class="docutils literal notranslate"><span class="pre">meta_name</span></code>), Data-Juicer data processing parameters (<code class="docutils literal notranslate"><span class="pre">dj_configs</span></code>), as well as other specific parameters for the job (<code class="docutils literal notranslate"><span class="pre">extra_configs</span></code>). Among these parameters, hook is required, while others may be left empty. dj_configs can refer to the full Data-Juicer data processing parameters available in <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml">config_all.yaml</a>. The <code class="docutils literal notranslate"><span class="pre">extra_configs</span></code> are task-specific parameters without restrictions. They can include parameters for model training, inference, evaluation, etc. For example, <code class="docutils literal notranslate"><span class="pre">path_k_sigma_recipe</span></code> can be used to specify the path for saving the data recipe refined using the k-sigma method. An example of a sandbox configuration file can be found at <code class="docutils literal notranslate"><span class="pre">configs/demo/sandbox/sandbox.yaml</span></code>:</p>
+<p>The sandbox will sequentially execute four types of jobs: Data/Model Probe (<code class="docutils literal notranslate"><span class="pre">probe_job_configs</span></code>), Iterative Recipe Refinement based on Probe Results(<code class="docutils literal notranslate"><span class="pre">refine_recipe_job_configs</span></code>), Dataset Processing and Model Training (<code class="docutils literal notranslate"><span class="pre">execution_job_configs</span></code>) and Data/Model Evaluation (<code class="docutils literal notranslate"><span class="pre">evaluation_job_configs</span></code>). Within each category of jobs, jobs are carried out in the order specified by the configured job list. Each task requires specifying: the hook for mounting this job (<code class="docutils literal notranslate"><span class="pre">hook</span></code>), the tag name for identifying the hook (<code class="docutils literal notranslate"><span class="pre">meta_name</span></code>), Data-Juicer data processing parameters (<code class="docutils literal notranslate"><span class="pre">dj_configs</span></code>), as well as other specific parameters for the job (<code class="docutils literal notranslate"><span class="pre">extra_configs</span></code>). Among these parameters, hook is required, while others may be left empty. dj_configs can refer to the full Data-Juicer data processing parameters available in <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml">config_all.yaml</a>. The <code class="docutils literal notranslate"><span class="pre">extra_configs</span></code> are task-specific parameters without restrictions. They can include parameters for model training, inference, evaluation, etc. For example, <code class="docutils literal notranslate"><span class="pre">path_k_sigma_recipe</span></code> can be used to specify the path for saving the data recipe refined using the k-sigma method. An example of a sandbox configuration file can be found at <code class="docutils literal notranslate"><span class="pre">configs/demo/sandbox/sandbox.yaml</span></code>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sandbox config example</span>
 
 <span class="c1"># global parameters</span>
@@ -511,12 +505,42 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <p>Based on this configuration file, sandbox:</p>
 <ol class="arabic simple">
 <li><p>Execute the Data-Juicer data analysis function to calculate specified metrics for each piece of data, for example, in <code class="docutils literal notranslate"><span class="pre">configs/demo/process.yaml</span></code>, the <code class="docutils literal notranslate"><span class="pre">language_id_score_filter</span></code> is designated to calculate language scores.</p></li>
-<li><p>With the results from Data-Juicer data analysis, fine-tune the data recipe using the k-sigma method. Note that the <code class="docutils literal notranslate"><span class="pre">meta_name</span></code> here must be set the same as the <code class="docutils literal notranslate"><span class="pre">meta_name</span></code> used during data analysis to utilize the results.</p></li>
+<li><p>With the results from Data-Juicer data analysis, fine-tune the data recipe using the k-sigma method. Note that the <code class="docutils literal notranslate"><span class="pre">meta_name</span></code> here is set the same as the <code class="docutils literal notranslate"><span class="pre">meta_name</span></code> used during data analysis to query the results from W&amp;B.</p></li>
 <li><p>Execute Data-Juicer’s data filtering function with the data recipe fine-tuned by the k-sigma method.</p></li>
 <li><p>Train the model with the filtered data.</p></li>
 <li><p>Analyze the data after filtering.</p></li>
 <li><p>Score the data after filtering with a scorer.</p></li>
 </ol>
+<p>When there are multiple pipelines needed in your config file, you can name each pipeline and organize them in a <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> field:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sandbox config example</span>
+
+<span class="c1"># global parameters</span>
+<span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;demo-sandbox&#39;</span>
+<span class="nt">experiment_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;demo-sandbox-run0&#39;</span><span class="w">              </span><span class="c1"># for wandb tracer name</span>
+<span class="nt">hpo_config</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">                                  </span><span class="c1"># path to a configuration file when using auto-HPO tool.</span>
+
+<span class="nt">pipelines</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pipeline_1</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">probe_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">  </span><span class="nt">pipeline_2</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">probe_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">    </span><span class="nt">refine_recipe_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">  </span><span class="nt">pipeline_3</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">probe_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">    </span><span class="nt">execution_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+</pre></div>
+</div>
+<p>In this example, there are 3 pipelines organized in the <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> field, named <code class="docutils literal notranslate"><span class="pre">pipeline_1</span></code>, <code class="docutils literal notranslate"><span class="pre">pipeline_2</span></code>, and <code class="docutils literal notranslate"><span class="pre">pipeline_3</span></code>. Each of them has their own different types of jobs. You can find a practical example of such config file for InternVL sandbox experiments in <code class="docutils literal notranslate"><span class="pre">configs/data_juicer_recipes/sandbox/internvl_coco_caption/sandbox_internvl_coco_caption.yaml</span></code>.</p>
+<p>For the single-pipeline format, the only pipeline is named “anonymous” in default.</p>
+<blockquote>
+<div><p>[!Important]</p>
+<p>The single pipeline format without <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> field and the multi-pipeline format with <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> field are both supported but can not be used at the same time.</p>
+</div></blockquote>
 </section>
 <section id="start-sandbox">
 <h4>Start Sandbox<a class="headerlink" href="#start-sandbox" title="Link to this heading">¶</a></h4>
@@ -539,10 +563,13 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <h3>Component Factory<a class="headerlink" href="#component-factory" title="Link to this heading">¶</a></h3>
 <p>In a single trial of the sandbox pipeline, four major steps involve various configurable components. Each of these components corresponds to a factory class used to initialize them:</p>
 <ul class="simple">
-<li><p><strong>Data Processing (DataExecutor)</strong>: Executor for dataset processing, i.e., the executor of Data-Juicer</p></li>
+<li><p><strong>Data Processing (DataExecutor)</strong>: Executor for dataset processing, i.e., the Executor of Data-Juicer</p></li>
+<li><p><strong>Data Pool Manipulator (DataPoolManipulator)</strong>: Manipulator for data pools, i.e., construction, combination</p></li>
+<li><p><strong>General Data Processing (GeneralDataExecutor)</strong>: General executor for dataset processing, i.e., dataset format conversion</p></li>
 <li><p><strong>Data Analyzing（DataAnalyzer）</strong>: Analyzer for dataset, i.e., the analyzer of Data-Juicer</p></li>
 <li><p><strong>Data Evaluation (DataEvaluator)</strong>: Evaluator on the quality of the dataset</p></li>
-<li><p><strong>Model-Data Evaluation（ModelInferEvaluator）</strong>: Evaluator of dataset quality using the model’s inference results</p></li>
+<li><p><strong>General Data Probe (GeneralProbe)</strong>: General probe components for the dataset</p></li>
+<li><p><strong>Model-Data Evaluation (ModelInferEvaluator)</strong>: Evaluator of dataset quality using the model’s inference results</p></li>
 <li><p><strong>Model Training (ModelTrainExecutor)</strong>: Executor for model training</p></li>
 <li><p><strong>Model Inference (ModelInferExecutor)</strong>: Executor for model inference</p></li>
 <li><p><strong>Model Evaluation (ModelEvaluator)</strong>: Evaluator on the performance of the model</p></li>
@@ -566,6 +593,68 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <td><p>The data process module of Data-Juicer</p></td>
 <td><p>-</p></td>
 <td><p>-</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>DataPoolManipulatorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolConstruction</span></code></p></td>
+<td><p>Construct data pool from specified analyzed data source</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolCombination</span></code></p></td>
+<td><p>Combine specified data pools</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolDuplication</span></code></p></td>
+<td><p>Duplicate a data pool for specified times</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolDownsampling</span></code></p></td>
+<td><p>Randomly downsample data pools to specified scale</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>GeneralDataExecutorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">COCOCaptionToDJConversion</span></code></p></td>
+<td><p>Convert InternVL COCO Caption datasets to DJ format</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html">InternVL COCO Caption</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">COCOCaptionMetaGeneration</span></code></p></td>
+<td><p>Generate meta file for InternVL COCO Caption datasets</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html">InternVL COCO Caption</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -606,18 +695,39 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Gpt3QualityEvaluator</span></code></p></td>
 <td><p>Evaluate the quality of a dataset using the GPT-3 text quality classifier reproduced by Data-Juicer.</p></td>
-<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of the object to be evaluated by the evaluator, currently only supports <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code>.<br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: An useless parameter.<br /></p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of the object to be evaluated by the evaluator, currently only supports <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code>.<br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: A useless parameter.<br /></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/tree/main/tools/quality_classifier">Data-Juicer Quality Classifier Toolkit</a></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">VBenchEvaluator</span></code></p></td>
 <td><p>Evaluate the generated videos according to given prompts in multi dimensions</p></td>
-<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of the object to be evaluated by the evaluator, currently only supports <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code><br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: An useless parameter.<br />- Return: The average score of generated videos in multi dimensions.<br /></p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of the object to be evaluated by the evaluator, currently only supports <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code><br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: A useless parameter.<br />- Return: The average score of generated videos in multi dimensions.<br /></p></td>
 <td><p><a class="reference external" href="https://arxiv.org/abs/2311.17982">VBench paper</a></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InceptionEvaluator</span></code></p></td>
 <td><p>Evaluate the generated videos by features extracted from video classification models.</p></td>
-<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of the object to be evaluated by the evaluator, currently only supports <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code><br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: An useless parameter.<br />- Return: A dictionary of scores in the given metric. <br /></p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of the object to be evaluated by the evaluator, currently only supports <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code><br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: A useless parameter.<br />- Return: A dictionary of scores in the given metric. <br /></p></td>
 <td><p><a class="reference external" href="https://github.com/NVlabs/long-video-gan/tree/main/metrics">Inception Metrics</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>GeneralProbeFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolRanking</span></code></p></td>
+<td><p>Rank data pools according to specified evaluation metrics</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -658,13 +768,23 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ModelscopeTrainExecutor</span></code></p></td>
 <td><p>Perform a training task on a model from the ModelScope platform using specified datasets, and monitor the change in training loss.</p></td>
-<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model training. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;modelscope&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: An useless parameter.<br /></p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model training. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;modelscope&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: A useless parameter.<br /></p></td>
 <td><p><a class="reference external" href="https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%AE%AD%E7%BB%83Train">ModelScope Docs of Model Training</a></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EasyAnimateTrainExecutor</span></code></p></td>
 <td><p>Perform a LoRA training task on EasyAnimate text-to-video model, and monitor the change in training loss.</p></td>
-<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model training. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;easyanimate&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: An useless parameter.<br /></p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model training. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;easyanimate&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: A useless parameter.<br /></p></td>
 <td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TrinityRFTTrainExecutor</span></code></p></td>
+<td><p>Perform a reinforcement fine-tuning task based on Trinity-RFT framework, and monitor the change in training states.</p></td>
+<td><p>- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: Could be the path to Trinity configs.</p></td>
+<td><p><a class="reference external" href="https://github.com/modelscope/Trinity-RFT">Trinity-RFT</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">InternVLCOCOCaptionTrainExecutor</span></code></p></td>
+<td><p>Perform a LoRA fine-tuning task on InternVL2 for COCO Caption task, and monitor the change in training loss and learning rate.</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html">InternVL COCO Caption</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -684,20 +804,99 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EasyAnimateInferExecutor</span></code></p></td>
 <td><p>Perform inference on EasyAnimate text-to-video model with the prompts from VBench, and save the generated videos.</p></td>
-<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model inference. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;easyanimate&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: An useless parameter.<br /></p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model inference. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;easyanimate&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: A useless parameter.<br /></p></td>
 <td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a></p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <ul class="simple">
-<li><p>ModelEvaluatorFactory</p>
+<li><p>ModelEvaluatorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InternVLCOCOCaptionEvaluator</span></code></p></td>
+<td><p>Evaluate Bleu-1/2/3/4, METEOR, ROUGE_L, and CIDEr for InternVL COCO Caption task</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model">InternVL COCO Caption</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Please refer to <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/factories.py</span></code> for detailed definitions.</p>
+</section>
+<section id="context-sharing">
+<h3>Context Sharing<a class="headerlink" href="#context-sharing" title="Link to this heading">¶</a></h3>
+<p>Sometimes, information needs to be shared between different hooks. For example, the <code class="docutils literal notranslate"><span class="pre">TrainModelHook</span></code> needs to share the model checkpoint path with the <code class="docutils literal notranslate"><span class="pre">EvaluateModelHook</span></code> to perform evaluation on the model after training.</p>
+<p>To achieve this, we integrate a global, both cross-hook and cross-pipeline information container called <code class="docutils literal notranslate"><span class="pre">context_infos</span></code> to store the executed results of hooks in each pipeline. The <code class="docutils literal notranslate"><span class="pre">context_infos</span></code> are constructed automatically when the pipeline is executed.</p>
+<section id="resume-mode">
+<h4>Resume Mode<a class="headerlink" href="#resume-mode" title="Link to this heading">¶</a></h4>
+<p>After each pipeline is finished, the <code class="docutils literal notranslate"><span class="pre">context_infos</span></code> are saved on disk. Based on this, Sandbox allows a pipeline-level resume mode to continue the sandbox execution from the last pipeline checkpoint. All we need to do is to set the <code class="docutils literal notranslate"><span class="pre">resume</span></code> parameter in the sandbox configuration file to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+</section>
+<section id="input-output-and-local-parameter-of-hooks">
+<h4>Input, Output, and Local Parameter of Hooks<a class="headerlink" href="#input-output-and-local-parameter-of-hooks" title="Link to this heading">¶</a></h4>
+<p>To obtain the context infos, three new parameters are added to the hook:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">input</span></code>: used to obtain results from the previous hook stored in the context infos, and update it in the configuration of the current hook.</p>
 <ul>
-<li><p>TBD</p></li>
+<li><p>Basic usage: <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;:</span> <span class="pre">&lt;key_in_context_infos&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;</span></code> is the key in the configuration of the current hook to be updated, and <code class="docutils literal notranslate"><span class="pre">&lt;key_in_context_infos&gt;</span></code> is the key of the previous result stored in the context infos.</p></li>
+<li><p>Each pair of input parameters would replace the values in the <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;</span></code> with the values in the context infos with key <code class="docutils literal notranslate"><span class="pre">&lt;key_in_context_infos&gt;</span></code>. Nested keys using dot (<code class="docutils literal notranslate"><span class="pre">.</span></code>) notation are supported for both of them.</p></li>
+<li><p>If only the result from the last hook is needed, a simple <code class="docutils literal notranslate"><span class="pre">-1</span></code> can be used as the hook key in the <code class="docutils literal notranslate"><span class="pre">&lt;key_in_context_infos&gt;</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output</span></code>: used to store the results of the current hook in the context infos.</p>
+<ul>
+<li><p>Basic usage: <code class="docutils literal notranslate"><span class="pre">[&lt;res_1_name&gt;,</span> <span class="pre">&lt;res_2_name&gt;,</span> <span class="pre">...]</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;res_i_name&gt;</span></code> represents the <code class="docutils literal notranslate"><span class="pre">i</span></code>th output result of the current hook. If the <code class="docutils literal notranslate"><span class="pre">output</span></code> parameter is not specified, simple “res_i” is used automatically for the <code class="docutils literal notranslate"><span class="pre">i</span></code>th output result.</p></li>
+<li><p>After the hook is executed, the results of the current hook are stored as dict in the context infos with the keys specified in the <code class="docutils literal notranslate"><span class="pre">output</span></code> parameter.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">local</span></code>: used to update the configuration of the current hook locally with specified values.</p>
+<ul>
+<li><p>Basic usage: <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;:</span> <span class="pre">&lt;value&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;</span></code> is the key in the configuration of the current hook to be updated, and <code class="docutils literal notranslate"><span class="pre">&lt;value&gt;</span></code> is the target value.</p></li>
+<li><p>Each pair of local parameters would replace the values in the <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;</span></code> with the values specified in the <code class="docutils literal notranslate"><span class="pre">&lt;value&gt;</span></code>. Nested keys using dot (<code class="docutils literal notranslate"><span class="pre">.</span></code>) notation are supported.</p></li>
 </ul>
 </li>
 </ul>
-<p>Please refer to <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/factories.py</span></code> for detailed definitions.</p>
+<p>An example of a hook using these parameters is shown below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">xxx_hook</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">meta_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">job_xxx</span>
+<span class="w">  </span><span class="nt">input</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">dj_configs.dataset_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pipeline1.name3.res4_key</span>
+<span class="w">    </span><span class="nt">extra_configs.meta_paths</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-1.res5_key</span>
+<span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;res6_key&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;res7_key&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">local</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">extra_configs.arg2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">42</span>
+<span class="w">  </span><span class="nt">dj_configs</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;/path/to/dj_configs.yaml&#39;</span>
+<span class="w">  </span><span class="nt">extra_configs</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">arg1</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;arg1_val&quot;</span>
+<span class="w">    </span><span class="nt">arg2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">404</span>
+<span class="w">    </span><span class="nt">meta_paths</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&lt;placeholder&gt;&quot;</span>
+</pre></div>
+</div>
+<p>In this hook, it uses all three parameters:</p>
+<ul class="simple">
+<li><p>In <code class="docutils literal notranslate"><span class="pre">input</span></code>, the hook replaces the <code class="docutils literal notranslate"><span class="pre">dataset_path</span></code> in the <code class="docutils literal notranslate"><span class="pre">dj_configs</span></code> in YAML format with the value of the <code class="docutils literal notranslate"><span class="pre">res4_key</span></code> stored in the context infos of the previous hook with <code class="docutils literal notranslate"><span class="pre">meta_name</span></code> “name3” in the pipeline named “pipeline1”. Beside, it replace the <code class="docutils literal notranslate"><span class="pre">meta_paths</span></code> in the <code class="docutils literal notranslate"><span class="pre">extra_configs</span></code> with the value of the <code class="docutils literal notranslate"><span class="pre">res5_key</span></code> stored in the context infos of the previous hook specified by “-1”.</p></li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">output</span></code>, the hook outputs two results named <code class="docutils literal notranslate"><span class="pre">res6_key</span></code> and <code class="docutils literal notranslate"><span class="pre">res7_key</span></code>, which will be stored in the context infos as following:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;job_xxx&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;res6_key&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">output_1</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s1">&#39;res7_key&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">output_2</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>In <code class="docutils literal notranslate"><span class="pre">local</span></code>, the hook replaces the original value of <code class="docutils literal notranslate"><span class="pre">arg2</span></code> in the <code class="docutils literal notranslate"><span class="pre">extra_configs</span></code>, which is 404 before, with the target value 42.</p></li>
+</ul>
+</section>
 </section>
 </section>
 <section id="developer-guide">
@@ -706,10 +905,11 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <img alt="sandbox-pipeline" src="https://img.alicdn.com/imgextra/i3/O1CN01ERmGre1uz3luKOn4n_!!6000000006107-2-tps-4655-1918.png" /></p>
 <section id="the-internal-implementation-of-components">
 <h3>The Internal Implementation of Components<a class="headerlink" href="#the-internal-implementation-of-components" title="Link to this heading">¶</a></h3>
-<p>Currently, components are mainly divided into two major categories:</p>
+<p>Currently, components are mainly divided into three major categories:</p>
 <ul class="simple">
 <li><p><strong>Executor</strong>: Since the data executor is already handled by the Data-Juicer’s Executor, the executor here specifically refers to the model executor, including model training, inference, evaluation, etc. The code is located in <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/model_executors.py</span></code>.</p></li>
 <li><p><strong>Evaluator</strong>: Used for evaluating the quality and performance of datasets or models. The code is located in <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/evaluators.py</span></code>.</p></li>
+<li><p><strong>DataPoolManipulator</strong>: Used for manipulating the data pool, such as construction, combination, sampling, etc. The code is located in <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/data_pool_manipulators.py</span></code>.</p></li>
 </ul>
 <section id="executor">
 <h4>Executor<a class="headerlink" href="#executor" title="Link to this heading">¶</a></h4>
@@ -733,6 +933,11 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <li><p><code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: The object to be evaluated.</p></li>
 </ul>
 <p>Users can also extend the usage of these two parameters based on their implementation.</p>
+</section>
+<section id="datapoolmanipulator">
+<h4>DataPoolManipulator<a class="headerlink" href="#datapoolmanipulator" title="Link to this heading">¶</a></h4>
+<p>The core function of the data pool manipulator is to manipulate the data pool, such as construction, combination, sampling, etc. The data pool manipulator needs to inherit from the base class <code class="docutils literal notranslate"><span class="pre">BaseDataPoolManipulator</span></code> and implement the <code class="docutils literal notranslate"><span class="pre">run</span></code> method. The <code class="docutils literal notranslate"><span class="pre">run</span></code> method. The necessary parameters usually come from the input data pool configs in the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method, covering input data pools, export paths, and specific parameters for each type of manipulators.</p>
+<p>Users can refer to the doc string of the <code class="docutils literal notranslate"><span class="pre">run</span></code> method of each manipulator for more details in <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/data_pool_manipulators.py</span></code>.</p>
 </section>
 </section>
 <section id="pipeline-hook">
@@ -764,50 +969,68 @@ bash<span class="w"> </span>setup_easyanimate.sh
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ProbeViaModelInferHook</span></code></p></td>
 <td><p>Analyze and understand the impact of the dataset on the model, explore and probe “difficult” and “dirty” data</p></td>
-<td><p>DataExecutorFactor <br />ModelInferEvaluatorFactory</p></td>
+<td><p>DataExecutorFactory <br />ModelInferEvaluatorFactory</p></td>
 <td><p>Data-Juicer Executor</p></td>
 <td><p>- probe_jobs<br />- evaluation_jobs</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RefineRecipeViaKSigmaHook</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GeneralProbeHook</span></code></p></td>
+<td><p>General hook for probing the dataset, including ranking the datasets and so on</p></td>
+<td><p>GeneralProbeFactory</p></td>
+<td><p>-</p></td>
+<td><p>- probe_jobs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RefineRecipeViaKSigmaHook</span></code></p></td>
 <td><p>Refine data recipe hyperparameters using the k-sigma method based on the probe results of the dataset</p></td>
 <td><p>-</p></td>
 <td><p>k-sigma recipe refinement tool of Data-Juicer Hyperparameter Optimization (HPO) toolkit</p></td>
 <td><p>- refine_recipe_jobs</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RefineRecipeViaModelFeedbackHook</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RefineRecipeViaModelFeedbackHook</span></code></p></td>
 <td><p>Refine data recipe hyperparameters using model probe and feedback results</p></td>
 <td><p>TODO</p></td>
 <td><p>-</p></td>
 <td><p>- refine_recipe_jobs</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ProcessDataHook</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ProcessDataHook</span></code></p></td>
 <td><p>Process and clean the dataset based on the current data recipe</p></td>
-<td><p>DataExecutorFactor</p></td>
+<td><p>DataExecutorFactory</p></td>
 <td><p>Data-Juicer Executor</p></td>
 <td><p>- execution_jobs</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TrainModelHook</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolManipulationHook</span></code></p></td>
+<td><p>Data pool manipulation,  including construction, combination, sampling, etc.</p></td>
+<td><p>DataPoolManipulatorFactory</p></td>
+<td><p>-</p></td>
+<td><p>- execution_jobs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GeneralDataExecutorHook</span></code></p></td>
+<td><p>General data processing for dataset, including format conversion, etc.</p></td>
+<td><p>GeneralDataExecutorFactory</p></td>
+<td><p>-</p></td>
+<td><p>- execution_jobs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TrainModelHook</span></code></p></td>
 <td><p>Train a model based on the current dataset</p></td>
 <td><p>ModelTrainExecutorFactory</p></td>
-<td><p><a class="reference internal" href="#../thirdparty//easy_animate/README.md"><span class="xref myst">EasyAnimate</span></a></p></td>
+<td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a> <br/> <a class="reference external" href="https://internvl.readthedocs.io/en/latest/index.html">InternVL</a></p></td>
 <td><p>- execution_jobs</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InferModelHook</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">InferModelHook</span></code></p></td>
 <td><p>The model generates output based on the given input</p></td>
 <td><p>ModelInferExecutorFactory</p></td>
-<td><p><a class="reference internal" href="#../thirdparty//easy_animate/README.md"><span class="xref myst">EasyAnimate</span></a></p></td>
+<td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a></p></td>
 <td><p>- execution_jobs</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EvaluateDataHook</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EvaluateDataHook</span></code></p></td>
 <td><p>Evaluate the dataset in terms of data quality and other dimensions</p></td>
 <td><p>DataEvaluatorFactory</p></td>
 <td><p><a class="reference internal" href="../tools/mm_eval/inception_metrics/README.html"><span class="std std-doc">inception metrics</span></a> for images and videos, such as FID and FVD <br /> <a class="reference internal" href="../tools/mm_eval/vbench_metrics/README.html"><span class="std std-doc">VBench</span></a></p></td>
 <td><p>- evaluation_jobs</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EvaluateModelHook</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EvaluateModelHook</span></code></p></td>
 <td><p>Evaluate the trained model</p></td>
 <td><p>ModelEvaluatorFactory</p></td>
-<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model">InternVL COCO Caption</a></p></td>
 <td><p>- evaluation_jobs</p></td>
 </tr>
 </tbody>
@@ -830,6 +1053,178 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <li><p><code class="docutils literal notranslate"><span class="pre">query</span></code>: This method queries a specific metric or experiment result from the wandb log.</p></li>
 </ul>
 </section>
+<section id="details-of-context-infos">
+<h3>Details of Context Infos<a class="headerlink" href="#details-of-context-infos" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">context_infos</span></code> consists of two levels:</p>
+<ul class="simple">
+<li><p>pipeline level: it’s the 1st level of <code class="docutils literal notranslate"><span class="pre">context_infos</span></code>, which is a dict with keys are the pipeline names and values are a list of context information of each job in this pipeline.</p></li>
+<li><p>job level: it’s the 2nd level of <code class="docutils literal notranslate"><span class="pre">context_infos</span></code>, which is a list of dicts, each dict represents the context information of a specific job, with <code class="docutils literal notranslate"><span class="pre">meta_name</span></code> to identify the job and other key-value pairs with keys are the name of the outputs of this job and values are the output values.</p></li>
+</ul>
+<p>Here is an example of <code class="docutils literal notranslate"><span class="pre">context_infos</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;pipeline_0&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;name1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res1_key&#39;</span><span class="p">:</span> <span class="s1">&#39;res1_value&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res2_key&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">res2_value</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;name2&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res3_key&#39;</span><span class="p">:</span> <span class="s1">&#39;res3_value&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;pipeline_1&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;name3&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res4_key&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">res4_value</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;pipeline_2&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;name4&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res5_key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;res5_1_value&#39;</span><span class="p">,</span> <span class="s1">&#39;res5_2_value&#39;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="environment-manager">
+<h3>Environment Manager<a class="headerlink" href="#environment-manager" title="Link to this heading">¶</a></h3>
+<p>Sandbox supports different kinds of third-party libraries for training, evaluation and so on. If we put all of them into
+one environment, version conflicts on some important and complex dependencies will occur. Therefore, we provide an
+easy-to-use environment manager to manage different environments for different third-party libraries, allow users to run
+commands in isolated environments independently.</p>
+<p>The basic class of environment is <code class="docutils literal notranslate"><span class="pre">Env</span></code> in <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/env_manager.py</span></code> implemented as below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Env</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+  
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_availability</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check the availability of the environment manager.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if an environment exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">install_py_deps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Install Python dependencies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run a command in this environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It consists of five main abstract methods:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">create</span></code>: create an environment if it’s not existing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">check_availability</span></code>: check the availability of the environment manager (e.g., <code class="docutils literal notranslate"><span class="pre">conda</span></code>, <code class="docutils literal notranslate"><span class="pre">venv</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">exists</span></code>: check if an environment exists.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">install_py_deps</span></code>: install Python dependencies. Usually support three ways: a “requirements.txt” file path, a dependency list, or a directory path to a library code base.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_cmd</span></code>: run a command in this environment.</p></li>
+</ul>
+<p>Now we provide two concrete implementations of <code class="docutils literal notranslate"><span class="pre">Env</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CondaEnv</span></code>: use <code class="docutils literal notranslate"><span class="pre">conda</span></code> or <code class="docutils literal notranslate"><span class="pre">mamba</span></code> to manage environments.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VirtualEnv</span></code>: use <code class="docutils literal notranslate"><span class="pre">venv</span></code>, <code class="docutils literal notranslate"><span class="pre">virtualenv</span></code>, or <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">venv</span></code> to manage environments.</p></li>
+</ul>
+<p>When initializing the environment manager, we can specify the environment manager to use by setting the <code class="docutils literal notranslate"><span class="pre">env_manager</span></code> parameter in the configuration file and the name of the environment by setting the <code class="docutils literal notranslate"><span class="pre">env_name</span></code> parameter. An example of the basic usage is as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.sandbox.env_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ENV_ROUTER</span>
+
+<span class="n">env_manager</span> <span class="o">=</span> <span class="s1">&#39;conda&#39;</span>
+<span class="n">env_name</span> <span class="o">=</span> <span class="s1">&#39;new_conda_env&#39;</span>
+
+<span class="c1"># create an environment</span>
+<span class="n">env</span> <span class="o">=</span>  <span class="n">ENV_ROUTER</span><span class="p">[</span><span class="n">env_manager</span><span class="p">](</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">modelscope</span><span class="o">/</span><span class="n">data</span><span class="o">-</span><span class="n">juicer</span><span class="o">/</span><span class="n">blob</span><span class="o">/</span><span class="n">main</span><span class="o">/</span><span class="n">docs</span><span class="o">/</span>
+  <span class="n">env_name</span><span class="o">=</span><span class="n">env_name</span><span class="p">,</span>
+  <span class="n">env_manager</span><span class="o">=</span><span class="n">env_manager</span><span class="p">)</span>
+<span class="c1"># check the availability</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">env</span><span class="o">.</span><span class="n">check_availability</span><span class="p">():</span>
+    <span class="c1"># this env manager is not available</span>
+    <span class="n">exit</span><span class="p">()</span>
+<span class="c1"># create a new env. If it&#39;s already existing, use the existing one</span>
+<span class="n">env</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+<span class="c1"># install extra dependencies</span>
+<span class="c1"># use a &quot;requirements.txt&quot; file</span>
+<span class="n">env</span><span class="o">.</span><span class="n">install_py_deps</span><span class="p">(</span><span class="s2">&quot;/path/to/requirements.txt&quot;</span><span class="p">)</span>
+<span class="c1"># use a dependency list</span>
+<span class="n">env</span><span class="o">.</span><span class="n">install_py_deps</span><span class="p">([</span><span class="s2">&quot;torch&quot;</span><span class="p">,</span> <span class="s2">&quot;torchvision&quot;</span><span class="p">])</span>
+<span class="c1"># use a directory path to a library code base, e.g., InternVL</span>
+<span class="n">env</span><span class="o">.</span><span class="n">install_py_deps</span><span class="p">(</span><span class="s2">&quot;/path/to/a/third-party/library&quot;</span><span class="p">)</span>
+
+<span class="c1"># run a command in this environment</span>
+<span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;python train.py&quot;</span>
+<span class="n">env</span><span class="o">.</span><span class="n">run_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A complete example of using the environment manager in a hook is available in the <code class="docutils literal notranslate"><span class="pre">InternVLCOCOCaptionEvaluator</span></code> class in <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/specific_hooks/intervl_coco_captioning/model_hooks.py</span></code>.</p>
+</section>
+</section>
+<section id="q-a">
+<h2>Q&amp;A<a class="headerlink" href="#q-a" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> when training InternVL:</p></li>
+</ol>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>RuntimeError: 
+        CUDA Setup failed despite GPU being available. Please run the following command to get more information:
+
+        python -m bitsandbytes
+
+        Inspect the output of the command and see if you can locate CUDA libraries. You might need to add them
+        to your LD_LIBRARY_PATH. If you suspect a bug, please take the information from python -m bitsandbytes
+        and open an issue at: https://github.com/TimDettmers/bitsandbytes/issues
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Reason: it might be the reason of incompatibility of CUDA, PyTorch, and bitsandbytes. Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">bitsandbytes</span></code> for more details.</p></li>
+<li><p>Solution:</p>
+<ul>
+<li><p>Remove the version limitation of bitsandbytes in <code class="docutils literal notranslate"><span class="pre">requirements/internvl_chat.txt</span></code> in the home of InternVL to avoid install the error version again when starting the env. Then reinstall it with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">uninstall</span> <span class="pre">bitsandbytes</span> <span class="pre">&amp;&amp;</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">bitsandbytes</span></code>.</p></li>
+<li><p>If the above solution does not work, reinstall the PyTorch that is compatible with the CUDA version of your GPU, and repeat the above step, until the command <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">bitsandbytes</span></code> outputs SUCCESS.</p></li>
+<li><p>Then, the <code class="docutils literal notranslate"><span class="pre">flash-attn</span></code> needs to be reinstalled as well.</p></li>
+</ul>
+</li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p><code class="docutils literal notranslate"><span class="pre">AssertionError</span></code> when training InternVL:</p></li>
+</ol>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>AssertionError: It is illegal to call Engine.step() inside no_sync context manager
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Solution: downgrade the version of <code class="docutils literal notranslate"><span class="pre">deepspeed</span></code> to <code class="docutils literal notranslate"><span class="pre">0.15.4</span></code>, and remove the version limitation of <code class="docutils literal notranslate"><span class="pre">deepspeed</span></code> in both <code class="docutils literal notranslate"><span class="pre">requirements/internvl_chat.txt</span></code> and <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> in the home of InternVL.</p></li>
+</ul>
+<ol class="arabic simple" start="3">
+<li><p><code class="docutils literal notranslate"><span class="pre">java</span> <span class="pre">not</span> <span class="pre">found</span></code> when evaluating InternVL:</p></li>
+</ol>
+<ul class="simple">
+<li><p>Solution: install java.</p></li>
+</ul>
 </section>
 </section>
 
@@ -890,8 +1285,8 @@ bash<span class="w"> </span>setup_easyanimate.sh
             <ul>
 <li><a class="reference internal" href="#">Sandbox</a><ul>
 <li><a class="reference internal" href="#user-guide">User Guide</a><ul>
-<li><a class="reference internal" href="#applications-and-achievements">Applications and Achievements</a></li>
 <li><a class="reference internal" href="#what-is-dj-sandbox">What is DJ-Sandbox?</a></li>
+<li><a class="reference internal" href="#applications-and-use-cases">Applications and Use-Cases</a></li>
 <li><a class="reference internal" href="#quick-start">Quick Start</a><ul>
 <li><a class="reference internal" href="#requirements">Requirements</a></li>
 <li><a class="reference internal" href="#prepare-configuration-files-for-sandbox">Prepare Configuration Files for Sandbox</a></li>
@@ -899,19 +1294,28 @@ bash<span class="w"> </span>setup_easyanimate.sh
 </ul>
 </li>
 <li><a class="reference internal" href="#component-factory">Component Factory</a></li>
+<li><a class="reference internal" href="#context-sharing">Context Sharing</a><ul>
+<li><a class="reference internal" href="#resume-mode">Resume Mode</a></li>
+<li><a class="reference internal" href="#input-output-and-local-parameter-of-hooks">Input, Output, and Local Parameter of Hooks</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#developer-guide">Developer Guide</a><ul>
 <li><a class="reference internal" href="#the-internal-implementation-of-components">The Internal Implementation of Components</a><ul>
 <li><a class="reference internal" href="#executor">Executor</a></li>
 <li><a class="reference internal" href="#evaluator">Evaluator</a></li>
+<li><a class="reference internal" href="#datapoolmanipulator">DataPoolManipulator</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pipeline-hook">Pipeline Hook</a></li>
 <li><a class="reference internal" href="#customized-sandbox-pipeline">Customized Sandbox Pipeline</a></li>
 <li><a class="reference internal" href="#watcher">Watcher</a></li>
+<li><a class="reference internal" href="#details-of-context-infos">Details of Context Infos</a></li>
+<li><a class="reference internal" href="#environment-manager">Environment Manager</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#q-a">Q&amp;A</a></li>
 </ul>
 </li>
 </ul>

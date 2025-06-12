@@ -511,8 +511,9 @@
             <span class="n">tmp_dj_cfg</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">tmp_dj_cfg</span><span class="o">.</span><span class="n">use_checkpoint</span> <span class="o">=</span> <span class="kc">False</span>
 
+            <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_init_configs</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
-            <span class="n">tmp_analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">tmp_dj_cfg</span><span class="p">)</span>
+            <span class="n">tmp_analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">get_init_configs</span><span class="p">(</span><span class="n">tmp_dj_cfg</span><span class="p">))</span>
 
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="c1"># do not overwrite the true analysis results</span>
@@ -561,8 +562,9 @@
                 <span class="n">tmp_dj_cfg</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="n">tmp_dj_cfg</span><span class="o">.</span><span class="n">use_checkpoint</span> <span class="o">=</span> <span class="kc">False</span>
 
+                <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_init_configs</span>
                 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
-                <span class="n">tmp_analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">tmp_dj_cfg</span><span class="p">)</span>
+                <span class="n">tmp_analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">get_init_configs</span><span class="p">(</span><span class="n">tmp_dj_cfg</span><span class="p">))</span>
                 <span class="c1"># do not overwrite the true analysis results</span>
                 <span class="n">tmp_analyzer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">skip_export</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -704,8 +706,11 @@
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.JobRequiredKeys">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">JobRequiredKeys</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">hook</span> <span class="o">=</span> <span class="s1">&#39;hook&#39;</span>
-    <span class="n">dj_configs</span> <span class="o">=</span> <span class="s1">&#39;dj_configs&#39;</span>
     <span class="n">meta_name</span> <span class="o">=</span> <span class="s1">&#39;meta_name&#39;</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="s1">&#39;input&#39;</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="s1">&#39;output&#39;</span>
+    <span class="n">local</span> <span class="o">=</span> <span class="s1">&#39;local&#39;</span>
+    <span class="n">dj_configs</span> <span class="o">=</span> <span class="s1">&#39;dj_configs&#39;</span>
     <span class="n">extra_configs</span> <span class="o">=</span> <span class="s1">&#39;extra_configs&#39;</span></div>
 
 </pre></div>
