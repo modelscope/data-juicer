@@ -1,3 +1,8 @@
 #!/bin/bash
-sphinx-apidoc -f -o source ../../data_juicer -t _templates
-make clean html
+make clean
+languages=(en zh_CN)
+
+for lang in "${languages[@]}"; do
+    sphinx-multiversion source build/$lang -D "language=$lang"
+done
+

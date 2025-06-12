@@ -1,7 +1,6 @@
 import asyncio
 import os
 import re
-import stat
 import subprocess
 import sys
 import time
@@ -34,8 +33,8 @@ class BaseModelExecutor(object):
         if self.watcher is None:
             run_task = asyncio.create_task(
                 self._run(run_type, run_obj, **kwargs))
-            await run_task
-            return None
+            ret = await run_task
+            return ret
         else:
             original_stdout = sys.stdout
             original_stderr = sys.stderr
@@ -51,13 +50,13 @@ class BaseModelExecutor(object):
                     sys.stderr = log_f
                     run_task = asyncio.create_task(
                         self._run(run_type, run_obj, **kwargs))
-                    await run_task
+                    ret = await run_task
                     print(self.END_OF_MODEL_EXEC, flush=True)
-                    summarized_watched_res = await watch_task
+                    await watch_task
             finally:
                 sys.stdout = original_stdout
                 sys.stderr = original_stderr
-            return summarized_watched_res
+            return ret
 
     def run_subprocess(self, script_path, run_args, working_dir, cmd='bash'):
         run_args = [str(arg) for arg in run_args]
@@ -208,66 +207,7 @@ class ModelscopeTrainExecutor(ModelScopeExecutor):
         self.work_dir = builder_kwargs['work_dir']
         self.build_executor(**builder_kwargs)
         self.executor.train()
-
-
-class EasyAnimateTrainExecutor(BaseModelExecutor):
-
-    def __init__(self, model_config: dict, watcher=None):
-        super().__init__(model_config, watcher)
-        cur_working_dir = os.getcwd()
-        self.script_path = os.path.join(
-            cur_working_dir, 'thirdparty/models/EasyAnimate/train_lora.sh')
-        self.working_dir = os.path.join(cur_working_dir,
-                                        'thirdparty/models/EasyAnimate/')
-        # make sure executable
-        current_permissions = os.stat(self.script_path).st_mode
-        os.chmod(
-            self.script_path,
-            current_permissions | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-
-    async def _run(self, run_type, run_obj=None, **kwargs):
-        config = self.model_config.train
-        run_args = [
-            config.model_path.pretrained_model_name_or_path,
-            config.model_path.transformer_path,
-            config.dataset_path.dataset_name,
-            config.dataset_path.dataset_meta_name,
-            config.training_config.sample_size,
-            config.training_config.mixed_precision,
-            config.training_config.batch_size_per_gpu,
-            config.training_config.gradient_accumulation_steps,
-            config.training_config.num_train_epochs,
-            config.training_config.dataloader_num_workers,
-            config.training_config.seed, config.saving_config.output_dir,
-            config.tracker_config.project_name,
-            config.tracker_config.experiment_name
-        ]
-        self.run_subprocess(self.script_path, run_args, self.working_dir)
-
-
-class EasyAnimateInferExecutor(BaseModelExecutor):
-
-    def __init__(self, model_config: dict, watcher=None):
-        super().__init__(model_config, watcher)
-        cur_working_dir = os.getcwd()
-        self.script_path = os.path.join(
-            cur_working_dir, 'thirdparty/models/EasyAnimate/infer_lora.sh')
-        self.working_dir = os.path.join(cur_working_dir,
-                                        './thirdparty/models/EasyAnimate/')
-
-    async def _run(self, run_type, run_obj=None, **kwargs):
-        config = self.model_config.train
-        run_args = [
-            config.model_path.pretrained_model_name_or_path,
-            config.model_path.transformer_path, config.model_path.lora_path,
-            config.infer_config.image_size,
-            config.infer_config.prompt_info_path, config.infer_config.gpu_num,
-            config.infer_config.batch_size,
-            config.infer_config.mixed_precision,
-            config.infer_config.video_num_per_prompt, config.infer_config.seed,
-            config.saving_config.output_video_dir
-        ]
-        self.run_subprocess(self.script_path, run_args, self.working_dir)
+        return self.work_dir
 
 
 class LLaVAExecutor(BaseModelExecutor):

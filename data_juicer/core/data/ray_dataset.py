@@ -15,6 +15,7 @@ from data_juicer.ops import Deduplicator, Filter, Mapper
 from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.lazy_loader import LazyLoader
+from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.process_utils import calculate_np
 
 ray = LazyLoader('ray')
@@ -50,7 +51,11 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     """
     path_keys = []
     columns = dataset.columns()
-    for key in [cfg.video_key, cfg.image_key, cfg.audio_key]:
+    for key in [
+            cfg.get('video_key', SpecialTokens.video),
+            cfg.get('image_key', SpecialTokens.image),
+            cfg.get('audio_key', SpecialTokens.audio)
+    ]:
         if key in columns:
             path_keys.append(key)
     if len(path_keys) > 0:
@@ -102,15 +107,7 @@ class RayDataset(DJDataset):
         if self.data is None or self.data.columns() is None:
             raise ValueError('Dataset is empty or not initialized')
 
-        # Get schema from Ray dataset
-        _schema = self.data.schema()
-
-        # convert schema to proper list and dict
-        column_types = {
-            k: Schema.map_ray_type_to_python(v)
-            for k, v in zip(_schema.names, _schema.types)
-        }
-        return Schema(column_types=column_types, columns=column_types.keys())
+        return Schema.from_ray_schema(self.data.schema())
 
     def get(self, k: int) -> List[Dict[str, Any]]:
         """Get k rows from the dataset."""
@@ -265,6 +262,9 @@ class RayDataset(DJDataset):
             return read_json_stream(paths)
         except AttributeError:
             return ray.data.read_json(paths)
+
+    def to_list(self) -> list:
+        return self.data.to_pandas().to_dict(orient='records')
 
 
 class JSONStreamDatasource(ray.data.read_api.JSONDatasource):
