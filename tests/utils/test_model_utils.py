@@ -87,8 +87,8 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
 
         model = prepare_api_model('test_model')
         self.assertEqual(model._client, mock_client)
-        self.assertEqual(model.model, 'test_model')  # 验证基础属性
-        self.assertEqual(model.endpoint, '/chat/completions')  # 验证默认endpoint
+        self.assertEqual(model.model, 'test_model')
+        self.assertEqual(model.endpoint, '/chat/completions')
 
         # Test with processor for chat model
         mock_openai.OpenAI.reset_mock()
