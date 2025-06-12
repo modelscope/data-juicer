@@ -1,4 +1,7 @@
 type: easyanimate
+# env related
+env_name: 'easyanimate'
+env_manager: 'conda'
 model_name: "easyanimate"
 trainer_name: "easyanimate-lora-trainer"
 train:
@@ -15,17 +18,17 @@ train:
   dataset_path:
     # The root directory to videos. Set empty if it is the absolute path in the dataset.
     dataset_name: ""
-    # path to the Data-Juicer dataset. Note that the root path is in "thirdparty/easy_animate"
-    dataset_meta_name: "../../../outputs/demo-bench/demo-dataset-with-multi-op-stats.jsonl"
+    # path to the Data-Juicer dataset. Note that the root path is in "thirdparty/models/EasyAnimate"
+    dataset_meta_name: "../../../outputs/demo-bench/demo-dataset-for-train.json"
   training_config:
     # image size, must match the pretrained easyanimate checkpoint.
     sample_size: 256
     mixed_precision: "bf16"
     batch_size_per_gpu: 8
     gradient_accumulation_steps: 1
-    num_train_epochs: 2
+    num_train_epochs: 1
     dataloader_num_workers: 8
     seed: 42
   saving_config:
-    # Note that the root path is in "thirdparty/easy_animate"
+    # Note that the root path is in "thirdparty/models/EasyAnimate"
     output_dir: "../../../outputs/demo-bench/models"

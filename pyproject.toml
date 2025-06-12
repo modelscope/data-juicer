@@ -153,20 +153,7 @@ sandbox = [
     "torch>=1.11.0",
     "fire",
     "pyspark",
-    "vbench",
-    "modelscope",
-    "deepspeed",
-    "safetensors",
-    "timm",
-    "xformers",
-    "decord",
-    "opencv-python",
-    "omegaconf",
-    "imageio[ffmpeg,pyav]",
-    "tensorboard",
-    "diffusers==0.27.0",
-    "transformers>=4.37.2",
-    "func_timeout",
+    "modelscope[framework,nlp]",
 ]
 
 
