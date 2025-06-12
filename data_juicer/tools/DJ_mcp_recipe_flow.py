@@ -36,13 +36,17 @@ def data_processing(requirements: str) -> list:
 
 # Operator Management
 @mcp.tool()
-def get_data_processing_ops(op_type: Optional[str] = None,
-                            tags: Optional[List[str]] = None,
-                            match_all: bool = True) -> dict:
+def get_data_processing_ops(
+    op_type: Optional[str] = None,
+    tags: Optional[List[str]] = None,
+    match_all: bool = True,
+) -> dict:
     """
     Retrieves a list of available data processing operators based on the specified type and tags.
     Operators are a collection of basic processes that assist in data modification,
     cleaning, filtering, deduplication, etc.
+
+    Should be used with run_data_recipe.
 
     If both tags and ops_type are None, return a list of all operators.
 
@@ -99,26 +103,41 @@ def get_data_processing_ops(op_type: Optional[str] = None,
 
 
 @mcp.tool()
-def run_data_recipe(dataset_path: str,
-                    process: list[Dict],
-                    export_path: Optional[str] = None) -> str:
+def run_data_recipe(
+    dataset_path: str,
+    process: list[Dict],
+    export_path: Optional[str] = None,
+    np: int = 1,
+) -> str:
     """
     Run data recipe.
+    It is recommended to use get_data_processing_ops to obtain a list of
+    operators related to your data processing requirements, organized into
+    your data processing flow.
 
     :param dataset_path: Path to the dataset to be processed.
-    :param process: List of process to be executed,
-                    dictionary containing operator names as keys and operator parameter dictionaries as values
-    :param export_path: Path to the exported dataset.
-                    Defaults to None, which means the dataset will be exported to './outputs'.
+    :param process: List of processing operations to be executed sequentially.
+                Each element is a dictionary with operator name as key and
+                its configuration as value. Multiple operators can be chained.
+    :param export_path: Path to export the processed dataset. Defaults to None,
+                       which exports to './outputs' directory.
+    :param np: Number of processes to use. Defaults to 1.
+
+    Example:
+        Run a data recipe to filter samples with text length outside 10-50 range:
+        >>> run_data_recipe(
+        ...     "/path/to/dataset.jsonl",
+        ...     [
+        ...         {
+        ...             "text_length_filter": {
+        ...                 "min_len": 10,
+        ...                 "max_len": 50
+        ...             }
+        ...         }
+        ...     ]
+        ... )
     """
-    args_dict = dict(locals())
-    args_dict.pop('dataset_path')
-    args_dict.pop('export_path')
-    dj_cfg = {
-        'dataset_path': dataset_path,
-        'export_path': export_path,
-        'process': process,
-    }
+    dj_cfg = dict(locals())
     return execute_op(dj_cfg)
 
 

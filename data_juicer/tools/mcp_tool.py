@@ -20,7 +20,8 @@ def add_extra_cfg(dj_cfg: Dict) -> Dict:
 
     # Problem: It will holding when use multi threads/procs
     # Can't multithreading and multiprocessing be used in a coroutine?
-    dj_cfg['np'] = 1  # set num proc to be 1
+    if not dj_cfg.get('np'):
+        dj_cfg['np'] = 1  # set num proc to be 1
     dj_cfg['open_monitor'] = False  # unable monitor to avoid multi proc
 
     return dj_cfg
