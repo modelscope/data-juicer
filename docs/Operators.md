@@ -38,7 +38,7 @@ Data-Juicer 中的算子分为以下 7 种类型。
 | [formatter](#formatter) | 8 | Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。 |
 | [grouper](#grouper) | 3 | Group samples to batched samples. 将样本分组，每一组组成一个批量样本。 |
 | [mapper](#mapper) | 81 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
-| [selector](#selector) | 5 | Selects top samples based on ranking. 基于排序选取高质量样本。 |
+| [selector](#selector) | 6 | Selects top samples based on ranking. 基于排序选取高质量样本。 |
 
 All the specific operators are listed below, each featured with several capability tags. 
 下面列出所有具体算子，每种算子都通过多个标签来注明其主要功能。
@@ -148,7 +148,7 @@ All the specific operators are listed below, each featured with several capabili
 | local_formatter | 🟢Stable | The class is used to load a dataset from local files or local directory. 类用于从本地文件或本地目录加载数据集。 | [code](../data_juicer/format/formatter.py) | [tests](../tests/format/test_unify_format.py) |
 | parquet_formatter | 🟢Stable | The class is used to load and format parquet-type files. 该类用于加载和格式化镶木地板类型的文件。 | [code](../data_juicer/format/parquet_formatter.py) | [tests](../tests/format/test_parquet_formatter.py) |
 | remote_formatter | 🟢Stable | The class is used to load a dataset from repository of huggingface hub. 该类用于从huggingface hub的存储库加载数据集。 | [code](../data_juicer/format/formatter.py) | [tests](../tests/format/test_unify_format.py) |
-| text_formatter | 🔴Alpha | The class is used to load and format text-type files. 类用于加载和格式化文本类型文件。 | [code](../data_juicer/format/text_formatter.py) | - |
+| text_formatter | 🔴Alpha | The class is used to load and format text-type files. 类用于加载和格式化文本类型的文件。 | [code](../data_juicer/format/text_formatter.py) | - |
 | tsv_formatter | 🟢Stable | The class is used to load and format tsv-type files. 该类用于加载和格式化tsv类型的文件。 | [code](../data_juicer/format/tsv_formatter.py) | [tests](../tests/format/test_tsv_formatter.py) |
 
 ## grouper <a name="grouper"/>
@@ -220,7 +220,7 @@ All the specific operators are listed below, each featured with several capabili
 | remove_long_words_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to remove long words within a specific range. 映射器删除特定范围内的长词。 | [code](../data_juicer/ops/mapper/remove_long_words_mapper.py) | [tests](../tests/ops/mapper/test_remove_long_words_mapper.py) |
 | remove_non_chinese_character_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to remove non chinese Character in text samples. 映射器删除文本样本中的非中文字符。 | [code](../data_juicer/ops/mapper/remove_non_chinese_character_mapper.py) | [tests](../tests/ops/mapper/test_remove_non_chinese_character_mapper.py) |
 | remove_repeat_sentences_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to remove repeat sentences in text samples. 映射器删除文本样本中的重复句子。 | [code](../data_juicer/ops/mapper/remove_repeat_sentences_mapper.py) | [tests](../tests/ops/mapper/test_remove_repeat_sentences_mapper.py) |
-| remove_specific_chars_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to clean specific chars in text samples. 映射器来清理文本示例中的特定字符。 | [code](../data_juicer/ops/mapper/remove_specific_chars_mapper.py) | [tests](../tests/ops/mapper/test_remove_specific_chars_mapper.py) |
+| remove_specific_chars_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to clean specific chars in text samples. 映射器来清理文本样本中的特定字符。 | [code](../data_juicer/ops/mapper/remove_specific_chars_mapper.py) | [tests](../tests/ops/mapper/test_remove_specific_chars_mapper.py) |
 | remove_table_text_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to remove table texts from text samples. 映射器从文本样本中删除表文本。 | [code](../data_juicer/ops/mapper/remove_table_text_mapper.py) | [tests](../tests/ops/mapper/test_remove_table_text_mapper.py) |
 | remove_words_with_incorrect_substrings_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to remove words with incorrect substrings. 映射器删除不正确的子字符串的单词。 | [code](../data_juicer/ops/mapper/remove_words_with_incorrect_substrings_mapper.py) | [tests](../tests/ops/mapper/test_remove_words_with_incorrect_substrings_mapper.py) |
 | replace_content_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to replace all content in the text that matches a specific regular expression pattern with a designated replacement string. 映射程序将文本中与特定正则表达式模式匹配的所有内容替换为指定的替换字符串。 | [code](../data_juicer/ops/mapper/replace_content_mapper.py) | [tests](../tests/ops/mapper/test_replace_content_mapper.py) |
@@ -249,6 +249,7 @@ All the specific operators are listed below, each featured with several capabili
 
 | Operator 算子 | Tags 标签 | Description 描述 | Source code 源码 | Unit tests 单测样例 |
 |----------|------|-------------|-------------|------------|
+| domain_diversity_selector | 🚀GPU 🔗API 🟡Beta | Selector to select samples based on the data's domain diversity. 选择器根据数据的域多样性选择样本。 | [code](../data_juicer/ops/selector/domain_diversity_selector.py) | [tests](../tests/ops/selector/test_domain_diversity_selector.py) |
 | frequency_specified_field_selector | 💻CPU 🟢Stable | Selector to select samples based on the sorted frequency of specified field. 选择器根据指定字段的排序频率选择样本。 | [code](../data_juicer/ops/selector/frequency_specified_field_selector.py) | [tests](../tests/ops/selector/test_frequency_specified_field_selector.py) |
 | random_selector | 💻CPU 🟢Stable | Selector to random select samples. 选择器来随机选择样本。 | [code](../data_juicer/ops/selector/random_selector.py) | [tests](../tests/ops/selector/test_random_selector.py) |
 | range_specified_field_selector | 💻CPU 🟢Stable | Selector to select a range of samples based on the sorted specified field value from smallest to largest. 选择器根据从最小到最大的排序指定字段值选择样本范围。 | [code](../data_juicer/ops/selector/range_specified_field_selector.py) | [tests](../tests/ops/selector/test_range_specified_field_selector.py) |
