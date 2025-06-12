@@ -132,14 +132,6 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
                 'dict or a list of dicts; refer to configs/datasets for more '
                 'detailed examples')
             parser.add_argument(
-                '--data_format',
-                type=str,
-                default='auto',
-                help=  # noqa: E251
-                'Data format of the dataset. '
-                '`auto` as default, which means auto-detect from the dataset path'
-            )
-            parser.add_argument(
                 '--generated_dataset_config',
                 type=Dict,
                 default=None,
