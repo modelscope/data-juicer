@@ -94,7 +94,7 @@ __all__ = [
     'CleanHtmlMapper', 'CleanIpMapper', 'CleanLinksMapper',
     'DialogIntentDetectionMapper', 'DialogSentimentDetectionMapper',
     'DialogSentimentIntensityMapper', 'DialogTopicDetectionMapper',
-    'Difference_Area_Generator_Mapper', 'Difference_Caption_Generator_Mapper'
+    'Difference_Area_Generator_Mapper', 'Difference_Caption_Generator_Mapper',
     'ExpandMacroMapper', 'ExtractEntityAttributeMapper',
     'ExtractEntityRelationMapper', 'ExtractEventMapper',
     'ExtractKeywordMapper', 'ExtractNicknameMapper',
