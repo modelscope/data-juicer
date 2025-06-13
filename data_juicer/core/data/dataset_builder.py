@@ -1,6 +1,7 @@
 import os
 import shlex
 from argparse import Namespace
+from pathlib import Path
 from typing import List, Tuple
 
 import numpy as np
@@ -228,7 +229,8 @@ def parse_cli_datapath(dataset_path) -> Tuple[List[str], List[float]]:
     # Handle empty input
     if not dataset_path or not dataset_path.strip():
         return [], []
-
+    # Convert unix style path
+    dataset_path = Path(dataset_path).as_posix()
     # Use shlex to properly handle quoted strings
     try:
         tokens = shlex.split(dataset_path)
