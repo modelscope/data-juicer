@@ -32,10 +32,12 @@ def timing_context(description):
     yield
     elapsed_time = time.time() - start_time
     # Use a consistent format that won't be affected by logger reconfiguration
-    logger.info(f'{description} took {elapsed_time:.2f} seconds')
+    logger.debug(f'{description} took {elapsed_time:.2f} seconds')
 
 
-def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
+def init_configs(args: Optional[List[str]] = None,
+                 which_entry: object = None,
+                 load_configs_only=False):
     """
     initialize the jsonargparse parser and parse configs from one of:
         1. POSIX-style commands line args;
@@ -45,6 +47,8 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
 
     :param args: list of params, e.g., ['--config', 'cfg.yaml'], default None.
     :param which_entry: which entry to init configs (executor/analyzer)
+    :param load_configs_only: whether to load the configs only, not including backing up config files, display them, and
+        setting up logger.
     :return: a global cfg object used by the DefaultExecutor or Analyzer
     """
     if args is None:
@@ -147,6 +151,14 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
                 help=  # noqa: E251
                 'List of validators to apply to the dataset. Each validator '
                 'must have a `type` field specifying the validator type.')
+            parser.add_argument(
+                '--work_dir',
+                type=str,
+                default=None,
+                help=  # noqa: E251
+                'Path to a work directory to store outputs during Data-Juicer '
+                'running. It\'s the directory where export_path is at in default.'
+            )
             parser.add_argument(
                 '--export_path',
                 type=str,
@@ -461,7 +473,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
             # Now add remaining arguments based on essential config
             if essential_cfg.config:
                 # Load config file to determine which operators are used
-                with open(essential_cfg.config[0].absolute) as f:
+                with open(os.path.abspath(essential_cfg.config[0])) as f:
                     config_data = yaml.safe_load(f)
                     used_ops = set()
                     if 'process' in config_data:
@@ -490,16 +502,18 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
                     raise NotImplementedError(err_msg)
 
         with timing_context('Initializing setup from config'):
-            cfg = init_setup_from_cfg(cfg)
+            cfg = init_setup_from_cfg(cfg, load_configs_only)
 
         with timing_context('Updating operator process'):
             cfg = update_op_process(cfg, parser, used_ops)
 
         # copy the config file into the work directory
-        config_backup(cfg)
+        if not load_configs_only:
+            config_backup(cfg)
 
         # show the final config tables before the process started
-        display_config(cfg)
+        if not load_configs_only:
+            display_config(cfg)
 
         global global_cfg, global_parser
         global_cfg = cfg
@@ -531,7 +545,7 @@ def update_ds_cache_dir_and_related_vars(new_ds_cache_path):
         config.DEFAULT_EXTRACTED_DATASETS_PATH)
 
 
-def init_setup_from_cfg(cfg: Namespace):
+def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
     """
     Do some extra setup tasks after parsing config file or command line.
 
@@ -544,38 +558,32 @@ def init_setup_from_cfg(cfg: Namespace):
     """
 
     cfg.export_path = os.path.abspath(cfg.export_path)
-    cfg.work_dir = os.path.dirname(cfg.export_path)
-    export_rel_path = os.path.relpath(cfg.export_path, start=cfg.work_dir)
-    log_dir = os.path.join(cfg.work_dir, 'log')
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir, exist_ok=True)
+    if cfg.work_dir is None:
+        cfg.work_dir = os.path.dirname(cfg.export_path)
     timestamp = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
-    cfg.timestamp = timestamp
-    logfile_name = f'export_{export_rel_path}_time_{timestamp}.txt'
-    setup_logger(save_dir=log_dir,
-                 filename=logfile_name,
-                 level='DEBUG' if cfg.debug else 'INFO',
-                 redirect=cfg.executor_type == 'default')
+    if not load_configs_only:
+        export_rel_path = os.path.relpath(cfg.export_path, start=cfg.work_dir)
+        log_dir = os.path.join(cfg.work_dir, 'log')
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir, exist_ok=True)
+        logfile_name = f'export_{export_rel_path}_time_{timestamp}.txt'
+        setup_logger(save_dir=log_dir,
+                     filename=logfile_name,
+                     level='DEBUG' if cfg.debug else 'INFO',
+                     redirect=cfg.executor_type == 'default')
 
     # check and get dataset dir
     if cfg.get('dataset_path', None) and os.path.exists(cfg.dataset_path):
         logger.info('dataset_path config is set and a valid local path')
         cfg.dataset_path = os.path.abspath(cfg.dataset_path)
-        if os.path.isdir(cfg.dataset_path):
-            cfg.dataset_dir = cfg.dataset_path
-        else:
-            cfg.dataset_dir = os.path.dirname(cfg.dataset_path)
     elif cfg.dataset_path == '' and cfg.get('dataset', None):
         logger.info('dataset_path config is empty; dataset is present')
-        cfg.dataset_dir = ''
     else:
         logger.warning(f'dataset_path [{cfg.dataset_path}] is not a valid '
                        f'local path, AND dataset is not present. '
                        f'Please check and retry, otherwise we '
                        f'will treat dataset_path as a remote dataset or a '
                        f'mixture of several datasets.')
-
-        cfg.dataset_dir = ''
 
     # check number of processes np
     sys_cpu_count = os.cpu_count()
@@ -634,14 +642,6 @@ def init_setup_from_cfg(cfg: Namespace):
         update_ds_cache_dir_and_related_vars(cfg.ds_cache_dir)
     else:
         cfg.ds_cache_dir = str(config.HF_DATASETS_CACHE)
-
-    # if there is suffix_filter op, turn on the add_suffix flag
-    cfg.add_suffix = False
-    for op in cfg.process:
-        op_name, _ = list(op.items())[0]
-        if op_name == 'suffix_filter':
-            cfg.add_suffix = True
-            break
 
     # update special tokens
     SpecialTokens.image = cfg.image_special_token
@@ -841,7 +841,7 @@ def update_op_process(cfg, parser, used_ops=None):
                                       excludes=['config'])
 
     if temp_cfg.config:
-        temp_args.extend(['--config', temp_cfg.config[0].absolute])
+        temp_args.extend(['--config', os.path.abspath(temp_cfg.config[0])])
     else:
         temp_args.append('--auto')
 
@@ -865,8 +865,7 @@ def namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None):
                 continue
             if excludes is not None and concat_key in excludes:
                 continue
-            arg_list.append(f'--{concat_key}')
-            arg_list.append(f'{value}')
+            arg_list.append(f'--{concat_key}={value}')
 
     return arg_list
 
@@ -874,7 +873,7 @@ def namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None):
 def config_backup(cfg: Namespace):
     if not cfg.config:
         return
-    cfg_path = cfg.config[0].absolute
+    cfg_path = os.path.abspath(cfg.config[0])
     work_dir = cfg.work_dir
     target_path = os.path.join(work_dir, os.path.basename(cfg_path))
     logger.info(f'Back up the input config file [{cfg_path}] into the '
@@ -926,8 +925,7 @@ def export_config(cfg: Namespace,
     """
     # remove ops outside the process list for better displaying
     cfg_to_export = cfg.clone()
-    for op in OPERATORS.modules.keys():
-        _ = cfg_to_export.pop(op)
+    cfg_to_export = prepare_cfgs_for_export(cfg_to_export)
 
     global global_parser
     if not global_parser:
@@ -1043,10 +1041,11 @@ def get_init_configs(cfg: Union[Namespace, Dict]):
     temp_file = os.path.join(temp_dir, 'job_dj_config.json')
     if isinstance(cfg, Namespace):
         cfg = namespace_to_dict(cfg)
-    # create an temp config file
+    # create a temp config file
     with open(temp_file, 'w') as f:
-        json.dump(cfg, f)
-    inited_dj_cfg = init_configs(['--config', temp_file])
+        json.dump(prepare_cfgs_for_export(cfg), f)
+    inited_dj_cfg = init_configs(['--config', temp_file],
+                                 load_configs_only=True)
     return inited_dj_cfg
 
 
@@ -1074,4 +1073,15 @@ def get_default_cfg():
         if not hasattr(cfg, key):
             setattr(cfg, key, value)
 
+    return cfg
+
+
+def prepare_cfgs_for_export(cfg):
+    # 1. convert Path to str
+    if 'config' in cfg:
+        cfg['config'] = [str(p) for p in cfg['config']]
+    # 2. remove level-1 op cfgs outside the process list
+    for op in OPERATORS.modules.keys():
+        if op in cfg:
+            _ = cfg.pop(op)
     return cfg

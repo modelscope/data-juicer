@@ -25,6 +25,7 @@ probe_job_configs:
 refine_recipe_job_configs:
   - hook: 'RefineRecipeViaKSigmaHook'
     meta_name: 'analysis_ori_data'
+    output: 'refined_recipe_path'
     dj_configs: 'configs/demo/process.yaml'
     extra_configs:
       path_k_sigma_recipe: './outputs/demo-process/k_sigma_new_recipe.yaml'
@@ -36,17 +37,24 @@ refine_recipe_job_configs:
 
 execution_job_configs:
   - hook: 'ProcessDataHook'
-    meta_name:
-    dj_configs: './outputs/demo-process/k_sigma_new_recipe.yaml'
+    meta_name: 'process_data_with_refined_recipe'
+    input:
+      dj_configs: '-1.refined_recipe_path'
+    output: 'processed_dataset_path'
+    dj_configs: '<auto_replaced_with_previous_output>'
     extra_configs:
   - hook: 'TrainModelHook'
-    meta_name:
+    meta_name: 'train_model'
+    input:
+      extra_configs.train_dataset: '-1.processed_dataset_path'
     dj_configs:
     extra_configs: 'configs/demo/sandbox/gpt3_extra_train_config.json'
 
 evaluation_job_configs:
   - hook: 'ProbeViaAnalyzerHook'
     meta_name: 'analysis_processed_data'
+    input:
+      dj_configs.dataset_path: 'anonymous.process_data_with_refined_recipe.processed_dataset_path'
     dj_configs: 'configs/demo/process.yaml'
     extra_configs:
   # - hook: 'ProbeViaModelInferHook'
@@ -60,6 +68,8 @@ evaluation_job_configs:
   #       (...model configs)
   - hook: 'EvaluateDataHook'
     meta_name: 'eval_data'
+    input:
+      extra_configs.dataset_path: 'anonymous.process_data_with_refined_recipe.processed_dataset_path'
     dj_configs:
     extra_configs: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
   # - hook: 'EvaluateModelHook'
