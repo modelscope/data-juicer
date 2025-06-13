@@ -1,4 +1,8 @@
 type: easyanimate
+# env related
+env_name: 'easyanimate'
+env_manager: 'conda'
+
 model_name: "easyanimate"
 infer_name: "easyanimate-lora-generate"
 train:
