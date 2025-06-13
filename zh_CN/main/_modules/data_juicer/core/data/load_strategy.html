@@ -638,13 +638,67 @@
                     <span class="sa">f</span><span class="s1">&#39;Current working directory: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using resolved path for loading ray dataset: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">file_extension_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;.json&#39;</span><span class="p">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;.jsonl&#39;</span><span class="p">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;.txt&#39;</span><span class="p">:</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;.csv&#39;</span><span class="p">:</span> <span class="s1">&#39;csv&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;.tsv&#39;</span><span class="p">:</span> <span class="s1">&#39;csv&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;.parquet&#39;</span><span class="p">:</span> <span class="s1">&#39;parquet&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;.npy&#39;</span><span class="p">:</span> <span class="s1">&#39;numpy&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;.tfrecords&#39;</span><span class="p">:</span> <span class="s1">&#39;tfrecords&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;.lance&#39;</span><span class="p">:</span> <span class="s1">&#39;lance&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">auto_detect</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">data_source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">auto_detect</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">data_source</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="n">file_extension_map</span><span class="p">:</span>
+                <span class="n">data_format</span> <span class="o">=</span> <span class="n">file_extension_map</span><span class="p">[</span><span class="n">suffix</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">data_source</span> <span class="ow">in</span> <span class="n">file_extension_map</span><span class="p">:</span>
+                <span class="n">data_format</span> <span class="o">=</span> <span class="n">file_extension_map</span><span class="p">[</span><span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">data_source</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">auto_detect</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">auto_detect</span><span class="p">:</span>
+            <span class="n">item_path</span> <span class="o">=</span> <span class="n">path</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">item_path</span><span class="p">):</span>
+                <span class="c1"># The first file encountered in the directory</span>
+                <span class="c1"># determines which data reader to use.</span>
+                <span class="n">path_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
+                <span class="n">not_found</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">while</span> <span class="n">not_found</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">path_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">cur_path</span> <span class="o">=</span> <span class="n">path_list</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">cur_path</span><span class="p">):</span>
+                        <span class="n">item_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cur_path</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">item_path</span><span class="p">):</span>
+                            <span class="n">path_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item_path</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">item_path</span><span class="p">):</span>
+                            <span class="n">not_found</span> <span class="o">=</span> <span class="kc">False</span>
+                            <span class="k">break</span>
+            <span class="n">file_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">item_path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># by default, we use json type to load data</span>
+            <span class="n">data_format</span> <span class="o">=</span> <span class="n">file_extension_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">file_extension</span><span class="p">,</span> <span class="s1">&#39;json&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Try to load data as </span><span class="si">{</span><span class="n">data_format</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Loading </span><span class="si">{</span><span class="n">data_format</span><span class="si">}</span><span class="s1"> data.&#39;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">dataset</span> <span class="o">=</span> <span class="n">RayDataset</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">RayDataset</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data_format</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">RayDataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">dataset_path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to load JSON data from </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">. &#39;</span>
-                               <span class="sa">f</span><span class="s1">&#39;Current working directory: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="si">}</span><span class="s1">. &#39;</span>
-                               <span class="sa">f</span><span class="s1">&#39;Error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+            <span class="k">if</span> <span class="n">auto_detect</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Failed to load data from </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">. &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;Please check data format and set the correct `dataset.configs.source`. &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;Current working directory: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="si">}</span><span class="s1">. &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;Error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Failed to load </span><span class="si">{</span><span class="n">data_format</span><span class="si">}</span><span class="s1"> data from </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">. &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;Current working directory: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="si">}</span><span class="s1">. &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;Error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 </div>
 
 

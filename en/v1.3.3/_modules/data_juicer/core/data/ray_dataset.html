@@ -640,6 +640,29 @@
             <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
             <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
+<div class="viewcode-block" id="RayDataset.read">
+<a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.ray_dataset.RayDataset.read">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span>
+                                                 <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">RayDataset</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data_format</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="s1">&#39;jsonl&#39;</span><span class="p">}:</span>
+            <span class="k">return</span> <span class="n">RayDataset</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">data_format</span> <span class="ow">in</span> <span class="p">{</span>
+                <span class="s1">&#39;parquet&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;images&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;parquet_bulk&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;csv&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;avro&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;numpy&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;tfrecords&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;webdataset&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;binary_files&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;lance&#39;</span><span class="p">,</span>
+        <span class="p">}:</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;read_</span><span class="si">{</span><span class="n">data_format</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)(</span><span class="n">paths</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="RayDataset.read_json">
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.ray_dataset.RayDataset.read_json">[docs]</a>
     <span class="nd">@classmethod</span>
