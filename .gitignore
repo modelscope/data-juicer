@@ -15,6 +15,7 @@ dist
 wandb/
 __pycache__
 .vscode/
+.ipynb_checkpoints/
 
 # label studio related
 label_studio_data/
@@ -30,5 +31,3 @@ tests/ops/data/*dup*
 tests/tools/tmp_*/
 tests/ops/deduplicator/chinese_dedup/
 tests/ops/deduplicator/english_dedup/
-
-.ipynb_checkpoints/
