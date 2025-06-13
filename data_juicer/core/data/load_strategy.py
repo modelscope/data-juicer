@@ -249,6 +249,7 @@ class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
             '.parquet': 'parquet',
             '.npy': 'numpy',
             '.tfrecords': 'tfrecords',
+            '.lance': 'lance',
         }
         auto_detect = False
         data_source = self.ds_config.get('source', None)
@@ -265,6 +266,8 @@ class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
         if auto_detect:
             item_path = path
             if os.path.isdir(item_path):
+                # The first file encountered in the directory
+                # determines which data reader to use.
                 path_list = [path]
                 not_found = True
                 while not_found and len(path_list) > 0:
@@ -277,6 +280,7 @@ class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
                             not_found = False
                             break
             file_extension = os.path.splitext(item_path)[1]
+            # by default, we use json type to load data
             data_format = file_extension_map.get(file_extension, 'json')
             logger.info(f'Try to load data as {data_format}.')
         else:

@@ -261,8 +261,17 @@ class RayDataset(DJDataset):
         if data_format in {'json', 'jsonl'}:
             return RayDataset.read_json(paths)
         elif data_format in {
-                'parquet', 'images', 'parquet_bulk', 'csv', 'text', 'avro',
-                'numpy', 'tfrecords', 'webdataset', 'binary_files'
+                'parquet',
+                'images',
+                'parquet_bulk',
+                'csv',
+                'text',
+                'avro',
+                'numpy',
+                'tfrecords',
+                'webdataset',
+                'binary_files',
+                'lance',
         }:
             return getattr(ray.data, f'read_{data_format}')(paths)
 
