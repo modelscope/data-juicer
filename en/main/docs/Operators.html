@@ -404,7 +404,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 <td><p>Detects and removes duplicate samples. 识别、删除重复样本。</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../data_juicer.core.html#data_juicer.core.NestedDataset.filter" title="data_juicer.core.NestedDataset.filter"><span class="xref myst py py-meth">filter</span></a></p></td>
-<td class="text-center"><p>48</p></td>
+<td class="text-center"><p>49</p></td>
 <td><p>Filters out low-quality samples. 过滤低质量样本。</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../data_juicer.format.html#module-data_juicer.format.formatter" title="data_juicer.format.formatter"><span class="xref myst py py-mod">formatter</span></a></p></td>
@@ -711,169 +711,175 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/language_id_score_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_language_id_score_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>llm_difficulty_score_filter</p></td>
+<tr class="row-even"><td><p>llm_analysis_filter</p></td>
 <td><p>🚀GPU 🌊vLLM 🧩HF 🔗API 🟡Beta</p></td>
+<td><p>Base filter class for leveraging LLMs to filter various samples. 用于利用llm过滤各种样本的基本筛选器类。</p></td>
+<td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/llm_analysis_filter.py">code</a></p></td>
+<td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_llm_analysis_filter.py">tests</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>llm_difficulty_score_filter</p></td>
+<td><p>💻CPU 🟡Beta</p></td>
 <td><p>Filter to keep sample with high difficulty score estimated by LLM. 过滤器以保持LLM估计的高难度分数的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/llm_difficulty_score_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_llm_difficulty_score_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>llm_quality_score_filter</p></td>
-<td><p>🚀GPU 🌊vLLM 🧩HF 🔗API 🟡Beta</p></td>
+<tr class="row-even"><td><p>llm_quality_score_filter</p></td>
+<td><p>💻CPU 🟡Beta</p></td>
 <td><p>Filter to keep sample with high quality score estimated by LLM. 过滤器以保持LLM估计的高质量分数的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/llm_quality_score_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_llm_quality_score_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>maximum_line_length_filter</p></td>
+<tr class="row-odd"><td><p>maximum_line_length_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Filter to keep samples with maximum line length within a specific range. 过滤器将最大行长度的样本保持在特定范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/maximum_line_length_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_maximum_line_length_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>perplexity_filter</p></td>
+<tr class="row-even"><td><p>perplexity_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Filter to keep samples with perplexity score less than a specific max value. 过滤以保留困惑度分数小于特定最大值的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/perplexity_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_perplexity_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>phrase_grounding_recall_filter</p></td>
+<tr class="row-odd"><td><p>phrase_grounding_recall_filter</p></td>
 <td><p>🔮Multimodal 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Filter to keep samples whose locating recalls of phrases extracted from text in the images are within a specified range. 过滤器，用于保留从图像中的文本中提取的短语的定位回忆在指定范围内的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/phrase_grounding_recall_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_phrase_grounding_recall_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>special_characters_filter</p></td>
+<tr class="row-even"><td><p>special_characters_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
-<td><p>Filter to keep samples with special-char ratio within a specific range. 过滤器将具有特殊字符比率的样品保持在特定范围内。</p></td>
+<td><p>Filter to keep samples with special-char ratio within a specific range. 过滤器将具有特殊字符比的样品保持在特定范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/special_characters_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_special_characters_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>specified_field_filter</p></td>
+<tr class="row-odd"><td><p>specified_field_filter</p></td>
 <td><p>💻CPU 🟢Stable</p></td>
 <td><p>Filter based on specified field information. 根据指定的字段信息进行筛选。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/specified_field_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_specified_field_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>specified_numeric_field_filter</p></td>
+<tr class="row-even"><td><p>specified_numeric_field_filter</p></td>
 <td><p>💻CPU 🟢Stable</p></td>
 <td><p>Filter based on specified numeric field information. 根据指定的数值字段信息进行筛选。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/specified_numeric_field_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_specified_numeric_field_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>stopwords_filter</p></td>
+<tr class="row-odd"><td><p>stopwords_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Filter to keep samples with stopword ratio larger than a specific min value. 过滤以保持停止词比率大于特定最小值的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/stopwords_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_stopwords_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>suffix_filter</p></td>
+<tr class="row-even"><td><p>suffix_filter</p></td>
 <td><p>💻CPU 🟢Stable</p></td>
 <td><p>Filter to keep samples with specified suffix. 过滤器以保留具有指定后缀的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/suffix_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_suffix_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>text_action_filter</p></td>
+<tr class="row-odd"><td><p>text_action_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Filter to keep texts those contain actions in the text. 过滤以保留文本中包含操作的文本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/text_action_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_text_action_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>text_entity_dependency_filter</p></td>
+<tr class="row-even"><td><p>text_entity_dependency_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Identify the entities in the text which are independent with other token, and filter them. 识别文本中与其他令牌独立的实体，并对其进行过滤。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/text_entity_dependency_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_text_entity_dependency_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>text_length_filter</p></td>
+<tr class="row-odd"><td><p>text_length_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Filter to keep samples with total text length within a specific range. 过滤以保持文本总长度在特定范围内的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/text_length_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_text_length_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>text_pair_similarity_filter</p></td>
+<tr class="row-even"><td><p>text_pair_similarity_filter</p></td>
 <td><p>🔤Text 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Filter to keep text pairs with similarities between texts within a specific range. 过滤器将文本之间具有相似性的文本对保留在特定范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/text_pair_similarity_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_text_pair_similarity_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>token_num_filter</p></td>
+<tr class="row-odd"><td><p>token_num_filter</p></td>
 <td><p>🔤Text 💻CPU 🧩HF 🟢Stable</p></td>
 <td><p>Filter to keep samples with total token number within a specific range. 筛选器将总令牌数的样本保留在特定范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/token_num_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_token_num_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_aesthetics_filter</p></td>
+<tr class="row-even"><td><p>video_aesthetics_filter</p></td>
 <td><p>🎬Video 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Filter to keep data samples with aesthetics scores for specified frames in the videos within a specific range. 过滤器将视频中指定帧的美学得分数据样本保留在特定范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/video_aesthetics_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_video_aesthetics_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>video_aspect_ratio_filter</p></td>
+<tr class="row-odd"><td><p>video_aspect_ratio_filter</p></td>
 <td><p>🎬Video 💻CPU 🟢Stable</p></td>
 <td><p>Filter to keep samples with video aspect ratio within a specific range. 过滤器将视频纵横比的样本保持在特定范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/video_aspect_ratio_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_video_aspect_ratio_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_duration_filter</p></td>
+<tr class="row-even"><td><p>video_duration_filter</p></td>
 <td><p>🎬Video 💻CPU 🟢Stable</p></td>
 <td><p>Keep data samples whose videos’ durations are within a specified range. 保留视频持续时间在指定范围内的数据样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/video_duration_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_video_duration_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>video_frames_text_similarity_filter</p></td>
+<tr class="row-odd"><td><p>video_frames_text_similarity_filter</p></td>
 <td><p>🔮Multimodal 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Filter to keep samples those similarities between sampled video frame images and text within a specific range. 过滤以保持采样视频帧图像和文本之间的相似性在特定范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/video_frames_text_similarity_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_video_frames_text_similarity_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_motion_score_filter</p></td>
+<tr class="row-even"><td><p>video_motion_score_filter</p></td>
 <td><p>🎬Video 💻CPU 🟢Stable</p></td>
 <td><p>Filter to keep samples with video motion scores within a specific range. 过滤器将视频运动分数的样本保持在特定范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/video_motion_score_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_video_motion_score_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>video_motion_score_raft_filter</p></td>
+<tr class="row-odd"><td><p>video_motion_score_raft_filter</p></td>
 <td><p>🎬Video 🚀GPU 🟢Stable</p></td>
 <td><p>Filter to keep samples with video motion scores within a specified range. 过滤器将视频运动分数的样本保持在指定范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/video_motion_score_raft_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_video_motion_score_raft_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_nsfw_filter</p></td>
+<tr class="row-even"><td><p>video_nsfw_filter</p></td>
 <td><p>🎬Video 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Filter to keep samples whose videos have low nsfw scores. 过滤器以保留其视频具有低nsfw分数的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/video_nsfw_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_video_nsfw_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>video_ocr_area_ratio_filter</p></td>
+<tr class="row-odd"><td><p>video_ocr_area_ratio_filter</p></td>
 <td><p>🎬Video 🚀GPU 🟢Stable</p></td>
 <td><p>Keep data samples whose detected text area ratios for specified frames in the video are within a specified range. 保留检测到的视频中指定帧的文本面积比率在指定范围内的数据样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/video_ocr_area_ratio_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_video_ocr_area_ratio_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_resolution_filter</p></td>
+<tr class="row-even"><td><p>video_resolution_filter</p></td>
 <td><p>🎬Video 💻CPU 🟢Stable</p></td>
 <td><p>Keep data samples whose videos’ resolutions are within a specified range. 保留视频分辨率在指定范围内的数据样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/video_resolution_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_video_resolution_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>video_tagging_from_frames_filter</p></td>
+<tr class="row-odd"><td><p>video_tagging_from_frames_filter</p></td>
 <td><p>🎬Video 🚀GPU 🟢Stable</p></td>
 <td><p>Filter to keep samples whose videos contain the given tags. 过滤器以保留其视频包含给定标签的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/video_tagging_from_frames_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_video_tagging_from_frames_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_watermark_filter</p></td>
+<tr class="row-even"><td><p>video_watermark_filter</p></td>
 <td><p>🎬Video 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Filter to keep samples whose videos have no watermark with high probability. 过滤器以保持其视频具有高概率没有水印的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/video_watermark_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_video_watermark_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>word_repetition_filter</p></td>
+<tr class="row-odd"><td><p>word_repetition_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Filter to keep samples with word-level n-gram repetition ratio within a specific range. 过滤器将单词级n-gram重复比率的样本保持在特定范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/word_repetition_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_word_repetition_filter.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>words_num_filter</p></td>
+<tr class="row-even"><td><p>words_num_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Filter to keep samples with total words number within a specific range. 过滤器，以保持总字数在特定范围内的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/words_num_filter.py">code</a></p></td>
@@ -934,7 +940,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 </tr>
 <tr class="row-even"><td><p>text_formatter</p></td>
 <td><p>🔴Alpha</p></td>
-<td><p>The class is used to load and format text-type files. 类用于加载和格式化文本类型文件。</p></td>
+<td><p>The class is used to load and format text-type files. 类用于加载和格式化文本类型的文件。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/format/text_formatter.py">code</a></p></td>
 <td><p>-</p></td>
 </tr>
@@ -1010,7 +1016,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 </tr>
 <tr class="row-even"><td><p>calibrate_qa_mapper</p></td>
 <td><p>🔤Text 💻CPU 🔗API 🟢Stable</p></td>
-<td><p>Mapper to calibrate question-answer pairs based on reference text. 映射器基于参考文本校准问答对。</p></td>
+<td><p>Mapper to calibrate question-answer pairs based on reference text. 映射器基于参考文本校准问题-答案对。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/calibrate_qa_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_calibrate_qa_mapper.py">tests</a></p></td>
 </tr>
@@ -1334,7 +1340,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 </tr>
 <tr class="row-even"><td><p>remove_specific_chars_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
-<td><p>Mapper to clean specific chars in text samples. 映射器来清理文本示例中的特定字符。</p></td>
+<td><p>Mapper to clean specific chars in text samples. 映射器来清理文本样本中的特定字符。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/remove_specific_chars_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_remove_specific_chars_mapper.py">tests</a></p></td>
 </tr>

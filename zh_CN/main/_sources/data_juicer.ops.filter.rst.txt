@@ -164,6 +164,14 @@ data\_juicer.ops.filter.language\_id\_score\_filter module
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.filter.llm\_analysis\_filter module
+----------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.llm_analysis_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.filter.llm\_difficulty\_score\_filter module
 -------------------------------------------------------------
 
