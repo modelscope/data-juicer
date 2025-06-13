@@ -5157,6 +5157,7 @@ distributed = [
 ]
 generic = [
     { name = "accelerate" },
+    { name = "cudf-cu12" },
     { name = "einops" },
     { name = "huggingface-hub" },
     { name = "onnxruntime" },
@@ -5182,7 +5183,6 @@ nlp = [
     { name = "tiktoken" },
 ]
 vision = [
-    { name = "cudf-cu12" },
     { name = "diffusers" },
     { name = "imagededup" },
     { name = "opencv-python" },
@@ -5207,7 +5207,7 @@ requires-dist = [
     { name = "coverage", marker = "extra == 'all'" },
     { name = "coverage", marker = "extra == 'dev'" },
     { name = "cudf-cu12", marker = "extra == 'all'" },
-    { name = "cudf-cu12", marker = "extra == 'vision'" },
+    { name = "cudf-cu12", marker = "extra == 'generic'" },
     { name = "dashscope", marker = "extra == 'ai-services'" },
     { name = "dashscope", marker = "extra == 'all'" },
     { name = "datasets", specifier = ">=2.19.0" },
