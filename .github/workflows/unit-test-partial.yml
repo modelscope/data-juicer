@@ -6,9 +6,6 @@ name: unittest-partial
 on:
   workflow_dispatch:
   pull_request:
-  push:
-    branches:
-      - main
 
 permissions:
   contents: read
