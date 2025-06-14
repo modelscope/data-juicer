@@ -37,7 +37,7 @@ Data-Juicer 中的算子分为以下 7 种类型。
 | [filter](#filter) | 49 | Filters out low-quality samples. 过滤低质量样本。 |
 | [formatter](#formatter) | 8 | Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。 |
 | [grouper](#grouper) | 3 | Group samples to batched samples. 将样本分组，每一组组成一个批量样本。 |
-| [mapper](#mapper) | 80 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
+| [mapper](#mapper) | 81 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
 | [selector](#selector) | 5 | Selects top samples based on ranking. 基于排序选取高质量样本。 |
 
 All the specific operators are listed below, each featured with several capability tags. 
@@ -187,6 +187,7 @@ All the specific operators are listed below, each featured with several capabili
 | extract_support_text_mapper | 🔤Text 💻CPU 🔗API 🟢Stable | Extract support sub text for a summary. 提取摘要的支持子文本。 | [code](../data_juicer/ops/mapper/extract_support_text_mapper.py) | [tests](../tests/ops/mapper/test_extract_support_text_mapper.py) |
 | extract_tables_from_html_mapper | 🔤Text 💻CPU 🟡Beta | Mapper to extract tables from HTML content. 映射器从HTML内容中提取表。 | [code](../data_juicer/ops/mapper/extract_tables_from_html_mapper.py) | [tests](../tests/ops/mapper/test_extract_tables_from_html_mapper.py) |
 | fix_unicode_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to fix unicode errors in text samples. 映射器修复文本示例中的unicode错误。 | [code](../data_juicer/ops/mapper/fix_unicode_mapper.py) | [tests](../tests/ops/mapper/test_fix_unicode_mapper.py) |
+| generate_challenging_qa_mapper | 🚀GPU 🧩HF 🌊vLLM 🟡Beta | Mapper to generate self-challenging question and answer pairs. 映射器生成自我挑战的问题和答案对。 | [code](../data_juicer/ops/mapper/generate_challenging_qa_mapper.py) | [tests](../tests/ops/mapper/test_generate_challenging_qa_mapper.py) |
 | generate_qa_from_examples_mapper | 🚀GPU 🌊vLLM 🧩HF 🟢Stable | Mapper to generate question and answer pairs from examples. 映射器从示例生成问题和答案对。 | [code](../data_juicer/ops/mapper/generate_qa_from_examples_mapper.py) | [tests](../tests/ops/mapper/test_generate_qa_from_examples_mapper.py) |
 | generate_qa_from_text_mapper | 🔤Text 🚀GPU 🌊vLLM 🧩HF 🟢Stable | Mapper to generate question and answer pairs from text. 映射器从文本生成问题和答案对。 | [code](../data_juicer/ops/mapper/generate_qa_from_text_mapper.py) | [tests](../tests/ops/mapper/test_generate_qa_from_text_mapper.py) |
 | image_blur_mapper | 🏞Image 💻CPU 🟢Stable | Mapper to blur images. 映射器来模糊图像。 | [code](../data_juicer/ops/mapper/image_blur_mapper.py) | [tests](../tests/ops/mapper/test_image_blur_mapper.py) |

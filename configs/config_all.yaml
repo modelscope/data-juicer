@@ -275,6 +275,10 @@ process:
       retain_html_tags: false,                                # If True, retains HTML tags in the tables; otherwise, removes them.
       include_header: true,                                   # If True, includes the table header; otherwise, excludes it. This parameter is effective only when `retain_html_tags` is False and applies solely to the extracted table content.
   - fix_unicode_mapper:                                     # fix unicode errors in text.
+  - generate_challenging_qa_mapper:                         # mapper to generate challenging question and answer pairs.
+      hf_model: 'Qwen/Qwen2.5-VL-7B-Instruct'                 # Huggingface model id.
+      category: 'Mathematical Reasoning'                      # The category for the current QA.
+      model_name: 'Qwen'                                      # The name for the current model.
   - generate_qa_from_examples_mapper:                       # mapper to generate question and answer pairs from examples.
       hf_model: 'Qwen/Qwen2.5-7B-Instruct'                    # Model name on huggingface to generate question and answer pairs.
       seed_file: 'demos/data/demo-dataset-chatml.jsonl'       # Path to the seed file in chatml format.
