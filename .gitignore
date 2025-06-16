@@ -34,4 +34,5 @@ tests/tools/tmp_*/
 tests/ops/deduplicator/chinese_dedup/
 tests/ops/deduplicator/english_dedup/
 
+# jupyter notebook checkpoints
 .ipynb_checkpoints/
