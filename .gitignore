@@ -3,6 +3,9 @@
 outputs/
 assets/
 
+# logs
+**/logs/*
+
 # setup
 data_juicer.egg-info/
 py_data_juicer.egg-info/
