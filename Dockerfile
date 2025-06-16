@@ -37,9 +37,9 @@ RUN pip install uv -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # install requirements which need to be installed from source
 RUN uv pip install --upgrade setuptools==69.5.1 setuptools_scm -i https://pypi.tuna.tsinghua.edu.cn/simple --system \
-    && uv pip install http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/recognize-anything-main.zip --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple --system
+    && uv pip install http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/recognize-anything-main.zip -i https://pypi.tuna.tsinghua.edu.cn/simple --system
 
 # install data-juicer then
 COPY . .
-RUN uv pip install -v -e .[all] --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple --ignore-installed --system \
+RUN uv pip install -v -e .[all] -i https://pypi.tuna.tsinghua.edu.cn/simple --ignore-installed --system \
     && python -c "import nltk; nltk.download('punkt_tab'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger');  nltk.download('averaged_perceptron_tagger_eng')"
