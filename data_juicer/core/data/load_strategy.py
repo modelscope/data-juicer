@@ -262,13 +262,67 @@ class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
         path = self._resolve_path(self.ds_config['path'])
 
         logger.info(f'Using resolved path for loading ray dataset: {path}')
+
+        file_extension_map = {
+            '.json': 'json',
+            '.jsonl': 'json',
+            '.txt': 'text',
+            '.csv': 'csv',
+            '.tsv': 'csv',
+            '.parquet': 'parquet',
+            '.npy': 'numpy',
+            '.tfrecords': 'tfrecords',
+            '.lance': 'lance',
+        }
+        auto_detect = False
+        data_source = self.ds_config.get('source', None)
+        if data_source is None:
+            auto_detect = True
+        else:
+            suffix = os.path.splitext(data_source)[1]
+            if suffix in file_extension_map:
+                data_format = file_extension_map[suffix]
+            elif '.' + data_source in file_extension_map:
+                data_format = file_extension_map['.' + data_source]
+            else:
+                auto_detect = True
+        if auto_detect:
+            item_path = path
+            if os.path.isdir(item_path):
+                # The first file encountered in the directory
+                # determines which data reader to use.
+                path_list = [path]
+                not_found = True
+                while not_found and len(path_list) > 0:
+                    cur_path = path_list.pop()
+                    for item in os.listdir(cur_path):
+                        item_path = os.path.join(cur_path, item)
+                        if os.path.isdir(item_path):
+                            path_list.append(item_path)
+                        elif os.path.isfile(item_path):
+                            not_found = False
+                            break
+            file_extension = os.path.splitext(item_path)[1]
+            # by default, we use json type to load data
+            data_format = file_extension_map.get(file_extension, 'json')
+            logger.info(f'Try to load data as {data_format}.')
+        else:
+            logger.info(f'Loading {data_format} data.')
         try:
-            dataset = RayDataset.read_json(path)
+            dataset = RayDataset.read(data_format, path)
             return RayDataset(dataset, dataset_path=path, cfg=self.cfg)
         except Exception as e:
-            raise RuntimeError(f'Failed to load JSON data from {path}. '
-                               f'Current working directory: {os.getcwd()}. '
-                               f'Error: {str(e)}')
+            if auto_detect:
+                raise RuntimeError(
+                    f'Failed to load data from {path}. '
+                    f'Please check data format and set the correct `dataset.configs.source`. '
+                    f'Current working directory: {os.getcwd()}. '
+                    f'Error: {str(e)}')
+            else:
+                raise RuntimeError(
+                    f'Failed to load {data_format} data from {path}. '
+                    f'Current working directory: {os.getcwd()}. '
+                    f'Error: {str(e)}')
 
 
 @DataLoadStrategyRegistry.register('ray', 'remote', 'huggingface')
@@ -307,7 +361,14 @@ class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
         text_keys = getattr(self.cfg, 'text_keys',
                             ['text'])  # Default to ['text']
         suffixes = getattr(self.cfg, 'suffixes', None)  # Default to None
-        add_suffix = getattr(self.cfg, 'add_suffix', False)  # Default to False
+        # if there is suffix_filter op, turn on the add_suffix flag
+        add_suffix = False
+        process_list = self.cfg.get('process', [])
+        for op in process_list:
+            op_name, _ = list(op.items())[0]
+            if op_name == 'suffix_filter':
+                add_suffix = True
+                break
         load_data_np = kwargs.get('num_proc', 1)
 
         # use proper formatter to load data
