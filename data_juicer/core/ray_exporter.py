@@ -9,6 +9,19 @@ class RayExporter:
     """The Exporter class is used to export a ray dataset to files of specific
     format."""
 
+    # TODO: support config for export, some export methods require additional args
+    _SUPPORTED_FORMATS = {
+        'json',
+        'jsonl',
+        'parquet',
+        'csv',
+        'tfrecords',
+        'webdataset',
+        'lance',
+        # 'images',
+        # 'numpy',
+    }
+
     def __init__(self,
                  export_path,
                  keep_stats_in_res_ds=True,
@@ -35,8 +48,6 @@ class RayExporter:
         :param export_path: the path to export datasets.
         :return: the export data format.
         """
-        support_dict = self._router()
-
         suffix = os.path.splitext(export_path)[-1].strip('.')
         if not suffix:
             logger.warning(
@@ -45,10 +56,10 @@ class RayExporter:
             suffix = 'jsonl'
 
         export_format = suffix
-        if export_format not in support_dict:
+        if export_format not in self._SUPPORTED_FORMATS:
             raise NotImplementedError(
                 f'export data format "{export_format}" is not supported '
-                f'for now. Only support {list(support_dict.keys())}.')
+                f'for now. Only support {self._SUPPORTED_FORMATS}.')
         return export_format
 
     def _export_impl(self, dataset, export_path):
@@ -77,8 +88,10 @@ class RayExporter:
             removed_fields = extra_fields.intersection(feature_fields)
             dataset = dataset.drop_columns(removed_fields)
 
-        export_method = RayExporter._router()[self.export_format]
-        export_method(dataset, export_path)
+        if self.export_format in {'json', 'jsonl'}:
+            return dataset.write_json(export_path, force_ascii=False)
+        else:
+            return getattr(dataset, f'write_{self.export_format}')(export_path)
 
     def export(self, dataset):
         """
@@ -88,53 +101,3 @@ class RayExporter:
         :return:
         """
         self._export_impl(dataset, self.export_path)
-
-    @staticmethod
-    def to_json(dataset, export_path, **kwargs):
-        """
-        Export method for json target files.
-
-        :param dataset: the dataset to export.
-        :param export_path: the path to store the exported dataset.
-        :param kwargs: extra arguments.
-        :return:
-        """
-        dataset.write_json(export_path, force_ascii=False)
-
-    @staticmethod
-    def to_lance(dataset, export_path, **kwargs):
-        """
-        Export method for lance target files.
-
-        :param dataset: the dataset to export.
-        :param export_path: the path to store the exported dataset.
-        :param kwargs: extra arguments.
-        :return:
-        """
-        dataset.write_lance(export_path)
-
-    @staticmethod
-    def to_parquet(dataset, export_path, **kwargs):
-        """
-        Export method for parquet target files.
-
-        :param dataset: the dataset to export.
-        :param export_path: the path to store the exported dataset.
-        :param kwargs: extra arguments.
-        :return:
-        """
-        dataset.write_parquet(export_path)
-
-    @staticmethod
-    def _router():
-        """
-        A router from different export type to corresponding export methods.
-
-        :return: A dict router.
-        """
-        return {
-            'json': RayExporter.to_json,
-            'jsonl': RayExporter.to_json,
-            'lance': RayExporter.to_lance,
-            'parquet': RayExporter.to_parquet,
-        }
