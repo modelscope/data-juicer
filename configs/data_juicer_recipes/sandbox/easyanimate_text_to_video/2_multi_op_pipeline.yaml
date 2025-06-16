@@ -16,7 +16,7 @@ execution_job_configs:
     dj_configs:
       project_name: 'demo-bench'
       dataset_path: './demos/data/demo-dataset-videos.jsonl'  # path to your dataset directory or file
-      export_path: './outputs/demo-bench/demo-dataset-with-multi-op-stats.jsonl'
+      export_path: './outputs/demo-bench/demo-dataset-with-multi-op-stats.json'
       export_original_dataset: true                            # must be true to keep statistics values with dataset
       process:
         # select samples with high language score
@@ -33,12 +33,18 @@ execution_job_configs:
     meta_name:
     dj_configs:
       project_name: 'demo-bench'
-      dataset_path: './outputs/demo-bench/demo-dataset-with-multi-op-stats.jsonl'
+      dataset_path: './outputs/demo-bench/demo-dataset-with-multi-op-stats.json'
       export_path: './outputs/demo-bench/demo-dataset-for-train.json'
       process:
         - random_selector:
             select_num: 16
     extra_configs:
+  - hook: 'GeneralDataExecutorHook'
+    meta_name: 'convert_to_ea_fmt'
+    extra_configs:
+      type: 'dj_to_easyanimate_video_dataset_conversion'
+      dataset_path: './outputs/demo-bench/demo-dataset-for-train.json'
+      export_path: './outputs/demo-bench/'
   # train model
   - hook: 'TrainModelHook'
     meta_name:

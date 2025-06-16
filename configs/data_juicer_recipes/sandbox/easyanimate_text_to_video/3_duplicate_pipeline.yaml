@@ -11,6 +11,12 @@ probe_job_configs:
 refine_recipe_job_configs:
 
 execution_job_configs:
+  - hook: 'GeneralDataExecutorHook'
+    meta_name: 'convert_to_ea_fmt'
+    extra_configs:
+      type: 'dj_to_easyanimate_video_dataset_conversion'
+      dataset_path: './outputs/demo-bench/demo-dataset-with-multi-op-stats.json'
+      export_path: './outputs/demo-bench/'
   # train model
   - hook: 'TrainModelHook'
     meta_name:
