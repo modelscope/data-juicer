@@ -33,7 +33,7 @@ ENV JAVA_HOME=/opt/jdk
 WORKDIR /data-juicer
 
 # install uv
-RUN pip install uv
+RUN pip install uv -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # install requirements which need to be installed from source
 RUN uv pip install --upgrade setuptools==69.5.1 setuptools_scm -i https://pypi.tuna.tsinghua.edu.cn/simple \
