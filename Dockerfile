@@ -33,7 +33,7 @@ ENV JAVA_HOME=/opt/jdk
 WORKDIR /data-juicer
 
 # install uv
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
+RUN curl -LsSf https://astral.sh/uv/install.sh | bash \
     && source /root/.local/bin/env
 
 # install requirements which need to be installed from source
