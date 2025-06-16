@@ -2,8 +2,7 @@ import unittest
 from data_juicer.core.data.load_strategy import (
     DataLoadStrategyRegistry, DataLoadStrategy, StrategyKey,
     DefaultLocalDataLoadStrategy,
-    RayLocalJsonDataLoadStrategy,
-    RayLocalLanceDataLoadStrategy
+    RayLocalJsonDataLoadStrategy
 )
 from argparse import Namespace
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
@@ -62,30 +61,6 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
         # Test no match
         strategy = DataLoadStrategyRegistry.get_strategy_class(
             "default", 'local', 'csv')
-        self.assertIsNone(strategy)
-    
-    def test_exact_match_double_register(self):
-        # Register a specific strategy
-        DataLoadStrategyRegistry._strategies = {}
-
-        @DataLoadStrategyRegistry.register("default", 'local', '*')
-        @DataLoadStrategyRegistry.register("default", 'local', 'json')
-        class TestStrategy(MockStrategy):
-            pass
-
-        # Test exact match
-        strategy = DataLoadStrategyRegistry.get_strategy_class(
-            "default", 'local', 'json')
-        self.assertEqual(strategy, TestStrategy)
-
-        # Test exact match
-        strategy = DataLoadStrategyRegistry.get_strategy_class(
-            "default", 'local', 'csv')
-        self.assertEqual(strategy, TestStrategy)
-
-        # Test no match
-        strategy = DataLoadStrategyRegistry.get_strategy_class(
-            "default", 'remote', 'json')
         self.assertIsNone(strategy)
 
     def test_wildcard_matching(self):
@@ -375,40 +350,6 @@ class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
             'path': rel_path
         }, self.cfg)
 
-        dataset = strategy.load_data()
-        result = list(dataset.get(2))
-        
-        self.assertEqual(len(result), 2)
-        self.assertEqual(result[0]['text'], "Today is Sunday and it's a happy day!")
-        self.assertEqual(result[1]['text'], "Today is Monday and it's a happy day!")
-
-
-class TestRayLocalLanceDataLoadStrategy(DataJuicerTestCaseBase):
-    def setUp(self):
-        """Instance-level setup run before each test"""
-        cur_dir = osp.dirname(osp.abspath(__file__))
-        self.tmp_dir = osp.join(cur_dir, f'tmp_{uuid.uuid4().hex}')
-        os.makedirs(self.tmp_dir, exist_ok=True)
-
-        self.cfg = get_default_cfg()
-        self.cfg.ray_address = 'local'
-        self.cfg.executor_type = 'ray'
-        self.cfg.work_dir = self.tmp_dir
-
-    def tearDown(self):
-        if osp.exists(self.tmp_dir):
-            shutil.rmtree(self.tmp_dir)
-
-    @TEST_TAG('ray')
-    def test_absolute_path_resolution(self):
-        """Test loading from absolute path"""
-        abs_path = os.path.join(WORK_DIR, 'test_data', 'sample.lance')
-    
-        # Now test the strategy
-        strategy = RayLocalLanceDataLoadStrategy({
-            'path': abs_path
-        }, self.cfg)
-        
         dataset = strategy.load_data()
         result = list(dataset.get(2))
         

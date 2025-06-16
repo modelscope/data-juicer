@@ -13,9 +13,6 @@ from data_juicer.core.data.config_validator import ConfigValidator
 from data_juicer.download.downloader import validate_snapshot_format
 from data_juicer.format.formatter import unify_format
 from data_juicer.format.load import load_formatter
-from data_juicer.utils.lazy_loader import LazyLoader
-
-ray = LazyLoader('ray')
 
 # based on executor type and data source type, use different
 # data load strategy to product corresponding datasets
@@ -159,6 +156,38 @@ class RayDataLoadStrategy(DataLoadStrategy):
     """
     abstract class for data load strategy for RayExecutor
     """
+
+    @abstractmethod
+    def load_data(self, **kwargs) -> DJDataset:
+        pass
+
+
+class DefaultDataLoadStrategy(DataLoadStrategy):
+    """
+    abstract class for data load strategy for LocalExecutor
+    """
+
+    @abstractmethod
+    def load_data(self, **kwargs) -> DJDataset:
+        pass
+
+
+# TODO dask support
+# class DaskDataLoadStrategy(DataLoadStrategy):
+#     @abstractmethod
+#     def load_data(self) -> Union[DaskDataset]:
+#         pass
+
+# TODO nemo support
+# class NemoDataLoadStrategy(DataLoadStrategy):
+#     @abstractmethod
+#     def load_data(self) -> Union[NemoDataset]:
+#         pass
+
+
+@DataLoadStrategyRegistry.register('ray', 'local', '*')
+class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
+
     # TODO ray defaults to json
 
     CONFIG_VALIDATION_RULES = {
@@ -169,11 +198,11 @@ class RayDataLoadStrategy(DataLoadStrategy):
         'custom_validators': {}
     }
 
-    @abstractmethod
-    def load_data(self, **kwargs) -> DJDataset:
-        pass
+    def load_data(self, **kwargs):
+        from data_juicer.core.data.ray_dataset import RayDataset
 
-    def _resolve_path(self, path):
+        path = self.ds_config['path']
+
         # Convert to absolute path if relative
         if not os.path.isabs(path):
             # Try multiple base paths
@@ -208,58 +237,6 @@ class RayDataLoadStrategy(DataLoadStrategy):
                     f"Could not find file '{path}' in any location. "
                     f'Tried: {possible_paths}. '
                     f'Current working directory: {os.getcwd()}')
-
-        return path
-
-
-class DefaultDataLoadStrategy(DataLoadStrategy):
-    """
-    abstract class for data load strategy for LocalExecutor
-    """
-
-    @abstractmethod
-    def load_data(self, **kwargs) -> DJDataset:
-        pass
-
-
-# TODO dask support
-# class DaskDataLoadStrategy(DataLoadStrategy):
-#     @abstractmethod
-#     def load_data(self) -> Union[DaskDataset]:
-#         pass
-
-# TODO nemo support
-# class NemoDataLoadStrategy(DataLoadStrategy):
-#     @abstractmethod
-#     def load_data(self) -> Union[NemoDataset]:
-#         pass
-
-
-@DataLoadStrategyRegistry.register('ray', 'local', 'lance')
-class RayLocalLanceDataLoadStrategy(RayDataLoadStrategy):
-
-    def load_data(self, **kwargs):
-        from data_juicer.core.data.ray_dataset import RayDataset
-
-        path = self._resolve_path(self.ds_config['path'])
-        logger.info(f'Using resolved path for loading ray dataset: {path}')
-        try:
-            dataset = ray.data.read_lance(path)
-            return RayDataset(dataset, dataset_path=path, cfg=self.cfg)
-        except Exception as e:
-            raise RuntimeError(f'Failed to load LANCE data from {path}. '
-                               f'Current working directory: {os.getcwd()}. '
-                               f'Error: {str(e)}')
-
-
-@DataLoadStrategyRegistry.register('ray', 'local', '*')
-@DataLoadStrategyRegistry.register('ray', 'local', 'json')
-class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
-
-    def load_data(self, **kwargs):
-        from data_juicer.core.data.ray_dataset import RayDataset
-
-        path = self._resolve_path(self.ds_config['path'])
 
         logger.info(f'Using resolved path for loading ray dataset: {path}')
 
