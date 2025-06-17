@@ -31,7 +31,6 @@ class AudioDurationFilterTest(DataJuicerTestCaseBase):
 
     @TEST_TAG("standalone", "ray")
     def test_default_filter(self):
-
         ds_list = [{
             'audios': [self.aud1_path]
         }, {
@@ -48,13 +47,10 @@ class AudioDurationFilterTest(DataJuicerTestCaseBase):
         }]
         dataset = self.generate_dataset(ds_list)
         op = AudioDurationFilter()
-        result = self.run_single_op(dataset, op, [op.audio_key])
-        self.assertDatasetEqual(result, tgt_list)
-
+        self._run_audio_duration_filter(dataset, tgt_list, op)
 
     @TEST_TAG("standalone", "ray")
     def test_filter_long_audios(self):
-
         ds_list = [{
             'audios': [self.aud1_path]
         }, {
@@ -65,12 +61,10 @@ class AudioDurationFilterTest(DataJuicerTestCaseBase):
         tgt_list = [{'audios': [self.aud1_path]}]
         dataset = self.generate_dataset(ds_list)
         op = AudioDurationFilter(max_duration=10)
-        result = self.run_single_op(dataset, op, [op.audio_key])
-        self.assertDatasetEqual(result, tgt_list)
+        self._run_audio_duration_filter(dataset, tgt_list, op)
 
     @TEST_TAG("standalone", "ray")
     def test_filter_short_audios(self):
-
         ds_list = [{
             'audios': [self.aud1_path]
         }, {
@@ -81,12 +75,10 @@ class AudioDurationFilterTest(DataJuicerTestCaseBase):
         tgt_list = [{'audios': [self.aud3_path]}]
         dataset = self.generate_dataset(ds_list)
         op = AudioDurationFilter(min_duration=60)
-        result = self.run_single_op(dataset, op, [op.audio_key])
-        self.assertDatasetEqual(result, tgt_list)
+        self._run_audio_duration_filter(dataset, tgt_list, op)
 
     @TEST_TAG("standalone", "ray")
     def test_filter_audios_within_range(self):
-
         ds_list = [{
             'audios': [self.aud1_path]
         }, {
@@ -97,9 +89,8 @@ class AudioDurationFilterTest(DataJuicerTestCaseBase):
         tgt_list = [{'audios': [self.aud2_path]}]
         dataset = self.generate_dataset(ds_list)
         op = AudioDurationFilter(min_duration=10, max_duration=20)
-        result = self.run_single_op(dataset, op, [op.audio_key])
-        self.assertDatasetEqual(result, tgt_list)
-
+        self._run_audio_duration_filter(dataset, tgt_list, op)
+        
     @TEST_TAG("standalone", "ray")
     def test_any(self):
         ds_list = [{
@@ -118,12 +109,10 @@ class AudioDurationFilterTest(DataJuicerTestCaseBase):
         op = AudioDurationFilter(min_duration=10,
                                  max_duration=20,
                                  any_or_all='any')
-        result = self.run_single_op(dataset, op, [op.audio_key])
-        self.assertDatasetEqual(result, tgt_list)
+        self._run_audio_duration_filter(dataset, tgt_list, op)
 
     @TEST_TAG("standalone", "ray")
     def test_all(self):
-
         ds_list = [{
             'audios': [self.aud1_path, self.aud2_path]
         }, {
@@ -136,12 +125,10 @@ class AudioDurationFilterTest(DataJuicerTestCaseBase):
         op = AudioDurationFilter(min_duration=10,
                                  max_duration=20,
                                  any_or_all='all')
-        result = self.run_single_op(dataset, op, [op.audio_key])
-        self.assertDatasetEqual(result, tgt_list)
+        self._run_audio_duration_filter(dataset, tgt_list, op)
 
     @TEST_TAG("standalone", "ray")
     def test_filter_in_parallel(self):
-
         ds_list = [{
             'audios': [self.aud1_path]
         }, {
@@ -152,8 +139,7 @@ class AudioDurationFilterTest(DataJuicerTestCaseBase):
         tgt_list = [{'audios': [self.aud2_path]}]
         dataset = self.generate_dataset(ds_list)
         op = AudioDurationFilter(min_duration=10, max_duration=20)
-        result = self.run_single_op(dataset, op, [op.audio_key])
-        self.assertDatasetEqual(result, tgt_list)
+        self._run_audio_duration_filter(dataset, tgt_list, op)
 
 
 if __name__ == '__main__':

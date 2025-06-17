@@ -4,8 +4,8 @@ from data_juicer.config.config import get_default_cfg
 from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.utils.lazy_loader import LazyLoader
 
-torch = LazyLoader('torch', 'torch')
-transformers = LazyLoader('transformers', 'transformers')
+torch = LazyLoader('torch')
+transformers = LazyLoader('transformers')
 
 
 class TextTokenDistCollector(object):

@@ -7,7 +7,7 @@ from ..base_op import OPERATORS
 from ..op_fusion import LOADED_IMAGES
 from .ray_basic_deduplicator import RayBasicDeduplicator
 
-imgdedup_methods = LazyLoader('imgdedup_methods', 'imagededup.methods')
+imgdedup_methods = LazyLoader('imagededup.methods')
 
 OP_NAME = 'ray_image_deduplicator'
 

@@ -28,3 +28,7 @@ venv/
 # dup files created by tests
 tests/ops/data/*dup*
 tests/tools/tmp_*/
+tests/ops/deduplicator/chinese_dedup/
+tests/ops/deduplicator/english_dedup/
+
+.ipynb_checkpoints/

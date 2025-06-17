@@ -139,8 +139,9 @@ class StatsKeysMeta(type):
             tmp_dj_cfg.use_cache = False
             tmp_dj_cfg.use_checkpoint = False
 
+            from data_juicer.config import get_init_configs
             from data_juicer.core import Analyzer
-            tmp_analyzer = Analyzer(tmp_dj_cfg)
+            tmp_analyzer = Analyzer(get_init_configs(tmp_dj_cfg))
 
             dataset = dataset.take(1)
             # do not overwrite the true analysis results
@@ -189,8 +190,9 @@ class StatsKeysMeta(type):
                 tmp_dj_cfg.use_cache = False
                 tmp_dj_cfg.use_checkpoint = False
 
+                from data_juicer.config import get_init_configs
                 from data_juicer.core import Analyzer
-                tmp_analyzer = Analyzer(tmp_dj_cfg)
+                tmp_analyzer = Analyzer(get_init_configs(tmp_dj_cfg))
                 # do not overwrite the true analysis results
                 tmp_analyzer.run(skip_export=True)
 
@@ -224,6 +226,8 @@ class StatsKeysConstant(object):
     num_token = 'num_token'
     num_words = 'num_words'
     word_rep_ratio = 'word_rep_ratio'
+    llm_analysis_score = 'llm_analysis_score'
+    llm_analysis_record = 'llm_analysis_record'
     llm_quality_score = 'llm_quality_score'
     llm_quality_record = 'llm_quality_record'
     llm_difficulty_score = 'llm_difficulty_score'
@@ -267,6 +271,9 @@ class StatsKeysConstant(object):
 
     # video-text
     video_frames_text_similarity = 'video_frames_text_similarity'
+
+    # general-field-filter
+    general_field_filter_condition = 'general_field_filter_condition'
 
 
 class StatsKeys(object, metaclass=StatsKeysMeta):
@@ -313,6 +320,9 @@ class InterVars(object):
 
 class JobRequiredKeys(Enum):
     hook = 'hook'
-    dj_configs = 'dj_configs'
     meta_name = 'meta_name'
+    input = 'input'
+    output = 'output'
+    local = 'local'
+    dj_configs = 'dj_configs'
     extra_configs = 'extra_configs'

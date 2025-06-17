@@ -3,13 +3,10 @@ from typing import Dict, List, Optional
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.logger_utils import HiddenPrints
 
 from ..base_op import OPERATORS, Mapper
 
-with HiddenPrints():
-    ffmpeg = LazyLoader('ffmpeg', 'ffmpeg')
-
+ffmpeg = LazyLoader('ffmpeg', 'ffmpeg-python')
 OP_NAME = 'video_ffmpeg_wrapped_mapper'
 
 

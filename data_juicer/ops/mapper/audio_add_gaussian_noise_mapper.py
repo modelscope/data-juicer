@@ -1,7 +1,6 @@
 import os
 
 import numpy as np
-import soundfile as sf
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
@@ -11,7 +10,8 @@ from ...utils.lazy_loader import LazyLoader
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_AUDIOS
 
-audiomentations = LazyLoader('audiomentations', 'audiomentations')
+audiomentations = LazyLoader('audiomentations')
+sf = LazyLoader('soundfile')
 
 OP_NAME = 'audio_add_gaussian_noise_mapper'
 

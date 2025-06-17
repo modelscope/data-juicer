@@ -34,8 +34,8 @@ jobs:
     - name: Install data-juicer
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        docker compose exec ray-head pip install -e .\[all\]
-        docker compose exec ray-worker pip install -e .\[all\]
+        docker compose exec ray-head bash -c '/root/.local/bin/uv pip install --system -e .\[all\]'
+        docker compose exec ray-worker bash -c '/root/.local/bin/uv pip install --system -e .\[all\]'
 
     - name: Clean dataset cache
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
@@ -45,14 +45,14 @@ jobs:
     - name: Run unittest standalone
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        docker compose exec -e OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ray-head python tests/run.py --tag standalone --mode regression
+        docker compose exec -e OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ray-head bash -c 'python tests/run.py --tag standalone --mode regression'
 
     - name: Upload coverage report of standalone
       uses: actions/upload-artifact@v4
       with:
         name: coverage_report_standalone
         include-hidden-files: true
-        path: dj-${{ github.run_id }}/coverage_report_standalone
+        path: dj-${{ github.run_id }}/.coverage
 
     - name: Get Total Coverage Result
       id: total
@@ -60,17 +60,52 @@ jobs:
       run: |
         echo "total=$(docker compose exec ray-head coverage report --format=total)" >> $GITHUB_OUTPUT
 
+    - name: Remove docker compose
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      if: always()
+      run: |
+        docker compose down --remove-orphans
+
+    - name: Cleanup workspace
+      if: always()
+      run: |
+        rm -rf  dj-${{ github.run_id }}
+
+  unittest-dist:
+    runs-on: [GPU, unittest]
+    environment: Testing
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        path: dj-${{ github.run_id }}
+
+    - name: Setup docker compose
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose up -d
+
+    - name: Install data-juicer
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose exec ray-head bash -c '/root/.local/bin/uv pip install --system -e .\[all\]'
+        docker compose exec ray-worker bash -c '/root/.local/bin/uv pip install --system -e .\[all\]'
+
+    - name: Clean dataset cache
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose exec ray-head rm -rf /data/huggingface/dataset
+
     - name: Run unittest ray
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        docker compose exec ray-head python tests/run.py --tag ray --mode regression
+        docker compose exec ray-head bash -c 'python tests/run.py --tag ray --mode regression'
 
     - name: Upload coverage report of ray
       uses: actions/upload-artifact@v4
       with:
         name: coverage_report_ray
         include-hidden-files: true
-        path: dj-${{ github.run_id }}/coverage_report_ray
+        path: dj-${{ github.run_id }}/.coverage
 
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker

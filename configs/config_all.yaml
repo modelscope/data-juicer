@@ -638,6 +638,8 @@ process:
       use_words_aug: false                                    # whether to augment words, especially for Chinese and Vietnamese
       words_aug_group_sizes: [2]                              # the group size of words to augment
       words_aug_join_char: ""                                 # the join char between words to augment
+  - general_field_filter:                                    # Filter to keep samples based on a general field filter condition.
+      filter_condition: ""                                  # The filter condition as a string. It can include logical operators (and/or) and chain comparisons.
   - image_aesthetics_filter:                                # filter samples according to the aesthetics score of images.
       hf_scorer_model: shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE # Huggingface model name for the aesthetics predictor
       min_score: 0.3                                          # the min aesthetics score of filter range

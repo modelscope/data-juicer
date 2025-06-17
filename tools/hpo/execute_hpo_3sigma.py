@@ -7,7 +7,7 @@ import yaml
 from jsonargparse import namespace_to_dict
 from loguru import logger
 
-from data_juicer.config import init_configs
+from data_juicer.config import init_configs, prepare_cfgs_for_export
 from data_juicer.core import Analyzer, DefaultExecutor
 from data_juicer.utils.constant import StatsKeys
 
@@ -76,6 +76,7 @@ def modify_recipe_k_sigma(cfg, df, path_k_sigma_recipe, k=3):
                                     f'{arg_name}={new_val}')
                         args[arg_name] = new_val
     if path_k_sigma_recipe:
+        cfg = prepare_cfgs_for_export(cfg)
         if path_k_sigma_recipe.endswith(
                 '.yaml') or path_k_sigma_recipe.endswith('.yml'):
             with open(path_k_sigma_recipe, 'w') as fout:

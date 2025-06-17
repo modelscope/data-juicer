@@ -8,6 +8,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - '*'
 
 jobs:
   pages:
@@ -18,6 +20,13 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Get git tags
+      run: |
+        git fetch --all --tags
+        git branch -a
+        git tag
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@master
       with:
@@ -31,13 +40,21 @@ jobs:
       run: |
         cd docs/sphinx_doc
         bash build_doc.sh
+    - name: Redirect index.html
+      run: |
+        REPOSITORY_OWNER="${GITHUB_REPOSITORY_OWNER}"
+        cd docs/sphinx_doc
+        cp ./redirect.html build/index.html
+        sed -i "s/\[VERSION\]/$(python -c 'import data_juicer;print(data_juicer.__version__)')/g" build/index.html
+        sed -i "s/\[REPOSITORY_OWNER\]/${REPOSITORY_OWNER}/g" build/index.html
+        cp build/index.html build/404.html
     - name: Upload Documentation
       uses: actions/upload-artifact@v4
       with:
         name: SphinxDoc
-        path: 'docs/sphinx_doc/build/html'
+        path: 'docs/sphinx_doc/build'
     - uses: peaceiris/actions-gh-pages@v3
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: 'docs/sphinx_doc/build/html'
+        publish_dir: 'docs/sphinx_doc/build'

@@ -1,16 +1,24 @@
 # 开发者指南
 
-- [1.编码规范](#1编码规范)
-- [2.构建自己的算子](#2构建自己的算子)
-  - [2.1 构建示例](#21-构建示例)
-    - [2.1.2 提供算子基本功能（alpha版本)](#212-提供算子基本功能alpha版本)
-    - [2.1.2 使算子更可用（beta版本)](#212-使算子更可用beta版本)
-    - [2.1.3 使算子更快更完备（stable版本)](#213-使算子更快更完备stable版本)
-- [3. 构建自己的数据菜谱和配置](#3-构建自己的数据菜谱和配置)
-  - [3.1 丰富的配置源和类型提示](#31-丰富的配置源和类型提示)
-  - [3.2 层次化的配置和帮助](#32-层次化的配置和帮助)
+- [开发者指南](#开发者指南)
+  - [1. 编码规范](#1-编码规范)
+  - [2. 构建自己的算子](#2-构建自己的算子)
+    - [2.1 构建示例](#21-构建示例)
+      - [2.1.2 提供算子基本功能（alpha版本）](#212-提供算子基本功能alpha版本)
+      - [2.1.2 使算子更可用（beta版本）](#212-使算子更可用beta版本)
+      - [2.1.3 使算子更快更完备（stable版本）](#213-使算子更快更完备stable版本)
+  - [3. 构建自己的数据菜谱和配置](#3-构建自己的数据菜谱和配置)
+    - [3.1 丰富的配置源和类型提示](#31-丰富的配置源和类型提示)
+    - [3.2 层次化的配置和帮助](#32-层次化的配置和帮助)
+  - [4. 依赖管理](#4-依赖管理)
+    - [4.1 安装 uv](#41-安装-uv)
+    - [4.2 虚拟环境管理](#42-虚拟环境管理)
+    - [4.3 添加新依赖](#43-添加新依赖)
+    - [4.4 开发环境设置](#44-开发环境设置)
+    - [4.5 延迟加载](#45-延迟加载)
+  - [5. 文档规范](#5-文档规范)
 
-## 1.编码规范
+## 1. 编码规范
 
 我们将编码规范定义在 `.pre-commit-config.yaml` 中。在向仓库贡献代码之前，请使用 `pre-commit` 工具对代码进行自动规范化。
 
@@ -33,7 +41,7 @@ git commit -m "<your_commit_message>"
 
 **注意**：我们在github workflow配置了pre-commit的检查。如果您的PR中该检查没通过，请在本地①确保pre-commit 的相关依赖与项目配置一致（可通过`pre-commit clean`和`pre-commit install`完成）；②push前执行了`pre-commit run --all-files`.
 
-## 2.构建自己的算子
+## 2. 构建自己的算子
 
 - Data-Juicer 支持每个人灵活、便捷定义自己的算子。
 - 在实现新的算子之前，请参考已有 [算子池](Operators.md) 以避免不必要的重复。
@@ -44,9 +52,9 @@ git commit -m "<your_commit_message>"
 - 📣📣📣 社区贡献者可在alpha状态后就提相应算子PR。此后该贡献者可以与Data-Juicer团队一起在后续PR中，将其渐进完善到beta和stable版本。我们非常欢迎共建，并会高亮[致谢](https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement)！
 
 ### 2.1 构建示例
-下面以 “TextLengthFilter” 的算子（过滤仅包含预期文本长度的样本语料）为例，展示相应开发构建过程。
+下面以 "TextLengthFilter" 的算子（过滤仅包含预期文本长度的样本语料）为例，展示相应开发构建过程。
 
-#### 2.1.2 提供算子基本功能（alpha版本)
+#### 2.1.2 提供算子基本功能（alpha版本）
 
 1. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)，可选) 如果该算子定义了某个统计变量，那么请在 `data_juicer/utils/constant.py` 文件中添加一个新的`StatsKeys`属性来统一保存管理。
 
@@ -141,7 +149,7 @@ process:
       max_len: 1000
 ```
 
-#### 2.1.2 使算子更可用（beta版本)
+#### 2.1.2 使算子更可用（beta版本）
 
 6. （![beta](https://img.shields.io/badge/beta-yellow?style=plastic) 强烈推荐）为了增强代码鲁棒性、验证正确性和直观展示如何使用其功能，最好为新添加的算子进行单元测试。对于上面的 `TextLengthFilter` 算子，在 `tests/ops/filter/` 中实现如 `test_text_length_filter.py` 的测试文件：
 
@@ -191,7 +199,7 @@ if __name__ == '__main__':
    ```
 
 
-#### 2.1.3 使算子更快更完备（stable版本)
+#### 2.1.3 使算子更快更完备（stable版本）
 
 - (![stable](https://img.shields.io/badge/stable-green?style=plastic)) 如果在算子中使用了 Hugging Face 模型，您可能希望利用 GPU 加速。为了实现这一点，请在算子的构造函数中声明 `_accelerator = 'cuda'`，并确保 `compute_stats_single/batched` 和 `process_single/batched` 方法接受一个额外的位置参数 `rank`。
 
@@ -358,15 +366,16 @@ else:
 ...
 ```
 
-5. 随着算子数量的增加，Data-Juicer的依赖也不断增多。为了防止Data-Juicer的依赖越来越重，我们为算子额外增加的依赖提供了一套延迟加载加上使用时安装依赖的策略。`LazyLoader`会检查加载的module对应的package有没有都安装，没有的话会动态自动安装。`AUTOINSTALL`用于安装额外的补丁。如下样例：
+5. 随着算子数量的增加，Data-Juicer的依赖也不断增多。为了防止Data-Juicer的依赖越来越重，我们为算子额外增加的依赖提供了一套延迟加载加上使用时安装依赖的策略。`LazyLoader`会检查加载的module对应的package有没有都安装，没有的话会动态自动安装。如下样例：
 
 ```python
 # ... (import some library)
-from data_juicer.utils.lazy_loader import LazyLoader, AUTOINSTALL
+from data_juicer.utils.lazy_loader import LazyLoader
 
 # lazy import
-kenlm = LazyLoader('kenlm', 'kenlm')
-sp = LazyLoader('sp', 'sentencepiece')
+torch = LazyLoader('torch')
+transformers = LazyLoader('transformers')
+nltk = LazyLoader('nltk')
 
 class PerplexityFilter(Filter):
     def __init__(self,
@@ -375,7 +384,7 @@ class PerplexityFilter(Filter):
                 **kwargs):
         # auto install before init
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['fasttext-wheel'])
+        LazyLoader.check_packages(['fasttext-wheel'])
         # ... (some codes)
 
     def process_single(self, sample):
@@ -435,11 +444,11 @@ optional arguments:
   --project_name PROJECT_NAME
                         name of your data process project. (type: str, default: null)
   --dataset_path DATASET_PATH
-                        path to your dataset file, relative with respect to the config file’s location (type: Path_fr, default: null)
+                        path to your dataset file, relative with respect to the config file's location (type: Path_fr, default: null)
   --dataset_dir DATASET_DIR
-                        path to your dataset(s) within a directory, relative with respect to the config file’s location (type: Path_drw, default: null)
+                        path to your dataset(s) within a directory, relative with respect to the config file's location (type: Path_drw, default: null)
   --export_path EXPORT_PATH
-                        path to the output processed dataset, relative with respect to the config file’s location (type: Path_fc, default: null)
+                        path to the output processed dataset, relative with respect to the config file's location (type: Path_fc, default: null)
   --process PROCESS, --process+ PROCESS
                         a list of several process operators with their arguments (type: List[Dict], default: null)
   --np NP               number of subprocess to process your dataset. (type: PositiveInt, default: null)
@@ -463,3 +472,102 @@ optional arguments:
 ......
 
 ```
+
+## 4. 依赖管理
+
+Data-Juicer 使用基于 `uv` 和 `pyproject.toml` 的现代依赖管理系统。依赖通过标准的 Python 打包格式 (PEP 621) 进行管理，并使用延迟加载系统按需安装。
+
+### 4.1 安装 uv
+
+`uv` 是一个快速的 Python 包安装器和解析器，用于替代 pip。您可以通过以下方式安装：
+
+```bash
+# 使用 curl 安装
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 或使用 pip 安装
+pip install uv
+```
+
+安装完成后，您可以使用 `uv --version` 验证安装是否成功。
+
+### 4.2 虚拟环境管理
+
+`uv` 提供了虚拟环境管理功能，可以替代 `venv` 和 `virtualenv`。以下是常用命令：
+
+```bash
+# 创建新的虚拟环境
+uv venv
+
+# 创建指定 Python 版本的虚拟环境
+uv venv --python 3.10
+
+# 激活虚拟环境
+# 在 Unix/macOS 上
+source .venv/bin/activate
+# 在 Windows 上
+.venv\Scripts\activate
+
+# 在虚拟环境中安装最小依赖
+uv pip install -e .
+```
+
+### 4.3 添加新依赖
+
+添加新依赖的方法：
+
+1. 将依赖添加到 `pyproject.toml` 的相应部分：
+   - 核心依赖放在 `[project.dependencies]` 中
+   - 可选依赖放在 `[project.optional-dependencies]` 的相应组中（ generic、dev、audio、video，etc.）
+
+2. 延迟加载系统会在首次使用时自动处理依赖安装。
+
+示例：
+```toml
+[project.dependencies]
+# 核心依赖
+numpy = ">=1.26.4,<2.0.0"
+
+[project.optional-dependencies]
+generic = [
+    "torch>=1.11.0",
+    "transformers>=4.47.0,<4.48.0",
+    ...
+]
+```
+
+### 4.4 开发环境设置
+
+1. 安装所有依赖：
+```bash
+uv pip install -e ".[all]"
+```
+
+2. 或安装特定组：
+```bash
+uv pip install -e ".[generic]"      # 通用依赖
+uv pip install -e ".[dev]"          # 开发工具
+uv pip install -e ".[ai_services]"  # 服务依赖
+```
+
+### 4.5 延迟加载
+
+延迟加载系统在首次使用时自动安装依赖。这意味着：
+- 初始安装更快
+- 只安装必需的依赖
+- 依赖按需安装
+- 优先使用 `uv` 进行快速安装
+
+## 5. 文档规范
+
+我们使用 Sphinx 进行文档管理。为保证开发文档顺利集成到 Sphinx 文档系统中，请在编写时注意以下规范：
+
+1. 标题层级
+
+    - 一级标题（`#`）：每个文档**必须且只能**包含一个一级标题，作为文档的整体标题。
+    - 确保标题层级结构正确，不要跳级使用标题。例如，一级标题下应该是二级标题，而不是直接跳到三级标题。
+
+2. 文件命名规范
+
+    - 中文文档：中文 Markdown 文件的命名必须以 `_ZH` 结尾。例如：`README_ZH.md`
+
