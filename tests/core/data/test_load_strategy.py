@@ -329,7 +329,34 @@ class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
         result = list(dataset.get(2))
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0]['text'], 'hello world')
+
+    @TEST_TAG('ray')
+    def test_read_parquet(self):
+        """Test read parquet"""
+        rel_path = './tests/core/data/test_data/parquet/sample.parquet'
+        strategy = RayLocalJsonDataLoadStrategy({
+            'path': rel_path
+        }, self.cfg)
+
+        dataset = strategy.load_data()
+        result = list(dataset.get(2))
         
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['text'], "Today is Sunday and it's a happy day!")
+        self.assertEqual(result[1]['text'], "Today is Monday and it's a happy day!")
+
+        rel_path = './tests/core/data/test_data/parquet'
+        strategy = RayLocalJsonDataLoadStrategy({
+            'path': rel_path
+        }, self.cfg)
+
+        dataset = strategy.load_data()
+        result = list(dataset.get(2))
+        
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['text'], "Today is Sunday and it's a happy day!")
+        self.assertEqual(result[1]['text'], "Today is Monday and it's a happy day!")
+
 
 if __name__ == '__main__':
     unittest.main()
