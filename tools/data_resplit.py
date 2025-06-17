@@ -1,4 +1,5 @@
 import argparse
+import glob
 import os
 from typing import List
 
@@ -10,7 +11,7 @@ DEFAULT_MAX_FILE_SIZE = 128  # 128 MB
 DEFAULT_MIN_FILE_SIZE = 1  # 1 MB
 
 
-def split_jsonl(file_path: str, max_size: float, output_dir: str):
+def split_jsonl(file_path: str, max_size: float, output_dir: str) -> None:
     """Split a jsonl file into multiple sub files more efficiently.
 
     Args:
@@ -21,39 +22,39 @@ def split_jsonl(file_path: str, max_size: float, output_dir: str):
     Yields:
         str: path of each newly created sub file
     """
-    os.makedirs(output_dir, exist_ok=True)
-    file_index = 0
-    max_byte_size = max_size * 1024**2
-    base_file_name = os.path.basename(file_path)
-    file_name = os.path.splitext(base_file_name)[0]
-    current_size = 0
+    max_bytes = max_size * 1024**2
+    base_name = os.path.splitext(os.path.basename(file_path))[0]
     buffer = []
     buffer_size = 0
+    file_index = 0
 
-    with open(file_path, 'r', encoding='utf-8') as infile:
-        while True:
-            # Determine the output file name
-            output_file_name = f'{file_name}_{file_index}.jsonl'
-            output_file_path = os.path.join(output_dir, output_file_name)
-
-            # Read lines until we reach the max buffer size
-            while current_size + buffer_size < max_byte_size:
-                line = infile.readline()
-                if not line:
-                    break
-                buffer.append(line)
-                buffer_size += len(line)
-
-            # Write the buffered lines to the current output file
-            if buffer:
-                with open(output_file_path, 'w', encoding='utf-8') as outfile:
-                    outfile.writelines(buffer)
-                buffer = []
-                buffer_size = 0
+    with open(file_path, 'rb') as infile:
+        for line in infile:
+            line_size = len(line)
+            if buffer_size + line_size > max_bytes:
+                _write_buffer(buffer, base_name, output_dir, file_index)
                 file_index += 1
+                buffer, buffer_size = [], 0
+                if line_size > max_bytes:
+                    logger.warning(
+                        f'Oversize line ({line_size} B) in {file_path}')
+                    _write_buffer([line], base_name, output_dir, file_index)
+                    file_index += 1
+                    continue
+            buffer.append(line)
+            buffer_size += line_size
+        if buffer:
+            _write_buffer(buffer, base_name, output_dir, file_index)
 
-            if not line:
-                break
+
+def _write_buffer(buffer: list, base_name: str, output_dir: str,
+                  index: int) -> None:
+    """Helper to write buffer to file."""
+    if not buffer:
+        return
+    output_path = os.path.join(output_dir, f'{base_name}_{index}.jsonl')
+    with open(output_path, 'wb') as f:
+        f.writelines(buffer)
 
 
 def get_jsonl_file_names(dataset_dir_path: str) -> List[str]:
@@ -67,12 +68,11 @@ def get_jsonl_file_names(dataset_dir_path: str) -> List[str]:
         List[str]: list of jsonl file paths
     """
     if os.path.isdir(dataset_dir_path):
-        jsonl_files = [
-            os.path.join(dataset_dir_path, f)
-            for f in os.listdir(dataset_dir_path)
-        ]
-    elif os.path.isfile(dataset_dir_path) and dataset_dir_path.endswith(
-            '.jsonl') or dataset_dir_path.endswith('.json'):
+        jsonl_files = glob.glob(os.path.join(dataset_dir_path, '*.jsonl')) + \
+                      glob.glob(os.path.join(dataset_dir_path, '*.json'))
+    elif os.path.isfile(
+            dataset_dir_path) and dataset_dir_path.lower().endswith(
+                ('.jsonl', '.json')):
         jsonl_files = [dataset_dir_path]
     else:
         raise ValueError(
