@@ -20,18 +20,18 @@ data\_juicer.analysis.column\_wise\_analysis module
    :undoc-members:
    :show-inheritance:
 
-data\_juicer.analysis.diversity\_analysis module
-------------------------------------------------
+data\_juicer.analysis.correlation\_analysis module
+--------------------------------------------------
 
-.. automodule:: data_juicer.analysis.diversity_analysis
+.. automodule:: data_juicer.analysis.correlation_analysis
    :members:
    :undoc-members:
    :show-inheritance:
 
-data\_juicer.analysis.draw module
----------------------------------
+data\_juicer.analysis.diversity\_analysis module
+------------------------------------------------
 
-.. automodule:: data_juicer.analysis.draw
+.. automodule:: data_juicer.analysis.diversity_analysis
    :members:
    :undoc-members:
    :show-inheritance:

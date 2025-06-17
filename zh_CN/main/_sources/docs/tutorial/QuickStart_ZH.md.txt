@@ -81,6 +81,7 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
 ## 数据分析
 
 - 以配置文件路径为参数运行 `analyze_data.py` 或者 `dj-analyze` 命令行工具来分析数据集。
+- 分析器会产出算子为整个数据集计算的 stats 的整体分布情况，每类 stats 的详细分布，以及不同算子的 stats 之间的相关性分析。
 
 ```shell
 # 适用于从源码安装

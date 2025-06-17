@@ -515,6 +515,85 @@ including percentile information</p></li>
 </dd></dl>
 
 </section>
+<section id="module-data_juicer.analysis.correlation_analysis">
+<span id="data-juicer-analysis-correlation-analysis-module"></span><h2>data_juicer.analysis.correlation_analysis module<a class="headerlink" href="#module-data_juicer.analysis.correlation_analysis" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.analysis.correlation_analysis.draw_heatmap">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.analysis.correlation_analysis.</span></span><span class="sig-name descname"><span class="pre">draw_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_kw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbarlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/correlation_analysis.html#draw_heatmap"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.analysis.correlation_analysis.draw_heatmap" title="Link to this definition">¶</a></dt>
+<dd><p>Create a heatmap from a numpy array and two lists of labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> -- A 2D numpy array of shape (M, N).</p></li>
+<li><p><strong>row_labels</strong> -- A list or array of length M with the labels for the rows.</p></li>
+<li><p><strong>col_labels</strong> -- A list or array of length N with the labels for the columns.</p></li>
+<li><p><strong>ax</strong> -- A <cite>matplotlib.axes.Axes</cite> instance to which the heatmap is plotted.  If
+not provided, use current Axes or create a new one.  Optional.</p></li>
+<li><p><strong>cbar_kw</strong> -- A dictionary with arguments to <cite>matplotlib.Figure.colorbar</cite>.  Optional.</p></li>
+<li><p><strong>cbarlabel</strong> -- The label for the colorbar.  Optional.</p></li>
+<li><p><strong>**kwargs</strong> -- All other arguments are forwarded to <cite>imshow</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.analysis.correlation_analysis.annotate_heatmap">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.analysis.correlation_analysis.</span></span><span class="sig-name descname"><span class="pre">annotate_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valfmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{x:.2f}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">textcolors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('black',</span> <span class="pre">'white')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">textkw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/correlation_analysis.html#annotate_heatmap"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.analysis.correlation_analysis.annotate_heatmap" title="Link to this definition">¶</a></dt>
+<dd><p>A function to annotate a heatmap.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>im</strong> -- The AxesImage to be labeled.</p></li>
+<li><p><strong>data</strong> -- Data used to annotate.  If None, the image's data is used.  Optional.</p></li>
+<li><p><strong>valfmt</strong> -- The format of the annotations inside the heatmap.  This should either
+use the string format method, e.g. &quot;$ {x:.2f}&quot;, or be a
+<cite>matplotlib.ticker.Formatter</cite>.  Optional.</p></li>
+<li><p><strong>textcolors</strong> -- A pair of colors.  The first is used for values below a threshold,
+the second for those above.  Optional.</p></li>
+<li><p><strong>threshold</strong> -- Value in data units according to which the colors from textcolors are
+applied.  If None (the default) uses the middle of the colormap as
+separation.  Optional.</p></li>
+<li><p><strong>**kwargs</strong> -- All other arguments are forwarded to each call to <cite>text</cite> used to create
+the text labels.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.analysis.correlation_analysis.is_numeric_list_series">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.analysis.correlation_analysis.</span></span><span class="sig-name descname"><span class="pre">is_numeric_list_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/correlation_analysis.html#is_numeric_list_series"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.analysis.correlation_analysis.is_numeric_list_series" title="Link to this definition">¶</a></dt>
+<dd><p>Whether a series is a numerical-list column.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.analysis.correlation_analysis.CorrelationAnalysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.analysis.correlation_analysis.</span></span><span class="sig-name descname"><span class="pre">CorrelationAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/correlation_analysis.html#CorrelationAnalysis"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.analysis.correlation_analysis.CorrelationAnalysis" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Analyze the correlations among different stats. Only for numerical stats.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.analysis.correlation_analysis.CorrelationAnalysis.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/correlation_analysis.html#CorrelationAnalysis.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.analysis.correlation_analysis.CorrelationAnalysis.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> -- the dataset to be analyzed</p></li>
+<li><p><strong>output_path</strong> -- path to store the analysis results</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.analysis.correlation_analysis.CorrelationAnalysis.analyze">
+<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pearson'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/correlation_analysis.html#CorrelationAnalysis.analyze"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.analysis.correlation_analysis.CorrelationAnalysis.analyze" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-data_juicer.analysis.diversity_analysis">
 <span id="data-juicer-analysis-diversity-analysis-module"></span><h2>data_juicer.analysis.diversity_analysis module<a class="headerlink" href="#module-data_juicer.analysis.diversity_analysis" title="Link to this heading">¶</a></h2>
 <dl class="py function">
@@ -627,30 +706,6 @@ it's function get_diversity</p></li>
 </dl>
 </dd></dl>
 
-</dd></dl>
-
-</section>
-<section id="module-data_juicer.analysis.draw">
-<span id="data-juicer-analysis-draw-module"></span><h2>data_juicer.analysis.draw module<a class="headerlink" href="#module-data_juicer.analysis.draw" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.analysis.draw.draw_heatmap">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.analysis.draw.</span></span><span class="sig-name descname"><span class="pre">draw_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triangle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/draw.html#draw_heatmap"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.analysis.draw.draw_heatmap" title="Link to this definition">¶</a></dt>
-<dd><p>Draw heatmap of input data with special labels.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> -- input data, now support
-[<cite>list</cite>, <cite>tuple</cite>, <cite>numpy array</cite>, 'torch tensor']</p></li>
-<li><p><strong>xlabels</strong> -- x axis labels.</p></li>
-<li><p><strong>ylabels</strong> -- y axis labels, if None, use xlabels.</p></li>
-<li><p><strong>figsize</strong> -- figure size.</p></li>
-<li><p><strong>triangle</strong> -- only display triangle.</p></li>
-</ul>
-</dd>
-<dt class="field-even">返回<span class="colon">:</span></dt>
-<dd class="field-even"><p>a plot figure.</p>
-</dd>
-</dl>
 </dd></dl>
 
 </section>
@@ -930,6 +985,32 @@ including percentile information</p></li>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.analysis.CorrelationAnalysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.analysis.</span></span><span class="sig-name descname"><span class="pre">CorrelationAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/correlation_analysis.html#CorrelationAnalysis"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.analysis.CorrelationAnalysis" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Analyze the correlations among different stats. Only for numerical stats.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.analysis.CorrelationAnalysis.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/correlation_analysis.html#CorrelationAnalysis.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.analysis.CorrelationAnalysis.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> -- the dataset to be analyzed</p></li>
+<li><p><strong>output_path</strong> -- path to store the analysis results</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.analysis.CorrelationAnalysis.analyze">
+<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pearson'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/correlation_analysis.html#CorrelationAnalysis.analyze"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.analysis.CorrelationAnalysis.analyze" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.analysis.DiversityAnalysis">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.analysis.</span></span><span class="sig-name descname"><span class="pre">DiversityAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang_or_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/diversity_analysis.html#DiversityAnalysis"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.analysis.DiversityAnalysis" title="Link to this definition">¶</a></dt>
 <dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -1111,6 +1192,17 @@ method of pandas.</p>
 </li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-data_juicer.analysis.correlation_analysis">data_juicer.analysis.correlation_analysis module</a><ul>
+<li><a class="reference internal" href="#data_juicer.analysis.correlation_analysis.draw_heatmap"><code class="docutils literal notranslate"><span class="pre">draw_heatmap()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.analysis.correlation_analysis.annotate_heatmap"><code class="docutils literal notranslate"><span class="pre">annotate_heatmap()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.analysis.correlation_analysis.is_numeric_list_series"><code class="docutils literal notranslate"><span class="pre">is_numeric_list_series()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.analysis.correlation_analysis.CorrelationAnalysis"><code class="docutils literal notranslate"><span class="pre">CorrelationAnalysis</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.analysis.correlation_analysis.CorrelationAnalysis.__init__"><code class="docutils literal notranslate"><span class="pre">CorrelationAnalysis.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.analysis.correlation_analysis.CorrelationAnalysis.analyze"><code class="docutils literal notranslate"><span class="pre">CorrelationAnalysis.analyze()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-data_juicer.analysis.diversity_analysis">data_juicer.analysis.diversity_analysis module</a><ul>
 <li><a class="reference internal" href="#data_juicer.analysis.diversity_analysis.find_root_verb_and_its_dobj"><code class="docutils literal notranslate"><span class="pre">find_root_verb_and_its_dobj()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.analysis.diversity_analysis.find_root_verb_and_its_dobj_in_string"><code class="docutils literal notranslate"><span class="pre">find_root_verb_and_its_dobj_in_string()</span></code></a></li>
@@ -1121,10 +1213,6 @@ method of pandas.</p>
 <li><a class="reference internal" href="#data_juicer.analysis.diversity_analysis.DiversityAnalysis.analyze"><code class="docutils literal notranslate"><span class="pre">DiversityAnalysis.analyze()</span></code></a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-data_juicer.analysis.draw">data_juicer.analysis.draw module</a><ul>
-<li><a class="reference internal" href="#data_juicer.analysis.draw.draw_heatmap"><code class="docutils literal notranslate"><span class="pre">draw_heatmap()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-data_juicer.analysis.measure">data_juicer.analysis.measure module</a><ul>
@@ -1178,6 +1266,11 @@ method of pandas.</p>
 <li><a class="reference internal" href="#data_juicer.analysis.ColumnWiseAnalysis.draw_hist"><code class="docutils literal notranslate"><span class="pre">ColumnWiseAnalysis.draw_hist()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.analysis.ColumnWiseAnalysis.draw_box"><code class="docutils literal notranslate"><span class="pre">ColumnWiseAnalysis.draw_box()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.analysis.ColumnWiseAnalysis.draw_wordcloud"><code class="docutils literal notranslate"><span class="pre">ColumnWiseAnalysis.draw_wordcloud()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.analysis.CorrelationAnalysis"><code class="docutils literal notranslate"><span class="pre">CorrelationAnalysis</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.analysis.CorrelationAnalysis.__init__"><code class="docutils literal notranslate"><span class="pre">CorrelationAnalysis.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.analysis.CorrelationAnalysis.analyze"><code class="docutils literal notranslate"><span class="pre">CorrelationAnalysis.analyze()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#data_juicer.analysis.DiversityAnalysis"><code class="docutils literal notranslate"><span class="pre">DiversityAnalysis</span></code></a><ul>

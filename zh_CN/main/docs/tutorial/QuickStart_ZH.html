@@ -450,6 +450,7 @@ python<span class="w"> </span>tools/process_data.py<span class="w"> </span>--con
 <h2>数据分析<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>以配置文件路径为参数运行 <code class="docutils literal notranslate"><span class="pre">analyze_data.py</span></code> 或者 <code class="docutils literal notranslate"><span class="pre">dj-analyze</span></code> 命令行工具来分析数据集。</p></li>
+<li><p>分析器会产出算子为整个数据集计算的 stats 的整体分布情况，每类 stats 的详细分布，以及不同算子的 stats 之间的相关性分析。</p></li>
 </ul>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># 适用于从源码安装</span>
 python<span class="w"> </span>tools/analyze_data.py<span class="w"> </span>--config<span class="w"> </span>configs/demo/analyzer.yaml
