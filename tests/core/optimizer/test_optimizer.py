@@ -1,10 +1,11 @@
 import unittest
 from typing import List, Dict, Any
+from unittest.mock import Mock, patch
 
 from data_juicer.core.pipeline_ast import PipelineAST, OpNode, OpType
 from data_juicer.core.optimizer.optimizer import PipelineOptimizer
 from data_juicer.core.optimizer.strategy import OptimizationStrategy
-from data_juicer.core.optimizer.filter_fusion_strategy import OpFusionStrategy
+from data_juicer.core.optimizer.filter_fusion_strategy import FilterFusionStrategy
 
 class MockStrategy(OptimizationStrategy):
     """Mock strategy for testing."""
@@ -45,7 +46,7 @@ class TestPipelineOptimizer(unittest.TestCase):
         """Test initialization with default strategies."""
         optimizer = PipelineOptimizer()
         self.assertEqual(len(optimizer.strategies), 1)
-        self.assertIsInstance(optimizer.strategies[0], OpFusionStrategy)
+        self.assertIsInstance(optimizer.strategies[0], FilterFusionStrategy)
     
     def test_init_custom_strategies(self):
         """Test initialization with custom strategies."""

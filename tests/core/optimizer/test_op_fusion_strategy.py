@@ -1,12 +1,12 @@
 import unittest
-from typing import Dict, Any
+from unittest.mock import Mock, patch
 
+from data_juicer.core.optimizer.filter_fusion_strategy import FilterFusionStrategy
 from data_juicer.core.pipeline_ast import PipelineAST, OpNode, OpType
-from data_juicer.core.optimizer.filter_fusion_strategy import OpFusionStrategy
 
-class TestOpFusionStrategy(unittest.TestCase):
+class TestFilterFusionStrategy(unittest.TestCase):
     def setUp(self):
-        self.strategy = OpFusionStrategy()
+        self.strategy = FilterFusionStrategy()
         self.ast = PipelineAST()
         
         # Sample probe results
@@ -78,7 +78,7 @@ class TestOpFusionStrategy(unittest.TestCase):
     
     def test_optimize_with_probe_results(self):
         """Test optimization with probe results for speed-based sorting."""
-        strategy = OpFusionStrategy(probe_results=self.probe_results)
+        strategy = FilterFusionStrategy(probe_results=self.probe_results)
         self.ast.build_from_config(self.config)
         
         # Apply optimization

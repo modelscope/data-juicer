@@ -10,6 +10,7 @@ from data_juicer.utils.registry import Registry
 OPERATORS = Registry('operators')
 
 
+@OPERATORS.register_module('fused_filter')
 class FusedFilter(Filter):
     """A fused operator for filters that can execute multiple filters in one pass."""
 

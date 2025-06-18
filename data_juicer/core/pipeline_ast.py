@@ -194,6 +194,25 @@ class PipelineAST:
                 current.add_child(new_node)
                 current = new_node
 
+    @staticmethod
+    def is_mapper_op(node_or_type) -> bool:
+        """Check if node or op_type is a mapper operation using value comparison."""
+        if hasattr(node_or_type, 'op_type'):
+            return getattr(node_or_type, 'op_type').value == 'mapper'
+        return node_or_type.value == 'mapper'
+
+    @staticmethod
+    def is_filter_op(node_or_type) -> bool:
+        """Check if node or op_type is a filter operation using value comparison."""
+        if hasattr(node_or_type, 'op_type'):
+            return getattr(node_or_type, 'op_type').value == 'filter'
+        return node_or_type.value == 'filter'
+
+    @staticmethod
+    def op_type_equals(a, b) -> bool:
+        """Compare OpType values safely to handle module import issues."""
+        return (getattr(a, 'value', a) == getattr(b, 'value', b))
+
     def _merge_compatible_operations(self) -> None:
         """Merge compatible operations to reduce pipeline complexity."""
         chain = self.get_operation_chain()
@@ -206,8 +225,8 @@ class PipelineAST:
             next_op = chain[i + 1]
 
             # Check if operations can be merged
-            if (current.op_type == next_op.op_type
-                    and current.op_type in [OpType.MAPPER, OpType.FILTER]):
+            if self.op_type_equals(current.op_type, next_op.op_type) and (
+                    self.is_mapper_op(current) or self.is_filter_op(current)):
                 # Merge configurations
                 merged_config = {**current.config, **next_op.config}
                 merged_node = OpNode(
@@ -285,7 +304,9 @@ if __name__ == '__main__':
     # Apply optimization if requested
     if args.optimize:
         from data_juicer.core.optimizer.filter_fusion_strategy import \
-            OpFusionStrategy
+            FilterFusionStrategy
+        from data_juicer.core.optimizer.mapper_fusion_strategy import \
+            MapperFusionStrategy
         from data_juicer.core.optimizer.optimizer import PipelineOptimizer
 
         # Load probe results if provided
@@ -295,9 +316,11 @@ if __name__ == '__main__':
             print(f'\nUsing probe results from: {probe_path}')
             probe_results = yaml.safe_load(open(probe_path, 'r'))
 
-        # Create optimizer with op fusion strategy
-        optimizer = PipelineOptimizer(
-            [OpFusionStrategy(probe_results=probe_results)])
+        # Create optimizer with filter fusion strategy
+        optimizer = PipelineOptimizer([
+            FilterFusionStrategy(probe_results=probe_results),
+            MapperFusionStrategy()
+        ])
 
         # Apply optimization
         optimized_ast = optimizer.optimize(ast)
