@@ -2,15 +2,20 @@ import ast
 import asyncio
 import copy
 import os
+import os.path as osp
+import random
 import re
 import shutil
+import time
 import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import AsyncGenerator, Dict, List, Optional, Union
 
 import pandas as pd
+import requests
 from datasets.utils.extract import ZstdExtractor as Extractor
+from loguru import logger
 
 from data_juicer.utils.common_utils import dict_to_hash
 from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
@@ -391,3 +396,68 @@ def get_all_files_paths_under(root,
 
     file_ls.sort()
     return file_ls
+
+
+def download_file(url,
+                  save_path,
+                  stream=False,
+                  headers=None,
+                  max_retries=3,
+                  timeout=30,
+                  retry_delay=1,
+                  max_delay=60):
+    """
+    Download a file from a given URL and save it to a specified path.
+    This function supports both HTTP and HTTPS protocols.
+    It uses the requests library for making HTTP requests and supports retrying in case of errors.
+
+    :param url (str): The URL of the file to download.
+    :param save_path (str): The path where the downloaded file will be saved.
+    :param stream (bool): If True, the file will be downloaded in chunks.
+        If False, the entire file will be downloaded at once.
+    :param headers (dict): The headers to include in the HTTP request.
+    :param max_retries (int): The maximum number of retries in case of errors.
+    :param timeout (int): The timeout in seconds for each HTTP request.
+    :param retry_delay (int): The delay between retries in seconds, exponential backoff with jitter.
+    :param max_delay: The maximum delay between retries in seconds.
+
+    :return: The response object from the HTTP request.
+    """
+    os.makedirs(osp.dirname(save_path), exist_ok=True)
+
+    retries = 0
+    while retries <= max_retries:
+        response = requests.get(url,
+                                headers=headers,
+                                stream=stream,
+                                timeout=timeout)
+
+        if 500 <= response.status_code < 600:
+            logger.warning(
+                f'[Retry] Server Error ({response.status_code}): {url}')
+            if retries < max_retries:
+                # exponential backoff (with random jitter to avoid the thundering herd effect)
+                jitter = random.uniform(0.8, 1.2)  # ±20% jitter
+                retry_delay = min(retry_delay * jitter, max_delay)
+                logger.warning(
+                    f'Will retry in {retry_delay} seconds (attempt {retries + 1})...'
+                )
+                time.sleep(retry_delay)
+                retry_delay *= 2  # exponential backoff
+                retries += 1
+                continue
+            else:
+                raise ValueError(
+                    '[Failed] Reach the maximum retry times, download failed!')
+        elif 400 <= response.status_code < 500:
+            raise ValueError(
+                f'[Failed] Client error ({response.status_code}): {url}')
+        else:
+            with open(save_path, 'wb') as f:
+                if stream:
+                    for chunk in response.iter_content(8192):
+                        f.write(chunk)
+                else:
+                    f.write(response.content)
+
+        return response

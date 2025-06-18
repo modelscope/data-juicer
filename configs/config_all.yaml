@@ -274,6 +274,15 @@ process:
       tables_field_name: 'html_tables'                        # Field name to store the extracted tables.
       retain_html_tags: false,                                # If True, retains HTML tags in the tables; otherwise, removes them.
       include_header: true,                                   # If True, includes the table header; otherwise, excludes it. This parameter is effective only when `retain_html_tags` is False and applies solely to the extracted table content.
+  - download_file_mapper:                                   # download url files to local files
+      save_dir: null                                          # The directory to save downloaded files.
+      download_field: null                                    # The filed name to get the url to download.
+      max_retries: 3                                          # The maximum number of retries in case of errors.
+      timeout: 30                                             # The timeout in seconds for each HTTP request.
+      retry_delay: 1                                          # The delay between retries in seconds, exponential backoff with jitter.
+      max_delay: 60                                           # The maximum delay between retries in seconds.
+      stream: false                                           # If True, the file will be downloaded in chunks. If False, the entire file will be downloaded at once.
+      headers: null                                           # The headers to include in the HTTP request.
   - fix_unicode_mapper:                                     # fix unicode errors in text.
   - generate_qa_from_examples_mapper:                       # mapper to generate question and answer pairs from examples.
       hf_model: 'Qwen/Qwen2.5-7B-Instruct'                    # Model name on huggingface to generate question and answer pairs.

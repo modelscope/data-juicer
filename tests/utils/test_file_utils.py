@@ -1,15 +1,22 @@
 import os
-import unittest
 import regex as re
+import requests
+import tempfile
+import shutil
+import jsonlines
+import unittest
+from unittest.mock import patch, MagicMock
 
+import data_juicer
 from data_juicer.utils.file_utils import (
-    find_files_with_suffix, is_absolute_path,
+    find_files_with_suffix, is_absolute_path, download_file,
     add_suffix_to_filename, create_directory_if_not_exists, transfer_filename,
     copy_data
 )
 from data_juicer.utils.mm_utils import Fields
-
+from data_juicer.utils.logger_utils import setup_logger
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+
 
 class FileUtilsTest(DataJuicerTestCaseBase):
 
@@ -74,6 +81,129 @@ class FileUtilsTest(DataJuicerTestCaseBase):
 
         self.assertTrue(copy_data(ori_dir, tgt_dir, tgt_fn))
         self.assertTrue(os.path.exists(os.path.join(tgt_dir, tgt_fn)))
+
+
+class TestDownloadFile(DataJuicerTestCaseBase):
+    def setUp(self):
+        self.test_dir = tempfile.mkdtemp()
+        self.test_path = os.path.join(self.test_dir, "test_file.txt")
+        self.url = "http://example.com/file"
+        self.headers = {"User-Agent": "test"}
+        data_juicer.utils.logger_utils.LOGGER_SETUP = False
+
+    def tearDown(self):
+        shutil.rmtree(self.test_dir)
+
+    def get_warning_logs(self):
+        file_path = os.path.join(self.test_dir, 'log_WARNING.txt')
+        with jsonlines.open(file_path, 'r') as reader:
+            records = [line for line in reader]
+        return records
+
+    @patch("data_juicer.utils.file_utils.requests.get")
+    def test_500_error_with_retry_success(self, mock_get):
+        setup_logger(self.test_dir)
+
+        # first request 500 second 200
+        mock_resp1 = MagicMock(status_code=500)
+        mock_resp2 = MagicMock(status_code=200)
+        # mock_resp2.iter_content.return_value = [b"data"]  # stream
+        mock_resp2.content = b"data"
+        mock_get.side_effect = [mock_resp1, mock_resp2]
+
+        response = download_file(
+            url=self.url,
+            save_path=self.test_path,
+            headers=self.headers,
+            max_retries=3,
+            retry_delay=0.1
+        )
+        
+        self.assertEqual(mock_get.call_count, 2)
+        self.assertEqual(response, mock_resp2)
+
+        records = self.get_warning_logs()
+        self.assertEqual(len(records), 2)
+
+        self.assertIn("Server Error (500)", records[0]['text'])
+        self.assertIn('Will retry in', records[1]['text'])
+        self.assertIn('(attempt 1)', records[1]['text'])
+        with open(self.test_path, 'r') as f:
+            self.assertEqual(f.read(), 'data')
+
+    @patch("data_juicer.utils.file_utils.requests.get")
+    def test_500_error_exceed_max_retries(self, mock_get):
+        setup_logger(self.test_dir)
+
+        # mock 500 errors for four times (max_retries=3)
+        mock_resp = MagicMock(status_code=500)
+        mock_get.return_value = mock_resp
+
+        with self.assertRaises(ValueError) as cm:
+            download_file(
+                url=self.url,
+                save_path=self.test_path,
+                max_retries=3,
+                retry_delay=0.1
+            )
+        
+        self.assertEqual(mock_get.call_count, 4)  # initial request + 3 retries
+        self.assertIn("Reach the maximum retry times", str(cm.exception))
+        
+        records = self.get_warning_logs()
+        self.assertEqual(len(records), 7)
+
+        self.assertIn("Server Error (500)", records[0]['text'])
+
+        self.assertIn('Will retry in', records[1]['text'])
+        self.assertIn('(attempt 1)', records[1]['text'])
+        
+        self.assertIn('Will retry in', records[5]['text'])
+        self.assertIn('(attempt 3)', records[5]['text'])
+
+        self.assertIn("Server Error (500)", records[6]['text'])
+
+    @patch("data_juicer.utils.file_utils.requests.get")
+    def test_400_client_error(self, mock_get):
+        setup_logger(self.test_dir)
+
+        mock_resp = MagicMock(status_code=404)
+        mock_get.return_value = mock_resp
+
+        with self.assertRaises(ValueError) as cm:
+            download_file(
+                url=self.url,
+                save_path=self.test_path
+            )
+        
+        self.assertIn("Client error (404)", str(cm.exception))
+
+    @patch("data_juicer.utils.file_utils.requests.get")
+    def test_connection_error(self, mock_get):
+        mock_get.side_effect = requests.ConnectionError("Connection failed")
+
+        with self.assertRaises(requests.ConnectionError):
+            download_file(
+                url=self.url,
+                save_path=self.test_path,
+                max_retries=2
+            )
+            
+        self.assertEqual(mock_get.call_count, 1)
+
+    @patch("data_juicer.utils.file_utils.requests.get")
+    def test_timeout_error(self, mock_get):
+        mock_get.side_effect = requests.Timeout("Request timed out")
+
+        with self.assertRaises(requests.Timeout):
+            download_file(
+                url=self.url,
+                save_path=self.test_path,
+                timeout=1,
+                max_retries=1
+            )
+        
+        self.assertEqual(mock_get.call_count, 1)
 
 
 if __name__ == '__main__':
