@@ -106,6 +106,11 @@ def find_files_with_suffix(
     return file_dict
 
 
+def is_remote_path(path: str):
+    """Check if the path is a remote path."""
+    return path.startswith(('http://', 'https://'))
+
+
 def is_absolute_path(path: Union[str, Path]) -> bool:
     """
     Check whether input path is a absolute path.
@@ -114,6 +119,9 @@ def is_absolute_path(path: Union[str, Path]) -> bool:
     :return: True means input path is absolute path, False means input
         path is a relative path.
     """
+    if is_remote_path(str(path)):
+        return True
+
     return Path(path).is_absolute()
 
 

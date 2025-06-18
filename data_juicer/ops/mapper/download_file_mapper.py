@@ -2,7 +2,7 @@ import os
 import os.path as osp
 
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.file_utils import download_file
+from data_juicer.utils.file_utils import download_file, is_remote_path
 
 from ..base_op import OPERATORS, Mapper
 
@@ -21,8 +21,8 @@ class DownloadFileMapper(Mapper):
                  timeout: int = 30,
                  retry_delay: int = 1,
                  max_delay: int = 60,
-                 stream: bool=False,
-                 headers = None,
+                 stream: bool = False,
+                 headers=None,
                  *args,
                  **kwargs):
         """
@@ -46,15 +46,12 @@ class DownloadFileMapper(Mapper):
         self.download_field = download_field
         self.save_dir = save_dir
         os.makedirs(self.save_dir, exist_ok=True)
-        self.max_retries=max_retries
-        self.timeout=timeout
-        self.retry_delay=retry_delay
-        self.max_delay=max_delay
-        self.stream=stream
-        self.headers=headers
-
-    def _is_url_file(self, url):
-        return url.startswith(('http', 'https'))
+        self.max_retries = max_retries
+        self.timeout = timeout
+        self.retry_delay = retry_delay
+        self.max_delay = max_delay
+        self.stream = stream
+        self.headers = headers
 
     def _download_data_with_context(self, sample, context):
         """
@@ -65,24 +62,23 @@ class DownloadFileMapper(Mapper):
         response = None
 
         for raw_url in raw_urls:
-            if self._is_url_file(raw_url):
+            if is_remote_path(raw_url):
                 save_path = osp.join(self.save_dir, osp.basename(raw_url))
                 if not osp.exists(save_path):
-                    response = download_file(
-                        raw_url,
-                        save_path,
-                        stream=self.stream,
-                        headers=self.headers,
-                        max_retries=self.max_retries,
-                        timeout=self.timeout,
-                        retry_delay=self.retry_delay,
-                        max_delay=self.max_delay)
+                    response = download_file(raw_url,
+                                             save_path,
+                                             stream=self.stream,
+                                             headers=self.headers,
+                                             max_retries=self.max_retries,
+                                             timeout=self.timeout,
+                                             retry_delay=self.retry_delay,
+                                             max_delay=self.max_delay)
                 local_path = save_path
             else:
                 local_path = raw_url
 
             if context and local_path not in sample[Fields.context]:
-                if self._is_url_file(raw_url) and response:
+                if is_remote_path(raw_url) and response:
                     data_item = response.content
                 else:
                     with open(local_path, 'rb') as f:
@@ -99,9 +95,8 @@ class DownloadFileMapper(Mapper):
 
     def process_single(self, sample, context=False):
         # there is no image in this sample
-        if self.download_field not in sample or not sample[self.download_field]:
+        if self.download_field not in sample or not sample[
+                self.download_field]:
             return sample
-        
         sample = self._download_data_with_context(sample, context)
-        
         return sample
