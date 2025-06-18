@@ -253,6 +253,26 @@ class RayDataset(DJDataset):
             exit(1)
 
     @classmethod
+    def read(cls, data_format: str, paths: Union[str,
+                                                 List[str]]) -> RayDataset:
+        if data_format in {'json', 'jsonl'}:
+            return RayDataset.read_json(paths)
+        elif data_format in {
+                'parquet',
+                'images',
+                'parquet_bulk',
+                'csv',
+                'text',
+                'avro',
+                'numpy',
+                'tfrecords',
+                'webdataset',
+                'binary_files',
+                'lance',
+        }:
+            return getattr(ray.data, f'read_{data_format}')(paths)
+
+    @classmethod
     def read_json(cls, paths: Union[str, List[str]]) -> RayDataset:
         # Note: a temp solution for reading json stream
         # TODO: replace with ray.data.read_json_stream once it is available

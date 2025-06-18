@@ -82,6 +82,7 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
 
 ## Data Analysis
 - Run `analyze_data.py` tool or `dj-analyze` command line tool with your config as the argument to analyze your dataset.
+- The analyzer will produce the overall distribution of the stats computed by the OPs for the whole dataset, the detailed distribution of each type of stats, and the correlation analysis among stats from different OPs.
 
 ```shell
 # only for installation from source
