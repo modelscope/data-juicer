@@ -70,6 +70,7 @@ generic = [
     "vllm>=0.6.5",  # LLM serving
     "huggingface_hub<0.26.0",  # Hugging Face Hub
     "onnxruntime",  # ONNX runtime
+    "cudf-cu12", # dataframe on GPU
 ]
 
 # Computer Vision
