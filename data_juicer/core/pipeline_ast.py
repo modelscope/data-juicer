@@ -1,7 +1,7 @@
 import argparse
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import yaml
 
@@ -139,61 +139,6 @@ class PipelineAST:
 
         return 'Pipeline:\n' + _visualize_node(self.root, 0, True)
 
-    def get_operation_chain(self) -> List[OpNode]:
-        """Get the linear chain of operations in the pipeline."""
-        if not self.root:
-            return []
-
-        chain = []
-        current = self.root
-        while current.children:
-            current = current.children[0]
-            chain.append(current)
-        return chain
-
-    def _validate_dependencies(self) -> List[Tuple[OpNode, OpNode]]:
-        """Validate operation dependencies and return invalid dependencies."""
-        invalid_deps = []
-        chain = self.get_operation_chain()
-
-        for i, node in enumerate(chain):
-            if node.op_type in self._op_dependencies:
-                allowed_deps = self._op_dependencies[node.op_type]
-                for j in range(i):
-                    if chain[j].op_type not in allowed_deps:
-                        invalid_deps.append((chain[j], node))
-
-        return invalid_deps
-
-    def _optimize_operation_order(self) -> None:
-        """Optimize the order of operations based on dependencies and efficiency."""
-        chain = self.get_operation_chain()
-        if not chain:
-            return
-
-        # Group operations by type
-        op_groups: Dict[OpType,
-                        List[OpNode]] = {op_type: []
-                                         for op_type in OpType}
-        for node in chain:
-            op_groups[node.op_type].append(node)
-
-        # Rebuild the tree with optimized order
-        self.root = OpNode(name='root', op_type=OpType.MAPPER, config={})
-        current = self.root
-
-        # Process operations in order: Mapper -> Filter -> Deduplicator -> Selector -> Grouper -> Aggregator
-        for op_type in [
-                OpType.MAPPER, OpType.FILTER, OpType.DEDUPLICATOR,
-                OpType.SELECTOR, OpType.GROUPER, OpType.AGGREGATOR
-        ]:
-            for node in op_groups[op_type]:
-                new_node = OpNode(name=node.name,
-                                  op_type=node.op_type,
-                                  config=node.config)
-                current.add_child(new_node)
-                current = new_node
-
     @staticmethod
     def is_mapper_op(node_or_type) -> bool:
         """Check if node or op_type is a mapper operation using value comparison."""
@@ -212,59 +157,6 @@ class PipelineAST:
     def op_type_equals(a, b) -> bool:
         """Compare OpType values safely to handle module import issues."""
         return (getattr(a, 'value', a) == getattr(b, 'value', b))
-
-    def _merge_compatible_operations(self) -> None:
-        """Merge compatible operations to reduce pipeline complexity."""
-        chain = self.get_operation_chain()
-        if not chain:
-            return
-
-        i = 0
-        while i < len(chain) - 1:
-            current = chain[i]
-            next_op = chain[i + 1]
-
-            # Check if operations can be merged
-            if self.op_type_equals(current.op_type, next_op.op_type) and (
-                    self.is_mapper_op(current) or self.is_filter_op(current)):
-                # Merge configurations
-                merged_config = {**current.config, **next_op.config}
-                merged_node = OpNode(
-                    name=f'merged_{current.name}_{next_op.name}',
-                    op_type=current.op_type,
-                    config=merged_config)
-
-                # Replace the two nodes with the merged node
-                if current.parent:
-                    current.parent.children.remove(current)
-                    current.parent.add_child(merged_node)
-                    if next_op.parent:
-                        next_op.parent.children.remove(next_op)
-                        merged_node.add_child(
-                            next_op.children[0] if next_op.children else None)
-
-                chain[i] = merged_node
-                chain.pop(i + 1)
-            else:
-                i += 1
-
-    def optimize(self) -> None:
-        """Optimize the pipeline AST based on operation dependencies and resource usage."""
-        if not self.root:
-            return
-
-        # Validate dependencies
-        invalid_deps = self._validate_dependencies()
-        if invalid_deps:
-            print('Warning: Invalid operation dependencies found:')
-            for dep, node in invalid_deps:
-                print(f'  {dep.name} -> {node.name}')
-
-        # Optimize operation order
-        self._optimize_operation_order()
-
-        # Merge compatible operations
-        self._merge_compatible_operations()
 
 
 if __name__ == '__main__':
