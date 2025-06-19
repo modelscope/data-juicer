@@ -200,21 +200,25 @@ def make_log_summarization(max_show_item=10):
 
     # make error summarization
     error_dict = {}
-    with jl.open(error_log_file) as reader:
-        for error_log in reader:
-            error_msg = error_log['record']['message']
-            find_res = re.findall(error_pattern, error_msg, flags=re.DOTALL)
-            if len(find_res) > 0:
-                op_name, sample, err_type, err_msg, _ = find_res[0]
-                error = (op_name, err_type, err_msg)
-                error_dict.setdefault(error, 0)
-                error_dict[error] += 1
+    if os.path.exists(error_log_file):
+        with jl.open(error_log_file) as reader:
+            for error_log in reader:
+                error_msg = error_log['record']['message']
+                find_res = re.findall(error_pattern,
+                                      error_msg,
+                                      flags=re.DOTALL)
+                if len(find_res) > 0:
+                    op_name, sample, err_type, err_msg, _ = find_res[0]
+                    error = (op_name, err_type, err_msg)
+                    error_dict.setdefault(error, 0)
+                    error_dict[error] += 1
     total_error_count = sum(error_dict.values())
     # make warning summarization
     warning_count = 0
-    with jl.open(warning_log_file) as reader:
-        for _ in reader:
-            warning_count += 1
+    if os.path.exists(warning_log_file):
+        with jl.open(warning_log_file) as reader:
+            for _ in reader:
+                warning_count += 1
     # make summary log
     summary = f'Processing finished with:\n' \
               f'<yellow>Warnings</yellow>: {warning_count}\n' \
