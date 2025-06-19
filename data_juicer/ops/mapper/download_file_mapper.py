@@ -1,8 +1,9 @@
+import copy
 import os
-import os.path as osp
+from typing import List, Union
 
-from data_juicer.utils.constant import Fields
-from data_juicer.utils.file_utils import download_file, is_remote_path
+from data_juicer.utils.file_utils import (download_files_parallel,
+                                          is_remote_path)
 
 from ..base_op import OPERATORS, Mapper
 
@@ -13,6 +14,8 @@ OP_NAME = 'download_file_mapper'
 class DownloadFileMapper(Mapper):
     """Mapper to download url files to local files.
     """
+
+    _batched_op = True
 
     def __init__(self,
                  save_dir: str = None,
@@ -53,54 +56,65 @@ class DownloadFileMapper(Mapper):
         self.stream = stream
         self.headers = headers
 
-    def _download_data_with_context(self, sample, context):
-        """
-        Download files with contexts.
-        """
-        raw_urls = sample[self.download_field]
-        if isinstance(raw_urls, str):
-            raw_urls = [raw_urls]
+    def download_nested_urls(self, nested_urls: List[Union[str, List[str]]],
+                             save_dir: str):
+        flat_urls = []
+        structure_info = []  # save as original index, sub index
 
-        new_paths = []
-        response = None
-
-        for raw_url in raw_urls:
-            if is_remote_path(raw_url):
-                save_path = osp.join(self.save_dir, osp.basename(raw_url))
-                if not osp.exists(save_path):
-                    response = download_file(raw_url,
-                                             save_path,
-                                             stream=self.stream,
-                                             headers=self.headers,
-                                             max_retries=self.max_retries,
-                                             timeout=self.timeout,
-                                             retry_delay=self.retry_delay,
-                                             max_delay=self.max_delay)
-                local_path = save_path
+        for idx, urls in enumerate(nested_urls):
+            if isinstance(urls, list):
+                for sub_idx, url in enumerate(urls):
+                    if is_remote_path(url):
+                        flat_urls.append(url)
+                        structure_info.append((idx, sub_idx))
             else:
-                local_path = raw_url
+                if is_remote_path(urls):
+                    flat_urls.append(urls)
+                    structure_info.append(
+                        (idx, -1))  # -1 means single str element
 
-            if context and local_path not in sample[Fields.context]:
-                if is_remote_path(raw_url) and response:
-                    data_item = response.content
+        download_results = download_files_parallel(
+            flat_urls,
+            save_dir,
+            stream=self.stream,
+            headers=self.headers,
+            max_retries=self.max_retries,
+            timeout=self.timeout,
+            retry_delay=self.retry_delay,
+            max_delay=self.max_delay)
+
+        keep_failed_url = True
+        if keep_failed_url:
+            reconstructed = copy.deepcopy(nested_urls)
+        else:
+            reconstructed = []
+            for item in nested_urls:
+                if isinstance(item, list):
+                    reconstructed.append([None] * len(item))
                 else:
-                    with open(local_path, 'rb') as f:
-                        data_item = f.read()
+                    reconstructed.append(None)
 
-                # store the data bytes into context
-                sample[Fields.context][local_path] = data_item
+        for (orig_idx, sub_idx), (success, save_path,
+                                  response) in zip(structure_info,
+                                                   download_results):
+            # TODO: add download stats
+            if sub_idx == -1:
+                reconstructed[orig_idx] = save_path
+            else:
+                reconstructed[orig_idx][sub_idx] = save_path
 
-            new_paths.append(local_path)
+        return reconstructed
 
-        # replace original url path with local path
-        sample[self.download_field] = new_paths[0] if isinstance(
-            sample[self.download_field], str) else new_paths
-        return sample
-
-    def process_single(self, sample, context=False):
-        # there is no image in this sample
-        if self.download_field not in sample or not sample[
+    def process_batched(self, samples):
+        if self.download_field not in samples or not samples[
                 self.download_field]:
-            return sample
-        sample = self._download_data_with_context(sample, context)
-        return sample
+            return samples
+
+        batch_nested_urls = samples[self.download_field]
+
+        reconstructed = self.download_nested_urls(batch_nested_urls,
+                                                  self.save_dir)
+
+        samples[self.download_field] = reconstructed
+
+        return samples

@@ -8,9 +8,11 @@ import re
 import shutil
 import time
 import warnings
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import AsyncGenerator, Dict, List, Optional, Union
+from urllib.parse import urlparse
 
 import pandas as pd
 import requests
@@ -406,27 +408,27 @@ def get_all_files_paths_under(root,
     return file_ls
 
 
-def download_file(url,
-                  save_path,
-                  stream=False,
-                  headers=None,
-                  max_retries=3,
-                  timeout=30,
-                  retry_delay=1,
-                  max_delay=60):
+def download_file(url: str,
+                  save_path: str,
+                  stream: bool = False,
+                  headers: Dict = None,
+                  max_retries: int = 3,
+                  timeout: int = 30,
+                  retry_delay: int = 1,
+                  max_delay: int = 60):
     """
     Download a file from a given URL and save it to a specified path.
     This function supports both HTTP and HTTPS protocols.
     It uses the requests library for making HTTP requests and supports retrying in case of errors.
 
-    :param url (str): The URL of the file to download.
-    :param save_path (str): The path where the downloaded file will be saved.
-    :param stream (bool): If True, the file will be downloaded in chunks.
+    :param url: The URL of the file to download.
+    :param save_path: The path where the downloaded file will be saved.
+    :param stream: If True, the file will be downloaded in chunks.
         If False, the entire file will be downloaded at once.
-    :param headers (dict): The headers to include in the HTTP request.
-    :param max_retries (int): The maximum number of retries in case of errors.
-    :param timeout (int): The timeout in seconds for each HTTP request.
-    :param retry_delay (int): The delay between retries in seconds, exponential backoff with jitter.
+    :param headers: The headers to include in the HTTP request.
+    :param max_retries: The maximum number of retries in case of errors.
+    :param timeout: The timeout in seconds for each HTTP request.
+    :param retry_delay: The delay between retries in seconds, exponential backoff with jitter.
     :param max_delay: The maximum delay between retries in seconds.
 
     :return: The response object from the HTTP request.
@@ -455,17 +457,78 @@ def download_file(url,
                 retries += 1
                 continue
             else:
-                raise ValueError(
-                    '[Failed] Reach the maximum retry times, download failed!')
-        elif 400 <= response.status_code < 500:
-            raise ValueError(
-                f'[Failed] Client error ({response.status_code}): {url}')
-        else:
-            with open(save_path, 'wb') as f:
-                if stream:
-                    for chunk in response.iter_content(8192):
-                        f.write(chunk)
-                else:
-                    f.write(response.content)
+                logger.warning('[Failed] Reach the maximum retry times!')
+                response.raise_for_status()
+
+        response.raise_for_status()
+
+        with open(save_path, 'wb') as f:
+            if stream:
+                for chunk in response.iter_content(8192):
+                    f.write(chunk)
+            else:
+                f.write(response.content)
 
         return response
+
+
+def download_files_parallel(urls: List[str],
+                            save_dir: str,
+                            num_workers: int = None,
+                            stream: bool = False,
+                            headers: Dict = None,
+                            max_retries: int = 3,
+                            timeout: int = 30,
+                            retry_delay: int = 1,
+                            max_delay: int = 60):
+    """Download files from a list of URLs in parallel.
+
+    :param urls: The URL of the file to download.
+    :param save_path: The path where the downloaded file will be saved.
+    :param stream: If True, the file will be downloaded in chunks.
+        If False, the entire file will be downloaded at once.
+    :param headers: The headers to include in the HTTP request.
+    :param max_retries: The maximum number of retries in case of errors.
+    :param timeout: The timeout in seconds for each HTTP request.
+    :param retry_delay: The delay between retries in seconds, exponential backoff with jitter.
+    :param max_delay: The maximum delay between retries in seconds.
+
+    :return: The response object from the HTTP request.
+    """
+
+    def _download_file(idx, url, save_dir, **kwargs):
+        success, response = True, None
+        try:
+            parsed_url = urlparse(url)
+            filename = os.path.basename(parsed_url.path)
+            save_path = osp.join(save_dir, filename)
+            response = download_file(url, save_path, **kwargs)
+        except Exception as e:
+            success = False
+            response = str(e)
+
+        return idx, save_path, success, response
+
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
+        futures = []
+        for idx, url in enumerate(urls):
+            future = executor.submit(_download_file,
+                                     idx,
+                                     url,
+                                     save_dir,
+                                     stream=stream,
+                                     headers=headers,
+                                     max_retries=max_retries,
+                                     timeout=timeout,
+                                     retry_delay=retry_delay,
+                                     max_delay=max_delay)
+            futures.append(future)
+
+        results = []
+        for future in as_completed(futures):
+            result = future.result()
+            results.append(result)
+
+        results.sort(key=lambda x: x[0])
+        return [(success, save_path, response)
+                for _, save_path, success, response in results]
