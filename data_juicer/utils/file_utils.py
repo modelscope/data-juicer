@@ -444,7 +444,7 @@ def download_file(url: str,
 
         if 500 <= response.status_code < 600:
             logger.warning(
-                f'[Retry] Server Error ({response.status_code}): {url}')
+                f'[Retry] {response.status_code} Server Error: {url}')
             if retries < max_retries:
                 # exponential backoff (with random jitter to avoid the thundering herd effect)
                 jitter = random.uniform(0.8, 1.2)  # ±20% jitter

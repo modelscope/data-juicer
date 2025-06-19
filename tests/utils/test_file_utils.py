@@ -6,6 +6,7 @@ import shutil
 import jsonlines
 import unittest
 from unittest.mock import patch, MagicMock
+from requests.exceptions import HTTPError
 
 import data_juicer
 from data_juicer.utils.file_utils import (
@@ -125,7 +126,7 @@ class TestDownloadFile(DataJuicerTestCaseBase):
         records = self.get_warning_logs()
         self.assertEqual(len(records), 2)
 
-        self.assertIn("Server Error (500)", records[0]['text'])
+        self.assertIn("500 Server Error", records[0]['text'])
         self.assertIn('Will retry in', records[1]['text'])
         self.assertIn('(attempt 1)', records[1]['text'])
         with open(self.test_path, 'r') as f:
@@ -137,9 +138,11 @@ class TestDownloadFile(DataJuicerTestCaseBase):
 
         # mock 500 errors for four times (max_retries=3)
         mock_resp = MagicMock(status_code=500)
+        
+        mock_resp.raise_for_status.side_effect = HTTPError("500 Server Error", response=mock_resp)
         mock_get.return_value = mock_resp
 
-        with self.assertRaises(ValueError) as cm:
+        with self.assertRaises(HTTPError) as cm:
             download_file(
                 url=self.url,
                 save_path=self.test_path,
@@ -148,12 +151,11 @@ class TestDownloadFile(DataJuicerTestCaseBase):
             )
         
         self.assertEqual(mock_get.call_count, 4)  # initial request + 3 retries
-        self.assertIn("Reach the maximum retry times", str(cm.exception))
-        
-        records = self.get_warning_logs()
-        self.assertEqual(len(records), 7)
 
-        self.assertIn("Server Error (500)", records[0]['text'])
+        records = self.get_warning_logs()
+        self.assertEqual(len(records), 8)
+
+        self.assertIn("500 Server Error", records[0]['text'])
 
         self.assertIn('Will retry in', records[1]['text'])
         self.assertIn('(attempt 1)', records[1]['text'])
@@ -161,22 +163,24 @@ class TestDownloadFile(DataJuicerTestCaseBase):
         self.assertIn('Will retry in', records[5]['text'])
         self.assertIn('(attempt 3)', records[5]['text'])
 
-        self.assertIn("Server Error (500)", records[6]['text'])
+        self.assertIn("500 Server Error", records[6]['text'])
+        self.assertIn("Reach the maximum retry times", records[7]['text'])
 
     @patch("data_juicer.utils.file_utils.requests.get")
     def test_400_client_error(self, mock_get):
         setup_logger(self.test_dir)
 
         mock_resp = MagicMock(status_code=404)
+        mock_resp.raise_for_status.side_effect = HTTPError("404 Client Error", response=mock_resp)
         mock_get.return_value = mock_resp
 
-        with self.assertRaises(ValueError) as cm:
+        with self.assertRaises(HTTPError) as cm:
             download_file(
                 url=self.url,
                 save_path=self.test_path
             )
         
-        self.assertIn("Client error (404)", str(cm.exception))
+        self.assertIn("404 Client Error", str(cm.exception))
 
     @patch("data_juicer.utils.file_utils.requests.get")
     def test_connection_error(self, mock_get):
