@@ -45,14 +45,14 @@ class DJToEasyAnimateVideoConversion(BaseDataPoolManipulator):
                 existing_input_paths,
                 desc='Converting to EasyAnimate video dataset format'):
             basename = os.path.splitext(os.path.basename(src_path))[0]
-            output_path = os.path.join(export_path, f'{basename}_ea_fmt.jsonl')
+            output_path = os.path.join(export_path, f'{basename}_ea_fmt.json')
             with open(src_path, 'r') as fin:
                 ori_fmt = json.load(fin)
                 with open(output_path, 'w') as fout:
                     res_fmt = []
                     for s in ori_fmt:
-                        s['text'] = s['text'].replace(
-                            SpecialTokens.VIDEO_TOKEN, '').strip()
+                        s['text'] = s['text'].replace(SpecialTokens.video,
+                                                      '').strip()
                         if len(s['videos']) == 0:
                             continue
                         s['file_path'] = s['videos'][0]

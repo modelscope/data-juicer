@@ -585,9 +585,18 @@ index 0000000..25b3377
 +wait
 +
 diff --git a/requirements.txt b/requirements.txt
-index 1d66be0..9ed1933 100644
+index 1d66be0..b9352d6 100644
 --- a/requirements.txt
 +++ b/requirements.txt
+@@ -3,7 +3,7 @@ einops
+ safetensors
+ timm
+ tomesd
+-torch>=2.1.2
++torch>=2.1.2,<2.7.0
+ torchdiffeq
+ torchsde
+ xformers
 @@ -22,5 +22,5 @@ beautifulsoup4
  ftfy
  accelerate>=0.25.0
