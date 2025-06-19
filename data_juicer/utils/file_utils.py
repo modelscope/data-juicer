@@ -458,7 +458,6 @@ def download_file(url: str,
                 continue
             else:
                 logger.warning('[Failed] Reach the maximum retry times!')
-                response.raise_for_status()
 
         response.raise_for_status()
 
