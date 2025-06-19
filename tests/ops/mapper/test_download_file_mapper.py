@@ -100,6 +100,40 @@ class DownloadFileMapperTest(DataJuicerTestCaseBase):
 
         self._test_image_download(ds_list)
         
+    def test_download_image_failed(self):
+        ds_list = [{
+            'images': self.img2_url + '_failed_test',
+            'id': 1
+        }, {
+            'images': self.img3_url + '_failed_test',
+            'id': 2
+        }, {
+            'images': self.img1_url,
+            'id': 3
+        }]
+
+        op = DownloadFileMapper(
+                save_dir=self.temp_dir,
+                download_field='images')
+
+        dataset = Dataset.from_list(ds_list)
+        dataset = dataset.map(op.process, batch_size=2)
+        
+        res_list = dataset.to_list()
+        res_list = sorted(res_list, key=lambda x: x['id'])
+
+        self.assertEqual(len(ds_list), len(res_list))
+
+        for i in range(len(ds_list)):
+            source, res = ds_list[i], res_list[i]
+            s_path, r_path = source[op.image_key], res[op.image_key]
+            fname = os.path.basename(s_path)
+            self.assertEqual(fname, os.path.basename(r_path))
+            if s_path.startswith('http') and 'failed_test' not in s_path:
+                self.assertEqual(os.path.dirname(r_path), self.temp_dir)
+            else:
+                self.assertEqual(s_path, r_path)
+
     def test_image_str_type(self):
         ds_list = [{
             'images': self.img2_path,

@@ -2,6 +2,8 @@ import copy
 import os
 from typing import List, Union
 
+from loguru import logger
+
 from data_juicer.utils.file_utils import (download_files_parallel,
                                           is_remote_path)
 
@@ -94,16 +96,20 @@ class DownloadFileMapper(Mapper):
                 else:
                     reconstructed.append(None)
 
-        for (orig_idx, sub_idx), (success, save_path,
-                                  response) in zip(structure_info,
-                                                   download_results):
+        failed_info = ''
+        for i, (success, save_path, response) in enumerate(download_results):
+            orig_idx, sub_idx = structure_info[i]
+            if not success:
+                save_path = flat_urls[i]
+                failed_info += '\n' + str(response)
+
             # TODO: add download stats
             if sub_idx == -1:
                 reconstructed[orig_idx] = save_path
             else:
                 reconstructed[orig_idx][sub_idx] = save_path
 
-        return reconstructed
+        return reconstructed, failed_info
 
     def process_batched(self, samples):
         if self.download_field not in samples or not samples[
@@ -112,9 +118,12 @@ class DownloadFileMapper(Mapper):
 
         batch_nested_urls = samples[self.download_field]
 
-        reconstructed = self.download_nested_urls(batch_nested_urls,
-                                                  self.save_dir)
+        reconstructed, failed_info = self.download_nested_urls(
+            batch_nested_urls, self.save_dir)
 
         samples[self.download_field] = reconstructed
+
+        if len(failed_info):
+            logger.error(f'Failed files:\n{failed_info}')
 
         return samples
