@@ -38,7 +38,7 @@ Data-Juicer 中的算子分为以下 7 种类型。
 | [formatter](#formatter) | 8 | Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。 |
 | [grouper](#grouper) | 3 | Group samples to batched samples. 将样本分组，每一组组成一个批量样本。 |
 | [mapper](#mapper) | 80 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
-| [selector](#selector) | 5 | Selects top samples based on ranking. 基于排序选取高质量样本。 |
+| [selector](#selector) | 6 | Selects top samples based on ranking. 基于排序选取高质量样本。 |
 
 All the specific operators are listed below, each featured with several capability tags. 
 下面列出所有具体算子，每种算子都通过多个标签来注明其主要功能。
@@ -248,6 +248,7 @@ All the specific operators are listed below, each featured with several capabili
 
 | Operator 算子 | Tags 标签 | Description 描述 | Source code 源码 | Unit tests 单测样例 |
 |----------|------|-------------|-------------|------------|
+| domain_diversity_selector | 🚀GPU 🔗API 🟡Beta | Selector to select samples based on the data's domain diversity. 选择器根据数据的域多样性选择样本。 | [code](../data_juicer/ops/selector/domain_diversity_selector.py) | [tests](../tests/ops/selector/test_domain_diversity_selector.py) |
 | frequency_specified_field_selector | 💻CPU 🟢Stable | Selector to select samples based on the sorted frequency of specified field. 选择器根据指定字段的排序频率选择样本。 | [code](../data_juicer/ops/selector/frequency_specified_field_selector.py) | [tests](../tests/ops/selector/test_frequency_specified_field_selector.py) |
 | random_selector | 💻CPU 🟢Stable | Selector to random select samples. 选择器来随机选择样本。 | [code](../data_juicer/ops/selector/random_selector.py) | [tests](../tests/ops/selector/test_random_selector.py) |
 | range_specified_field_selector | 💻CPU 🟢Stable | Selector to select a range of samples based on the sorted specified field value from smallest to largest. 选择器根据从最小到最大的排序指定字段值选择样本范围。 | [code](../data_juicer/ops/selector/range_specified_field_selector.py) | [tests](../tests/ops/selector/test_range_specified_field_selector.py) |
