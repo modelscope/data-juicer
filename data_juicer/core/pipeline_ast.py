@@ -1,4 +1,4 @@
-# built in imports
+# standard library imports
 import argparse
 from dataclasses import dataclass
 from enum import Enum
