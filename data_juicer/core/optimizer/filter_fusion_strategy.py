@@ -15,10 +15,7 @@ LOADED_AUDIOS = Registry(InterVars.loaded_audios)
 LOADED_VIDEOS = Registry(InterVars.loaded_videos)
 INTER_SAMPLED_FRAMES = Registry(InterVars.sampled_frames)
 
-ALL_INTER_VARS = [
-    INTER_LINES, INTER_WORDS, LOADED_AUDIOS, LOADED_IMAGES, LOADED_VIDEOS,
-    INTER_SAMPLED_FRAMES
-]
+ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_AUDIOS, LOADED_IMAGES, LOADED_VIDEOS, INTER_SAMPLED_FRAMES]
 
 
 class FilterFusionStrategy(OptimizationStrategy):
@@ -60,11 +57,10 @@ class FilterFusionStrategy(OptimizationStrategy):
 
             for group in filter_groups:
                 if len(group) > 1:
-                    # Create fused operation
-                    fused_name = f"fused_{'_'.join(n.name for n in group)}"
-                    logger.info(
-                        f'Fusing filter operations into {fused_name}: {[n.name for n in group]}'
-                    )
+                    # Create fused operation with clean naming
+                    fused_name = 'fused_filter'
+                    detailed_ops = [n.name for n in group]
+                    logger.info(f'Fusing filter operations into {fused_name}: {detailed_ops}')
 
                     # Create operation configs
                     op_configs = []
@@ -73,20 +69,20 @@ class FilterFusionStrategy(OptimizationStrategy):
                         op_configs.append(op_config)
 
                     # Create fused node
-                    fused_node = OpNode(name=fused_name,
-                                        op_type=OpType.FILTER,
-                                        config={
-                                            'general_fused_op': {
-                                                'fused_op_list': op_configs
-                                            }
-                                        })
+                    fused_node = OpNode(
+                        name=fused_name,
+                        op_type=OpType.FILTER,
+                        config={
+                            'general_fused_op': {
+                                'fused_op_list': op_configs,
+                                'detailed_ops': detailed_ops,  # For display purposes
+                            }
+                        })
                     current.add_child(fused_node)
                     current = fused_node
                 else:
                     # Keep single operations as is
-                    new_node = OpNode(name=group[0].name,
-                                      op_type=group[0].op_type,
-                                      config=group[0].config or {})
+                    new_node = OpNode(name=group[0].name, op_type=group[0].op_type, config=group[0].config or {})
                     current.add_child(new_node)
                     current = new_node
 
@@ -173,8 +169,7 @@ class FilterFusionStrategy(OptimizationStrategy):
         """
         # Check dependencies
         for op in group:
-            if self._has_dependency(node, op) or self._has_dependency(
-                    op, node):
+            if self._has_dependency(node, op) or self._has_dependency(op, node):
                 return False
 
         return True
@@ -236,8 +231,7 @@ class FilterFusionStrategy(OptimizationStrategy):
             'word_repetition_filter': {StatsKeys.word_rep_ratio},
             'average_line_length_filter': {StatsKeys.avg_line_length},
             'maximum_line_length_filter': {StatsKeys.max_line_length},
-            'alphanumeric_filter':
-            {StatsKeys.alnum_ratio, StatsKeys.alpha_token_ratio},
+            'alphanumeric_filter': {StatsKeys.alnum_ratio, StatsKeys.alpha_token_ratio},
             'special_characters_filter': {StatsKeys.special_char_ratio},
             'perplexity_filter': {StatsKeys.perplexity},
             'stopwords_filter': {StatsKeys.stopwords_ratio},
@@ -294,8 +288,7 @@ class FilterFusionStrategy(OptimizationStrategy):
 
         return False
 
-    def _check_operation_specific_dependencies(self, op1: OpNode,
-                                               op2: OpNode) -> bool:
+    def _check_operation_specific_dependencies(self, op1: OpNode, op2: OpNode) -> bool:
         """Check operation-specific dependencies."""
         # Some operations have specific dependencies that can't be generalized
 

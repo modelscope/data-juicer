@@ -64,18 +64,12 @@ class PipelineAST:
         # Operation dependencies and optimization rules
         self._op_dependencies = {
             OpType.FILTER: {OpType.MAPPER},  # Filters can depend on mappers
-            OpType.DEDUPLICATOR:
-            {OpType.MAPPER,
-             OpType.FILTER},  # Deduplicators can depend on mappers and filters
-            OpType.SELECTOR:
-            {OpType.MAPPER, OpType.FILTER,
-             OpType.DEDUPLICATOR},  # Selectors can depend on all previous ops
-            OpType.GROUPER: {
-                OpType.MAPPER, OpType.FILTER, OpType.DEDUPLICATOR,
-                OpType.SELECTOR
-            },  # Groupers can depend on all previous ops
-            OpType.AGGREGATOR:
-            {OpType.GROUPER}  # Aggregators can only depend on groupers
+            OpType.DEDUPLICATOR: {OpType.MAPPER, OpType.FILTER},  # Deduplicators can depend on mappers and filters
+            OpType.SELECTOR: {OpType.MAPPER, OpType.FILTER,
+                              OpType.DEDUPLICATOR},  # Selectors can depend on all previous ops
+            OpType.GROUPER: {OpType.MAPPER, OpType.FILTER, OpType.DEDUPLICATOR,
+                             OpType.SELECTOR},  # Groupers can depend on all previous ops
+            OpType.AGGREGATOR: {OpType.GROUPER}  # Aggregators can only depend on groupers
         }
 
     def _get_op_type(self, op_name: str) -> OpType:
@@ -127,12 +121,23 @@ class PipelineAST:
         if not self.root:
             return 'Empty pipeline'
 
-        def _visualize_node(node: OpNode,
-                            level: int = 0,
-                            is_last: bool = True) -> str:
+        def _visualize_node(node: OpNode, level: int = 0, is_last: bool = True) -> str:
             indent = '  ' * level
             prefix = '└── ' if is_last else '├── '
-            result = f'{indent}{prefix}{node.name} ({node.op_type.value})\n'
+
+            # Check if this is a fused operation and get detailed ops
+            detailed_ops = None
+            if node.name == 'fused_mapper' and 'fused_mapper' in node.config:
+                detailed_ops = node.config['fused_mapper'].get('detailed_ops', [])
+            elif node.name == 'fused_filter' and 'general_fused_op' in node.config:
+                detailed_ops = node.config['general_fused_op'].get('detailed_ops', [])
+
+            # Format the node name with detailed operations if available
+            if detailed_ops:
+                ops_str = ', '.join(detailed_ops)
+                result = f'{indent}{prefix}{node.name} ({node.op_type.value}) [{ops_str}]\n'
+            else:
+                result = f'{indent}{prefix}{node.name} ({node.op_type.value})\n'
 
             for i, child in enumerate(node.children):
                 is_last_child = i == len(node.children) - 1
@@ -165,20 +170,15 @@ if __name__ == '__main__':
     import os
 
     # Set up argument parser
-    parser = argparse.ArgumentParser(
-        description='Build and visualize pipeline AST from config file')
-    parser.add_argument(
-        '--config',
-        type=str,
-        default='configs/data_juicer_recipes/pile-philpaper-refine.yaml',
-        help='Path to the pipeline configuration file (YAML)')
-    parser.add_argument(
-        '--probe-results',
-        type=str,
-        help='Path to probe results file (YAML) containing operation speeds')
-    parser.add_argument('--optimize',
-                        action='store_true',
-                        help='Apply optimization strategies to the pipeline')
+    parser = argparse.ArgumentParser(description='Build and visualize pipeline AST from config file')
+    parser.add_argument('--config',
+                        type=str,
+                        default='configs/data_juicer_recipes/pile-philpaper-refine.yaml',
+                        help='Path to the pipeline configuration file (YAML)')
+    parser.add_argument('--probe-results',
+                        type=str,
+                        help='Path to probe results file (YAML) containing operation speeds')
+    parser.add_argument('--optimize', action='store_true', help='Apply optimization strategies to the pipeline')
 
     args = parser.parse_args()
 
@@ -197,10 +197,8 @@ if __name__ == '__main__':
 
     # Apply optimization if requested
     if args.optimize:
-        from data_juicer.core.optimizer.filter_fusion_strategy import \
-            FilterFusionStrategy
-        from data_juicer.core.optimizer.mapper_fusion_strategy import \
-            MapperFusionStrategy
+        from data_juicer.core.optimizer.filter_fusion_strategy import FilterFusionStrategy
+        from data_juicer.core.optimizer.mapper_fusion_strategy import MapperFusionStrategy
         from data_juicer.core.optimizer.optimizer import PipelineOptimizer
 
         # Load probe results if provided
@@ -211,10 +209,7 @@ if __name__ == '__main__':
             probe_results = yaml.safe_load(open(probe_path, 'r'))
 
         # Create optimizer with filter fusion strategy
-        optimizer = PipelineOptimizer([
-            FilterFusionStrategy(probe_results=probe_results),
-            MapperFusionStrategy()
-        ])
+        optimizer = PipelineOptimizer([FilterFusionStrategy(probe_results=probe_results), MapperFusionStrategy()])
 
         # Apply optimization
         optimized_ast = optimizer.optimize(ast)

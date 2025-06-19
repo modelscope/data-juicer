@@ -40,30 +40,27 @@ class MapperFusionStrategy(OptimizationStrategy):
 
             for group in mapper_groups:
                 if len(group) > 1:
-                    # Create fused operation
-                    fused_name = f"fused_{'_'.join(n.name for n in group)}"
-                    logger.info(
-                        f'Fusing mapper operations into {fused_name}: {[n.name for n in group]}'
-                    )
+                    # Create fused operation with clean naming
+                    fused_name = 'fused_mapper'
+                    detailed_ops = [n.name for n in group]
+                    logger.info(f'Fusing mapper operations into {fused_name}: {detailed_ops}')
 
                     # Create fused node using FusedMapper
-                    fused_node = OpNode(name=fused_name,
-                                        op_type=OpType.MAPPER,
-                                        config={
-                                            'fused_mapper': {
-                                                'name':
-                                                fused_name,
-                                                'fused_mappers':
-                                                [op.name for op in group],
-                                            }
-                                        })
+                    fused_node = OpNode(
+                        name=fused_name,
+                        op_type=OpType.MAPPER,
+                        config={
+                            'fused_mapper': {
+                                'name': fused_name,
+                                'fused_mappers': detailed_ops,
+                                'detailed_ops': detailed_ops,  # For display purposes
+                            }
+                        })
                     current.add_child(fused_node)
                     current = fused_node
                 else:
                     # Keep single operations as is
-                    new_node = OpNode(name=group[0].name,
-                                      op_type=group[0].op_type,
-                                      config=group[0].config or {})
+                    new_node = OpNode(name=group[0].name, op_type=group[0].op_type, config=group[0].config or {})
                     current.add_child(new_node)
                     current = new_node
 
@@ -116,9 +113,7 @@ class MapperFusionStrategy(OptimizationStrategy):
             if not PipelineAST.is_mapper_op(node):
                 # If we encounter a non-mapper, finalize current group
                 if current_group:
-                    logger.info(
-                        f'Finalizing mapper group: {[n.name for n in current_group]}'
-                    )
+                    logger.info(f'Finalizing mapper group: {[n.name for n in current_group]}')
                     groups.append(current_group)
                     current_group = []
                 # Add the non-mapper node as a separate group
@@ -133,29 +128,20 @@ class MapperFusionStrategy(OptimizationStrategy):
                     # Check if current mapper can be fused with the group
                     if self._can_fuse_with_group(node, current_group):
                         current_group.append(node)
-                        logger.info(
-                            f'Added {node.name} to current group: {[n.name for n in current_group]}'
-                        )
+                        logger.info(f'Added {node.name} to current group: {[n.name for n in current_group]}')
                     else:
                         # Finalize current group and start a new one
-                        logger.info(
-                            f'Finalizing mapper group due to dependency: {[n.name for n in current_group]}'
-                        )
+                        logger.info(f'Finalizing mapper group due to dependency: {[n.name for n in current_group]}')
                         groups.append(current_group)
                         current_group = [node]
-                        logger.info(
-                            f'Starting new mapper group with: {node.name}')
+                        logger.info(f'Starting new mapper group with: {node.name}')
 
         # Don't forget the last group
         if current_group:
-            logger.info(
-                f'Finalizing final mapper group: {[n.name for n in current_group]}'
-            )
+            logger.info(f'Finalizing final mapper group: {[n.name for n in current_group]}')
             groups.append(current_group)
 
-        logger.info(
-            f'Final mapper groups: {[[n.name for n in group] for group in groups]}'
-        )
+        logger.info(f'Final mapper groups: {[[n.name for n in group] for group in groups]}')
         return groups
 
     def _can_fuse_with_group(self, node: OpNode, group: List[OpNode]) -> bool:
@@ -170,15 +156,11 @@ class MapperFusionStrategy(OptimizationStrategy):
         """
         # Check dependencies
         for op in group:
-            if self._has_dependency(node, op) or self._has_dependency(
-                    op, node):
-                logger.info(
-                    f'Cannot fuse {node.name} with group {[n.name for n in group]} due to dependency'
-                )
+            if self._has_dependency(node, op) or self._has_dependency(op, node):
+                logger.info(f'Cannot fuse {node.name} with group {[n.name for n in group]} due to dependency')
                 return False
 
-        logger.info(
-            f'Can fuse {node.name} with group {[n.name for n in group]}')
+        logger.info(f'Can fuse {node.name} with group {[n.name for n in group]}')
         return True
 
     def _has_dependency(self, op1: OpNode, op2: OpNode) -> bool:
@@ -195,22 +177,17 @@ class MapperFusionStrategy(OptimizationStrategy):
         op1_vars = set(op1.config.get('inter_vars', []))
         op2_vars = set(op2.config.get('inter_vars', []))
         if op1_vars & op2_vars:
-            logger.info(
-                f'Dependency found via inter_vars: {op1.name} <-> {op2.name}')
+            logger.info(f'Dependency found via inter_vars: {op1.name} <-> {op2.name}')
             return True
 
         # 2. Check field dependencies (mappers that modify the same fields)
         if self._check_field_dependencies(op1, op2):
-            logger.info(
-                f'Dependency found via field dependencies: {op1.name} <-> {op2.name}'
-            )
+            logger.info(f'Dependency found via field dependencies: {op1.name} <-> {op2.name}')
             return True
 
         # 3. Check operation-specific dependencies
         if self._check_operation_specific_dependencies(op1, op2):
-            logger.info(
-                f'Dependency found via operation-specific dependencies: {op1.name} <-> {op2.name}'
-            )
+            logger.info(f'Dependency found via operation-specific dependencies: {op1.name} <-> {op2.name}')
             return True
 
         return False
@@ -245,39 +222,34 @@ class MapperFusionStrategy(OptimizationStrategy):
 
         return field_mapping.get(op.name, set())
 
-    def _check_operation_specific_dependencies(self, op1: OpNode,
-                                               op2: OpNode) -> bool:
+    def _check_operation_specific_dependencies(self, op1: OpNode, op2: OpNode) -> bool:
         """Check operation-specific dependencies."""
         # Define specific dependencies that prevent fusion
 
         # Unicode fixing should come before punctuation normalization
-        if (op1.name == 'punctuation_normalization_mapper'
-                and op2.name == 'fix_unicode_mapper'):
+        if (op1.name == 'punctuation_normalization_mapper' and op2.name == 'fix_unicode_mapper'):
             return True
 
-        if (op1.name == 'fix_unicode_mapper'
-                and op2.name == 'punctuation_normalization_mapper'):
+        if (op1.name == 'fix_unicode_mapper' and op2.name == 'punctuation_normalization_mapper'):
             return True
 
         # Email/links cleaning should come before punctuation normalization
-        if (op1.name == 'punctuation_normalization_mapper'
-                and op2.name in ['clean_email_mapper', 'clean_links_mapper']):
+        if (op1.name == 'punctuation_normalization_mapper' and
+                op2.name in ['clean_email_mapper', 'clean_links_mapper']):
             return True
 
-        if (op1.name in ['clean_email_mapper', 'clean_links_mapper']
-                and op2.name == 'punctuation_normalization_mapper'):
+        if (op1.name in ['clean_email_mapper', 'clean_links_mapper'] and
+                op2.name == 'punctuation_normalization_mapper'):
             return True
 
         # Whitespace normalization should come after most other text operations
         if (op1.name == 'whitespace_normalization_mapper' and op2.name in [
-                'clean_email_mapper', 'clean_links_mapper',
-                'fix_unicode_mapper', 'punctuation_normalization_mapper'
+                'clean_email_mapper', 'clean_links_mapper', 'fix_unicode_mapper', 'punctuation_normalization_mapper'
         ]):
             return True
 
         if (op1.name in [
-                'clean_email_mapper', 'clean_links_mapper',
-                'fix_unicode_mapper', 'punctuation_normalization_mapper'
+                'clean_email_mapper', 'clean_links_mapper', 'fix_unicode_mapper', 'punctuation_normalization_mapper'
         ] and op2.name == 'whitespace_normalization_mapper'):
             return True
 

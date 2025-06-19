@@ -78,10 +78,7 @@ def catch_map_batches_exception(method, skip_op_error=False, op_name=None):
     return wrapper
 
 
-def catch_map_single_exception(method,
-                               return_sample=True,
-                               skip_op_error=False,
-                               op_name=None):
+def catch_map_single_exception(method, return_sample=True, skip_op_error=False, op_name=None):
     """
     For single-map sample-level fault tolerance.
     The input sample is expected batch_size = 1.
@@ -96,9 +93,7 @@ def catch_map_single_exception(method,
         if not isinstance(first_val, list):
             return False
         first_len = len(first_val)
-        return all(
-            isinstance(val, list) and len(val) == first_len
-            for val in val_iter)
+        return all(isinstance(val, list) and len(val) == first_len for val in val_iter)
 
     @wraps(method)
     @convert_arrow_to_python
@@ -210,11 +205,8 @@ class OP:
         return self.accelerator == 'cuda' and is_cuda_available()
 
     def runtime_np(self):
-        op_proc = calculate_np(self._name, self.mem_required,
-                               self.cpu_required, self.num_proc,
-                               self.use_cuda())
-        logger.debug(
-            f'Op [{self._name}] running with number of procs:{op_proc}')
+        op_proc = calculate_np(self._name, self.mem_required, self.cpu_required, self.num_proc, self.use_cuda())
+        logger.debug(f'Op [{self._name}] running with number of procs:{op_proc}')
         return op_proc
 
     def remove_extra_parameters(self, param_dict, keys=None):
@@ -225,10 +217,7 @@ class OP:
 
         """
         if keys is None:
-            param_dict = {
-                k: v
-                for k, v in param_dict.items() if not k.startswith('_')
-            }
+            param_dict = {k: v for k, v in param_dict.items() if not k.startswith('_')}
             param_dict.pop('self', None)
         else:
             param_dict = {k: v for k, v in param_dict.items() if k not in keys}
@@ -309,15 +298,13 @@ class Mapper(OP):
 
         # runtime wrappers
         if self.is_batched_op():
-            self.process = catch_map_batches_exception(
-                self.process_batched,
-                skip_op_error=self.skip_op_error,
-                op_name=self._name)
+            self.process = catch_map_batches_exception(self.process_batched,
+                                                       skip_op_error=self.skip_op_error,
+                                                       op_name=self._name)
         else:
-            self.process = catch_map_single_exception(
-                self.process_single,
-                skip_op_error=self.skip_op_error,
-                op_name=self._name)
+            self.process = catch_map_single_exception(self.process_single,
+                                                      skip_op_error=self.skip_op_error,
+                                                      op_name=self._name)
 
     # set the process method is not allowed to be overridden
     @classmethod
@@ -325,10 +312,9 @@ class Mapper(OP):
         not_allowed_list = ['process']
         for method_name in not_allowed_list:
             if method_name in cls.__dict__:
-                raise TypeError(
-                    f'Method {method_name} cannot be overridden by subclass '
-                    f'{cls.__name__}. Please implement {method_name}_single '
-                    f'or {method_name}_batched.')
+                raise TypeError(f'Method {method_name} cannot be overridden by subclass '
+                                f'{cls.__name__}. Please implement {method_name}_single '
+                                f'or {method_name}_batched.')
 
     def __call__(self, *args, **kwargs):
         return self.process(*args, **kwargs)
@@ -375,8 +361,7 @@ class Mapper(OP):
             desc=self._name + '_process',
         )
         if tracer:
-            tracer.trace_mapper(self._name, dataset, new_dataset,
-                                self.text_key)
+            tracer.trace_mapper(self._name, dataset, new_dataset, self.text_key)
         free_models()
         return new_dataset
 
@@ -405,24 +390,20 @@ class Filter(OP):
 
         # runtime wrappers
         if self.is_batched_op():
-            self.compute_stats = catch_map_batches_exception(
-                self.compute_stats_batched,
-                skip_op_error=self.skip_op_error,
-                op_name=self._name)
-            self.process = catch_map_batches_exception(
-                self.process_batched,
-                skip_op_error=self.skip_op_error,
-                op_name=self._name)
+            self.compute_stats = catch_map_batches_exception(self.compute_stats_batched,
+                                                             skip_op_error=self.skip_op_error,
+                                                             op_name=self._name)
+            self.process = catch_map_batches_exception(self.process_batched,
+                                                       skip_op_error=self.skip_op_error,
+                                                       op_name=self._name)
         else:
-            self.compute_stats = catch_map_single_exception(
-                self.compute_stats_single,
-                skip_op_error=self.skip_op_error,
-                op_name=self._name)
-            self.process = catch_map_single_exception(
-                self.process_single,
-                return_sample=False,
-                skip_op_error=self.skip_op_error,
-                op_name=self._name)
+            self.compute_stats = catch_map_single_exception(self.compute_stats_single,
+                                                            skip_op_error=self.skip_op_error,
+                                                            op_name=self._name)
+            self.process = catch_map_single_exception(self.process_single,
+                                                      return_sample=False,
+                                                      skip_op_error=self.skip_op_error,
+                                                      op_name=self._name)
 
     # set the process method is not allowed to be overridden
     @classmethod
@@ -430,10 +411,9 @@ class Filter(OP):
         not_allowed_list = ['compute_stats', 'process']
         for method_name in not_allowed_list:
             if method_name in cls.__dict__:
-                raise TypeError(
-                    f'Method {method_name} cannot be overridden by subclass '
-                    f'{cls.__name__}. Please implement {method_name}_single '
-                    f'or {method_name}_batched.')
+                raise TypeError(f'Method {method_name} cannot be overridden by subclass '
+                                f'{cls.__name__}. Please implement {method_name}_single '
+                                f'or {method_name}_batched.')
 
     def __call__(self, *args, **kwargs):
         return self.compute_stats(*args, **kwargs)
@@ -443,8 +423,7 @@ class Filter(OP):
         num_samples = len(samples[Fields.stats])
         for i in range(num_samples):
             this_sample = {key: samples[key][i] for key in keys}
-            res_sample = self.compute_stats_single(this_sample, *args,
-                                                   **kwargs)
+            res_sample = self.compute_stats_single(this_sample, *args, **kwargs)
             samples[Fields.stats][i] = res_sample[Fields.stats]
             if 'context' in kwargs and kwargs['context']:
                 samples[Fields.context][i] = res_sample[Fields.context]
@@ -452,17 +431,16 @@ class Filter(OP):
         return samples
 
     def process_batched(self, samples):
-        return map(lambda stat: self.process_single({Fields.stats: stat}),
-                   samples[Fields.stats])
+        return map(lambda stat: self.process_single({Fields.stats: stat}), samples[Fields.stats])
 
-    def compute_stats_single(self, sample, context=False):
+    def compute_stats_single(self, sample, *args, **kwargs):
         """
         Compute stats for the sample which is used as a metric to decide
         whether to filter this sample.
 
         :param sample: input sample.
-        :param context: whether to store context information of intermediate
-            vars in the sample temporarily.
+        :param args: additional positional arguments
+        :param kwargs: additional keyword arguments (e.g., context=False, rank=None)
         :return: sample with computed stats
         """
         raise NotImplementedError
@@ -519,15 +497,13 @@ class Deduplicator(OP):
 
         # runtime wrappers
         if self.is_batched_op():
-            self.compute_hash = catch_map_batches_exception(
-                self.compute_hash,
-                skip_op_error=self.skip_op_error,
-                op_name=self._name)
+            self.compute_hash = catch_map_batches_exception(self.compute_hash,
+                                                            skip_op_error=self.skip_op_error,
+                                                            op_name=self._name)
         else:
-            self.compute_hash = catch_map_single_exception(
-                self.compute_hash,
-                skip_op_error=self.skip_op_error,
-                op_name=self._name)
+            self.compute_hash = catch_map_single_exception(self.compute_hash,
+                                                           skip_op_error=self.skip_op_error,
+                                                           op_name=self._name)
 
     def compute_hash(self, sample):
         """
@@ -664,10 +640,9 @@ class Aggregator(OP):
             queries and responses
         """
         super(Aggregator, self).__init__(*args, **kwargs)
-        self.process = catch_map_single_exception(
-            self.process_single,
-            skip_op_error=self.skip_op_error,
-            op_name=self._name)
+        self.process = catch_map_single_exception(self.process_single,
+                                                  skip_op_error=self.skip_op_error,
+                                                  op_name=self._name)
 
     def process_single(self, sample):
         """
@@ -700,7 +675,6 @@ class Aggregator(OP):
             desc=self._name + '_process',
         )
         if tracer:
-            tracer.trace_mapper(self._name, dataset, new_dataset,
-                                self.text_key)
+            tracer.trace_mapper(self._name, dataset, new_dataset, self.text_key)
         free_models()
         return new_dataset
