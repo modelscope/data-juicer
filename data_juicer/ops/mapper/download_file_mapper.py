@@ -58,6 +58,9 @@ class DownloadFileMapper(Mapper):
         Download files with contexts.
         """
         raw_urls = sample[self.download_field]
+        if isinstance(raw_urls, str):
+            raw_urls = [raw_urls]
+
         new_paths = []
         response = None
 
@@ -90,7 +93,8 @@ class DownloadFileMapper(Mapper):
             new_paths.append(local_path)
 
         # replace original url path with local path
-        sample[self.download_field] = new_paths
+        sample[self.download_field] = new_paths[0] if isinstance(
+            sample[self.download_field], str) else new_paths
         return sample
 
     def process_single(self, sample, context=False):

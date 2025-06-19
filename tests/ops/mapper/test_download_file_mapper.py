@@ -20,9 +20,9 @@ class DownloadFileMapperTest(DataJuicerTestCaseBase):
         self.temp_dir = tempfile.mkdtemp()
         self.data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')
-        img1_path = os.path.join(self.data_path, 'img1.png')
-        img2_path = os.path.join(self.data_path, 'img2.jpg')
-        img3_path = os.path.join(self.data_path, 'img3.jpg')
+        self.img1_path = os.path.join(self.data_path, 'img1.png')
+        self.img2_path = os.path.join(self.data_path, 'img2.jpg')
+        self.img3_path = os.path.join(self.data_path, 'img3.jpg')
 
         # start HTTP server
         self.server_address = ('localhost', 0)  # 0 means random port
@@ -31,9 +31,9 @@ class DownloadFileMapperTest(DataJuicerTestCaseBase):
             partial(SimpleHTTPRequestHandler, directory=self.data_path)
         )
         self.port = self.httpd.server_address[1]
-        self.img1_url = f'http://localhost:{self.port}/{os.path.basename(img1_path)}'
-        self.img2_url = f'http://localhost:{self.port}/{os.path.basename(img2_path)}'
-        self.img3_url = f'http://localhost:{self.port}/{os.path.basename(img3_path)}'
+        self.img1_url = f'http://localhost:{self.port}/{os.path.basename(self.img1_path)}'
+        self.img2_url = f'http://localhost:{self.port}/{os.path.basename(self.img2_path)}'
+        self.img3_url = f'http://localhost:{self.port}/{os.path.basename(self.img3_path)}'
         
         # start the server in a thread
         self.server_thread = threading.Thread(target=self.httpd.serve_forever)
@@ -47,11 +47,14 @@ class DownloadFileMapperTest(DataJuicerTestCaseBase):
 
     def _test_image_download(self, context=False):
         ds_list = [{
-            'images': [self.img2_url]
+            'images': [self.img2_url],
+            'id': 1
         }, {
-            'images': [self.img3_url]
+            'images': [self.img3_url],
+            'id': 2
         }, {
-            'images': [self.img1_url]
+            'images': [self.img1_url],
+            'id': 3
         }]
         op = DownloadFileMapper(
                 save_dir=self.temp_dir,
@@ -71,6 +74,7 @@ class DownloadFileMapperTest(DataJuicerTestCaseBase):
             dataset = dataset.map(op.process_single)
         
         res_list = dataset.to_list()
+        res_list = sorted(res_list, key=lambda x: x['id'])
 
         self.assertEqual(len(ds_list), len(res_list))
 
@@ -94,6 +98,60 @@ class DownloadFileMapperTest(DataJuicerTestCaseBase):
 
     def test_image_download(self):
         self._test_image_download(context=False)
+
+    def test_download_filed(self):
+        ds_list = [{
+            'images_skip': self.img2_url,
+            'id': 1
+        }, {
+            'images_skip': self.img3_url,
+            'id': 2
+        }, {
+            'images_skip': self.img1_url,
+            'id': 3
+        }]
+        op = DownloadFileMapper(
+                save_dir=self.temp_dir,
+                download_field='images')
+
+        dataset = Dataset.from_list(ds_list)
+        dataset = dataset.map(op.process_single)
+        res_list = dataset.to_list()
+        res_list = sorted(res_list, key=lambda x: x['id'])
+
+        self.assertEqual(len(ds_list), len(res_list))
+        for i in range(len(ds_list)):
+            source, res = ds_list[i], res_list[i]
+            self.assertDictEqual(source, res)
+
+    def test_local_path(self):
+        ds_list = [{
+            'images': self.img2_path,
+            'id': 1
+        }, {
+            'images': self.img3_path,
+            'id': 2
+        }, {
+            'images': self.img1_url,
+            'id': 3
+        }]
+
+        op = DownloadFileMapper(
+                save_dir=self.temp_dir,
+                download_field='images')
+
+        dataset = Dataset.from_list(ds_list)
+        dataset = dataset.map(op.process_single)
+        
+        res_list = dataset.to_list()
+        res_list = sorted(res_list, key=lambda x: x['id'])
+
+        self.assertEqual(len(ds_list), len(res_list))
+        self.assertDictEqual(res_list[0], ds_list[0])
+        self.assertDictEqual(res_list[1], ds_list[1])
+        self.assertEqual(
+            res_list[2][op.image_key],
+            os.path.join(self.temp_dir, os.path.basename(ds_list[2][op.image_key])))
 
 
 if __name__ == '__main__':
