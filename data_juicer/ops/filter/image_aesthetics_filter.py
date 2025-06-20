@@ -9,27 +9,28 @@ from ...utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
-torch = LazyLoader('torch')
+torch = LazyLoader("torch")
 
-OP_NAME = 'image_aesthetics_filter'
+OP_NAME = "image_aesthetics_filter"
 
 
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageAestheticsFilter(Filter):
-    """Filter to keep samples with aesthetics scores within a specific range.
-    """
+    """Filter to keep samples with aesthetics scores within a specific range."""
 
-    _accelerator = 'cuda'
+    _accelerator = "cuda"
 
-    def __init__(self,
-                 hf_scorer_model: str = '',
-                 trust_remote_code: bool = False,
-                 min_score: float = 0.5,
-                 max_score: float = 1.0,
-                 any_or_all: str = 'any',
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        hf_scorer_model: str = "",
+        trust_remote_code: bool = False,
+        min_score: float = 0.5,
+        max_score: float = 1.0,
+        any_or_all: str = "any",
+        *args,
+        **kwargs,
+    ):
         """
         Initialization method.
 
@@ -46,26 +47,24 @@ class ImageAestheticsFilter(Filter):
         :param args: Extra positional arguments.
         :param kwargs: Extra keyword arguments.
         """
-        kwargs.setdefault('mem_required', '1500MB')
+        kwargs.setdefault("mem_required", "1500MB")
         super().__init__(*args, **kwargs)
-        if hf_scorer_model == '':
-            hf_scorer_model = \
-                'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE'
+        if hf_scorer_model == "":
+            hf_scorer_model = "shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE"
         self.min_score = min_score
         self.max_score = max_score
 
-        if any_or_all not in ['any', 'all']:
-            raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
-                             f'Can only be one of ["any", "all"].')
-        self.any = (any_or_all == 'any')
+        if any_or_all not in ["any", "all"]:
+            raise ValueError(f"Keep strategy [{any_or_all}] is not supported. " f'Can only be one of ["any", "all"].')
+        self.any = any_or_all == "any"
 
         self.model_key = prepare_model(
-            model_type='simple_aesthetics',
+            model_type="simple_aesthetics",
             pretrained_model_name_or_path=hf_scorer_model,
-            trust_remote_code=trust_remote_code)
+            trust_remote_code=trust_remote_code,
+        )
         # the original score predicted by laion-ai's scorer is within [0, 10]
-        self.need_normalized_by_ten = ('shunk031/aesthetics-predictor'
-                                       in hf_scorer_model)
+        self.need_normalized_by_ten = "shunk031/aesthetics-predictor" in hf_scorer_model
 
     def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
@@ -74,19 +73,16 @@ class ImageAestheticsFilter(Filter):
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][StatsKeys.image_aesthetics_scores] = np.array(
-                [], dtype=np.float64)
+            sample[Fields.stats][StatsKeys.image_aesthetics_scores] = np.array([], dtype=np.float64)
             return sample
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context,
-                                                loaded_image_keys, load_image)
+        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
 
         # compute aesthetics_scores
         model, processor = get_model(self.model_key, rank, self.use_cuda())
-        inputs = processor(images=list(images.values()),
-                           return_tensors='pt').to(model.device)
+        inputs = processor(images=list(images.values()), return_tensors="pt").to(model.device)
         with torch.no_grad():
             outputs = model(**inputs)
         if self.need_normalized_by_ten:
@@ -94,26 +90,21 @@ class ImageAestheticsFilter(Filter):
         else:
             aesthetics_scores = outputs.logits
 
-        aesthetics_scores = [
-            aesthetics_score.item() for aesthetics_score in aesthetics_scores
-        ]
+        aesthetics_scores = [aesthetics_score.item() for aesthetics_score in aesthetics_scores]
 
-        logger.debug(f'aesthetics_scores: {aesthetics_scores}')
+        logger.debug(f"aesthetics_scores: {aesthetics_scores}")
 
-        sample[Fields.stats][StatsKeys.image_aesthetics_scores] =\
-            aesthetics_scores
+        sample[Fields.stats][StatsKeys.image_aesthetics_scores] = aesthetics_scores
         return sample
 
     def process_single(self, sample):
-        aesthetics_scores = (
-            sample)[Fields.stats][StatsKeys.image_aesthetics_scores]
+        aesthetics_scores = (sample)[Fields.stats][StatsKeys.image_aesthetics_scores]
         if len(aesthetics_scores) <= 0:
             return True
 
-        keep_bools = np.array([
-            self.min_score <= aesthetics_score <= self.max_score
-            for aesthetics_score in aesthetics_scores
-        ])
+        keep_bools = np.array(
+            [self.min_score <= aesthetics_score <= self.max_score for aesthetics_score in aesthetics_scores]
+        )
 
         # different strategies
         if self.any:

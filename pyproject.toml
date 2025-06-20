@@ -179,6 +179,9 @@ dj-install = "data_juicer.tools.dj_install:main"
 requires = ["hatchling", "uv>=0.1.0"]
 build-backend = "hatchling.build"
 
+[tool.hatch.version]
+path = "data_juicer/__init__.py"
+
 [tool.hatch.build.targets.wheel]
 packages = ["data_juicer"]
 include = ["uv.lock", "pyproject.toml"]
@@ -205,5 +208,5 @@ extend-ignore = [
 line-length = 120
 target-version = ['py310']
 
-[tool.hatch.version]
-path = "data_juicer/__init__.py"
+[tool.isort]
+profile = "black"
