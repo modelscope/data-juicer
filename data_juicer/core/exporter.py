@@ -184,15 +184,16 @@ class Exporter:
 
                 # export dataset into multiple shards using multiprocessing
                 logger.info(f'Start to exporting to {num_shards} shards.')
-                pool = Pool(self.num_proc)
-                for i in range(num_shards):
-                    pool.apply_async(export_method,
-                                     args=(
-                                         shards[i],
-                                         filenames[i],
-                                     ))
-                pool.close()
-                pool.join()
+                with Pool(self.num_proc) as pool:
+                    for i in range(num_shards):
+                        pool.apply_async(export_method,
+                                         args=(
+                                             shards[i],
+                                             filenames[i],
+                                         ),
+                                         error_callback=logger.error)
+                    pool.close()
+                    pool.join()
 
     def export(self, dataset):
         """

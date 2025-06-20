@@ -49,6 +49,12 @@ execution_job_configs:
         - random_selector:
             select_num: 16
     extra_configs:
+  - hook: 'GeneralDataExecutorHook'
+    meta_name: 'convert_to_ea_fmt'
+    extra_configs:
+      type: 'dj_to_easyanimate_video_dataset_conversion'
+      dataset_path: './outputs/demo-bench/demo-dataset-for-train.json'
+      export_path: './outputs/demo-bench/'
   # train model
   - hook: 'TrainModelHook'
     meta_name:

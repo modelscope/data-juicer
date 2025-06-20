@@ -119,6 +119,10 @@ class GeneralDataExecutorFactory(object):
             from data_juicer.core.sandbox.specific_hooks.intervl_coco_captioning.preparation_hooks import \
                 COCOCaptionMetaGeneration
             executor = COCOCaptionMetaGeneration(data_exec_cfg)
+        elif data_exec_cfg.type == 'dj_to_easyanimate_video_dataset_conversion':
+            from data_juicer.core.sandbox.specific_hooks.text_to_video.preparation_hooks import \
+                DJToEasyAnimateVideoConversion
+            executor = DJToEasyAnimateVideoConversion(data_exec_cfg)
 
         return executor
 
