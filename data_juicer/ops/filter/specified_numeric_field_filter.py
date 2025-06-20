@@ -13,7 +13,7 @@ def is_number(s):
     return False
 
 
-OP_NAME = 'specified_numeric_field_filter'
+OP_NAME = "specified_numeric_field_filter"
 
 
 @NON_STATS_FILTERS.register_module(OP_NAME)
@@ -26,12 +26,9 @@ class SpecifiedNumericFieldFilter(Filter):
     specified range, the sample will be filtered.
     """
 
-    def __init__(self,
-                 field_key: str = '',
-                 min_value: float = -sys.maxsize,
-                 max_value: float = sys.maxsize,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self, field_key: str = "", min_value: float = -sys.maxsize, max_value: float = sys.maxsize, *args, **kwargs
+    ):
         """
         Initialization method.
 
@@ -61,9 +58,8 @@ class SpecifiedNumericFieldFilter(Filter):
             return True
 
         field_value = sample
-        for key in self.field_key.split('.'):
-            assert key in field_value.keys(), "'{}' not in {}".format(
-                key, field_value.keys())
+        for key in self.field_key.split("."):
+            assert key in field_value.keys(), "'{}' not in {}".format(key, field_value.keys())
             field_value = field_value[key]
 
         if is_number(field_value):

@@ -4,10 +4,10 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-OP_NAME = 'mllm_mapper'
+OP_NAME = "mllm_mapper"
 
-torch = LazyLoader('torch')
-transformers = LazyLoader('transformers')
+torch = LazyLoader("torch")
+transformers = LazyLoader("transformers")
 
 
 @LOADED_IMAGES.register_module(OP_NAME)
@@ -19,16 +19,19 @@ class MllmMapper(Mapper):
         Qwen/Qwen2-VL-7B-Instruct,
     ]
     """
-    _accelerator = 'cuda'
 
-    def __init__(self,
-                 hf_model: str = 'llava-hf/llava-v1.6-vicuna-7b-hf',
-                 max_new_tokens=256,
-                 temperature=0.2,
-                 top_p=None,
-                 num_beams=1,
-                 *args,
-                 **kwargs):
+    _accelerator = "cuda"
+
+    def __init__(
+        self,
+        hf_model: str = "llava-hf/llava-v1.6-vicuna-7b-hf",
+        max_new_tokens=256,
+        temperature=0.2,
+        top_p=None,
+        num_beams=1,
+        *args,
+        **kwargs,
+    ):
         """
         Initialization method.
         :param hf_model: hugginface model id.
@@ -46,20 +49,18 @@ class MllmMapper(Mapper):
         """
         torch.set_num_threads(1)
 
-        kwargs.setdefault('mem_required', '32GB')
-        kwargs.setdefault('num_proc', 1)
+        kwargs.setdefault("mem_required", "32GB")
+        kwargs.setdefault("num_proc", 1)
         super().__init__(*args, **kwargs)
 
         self.hf_model = hf_model
-        self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_model)
+        self.model_key = prepare_model(model_type="huggingface", pretrained_model_name_or_path=hf_model)
         self.max_new_tokens = max_new_tokens
         self.temperature = temperature
         self.top_p = top_p
         self.num_beams = num_beams
 
     def process_single(self, sample=None, rank=None):
-
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
             return sample
@@ -73,43 +74,33 @@ class MllmMapper(Mapper):
                 image = load_image(loaded_image_key)
                 images[loaded_image_key] = image
 
-        model, processor = get_model(model_key=self.model_key,
-                                     rank=rank,
-                                     use_cuda=self.use_cuda())
+        model, processor = get_model(model_key=self.model_key, rank=rank, use_cuda=self.use_cuda())
 
         conversation = [
             {
-                'role':
-                'user',
-                'content': [
-                    {
-                        'type': 'text',
-                        'text': sample[self.text_key]
-                    },
-                    {
-                        'type': 'image'
-                    },
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": sample[self.text_key]},
+                    {"type": "image"},
                 ],
             },
         ]
-        prompt = processor.apply_chat_template(conversation,
-                                               add_generation_prompt=True)
+        prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
 
         sample[self.text_key] = []
 
         for image_key in images:
-            inputs = processor(images=images[image_key],
-                               text=prompt,
-                               return_tensors='pt').to(model.device)
+            inputs = processor(images=images[image_key], text=prompt, return_tensors="pt").to(model.device)
 
-            response = model.generate(**inputs,
-                                      max_new_tokens=self.max_new_tokens,
-                                      temperature=self.temperature,
-                                      top_p=self.top_p,
-                                      num_beams=self.num_beams)
+            response = model.generate(
+                **inputs,
+                max_new_tokens=self.max_new_tokens,
+                temperature=self.temperature,
+                top_p=self.top_p,
+                num_beams=self.num_beams,
+            )
 
-            output = processor.decode(response.cpu()[0],
-                                      skip_special_tokens=True)
+            output = processor.decode(response.cpu()[0], skip_special_tokens=True)
 
             sample[self.text_key].append(output)
 

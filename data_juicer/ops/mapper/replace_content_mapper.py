@@ -5,7 +5,7 @@ import regex as re
 from ..base_op import OPERATORS, Mapper
 
 
-@OPERATORS.register_module('replace_content_mapper')
+@OPERATORS.register_module("replace_content_mapper")
 class ReplaceContentMapper(Mapper):
     """Mapper to replace all content in the text that matches
     a specific regular expression pattern with a designated
@@ -13,11 +13,7 @@ class ReplaceContentMapper(Mapper):
 
     _batched_op = True
 
-    def __init__(self,
-                 pattern: Union[str, List[str], None] = None,
-                 repl: Union[str, List[str]] = '',
-                 *args,
-                 **kwargs):
+    def __init__(self, pattern: Union[str, List[str], None] = None, repl: Union[str, List[str]] = "", *args, **kwargs):
         """
         Initialization method.
 
@@ -38,9 +34,9 @@ class ReplaceContentMapper(Mapper):
 
     def _prepare_pattern(self, pattern: str) -> re.Pattern:
         """Prepare the regular expression pattern."""
-        if ((pattern is not None and len(pattern) > 2)
-                and (pattern.startswith("r'") and pattern.endswith("'")
-                     or pattern.startswith('r"') and pattern.endswith('"'))):
+        if (pattern is not None and len(pattern) > 2) and (
+            pattern.startswith("r'") and pattern.endswith("'") or pattern.startswith('r"') and pattern.endswith('"')
+        ):
             pattern = pattern[2:-1]
         return re.compile(pattern, flags=re.DOTALL)
 
@@ -53,9 +49,9 @@ class ReplaceContentMapper(Mapper):
                 if isinstance(self.repl, list) and i < len(self.repl):
                     replacement = self.repl[i]
                 elif isinstance(self.repl, list) and i >= len(self.repl):
-                    raise ValueError(f"pattern length: {len(self.pattern)} '"
-                                     f'must be equal to '
-                                     f'repl length: {len(self.repl)}')
+                    raise ValueError(
+                        f"pattern length: {len(self.pattern)} '" f"must be equal to " f"repl length: {len(self.repl)}"
+                    )
                 else:
                     replacement = self.repl
 

@@ -7,16 +7,17 @@ from data_juicer.ops.base_op import OPERATORS, Selector
 from data_juicer.utils.sample import random_sample
 
 
-@OPERATORS.register_module('random_selector')
+@OPERATORS.register_module("random_selector")
 class RandomSelector(Selector):
-    """Selector to random select samples. """
+    """Selector to random select samples."""
 
-    def __init__(self,
-                 select_ratio: Optional[Annotated[float,
-                                                  Field(ge=0, le=1)]] = None,
-                 select_num: PositiveInt = None,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        select_ratio: Optional[Annotated[float, Field(ge=0, le=1)]] = None,
+        select_num: PositiveInt = None,
+        *args,
+        **kwargs,
+    ):
         """
         Initialization method.
 

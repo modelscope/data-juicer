@@ -4,7 +4,7 @@ from data_juicer.utils.constant import Fields
 
 from ..base_op import NON_STATS_FILTERS, OPERATORS, Filter
 
-OP_NAME = 'suffix_filter'
+OP_NAME = "suffix_filter"
 
 
 @NON_STATS_FILTERS.register_module(OP_NAME)

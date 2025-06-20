@@ -6,14 +6,13 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Mapper
 
-ffmpeg = LazyLoader('ffmpeg', 'ffmpeg-python')
-OP_NAME = 'video_ffmpeg_wrapped_mapper'
+ffmpeg = LazyLoader("ffmpeg", "ffmpeg-python")
+OP_NAME = "video_ffmpeg_wrapped_mapper"
 
 
 @OPERATORS.register_module(OP_NAME)
 class VideoFFmpegWrappedMapper(Mapper):
-    """Simple wrapper for FFmpeg video filters.
-    """
+    """Simple wrapper for FFmpeg video filters."""
 
     def __init__(
         self,
@@ -63,14 +62,11 @@ class VideoFFmpegWrappedMapper(Mapper):
             if video_key in processed:
                 continue
 
-            output_key = transfer_filename(video_key, OP_NAME,
-                                           **self._init_parameters)
-            stream = (ffmpeg.input(video_key).filter(
-                self.filter_name, **self.filter_kwargs).output(output_key))
+            output_key = transfer_filename(video_key, OP_NAME, **self._init_parameters)
+            stream = ffmpeg.input(video_key).filter(self.filter_name, **self.filter_kwargs).output(output_key)
             if self.global_args is not None:
                 stream = stream.global_args(*self.global_args)
-            stream.run(capture_stderr=self.capture_stderr,
-                       overwrite_output=self.overwrite_output)
+            stream.run(capture_stderr=self.capture_stderr, overwrite_output=self.overwrite_output)
             processed[video_key] = output_key
 
         # when the file is modified, its source file needs to be updated.

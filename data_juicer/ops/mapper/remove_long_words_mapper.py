@@ -5,21 +5,21 @@
 import sys
 
 from ..base_op import OPERATORS, Mapper
-from ..common import (SPECIAL_CHARACTERS, merge_on_whitespace_tab_newline,
-                      split_on_newline_tab_whitespace, strip)
+from ..common import (
+    SPECIAL_CHARACTERS,
+    merge_on_whitespace_tab_newline,
+    split_on_newline_tab_whitespace,
+    strip,
+)
 
 
-@OPERATORS.register_module('remove_long_words_mapper')
+@OPERATORS.register_module("remove_long_words_mapper")
 class RemoveLongWordsMapper(Mapper):
     """Mapper to remove long words within a specific range."""
 
     _batched_op = True
 
-    def __init__(self,
-                 min_len: int = 1,
-                 max_len: int = sys.maxsize,
-                 *args,
-                 **kwargs):
+    def __init__(self, min_len: int = 1, max_len: int = sys.maxsize, *args, **kwargs):
         """
         Initialization method.
 
@@ -37,8 +37,7 @@ class RemoveLongWordsMapper(Mapper):
     def should_keep_long_word(self, word):
         if self.min_len <= len(word) <= self.max_len:
             return True
-        elif self.min_len <= len(strip(word,
-                                       SPECIAL_CHARACTERS)) <= self.max_len:
+        elif self.min_len <= len(strip(word, SPECIAL_CHARACTERS)) <= self.max_len:
             return True
         else:
             return False
@@ -46,10 +45,9 @@ class RemoveLongWordsMapper(Mapper):
     def process_batched(self, samples):
         for idx, text in enumerate(samples[self.text_key]):
             sentences = split_on_newline_tab_whitespace(text)
-            sentences = [[[
-                word for word in subsentence
-                if self.should_keep_long_word(word)
-            ] for subsentence in sentence] for sentence in sentences]
-            samples[self.text_key][idx] = merge_on_whitespace_tab_newline(
-                sentences)
+            sentences = [
+                [[word for word in subsentence if self.should_keep_long_word(word)] for subsentence in sentence]
+                for sentence in sentences
+            ]
+            samples[self.text_key][idx] = merge_on_whitespace_tab_newline(sentences)
         return samples

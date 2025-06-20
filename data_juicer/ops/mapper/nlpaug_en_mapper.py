@@ -7,12 +7,12 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Mapper
 
-nlpaug = LazyLoader('nlpaug')
-nac = LazyLoader('nlpaug.augmenter.char')
-naw = LazyLoader('nlpaug.augmenter.word')
-naf = LazyLoader('nlpaug.flow')
+nlpaug = LazyLoader("nlpaug")
+nac = LazyLoader("nlpaug.augmenter.char")
+naw = LazyLoader("nlpaug.augmenter.word")
+naf = LazyLoader("nlpaug.flow")
 
-OP_NAME = 'nlpaug_en_mapper'
+OP_NAME = "nlpaug_en_mapper"
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -21,21 +21,23 @@ class NlpaugEnMapper(Mapper):
 
     _batched_op = True
 
-    def __init__(self,
-                 sequential: bool = False,
-                 aug_num: PositiveInt = 1,
-                 keep_original_sample: bool = True,
-                 delete_random_word: bool = False,
-                 swap_random_word: bool = False,
-                 spelling_error_word: bool = False,
-                 split_random_word: bool = False,
-                 keyboard_error_char: bool = False,
-                 ocr_error_char: bool = False,
-                 delete_random_char: bool = False,
-                 swap_random_char: bool = False,
-                 insert_random_char: bool = False,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        sequential: bool = False,
+        aug_num: PositiveInt = 1,
+        keep_original_sample: bool = True,
+        delete_random_word: bool = False,
+        swap_random_word: bool = False,
+        spelling_error_word: bool = False,
+        split_random_word: bool = False,
+        keyboard_error_char: bool = False,
+        ocr_error_char: bool = False,
+        delete_random_char: bool = False,
+        swap_random_char: bool = False,
+        insert_random_char: bool = False,
+        *args,
+        **kwargs,
+    ):
         """
         Initialization method. All augmentation methods use default parameters
         in default. We recommend you to only use 1-3 augmentation methods at a
@@ -89,9 +91,11 @@ class NlpaugEnMapper(Mapper):
 
         self.aug_num = aug_num
         if aug_num >= 10:
-            logger.warning(f'Relatively large augmentation number [{aug_num}]'
-                           f' might generate large number of new samples and '
-                           f'requires more memory and disk space.')
+            logger.warning(
+                f"Relatively large augmentation number [{aug_num}]"
+                f" might generate large number of new samples and "
+                f"requires more memory and disk space."
+            )
         self.sequential = sequential
         self.keep_original_sample = keep_original_sample
 
@@ -152,6 +156,5 @@ class NlpaugEnMapper(Mapper):
         # add other replicate fields
         for key in res_samples:
             if key != self.text_key:
-                res_samples[key] = res_samples[key] * \
-                                   len(res_samples[self.text_key])
+                res_samples[key] = res_samples[key] * len(res_samples[self.text_key])
         return res_samples

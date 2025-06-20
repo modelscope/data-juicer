@@ -6,9 +6,9 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Mapper
 
-selectolax = LazyLoader('selectolax')
+selectolax = LazyLoader("selectolax")
 
-OP_NAME = 'clean_html_mapper'
+OP_NAME = "clean_html_mapper"
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -27,16 +27,13 @@ class CleanHtmlMapper(Mapper):
         super().__init__(*args, **kwargs)
 
     def process_batched(self, samples):
-
         def _clean_html(raw_html):
-            raw_html = raw_html.replace('<li>', '\n*')
-            raw_html = raw_html.replace('</li>', '')
-            raw_html = raw_html.replace('<ol>', '\n*')
-            raw_html = raw_html.replace('</ol>', '')
+            raw_html = raw_html.replace("<li>", "\n*")
+            raw_html = raw_html.replace("</li>", "")
+            raw_html = raw_html.replace("<ol>", "\n*")
+            raw_html = raw_html.replace("</ol>", "")
             parser = selectolax.parser.HTMLParser(raw_html)
             return parser.text()
 
-        samples[self.text_key] = [
-            _clean_html(text) for text in samples[self.text_key]
-        ]
+        samples[self.text_key] = [_clean_html(text) for text in samples[self.text_key]]
         return samples

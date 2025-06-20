@@ -4,15 +4,19 @@ import numpy as np
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, MetaKeys
-from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
-                                        extract_video_frames_uniformly,
-                                        load_data_with_context, load_video)
+from data_juicer.utils.mm_utils import (
+    close_video,
+    extract_key_frames,
+    extract_video_frames_uniformly,
+    load_data_with_context,
+    load_video,
+)
 from data_juicer.utils.model_utils import get_model, prepare_model, ram, torch
 
 from ..base_op import OPERATORS, TAGGING_OPS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
-OP_NAME = 'video_tagging_from_frames_mapper'
+OP_NAME = "video_tagging_from_frames_mapper"
 
 
 @TAGGING_OPS.register_module(OP_NAME)
@@ -20,17 +24,18 @@ OP_NAME = 'video_tagging_from_frames_mapper'
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoTaggingFromFramesMapper(Mapper):
-    """Mapper to generate video tags from frames extract by video.
-    """
+    """Mapper to generate video tags from frames extract by video."""
 
-    _accelerator = 'cuda'
+    _accelerator = "cuda"
 
-    def __init__(self,
-                 frame_sampling_method: str = 'all_keyframes',
-                 frame_num: PositiveInt = 3,
-                 tag_field_name: str = MetaKeys.video_frame_tags,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        frame_sampling_method: str = "all_keyframes",
+        frame_num: PositiveInt = 3,
+        tag_field_name: str = MetaKeys.video_frame_tags,
+        *args,
+        **kwargs,
+    ):
         """
         Initialization method.
 
@@ -52,16 +57,16 @@ class VideoTaggingFromFramesMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault('mem_required', '9GB')
+        kwargs.setdefault("mem_required", "9GB")
         super().__init__(*args, **kwargs)
-        if frame_sampling_method not in ['all_keyframes', 'uniform']:
+        if frame_sampling_method not in ["all_keyframes", "uniform"]:
             raise ValueError(
-                f'Frame sampling method [{frame_sampling_method}] is not '
-                f'supported. Can only be one of ["all_keyframes", "uniform"].')
+                f"Frame sampling method [{frame_sampling_method}] is not "
+                f'supported. Can only be one of ["all_keyframes", "uniform"].'
+            )
         self.model_key = prepare_model(
-            model_type='recognizeAnything',
-            pretrained_model_name_or_path='ram_plus_swin_large_14m.pth',
-            input_size=384)
+            model_type="recognizeAnything", pretrained_model_name_or_path="ram_plus_swin_large_14m.pth", input_size=384
+        )
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num
         self.transform = ram.get_transform(image_size=384)
@@ -75,14 +80,12 @@ class VideoTaggingFromFramesMapper(Mapper):
 
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
-            sample[Fields.meta][self.tag_field_name] = np.array([[]],
-                                                                dtype=np.str_)
+            sample[Fields.meta][self.tag_field_name] = np.array([[]], dtype=np.str_)
             return sample
 
         # load videos
         loaded_video_keys = sample[self.video_key]
-        sample, videos = load_data_with_context(sample, context,
-                                                loaded_video_keys, load_video)
+        sample, videos = load_data_with_context(sample, context, loaded_video_keys, load_video)
 
         model = get_model(self.model_key, rank, self.use_cuda())
         video_tags = []
@@ -90,21 +93,21 @@ class VideoTaggingFromFramesMapper(Mapper):
             video = videos[value]
 
             # extract frame images
-            if self.frame_sampling_method == 'all_keyframes':
+            if self.frame_sampling_method == "all_keyframes":
                 frames = extract_key_frames(video)
-            elif self.frame_sampling_method == 'uniform':
+            elif self.frame_sampling_method == "uniform":
                 frames = extract_video_frames_uniformly(video, self.frame_num)
             else:
                 video_tags.append([])
                 continue
 
-            frame_tensor = torch.stack([
-                self.transform(frame.to_image()) for frame in frames
-            ]).to(next(model.parameters()).device)
+            frame_tensor = torch.stack([self.transform(frame.to_image()) for frame in frames]).to(
+                next(model.parameters()).device
+            )
             with torch.no_grad():
                 tags, _ = model.generate_tag(frame_tensor)
 
-            words = [word.strip() for tag in tags for word in tag.split('|')]
+            words = [word.strip() for tag in tags for word in tag.split("|")]
             word_count = Counter(words)
             sorted_word_list = [item for item, _ in word_count.most_common()]
             video_tags.append(np.array(sorted_word_list, dtype=np.str_))

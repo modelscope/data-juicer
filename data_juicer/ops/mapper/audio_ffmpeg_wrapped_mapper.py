@@ -6,15 +6,14 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Mapper
 
-ffmpeg = LazyLoader('ffmpeg', 'ffmpeg-python')
+ffmpeg = LazyLoader("ffmpeg", "ffmpeg-python")
 
-OP_NAME = 'audio_ffmpeg_wrapped_mapper'
+OP_NAME = "audio_ffmpeg_wrapped_mapper"
 
 
 @OPERATORS.register_module(OP_NAME)
 class AudioFFmpegWrappedMapper(Mapper):
-    """Simple wrapper for FFmpeg audio filters.
-    """
+    """Simple wrapper for FFmpeg audio filters."""
 
     def __init__(
         self,
@@ -64,14 +63,11 @@ class AudioFFmpegWrappedMapper(Mapper):
             if audio_key in processed:
                 continue
 
-            output_key = transfer_filename(audio_key, OP_NAME,
-                                           **self._init_parameters)
-            stream = (ffmpeg.input(audio_key).filter(
-                self.filter_name, **self.filter_kwargs).output(output_key))
+            output_key = transfer_filename(audio_key, OP_NAME, **self._init_parameters)
+            stream = ffmpeg.input(audio_key).filter(self.filter_name, **self.filter_kwargs).output(output_key)
             if self.global_args is not None:
                 stream = stream.global_args(*self.global_args)
-            stream.run(capture_stderr=self.capture_stderr,
-                       overwrite_output=self.overwrite_output)
+            stream.run(capture_stderr=self.capture_stderr, overwrite_output=self.overwrite_output)
             processed[audio_key] = output_key
 
         # when the file is modified, its source file needs to be updated.

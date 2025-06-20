@@ -10,15 +10,15 @@ from .ray_video_deduplicator import RayVideoDeduplicator
 from .video_deduplicator import VideoDeduplicator
 
 __all__ = [
-    'DocumentDeduplicator',
-    'DocumentMinhashDeduplicator',
-    'DocumentSimhashDeduplicator',
-    'ImageDeduplicator',
-    'RayBasicDeduplicator',
-    'RayDocumentDeduplicator',
-    'RayImageDeduplicator',
-    'RayVideoDeduplicator',
-    'RayImageDeduplicator',
-    'RayBTSMinhashDeduplicator',
-    'VideoDeduplicator',
+    "DocumentDeduplicator",
+    "DocumentMinhashDeduplicator",
+    "DocumentSimhashDeduplicator",
+    "ImageDeduplicator",
+    "RayBasicDeduplicator",
+    "RayDocumentDeduplicator",
+    "RayImageDeduplicator",
+    "RayVideoDeduplicator",
+    "RayImageDeduplicator",
+    "RayBTSMinhashDeduplicator",
+    "VideoDeduplicator",
 ]

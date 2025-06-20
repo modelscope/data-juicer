@@ -7,7 +7,13 @@ from .text_formatter import TextFormatter
 from .tsv_formatter import TsvFormatter
 
 __all__ = [
-    'JsonFormatter', 'LocalFormatter', 'RemoteFormatter', 'TextFormatter',
-    'ParquetFormatter', 'CsvFormatter', 'TsvFormatter', 'EmptyFormatter',
-    'RayEmptyFormatter'
+    "JsonFormatter",
+    "LocalFormatter",
+    "RemoteFormatter",
+    "TextFormatter",
+    "ParquetFormatter",
+    "CsvFormatter",
+    "TsvFormatter",
+    "EmptyFormatter",
+    "RayEmptyFormatter",
 ]

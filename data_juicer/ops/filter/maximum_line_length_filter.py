@@ -5,7 +5,7 @@ from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_LINES
 
-OP_NAME = 'maximum_line_length_filter'
+OP_NAME = "maximum_line_length_filter"
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -16,11 +16,7 @@ class MaximumLineLengthFilter(Filter):
 
     _batched_op = True
 
-    def __init__(self,
-                 min_len: int = 10,
-                 max_len: int = sys.maxsize,
-                 *args,
-                 **kwargs):
+    def __init__(self, min_len: int = 10, max_len: int = sys.maxsize, *args, **kwargs):
         """
         Initialization method.
 
@@ -40,7 +36,7 @@ class MaximumLineLengthFilter(Filter):
     def compute_stats_batched(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
-        context_key = f'{InterVars.lines}'
+        context_key = f"{InterVars.lines}"
 
         for idx, stat in enumerate(samples_stats):
             # check if it's computed already
@@ -54,20 +50,18 @@ class MaximumLineLengthFilter(Filter):
                 if context:
                     samples[Fields.context][idx][context_key] = lines
             line_lengths = list(map(len, lines))
-            samples_stats[idx][StatsKeys.max_line_length] = max(
-                line_lengths) if line_lengths else 0
+            samples_stats[idx][StatsKeys.max_line_length] = max(line_lengths) if line_lengths else 0
 
         return samples
 
     def process_batched(self, samples):
         if isinstance(samples[Fields.stats], list):
             return map(
-                lambda stat: self.min_len <= stat[StatsKeys.max_line_length] <=
-                self.max_len, samples[Fields.stats])
+                lambda stat: self.min_len <= stat[StatsKeys.max_line_length] <= self.max_len, samples[Fields.stats]
+            )
         else:
             # single sample for ray filter
-            if self.min_len <= samples[Fields.stats][
-                    StatsKeys.max_line_length] <= self.max_len:
+            if self.min_len <= samples[Fields.stats][StatsKeys.max_line_length] <= self.max_len:
                 return True
             else:
                 return False

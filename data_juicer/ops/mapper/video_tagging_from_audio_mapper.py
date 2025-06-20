@@ -7,8 +7,8 @@ from data_juicer.utils.model_utils import get_model, prepare_model, torch
 
 from ..base_op import OPERATORS, TAGGING_OPS, Mapper
 
-OP_NAME = 'video_tagging_from_audio_mapper'
-torchaudio = LazyLoader('torchaudio')
+OP_NAME = "video_tagging_from_audio_mapper"
+torchaudio = LazyLoader("torchaudio")
 
 
 @TAGGING_OPS.register_module(OP_NAME)
@@ -18,14 +18,16 @@ class VideoTaggingFromAudioMapper(Mapper):
     using the Audio Spectrogram Transformer.
     """
 
-    _accelerator = 'cuda'
+    _accelerator = "cuda"
 
-    def __init__(self,
-                 hf_ast: str = 'MIT/ast-finetuned-audioset-10-10-0.4593',
-                 trust_remote_code: bool = False,
-                 tag_field_name: str = MetaKeys.video_audio_tags,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        hf_ast: str = "MIT/ast-finetuned-audioset-10-10-0.4593",
+        trust_remote_code: bool = False,
+        tag_field_name: str = MetaKeys.video_audio_tags,
+        *args,
+        **kwargs,
+    ):
         """
         Initialization method.
 
@@ -36,13 +38,13 @@ class VideoTaggingFromAudioMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault('mem_required', '500MB')
+        kwargs.setdefault("mem_required", "500MB")
         super().__init__(*args, **kwargs)
-        self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_ast,
-                                       trust_remote_code=trust_remote_code)
+        self.model_key = prepare_model(
+            model_type="huggingface", pretrained_model_name_or_path=hf_ast, trust_remote_code=trust_remote_code
+        )
         self._model_sampling_rate = 16000
-        self._no_audio_label = 'EMPTY'
+        self._no_audio_label = "EMPTY"
 
         self.tag_field_name = tag_field_name
 
@@ -53,20 +55,17 @@ class VideoTaggingFromAudioMapper(Mapper):
 
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
-            sample[Fields.meta][self.tag_field_name] = np.array([],
-                                                                dtype=np.str_)
+            sample[Fields.meta][self.tag_field_name] = np.array([], dtype=np.str_)
             return sample
 
         # load video paths
         loaded_video_keys = sample[self.video_key]
 
-        model, feature_extractor = get_model(self.model_key, rank,
-                                             self.use_cuda())
+        model, feature_extractor = get_model(self.model_key, rank, self.use_cuda())
         video_audio_tags = []
         for video_path in loaded_video_keys:
             # only extract audio data and sr for index 0 for now
-            ys, srs, valid_indexes = extract_audio_from_video(
-                video_path, stream_indexes=[0])
+            ys, srs, valid_indexes = extract_audio_from_video(video_path, stream_indexes=[0])
             if len(valid_indexes) == 0:
                 # there is no valid audio streams. Skip!
                 video_audio_tags.append(self._no_audio_label)
@@ -77,18 +76,14 @@ class VideoTaggingFromAudioMapper(Mapper):
             sr = srs[0]
             # check if it meets the sampling rate condition of the model
             if sr != self._model_sampling_rate:
-                resampler = torchaudio.transforms.Resample(
-                    orig_freq=sr, new_freq=self._model_sampling_rate)
+                resampler = torchaudio.transforms.Resample(orig_freq=sr, new_freq=self._model_sampling_rate)
                 y = resampler(torch.from_numpy(y).float()).numpy()
                 sr = self._model_sampling_rate
-            inputs = feature_extractor(y,
-                                       sampling_rate=sr,
-                                       return_tensors='pt').to(model.device)
+            inputs = feature_extractor(y, sampling_rate=sr, return_tensors="pt").to(model.device)
             with torch.no_grad():
                 logits = model(**inputs).logits
             predicted_tag_id = torch.argmax(logits, dim=-1).item()
             predicted_tag = model.config.id2label[predicted_tag_id]
             video_audio_tags.append(predicted_tag)
-        sample[Fields.meta][self.tag_field_name] = np.array(video_audio_tags,
-                                                            dtype=np.str_)
+        sample[Fields.meta][self.tag_field_name] = np.array(video_audio_tags, dtype=np.str_)
         return sample

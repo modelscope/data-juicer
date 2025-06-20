@@ -5,7 +5,7 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
 
-OP_NAME = 'text_action_filter'
+OP_NAME = "text_action_filter"
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -14,11 +14,7 @@ class TextActionFilter(Filter):
     Filter to keep texts those contain actions in the text.
     """
 
-    def __init__(self,
-                 lang: str = 'en',
-                 min_action_num: int = 1,
-                 *args,
-                 **kwargs):
+    def __init__(self, lang: str = "en", min_action_num: int = 1, *args, **kwargs):
         """
         Initialization method.
 
@@ -29,16 +25,16 @@ class TextActionFilter(Filter):
             parameter.
         """
         super().__init__(*args, **kwargs)
-        LazyLoader.check_packages(['spacy-pkuseg'], '--no-deps')
+        LazyLoader.check_packages(["spacy-pkuseg"], "--no-deps")
 
-        if lang not in ['en', 'zh']:
+        if lang not in ["en", "zh"]:
             raise ValueError(
-                f'Language [{lang}] is not supported in action detection.'
-                f'Can only be one of ["en", "zh"].')
+                f"Language [{lang}] is not supported in action detection." f'Can only be one of ["en", "zh"].'
+            )
         self.lang = lang
-        self.model_key = prepare_model(model_type='spacy', lang=lang)
-        self.action_poss = ['VERB']
-        self.action_tags = ['VV', 'VB', 'VBP', 'VBZ', 'VBD', 'VBG', 'VBN']
+        self.model_key = prepare_model(model_type="spacy", lang=lang)
+        self.action_poss = ["VERB"]
+        self.action_tags = ["VV", "VB", "VBP", "VBZ", "VBD", "VBG", "VBN"]
         self.min_action_num = min_action_num
 
     def compute_stats_single(self, sample, context=False):
@@ -53,8 +49,7 @@ class TextActionFilter(Filter):
         doc = model(text)
         num_action = 0
         for token in doc:
-            if token.pos_ in self.action_poss \
-             and token.tag_ in self.action_tags:
+            if token.pos_ in self.action_poss and token.tag_ in self.action_tags:
                 num_action += 1
         sample[Fields.stats][StatsKeys.num_action] = num_action
 

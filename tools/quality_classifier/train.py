@@ -30,19 +30,26 @@
 import fire
 from loguru import logger
 
-from tools.quality_classifier.qc_utils import (eval, init_spark, load_datasets,
-                                               shuffle, train)
+from tools.quality_classifier.qc_utils import (
+    eval,
+    init_spark,
+    load_datasets,
+    shuffle,
+    train,
+)
 
 
 @logger.catch(reraise=True)
-def main(positive_datasets,
-         negative_datasets,
-         output_model_path='my_quality_model',
-         num_training_samples=0,
-         train_test_split_ratio=0.8,
-         tokenizer=None,
-         evaluation=True,
-         text_key='text'):
+def main(
+    positive_datasets,
+    negative_datasets,
+    output_model_path="my_quality_model",
+    num_training_samples=0,
+    train_test_split_ratio=0.8,
+    tokenizer=None,
+    evaluation=True,
+    text_key="text",
+):
     """
     Train a quality classifier using your own pos/neg datasets
     :param positive_datasets: the paths to the positive datasets. It could be a
@@ -77,34 +84,24 @@ def main(positive_datasets,
     spark = init_spark()
 
     # load positive and negative datasets
-    pos = load_datasets(spark,
-                        positive_datasets,
-                        text_key=text_key,
-                        label=1,
-                        only_text=True)
-    neg = load_datasets(spark,
-                        negative_datasets,
-                        text_key=text_key,
-                        label=0,
-                        only_text=True)
+    pos = load_datasets(spark, positive_datasets, text_key=text_key, label=1, only_text=True)
+    neg = load_datasets(spark, negative_datasets, text_key=text_key, label=0, only_text=True)
 
     if pos is None or neg is None:
-        logger.error('Empty dataset in positive/negative dataset list...')
+        logger.error("Empty dataset in positive/negative dataset list...")
         exit(1)
 
     # sample a part of positive/negative samples to train
     if num_training_samples > 0:
-        logger.info(f'Only use {num_training_samples} pairs samples to train.')
+        logger.info(f"Only use {num_training_samples} pairs samples to train.")
         pos = shuffle(pos).limit(num_training_samples)
         neg = shuffle(neg).limit(num_training_samples)
 
     # merge pos and neg samples
     ds = pos.unionAll(neg)
     # split the merged dataset into training and test set
-    train_set, test_set = ds.randomSplit(
-        [train_test_split_ratio, 1.0 - train_test_split_ratio], seed=42)
-    logger.info(f'Number of training samples: {train_set.count()}, '
-                f'test samples: {test_set.count()}')
+    train_set, test_set = ds.randomSplit([train_test_split_ratio, 1.0 - train_test_split_ratio], seed=42)
+    logger.info(f"Number of training samples: {train_set.count()}, " f"test samples: {test_set.count()}")
 
     # start the ML pipeline to train the classifier
     train(output_model_path, train_set, tokenizer)
@@ -114,5 +111,5 @@ def main(positive_datasets,
         eval(output_model_path, test_set, tokenizer)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     fire.Fire(main)

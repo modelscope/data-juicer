@@ -6,39 +6,37 @@ from PIL import ImageFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.mm_utils import (close_video, detect_faces,
-                                        load_data_with_context, load_video,
-                                        process_each_frame)
+from data_juicer.utils.mm_utils import (
+    close_video,
+    detect_faces,
+    load_data_with_context,
+    load_video,
+    process_each_frame,
+)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
-cv2 = LazyLoader('cv2', 'opencv-python')
+cv2 = LazyLoader("cv2", "opencv-python")
 
-OP_NAME = 'video_face_blur_mapper'
+OP_NAME = "video_face_blur_mapper"
 
 
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoFaceBlurMapper(Mapper):
-    """Mapper to blur faces detected in videos.
-    """
+    """Mapper to blur faces detected in videos."""
 
     _default_kwargs = {
-        'scaleFactor': 1.1,
-        'minNeighbors': 3,
-        'minSize': None,
-        'maxSize': None,
+        "scaleFactor": 1.1,
+        "minNeighbors": 3,
+        "minSize": None,
+        "maxSize": None,
     }
 
-    def __init__(self,
-                 cv_classifier: str = '',
-                 blur_type: str = 'gaussian',
-                 radius: float = 2,
-                 *args,
-                 **kwargs):
+    def __init__(self, cv_classifier: str = "", blur_type: str = "gaussian", radius: float = 2, *args, **kwargs):
         """
         Initialization method.
 
@@ -53,19 +51,18 @@ class VideoFaceBlurMapper(Mapper):
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
 
-        if cv_classifier == '':
-            cv_classifier = os.path.join(cv2.data.haarcascades,
-                                         'haarcascade_frontalface_alt.xml')
-        if blur_type not in ['mean', 'box', 'gaussian']:
+        if cv_classifier == "":
+            cv_classifier = os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_alt.xml")
+        if blur_type not in ["mean", "box", "gaussian"]:
             raise ValueError(
-                f'Blur_type [{blur_type}] is not supported. '
-                f'Can only be one of ["mean", "box", "gaussian"]. ')
+                f"Blur_type [{blur_type}] is not supported. " f'Can only be one of ["mean", "box", "gaussian"]. '
+            )
         if radius < 0:
-            raise ValueError('Radius must be >= 0. ')
+            raise ValueError("Radius must be >= 0. ")
 
-        if blur_type == 'mean':
+        if blur_type == "mean":
             self.blur = ImageFilter.BLUR
-        elif blur_type == 'box':
+        elif blur_type == "box":
             self.blur = ImageFilter.BoxBlur(radius)
         else:
             self.blur = ImageFilter.GaussianBlur(radius)
@@ -78,8 +75,7 @@ class VideoFaceBlurMapper(Mapper):
             if key in self.extra_kwargs:
                 self.extra_kwargs[key] = kwargs[key]
 
-        self.model_key = prepare_model(model_type='opencv_classifier',
-                                       model_path=cv_classifier)
+        self.model_key = prepare_model(model_type="opencv_classifier", model_path=cv_classifier)
 
     def process_single(self, sample, context=False):
         # there is no video in this sample
@@ -91,8 +87,7 @@ class VideoFaceBlurMapper(Mapper):
             sample[Fields.source_file] = sample[self.video_key]
 
         loaded_video_keys = sample[self.video_key]
-        sample, videos = load_data_with_context(sample, context,
-                                                loaded_video_keys, load_video)
+        sample, videos = load_data_with_context(sample, context, loaded_video_keys, load_video)
 
         model = get_model(self.model_key)
 
@@ -100,7 +95,7 @@ class VideoFaceBlurMapper(Mapper):
             image = frame.to_image()
             dets = detect_faces(image, model, **self.extra_kwargs)
             if len(dets) > 0:
-                for (x, y, w, h) in dets:
+                for x, y, w, h in dets:
                     box = (x, y, x + w, y + h)
                     blured_roi = image.crop(box).filter(self.blur)
                     image.paste(blured_roi, box)
@@ -114,10 +109,8 @@ class VideoFaceBlurMapper(Mapper):
                 continue
 
             video = videos[video_key]
-            blured_video_key = transfer_filename(video_key, OP_NAME,
-                                                 **self._init_parameters)
-            output_video_key = process_each_frame(video, blured_video_key,
-                                                  _blur_func)
+            blured_video_key = transfer_filename(video_key, OP_NAME, **self._init_parameters)
+            output_video_key = process_each_frame(video, blured_video_key, _blur_func)
             processed_video_keys[video_key] = output_video_key
 
             if not context:
@@ -129,7 +122,5 @@ class VideoFaceBlurMapper(Mapper):
                 if processed_video_keys[value] != value:
                     sample[Fields.source_file][i] = value
 
-        sample[self.video_key] = [
-            processed_video_keys[key] for key in loaded_video_keys
-        ]
+        sample[self.video_key] = [processed_video_keys[key] for key in loaded_video_keys]
         return sample

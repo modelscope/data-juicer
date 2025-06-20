@@ -2,7 +2,7 @@ from typing import List
 
 from ..base_op import NON_STATS_FILTERS, OPERATORS, Filter
 
-OP_NAME = 'specified_field_filter'
+OP_NAME = "specified_field_filter"
 
 
 @NON_STATS_FILTERS.register_module(OP_NAME)
@@ -15,11 +15,7 @@ class SpecifiedFieldFilter(Filter):
     specified target value, the sample will be filtered.
     """
 
-    def __init__(self,
-                 field_key: str = '',
-                 target_value: List = [],
-                 *args,
-                 **kwargs):
+    def __init__(self, field_key: str = "", target_value: List = [], *args, **kwargs):
         """
         Initialization method.
 
@@ -44,13 +40,11 @@ class SpecifiedFieldFilter(Filter):
             return True
 
         field_value = sample
-        for key in self.field_key.split('.'):
-            assert key in field_value.keys(), "'{}' not in {}".format(
-                key, field_value.keys())
+        for key in self.field_key.split("."):
+            assert key in field_value.keys(), "'{}' not in {}".format(key, field_value.keys())
             field_value = field_value[key]
 
-        if not (isinstance(field_value, list)
-                or isinstance(field_value, tuple)):
+        if not (isinstance(field_value, list) or isinstance(field_value, tuple)):
             field_value = [field_value]
         for value in field_value:
             if value not in self.target_value:

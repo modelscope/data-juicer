@@ -24,13 +24,10 @@ LOADED_VIDEOS = Registry(InterVars.loaded_videos)
 INTER_SAMPLED_FRAMES = Registry(InterVars.sampled_frames)
 
 # all
-ALL_INTER_VARS = [
-    INTER_LINES, INTER_WORDS, LOADED_AUDIOS, LOADED_IMAGES, LOADED_VIDEOS,
-    INTER_SAMPLED_FRAMES
-]
+ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_AUDIOS, LOADED_IMAGES, LOADED_VIDEOS, INTER_SAMPLED_FRAMES]
 
 # supported fusion strategies
-FUSION_STRATEGIES = {'greedy', 'probe'}
+FUSION_STRATEGIES = {"greedy", "probe"}
 
 
 def fuse_operators(ops, probe_res=None):
@@ -73,10 +70,7 @@ def fuse_filter_group(original_filter_group):
     fused_group = []
     group_speed = []
     all_intermediate_vars = ALL_INTER_VARS
-    all_fused_filters = {
-        inter_vars: []
-        for inter_vars in all_intermediate_vars
-    }
+    all_fused_filters = {inter_vars: [] for inter_vars in all_intermediate_vars}
     # group these filters by their intermediate vars
     for op, probe_res in original_filter_group:
         op_name = op._name
@@ -88,7 +82,7 @@ def fuse_filter_group(original_filter_group):
             # first apply other filters to decrease the number of samples, so
             # we add them into the fused_group list directly
             fused_group.append(op)
-            group_speed.append(probe_res['speed'] if probe_res else 0)
+            group_speed.append(probe_res["speed"] if probe_res else 0)
 
     # try to fuse ops for each type of intermediate vars
     for inter_vars in all_intermediate_vars:
@@ -100,20 +94,13 @@ def fuse_filter_group(original_filter_group):
             # more than 1 ops share the same intermediate var, try to fuse them
             ops, probe_res_list = zip(*inter_vars_filter)
             # new definition: new name and a definition list of fused op list
-            fused_filter_name = 'OpFusion:(%s)' % ','.join(
-                [op._name for op in ops])
-            logger.info(f'Ops are fused into one op '
-                        f'{fused_filter_name}.')
+            fused_filter_name = "OpFusion:(%s)" % ",".join([op._name for op in ops])
+            logger.info(f"Ops are fused into one op " f"{fused_filter_name}.")
             # use these ops to create a FusedFilter object, and add the fused
             # definition and op into the fused group
             fused_filter = FusedFilter(fused_filter_name, ops)
-            fused_filter._op_cfg = {
-                fused_filter_name: [op._op_cfg for op in ops]
-            }
-            fused_filter_speed = sum([
-                1.0 / probe_res['speed'] for probe_res in probe_res_list
-                if probe_res
-            ])
+            fused_filter._op_cfg = {fused_filter_name: [op._op_cfg for op in ops]}
+            fused_filter_speed = sum([1.0 / probe_res["speed"] for probe_res in probe_res_list if probe_res])
             if fused_filter_speed > 0:
                 fused_filter_speed = 1.0 / fused_filter_speed
             fused_group.append(fused_filter)
@@ -123,17 +110,14 @@ def fuse_filter_group(original_filter_group):
             # group directly without fusion
             fused_group.append(inter_vars_filter[0][0])
             probe_res = inter_vars_filter[0][1]
-            group_speed.append(probe_res['speed'] if probe_res else 0)
+            group_speed.append(probe_res["speed"] if probe_res else 0)
 
     # reorder according to the probed speed results in group_speed
     # 'greedy': all speed data in group_speed will be 0, which will keep the
     #   current order of fused group
     # 'probe': OPs in fused group will be reordered according to the speed data
     #   in group_speed in descending order
-    fused_group = [
-        op for op, _ in sorted(
-            zip(fused_group, group_speed), key=lambda it: it[1], reverse=True)
-    ]
+    fused_group = [op for op, _ in sorted(zip(fused_group, group_speed), key=lambda it: it[1], reverse=True)]
 
     return fused_group
 
@@ -154,10 +138,9 @@ class FusedFilter(Filter):
         self.fused_filters = fused_filters
         # set accelerator to 'cuda' if there exists any ops whose accelerator
         # is 'cuda'
-        accelerator_methods = set(
-            [op.accelerator for op in self.fused_filters])
-        if 'cuda' in accelerator_methods:
-            self.accelerator = 'cuda'
+        accelerator_methods = set([op.accelerator for op in self.fused_filters])
+        if "cuda" in accelerator_methods:
+            self.accelerator = "cuda"
 
         # update num_proc with the min num_proc of all fusible filters
         self.num_proc = min([op.runtime_np() for op in self.fused_filters])
@@ -170,10 +153,8 @@ class FusedFilter(Filter):
         samples[Fields.context] = [{} for _ in range(num_samples)]
         for op in self.fused_filters:
             # open the context for these fused ops
-            if op.accelerator == 'cuda':
-                samples = op.compute_stats_batched(samples,
-                                                   rank=rank,
-                                                   context=True)
+            if op.accelerator == "cuda":
+                samples = op.compute_stats_batched(samples, rank=rank, context=True)
             else:
                 samples = op.compute_stats_batched(samples, context=True)
         # clean up the contexts after processing
@@ -198,7 +179,7 @@ class FusedFilter(Filter):
         return res
 
 
-@OPERATORS.register_module('general_fused_op')
+@OPERATORS.register_module("general_fused_op")
 class GeneralFusedOP(OP):
     """An explicitly fused operator designed to execute multiple sequential
     operations (OPs) on the same batch, enabling fine-grained control over
@@ -206,31 +187,25 @@ class GeneralFusedOP(OP):
 
     _batched_op = True
 
-    def __init__(self,
-                 batch_size: int = 1,
-                 fused_op_list: List = None,
-                 *args,
-                 **kwargs):
+    def __init__(self, batch_size: int = 1, fused_op_list: List = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.batch_size = batch_size
         if fused_op_list is None:
             fused_op_list = []
         self.fused_ops = load_ops(fused_op_list)
-        self._name = 'GeneralFusedOP:(%s)' % ','.join(
-            [op._name for op in self.fused_ops])
+        self._name = "GeneralFusedOP:(%s)" % ",".join([op._name for op in self.fused_ops])
         # set accelerator to 'cuda' if there exists any ops whose accelerator
         # is 'cuda'
         accelerator_methods = set([op.accelerator for op in self.fused_ops])
-        if 'cuda' in accelerator_methods:
-            self.accelerator = 'cuda'
+        if "cuda" in accelerator_methods:
+            self.accelerator = "cuda"
 
         # update num_proc with the min num_proc of all fusible filters
-        self.num_proc = min([op.runtime_np() for op in self.fused_ops]) \
-            if self.fused_ops else 1
+        self.num_proc = min([op.runtime_np() for op in self.fused_ops]) if self.fused_ops else 1
 
     def process_batched(self, samples, rank=None):
         for op in self.fused_ops:
-            process_args = {'rank': rank} if op.accelerator == 'cuda' else {}
+            process_args = {"rank": rank} if op.accelerator == "cuda" else {}
             if isinstance(op, Mapper):
                 samples = op.process_batched(samples, **process_args)
             elif isinstance(op, Filter):
@@ -238,20 +213,19 @@ class GeneralFusedOP(OP):
                 indicators = list(op.process_batched(samples))
                 new_samples = {}
                 for key in samples:
-                    new_samples[key] = [
-                        val for val, indicator in zip(samples[key], indicators)
-                        if indicator
-                    ]
+                    new_samples[key] = [val for val, indicator in zip(samples[key], indicators) if indicator]
                 samples = new_samples
             else:
                 raise NotImplementedError(
-                    f'FusedOP does not support OP {op._name} of type '
-                    f'{type(op)} and only supports Mapper and Filter now.')
+                    f"FusedOP does not support OP {op._name} of type "
+                    f"{type(op)} and only supports Mapper and Filter now."
+                )
         return samples
 
     def run(self, dataset, *, exporter=None, tracer=None):
         # prepare the dataset
         from data_juicer.core.data import NestedDataset
+
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
         if not self.fused_ops:
@@ -265,6 +239,6 @@ class GeneralFusedOP(OP):
             num_proc=self.num_proc,
             with_rank=self.use_cuda(),
             batch_size=self.batch_size,
-            desc=self._name + '_process',
+            desc=self._name + "_process",
         )
         return new_dataset
