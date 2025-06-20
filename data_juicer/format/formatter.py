@@ -5,7 +5,8 @@ from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
 from loguru import logger
 
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.file_utils import find_files_with_suffix
+from data_juicer.utils.file_utils import (find_files_with_suffix,
+                                          is_absolute_path)
 from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.registry import Registry
 
@@ -257,7 +258,7 @@ def unify_format(
                 if not paths:
                     continue
                 new_paths = [
-                    path if os.path.isabs(path) else os.path.join(
+                    path if is_absolute_path(path) else os.path.join(
                         dataset_dir, path) for path in paths
                 ]
                 sample[path_key] = new_paths
