@@ -14,15 +14,15 @@ def _cosine_similarity(a, b):
 
 class TextEmbdSimilarityAttributor:
     client = OpenAI(
-        api_key=os.getenv("OPENAI_API_KEY"),  # 如果您没有配置环境变量，请在此处用您的API Key进行替换
-        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"  # 百炼服务的base_url
+        api_key=os.getenv("DASHSCOPE_API_KEY"),
+        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
     )
 
     def get_embed(self, text_input):
         completion = self.client.embeddings.create(
             model="text-embedding-v4",
             input=text_input,
-            dimensions=1024,  # 指定向量维度（仅 text-embedding-v3及 text-embedding-v4支持该参数）
+            dimensions=1024,  # for text-embedding-v3 and text-embedding-v4 only
             encoding_format="float"
         )
         embed = completion.to_dict()["data"][0]["embedding"]
