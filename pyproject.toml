@@ -33,7 +33,7 @@ dependencies = [
     "pydantic>=2.0",  # data validation
     "uv",
     "wordcloud",
-    "spacy==3.7.0",
+    "spacy==3.8.0",
     "httpx",
     "av==13.1.0",  # video/audio handling
     "emoji==2.2.0",  # emoji handling
@@ -56,7 +56,8 @@ dependencies = [
     "regex",  # regular expressions
     "tomli",
     "tomli-w",
-    "gitpython"
+    "gitpython",
+    "mcp[cli]>=1.7.0",
 ]
 
 [project.optional-dependencies]
