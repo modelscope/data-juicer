@@ -550,20 +550,6 @@ def run_simple_demo():
     logger.info(f'  Time Saved: {time_saved_complex:.3f}s '
                 f'({time_saved_complex/individual_stats_complex["total_time"]*100:.1f}%)')
 
-    logger.info('\n💡 WHY FUSED FILTERS ARE FASTER:')
-    logger.info('1. Single data pass for stats computation')
-    logger.info('2. Parallel execution of independent filters')
-    logger.info('3. Better cache locality')
-    logger.info('4. Reduced function call overhead')
-    logger.info('5. Shared memory buffers')
-
-    logger.info('\n🔧 HYBRID STRATEGY BENEFITS:')
-    logger.info('1. Automatic detection of filter complexity')
-    logger.info('2. Parallel execution for simple filters')
-    logger.info('3. Sequential execution for complex filters')
-    logger.info('4. Dependency-aware optimization')
-    logger.info('5. Best of both worlds: performance + correctness')
-
 
 def benchmark_individual_simple(filters: List[Filter], test_data: Dict[str, Any]) -> Dict[str, float]:
     """Benchmark individual filter execution (simple version)."""
