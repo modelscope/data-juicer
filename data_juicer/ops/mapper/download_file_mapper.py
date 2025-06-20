@@ -44,10 +44,10 @@ class DownloadFileMapper(Mapper):
         os.makedirs(self.save_dir, exist_ok=True)
         self.timeout = timeout
 
-    def download_files_async(self, urls, save_dir):
+    def download_files_async(self, urls, save_dir, **kwargs):
 
         async def _download_file(session: aiohttp.ClientSession, idx: int,
-                                 url: str, save_dir) -> dict:
+                                 url: str, save_dir, **kwargs) -> dict:
             try:
                 filename = os.path.basename(urlparse(url).path)
                 save_path = osp.join(save_dir, filename)
@@ -57,7 +57,8 @@ class DownloadFileMapper(Mapper):
                 response = await download_file(session,
                                                url,
                                                save_path,
-                                               timeout=self.timeout)
+                                               timeout=self.timeout,
+                                               **kwargs)
             except Exception as e:
                 status = 'failed'
                 response = str(e)
@@ -65,15 +66,15 @@ class DownloadFileMapper(Mapper):
 
             return idx, save_path, status, response
 
-        async def run_downloads():
+        async def run_downloads(urls, save_dir, **kwargs):
             async with aiohttp.ClientSession() as session:
                 tasks = [
-                    _download_file(session, idx, url, save_dir)
+                    _download_file(session, idx, url, save_dir, **kwargs)
                     for idx, url in enumerate(urls)
                 ]
                 return await asyncio.gather(*tasks)
 
-        results = asyncio.run(run_downloads())
+        results = asyncio.run(run_downloads(urls, save_dir, **kwargs))
         results.sort(key=lambda x: x[0])
 
         return results

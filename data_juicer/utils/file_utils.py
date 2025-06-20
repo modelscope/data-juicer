@@ -405,18 +405,21 @@ def get_all_files_paths_under(root,
 async def download_file(session: aiohttp.ClientSession,
                         url: str,
                         save_path: str,
-                        timeout: int = 300):
+                        timeout: int = 300,
+                        **kwargs):
     """
     Download a file from a given URL and save it to a specified directory.
     :param url: The URL of the file to download.
     :param save_path: The path where the downloaded file will be saved.
     :param timeout: The timeout in seconds for each HTTP request.
+    :param kwargs: The keyword arguments to pass to the HTTP request.
 
     :return: The response object from the HTTP request.
     """
     async with session.get(url,
                            timeout=aiohttp.ClientTimeout(total=timeout),
-                           raise_for_status=True) as response:
+                           raise_for_status=True,
+                           **kwargs) as response:
 
         with open(save_path, 'wb') as f:
             while chunk := await response.content.read():
