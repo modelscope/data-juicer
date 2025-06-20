@@ -9,13 +9,12 @@ from pydantic import PositiveInt
 from data_juicer.ops.base_op import OPERATORS, Filter
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.model_utils import (get_model, prepare_model,
-                                           update_sampling_params)
+from data_juicer.utils.model_utils import get_model, prepare_model, update_sampling_params
 
-torch = LazyLoader('torch')
-vllm = LazyLoader('vllm')
+torch = LazyLoader("torch")
+vllm = LazyLoader("vllm")
 
-OP_NAME = 'llm_analysis_filter'
+OP_NAME = "llm_analysis_filter"
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -89,31 +88,31 @@ json
 }
 """  # noqa: E501
     DEFAULT_INPUT_TEMPLATE = "# Data\n'''\n{data}\n'''\n\n# Response\njson\n"
-    DEFAULT_FIELD_TEMPLATE = '**{field_name}**\n{field_data}'
-    DEFAULT_DIM_REQUIRED_KEYS = [
-        'clarity', 'relevance', 'usefulness', 'fluency'
-    ]
+    DEFAULT_FIELD_TEMPLATE = "**{field_name}**\n{field_data}"
+    DEFAULT_DIM_REQUIRED_KEYS = ["clarity", "relevance", "usefulness", "fluency"]
 
-    _accelerator = 'cuda'
+    _accelerator = "cuda"
 
-    def __init__(self,
-                 api_or_hf_model: str = 'gpt-4o',
-                 min_score: float = 0.5,
-                 is_hf_model: bool = False,
-                 *,
-                 api_endpoint: Optional[str] = None,
-                 response_path: Optional[str] = None,
-                 input_keys: List[str] = ['text'],
-                 field_names: List[str] = ['Text'],
-                 system_prompt: Optional[str] = None,
-                 input_template: Optional[str] = None,
-                 field_template: Optional[str] = None,
-                 try_num: PositiveInt = 3,
-                 enable_vllm: bool = False,
-                 model_params: Dict = {},
-                 sampling_params: Dict = {},
-                 dim_required_keys: Optional[List[str]] = None,
-                 **kwargs):
+    def __init__(
+        self,
+        api_or_hf_model: str = "gpt-4o",
+        min_score: float = 0.5,
+        is_hf_model: bool = False,
+        *,
+        api_endpoint: Optional[str] = None,
+        response_path: Optional[str] = None,
+        input_keys: List[str] = ["text"],
+        field_names: List[str] = ["Text"],
+        system_prompt: Optional[str] = None,
+        input_template: Optional[str] = None,
+        field_template: Optional[str] = None,
+        try_num: PositiveInt = 3,
+        enable_vllm: bool = False,
+        model_params: Dict = {},
+        sampling_params: Dict = {},
+        dim_required_keys: Optional[List[str]] = None,
+        **kwargs,
+    ):
         """
         Initialization method.
 
@@ -144,9 +143,7 @@ json
         super().__init__(**kwargs)
 
         self.system_prompt = system_prompt or self.DEFAULT_SYSTEM_PROMPT
-        assert len(input_keys) == len(
-            field_names
-        ), 'The input_keys and field_names must correspond one-to-one!'
+        assert len(input_keys) == len(field_names), "The input_keys and field_names must correspond one-to-one!"
         self.input_keys = input_keys
         self.field_names = field_names
         self.input_template = input_template or self.DEFAULT_INPUT_TEMPLATE
@@ -159,58 +156,59 @@ json
         self.enable_vllm = enable_vllm
         self.is_hf_model = is_hf_model
 
-        sampling_params = update_sampling_params(sampling_params,
-                                                 api_or_hf_model,
-                                                 self.enable_vllm)
+        sampling_params = update_sampling_params(sampling_params, api_or_hf_model, self.enable_vllm)
 
         if enable_vllm:
-            assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
+            assert torch.cuda.device_count() >= 1, "must be executed in CUDA"
             # cannot initialize vllm replicas on different GPUs
             self.num_proc = 1
-            if model_params.get('tensor_parallel_size') is None:
+            if model_params.get("tensor_parallel_size") is None:
                 tensor_parallel_size = torch.cuda.device_count()
-                logger.info(f'Set tensor_parallel_size to \
-                    {tensor_parallel_size} for vllm.')
-                model_params['tensor_parallel_size'] = tensor_parallel_size
+                logger.info(
+                    f"Set tensor_parallel_size to \
+                    {tensor_parallel_size} for vllm."
+                )
+                model_params["tensor_parallel_size"] = tensor_parallel_size
             self.model_key = prepare_model(
-                model_type='vllm',
-                pretrained_model_name_or_path=api_or_hf_model,
-                **model_params)
+                model_type="vllm", pretrained_model_name_or_path=api_or_hf_model, **model_params
+            )
             self.sampling_params = vllm.SamplingParams(**sampling_params)
         elif is_hf_model:
             self.model_key = prepare_model(
-                model_type='huggingface',
+                model_type="huggingface",
                 pretrained_model_name_or_path=api_or_hf_model,
                 return_pipe=True,
                 trust_remote_code=True,
-                **model_params)
+                **model_params,
+            )
             self.sampling_params = sampling_params
         else:
             self.sampling_params = sampling_params
 
-            self.model_key = prepare_model(model_type='api',
-                                           model=api_or_hf_model,
-                                           endpoint=api_endpoint,
-                                           response_path=response_path,
-                                           **model_params)
+            self.model_key = prepare_model(
+                model_type="api",
+                model=api_or_hf_model,
+                endpoint=api_endpoint,
+                response_path=response_path,
+                **model_params,
+            )
 
     def build_input(self, sample):
         if not set(self.input_keys) <= set(sample.keys()):
-            logger.warning(
-                f'Not all input keys {self.input_keys} are in the sample!')
+            logger.warning(f"Not all input keys {self.input_keys} are in the sample!")
         field_strs = [
             self.field_template.format(field_name=n, field_data=sample[k])
-            for (k, n) in zip(self.input_keys, self.field_names) if k in sample
+            for (k, n) in zip(self.input_keys, self.field_names)
+            if k in sample
         ]
-        data_str = '\n\n'.join(field_strs)
+        data_str = "\n\n".join(field_strs)
         input_prompt = self.input_template.format(data=data_str)
 
         return input_prompt
 
     def parse_output(self, raw_output):
-
         def extract_outer_braces(s):
-            pattern = r'(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})'
+            pattern = r"(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})"
             match = re.search(pattern, s)
 
             if match:
@@ -220,11 +218,11 @@ json
 
         json_str = extract_outer_braces(raw_output)
         data = json.loads(json_str)
-        if 'flags' in data:
-            data['flags'] = np.array(data['flags'], dtype=np.str_)
-        tags = data.get('tags', None)
+        if "flags" in data:
+            data["flags"] = np.array(data["flags"], dtype=np.str_)
+        tags = data.get("tags", None)
 
-        dimension_scores = data.get('dimension_scores', None)
+        dimension_scores = data.get("dimension_scores", None)
 
         total_score = 0
         if dimension_scores and self.dim_required_keys:
@@ -235,10 +233,11 @@ json
         else:
             avg_score = None
             logger.warning(
-                'Either dimension_scores is empty or dim_required_keys '
-                'is empty. Dimension score has been set to None, '
-                'Ensure this setting is intentional to disable the '
-                'dimension score. ')
+                "Either dimension_scores is empty or dim_required_keys "
+                "is empty. Dimension score has been set to None, "
+                "Ensure this setting is intentional to disable the "
+                "dimension score. "
+            )
 
         return avg_score, data, tags
 
@@ -248,13 +247,10 @@ json
         else:
             model = get_model(self.model_key, rank, self.use_cuda())
 
-        messages = [{
-            'role': 'system',
-            'content': self.system_prompt
-        }, {
-            'role': 'user',
-            'content': self.build_input(sample)
-        }]
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": self.build_input(sample)},
+        ]
         score, record, tags = 0, None, None
         for _ in range(self.try_num):
             try:
@@ -262,17 +258,15 @@ json
                     response = model.chat(messages, self.sampling_params)
                     output = response[0].outputs[0].text
                 elif self.is_hf_model:
-                    response = model(messages,
-                                     return_full_text=False,
-                                     **self.sampling_params)
-                    output = response[0]['generated_text']
+                    response = model(messages, return_full_text=False, **self.sampling_params)
+                    output = response[0]["generated_text"]
                 else:
                     output = model(messages, **self.sampling_params)
                 score, record, tags = self.parse_output(output)
                 if record is not None:
                     break
             except Exception as e:
-                logger.warning(f'Exception: {e}')
+                logger.warning(f"Exception: {e}")
 
         return score, record, tags
 

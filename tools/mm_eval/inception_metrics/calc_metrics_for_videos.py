@@ -9,13 +9,15 @@ from pathlib import Path
 from tools.mm_eval.inception_metrics.video_metrics import metric_main
 from tools.mm_eval.inception_metrics.util import EasyDict
 
+
 def fix_seeds(seed=42):
     random.seed(seed)
     np.random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+
 
 def calc_metrics(
     fake_data_path: str,
@@ -33,33 +35,33 @@ def calc_metrics(
     seed: int = 42,
 ):
     """
-        Call the FID/FVD metrics for image/video generation
+    Call the FID/FVD metrics for image/video generation
 
-        :param fake_data_path: The path to generated dataset. Only support 
-            for `jsonl` format. The video paths are put in the list under 
-            `videos` keys.
-        :param real_data_path: The path to ground truth dataset. 
-            Only support for `jsonl` format. The video paths are put 
-            in the list under `videos` keys. Required when computing FVD.
-        :param fake_mm_dir: The root directory to store the fake videos.
-            If it is not none, the paths in jsonl file at fake_data_path
-            are relative paths on it, else are absolute path.
-        :param real_mm_dir: The root directory to store the real videos.
-            If it is not none, the paths in jsonl file at real_data_path
-            are relative paths on it, else are absolute path.
-        :param metric: Metric to compute, can be one of 
-            [`fvd2048_16f`, `fvd2048_128f`, `fvd2048_128f_subsample8f`,
-            `kvd2048_16f`, `isv2048_ucf`, `prv2048_3n_16f`, `fid50k`,
-            `kid50k`, `is50k`, `pr50k_3n`]
-        :param detector_path: Path to the corresponding detection model.
-            Download the model from web if it is None.
-        :param result_path: Path to JSON filename for saving results
-        :param num_runs: How many runs of the metric to average over
-        :param height: Sampled frames will be resized to this height
-        :param width: Sampled frames will be resized to this width
-        :param replace_cache: Whether to replace the dataset stats cache
-        :param verbose: Whether to log progress
-        :param seed: the random seed
+    :param fake_data_path: The path to generated dataset. Only support
+        for `jsonl` format. The video paths are put in the list under
+        `videos` keys.
+    :param real_data_path: The path to ground truth dataset.
+        Only support for `jsonl` format. The video paths are put
+        in the list under `videos` keys. Required when computing FVD.
+    :param fake_mm_dir: The root directory to store the fake videos.
+        If it is not none, the paths in jsonl file at fake_data_path
+        are relative paths on it, else are absolute path.
+    :param real_mm_dir: The root directory to store the real videos.
+        If it is not none, the paths in jsonl file at real_data_path
+        are relative paths on it, else are absolute path.
+    :param metric: Metric to compute, can be one of
+        [`fvd2048_16f`, `fvd2048_128f`, `fvd2048_128f_subsample8f`,
+        `kvd2048_16f`, `isv2048_ucf`, `prv2048_3n_16f`, `fid50k`,
+        `kid50k`, `is50k`, `pr50k_3n`]
+    :param detector_path: Path to the corresponding detection model.
+        Download the model from web if it is None.
+    :param result_path: Path to JSON filename for saving results
+    :param num_runs: How many runs of the metric to average over
+    :param height: Sampled frames will be resized to this height
+    :param width: Sampled frames will be resized to this width
+    :param replace_cache: Whether to replace the dataset stats cache
+    :param verbose: Whether to log progress
+    :param seed: the random seed
     """
     print(f"Metric: {metric}")
 
@@ -70,8 +72,7 @@ def calc_metrics(
 
     _metrics = list(metric_main._metric_dict.keys())
     if metric not in _metrics:
-        raise ValueError(f'Metric [{metric}] is not supported. '
-                         f'Can only be one of {_metrics}.')
+        raise ValueError(f"Metric [{metric}] is not supported. " f"Can only be one of {_metrics}.")
 
     # assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
 
@@ -101,9 +102,8 @@ def calc_metrics(
         replace_cache=replace_cache,
         verbose=verbose,
         num_runs=num_runs,
-        detector_path=detector_path
+        detector_path=detector_path,
     )
-
 
     json_line = json.dumps(
         dict(

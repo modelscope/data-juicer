@@ -13,6 +13,7 @@ from torch.utils.data import Dataset
 
 from data_juicer.utils.mm_utils import load_video, close_video
 
+
 @dataclass
 class VideoDataset(Dataset):
     dataset_path: str
@@ -23,7 +24,7 @@ class VideoDataset(Dataset):
     min_spacing: int = 1
     max_spacing: int = 1
     x_flip: bool = False
-    video_key: str = 'videos'
+    video_key: str = "videos"
 
     def __post_init__(self):
         assert self.seq_length >= 1
@@ -48,7 +49,7 @@ class VideoDataset(Dataset):
             1 if self.seq_length == 1 else min(self.max_spacing, (total_frame_num - 1) // (self.seq_length - 1))
         )
         if max_spacing < 1:
-            raise ValueError(f'seq_length > frames num in {video_path}')
+            raise ValueError(f"seq_length > frames num in {video_path}")
 
         spacing = torch.randint(self.min_spacing, max_spacing + 1, size=()).item()
 
@@ -70,11 +71,11 @@ class VideoDataset(Dataset):
                     tensor_frame = 2 * tensor_frame.to(torch.float32) / 255 - 1
                     sampled_frames.append(tensor_frame)
                 frame_id += 1
-        
+
         close_video(container)
-        assert frame_id >= total_frame_num, 'frame num error'
+        assert frame_id >= total_frame_num, "frame num error"
         return sampled_frames, spacing
-        
+
     def __getitem__(self, index: int) -> dict:
         video_path = self.video_paths[index]
         frames, spacing = self.sample_frames(video_path)
@@ -100,7 +101,7 @@ class VideoDatasetPerImage(Dataset):
     mm_dir: str = None
     seq_length: int = 1
     x_flip: bool = False
-    video_key: str = 'videos'
+    video_key: str = "videos"
 
     def __post_init__(self):
 
@@ -139,7 +140,7 @@ class VideoDatasetPerImage(Dataset):
                     tensor_frame = 2 * tensor_frame.to(torch.float32) / 255 - 1
                     sampled_frames.append(tensor_frame)
                 frame_id += 1
-        
+
         close_video(container)
         return sampled_frames
 

@@ -10,13 +10,17 @@ from pydantic import PositiveInt
 
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
-                                        extract_key_frames,
-                                        extract_video_frames_uniformly,
-                                        insert_texts_after_placeholders,
-                                        load_data_with_context, load_video,
-                                        remove_non_special_tokens,
-                                        remove_special_tokens)
+from data_juicer.utils.mm_utils import (
+    SpecialTokens,
+    close_video,
+    extract_key_frames,
+    extract_video_frames_uniformly,
+    insert_texts_after_placeholders,
+    load_data_with_context,
+    load_video,
+    remove_non_special_tokens,
+    remove_special_tokens,
+)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
@@ -302,8 +306,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
             generated_text_per_chunk.extend(
                 generated_text_candidates_single_chunk)
         elif self.keep_candidate_mode == 'similar_one_simhash':
-            from ..deduplicator.document_simhash_deduplicator import \
-                DocumentSimhashDeduplicator
+            from ..deduplicator.document_simhash_deduplicator import DocumentSimhashDeduplicator
 
             ori_normal_text = remove_special_tokens(chunk)
             # using a simhash OP to calculate their similarity

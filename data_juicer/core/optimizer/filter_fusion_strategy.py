@@ -27,7 +27,7 @@ class FilterFusionStrategy(OptimizationStrategy):
         Args:
             probe_results: Optional dictionary containing operation speeds
         """
-        super().__init__(name='filter_fusion')
+        super().__init__(name="filter_fusion")
         self.probe_results = probe_results or {}
 
     def optimize(self, ast: PipelineAST) -> PipelineAST:
@@ -44,7 +44,7 @@ class FilterFusionStrategy(OptimizationStrategy):
 
         # Create a new AST
         new_ast = PipelineAST()
-        new_ast.root = OpNode(name='root', op_type=OpType.ROOT, config={})
+        new_ast.root = OpNode(name="root", op_type=OpType.ROOT, config={})
 
         # Get all unique operation chains
         op_chains = self._get_unique_op_chains(ast.root)
@@ -58,9 +58,9 @@ class FilterFusionStrategy(OptimizationStrategy):
             for group in filter_groups:
                 if len(group) > 1:
                     # Create fused operation with clean naming
-                    fused_name = 'fused_filter'
+                    fused_name = "fused_filter"
                     detailed_ops = [n.name for n in group]
-                    logger.info(f'Fusing filter operations into {fused_name}: {detailed_ops}')
+                    logger.info(f"Fusing filter operations into {fused_name}: {detailed_ops}")
 
                     # Create operation configs
                     op_configs = []
@@ -73,11 +73,12 @@ class FilterFusionStrategy(OptimizationStrategy):
                         name=fused_name,
                         op_type=OpType.FILTER,
                         config={
-                            'general_fused_op': {
-                                'fused_op_list': op_configs,
-                                'detailed_ops': detailed_ops,  # For display purposes
+                            "general_fused_op": {
+                                "fused_op_list": op_configs,
+                                "detailed_ops": detailed_ops,  # For display purposes
                             }
-                        })
+                        },
+                    )
                     current.add_child(fused_node)
                     current = fused_node
                 else:
@@ -189,8 +190,8 @@ class FilterFusionStrategy(OptimizationStrategy):
         config2 = op2.config or {}
 
         # 1. Check intermediate variables
-        op1_vars = set(config1.get('inter_vars', []))
-        op2_vars = set(config2.get('inter_vars', []))
+        op1_vars = set(config1.get("inter_vars", []))
+        op2_vars = set(config2.get("inter_vars", []))
         if op1_vars & op2_vars:
             return True
 
@@ -225,19 +226,19 @@ class FilterFusionStrategy(OptimizationStrategy):
         """Get stats keys that an operation produces or consumes."""
         # Map operation names to their stats keys
         stats_mapping = {
-            'words_num_filter': {StatsKeys.num_words},
-            'text_length_filter': {StatsKeys.text_len},
-            'character_repetition_filter': {StatsKeys.char_rep_ratio},
-            'word_repetition_filter': {StatsKeys.word_rep_ratio},
-            'average_line_length_filter': {StatsKeys.avg_line_length},
-            'maximum_line_length_filter': {StatsKeys.max_line_length},
-            'alphanumeric_filter': {StatsKeys.alnum_ratio, StatsKeys.alpha_token_ratio},
-            'special_characters_filter': {StatsKeys.special_char_ratio},
-            'perplexity_filter': {StatsKeys.perplexity},
-            'stopwords_filter': {StatsKeys.stopwords_ratio},
-            'flagged_words_filter': {StatsKeys.flagged_words_ratio},
-            'text_entity_dependency_filter': {StatsKeys.num_dependency_edges},
-            'general_field_filter': {StatsKeys.general_field_filter_condition},
+            "words_num_filter": {StatsKeys.num_words},
+            "text_length_filter": {StatsKeys.text_len},
+            "character_repetition_filter": {StatsKeys.char_rep_ratio},
+            "word_repetition_filter": {StatsKeys.word_rep_ratio},
+            "average_line_length_filter": {StatsKeys.avg_line_length},
+            "maximum_line_length_filter": {StatsKeys.max_line_length},
+            "alphanumeric_filter": {StatsKeys.alnum_ratio, StatsKeys.alpha_token_ratio},
+            "special_characters_filter": {StatsKeys.special_char_ratio},
+            "perplexity_filter": {StatsKeys.perplexity},
+            "stopwords_filter": {StatsKeys.stopwords_ratio},
+            "flagged_words_filter": {StatsKeys.flagged_words_ratio},
+            "text_entity_dependency_filter": {StatsKeys.num_dependency_edges},
+            "general_field_filter": {StatsKeys.general_field_filter_condition},
         }
 
         return stats_mapping.get(op.name, set())
@@ -252,7 +253,7 @@ class FilterFusionStrategy(OptimizationStrategy):
         op2_models = set()
 
         # Check for model keys in config
-        for key in ['model_key', 'sp_model_key', 'kl_model_key']:
+        for key in ["model_key", "sp_model_key", "kl_model_key"]:
             if key in config1:
                 op1_models.add(config1[key])
             if key in config2:
@@ -271,7 +272,7 @@ class FilterFusionStrategy(OptimizationStrategy):
         op2_fields = set()
 
         # Check for field keys in config
-        for key in ['text_key', 'image_key', 'audio_key', 'video_key']:
+        for key in ["text_key", "image_key", "audio_key", "video_key"]:
             if key in config1:
                 op1_fields.add(config1[key])
             if key in config2:
@@ -283,7 +284,7 @@ class FilterFusionStrategy(OptimizationStrategy):
 
         # Only consider it a dependency if both operations are text processors
         # and they share text_key (indicating they process the same text)
-        if shared_fields and 'text_key' in shared_fields:
+        if shared_fields and "text_key" in shared_fields:
             return True
 
         return False

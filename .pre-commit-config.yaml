@@ -1,22 +1,13 @@
 repos:
-  - repo: https://github.com/PyCQA/flake8
-    rev: 6.1.0
-    hooks:
-      - id: flake8
-        additional_dependencies:
-          - flake8-pyproject
-          - pycodestyle<2.12.0
   - repo: https://github.com/PyCQA/isort.git
     rev: 5.12.0
     hooks:
       - id: isort
-  - repo: https://github.com/pre-commit/mirrors-yapf
-    rev: v0.32.0
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
     hooks:
-      - id: yapf
+      - id: black
         exclude: data_juicer/ops/common/special_characters.py
-        additional_dependencies:
-          - toml
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -28,8 +19,6 @@ repos:
         exclude: thirdparty/
       - id: requirements-txt-fixer
         exclude: thirdparty/
-      - id: double-quote-string-fixer
-        exclude: ^(thirdparty/|data_juicer/ops/common/special_characters.py)
       - id: check-merge-conflict
         exclude: thirdparty/
       - id: fix-encoding-pragma
@@ -38,6 +27,13 @@ repos:
       - id: mixed-line-ending
         exclude: thirdparty/
         args: [ "--fix=lf" ]
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-pyproject  # Reads config from pyproject.toml
+          - flake8-black      # Ignores black-incompatible rules
   - repo: local
     hooks:
       - id: build-op-doc

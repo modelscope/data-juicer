@@ -13,7 +13,7 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..common import split_text_by_punctuation
 
-OP_NAME = 'extract_keyword_mapper'
+OP_NAME = "extract_keyword_mapper"
 
 
 # TODO: LLM-based inference.
@@ -98,23 +98,25 @@ Text:
 Output:
 """
 
-    DEFAULT_COMPLETION_DELIMITER = '<|COMPLETE|>'
+    DEFAULT_COMPLETION_DELIMITER = "<|COMPLETE|>"
     DEFAULT_OUTPUT_PATTERN = r'\("content_keywords"(.*?)\)'
 
-    def __init__(self,
-                 api_model: str = 'gpt-4o',
-                 *,
-                 keyword_key: str = MetaKeys.keyword,
-                 api_endpoint: Optional[str] = None,
-                 response_path: Optional[str] = None,
-                 prompt_template: Optional[str] = None,
-                 completion_delimiter: Optional[str] = None,
-                 output_pattern: Optional[str] = None,
-                 try_num: PositiveInt = 3,
-                 drop_text: bool = False,
-                 model_params: Dict = {},
-                 sampling_params: Dict = {},
-                 **kwargs):
+    def __init__(
+        self,
+        api_model: str = "gpt-4o",
+        *,
+        keyword_key: str = MetaKeys.keyword,
+        api_endpoint: Optional[str] = None,
+        response_path: Optional[str] = None,
+        prompt_template: Optional[str] = None,
+        completion_delimiter: Optional[str] = None,
+        output_pattern: Optional[str] = None,
+        try_num: PositiveInt = 3,
+        drop_text: bool = False,
+        model_params: Dict = {},
+        sampling_params: Dict = {},
+        **kwargs,
+    ):
         """
         Initialization method.
         :param api_model: API model name.
@@ -139,16 +141,13 @@ Output:
         self.keyword_key = keyword_key
 
         self.prompt_template = prompt_template or self.DEFAULT_PROMPT_TEMPLATE
-        self.completion_delimiter = completion_delimiter or \
-            self.DEFAULT_COMPLETION_DELIMITER
+        self.completion_delimiter = completion_delimiter or self.DEFAULT_COMPLETION_DELIMITER
         self.output_pattern = output_pattern or self.DEFAULT_OUTPUT_PATTERN
 
         self.sampling_params = sampling_params
-        self.model_key = prepare_model(model_type='api',
-                                       model=api_model,
-                                       endpoint=api_endpoint,
-                                       response_path=response_path,
-                                       **model_params)
+        self.model_key = prepare_model(
+            model_type="api", model=api_model, endpoint=api_endpoint, response_path=response_path, **model_params
+        )
 
         self.try_num = try_num
         self.drop_text = drop_text
@@ -156,8 +155,7 @@ Output:
     def parse_output(self, raw_output):
         keywords = []
 
-        output_pattern = re.compile(self.output_pattern,
-                                    re.VERBOSE | re.DOTALL)
+        output_pattern = re.compile(self.output_pattern, re.VERBOSE | re.DOTALL)
         matches = output_pattern.findall(raw_output)
         for record in matches:
             items = split_text_by_punctuation(record)
@@ -166,7 +164,6 @@ Output:
         return keywords
 
     def process_single(self, sample, rank=None):
-
         # check if it's generated already
         if self.keyword_key in sample[Fields.meta]:
             return sample
@@ -174,9 +171,9 @@ Output:
         client = get_model(self.model_key, rank=rank)
 
         input_prompt = self.prompt_template.format(
-            completion_delimiter=self.completion_delimiter,
-            input_text=sample[self.text_key])
-        messages = [{'role': 'user', 'content': input_prompt}]
+            completion_delimiter=self.completion_delimiter, input_text=sample[self.text_key]
+        )
+        messages = [{"role": "user", "content": input_prompt}]
 
         keywords = np.array([], dtype=str)
         for _ in range(self.try_num):
@@ -187,7 +184,7 @@ Output:
                     keywords = results
                     break
             except Exception as e:
-                logger.warning(f'Exception: {e}')
+                logger.warning(f"Exception: {e}")
 
         sample[Fields.meta][self.keyword_key] = keywords
         if self.drop_text:

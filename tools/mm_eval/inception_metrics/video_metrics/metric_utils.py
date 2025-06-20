@@ -36,7 +36,9 @@ def get_infinite_data_iter(dataset: Dataset, batch_size: int, seed: int = None, 
     seed = random_seed() if seed is None else seed
     generator = torch.Generator().manual_seed(seed)
     sampler = DistributedSampler(dataset, seed=seed) if distributed.get_world_size() > 1 else None
-    loader = DataLoader(dataset, batch_size=batch_size, shuffle=(sampler is None), sampler=sampler, generator=generator, **loader_kwargs)
+    loader = DataLoader(
+        dataset, batch_size=batch_size, shuffle=(sampler is None), sampler=sampler, generator=generator, **loader_kwargs
+    )
 
     epoch = 0
     while True:
