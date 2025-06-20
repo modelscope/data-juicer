@@ -2,14 +2,12 @@ import ast
 import asyncio
 import copy
 import os
-import os.path as osp
 import re
 import shutil
 import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import AsyncGenerator, Dict, List, Optional, Union
-from urllib.parse import urlparse
 
 import aiohttp
 import pandas as pd
@@ -404,75 +402,24 @@ def get_all_files_paths_under(root,
     return file_ls
 
 
-async def download_file(
-        session: aiohttp.ClientSession,
-        url: str,
-        save_dir: str,
-        timeout: int = 300,
-        stream: bool = False,
-        chunk_size: int = 65536  # 64KB chunks
-) -> Dict:
+async def download_file(session: aiohttp.ClientSession,
+                        url: str,
+                        save_path: str,
+                        timeout: int = 300):
     """
     Download a file from a given URL and save it to a specified directory.
     :param url: The URL of the file to download.
-    :param save_dir: The directory where the downloaded file will be saved.
-    :param stream: If True, the file will be downloaded in chunks.
-        If False, the entire file will be downloaded at once.
+    :param save_path: The path where the downloaded file will be saved.
     :param timeout: The timeout in seconds for each HTTP request.
 
-    :return: The download information dict.
+    :return: The response object from the HTTP request.
     """
-    state_dict = {
-        'url': url,
-        'status': None,
-        'save_path': None,
-        'message': None,
-        'response': None
-    }
+    async with session.get(url,
+                           timeout=aiohttp.ClientTimeout(total=timeout),
+                           raise_for_status=True) as response:
 
-    try:
-        os.makedirs(save_dir, exist_ok=True)
-        filename = os.path.basename(urlparse(url).path)
-        save_path = osp.join(save_dir, filename)
-        if os.path.exists(save_path):
-            state_dict.update({
-                'status': 'success',
-                'message': 'File already exists',
-                'save_path': save_path,
-            })
-            return state_dict
+        with open(save_path, 'wb') as f:
+            while chunk := await response.content.read():
+                f.write(chunk)
 
-        async with session.get(
-                url, timeout=aiohttp.ClientTimeout(total=timeout)) as response:
-            if response.status == 200:
-                if stream:
-                    with open(save_path, 'wb') as f:
-                        async for chunk in response.content.iter_chunked(
-                                chunk_size):
-                            f.write(chunk)
-                else:
-                    with open(save_path, 'wb') as f:
-                        while chunk := await response.content.read():
-                            f.write(chunk)
-
-                state_dict.update({
-                    'status': 'success',
-                    'save_path': save_path,
-                    'response': response
-                })
-                return state_dict
-
-            state_dict.update({
-                'status': 'failed',
-                'message': f'HTTP {response.status}',
-                'response': response
-            })
-
-        return state_dict
-    except Exception as e:
-        state_dict.update({
-            'status': 'error',
-            'message': str(e),
-        })
-
-        return state_dict
+        return response
