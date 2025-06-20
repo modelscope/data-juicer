@@ -26,7 +26,9 @@ class PairPreferenceMapper(Mapper):
         "【原因】\n"
         "生成该回答的原因"
     )
-    DEFAULT_INPUT_TEMPLATE = "【参考信息】\n" "{reference}\n" "\n" "以下是原始问答对：\n" "【问题】\n" "{query}\n" "【回答】\n" "{response}"
+    DEFAULT_INPUT_TEMPLATE = (
+        "【参考信息】\n" "{reference}\n" "\n" "以下是原始问答对：\n" "【问题】\n" "{query}\n" "【回答】\n" "{response}"
+    )
     DEFAULT_OUTPUT_PATTERN = r".*?【回答】\s*(.*?)\s*【原因】\s*(.*)"
 
     def __init__(

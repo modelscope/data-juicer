@@ -26,7 +26,12 @@ class OptimizeQAMapper(Mapper):
 
     # avoid leading whitespace
     DEFAULT_SYSTEM_PROMPT = (
-        "请优化输入的问答对，使【问题】和【回答】都更加详细、准确。" "必须按照以下标记格式，直接输出优化后的问答对：\n" "【问题】\n" "优化后的问题\n" "【回答】\n" "优化后的回答"
+        "请优化输入的问答对，使【问题】和【回答】都更加详细、准确。"
+        "必须按照以下标记格式，直接输出优化后的问答对：\n"
+        "【问题】\n"
+        "优化后的问题\n"
+        "【回答】\n"
+        "优化后的回答"
     )
     DEFAULT_INPUT_TEMPLATE = "以下是原始问答对：\n{}"
     DEFAULT_QA_PAIR_TEMPLATE = "【问题】\n{}\n【回答】\n{}"
