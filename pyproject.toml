@@ -62,12 +62,12 @@ dependencies = [
 [project.optional-dependencies]
 # Generic ML & DL
 generic = [
-    "torch>=1.11.0",  # PyTorch
-    "transformers>=4.47.0,<4.48.0",  # Hugging Face Transformers
+    "torch==2.6.0",  # PyTorch
+    "transformers>=4.47.0",  # Hugging Face Transformers
     "transformers_stream_generator",  # Stream generation for Transformers
     "einops",  # Tensor operations
     "accelerate",  # Model acceleration
-    "vllm>=0.6.5",  # LLM serving
+    "vllm==0.8.5.post1",  # LLM serving
     "huggingface_hub<0.26.0",  # Hugging Face Hub
     "onnxruntime",  # ONNX runtime
 ]
@@ -111,7 +111,7 @@ audio = [
 
 # Distributed Computing
 distributed = [
-    "ray==2.40.0",  # distributed computing
+    "ray==2.47.1",  # distributed computing
     "pyspark",  # distributed data processing
 ]
 
@@ -150,7 +150,7 @@ ai_services = [
 # Todo: the sandbox dependencies will be provided in
 # micro-services rather than all-in-one env
 sandbox = [
-    "torch>=1.11.0",
+    "torch==2.6.0",
     "fire",
     "pyspark",
     "modelscope[framework,nlp]",
