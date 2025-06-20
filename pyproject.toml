@@ -136,6 +136,8 @@ dev = [
     "pytest",  # testing framework
     "pytest-cov",  # coverage reporting
     "build",  # package building
+    "black>=25.1.0",
+    "flake8-black",
 ]
 
 # AI Services & APIs
@@ -193,6 +195,15 @@ per-file-ignores = [
     "*/__init__.py: F401"
 ]
 max-line-length = 120
+extend-ignore = [
+    "E203",  # whitespace before ':' (black handles this)
+    "E501",  # line too long (black handles this)
+    "BLK100",  # black would make changes (black handles this)
+]
+
+[tool.black]
+line-length = 120
+target-version = ['py310']
 
 [tool.hatch.version]
 path = "data_juicer/__init__.py"
