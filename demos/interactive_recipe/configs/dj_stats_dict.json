@@ -1,0 +1,4 @@
+{
+  "alphanumeric_filter": "alnum_ratio",
+  "average_line_length_filter": "avg_line_length"
+}
