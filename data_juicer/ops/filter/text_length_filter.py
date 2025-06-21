@@ -12,11 +12,7 @@ class TextLengthFilter(Filter):
 
     _batched_op = True
 
-    def __init__(self,
-                 min_len: int = 10,
-                 max_len: int = sys.maxsize,
-                 *args,
-                 **kwargs):
+    def __init__(self, min_len: int = 10, max_len: int = sys.maxsize, *args, **kwargs):
         """
         Initialization method.
 
@@ -33,7 +29,7 @@ class TextLengthFilter(Filter):
         self.min_len = min_len
         self.max_len = max_len
 
-    def compute_stats_batched(self, samples):
+    def compute_stats_batched(self, samples, *args, **kwargs):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
         for i, stat in enumerate(samples_stats):
@@ -47,13 +43,10 @@ class TextLengthFilter(Filter):
 
     def process_batched(self, samples):
         if isinstance(samples[Fields.stats], list):
-            return map(
-                lambda stat: self.min_len <= stat[StatsKeys.text_len] <= self.
-                max_len, samples[Fields.stats])
+            return map(lambda stat: self.min_len <= stat[StatsKeys.text_len] <= self.max_len, samples[Fields.stats])
         else:
             # single sample for ray filter
-            if self.min_len <= samples[Fields.stats][
-                    StatsKeys.text_len] <= self.max_len:
+            if self.min_len <= samples[Fields.stats][StatsKeys.text_len] <= self.max_len:
                 return True
             else:
                 return False

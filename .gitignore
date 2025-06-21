@@ -3,6 +3,9 @@
 outputs/
 assets/
 
+# logs
+**/logs/*
+
 # setup
 data_juicer.egg-info/
 py_data_juicer.egg-info/
@@ -31,4 +34,5 @@ tests/tools/tmp_*/
 tests/ops/deduplicator/chinese_dedup/
 tests/ops/deduplicator/english_dedup/
 
+# jupyter notebook checkpoints
 .ipynb_checkpoints/

@@ -4,8 +4,7 @@ from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
-from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
-                      words_refinement)
+from ..common import SPECIAL_CHARACTERS, get_words_from_document, words_refinement
 from ..op_fusion import INTER_WORDS
 
 OP_NAME = 'words_num_filter'
@@ -47,10 +46,9 @@ class WordsNumFilter(Filter):
         self.lang = lang
 
         if tokenization:
-            self.model_key = prepare_model(model_type='sentencepiece',
-                                           lang=lang)
+            self.model_key = prepare_model(model_type='sentencepiece', lang=lang)
 
-    def compute_stats_batched(self, samples, context=False):
+    def compute_stats_batched(self, samples, *args, **kwargs):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
         words_key = f'{InterVars.words}-{self.model_key}'
@@ -59,14 +57,13 @@ class WordsNumFilter(Filter):
             # check if it's computed already
             if StatsKeys.num_words in stat:
                 continue
+            context = kwargs.get('context', False)
             if context and words_key in samples[Fields.context][idx]:
                 words = samples[Fields.context][idx][words_key]
             else:
                 tokenizer = get_model(self.model_key)
-                words = get_words_from_document(
-                    samples_list[idx],
-                    token_func=tokenizer.encode_as_pieces
-                    if tokenizer else None)
+                words = get_words_from_document(samples_list[idx],
+                                                token_func=tokenizer.encode_as_pieces if tokenizer else None)
                 if context:
                     samples[Fields.context][idx][words_key] = words
             words = words_refinement(words, strip_chars=SPECIAL_CHARACTERS)
@@ -76,13 +73,10 @@ class WordsNumFilter(Filter):
 
     def process_batched(self, samples):
         if isinstance(samples[Fields.stats], list):
-            return map(
-                lambda stat: self.min_num <= stat[StatsKeys.num_words] <= self.
-                max_num, samples[Fields.stats])
+            return map(lambda stat: self.min_num <= stat[StatsKeys.num_words] <= self.max_num, samples[Fields.stats])
         else:
             # single sample for ray filter
-            if self.min_num <= samples[Fields.stats][
-                    StatsKeys.num_words] <= self.max_num:
+            if self.min_num <= samples[Fields.stats][StatsKeys.num_words] <= self.max_num:
                 return True
             else:
                 return False

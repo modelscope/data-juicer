@@ -13,11 +13,7 @@ class LanguageIDScoreFilter(Filter):
     """Filter to keep samples in a specific language with confidence score
     larger than a specific min value."""
 
-    def __init__(self,
-                 lang: Union[str, List[str]] = '',
-                 min_score: float = 0.8,
-                 *args,
-                 **kwargs):
+    def __init__(self, lang: Union[str, List[str]] = '', min_score: float = 0.8, *args, **kwargs):
         """
         Initialization method.
 
@@ -40,10 +36,9 @@ class LanguageIDScoreFilter(Filter):
         self.min_score = min_score
         self.model_key = prepare_model(model_type='fasttext')
 
-    def compute_stats_single(self, sample):
+    def compute_stats_single(self, sample, *args, **kwargs):
         # check if it's computed already
-        if StatsKeys.lang in sample[
-                Fields.stats] and StatsKeys.lang_score in sample[Fields.stats]:
+        if StatsKeys.lang in sample[Fields.stats] and StatsKeys.lang_score in sample[Fields.stats]:
             return sample
 
         text = sample[self.text_key].lower().replace('\n', ' ')
