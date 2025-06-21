@@ -28,28 +28,32 @@ class EasyAnimateTrainExecutor(BaseModelExecutor):
     def __init__(self, model_config: dict, watcher=None):
         super().__init__(model_config, watcher)
         # env related
-        easyanimate_env = self.model_config.get("env_name", None)
-        easyanimate_env_manager = self.model_config.get("env_manager", "conda")
-        easyanimate_env_params = self.model_config.get("env_params", {})
+        easyanimate_env = self.model_config.get('env_name', None)
+        easyanimate_env_manager = self.model_config.get('env_manager', 'conda')
+        easyanimate_env_params = self.model_config.get('env_params', {})
         cur_working_dir = os.getcwd()
-        self.easyanimate_home = os.path.join(cur_working_dir, "thirdparty/models/EasyAnimate")
+        self.easyanimate_home = os.path.join(cur_working_dir,
+                                             'thirdparty/models/EasyAnimate')
         self.env = ENV_ROUTER[easyanimate_env_manager](
-            env_name=easyanimate_env, env_manager=easyanimate_env_manager, **easyanimate_env_params
-        )
+            env_name=easyanimate_env,
+            env_manager=easyanimate_env_manager,
+            **easyanimate_env_params)
         self.env.create()
         # setup EasyAnimate
         cmd = f'cd {self.easyanimate_home.replace("EasyAnimate", "")} && bash setup_easyanimate.sh'
         self.env.run_cmd(cmd)
         # install requirements
-        cmd = f"cd {self.easyanimate_home} && python install.py"
+        cmd = f'cd {self.easyanimate_home} && python install.py'
         self.env.run_cmd(cmd)
         # install extra deepspeed and func_timeout
-        self.env.install_py_deps(["deepspeed", "func_timeout", "wandb"])
+        self.env.install_py_deps(['deepspeed', 'func_timeout', 'wandb'])
 
-        self.script_path = os.path.join(self.easyanimate_home, "train_lora.sh")
+        self.script_path = os.path.join(self.easyanimate_home, 'train_lora.sh')
         # make sure executable
         current_permissions = os.stat(self.script_path).st_mode
-        os.chmod(self.script_path, current_permissions | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        os.chmod(
+            self.script_path,
+            current_permissions | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
     async def _run(self, run_type, run_obj=None, **kwargs):
         config = self.model_config.train
@@ -64,10 +68,9 @@ class EasyAnimateTrainExecutor(BaseModelExecutor):
             config.training_config.gradient_accumulation_steps,
             config.training_config.num_train_epochs,
             config.training_config.dataloader_num_workers,
-            config.training_config.seed,
-            config.saving_config.output_dir,
+            config.training_config.seed, config.saving_config.output_dir,
             config.tracker_config.project_name,
-            config.tracker_config.experiment_name,
+            config.tracker_config.experiment_name
         ]
         str_run_args = [f'"{str(arg)}"' for arg in run_args]
         cmd = f'cd {self.easyanimate_home} && bash {self.script_path} {" ".join(str_run_args)}'
@@ -92,40 +95,39 @@ class EasyAnimateInferExecutor(BaseModelExecutor):
     def __init__(self, model_config: dict, watcher=None):
         super().__init__(model_config, watcher)
         # env related
-        easyanimate_env = self.model_config.get("env_name", None)
-        easyanimate_env_manager = self.model_config.get("env_manager", "conda")
-        easyanimate_env_params = self.model_config.get("env_params", {})
+        easyanimate_env = self.model_config.get('env_name', None)
+        easyanimate_env_manager = self.model_config.get('env_manager', 'conda')
+        easyanimate_env_params = self.model_config.get('env_params', {})
         cur_working_dir = os.getcwd()
-        self.easyanimate_home = os.path.join(cur_working_dir, "thirdparty/models/EasyAnimate")
+        self.easyanimate_home = os.path.join(cur_working_dir,
+                                             'thirdparty/models/EasyAnimate')
         self.env = ENV_ROUTER[easyanimate_env_manager](
-            env_name=easyanimate_env, env_manager=easyanimate_env_manager, **easyanimate_env_params
-        )
+            env_name=easyanimate_env,
+            env_manager=easyanimate_env_manager,
+            **easyanimate_env_params)
         self.env.create()
         # setup EasyAnimate
         cmd = f'cd {self.easyanimate_home.replace("EasyAnimate", "")} && bash setup_easyanimate.sh'
         self.env.run_cmd(cmd)
         # install requirements
-        cmd = f"cd {self.easyanimate_home} && python install.py"
+        cmd = f'cd {self.easyanimate_home} && python install.py'
         self.env.run_cmd(cmd)
         # install extra deepspeed and func_timeout
-        self.env.install_py_deps(["deepspeed", "func_timeout", "wandb"])
+        self.env.install_py_deps(['deepspeed', 'func_timeout', 'wandb'])
 
-        self.script_path = os.path.join(self.easyanimate_home, "infer_lora.sh")
+        self.script_path = os.path.join(self.easyanimate_home, 'infer_lora.sh')
 
     async def _run(self, run_type, run_obj=None, **kwargs):
         config = self.model_config.train
         run_args = [
             config.model_path.pretrained_model_name_or_path,
-            config.model_path.transformer_path,
-            config.model_path.lora_path,
+            config.model_path.transformer_path, config.model_path.lora_path,
             config.infer_config.image_size,
-            config.infer_config.prompt_info_path,
-            config.infer_config.gpu_num,
+            config.infer_config.prompt_info_path, config.infer_config.gpu_num,
             config.infer_config.batch_size,
             config.infer_config.mixed_precision,
-            config.infer_config.video_num_per_prompt,
-            config.infer_config.seed,
-            config.saving_config.output_video_dir,
+            config.infer_config.video_num_per_prompt, config.infer_config.seed,
+            config.saving_config.output_video_dir
         ]
         str_run_args = [f'"{str(arg)}"' for arg in run_args]
         cmd = f'cd {self.easyanimate_home} && bash {self.script_path} {" ".join(str_run_args)}'
@@ -155,81 +157,85 @@ class VBenchEvaluator(BaseEvaluator):
     def __init__(self, eval_config: dict):
         super().__init__(eval_config)
         # env related
-        vbench_env = self.eval_config.get("env_name", None)
-        vbench_env_manager = self.eval_config.get("env_manager", "conda")
-        vbench_env_params = self.eval_config.get("env_params", {})
+        vbench_env = self.eval_config.get('env_name', None)
+        vbench_env_manager = self.eval_config.get('env_manager', 'conda')
+        vbench_env_params = self.eval_config.get('env_params', {})
         self.env = ENV_ROUTER[vbench_env_manager](
-            env_name=vbench_env, env_manager=vbench_env_manager, **vbench_env_params
-        )
+            env_name=vbench_env,
+            env_manager=vbench_env_manager,
+            **vbench_env_params)
         self.env.create()
         # install vbench
-        self.env.install_py_deps(
-            [
-                "vbench",
-                "detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867",
-            ]
-        )
+        self.env.install_py_deps([
+            'vbench',
+            'detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867'
+        ])
 
         # eval gpus
-        self.num_gpus = self.eval_config.get("num_gpus", cuda_device_count())
+        self.num_gpus = self.eval_config.get('num_gpus', cuda_device_count())
         if self.num_gpus <= 0:
-            raise RuntimeError("No available GPUs.")
+            raise RuntimeError('No available GPUs.')
         if self.num_gpus > cuda_device_count():
             logger.warning(
-                f"GPUs are not enough for {self.num_gpus}. Fallback to the number of all the GPUs "
-                f"({cuda_device_count()}) on this machine."
-            )
+                f'GPUs are not enough for {self.num_gpus}. Fallback to the number of all the GPUs '
+                f'({cuda_device_count()}) on this machine.')
             self.num_gpus = cuda_device_count()
 
         # eval arguments
-        self.eval_name = self.eval_config.get("eval_name", "vbench_evaluator")
-        self.full_json_dir = self.eval_config.get("full_json_dir", None)
-        self.output_path = self.eval_config.get("output_path", None)
-        self.videos_path = self.eval_config.get("videos_path", None)
-        self.dimension_list = self.eval_config.get("dimension_list", [])
-        self.load_ckpt_from_local = self.eval_config.get("load_ckpt_from_local", False)
+        self.eval_name = self.eval_config.get('eval_name', 'vbench_evaluator')
+        self.full_json_dir = self.eval_config.get('full_json_dir', None)
+        self.output_path = self.eval_config.get('output_path', None)
+        self.videos_path = self.eval_config.get('videos_path', None)
+        self.dimension_list = self.eval_config.get('dimension_list', [])
+        self.load_ckpt_from_local = self.eval_config.get(
+            'load_ckpt_from_local', False)
 
         if self.full_json_dir is None:
-            raise ValueError("Please specify the full_json_dir.")
+            raise ValueError('Please specify the full_json_dir.')
         if self.output_path is None:
-            raise ValueError("Please specify the output_path.")
+            raise ValueError('Please specify the output_path.')
         if self.videos_path is None:
-            raise ValueError("Please specify the videos_path.")
-        if not isinstance(self.dimension_list, list) or len(self.dimension_list) == 0:
-            raise ValueError("Please specify the dimension_list.")
+            raise ValueError('Please specify the videos_path.')
+        if not isinstance(self.dimension_list, list) or len(
+                self.dimension_list) == 0:
+            raise ValueError('Please specify the dimension_list.')
 
     def run(self, eval_type, eval_obj=None, **kwargs):
-        if eval_type == "data":
-            result_dict = {"mean_score": 0, "detail": {}}
+        if eval_type == 'data':
+            result_dict = {'mean_score': 0, 'detail': {}}
             scores = []
-            eval_log_path = os.path.join(self.output_path, "eval_log.txt")
-            logger.info(f"Evaluating for {self.dimension_list}")
-            cmd = (
-                f"vbench evaluate --ngpus {self.num_gpus} --full_json_dir {self.full_json_dir} "
-                f"--output_path {self.output_path} --videos_path {self.videos_path} "
-                f"--dimension {self.dimension_list} --load_ckpt_from_local {self.load_ckpt_from_local} 2>&1"
-                f' | tee -a "{eval_log_path}"'
-            )
+            eval_log_path = os.path.join(self.output_path, 'eval_log.txt')
+            logger.info(f'Evaluating for {self.dimension_list}')
+            cmd = f'vbench evaluate --ngpus {self.num_gpus} --full_json_dir {self.full_json_dir} ' \
+                  f'--output_path {self.output_path} --videos_path {self.videos_path} ' \
+                  f'--dimension {self.dimension_list} --load_ckpt_from_local {self.load_ckpt_from_local} 2>&1' \
+                  f' | tee -a "{eval_log_path}"'
             self.env.run_cmd(cmd)
             # read eval log to find the result json file
-            with open(eval_log_path, "r") as fin:
+            with open(eval_log_path, 'r') as fin:
                 content = fin.read()
-            result_name_pattern = r"Evaluation results saved to (.*?).json"
+            result_name_pattern = r'Evaluation results saved to (.*?).json'
             res = re.findall(result_name_pattern, content)
             if len(res) > 0:
                 result_name = res[0]
             else:
-                raise RuntimeError("Cannot find the result json file from the evaluation log.")
-            results = json.load(open(f"{result_name}.json", "r"))
+                raise RuntimeError(
+                    'Cannot find the result json file from the evaluation log.'
+                )
+            results = json.load(open(f'{result_name}.json', 'r'))
             for dimension in results:
                 score = results[dimension][0]
-                result_dict["detail"][dimension] = score
+                result_dict['detail'][dimension] = score
                 scores.append(score)
-            result_dict["mean_score"] = sum(scores) / len(scores)
+            result_dict['mean_score'] = sum(scores) / len(scores)
 
-            with open(os.path.join(self.output_path, f"{self.eval_name}_merged_results.json"), "w") as f:
+            with open(
+                    os.path.join(self.output_path,
+                                 f'{self.eval_name}_merged_results.json'),
+                    'w') as f:
                 json.dump(result_dict, f)
 
-            return float(result_dict["mean_score"])
+            return float(result_dict['mean_score'])
         else:
-            raise NotImplementedError("Unsupported evaluation type: {}".format(eval_type))
+            raise NotImplementedError(
+                'Unsupported evaluation type: {}'.format(eval_type))

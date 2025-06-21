@@ -25,14 +25,15 @@ class TrinityRFTTrainExecutor(BaseModelExecutor):
 
     def __init__(self, model_config: dict, watcher=None):
         super().__init__(model_config, watcher)
-        trinity_env = self.model_config.get("env_name", None)
-        trinity_env_manager = self.model_config.get("env_manager", "conda")
-        trinity_env_params = self.model_config.get("env_params", {})
-        trinity_home = self.model_config.get("trinity_home", None)
+        trinity_env = self.model_config.get('env_name', None)
+        trinity_env_manager = self.model_config.get('env_manager', 'conda')
+        trinity_env_params = self.model_config.get('env_params', {})
+        trinity_home = self.model_config.get('trinity_home', None)
         # prepare trinity environment
         self.env = ENV_ROUTER[trinity_env_manager](
-            env_name=trinity_env, env_manager=trinity_env_manager, **trinity_env_params
-        )
+            env_name=trinity_env,
+            env_manager=trinity_env_manager,
+            **trinity_env_params)
         self.env.create()
         if trinity_home:
             self.env.install_py_deps(trinity_home)
@@ -44,15 +45,16 @@ class TrinityRFTTrainExecutor(BaseModelExecutor):
         if run_obj is not None and isinstance(run_obj, str):
             trinity_config_path = run_obj
         else:
-            trinity_config_path = self.model_config.get("trinity_config_path", None)
-        cmd = f"trinity run --config {trinity_config_path}"
+            trinity_config_path = self.model_config.get(
+                'trinity_config_path', None)
+        cmd = f'trinity run --config {trinity_config_path}'
         self.env.run_cmd(cmd)
         trinity_cfg = yaml.safe_load()
-        return trinity_cfg.get("checkpoint_root_dir", None)
+        return trinity_cfg.get('checkpoint_root_dir', None)
 
     async def _watch_run(self, line, **kwargs):
         # e.g. "(Trainer pid=3839503) INFO 05-08 11:11:13 monitor.py:96] Step 12: {<a dict record>}"
-        pattern = r"^\(Trainer pid=(\d+)\) INFO (.*?) monitor.py:(.*?)] Step (\d*?): (.*?)$"
+        pattern = r'^\(Trainer pid=(\d+)\) INFO (.*?) monitor.py:(.*?)] Step (\d*?): (.*?)$'
         if self.watcher:
             match = re.match(pattern, line.strip())
             if match:
@@ -61,6 +63,6 @@ class TrinityRFTTrainExecutor(BaseModelExecutor):
                     record_dict = json.loads(record.replace("'", '"'))
                 except:  # noqa: E722
                     record_dict = {}
-                if "perf/throughput" in record_dict:
+                if 'perf/throughput' in record_dict:
                     for key, val in record_dict.items():
                         self.watcher.watch(val, key)

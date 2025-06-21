@@ -7,18 +7,16 @@ from loguru import logger
 
 from data_juicer.config import get_init_configs, prepare_side_configs
 from data_juicer.core.data.dj_dataset import nested_query
-from data_juicer.core.sandbox.factories import (
-    data_analyzer_factory,
-    data_evaluator_factory,
-    data_executor_factory,
-    data_pool_manipulator_factory,
-    general_data_executor_factory,
-    general_probe_factory,
-    mode_infer_evaluator_factory,
-    model_evaluator_factory,
-    model_infer_executor_factory,
-    model_train_executor_factory,
-)
+from data_juicer.core.sandbox.factories import (data_analyzer_factory,
+                                                data_evaluator_factory,
+                                                data_executor_factory,
+                                                data_pool_manipulator_factory,
+                                                general_data_executor_factory,
+                                                general_probe_factory,
+                                                mode_infer_evaluator_factory,
+                                                model_evaluator_factory,
+                                                model_infer_executor_factory,
+                                                model_train_executor_factory)
 from data_juicer.utils.constant import JobRequiredKeys
 from tools.hpo.execute_hpo_3sigma import modify_recipe_k_sigma
 

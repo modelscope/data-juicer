@@ -4,7 +4,7 @@ from typing import Any, Dict
 from ...utils.constant import Fields, StatsKeys
 from ..base_op import OPERATORS, Filter
 
-OP_NAME = "general_field_filter"
+OP_NAME = 'general_field_filter'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -14,7 +14,7 @@ class GeneralFieldFilter(Filter):
     The filter condition is a string that can include logical operators and chain comparisons.
     """
 
-    def __init__(self, filter_condition: str = "", *args, **kwargs):
+    def __init__(self, filter_condition: str = '', *args, **kwargs):
         """
         Initialization method.
         :param filter_condition: The filter condition as a string.
@@ -26,16 +26,15 @@ class GeneralFieldFilter(Filter):
         self.ast_tree: ast.Expression = None
         if filter_condition:
             try:
-                self.ast_tree = ast.parse(filter_condition, mode="eval")
+                self.ast_tree = ast.parse(filter_condition, mode='eval')
             except SyntaxError as e:
-                raise ValueError(f"Invalid filter condition: {filter_condition}") from e
+                raise ValueError(
+                    f'Invalid filter condition: {filter_condition}') from e
 
     def compute_stats_single(self, sample, context=False):
-        if (
-            not self.filter_condition
-            or self.filter_condition == ""
-            or StatsKeys.general_field_filter_condition in sample[Fields.stats]
-        ):
+        if (not self.filter_condition or self.filter_condition == ''
+                or StatsKeys.general_field_filter_condition
+                in sample[Fields.stats]):
             return sample
 
         transformer = ExpressionTransformer(sample)
@@ -45,17 +44,25 @@ class GeneralFieldFilter(Filter):
         return sample
 
     def process_single(self, sample: Dict) -> bool:
-        return sample.get(Fields.stats, {}).get(StatsKeys.general_field_filter_condition, True)
+        return sample.get(Fields.stats,
+                          {}).get(StatsKeys.general_field_filter_condition,
+                                  True)
 
 
 class ExpressionTransformer(ast.NodeVisitor):
     _COMPARE_OPERATORS = {
-        ast.Gt: lambda left_operand, right_operand: left_operand > right_operand,
-        ast.Lt: lambda left_operand, right_operand: left_operand < right_operand,
-        ast.Eq: lambda left_operand, right_operand: left_operand == right_operand,
-        ast.NotEq: lambda left_operand, right_operand: left_operand != right_operand,
-        ast.GtE: lambda left_operand, right_operand: left_operand >= right_operand,
-        ast.LtE: lambda left_operand, right_operand: left_operand <= right_operand,
+        ast.Gt:
+        lambda left_operand, right_operand: left_operand > right_operand,
+        ast.Lt:
+        lambda left_operand, right_operand: left_operand < right_operand,
+        ast.Eq:
+        lambda left_operand, right_operand: left_operand == right_operand,
+        ast.NotEq:
+        lambda left_operand, right_operand: left_operand != right_operand,
+        ast.GtE:
+        lambda left_operand, right_operand: left_operand >= right_operand,
+        ast.LtE:
+        lambda left_operand, right_operand: left_operand <= right_operand,
     }
 
     def __init__(self, sample: Dict):
@@ -67,7 +74,8 @@ class ExpressionTransformer(ast.NodeVisitor):
             return all(values)
         elif isinstance(node.op, ast.Or):
             return any(values)
-        raise ValueError(f"Unsupported logical operator: {type(node.op).__name__}")
+        raise ValueError(
+            f'Unsupported logical operator: {type(node.op).__name__}')
 
     def visit_Compare(self, node: ast.Compare) -> bool:
         left = self.visit(node.left)
@@ -90,16 +98,17 @@ class ExpressionTransformer(ast.NodeVisitor):
         op_type = type(op)
         if op_type in self._COMPARE_OPERATORS:
             return self._COMPARE_OPERATORS[op_type](left, right)
-        raise ValueError(f"Unsupported comparison operator: {op_type.__name__}")
+        raise ValueError(
+            f'Unsupported comparison operator: {op_type.__name__}')
 
     def visit_Name(self, node: ast.Name) -> Any:
-        if "." in node.id:
-            prefix, key = node.id.split(".", 1)
+        if '.' in node.id:
+            prefix, key = node.id.split('.', 1)
             if prefix == Fields.stats:
                 return self.sample.get(Fields.stats, {}).get(key)
             if prefix == Fields.meta:
                 return self.sample.get(Fields.meta, {}).get(key)
-            raise ValueError(f"Unsupported prefix: {prefix}")
+            raise ValueError(f'Unsupported prefix: {prefix}')
         return self.sample.get(node.id)
 
     def visit_Attribute(self, node: ast.Attribute) -> Any:
@@ -114,7 +123,9 @@ class ExpressionTransformer(ast.NodeVisitor):
         return node.value
 
     def generic_visit(self, node: ast.AST) -> None:
-        raise ValueError(f"Unsupported node type: {type(node).__name__}, details: {ast.dump(node)}")
+        raise ValueError(
+            f'Unsupported node type: {type(node).__name__}, details: {ast.dump(node)}'
+        )
 
     def transform(self, ast_tree: ast.Expression) -> bool:
         return self.visit(ast_tree.body)

@@ -17,33 +17,33 @@ classifiers = [
 
 # Core dependencies
 dependencies = [
-    "datasets>=2.19.0", # core data loading
-    "fsspec==2023.5.0", # file system operations
-    "pandas", # data manipulation
-    "numpy>=1.26.4,<2.0.0", # numerical operations
-    "loguru", # logging
-    "tqdm", # progress bars
-    "jsonargparse[signatures]", # configuration
-    "jsonlines", # JSONL handling
-    "zstandard", # compression
-    "lz4", # compression
-    "multiprocess==0.70.12", # parallel processing
-    "dill==0.3.4", # serialization
-    "psutil", # system monitoring
-    "pydantic>=2.0", # data validation
+    "datasets>=2.19.0",  # core data loading
+    "fsspec==2023.5.0",  # file system operations
+    "pandas",  # data manipulation
+    "numpy>=1.26.4,<2.0.0",  # numerical operations
+    "loguru",  # logging
+    "tqdm",  # progress bars
+    "jsonargparse[signatures]",  # configuration
+    "jsonlines",  # JSONL handling
+    "zstandard",  # compression
+    "lz4",  # compression
+    "multiprocess==0.70.12",  # parallel processing
+    "dill==0.3.4",  # serialization
+    "psutil",  # system monitoring
+    "pydantic>=2.0",  # data validation
     "uv",
     "wordcloud",
     "spacy==3.7.0",
     "httpx",
-    "av==13.1.0", # video/audio handling
-    "emoji==2.2.0", # emoji handling
+    "av==13.1.0",  # video/audio handling
+    "emoji==2.2.0",  # emoji handling
     "tabulate",
     "librosa>=0.10",
     "resampy",
     "samplerate==0.1.0",
     "bs4",
     "matplotlib",
-    "plotly", # interactive plots
+    "plotly",  # interactive plots
     "seaborn",
     "requests",
     "wget",
@@ -53,10 +53,10 @@ dependencies = [
     "Pillow",
     "fastapi>=0.110",
     "mwparserfromhell",
-    "regex", # regular expressions
+    "regex",  # regular expressions
     "tomli",
     "tomli-w",
-    "gitpython",
+    "gitpython"
 ]
 
 [project.optional-dependencies]
@@ -136,8 +136,6 @@ dev = [
     "pytest",  # testing framework
     "pytest-cov",  # coverage reporting
     "build",  # package building
-    "black>=25.1.0",
-    "flake8-black",
 ]
 
 # AI Services & APIs
@@ -195,41 +193,6 @@ per-file-ignores = [
     "*/__init__.py: F401"
 ]
 max-line-length = 120
-extend-ignore = [
-    "E203",  # whitespace before ':' (black handles this)
-    "E501",  # line too long (black handles this)
-    "BLK100",  # black would make changes (black handles this)
-]
 
 [tool.hatch.version]
 path = "data_juicer/__init__.py"
-
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-line_length = 120
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-ensure_newline_before_comments = true
-force_single_line = false
-indent = 4
-known_first_party = ["data_juicer"]
-
-[tool.black]
-line-length = 120
-target-version = ['py37']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''

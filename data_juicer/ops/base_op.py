@@ -12,10 +12,10 @@ from data_juicer.utils.model_utils import free_models
 from data_juicer.utils.process_utils import calculate_np
 from data_juicer.utils.registry import Registry
 
-OPERATORS = Registry("Operators")
-UNFORKABLE = Registry("Unforkable")
-NON_STATS_FILTERS = Registry("Non-stats Filters")
-TAGGING_OPS = Registry("Tagging Operators")
+OPERATORS = Registry('Operators')
+UNFORKABLE = Registry('Unforkable')
+NON_STATS_FILTERS = Registry('Non-stats Filters')
+TAGGING_OPS = Registry('Tagging Operators')
 
 
 def convert_list_dict_to_dict_list(samples):
@@ -38,6 +38,7 @@ def convert_dict_list_to_list_dict(samples):
 
 
 def convert_arrow_to_python(method):
+
     @wraps(method)
     def wrapper(sample, *args, **kwargs):
         if isinstance(sample, pa.Table):
@@ -66,12 +67,9 @@ def catch_map_batches_exception(method, skip_op_error=False, op_name=None):
             import traceback
 
             from loguru import logger
-
-            logger.error(
-                f"An error occurred in {op_name} when processing "
-                f'samples "{samples}" -- {type(e)}: {e} -- '
-                f"{traceback.format_exc()}"
-            )
+            logger.error(f'An error occurred in {op_name} when processing '
+                         f'samples "{samples}" -- {type(e)}: {e} -- '
+                         f'{traceback.format_exc()}')
             ret = {key: [] for key in samples.keys()}
             ret[Fields.stats] = []
             ret[Fields.source_file] = []
@@ -114,12 +112,9 @@ def catch_map_single_exception(method, return_sample=True, skip_op_error=False, 
                 import traceback
 
                 from loguru import logger
-
-                logger.error(
-                    f"An error occurred in {op_name} when processing "
-                    f'sample "{sample}" -- {type(e)}: {e} -- '
-                    f"{traceback.format_exc()}"
-                )
+                logger.error(f'An error occurred in {op_name} when processing '
+                             f'sample "{sample}" -- {type(e)}: {e} -- '
+                             f'{traceback.format_exc()}')
                 ret = {key: [] for key in sample.keys()}
                 ret[Fields.stats] = []
                 ret[Fields.source_file] = []
@@ -132,7 +127,8 @@ def catch_map_single_exception(method, return_sample=True, skip_op_error=False, 
 
 
 class OP:
-    _accelerator = "cpu"
+
+    _accelerator = 'cpu'
     _batched_op = False
 
     def __init__(self, *args, **kwargs):
@@ -156,47 +152,46 @@ class OP:
         :param work_dir: the working directory for this operator
         """
         # init data keys
-        self.text_key = kwargs.get("text_key", "text")
-        self.image_key = kwargs.get("image_key", "images")
-        self.audio_key = kwargs.get("audio_key", "audios")
-        self.video_key = kwargs.get("video_key", "videos")
+        self.text_key = kwargs.get('text_key', 'text')
+        self.image_key = kwargs.get('image_key', 'images')
+        self.audio_key = kwargs.get('audio_key', 'audios')
+        self.video_key = kwargs.get('video_key', 'videos')
 
-        self.query_key = kwargs.get("query_key", "query")
-        self.response_key = kwargs.get("response_key", "response")
-        self.history_key = kwargs.get("history_key", "history")
+        self.query_key = kwargs.get('query_key', 'query')
+        self.response_key = kwargs.get('response_key', 'response')
+        self.history_key = kwargs.get('history_key', 'history')
 
-        self.index_key = kwargs.get("index_key", None)
+        self.index_key = kwargs.get('index_key', None)
 
-        self.batch_size = kwargs.get("batch_size", 1000)
-        self.work_dir = kwargs.get("work_dir", None)
+        self.batch_size = kwargs.get('batch_size', 1000)
+        self.work_dir = kwargs.get('work_dir', None)
 
         # for unittest, do not skip the error.
         # It would be set to be True in config init.
-        self.skip_op_error = kwargs.get("skip_op_error", False)
+        self.skip_op_error = kwargs.get('skip_op_error', False)
 
         # whether the model can be accelerated using cuda
-        _accelerator = kwargs.get("accelerator", None)
+        _accelerator = kwargs.get('accelerator', None)
         if _accelerator is not None:
             self.accelerator = _accelerator
         else:
             self.accelerator = self._accelerator
 
         # parameters to determine the number of procs for this op
-        self.num_proc = kwargs.get("num_proc", None)
-        self.cpu_required = kwargs.get("cpu_required", 1)
-        self.mem_required = kwargs.get("mem_required", 0)
+        self.num_proc = kwargs.get('num_proc', None)
+        self.cpu_required = kwargs.get('cpu_required', 1)
+        self.mem_required = kwargs.get('mem_required', 0)
         if isinstance(self.mem_required, str):
             self.mem_required = size_to_bytes(self.mem_required) / 1024**3
 
-        self.turbo = kwargs.get("turbo", False)
+        self.turbo = kwargs.get('turbo', False)
 
         # nested wrappers
         from data_juicer.core.data import wrap_func_with_nested_access
-
-        for name in ["process", "compute_stats", "compute_hash"]:
+        for name in ['process', 'compute_stats', 'compute_hash']:
             method = getattr(self, name, None)
             if method and callable(method):
-                setattr(self, f"_{name}", method)
+                setattr(self, f'_{name}', method)
                 method = wrap_func_with_nested_access(method)
                 setattr(self, name, method)
 
@@ -207,31 +202,31 @@ class OP:
         raise NotImplementedError
 
     def use_cuda(self):
-        return self.accelerator == "cuda" and is_cuda_available()
+        return self.accelerator == 'cuda' and is_cuda_available()
 
     def runtime_np(self):
         op_proc = calculate_np(self._name, self.mem_required, self.cpu_required, self.num_proc, self.use_cuda())
-        logger.debug(f"Op [{self._name}] running with number of procs:{op_proc}")
+        logger.debug(f'Op [{self._name}] running with number of procs:{op_proc}')
         return op_proc
 
     def remove_extra_parameters(self, param_dict, keys=None):
         """
-        at the beginning of the init of the mapper op, call
-        self.remove_extra_parameters(locals())
-        to get the init parameter dict of the op for convenience
+            at the beginning of the init of the mapper op, call
+            self.remove_extra_parameters(locals())
+            to get the init parameter dict of the op for convenience
 
         """
         if keys is None:
-            param_dict = {k: v for k, v in param_dict.items() if not k.startswith("_")}
-            param_dict.pop("self", None)
+            param_dict = {k: v for k, v in param_dict.items() if not k.startswith('_')}
+            param_dict.pop('self', None)
         else:
             param_dict = {k: v for k, v in param_dict.items() if k not in keys}
         return param_dict
 
     def add_parameters(self, init_parameter_dict, **extra_param_dict):
         """
-        add parameters for each sample, need to keep extra_param_dict
-        and init_parameter_dict unchanged.
+            add parameters for each sample, need to keep extra_param_dict
+            and init_parameter_dict unchanged.
         """
         related_parameters = copy.deepcopy(init_parameter_dict)
         related_parameters.update(extra_param_dict)
@@ -239,34 +234,34 @@ class OP:
 
     def run(self, dataset):
         from data_juicer.core.data import NestedDataset
-
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
         # add meta field for OPs that produce tags
         from data_juicer.core.data import add_same_content_to_new_column
-
-        if self._name in TAGGING_OPS.modules and Fields.meta not in dataset.features:
-            dataset = dataset.map(
-                add_same_content_to_new_column,
-                fn_kwargs={"new_column_name": Fields.meta, "initial_value": {}},
-                num_proc=self.runtime_np(),
-                batch_size=self.batch_size,
-                desc="Adding new column for meta",
-            )
+        if self._name in TAGGING_OPS.modules \
+                and Fields.meta not in dataset.features:
+            dataset = dataset.map(add_same_content_to_new_column,
+                                  fn_kwargs={
+                                      'new_column_name': Fields.meta,
+                                      'initial_value': {}
+                                  },
+                                  num_proc=self.runtime_np(),
+                                  batch_size=self.batch_size,
+                                  desc='Adding new column for meta')
         # add stats field for Filters that produce stats
-        if (
-            isinstance(self, Filter)
-            and self._name not in NON_STATS_FILTERS.modules
-            and Fields.stats not in dataset.features
-        ):
-            dataset = dataset.map(
-                add_same_content_to_new_column,
-                fn_kwargs={"new_column_name": Fields.stats, "initial_value": {}},
-                num_proc=self.runtime_np(),
-                batch_size=self.batch_size,
-                desc="Adding new column for stats",
-            )
-        if self.index_key is not None and self.index_key not in dataset.features:
+        if isinstance(self, Filter) \
+                and self._name not in NON_STATS_FILTERS.modules \
+                and Fields.stats not in dataset.features:
+            dataset = dataset.map(add_same_content_to_new_column,
+                                  fn_kwargs={
+                                      'new_column_name': Fields.stats,
+                                      'initial_value': {}
+                                  },
+                                  num_proc=self.runtime_np(),
+                                  batch_size=self.batch_size,
+                                  desc='Adding new column for stats')
+        if self.index_key is not None \
+                and self.index_key not in dataset.features:
 
             def add_index(sample, idx):
                 sample[self.index_key] = idx
@@ -281,6 +276,7 @@ class OP:
 
 
 class Mapper(OP):
+
     def __init__(self, *args, **kwargs):
         """
         Base class that conducts data editing.
@@ -302,25 +298,23 @@ class Mapper(OP):
 
         # runtime wrappers
         if self.is_batched_op():
-            self.process = catch_map_batches_exception(
-                self.process_batched, skip_op_error=self.skip_op_error, op_name=self._name
-            )
+            self.process = catch_map_batches_exception(self.process_batched,
+                                                       skip_op_error=self.skip_op_error,
+                                                       op_name=self._name)
         else:
-            self.process = catch_map_single_exception(
-                self.process_single, skip_op_error=self.skip_op_error, op_name=self._name
-            )
+            self.process = catch_map_single_exception(self.process_single,
+                                                      skip_op_error=self.skip_op_error,
+                                                      op_name=self._name)
 
     # set the process method is not allowed to be overridden
     @classmethod
     def __init_subclass__(cls, **kwargs):
-        not_allowed_list = ["process"]
+        not_allowed_list = ['process']
         for method_name in not_allowed_list:
             if method_name in cls.__dict__:
-                raise TypeError(
-                    f"Method {method_name} cannot be overridden by subclass "
-                    f"{cls.__name__}. Please implement {method_name}_single "
-                    f"or {method_name}_batched."
-                )
+                raise TypeError(f'Method {method_name} cannot be overridden by subclass '
+                                f'{cls.__name__}. Please implement {method_name}_single '
+                                f'or {method_name}_batched.')
 
     def __call__(self, *args, **kwargs):
         return self.process(*args, **kwargs)
@@ -364,7 +358,7 @@ class Mapper(OP):
             num_proc=self.runtime_np(),
             with_rank=self.use_cuda(),
             batch_size=self.batch_size,
-            desc=self._name + "_process",
+            desc=self._name + '_process',
         )
         if tracer:
             tracer.trace_mapper(self._name, dataset, new_dataset, self.text_key)
@@ -373,6 +367,7 @@ class Mapper(OP):
 
 
 class Filter(OP):
+
     def __init__(self, *args, **kwargs):
         """
         Base class that removes specific info.
@@ -391,35 +386,34 @@ class Filter(OP):
             queries and responses
         """
         super(Filter, self).__init__(*args, **kwargs)
-        self.stats_export_path = kwargs.get("stats_export_path", None)
+        self.stats_export_path = kwargs.get('stats_export_path', None)
 
         # runtime wrappers
         if self.is_batched_op():
-            self.compute_stats = catch_map_batches_exception(
-                self.compute_stats_batched, skip_op_error=self.skip_op_error, op_name=self._name
-            )
-            self.process = catch_map_batches_exception(
-                self.process_batched, skip_op_error=self.skip_op_error, op_name=self._name
-            )
+            self.compute_stats = catch_map_batches_exception(self.compute_stats_batched,
+                                                             skip_op_error=self.skip_op_error,
+                                                             op_name=self._name)
+            self.process = catch_map_batches_exception(self.process_batched,
+                                                       skip_op_error=self.skip_op_error,
+                                                       op_name=self._name)
         else:
-            self.compute_stats = catch_map_single_exception(
-                self.compute_stats_single, skip_op_error=self.skip_op_error, op_name=self._name
-            )
-            self.process = catch_map_single_exception(
-                self.process_single, return_sample=False, skip_op_error=self.skip_op_error, op_name=self._name
-            )
+            self.compute_stats = catch_map_single_exception(self.compute_stats_single,
+                                                            skip_op_error=self.skip_op_error,
+                                                            op_name=self._name)
+            self.process = catch_map_single_exception(self.process_single,
+                                                      return_sample=False,
+                                                      skip_op_error=self.skip_op_error,
+                                                      op_name=self._name)
 
     # set the process method is not allowed to be overridden
     @classmethod
     def __init_subclass__(cls, **kwargs):
-        not_allowed_list = ["compute_stats", "process"]
+        not_allowed_list = ['compute_stats', 'process']
         for method_name in not_allowed_list:
             if method_name in cls.__dict__:
-                raise TypeError(
-                    f"Method {method_name} cannot be overridden by subclass "
-                    f"{cls.__name__}. Please implement {method_name}_single "
-                    f"or {method_name}_batched."
-                )
+                raise TypeError(f'Method {method_name} cannot be overridden by subclass '
+                                f'{cls.__name__}. Please implement {method_name}_single '
+                                f'or {method_name}_batched.')
 
     def __call__(self, *args, **kwargs):
         return self.compute_stats(*args, **kwargs)
@@ -431,7 +425,7 @@ class Filter(OP):
             this_sample = {key: samples[key][i] for key in keys}
             res_sample = self.compute_stats_single(this_sample, *args, **kwargs)
             samples[Fields.stats][i] = res_sample[Fields.stats]
-            if "context" in kwargs and kwargs["context"]:
+            if 'context' in kwargs and kwargs['context']:
                 samples[Fields.context][i] = res_sample[Fields.context]
 
         return samples
@@ -462,19 +456,18 @@ class Filter(OP):
 
     def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
         dataset = super(Filter, self).run(dataset)
-        new_dataset = dataset.map(
-            self.compute_stats,
-            num_proc=self.runtime_np(),
-            with_rank=self.use_cuda(),
-            batch_size=self.batch_size,
-            desc=self._name + "_compute_stats",
-        )
+        new_dataset = dataset.map(self.compute_stats,
+                                  num_proc=self.runtime_np(),
+                                  with_rank=self.use_cuda(),
+                                  batch_size=self.batch_size,
+                                  desc=self._name + '_compute_stats')
         if exporter and self.stats_export_path is not None:
             exporter.export_compute_stats(new_dataset, self.stats_export_path)
         if reduce:
-            new_dataset = new_dataset.filter(
-                self.process, num_proc=self.runtime_np(), batch_size=self.batch_size, desc=self._name + "_process"
-            )
+            new_dataset = new_dataset.filter(self.process,
+                                             num_proc=self.runtime_np(),
+                                             batch_size=self.batch_size,
+                                             desc=self._name + '_process')
             if tracer:
                 tracer.trace_filter(self._name, dataset, new_dataset)
         free_models()
@@ -482,6 +475,7 @@ class Filter(OP):
 
 
 class Deduplicator(OP):
+
     def __init__(self, *args, **kwargs):
         """
         Base class that conducts deduplication.
@@ -503,13 +497,13 @@ class Deduplicator(OP):
 
         # runtime wrappers
         if self.is_batched_op():
-            self.compute_hash = catch_map_batches_exception(
-                self.compute_hash, skip_op_error=self.skip_op_error, op_name=self._name
-            )
+            self.compute_hash = catch_map_batches_exception(self.compute_hash,
+                                                            skip_op_error=self.skip_op_error,
+                                                            op_name=self._name)
         else:
-            self.compute_hash = catch_map_single_exception(
-                self.compute_hash, skip_op_error=self.skip_op_error, op_name=self._name
-            )
+            self.compute_hash = catch_map_single_exception(self.compute_hash,
+                                                           skip_op_error=self.skip_op_error,
+                                                           op_name=self._name)
 
     def compute_hash(self, sample):
         """
@@ -533,9 +527,10 @@ class Deduplicator(OP):
 
     def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
         dataset = super(Deduplicator, self).run(dataset)
-        new_dataset = dataset.map(
-            self.compute_hash, num_proc=self.runtime_np(), with_rank=self.use_cuda(), desc=self._name + "_compute_hash"
-        )
+        new_dataset = dataset.map(self.compute_hash,
+                                  num_proc=self.runtime_np(),
+                                  with_rank=self.use_cuda(),
+                                  desc=self._name + '_compute_hash')
         if reduce:
             show_num = tracer.show_num if tracer else 0
             new_dataset, dup_pairs = self.process(new_dataset, show_num)
@@ -546,6 +541,7 @@ class Deduplicator(OP):
 
 
 class Selector(OP):
+
     def __init__(self, *args, **kwargs):
         """
         Base class that conducts selection in dataset-level.
@@ -584,6 +580,7 @@ class Selector(OP):
 
 
 class Grouper(OP):
+
     def __init__(self, *args, **kwargs):
         """
         Base class that group samples.
@@ -616,7 +613,6 @@ class Grouper(OP):
         dataset = super(Grouper, self).run(dataset)
         batched_samples = self.process(dataset)
         from data_juicer.core.data import NestedDataset
-
         new_dataset = NestedDataset.from_list(batched_samples)
         if tracer:
             tracer.trace_filter(self._name, dataset, new_dataset)
@@ -625,6 +621,7 @@ class Grouper(OP):
 
 
 class Aggregator(OP):
+
     def __init__(self, *args, **kwargs):
         """
         Base class that group samples.
@@ -643,9 +640,9 @@ class Aggregator(OP):
             queries and responses
         """
         super(Aggregator, self).__init__(*args, **kwargs)
-        self.process = catch_map_single_exception(
-            self.process_single, skip_op_error=self.skip_op_error, op_name=self._name
-        )
+        self.process = catch_map_single_exception(self.process_single,
+                                                  skip_op_error=self.skip_op_error,
+                                                  op_name=self._name)
 
     def process_single(self, sample):
         """
@@ -662,20 +659,20 @@ class Aggregator(OP):
         # add batched meta field for OPs that produce aggregations
         if Fields.batch_meta not in dataset.features:
             from data_juicer.core.data import add_same_content_to_new_column
-
-            dataset = dataset.map(
-                add_same_content_to_new_column,
-                fn_kwargs={"new_column_name": Fields.batch_meta, "initial_value": {}},
-                num_proc=self.runtime_np(),
-                batch_size=self.batch_size,
-                desc="Adding new column for aggregation",
-            )
+            dataset = dataset.map(add_same_content_to_new_column,
+                                  fn_kwargs={
+                                      'new_column_name': Fields.batch_meta,
+                                      'initial_value': {}
+                                  },
+                                  num_proc=self.runtime_np(),
+                                  batch_size=self.batch_size,
+                                  desc='Adding new column for aggregation')
         new_dataset = dataset.map(
             self.process,
             num_proc=self.runtime_np(),
             with_rank=self.use_cuda(),
             batch_size=self.batch_size,
-            desc=self._name + "_process",
+            desc=self._name + '_process',
         )
         if tracer:
             tracer.trace_mapper(self._name, dataset, new_dataset, self.text_key)

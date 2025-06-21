@@ -9,10 +9,10 @@ from data_juicer.ops.base_op import Filter, Mapper
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.registry import Registry
 
-OPERATORS = Registry("operators")
+OPERATORS = Registry('operators')
 
 
-@OPERATORS.register_module("fused_filter")
+@OPERATORS.register_module('fused_filter')
 class FusedFilter(Filter):
     """A fused operator for filters that can execute multiple filters in one pass."""
 
@@ -33,10 +33,10 @@ class FusedFilter(Filter):
         self._in_performance_test = False
 
         # Set accelerator based on available methods
-        if any(hasattr(op, "accelerator") and op.accelerator == "cuda" for op in self.fused_filters):
-            self.accelerator = "cuda"
+        if any(hasattr(op, 'accelerator') and op.accelerator == 'cuda' for op in self.fused_filters):
+            self.accelerator = 'cuda'
         else:
-            self.accelerator = "cpu"
+            self.accelerator = 'cpu'
 
         # Update num_proc with the minimum of all fused filters
         self.num_proc = min([op.runtime_np() for op in self.fused_filters])
@@ -44,11 +44,11 @@ class FusedFilter(Filter):
         # Store original operation configs (create simple config if not available)
         self._op_cfg = {}
         for op in self.fused_filters:
-            if hasattr(op, "config") and op.config:
+            if hasattr(op, 'config') and op.config:
                 self._op_cfg[op._name] = op.config
             else:
                 # Create a simple config for filters without explicit config
-                self._op_cfg[op._name] = {"inter_vars": [], "dependencies": []}
+                self._op_cfg[op._name] = {'inter_vars': [], 'dependencies': []}
 
         # Analyze dependencies and determine execution strategy
         self._analyze_dependencies()
@@ -63,25 +63,16 @@ class FusedFilter(Filter):
         # Log the chosen strategy
         logger.info(f"FusedFilter '{name}' using {self.execution_strategy} execution strategy")
         if self.has_dependencies:
-            logger.info("  Reason: Filters have dependencies")
+            logger.info('  Reason: Filters have dependencies')
         else:
             simple_count = sum(
-                1
-                for op in self.fused_filters
-                if op._name
-                in {
-                    "text_length_filter",
-                    "words_num_filter",
-                    "character_repetition_filter",
-                    "word_repetition_filter",
-                    "special_characters_filter",
-                    "alphanumeric_filter",
-                    "average_line_length_filter",
-                    "maximum_line_length_filter",
-                }
-            )
+                1 for op in self.fused_filters if op._name in {
+                    'text_length_filter', 'words_num_filter', 'character_repetition_filter', 'word_repetition_filter',
+                    'special_characters_filter', 'alphanumeric_filter', 'average_line_length_filter',
+                    'maximum_line_length_filter'
+                })
             complex_count = len(self.fused_filters) - simple_count
-            logger.info(f"  Reason: {simple_count} simple filters, {complex_count} complex filters")
+            logger.info(f'  Reason: {simple_count} simple filters, {complex_count} complex filters')
 
     def _analyze_dependencies(self):
         """Analyze dependencies between filters to optimize execution order."""
@@ -113,8 +104,8 @@ class FusedFilter(Filter):
     def _has_dependency(self, op1: Filter, op2: Filter) -> bool:
         """Check if op2 depends on op1's output."""
         # Get intermediate variables used by each operation from stored configs
-        op1_vars = set(self._op_cfg.get(op1._name, {}).get("inter_vars", []))
-        op2_vars = set(self._op_cfg.get(op2._name, {}).get("inter_vars", []))
+        op1_vars = set(self._op_cfg.get(op1._name, {}).get('inter_vars', []))
+        op2_vars = set(self._op_cfg.get(op2._name, {}).get('inter_vars', []))
 
         # Check if op2 uses any variables produced by op1
         return bool(op1_vars & op2_vars)
@@ -131,11 +122,8 @@ class FusedFilter(Filter):
                 group.append(op)
                 # Add independent operations to visit
                 for other_op in self.fused_filters:
-                    if (
-                        other_op not in visited
-                        and other_op not in self.dependency_graph[op]
-                        and op not in self.dependency_graph[other_op]
-                    ):
+                    if (other_op not in visited and other_op not in self.dependency_graph[op] and
+                            op not in self.dependency_graph[other_op]):
                         to_visit.add(other_op)
 
         return group
@@ -143,7 +131,7 @@ class FusedFilter(Filter):
     def _determine_execution_strategy(self):
         """Determine the best execution strategy based on filter characteristics."""
         if self.has_dependencies:
-            return "sequential"
+            return 'sequential'
 
         # Check if filters are simple enough for parallel execution
         simple_filters = 0
@@ -153,14 +141,9 @@ class FusedFilter(Filter):
             # Simple filters: text_length, words_num, character_repetition
             # Complex filters: perplexity, stopwords, flagged_words
             simple_filter_names = {
-                "text_length_filter",
-                "words_num_filter",
-                "character_repetition_filter",
-                "word_repetition_filter",
-                "special_characters_filter",
-                "alphanumeric_filter",
-                "average_line_length_filter",
-                "maximum_line_length_filter",
+                'text_length_filter', 'words_num_filter', 'character_repetition_filter', 'word_repetition_filter',
+                'special_characters_filter', 'alphanumeric_filter', 'average_line_length_filter',
+                'maximum_line_length_filter'
             }
 
             if op._name in simple_filter_names:
@@ -170,9 +153,9 @@ class FusedFilter(Filter):
 
         # Use parallel if mostly simple filters, sequential if complex filters
         if complex_filters > simple_filters:
-            return "sequential"
+            return 'sequential'
         else:
-            return "parallel"
+            return 'parallel'
 
     def _should_skip_fusion(self, sample_size: int = 1000) -> bool:
         """Determine if fusion should be skipped based on performance analysis.
@@ -193,11 +176,8 @@ class FusedFilter(Filter):
 
         # Skip performance test for complex filters (always use fusion)
         complex_filter_names = {
-            "perplexity_filter",
-            "stopwords_filter",
-            "flagged_words_filter",
-            "language_id_score_filter",
-            "word_repetition_filter",
+            'perplexity_filter', 'stopwords_filter', 'flagged_words_filter', 'language_id_score_filter',
+            'word_repetition_filter'
         }
         complex_count = sum(1 for op in self.fused_filters if op._name in complex_filter_names)
 
@@ -213,7 +193,7 @@ class FusedFilter(Filter):
         try:
             return self._quick_performance_test(min(100, sample_size))
         except Exception as e:
-            logger.warning(f"Performance test failed: {e}. Defaulting to fusion.")
+            logger.warning(f'Performance test failed: {e}. Defaulting to fusion.')
             return False
 
     def _quick_performance_test(self, sample_size: int) -> bool:
@@ -237,8 +217,8 @@ class FusedFilter(Filter):
         try:
             # Create minimal test data
             test_data = {
-                "text": ["".join(random.choices(string.ascii_letters + " ", k=50)) for _ in range(sample_size)],
-                Fields.stats: [{} for _ in range(sample_size)],
+                'text': [''.join(random.choices(string.ascii_letters + ' ', k=50)) for _ in range(sample_size)],
+                Fields.stats: [{} for _ in range(sample_size)]
             }
 
             # Measure individual execution time
@@ -255,7 +235,7 @@ class FusedFilter(Filter):
             fused_time = time.time() - fused_start
 
             # Calculate overhead ratio
-            overhead_ratio = fused_time / individual_time if individual_time > 0 else float("inf")
+            overhead_ratio = fused_time / individual_time if individual_time > 0 else float('inf')
 
             # Decision logic for simple filters only
             if individual_time < 0.001:
@@ -268,11 +248,9 @@ class FusedFilter(Filter):
                 # Default to fusion for most cases
                 should_skip = False
 
-            logger.info(
-                f"Performance test: individual={individual_time:.3f}s, "
-                f"fused={fused_time:.3f}s, ratio={overhead_ratio:.2f}x, "
-                f"skip={should_skip}"
-            )
+            logger.info(f'Performance test: individual={individual_time:.3f}s, '
+                        f'fused={fused_time:.3f}s, ratio={overhead_ratio:.2f}x, '
+                        f'skip={should_skip}')
 
             return should_skip
 
@@ -287,12 +265,11 @@ class FusedFilter(Filter):
         # Check if we should skip fusion based on performance analysis
         if self._should_skip_fusion(len(samples[Fields.stats])):
             from loguru import logger
-
-            logger.debug(f"Skipping fusion for {self._name} - executing filters individually")
+            logger.debug(f'Skipping fusion for {self._name} - executing filters individually')
 
             # Execute filters individually (no fusion)
             for op in self.fused_filters:
-                if op.accelerator == "cuda":
+                if op.accelerator == 'cuda':
                     samples = op.compute_stats_batched(samples, rank=rank)
                 else:
                     samples = op.compute_stats_batched(samples)
@@ -302,13 +279,13 @@ class FusedFilter(Filter):
         num_samples = len(samples[Fields.stats])
         samples[Fields.context] = [{} for _ in range(num_samples)]
 
-        if self.execution_strategy == "parallel":
+        if self.execution_strategy == 'parallel':
             # Parallel execution for independent filters
             with concurrent.futures.ThreadPoolExecutor(max_workers=self.num_proc) as executor:
                 futures = []
                 for group in self.independent_groups:
                     for op in group:
-                        if op.accelerator == "cuda":
+                        if op.accelerator == 'cuda':
                             futures.append(executor.submit(op.compute_stats_batched, samples, rank=rank, context=True))
                         else:
                             futures.append(executor.submit(op.compute_stats_batched, samples, context=True))
@@ -318,7 +295,7 @@ class FusedFilter(Filter):
         else:
             # Sequential execution for dependent or complex filters
             for op in self.fused_filters:
-                if op.accelerator == "cuda":
+                if op.accelerator == 'cuda':
                     samples = op.compute_stats_batched(samples, rank=rank, context=True)
                 else:
                     samples = op.compute_stats_batched(samples, context=True)
@@ -339,8 +316,7 @@ class FusedFilter(Filter):
         # Check if we should skip fusion based on performance analysis
         if self._should_skip_fusion(len(samples[Fields.stats])):
             from loguru import logger
-
-            logger.debug(f"Skipping fusion for {self._name} - processing filters individually")
+            logger.debug(f'Skipping fusion for {self._name} - processing filters individually')
 
             # Process filters individually (no fusion)
             result = None
@@ -355,7 +331,7 @@ class FusedFilter(Filter):
 
             return result
 
-        if self.execution_strategy == "parallel":
+        if self.execution_strategy == 'parallel':
             # Parallel execution - all filters see original data
             return self._process_batched_parallel(samples)
         else:
@@ -426,7 +402,6 @@ class FusedFilter(Filter):
         """
         # Prepare the dataset
         from data_juicer.core.data import NestedDataset
-
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
 
@@ -440,13 +415,13 @@ class FusedFilter(Filter):
             num_proc=self.num_proc,
             with_rank=self.use_cuda(),
             batch_size=self.batch_size,
-            desc=self._name + "_process",
+            desc=self._name + '_process',
         )
 
         return new_dataset
 
 
-@OPERATORS.register_module("fused_mapper")
+@OPERATORS.register_module('fused_mapper')
 class FusedMapper(Mapper):
     """A fused operator for mappers that can execute multiple mappers in one pass."""
 
@@ -473,8 +448,8 @@ class FusedMapper(Mapper):
 
         # Set accelerator to 'cuda' if any of the fused mappers use CUDA
         accelerator_methods = set([op.accelerator for op in self.fused_mappers])
-        if "cuda" in accelerator_methods:
-            self.accelerator = "cuda"
+        if 'cuda' in accelerator_methods:
+            self.accelerator = 'cuda'
 
         # Update num_proc with the minimum of all fused mappers
         self.num_proc = min([op.runtime_np() for op in self.fused_mappers])
@@ -494,7 +469,7 @@ class FusedMapper(Mapper):
         """
         # Process mappers sequentially
         for op in self.fused_mappers:
-            process_args = {"rank": rank} if op.accelerator == "cuda" else {}
+            process_args = {'rank': rank} if op.accelerator == 'cuda' else {}
             samples = op.process_batched(samples, **process_args)
         return samples
 
@@ -511,7 +486,6 @@ class FusedMapper(Mapper):
         """
         # Prepare the dataset
         from data_juicer.core.data import NestedDataset
-
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
 
@@ -525,7 +499,7 @@ class FusedMapper(Mapper):
             num_proc=self.num_proc,
             with_rank=self.use_cuda(),
             batch_size=self.batch_size,
-            desc=self._name + "_process",
+            desc=self._name + '_process',
         )
 
         return new_dataset
