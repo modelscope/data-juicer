@@ -69,7 +69,6 @@ generic = [
     "accelerate",  # Model acceleration
     "vllm==0.9.1",  # LLM serving
     "onnxruntime",  # ONNX runtime
-    "flash-attn==2.8.0.post2",  # flash-attn for torch==2.7.0
 ]
 
 # Computer Vision
