@@ -73,6 +73,11 @@ BACKUP_MODEL_LINKS = {
     'FastSAM-x.pt':
     'https://github.com/ultralytics/assets/releases/download/v8.2.0/'
     'FastSAM-x.pt',
+
+    # spacy
+    '*_core_web_md-3.*.0':
+    'https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/'
+    'data_juicer/models/',
 }
 
 
@@ -112,19 +117,22 @@ def check_model(model_name, force=False):
             logger.info(
                 f'Model [{cached_model_path}] is not found. Downloading...')
 
+        model_link = os.path.join(MODEL_LINKS, model_name)
         try:
-            model_link = os.path.join(MODEL_LINKS, model_name)
             wget.download(model_link, cached_model_path)
         except:  # noqa: E722
+            backup_model_link = get_backup_model_link(model_name)
+            if backup_model_link is not None:
+                backup_model_link = os.path.join(backup_model_link, model_name)
             try:
-                backup_model_link = os.path.join(
-                    get_backup_model_link(model_name), model_name)
                 wget.download(backup_model_link, cached_model_path)
             except:  # noqa: E722
                 logger.error(
                     f'Downloading model [{model_name}] error. '
                     f'Please retry later or download it into {DJMC} '
                     f'manually from {model_link} or {backup_model_link} ')
+                import traceback
+                traceback.print_exc()
                 exit(1)
     return cached_model_path
 
