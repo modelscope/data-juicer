@@ -769,7 +769,12 @@
                 <span class="n">adapter</span><span class="o">.</span><span class="n">insight_mining</span><span class="p">()</span>
             <span class="c1"># make summarization on the error/warning logs</span>
             <span class="k">if</span> <span class="n">work_dir</span><span class="p">:</span>
-                <span class="n">make_log_summarization</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">make_log_summarization</span><span class="p">()</span>
+                <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+                    <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="s1">&#39;Error occurred when making log summarization&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dataset</span></div>
 
 

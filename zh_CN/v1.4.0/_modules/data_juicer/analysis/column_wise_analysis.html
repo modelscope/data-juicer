@@ -687,6 +687,8 @@
         <span class="n">word_list</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="n">word_nums</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">word_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">w</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
             <span class="k">if</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">word_nums</span><span class="p">:</span>
                 <span class="n">word_nums</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
