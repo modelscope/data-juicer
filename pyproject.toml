@@ -110,7 +110,7 @@ audio = [
 
 # Distributed Computing
 distributed = [
-    "ray==2.47.1",  # distributed computing
+    "ray[default]==2.47.1",  # distributed computing
     "pyspark",  # distributed data processing
 ]
 
