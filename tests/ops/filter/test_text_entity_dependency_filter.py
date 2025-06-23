@@ -71,7 +71,7 @@ class TextEntityDependencyFilterTest(DataJuicerTestCaseBase):
         }, {
             'text': '书。山。星星。土豆。'
         }]
-        tgt_list = [{'text': '她在笑'}, {'text': '枯藤老树昏鸦'}, {'text': '一只会上树的猫'}]
+        tgt_list = [{'text': '她在笑'}, {'text': '枯藤老树昏鸦'}, {'text': '上上下下左左右右'}, {'text': '一只会上树的猫'}]
         dataset = Dataset.from_list(ds_list)
         op = TextEntityDependencyFilter(lang='zh', any_or_all='all')
         self._run_text_entity_denpendency_filter(dataset, tgt_list, op,
