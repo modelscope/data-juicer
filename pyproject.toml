@@ -95,7 +95,7 @@ nlp = [
     "nlpaug",  # Text augmentation
     "nlpcda",  # Chinese text augmentation
     "tiktoken",  # Token counting
-    "opencc==1.1.6",  # Chinese conversion
+    "opencc==1.1.9",  # Chinese conversion
     "spacy-pkuseg",  # Chinese segmentation
     "rouge",  # Text evaluation
 ]
