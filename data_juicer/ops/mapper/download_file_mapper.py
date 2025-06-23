@@ -26,6 +26,7 @@ class DownloadFileMapper(Mapper):
                  save_dir: str = None,
                  download_field: str = None,
                  timeout: int = 30,
+                 max_concurrent: int = 10,
                  *args,
                  **kwargs):
         """
@@ -33,6 +34,7 @@ class DownloadFileMapper(Mapper):
 
         :param save_dir: The directory to save downloaded files.
         :param download_field: The filed name to get the url to download.
+        :param max_concurrent: Maximum concurrent downloads.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -43,10 +45,12 @@ class DownloadFileMapper(Mapper):
         self.save_dir = save_dir
         os.makedirs(self.save_dir, exist_ok=True)
         self.timeout = timeout
+        self.max_concurrent = max_concurrent
 
     def download_files_async(self, urls, save_dir, **kwargs):
 
-        async def _download_file(session: aiohttp.ClientSession, idx: int,
+        async def _download_file(session: aiohttp.ClientSession,
+                                 semaphore: asyncio.Semaphore, idx: int,
                                  url: str, save_dir, **kwargs) -> dict:
             try:
                 filename = os.path.basename(urlparse(url).path)
@@ -54,11 +58,13 @@ class DownloadFileMapper(Mapper):
                 status = 'success'
                 if os.path.exists(save_path):
                     return idx, save_path, status, None
-                response = await download_file(session,
-                                               url,
-                                               save_path,
-                                               timeout=self.timeout,
-                                               **kwargs)
+
+                async with semaphore:
+                    response = await download_file(session,
+                                                   url,
+                                                   save_path,
+                                                   timeout=self.timeout,
+                                                   **kwargs)
             except Exception as e:
                 status = 'failed'
                 response = str(e)
@@ -67,10 +73,11 @@ class DownloadFileMapper(Mapper):
             return idx, save_path, status, response
 
         async def run_downloads(urls, save_dir, **kwargs):
+            semaphore = asyncio.Semaphore(self.max_concurrent)
             async with aiohttp.ClientSession() as session:
                 tasks = [
-                    _download_file(session, idx, url, save_dir, **kwargs)
-                    for idx, url in enumerate(urls)
+                    _download_file(session, semaphore, idx, url, save_dir,
+                                   **kwargs) for idx, url in enumerate(urls)
                 ]
                 return await asyncio.gather(*tasks)
 
