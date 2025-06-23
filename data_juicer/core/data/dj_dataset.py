@@ -340,7 +340,11 @@ class NestedDataset(Dataset, DJDataset):
                 adapter.insight_mining()
             # make summarization on the error/warning logs
             if work_dir:
-                make_log_summarization()
+                try:
+                    make_log_summarization()
+                except:  # noqa: E722
+                    traceback.print_exc()
+                    logger.error("Error occurred when making log summarization")
         return dataset
 
     def update_args(self, args, kargs, is_filter=False):

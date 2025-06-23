@@ -295,6 +295,8 @@ class ColumnWiseAnalysis:
         word_list = data.tolist()
         word_nums = {}
         for w in word_list:
+            if w is None:
+                continue
             if w in word_nums:
                 word_nums[w] += 1
             else:
