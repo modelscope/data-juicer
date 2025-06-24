@@ -89,8 +89,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
                 print('CLEAN all TRANSFORMERS_CACHE')
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
 
-    @classmethod
-    def tearDown(cls) -> None:
+        # clear models in memory
         free_models()
 
     def generate_dataset(self, data) -> DJDataset:

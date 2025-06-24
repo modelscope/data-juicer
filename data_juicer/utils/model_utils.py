@@ -1124,8 +1124,12 @@ def free_models(clear_model_zoo=True):
     global MODEL_ZOO
     for model_key in MODEL_ZOO:
         try:
-            MODEL_ZOO[model_key].to('cpu')
+            model = MODEL_ZOO[model_key]
+            model.to('cpu')
+            if clear_model_zoo:
+                del model
         except Exception:
             pass
     if clear_model_zoo:
         MODEL_ZOO.clear()
+    torch.cuda.empty_cache()
