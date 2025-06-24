@@ -17,7 +17,7 @@ from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
                                         load_data_with_context, load_video,
                                         remove_non_special_tokens,
                                         remove_special_tokens)
-from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.model_utils import get_model, prepare_model, torch
 
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
@@ -232,15 +232,16 @@ class VideoCaptioningFromFramesMapper(Mapper):
                         images=video_frame_videos_chunk,
                         return_tensors='pt',
                     ).to(model.device)
-                    for i in range(self.caption_num):
-                        generated_ids = model.generate(**inputs,
-                                                       max_new_tokens=128,
-                                                       do_sample=True)
-                        generated_text = processor.batch_decode(
-                            generated_ids, skip_special_tokens=True)
-                        generated_text_candidates_single_chunk[i] += [
-                            '. '.join([txt.strip() for txt in generated_text])
-                        ]
+                    with torch.no_grad():
+                        for i in range(self.caption_num):
+                            generated_ids = model.generate(**inputs,
+                                                           max_new_tokens=128,
+                                                           do_sample=True)
+                            generated_text = processor.batch_decode(
+                                generated_ids, skip_special_tokens=True)
+                            generated_text_candidates_single_chunk[i] += [
+                                '. '.join([txt.strip() for txt in generated_text])
+                            ]
 
                 # 3. insert a list of generated captions into the positions of
                 # subsequent placeholders in the original string

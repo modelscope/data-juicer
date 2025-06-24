@@ -127,13 +127,12 @@ def check_model(model_name, force=False):
             try:
                 wget.download(backup_model_link, cached_model_path)
             except:  # noqa: E722
-                logger.error(
+                import traceback
+                traceback.print_exc()
+                raise RuntimeError(
                     f'Downloading model [{model_name}] error. '
                     f'Please retry later or download it into {DJMC} '
                     f'manually from {model_link} or {backup_model_link} ')
-                import traceback
-                traceback.print_exc()
-                exit(1)
     return cached_model_path
 
 
