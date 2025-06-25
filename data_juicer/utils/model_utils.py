@@ -73,6 +73,11 @@ BACKUP_MODEL_LINKS = {
     'FastSAM-x.pt':
     'https://github.com/ultralytics/assets/releases/download/v8.2.0/'
     'FastSAM-x.pt',
+
+    # spacy
+    '*_core_web_md-3.*.0':
+    'https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/'
+    'data_juicer/models/',
 }
 
 
@@ -112,20 +117,22 @@ def check_model(model_name, force=False):
             logger.info(
                 f'Model [{cached_model_path}] is not found. Downloading...')
 
+        model_link = os.path.join(MODEL_LINKS, model_name)
         try:
-            model_link = os.path.join(MODEL_LINKS, model_name)
             wget.download(model_link, cached_model_path)
         except:  # noqa: E722
+            backup_model_link = get_backup_model_link(model_name)
+            if backup_model_link is not None:
+                backup_model_link = os.path.join(backup_model_link, model_name)
             try:
-                backup_model_link = os.path.join(
-                    get_backup_model_link(model_name), model_name)
                 wget.download(backup_model_link, cached_model_path)
             except:  # noqa: E722
-                logger.error(
+                import traceback
+                traceback.print_exc()
+                raise RuntimeError(
                     f'Downloading model [{model_name}] error. '
                     f'Please retry later or download it into {DJMC} '
                     f'manually from {model_link} or {backup_model_link} ')
-                exit(1)
     return cached_model_path
 
 
@@ -1117,8 +1124,12 @@ def free_models(clear_model_zoo=True):
     global MODEL_ZOO
     for model_key in MODEL_ZOO:
         try:
-            MODEL_ZOO[model_key].to('cpu')
+            model = MODEL_ZOO[model_key]
+            model.to('cpu')
+            if clear_model_zoo:
+                del model
         except Exception:
             pass
     if clear_model_zoo:
         MODEL_ZOO.clear()
+    torch.cuda.empty_cache()

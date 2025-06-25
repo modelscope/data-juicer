@@ -62,12 +62,12 @@ dependencies = [
 [project.optional-dependencies]
 # Generic ML & DL
 generic = [
-    "torch==2.7.0",  # PyTorch
+    "torch==2.6.0",  # PyTorch
     "transformers>=4.47.0",  # Hugging Face Transformers
     "transformers_stream_generator",  # Stream generation for Transformers
     "einops",  # Tensor operations
     "accelerate",  # Model acceleration
-    "vllm==0.9.1",  # LLM serving
+    "vllm==0.8.5.post1",  # LLM serving
     "onnxruntime",  # ONNX runtime
 ]
 
@@ -149,10 +149,9 @@ ai_services = [
 # Todo: the sandbox dependencies will be provided in
 # micro-services rather than all-in-one env
 sandbox = [
-    "torch==2.7.0",
+    "torch==2.6.0",
     "fire",
     "pyspark",
-    "modelscope[framework,nlp]",
 ]
 
 
@@ -165,6 +164,7 @@ all = [
     "py-data-juicer[distributed]",
     "py-data-juicer[dev]",
     "py-data-juicer[ai_services]",
+    "py-data-juicer[sandbox]",
 ]
 
 [project.scripts]
