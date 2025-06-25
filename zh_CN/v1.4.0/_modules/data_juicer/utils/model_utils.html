@@ -423,6 +423,11 @@
     <span class="s1">&#39;FastSAM-x.pt&#39;</span><span class="p">:</span>
     <span class="s1">&#39;https://github.com/ultralytics/assets/releases/download/v8.2.0/&#39;</span>
     <span class="s1">&#39;FastSAM-x.pt&#39;</span><span class="p">,</span>
+
+    <span class="c1"># spacy</span>
+    <span class="s1">&#39;*_core_web_md-3.*.0&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/&#39;</span>
+    <span class="s1">&#39;data_juicer/models/&#39;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -467,20 +472,22 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s1">&#39;Model [</span><span class="si">{</span><span class="n">cached_model_path</span><span class="si">}</span><span class="s1">] is not found. Downloading...&#39;</span><span class="p">)</span>
 
+        <span class="n">model_link</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODEL_LINKS</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">model_link</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODEL_LINKS</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
             <span class="n">wget</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">model_link</span><span class="p">,</span> <span class="n">cached_model_path</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+            <span class="n">backup_model_link</span> <span class="o">=</span> <span class="n">get_backup_model_link</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">backup_model_link</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">backup_model_link</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">backup_model_link</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">backup_model_link</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">get_backup_model_link</span><span class="p">(</span><span class="n">model_name</span><span class="p">),</span> <span class="n">model_name</span><span class="p">)</span>
                 <span class="n">wget</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">backup_model_link</span><span class="p">,</span> <span class="n">cached_model_path</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+                <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s1">&#39;Downloading model [</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s1">] error. &#39;</span>
                     <span class="sa">f</span><span class="s1">&#39;Please retry later or download it into </span><span class="si">{</span><span class="n">DJMC</span><span class="si">}</span><span class="s1"> &#39;</span>
                     <span class="sa">f</span><span class="s1">&#39;manually from </span><span class="si">{</span><span class="n">model_link</span><span class="si">}</span><span class="s1"> or </span><span class="si">{</span><span class="n">backup_model_link</span><span class="si">}</span><span class="s1"> &#39;</span><span class="p">)</span>
-                <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cached_model_path</span></div>
 
 
@@ -1553,11 +1560,15 @@
     <span class="k">global</span> <span class="n">MODEL_ZOO</span>
     <span class="k">for</span> <span class="n">model_key</span> <span class="ow">in</span> <span class="n">MODEL_ZOO</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">MODEL_ZOO</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">MODEL_ZOO</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">clear_model_zoo</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">model</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
     <span class="k">if</span> <span class="n">clear_model_zoo</span><span class="p">:</span>
-        <span class="n">MODEL_ZOO</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+        <span class="n">MODEL_ZOO</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span></div>
 
 </pre></div>
         </article>

@@ -425,7 +425,10 @@
         <span class="kn">import</span><span class="w"> </span><span class="nn">multiprocess</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">original_mp_method</span> <span class="o">=</span> <span class="n">multiprocess</span><span class="o">.</span><span class="n">get_start_method</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">is_cuda_available</span><span class="p">():</span>
-            <span class="n">multiprocess</span><span class="o">.</span><span class="n">set_start_method</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+            <span class="n">multiprocess</span><span class="o">.</span><span class="n">set_start_method</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># clear models in memory</span>
+        <span class="n">free_models</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="DataJuicerTestCaseBase.tearDownClass">
@@ -455,8 +458,8 @@
 
 <div class="viewcode-block" id="DataJuicerTestCaseBase.tearDown">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.tearDown">[文档]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tearDown</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># clear models in memory</span>
         <span class="n">free_models</span><span class="p">()</span></div>
 
 

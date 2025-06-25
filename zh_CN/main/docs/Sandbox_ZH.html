@@ -450,6 +450,13 @@
 <p>并根据官方说明准备好沙盒中使用的第三方库（例如 EasyAnimate 、 VBench 、 InternVL 等），或者您也可以简单地从 GitHub 克隆第三方存储库，并在沙盒运行期间将安装过程留给我们的 <code class="docutils literal notranslate"><span class="pre">EnvManager</span></code> 完成。</p>
 <p><strong>注意</strong>：一些沙盒的依赖还需要额外的领域依赖。</p>
 <ol class="arabic simple">
+<li><p>要使用<a class="reference external" href="https://github.com/modelscope/modelscope">ModelScope</a>时需从ModelScope的独立host安装其相关依赖：</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;modelscope[framework,nlp]&quot;</span><span class="w"> </span>-f<span class="w"> </span>https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
+</pre></div>
+</div>
+<p>可参考<a class="reference external" href="https://www.modelscope.cn/docs/intro/environment-setup">ModelScope文档</a>获取更多信息。</p>
+<ol class="arabic simple" start="2">
 <li><p>要使用<a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a>时需要执行如下安装脚本：</p></li>
 </ol>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>thirdparty/models/
