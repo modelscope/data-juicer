@@ -1596,6 +1596,12 @@ etc</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.file_utils.is_remote_path">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">is_remote_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#is_remote_path"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.is_remote_path" title="Link to this definition">¶</a></dt>
+<dd><p>Check if the path is a remote path.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.file_utils.is_absolute_path">
 <span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">is_absolute_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#is_absolute_path"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.is_absolute_path" title="Link to this definition">¶</a></dt>
 <dd><p>Check whether input path is a absolute path.</p>
@@ -1753,6 +1759,21 @@ number of files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">参数<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>followlinks</strong> -- Whether to follow symbolic links.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.file_utils.download_file">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">download_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClientSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#download_file"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.download_file" title="Link to this definition">¶</a></dt>
+<dd><p>Download a file from a given URL and save it to a specified directory.
+:param url: The URL of the file to download.
+:param save_path: The path where the downloaded file will be saved.
+:param timeout: The timeout in seconds for each HTTP request.
+:param kwargs: The keyword arguments to pass to the HTTP request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The response object from the HTTP request.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3452,6 +3473,7 @@ Currently, <cite>standalone</cite>, <cite>ray</cite> are supported.</p>
 <li><a class="reference internal" href="#module-data_juicer.utils.file_utils">data_juicer.utils.file_utils module</a><ul>
 <li><a class="reference internal" href="#data_juicer.utils.file_utils.follow_read"><code class="docutils literal notranslate"><span class="pre">follow_read()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.file_utils.find_files_with_suffix"><code class="docutils literal notranslate"><span class="pre">find_files_with_suffix()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.file_utils.is_remote_path"><code class="docutils literal notranslate"><span class="pre">is_remote_path()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.file_utils.is_absolute_path"><code class="docutils literal notranslate"><span class="pre">is_absolute_path()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.file_utils.add_suffix_to_filename"><code class="docutils literal notranslate"><span class="pre">add_suffix_to_filename()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.file_utils.create_directory_if_not_exists"><code class="docutils literal notranslate"><span class="pre">create_directory_if_not_exists()</span></code></a></li>
@@ -3462,6 +3484,7 @@ Currently, <cite>standalone</cite>, <cite>ray</cite> are supported.</p>
 <li><a class="reference internal" href="#data_juicer.utils.file_utils.single_partition_write_with_filename"><code class="docutils literal notranslate"><span class="pre">single_partition_write_with_filename()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.file_utils.read_single_partition"><code class="docutils literal notranslate"><span class="pre">read_single_partition()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.file_utils.get_all_files_paths_under"><code class="docutils literal notranslate"><span class="pre">get_all_files_paths_under()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.file_utils.download_file"><code class="docutils literal notranslate"><span class="pre">download_file()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-data_juicer.utils.fingerprint_utils">data_juicer.utils.fingerprint_utils module</a><ul>

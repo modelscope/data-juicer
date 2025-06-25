@@ -1299,6 +1299,48 @@ e.g {‘temperature’: 0.9, ‘top_p’: 0.95}</p></li>
 </dd></dl>
 
 </section>
+<section id="module-data_juicer.ops.mapper.download_file_mapper">
+<span id="data-juicer-ops-mapper-download-file-mapper-module"></span><h2>data_juicer.ops.mapper.download_file_mapper module<a class="headerlink" href="#module-data_juicer.ops.mapper.download_file_mapper" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.download_file_mapper.</span></span><span class="sig-name descname"><span class="pre">DownloadFileMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_concurrent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/download_file_mapper.html#DownloadFileMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
+<p>Mapper to download url files to local files.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_concurrent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/download_file_mapper.html#DownloadFileMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> – The directory to save downloaded files.</p></li>
+<li><p><strong>download_field</strong> – The filed name to get the url to download.</p></li>
+<li><p><strong>max_concurrent</strong> – Maximum concurrent downloads.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.download_files_async">
+<span class="sig-name descname"><span class="pre">download_files_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">urls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/download_file_mapper.html#DownloadFileMapper.download_files_async"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.download_files_async" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.download_nested_urls">
+<span class="sig-name descname"><span class="pre">download_nested_urls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nested_urls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/download_file_mapper.html#DownloadFileMapper.download_nested_urls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.download_nested_urls" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.process_batched">
+<span class="sig-name descname"><span class="pre">process_batched</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/download_file_mapper.html#DownloadFileMapper.process_batched"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.process_batched" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-data_juicer.ops.mapper.expand_macro_mapper">
 <span id="data-juicer-ops-mapper-expand-macro-mapper-module"></span><h2>data_juicer.ops.mapper.expand_macro_mapper module<a class="headerlink" href="#module-data_juicer.ops.mapper.expand_macro_mapper" title="Link to this heading">¶</a></h2>
 <dl class="py class">
@@ -8976,6 +9018,45 @@ in text samples.</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.DownloadFileMapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.</span></span><span class="sig-name descname"><span class="pre">DownloadFileMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_concurrent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/download_file_mapper.html#DownloadFileMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.DownloadFileMapper" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
+<p>Mapper to download url files to local files.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.DownloadFileMapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_concurrent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/download_file_mapper.html#DownloadFileMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.DownloadFileMapper.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> – The directory to save downloaded files.</p></li>
+<li><p><strong>download_field</strong> – The filed name to get the url to download.</p></li>
+<li><p><strong>max_concurrent</strong> – Maximum concurrent downloads.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.DownloadFileMapper.download_files_async">
+<span class="sig-name descname"><span class="pre">download_files_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">urls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/download_file_mapper.html#DownloadFileMapper.download_files_async"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.DownloadFileMapper.download_files_async" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.DownloadFileMapper.download_nested_urls">
+<span class="sig-name descname"><span class="pre">download_nested_urls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nested_urls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/download_file_mapper.html#DownloadFileMapper.download_nested_urls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.DownloadFileMapper.download_nested_urls" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.DownloadFileMapper.process_batched">
+<span class="sig-name descname"><span class="pre">process_batched</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/download_file_mapper.html#DownloadFileMapper.process_batched"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.DownloadFileMapper.process_batched" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 
@@ -9200,6 +9281,16 @@ in text samples.</p>
 <li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_topic_detection_mapper.DialogTopicDetectionMapper.build_input"><code class="docutils literal notranslate"><span class="pre">DialogTopicDetectionMapper.build_input()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_topic_detection_mapper.DialogTopicDetectionMapper.parse_output"><code class="docutils literal notranslate"><span class="pre">DialogTopicDetectionMapper.parse_output()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_topic_detection_mapper.DialogTopicDetectionMapper.process_single"><code class="docutils literal notranslate"><span class="pre">DialogTopicDetectionMapper.process_single()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-data_juicer.ops.mapper.download_file_mapper">data_juicer.ops.mapper.download_file_mapper module</a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper"><code class="docutils literal notranslate"><span class="pre">DownloadFileMapper</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.__init__"><code class="docutils literal notranslate"><span class="pre">DownloadFileMapper.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.download_files_async"><code class="docutils literal notranslate"><span class="pre">DownloadFileMapper.download_files_async()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.download_nested_urls"><code class="docutils literal notranslate"><span class="pre">DownloadFileMapper.download_nested_urls()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.process_batched"><code class="docutils literal notranslate"><span class="pre">DownloadFileMapper.process_batched()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -10311,6 +10402,13 @@ in text samples.</p>
 <li><a class="reference internal" href="#data_juicer.ops.mapper.WhitespaceNormalizationMapper"><code class="docutils literal notranslate"><span class="pre">WhitespaceNormalizationMapper</span></code></a><ul>
 <li><a class="reference internal" href="#data_juicer.ops.mapper.WhitespaceNormalizationMapper.__init__"><code class="docutils literal notranslate"><span class="pre">WhitespaceNormalizationMapper.__init__()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.ops.mapper.WhitespaceNormalizationMapper.process_batched"><code class="docutils literal notranslate"><span class="pre">WhitespaceNormalizationMapper.process_batched()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.DownloadFileMapper"><code class="docutils literal notranslate"><span class="pre">DownloadFileMapper</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.DownloadFileMapper.__init__"><code class="docutils literal notranslate"><span class="pre">DownloadFileMapper.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.DownloadFileMapper.download_files_async"><code class="docutils literal notranslate"><span class="pre">DownloadFileMapper.download_files_async()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.DownloadFileMapper.download_nested_urls"><code class="docutils literal notranslate"><span class="pre">DownloadFileMapper.download_nested_urls()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.DownloadFileMapper.process_batched"><code class="docutils literal notranslate"><span class="pre">DownloadFileMapper.process_batched()</span></code></a></li>
 </ul>
 </li>
 </ul>

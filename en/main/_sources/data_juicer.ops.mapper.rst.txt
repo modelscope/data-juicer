@@ -132,6 +132,14 @@ data\_juicer.ops.mapper.dialog\_topic\_detection\_mapper module
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.mapper.download\_file\_mapper module
+-----------------------------------------------------
+
+.. automodule:: data_juicer.ops.mapper.download_file_mapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.mapper.expand\_macro\_mapper module
 ----------------------------------------------------
 
