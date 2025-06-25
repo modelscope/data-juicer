@@ -5175,6 +5175,11 @@ nlp = [
     { name = "spacy-pkuseg" },
     { name = "tiktoken" },
 ]
+sandbox = [
+    { name = "fire" },
+    { name = "pyspark" },
+    { name = "torch" },
+]
 vision = [
     { name = "diffusers" },
     { name = "imagededup" },
@@ -5217,6 +5222,7 @@ requires-dist = [
     { name = "ffmpeg-python", marker = "extra == 'audio'" },
     { name = "fire", marker = "extra == 'all'" },
     { name = "fire", marker = "extra == 'dev'" },
+    { name = "fire", marker = "extra == 'sandbox'" },
     { name = "fsspec", specifier = "==2023.5.0" },
     { name = "ftfy", marker = "extra == 'all'" },
     { name = "ftfy", marker = "extra == 'nlp'" },
@@ -5267,6 +5273,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyspark", marker = "extra == 'all'" },
     { name = "pyspark", marker = "extra == 'distributed'" },
+    { name = "pyspark", marker = "extra == 'sandbox'" },
     { name = "pytest", marker = "extra == 'all'" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "pytest-cov", marker = "extra == 'all'" },
@@ -5322,6 +5329,7 @@ requires-dist = [
     { name = "tomli-w" },
     { name = "torch", marker = "extra == 'all'", specifier = "==2.6.0" },
     { name = "torch", marker = "extra == 'generic'", specifier = "==2.6.0" },
+    { name = "torch", marker = "extra == 'sandbox'", specifier = "==2.6.0" },
     { name = "torchaudio", marker = "extra == 'all'" },
     { name = "torchaudio", marker = "extra == 'audio'" },
     { name = "tqdm" },
@@ -5340,7 +5348,7 @@ requires-dist = [
     { name = "wordcloud" },
     { name = "zstandard" },
 ]
-provides-extras = ["ai-services", "all", "audio", "dev", "distributed", "generic", "nlp", "vision"]
+provides-extras = ["ai-services", "all", "audio", "dev", "distributed", "generic", "nlp", "sandbox", "vision"]
 
 [[package]]
 name = "py-spy"
