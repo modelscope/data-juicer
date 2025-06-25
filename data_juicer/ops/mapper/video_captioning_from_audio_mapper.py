@@ -5,7 +5,7 @@ import regex as re
 
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens, extract_audio_from_video
-from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.model_utils import get_model, prepare_model, torch
 
 from ..base_op import OPERATORS, Mapper
 
@@ -83,9 +83,14 @@ class VideoCaptioningFromAudioMapper(Mapper):
 
                 # start to inference
                 audio_info = processor.process_audio(query)
-                inputs = processor(query, return_tensors="pt", audio_info=audio_info).to(model.device)
-                outputs = model.generate(**inputs, audio_info=audio_info)
-                response = processor.decode(outputs[0], skip_special_tokens=True, audio_info=audio_info)
+                inputs = processor(query,
+                                   return_tensors='pt',
+                                   audio_info=audio_info).to(model.device)
+                with torch.no_grad():
+                    outputs = model.generate(**inputs, audio_info=audio_info)
+                response = processor.decode(outputs[0],
+                                            skip_special_tokens=True,
+                                            audio_info=audio_info)
                 # remove audio path
                 response = response.replace(extracted_audio_path, "").replace("<audio>", "").replace("</audio>", "")
                 response = self.response_remove_pattern.sub("", response).strip()
