@@ -157,7 +157,7 @@ dependencies = [
     "pydantic>=2.0",
     "uv",
     "wordcloud",
-    "spacy==3.7.0",
+    "spacy==3.8.0",
     "httpx",
     "av==13.1.0",
     "emoji==2.2.0",

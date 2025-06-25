@@ -5,7 +5,7 @@ import regex as re
 
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens, extract_audio_from_video
-from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.model_utils import get_model, prepare_model, torch
 
 from ..base_op import OPERATORS, Mapper
 
@@ -91,7 +91,8 @@ class VideoCaptioningFromAudioMapper(Mapper):
                 inputs = processor(query,
                                    return_tensors='pt',
                                    audio_info=audio_info).to(model.device)
-                outputs = model.generate(**inputs, audio_info=audio_info)
+                with torch.no_grad():
+                    outputs = model.generate(**inputs, audio_info=audio_info)
                 response = processor.decode(outputs[0],
                                             skip_special_tokens=True,
                                             audio_info=audio_info)

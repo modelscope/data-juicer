@@ -51,7 +51,13 @@ pip install -v -e .[sandbox]
 
 **注意**：一些沙盒的依赖还需要额外的领域依赖。
 
-1. 要使用[EasyAnimate](https://github.com/aigc-apps/EasyAnimate)时需要执行如下安装脚本：
+1. 要使用[ModelScope](https://github.com/modelscope/modelscope)时需从ModelScope的独立host安装其相关依赖：
+```shell
+pip install "modelscope[framework,nlp]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
+```
+可参考[ModelScope文档](https://www.modelscope.cn/docs/intro/environment-setup)获取更多信息。
+
+2. 要使用[EasyAnimate](https://github.com/aigc-apps/EasyAnimate)时需要执行如下安装脚本：
 ```shell
 cd thirdparty/models/
 bash setup_easyanimate.sh
