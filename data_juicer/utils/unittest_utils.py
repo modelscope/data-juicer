@@ -67,6 +67,9 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         if is_cuda_available():
             multiprocess.set_start_method('spawn', force=True)
 
+        # clear models in memory
+        free_models()
+
     @classmethod
     def tearDownClass(cls, hf_model_name=None) -> None:
         import multiprocess
@@ -89,8 +92,8 @@ class DataJuicerTestCaseBase(unittest.TestCase):
                 print('CLEAN all TRANSFORMERS_CACHE')
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
 
-    @classmethod
-    def tearDown(cls) -> None:
+    def tearDown(self) -> None:
+        # clear models in memory
         free_models()
 
     def generate_dataset(self, data) -> DJDataset:

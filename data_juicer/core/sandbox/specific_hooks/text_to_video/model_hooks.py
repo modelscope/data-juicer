@@ -200,30 +200,33 @@ class VBenchEvaluator(BaseEvaluator):
                 self.dimension_list) == 0:
             raise ValueError('Please specify the dimension_list.')
 
+        os.makedirs(self.output_path, exist_ok=True)
+
     def run(self, eval_type, eval_obj=None, **kwargs):
         if eval_type == 'data':
             result_dict = {'mean_score': 0, 'detail': {}}
             scores = []
-            eval_log_path = os.path.join(self.output_path, 'eval_log.txt')
-            logger.info(f'Evaluating for {self.dimension_list}')
-            cmd = f'vbench evaluate --ngpus {self.num_gpus} --full_json_dir {self.full_json_dir} ' \
-                  f'--output_path {self.output_path} --videos_path {self.videos_path} ' \
-                  f'--dimension {self.dimension_list} --load_ckpt_from_local {self.load_ckpt_from_local} 2>&1' \
-                  f' | tee -a "{eval_log_path}"'
-            self.env.run_cmd(cmd)
-            # read eval log to find the result json file
-            with open(eval_log_path, 'r') as fin:
-                content = fin.read()
-            result_name_pattern = r'Evaluation results saved to (.*?).json'
-            res = re.findall(result_name_pattern, content)
-            if len(res) > 0:
-                result_name = res[0]
-            else:
-                raise RuntimeError(
-                    'Cannot find the result json file from the evaluation log.'
-                )
-            results = json.load(open(f'{result_name}.json', 'r'))
-            for dimension in results:
+            for dimension in self.dimension_list:
+                eval_log_path = os.path.join(self.output_path,
+                                             f'eval_log_{dimension}.txt')
+                logger.info(f'Evaluating for {dimension}')
+                cmd = f'vbench evaluate --ngpus {self.num_gpus} --full_json_dir {self.full_json_dir} ' \
+                      f'--output_path {self.output_path} --videos_path {self.videos_path} ' \
+                      f'--dimension {dimension} --load_ckpt_from_local {self.load_ckpt_from_local} 2>&1' \
+                      f' | tee -a "{eval_log_path}"'
+                self.env.run_cmd(cmd)
+                # read eval log to find the result json file
+                with open(eval_log_path, 'r') as fin:
+                    content = fin.read()
+                result_name_pattern = r'Evaluation results saved to (.*?).json'
+                res = re.findall(result_name_pattern, content)
+                if len(res) > 0:
+                    result_name = res[0]
+                else:
+                    raise RuntimeError(
+                        'Cannot find the result json file from the evaluation log.'
+                    )
+                results = json.load(open(f'{result_name}.json', 'r'))
                 score = results[dimension][0]
                 result_dict['detail'][dimension] = score
                 scores.append(score)

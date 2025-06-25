@@ -33,7 +33,7 @@ dependencies = [
     "pydantic>=2.0",  # data validation
     "uv",
     "wordcloud",
-    "spacy==3.7.0",
+    "spacy==3.8.0",
     "httpx",
     "av==13.1.0",  # video/audio handling
     "emoji==2.2.0",  # emoji handling
@@ -62,13 +62,12 @@ dependencies = [
 [project.optional-dependencies]
 # Generic ML & DL
 generic = [
-    "torch>=1.11.0",  # PyTorch
-    "transformers>=4.47.0,<4.48.0",  # Hugging Face Transformers
+    "torch==2.6.0",  # PyTorch
+    "transformers>=4.47.0",  # Hugging Face Transformers
     "transformers_stream_generator",  # Stream generation for Transformers
     "einops",  # Tensor operations
     "accelerate",  # Model acceleration
-    "vllm>=0.6.5",  # LLM serving
-    "huggingface_hub<0.26.0",  # Hugging Face Hub
+    "vllm==0.8.5.post1",  # LLM serving
     "onnxruntime",  # ONNX runtime
     "cudf-cu12", # dataframe on GPU
 ]
@@ -77,7 +76,7 @@ generic = [
 vision = [
     "opencv-python",  # OpenCV
     "imagededup",  # Image deduplication
-    "diffusers>=0.18.0",  # Diffusion models
+    "diffusers>=0.33.0",  # Diffusion models
     "simple-aesthetics-predictor",  # Image aesthetics
     "scenedetect[opencv]",  # Scene detection
     "ultralytics",  # YOLO models
@@ -112,7 +111,7 @@ audio = [
 
 # Distributed Computing
 distributed = [
-    "ray==2.40.0",  # distributed computing
+    "ray[default]==2.47.1",  # distributed computing
     "pyspark",  # distributed data processing
 ]
 
@@ -151,10 +150,9 @@ ai_services = [
 # Todo: the sandbox dependencies will be provided in
 # micro-services rather than all-in-one env
 sandbox = [
-    "torch>=1.11.0",
+    "torch==2.6.0",
     "fire",
     "pyspark",
-    "modelscope[framework,nlp]",
 ]
 
 
@@ -167,6 +165,7 @@ all = [
     "py-data-juicer[distributed]",
     "py-data-juicer[dev]",
     "py-data-juicer[ai_services]",
+    "py-data-juicer[sandbox]",
 ]
 
 [project.scripts]
