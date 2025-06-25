@@ -6,7 +6,8 @@ from jsonargparse import Namespace
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.analysis import ColumnWiseAnalysis, OverallAnalysis
+from data_juicer.analysis import (ColumnWiseAnalysis, CorrelationAnalysis,
+                                  OverallAnalysis)
 from data_juicer.config import init_configs
 from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.ops import NON_STATS_FILTERS, TAGGING_OPS, Filter, load_ops
@@ -165,6 +166,13 @@ class Analyzer:
             save_stats_in_one_file=self.cfg.save_stats_in_one_file,
         )
         column_wise_analysis.analyze(skip_export=skip_export)
+
+        logger.info('Applying correlation analysis on stats...')
+        correlation_analysis = CorrelationAnalysis(
+            dataset,
+            self.analysis_path,
+        )
+        correlation_analysis.analyze(skip_export=skip_export)
 
         if not skip_return:
             return dataset

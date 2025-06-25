@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Utility script to generate uv.lock file excluding sandbox dependencies.
+Utility script to generate uv.lock file.
 """
 
 import shutil
@@ -33,7 +33,7 @@ def check_uv_installed():
 
 
 def generate_uv_lock():
-    """Generate uv.lock file excluding sandbox dependencies."""
+    """Generate uv.lock file."""
     # Check prerequisites
     check_uv_installed()
 
@@ -46,10 +46,6 @@ def generate_uv_lock():
     shutil.copy2(pyproject_path, backup_path)
 
     try:
-        # Create modified pyproject.toml without sandbox
-        if 'sandbox' in pyproject['project']['optional-dependencies']:
-            del pyproject['project']['optional-dependencies']['sandbox']
-
         # Write modified pyproject.toml
         toml_str = tomli_w.dumps(pyproject)
         with open(pyproject_path, 'w', encoding='utf-8') as f:
