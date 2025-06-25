@@ -12,6 +12,7 @@ from typing_extensions import Annotated
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
+from data_juicer.utils.resource_utils import get_ray_gpu_count, get_ray_gpu_memory
 
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
@@ -28,6 +29,7 @@ BATCH_SIZE = 1000
 
 
 class IdGenerator:
+
     def __init__(self, start_id=0):
         self.next_id = start_id
 
@@ -38,6 +40,7 @@ class IdGenerator:
 
 
 class EdgeBuffer:
+
     def __init__(self):
         self.edge_dict = {}
 
@@ -236,6 +239,51 @@ def get_remote_classes():
 OP_NAME = "ray_bts_minhash_deduplicator"
 
 
+class GPUMinHashActor:
+
+    def __init__(self, width: int = 5, perm_a: np.ndarray = None, perm_b: np.ndarray = None, lowercase: bool = True):
+        import cudf
+        import rmm
+
+        rmm.reinitialize(pool_allocator=True)
+        self.width = width
+        gen = np.random.RandomState(seed=42)
+        if perm_a is None or perm_b is None:
+            perm_a, perm_b = np.array(
+                [
+                    (
+                        gen.randint(1, MERSENNE_PRIME, dtype=np.uint64),
+                        gen.randint(0, MERSENNE_PRIME, dtype=np.uint64),
+                    )
+                    for _ in range(256)
+                ],
+                dtype=np.uint64,
+            ).T
+        self.perm_a = cudf.Series(perm_a).astype("uint32")
+        self.perm_b = cudf.Series(perm_b).astype("uint32")
+        self.lowercase = lowercase
+
+    def compute_minhash(self, text_arr: pa.Array) -> pa.Array:
+        """
+        Compute MinHash signatures for texts in a table
+        """
+        import cudf
+
+        text_df = cudf.Series.from_arrow(text_arr)
+        if self.lowercase:
+            text_df = text_df.str.lower()
+        minhashes = text_df.str.minhash(seed=0, a=self.perm_a, b=self.perm_b, width=self.width)
+        del text_df
+        arrow_minhashes = minhashes.to_arrow()
+        del minhashes
+        return arrow_minhashes
+
+    def __call__(self, table: pa.Table, text_key: str = "text") -> pa.Table:
+        minhashes = self.compute_minhash(table[text_key])
+        new_table = table.append_column("_minhash", minhashes)
+        return new_table
+
+
 @OPERATORS.register_module(OP_NAME)
 class RayBTSMinhashDeduplicator(Deduplicator):
     """
@@ -264,6 +312,8 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         max_pending_filter_tasks: Optional[int] = 20,
         num_filter_task_returns: Optional[int] = 10,
         merge_batch_size: Optional[int] = 1000,
+        minhash_batch_size: Optional[int] = "auto",
+        memory_per_sample: Optional[float] = 0.1,  # MB per sample
         *args,
         **kwargs,
     ):
@@ -312,16 +362,32 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             to return. Default it's 10.
         :param merge_batch_size: batch size for BTS operations. Default
             it's 1000.
-        :param tmp_file_name: the temporary folder name for deduplication.
+        :param minhash_batch_size: batch size for MinHash computation. If "auto",
+            it will be set to default value on CPU(1024), or auto calculated per
+            available GPU memory and memory_per_sample setting for GPU.
+        :param memory_per_sample: estimated memory needed per sample in MB.
+            Used to calculate batch size based on available GPU memory.
+            Default is 0.1 MB per sample.
         """
+
         super().__init__(*args, **kwargs)
-        # about minhash computation
+
         self.tokenization = tokenization
         self.window_size = window_size
         self.lowercase = lowercase
         self.ignore_pattern = ignore_pattern
+        self.memory_per_sample = memory_per_sample
+        if minhash_batch_size == "auto":
+            if self.use_cuda():
+                self.minhash_batch_size = 200_000
+            else:
+                self.minhash_batch_size = 1024
+        else:
+            self.minhash_batch_size = minhash_batch_size
         if self.ignore_pattern:
             self.ignore_pattern = regex.compile(self.ignore_pattern)
+        if self.use_cuda() and self.tokenization != "character":
+            raise ValueError("GPU MinHash computation is only supported for character tokenization")
 
         # check parameters
         if self.ignore_pattern and self.tokenization == "punctuation":
@@ -441,9 +507,32 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         self.empty_hash_value = b"\x00\x00\x00\x00" + empty_hash_value.tobytes()
         self.empty_hash_table_id = int(MAX_HASH % self.union_find_parallel_num)
 
-    def calc_minhash(self, text_list: pa.Array, uid_list: List) -> pa.Table:
+    def band_minhash(self, minhash_list, uid_list):
+        """
+        Logic for creating and pusing LSH bands to the union find list
+        """
         pairs = {}
+        minhash_list = minhash_list.to_numpy(zero_copy_only=False)
+        for minhash, uid in zip(minhash_list, uid_list):
+            for i, (start, end) in enumerate(self.hash_ranges):
+                hash_value = i.to_bytes(4, "big") + minhash[start:end].tobytes()
+                hash_table_id = minhash[start] % self.union_find_parallel_num
+                if hash_table_id not in pairs:
+                    pairs[hash_table_id] = []
+                pairs[hash_table_id].append((hash_value, uid))
+        result_refs = []
+        for i, p in pairs.items():
+            if len(result_refs) > self.max_pending_filter_tasks:
+                ready_refs, result_refs = ray.wait(result_refs, num_returns=self.num_filter_task_returns)
+                ray.get(ready_refs)
+            result_refs.append(self.union_find_list[i].add_key_value_pairs.remote(p))
+        ray.get(result_refs)
 
+    def calc_minhash(self, text_list: pa.Array, uid_list: List) -> pa.Table:
+        """
+        Logic for computing minhash values for each text in the input table
+        """
+        pairs = {}
         for text, uid in zip(text_list, uid_list):
             text = text.as_py()
             if self.lowercase:
@@ -452,7 +541,6 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                 text = self.ignore_pattern.sub("", text)
 
             tokens = self.tokenization_func(text)
-
             if len(tokens) > 0:
                 hv = np.array([sha1_hash32(token) for token in tokens], dtype=np.uint64)
                 phv = ((hv[:, None] * self.perm_a[None, :] + self.perm_b) % MERSENNE_PRIME).astype(np.uint32)
@@ -522,6 +610,15 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         remote_classes = get_remote_classes()
         id_generator = remote_classes["IdGenerator"].remote()
 
+        def band_with_uid(table: pa.Table) -> pa.Table:
+            num_rows = len(table)
+            min_id, max_id = ray.get(id_generator.get_next_id.remote(num_rows))
+            uid_list = range(min_id, max_id)
+            self.band_minhash(table["_minhash"], uid_list)
+            new_table = table.append_column(HashKeys.uid, pa.array(list(uid_list)))
+            new_table = new_table.drop_columns(["_minhash"])
+            return new_table
+
         def minhash_with_uid(table: pa.Table) -> pa.Table:
             num_rows = len(table)
             min_id, max_id = ray.get(id_generator.get_next_id.remote(num_rows))
@@ -531,22 +628,73 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             return new_table
 
         tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
-        dataset.map_batches(
-            minhash_with_uid,
-            batch_format="pyarrow",
-            zero_copy_batch=True,
-        ).write_parquet(tmp_dir)
-        dataset = ray.data.read_parquet(tmp_dir)
+        if self.use_cuda():
+            logger.info("Using GPU for MinHash computation")
+            # Get available GPU count and set concurrency
+            gpu_count = get_ray_gpu_count()
+            if gpu_count == 0:
+                logger.error("No GPUs available in Ray cluster")
+                raise RuntimeError("No GPUs available in Ray cluster")
+
+            concurrency = max(1, gpu_count)  # Ensure at least 1 concurrent task
+            logger.info(f"Setting GPU concurrency to {concurrency} based on available GPUs")
+
+            # Get available GPU memory and set batch size
+            gpu_memory = get_ray_gpu_memory()
+            if gpu_memory:
+                min_memory = min(gpu_memory.values())
+                # Use 80% of available memory to leave room for overhead
+                safe_memory = min_memory * 0.8
+                estimated_batch_size = int(safe_memory / self.memory_per_sample)
+
+                # For very large GPUs, cap at 2M samples to maintain reasonable processing time
+                # This is a soft cap - can be adjusted based on performance testing
+                max_reasonable_batch = 2_000_000
+                batch_size = max(10_000, min(estimated_batch_size, max_reasonable_batch))
+
+                logger.info(
+                    f"Setting batch size to {batch_size} based on available GPU memory "
+                    f"({min_memory}MB), memory per sample ({self.memory_per_sample}MB), "
+                    f"and safe memory limit ({safe_memory}MB)"
+                )
+            else:
+                batch_size = self.minhash_batch_size
+                logger.info(f"Using default batch size of {batch_size}")
+
+            dataset = dataset.map_batches(
+                GPUMinHashActor,
+                batch_format="pyarrow",
+                zero_copy_batch=True,
+                num_gpus=1,
+                concurrency=concurrency,
+                batch_size=batch_size,
+            )
+            dataset.map_batches(
+                band_with_uid,
+                batch_format="pyarrow",
+                zero_copy_batch=True,
+            ).write_parquet(tmp_dir)
+            del dataset
+        else:
+            logger.info("Using CPU for MinHash computation")
+            dataset.map_batches(
+                minhash_with_uid,
+                batch_format="pyarrow",
+                zero_copy_batch=True,
+            ).write_parquet(tmp_dir)
         end_time = time.time()
         logger.info(f"MinHash time = {end_time - start_time}")
-
+        new_dataset = ray.data.read_parquet(tmp_dir)
         start_time = time.time()
         self.merge()
         end_time = time.time()
         logger.info(f"merge time = {end_time - start_time}")
-        result = dataset.map_batches(
+        start_time = time.time()
+        result = new_dataset.map_batches(
             self.filter_with_union_find,
             batch_format="pyarrow",
             zero_copy_batch=True,
         )
+        end_time = time.time()
+        logger.info(f"filter time = {end_time - start_time}")
         return result

@@ -14,6 +14,7 @@ from data_juicer.core.data.schema import Schema
 from data_juicer.ops import Deduplicator, Filter, Mapper
 from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.file_utils import is_remote_path
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.process_utils import calculate_np
@@ -22,6 +23,8 @@ ray = LazyLoader("ray")
 
 
 def get_abs_path(path, dataset_dir):
+    if is_remote_path(path):
+        return path
     full_path = os.path.abspath(os.path.join(dataset_dir, path))
     if os.path.exists(full_path):
         return full_path

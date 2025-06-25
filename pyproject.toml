@@ -69,6 +69,7 @@ generic = [
     "accelerate",  # Model acceleration
     "vllm==0.8.5.post1",  # LLM serving
     "onnxruntime",  # ONNX runtime
+    "cudf-cu12", # dataframe on GPU
 ]
 
 # Computer Vision

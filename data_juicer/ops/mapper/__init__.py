@@ -16,6 +16,7 @@ from .dialog_intent_detection_mapper import DialogIntentDetectionMapper
 from .dialog_sentiment_detection_mapper import DialogSentimentDetectionMapper
 from .dialog_sentiment_intensity_mapper import DialogSentimentIntensityMapper
 from .dialog_topic_detection_mapper import DialogTopicDetectionMapper
+from .download_file_mapper import DownloadFileMapper
 from .expand_macro_mapper import ExpandMacroMapper
 from .extract_entity_attribute_mapper import ExtractEntityAttributeMapper
 from .extract_entity_relation_mapper import ExtractEntityRelationMapper
@@ -104,6 +105,7 @@ __all__ = [
     "DialogTopicDetectionMapper",
     "Difference_Area_Generator_Mapper",
     "Difference_Caption_Generator_Mapper",
+    "DownloadFileMapper",
     "ExpandMacroMapper",
     "ExtractEntityAttributeMapper",
     "ExtractEntityRelationMapper",
