@@ -152,7 +152,6 @@ sandbox = [
     "torch==2.6.0",
     "fire",
     "pyspark",
-    "modelscope[framework,nlp]",
 ]
 
 
@@ -165,6 +164,7 @@ all = [
     "py-data-juicer[distributed]",
     "py-data-juicer[dev]",
     "py-data-juicer[ai_services]",
+    "py-data-juicer[sandbox]",
 ]
 
 [project.scripts]
