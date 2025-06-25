@@ -360,6 +360,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">HashKeys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">prepare_sentencepiece_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.resource_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">get_ray_gpu_count</span><span class="p">,</span>
+                                              <span class="n">get_ray_gpu_memory</span><span class="p">)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Deduplicator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..common.helper_func</span><span class="w"> </span><span class="kn">import</span> <span class="n">split_on_whitespace</span>
@@ -655,12 +657,68 @@
     <span class="k">return</span> <span class="p">{</span>
         <span class="s1">&#39;IdGenerator&#39;</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">IdGenerator</span><span class="p">),</span>
         <span class="s1">&#39;EdgeBuffer&#39;</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">scheduling_strategy</span><span class="o">=</span><span class="s1">&#39;SPREAD&#39;</span><span class="p">)(</span><span class="n">EdgeBuffer</span><span class="p">),</span>
-        <span class="s1">&#39;BTSUnionFind&#39;</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">scheduling_strategy</span><span class="o">=</span><span class="s1">&#39;SPREAD&#39;</span><span class="p">)(</span><span class="n">BTSUnionFind</span><span class="p">)</span>
+        <span class="s1">&#39;BTSUnionFind&#39;</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">scheduling_strategy</span><span class="o">=</span><span class="s1">&#39;SPREAD&#39;</span><span class="p">)(</span><span class="n">BTSUnionFind</span><span class="p">),</span>
     <span class="p">}</span></div>
 
 
 
 <span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;ray_bts_minhash_deduplicator&#39;</span>
+
+
+<div class="viewcode-block" id="GPUMinHashActor">
+<a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.GPUMinHashActor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GPUMinHashActor</span><span class="p">:</span>
+
+<div class="viewcode-block" id="GPUMinHashActor.__init__">
+<a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.GPUMinHashActor.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+                 <span class="n">perm_a</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">perm_b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">lowercase</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cudf</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">rmm</span>
+        <span class="n">rmm</span><span class="o">.</span><span class="n">reinitialize</span><span class="p">(</span><span class="n">pool_allocator</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="n">gen</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">perm_a</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">perm_b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">perm_a</span><span class="p">,</span> <span class="n">perm_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[(</span>
+                    <span class="n">gen</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">MERSENNE_PRIME</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">),</span>
+                    <span class="n">gen</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">MERSENNE_PRIME</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">),</span>
+                <span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">)],</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perm_a</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">perm_a</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint32&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perm_b</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">perm_b</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint32&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowercase</span> <span class="o">=</span> <span class="n">lowercase</span></div>
+
+
+<div class="viewcode-block" id="GPUMinHashActor.compute_minhash">
+<a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.GPUMinHashActor.compute_minhash">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_minhash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_arr</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute MinHash signatures for texts in a table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cudf</span>
+        <span class="n">text_df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_arrow</span><span class="p">(</span><span class="n">text_arr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowercase</span><span class="p">:</span>
+            <span class="n">text_df</span> <span class="o">=</span> <span class="n">text_df</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">minhashes</span> <span class="o">=</span> <span class="n">text_df</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">minhash</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                        <span class="n">a</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">perm_a</span><span class="p">,</span>
+                                        <span class="n">b</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">perm_b</span><span class="p">,</span>
+                                        <span class="n">width</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">text_df</span>
+        <span class="n">arrow_minhashes</span> <span class="o">=</span> <span class="n">minhashes</span><span class="o">.</span><span class="n">to_arrow</span><span class="p">()</span>
+        <span class="k">del</span> <span class="p">(</span><span class="n">minhashes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">arrow_minhashes</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;text&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">:</span>
+        <span class="n">minhashes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_minhash</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="n">text_key</span><span class="p">])</span>
+        <span class="n">new_table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">append_column</span><span class="p">(</span><span class="s1">&#39;_minhash&#39;</span><span class="p">,</span> <span class="n">minhashes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_table</span></div>
+
 
 
 <div class="viewcode-block" id="RayBTSMinhashDeduplicator">
@@ -695,6 +753,8 @@
         <span class="n">max_pending_filter_tasks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
         <span class="n">num_filter_task_returns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">merge_batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="n">minhash_batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+        <span class="n">memory_per_sample</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># MB per sample</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
@@ -743,16 +803,34 @@
 <span class="sd">            to return. Default it&#39;s 10.</span>
 <span class="sd">        :param merge_batch_size: batch size for BTS operations. Default</span>
 <span class="sd">            it&#39;s 1000.</span>
-<span class="sd">        :param tmp_file_name: the temporary folder name for deduplication.</span>
+<span class="sd">        :param minhash_batch_size: batch size for MinHash computation. If &quot;auto&quot;,</span>
+<span class="sd">            it will be set to default value on CPU(1024), or auto calculated per</span>
+<span class="sd">            available GPU memory and memory_per_sample setting for GPU.</span>
+<span class="sd">        :param memory_per_sample: estimated memory needed per sample in MB.</span>
+<span class="sd">            Used to calculate batch size based on available GPU memory.</span>
+<span class="sd">            Default is 0.1 MB per sample.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="c1"># about minhash computation</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">=</span> <span class="n">tokenization</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lowercase</span> <span class="o">=</span> <span class="n">lowercase</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span> <span class="o">=</span> <span class="n">ignore_pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memory_per_sample</span> <span class="o">=</span> <span class="n">memory_per_sample</span>
+        <span class="k">if</span> <span class="n">minhash_batch_size</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">minhash_batch_size</span> <span class="o">=</span> <span class="mi">200_000</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">minhash_batch_size</span> <span class="o">=</span> <span class="mi">1024</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">minhash_batch_size</span> <span class="o">=</span> <span class="n">minhash_batch_size</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">!=</span> <span class="s1">&#39;character&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;GPU MinHash computation is only supported for character tokenization&#39;</span>
+            <span class="p">)</span>
 
         <span class="c1"># check parameters</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">==</span> <span class="s1">&#39;punctuation&#39;</span><span class="p">:</span>
@@ -875,11 +953,41 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">empty_hash_table_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">MAX_HASH</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">union_find_parallel_num</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="RayBTSMinhashDeduplicator.band_minhash">
+<a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.RayBTSMinhashDeduplicator.band_minhash">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">band_minhash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minhash_list</span><span class="p">,</span> <span class="n">uid_list</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Logic for creating and pusing LSH bands to the union find list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pairs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">minhash_list</span> <span class="o">=</span> <span class="n">minhash_list</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">zero_copy_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">minhash</span><span class="p">,</span> <span class="n">uid</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">minhash_list</span><span class="p">,</span> <span class="n">uid_list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash_ranges</span><span class="p">):</span>
+                <span class="n">hash_value</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span> \
+                    <span class="o">+</span> <span class="n">minhash</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+                <span class="n">hash_table_id</span> <span class="o">=</span> <span class="n">minhash</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> \
+                    <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">union_find_parallel_num</span>
+                <span class="k">if</span> <span class="n">hash_table_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+                    <span class="n">pairs</span><span class="p">[</span><span class="n">hash_table_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">pairs</span><span class="p">[</span><span class="n">hash_table_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">hash_value</span><span class="p">,</span> <span class="n">uid</span><span class="p">))</span>
+        <span class="n">result_refs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pairs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result_refs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_pending_filter_tasks</span><span class="p">:</span>
+                <span class="n">ready_refs</span><span class="p">,</span> <span class="n">result_refs</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span>
+                    <span class="n">result_refs</span><span class="p">,</span> <span class="n">num_returns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_filter_task_returns</span><span class="p">)</span>
+                <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ready_refs</span><span class="p">)</span>
+            <span class="n">result_refs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">union_find_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">add_key_value_pairs</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+        <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">result_refs</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="RayBTSMinhashDeduplicator.calc_minhash">
 <a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.RayBTSMinhashDeduplicator.calc_minhash">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">calc_minhash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_list</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">uid_list</span><span class="p">:</span> <span class="n">List</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Logic for computing minhash values for each text in the input table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pairs</span> <span class="o">=</span> <span class="p">{}</span>
-
         <span class="k">for</span> <span class="n">text</span><span class="p">,</span> <span class="n">uid</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">text_list</span><span class="p">,</span> <span class="n">uid_list</span><span class="p">):</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">as_py</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowercase</span><span class="p">:</span>
@@ -888,7 +996,6 @@
                 <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
 
             <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization_func</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">hv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sha1_hash32</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">],</span>
                               <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span>
@@ -994,6 +1101,16 @@
         <span class="n">remote_classes</span> <span class="o">=</span> <span class="n">get_remote_classes</span><span class="p">()</span>
         <span class="n">id_generator</span> <span class="o">=</span> <span class="n">remote_classes</span><span class="p">[</span><span class="s1">&#39;IdGenerator&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
 
+        <span class="k">def</span><span class="w"> </span><span class="nf">band_with_uid</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">:</span>
+            <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+            <span class="n">min_id</span><span class="p">,</span> <span class="n">max_id</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_generator</span><span class="o">.</span><span class="n">get_next_id</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_rows</span><span class="p">))</span>
+            <span class="n">uid_list</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_id</span><span class="p">,</span> <span class="n">max_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">band_minhash</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;_minhash&#39;</span><span class="p">],</span> <span class="n">uid_list</span><span class="p">)</span>
+            <span class="n">new_table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">append_column</span><span class="p">(</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">uid</span><span class="p">,</span>
+                                            <span class="n">pa</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">uid_list</span><span class="p">)))</span>
+            <span class="n">new_table</span> <span class="o">=</span> <span class="n">new_table</span><span class="o">.</span><span class="n">drop_columns</span><span class="p">([</span><span class="s1">&#39;_minhash&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">new_table</span>
+
         <span class="k">def</span><span class="w"> </span><span class="nf">minhash_with_uid</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">:</span>
             <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
             <span class="n">min_id</span><span class="p">,</span> <span class="n">max_id</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_generator</span><span class="o">.</span><span class="n">get_next_id</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_rows</span><span class="p">))</span>
@@ -1005,24 +1122,79 @@
 
         <span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;.tmp&#39;</span><span class="p">,</span>
                                <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_job_id</span><span class="p">())</span>
-        <span class="n">dataset</span><span class="o">.</span><span class="n">map_batches</span><span class="p">(</span>
-            <span class="n">minhash_with_uid</span><span class="p">,</span>
-            <span class="n">batch_format</span><span class="o">=</span><span class="s1">&#39;pyarrow&#39;</span><span class="p">,</span>
-            <span class="n">zero_copy_batch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">write_parquet</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Using GPU for MinHash computation&#39;</span><span class="p">)</span>
+            <span class="c1"># Get available GPU count and set concurrency</span>
+            <span class="n">gpu_count</span> <span class="o">=</span> <span class="n">get_ray_gpu_count</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">gpu_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;No GPUs available in Ray cluster&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;No GPUs available in Ray cluster&#39;</span><span class="p">)</span>
+
+            <span class="n">concurrency</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span>
+                              <span class="n">gpu_count</span><span class="p">)</span>  <span class="c1"># Ensure at least 1 concurrent task</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Setting GPU concurrency to </span><span class="si">{</span><span class="n">concurrency</span><span class="si">}</span><span class="s1"> based on available GPUs&#39;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Get available GPU memory and set batch size</span>
+            <span class="n">gpu_memory</span> <span class="o">=</span> <span class="n">get_ray_gpu_memory</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">gpu_memory</span><span class="p">:</span>
+                <span class="n">min_memory</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">gpu_memory</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+                <span class="c1"># Use 80% of available memory to leave room for overhead</span>
+                <span class="n">safe_memory</span> <span class="o">=</span> <span class="n">min_memory</span> <span class="o">*</span> <span class="mf">0.8</span>
+                <span class="n">estimated_batch_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">safe_memory</span> <span class="o">/</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">memory_per_sample</span><span class="p">)</span>
+
+                <span class="c1"># For very large GPUs, cap at 2M samples to maintain reasonable processing time</span>
+                <span class="c1"># This is a soft cap - can be adjusted based on performance testing</span>
+                <span class="n">max_reasonable_batch</span> <span class="o">=</span> <span class="mi">2_000_000</span>
+                <span class="n">batch_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="mi">10_000</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">estimated_batch_size</span><span class="p">,</span> <span class="n">max_reasonable_batch</span><span class="p">))</span>
+
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Setting batch size to </span><span class="si">{</span><span class="n">batch_size</span><span class="si">}</span><span class="s1"> based on available GPU memory &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="n">min_memory</span><span class="si">}</span><span class="s1">MB), memory per sample (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">memory_per_sample</span><span class="si">}</span><span class="s1">MB), &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;and safe memory limit (</span><span class="si">{</span><span class="n">safe_memory</span><span class="si">}</span><span class="s1">MB)&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minhash_batch_size</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using default batch size of </span><span class="si">{</span><span class="n">batch_size</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map_batches</span><span class="p">(</span>
+                <span class="n">GPUMinHashActor</span><span class="p">,</span>
+                <span class="n">batch_format</span><span class="o">=</span><span class="s1">&#39;pyarrow&#39;</span><span class="p">,</span>
+                <span class="n">zero_copy_batch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">concurrency</span><span class="o">=</span><span class="n">concurrency</span><span class="p">,</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">map_batches</span><span class="p">(</span>
+                <span class="n">band_with_uid</span><span class="p">,</span>
+                <span class="n">batch_format</span><span class="o">=</span><span class="s1">&#39;pyarrow&#39;</span><span class="p">,</span>
+                <span class="n">zero_copy_batch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">write_parquet</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">dataset</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Using CPU for MinHash computation&#39;</span><span class="p">)</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">map_batches</span><span class="p">(</span>
+                <span class="n">minhash_with_uid</span><span class="p">,</span>
+                <span class="n">batch_format</span><span class="o">=</span><span class="s1">&#39;pyarrow&#39;</span><span class="p">,</span>
+                <span class="n">zero_copy_batch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">write_parquet</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span>
         <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;MinHash time = </span><span class="si">{</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
+        <span class="n">new_dataset</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span>
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">()</span>
         <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;merge time = </span><span class="si">{</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map_batches</span><span class="p">(</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">new_dataset</span><span class="o">.</span><span class="n">map_batches</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">filter_with_union_find</span><span class="p">,</span>
             <span class="n">batch_format</span><span class="o">=</span><span class="s1">&#39;pyarrow&#39;</span><span class="p">,</span>
             <span class="n">zero_copy_batch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;filter time = </span><span class="si">{</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span></div>
 </div>
 

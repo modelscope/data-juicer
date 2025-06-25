@@ -3037,6 +3037,34 @@ the same name. Default: False.</p></li>
 <span class="sig-prename descclassname"><span class="pre">data_juicer.utils.resource_utils.</span></span><span class="sig-name descname"><span class="pre">query_mem_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/resource_utils.html#query_mem_info"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.resource_utils.query_mem_info" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.resource_utils.get_ray_gpu_count">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.resource_utils.</span></span><span class="sig-name descname"><span class="pre">get_ray_gpu_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/resource_utils.html#get_ray_gpu_count"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.resource_utils.get_ray_gpu_count" title="Link to this definition">¶</a></dt>
+<dd><p>Get the number of available GPUs in the Ray cluster.</p>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of available GPUs, or 0 if no GPUs are available or Ray is not initialized</p>
+</dd>
+<dt class="field-even">返回类型<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.resource_utils.get_ray_gpu_memory">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.resource_utils.</span></span><span class="sig-name descname"><span class="pre">get_ray_gpu_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/resource_utils.html#get_ray_gpu_memory"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.resource_utils.get_ray_gpu_memory" title="Link to this definition">¶</a></dt>
+<dd><p>Get the available GPU memory in the Ray cluster.</p>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary mapping GPU indices to available memory in MB, or empty dict if no GPUs available</p>
+</dd>
+<dt class="field-even">返回类型<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-data_juicer.utils.sample">
 <span id="data-juicer-utils-sample-module"></span><h2>data_juicer.utils.sample module<a class="headerlink" href="#module-data_juicer.utils.sample" title="Link to this heading">¶</a></h2>
@@ -3585,6 +3613,8 @@ Currently, <cite>standalone</cite>, <cite>ray</cite> are supported.</p>
 <li><a class="reference internal" href="#data_juicer.utils.resource_utils.get_cpu_count"><code class="docutils literal notranslate"><span class="pre">get_cpu_count()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.resource_utils.get_cpu_utilization"><code class="docutils literal notranslate"><span class="pre">get_cpu_utilization()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.resource_utils.query_mem_info"><code class="docutils literal notranslate"><span class="pre">query_mem_info()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.resource_utils.get_ray_gpu_count"><code class="docutils literal notranslate"><span class="pre">get_ray_gpu_count()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.resource_utils.get_ray_gpu_memory"><code class="docutils literal notranslate"><span class="pre">get_ray_gpu_memory()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-data_juicer.utils.sample">data_juicer.utils.sample module</a><ul>
