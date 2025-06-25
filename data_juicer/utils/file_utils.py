@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import AsyncGenerator, Dict, List, Optional, Union
 
+import aiohttp
 import pandas as pd
 from datasets.utils.extract import ZstdExtractor as Extractor
 
@@ -101,6 +102,11 @@ def find_files_with_suffix(
     return file_dict
 
 
+def is_remote_path(path: str):
+    """Check if the path is a remote path."""
+    return path.startswith(('http://', 'https://'))
+
+
 def is_absolute_path(path: Union[str, Path]) -> bool:
     """
     Check whether input path is a absolute path.
@@ -109,6 +115,9 @@ def is_absolute_path(path: Union[str, Path]) -> bool:
     :return: True means input path is absolute path, False means input
         path is a relative path.
     """
+    if is_remote_path(str(path)):
+        return True
+
     return Path(path).is_absolute()
 
 
@@ -391,3 +400,29 @@ def get_all_files_paths_under(root,
 
     file_ls.sort()
     return file_ls
+
+
+async def download_file(session: aiohttp.ClientSession,
+                        url: str,
+                        save_path: str,
+                        timeout: int = 300,
+                        **kwargs):
+    """
+    Download a file from a given URL and save it to a specified directory.
+    :param url: The URL of the file to download.
+    :param save_path: The path where the downloaded file will be saved.
+    :param timeout: The timeout in seconds for each HTTP request.
+    :param kwargs: The keyword arguments to pass to the HTTP request.
+
+    :return: The response object from the HTTP request.
+    """
+    async with session.get(url,
+                           timeout=aiohttp.ClientTimeout(total=timeout),
+                           raise_for_status=True,
+                           **kwargs) as response:
+
+        with open(save_path, 'wb') as f:
+            while chunk := await response.content.read():
+                f.write(chunk)
+
+        return response

@@ -37,7 +37,7 @@ Data-Juicer 中的算子分为以下 7 种类型。
 | [filter](#filter) | 49 | Filters out low-quality samples. 过滤低质量样本。 |
 | [formatter](#formatter) | 8 | Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。 |
 | [grouper](#grouper) | 3 | Group samples to batched samples. 将样本分组，每一组组成一个批量样本。 |
-| [mapper](#mapper) | 80 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
+| [mapper](#mapper) | 81 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
 | [selector](#selector) | 5 | Selects top samples based on ranking. 基于排序选取高质量样本。 |
 
 All the specific operators are listed below, each featured with several capability tags. 
@@ -178,6 +178,7 @@ All the specific operators are listed below, each featured with several capabili
 | dialog_sentiment_detection_mapper | 💻CPU 🔗API 🟢Stable | Mapper to generate user's sentiment labels in dialog. 映射器在对话框中生成用户的情绪标签。 | [code](../data_juicer/ops/mapper/dialog_sentiment_detection_mapper.py) | [tests](../tests/ops/mapper/test_dialog_sentiment_detection_mapper.py) |
 | dialog_sentiment_intensity_mapper | 💻CPU 🔗API 🟢Stable | Mapper to predict user's sentiment intensity (from -5 to 5 in default prompt) in dialog. Mapper在对话框中预测用户的情绪强度 (在默认提示中从-5到5)。 | [code](../data_juicer/ops/mapper/dialog_sentiment_intensity_mapper.py) | [tests](../tests/ops/mapper/test_dialog_sentiment_intensity_mapper.py) |
 | dialog_topic_detection_mapper | 💻CPU 🔗API 🟢Stable | Mapper to generate user's topic labels in dialog. 映射器在对话框中生成用户的主题标签。 | [code](../data_juicer/ops/mapper/dialog_topic_detection_mapper.py) | [tests](../tests/ops/mapper/test_dialog_topic_detection_mapper.py) |
+| download_file_mapper | 💻CPU 🟡Beta | Mapper to download url files to local files. 映射器将url文件下载到本地文件。 | [code](../data_juicer/ops/mapper/download_file_mapper.py) | [tests](../tests/ops/mapper/test_download_file_mapper.py) |
 | expand_macro_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to expand macro definitions in the document body of Latex samples. Mapper来扩展Latex示例文档主体中的宏定义。 | [code](../data_juicer/ops/mapper/expand_macro_mapper.py) | [tests](../tests/ops/mapper/test_expand_macro_mapper.py) |
 | extract_entity_attribute_mapper | 🔤Text 💻CPU 🔗API 🟢Stable | Extract attributes for given entities from the text. 从文本中提取给定实体的属性。 | [code](../data_juicer/ops/mapper/extract_entity_attribute_mapper.py) | [tests](../tests/ops/mapper/test_extract_entity_attribute_mapper.py) |
 | extract_entity_relation_mapper | 🔤Text 💻CPU 🔗API 🟢Stable | Extract entities and relations in the text for knowledge graph. 提取知识图谱的文本中的实体和关系。 | [code](../data_juicer/ops/mapper/extract_entity_relation_mapper.py) | [tests](../tests/ops/mapper/test_extract_entity_relation_mapper.py) |
