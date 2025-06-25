@@ -658,7 +658,7 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path, *, return_mod
         return (model, processor)
 
 
-def prepare_spacy_model(lang, name_pattern="{}_core_web_md-3.8.0", **model_params):
+def prepare_spacy_model(lang, name_pattern="{}_core_web_md-3.7.0", **model_params):
     """
     Prepare spacy model for specific language.
 
