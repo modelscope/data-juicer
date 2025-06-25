@@ -10,13 +10,17 @@ from pydantic import PositiveInt
 
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
-                                        extract_key_frames,
-                                        extract_video_frames_uniformly,
-                                        insert_texts_after_placeholders,
-                                        load_data_with_context, load_video,
-                                        remove_non_special_tokens,
-                                        remove_special_tokens)
+from data_juicer.utils.mm_utils import (
+    SpecialTokens,
+    close_video,
+    extract_key_frames,
+    extract_video_frames_uniformly,
+    insert_texts_after_placeholders,
+    load_data_with_context,
+    load_video,
+    remove_non_special_tokens,
+    remove_special_tokens,
+)
 from data_juicer.utils.model_utils import get_model, prepare_model, torch
 
 from ..base_op import OPERATORS, Mapper

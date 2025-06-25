@@ -57,17 +57,10 @@ BACKUP_MODEL_LINKS = {
     "ram_plus_swin_large_14m.pth": "http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/models/"
     "ram_plus_swin_large_14m.pth",
     # FastSAM
-    'FastSAM-s.pt':
-    'https://github.com/ultralytics/assets/releases/download/v8.2.0/'
-    'FastSAM-s.pt',
-    'FastSAM-x.pt':
-    'https://github.com/ultralytics/assets/releases/download/v8.2.0/'
-    'FastSAM-x.pt',
-
+    "FastSAM-s.pt": "https://github.com/ultralytics/assets/releases/download/v8.2.0/" "FastSAM-s.pt",
+    "FastSAM-x.pt": "https://github.com/ultralytics/assets/releases/download/v8.2.0/" "FastSAM-x.pt",
     # spacy
-    '*_core_web_md-3.*.0':
-    'https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/'
-    'data_juicer/models/',
+    "*_core_web_md-3.*.0": "https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/" "data_juicer/models/",
 }
 
 
@@ -116,11 +109,13 @@ def check_model(model_name, force=False):
                 wget.download(backup_model_link, cached_model_path)
             except:  # noqa: E722
                 import traceback
+
                 traceback.print_exc()
                 raise RuntimeError(
-                    f'Downloading model [{model_name}] error. '
-                    f'Please retry later or download it into {DJMC} '
-                    f'manually from {model_link} or {backup_model_link} ')
+                    f"Downloading model [{model_name}] error. "
+                    f"Please retry later or download it into {DJMC} "
+                    f"manually from {model_link} or {backup_model_link} "
+                )
     return cached_model_path
 
 
@@ -1004,7 +999,7 @@ def free_models(clear_model_zoo=True):
     for model_key in MODEL_ZOO:
         try:
             model = MODEL_ZOO[model_key]
-            model.to('cpu')
+            model.to("cpu")
             if clear_model_zoo:
                 del model
         except Exception:
