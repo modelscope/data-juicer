@@ -358,18 +358,21 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">HashKeys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">SpecialTokens</span><span class="p">,</span>
-                                        <span class="n">insert_texts_after_placeholders</span><span class="p">,</span>
-                                        <span class="n">load_image</span><span class="p">,</span> <span class="n">remove_non_special_tokens</span><span class="p">,</span>
-                                        <span class="n">remove_special_tokens</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SpecialTokens</span><span class="p">,</span>
+    <span class="n">insert_texts_after_placeholders</span><span class="p">,</span>
+    <span class="n">load_image</span><span class="p">,</span>
+    <span class="n">remove_non_special_tokens</span><span class="p">,</span>
+    <span class="n">remove_special_tokens</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..op_fusion</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOADED_IMAGES</span>
 
-<span class="n">simhash</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;simhash&#39;</span><span class="p">,</span> <span class="s1">&#39;simhash-pybind&#39;</span><span class="p">)</span>
+<span class="n">simhash</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;simhash&quot;</span><span class="p">,</span> <span class="s2">&quot;simhash-pybind&quot;</span><span class="p">)</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;image_captioning_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;image_captioning_mapper&quot;</span>
 
 
 <div class="viewcode-block" id="ImageCaptioningMapper">
@@ -380,21 +383,23 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to generate samples whose captions are generated based on</span>
 <span class="sd">    another model and the figure.&quot;&quot;&quot;</span>
 
-    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="ImageCaptioningMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_captioning_mapper.ImageCaptioningMapper.__init__">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">hf_img2seq</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Salesforce/blip2-opt-2.7b&#39;</span><span class="p">,</span>
-                 <span class="n">trust_remote_code</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">caption_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="n">keep_candidate_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;random_any&#39;</span><span class="p">,</span>
-                 <span class="n">keep_original_sample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="n">prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">prompt_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">hf_img2seq</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Salesforce/blip2-opt-2.7b&quot;</span><span class="p">,</span>
+        <span class="n">trust_remote_code</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">caption_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">keep_candidate_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;random_any&quot;</span><span class="p">,</span>
+        <span class="n">keep_original_sample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prompt_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -435,31 +440,29 @@
 <span class="sd">        :param args: extra args</span>
 <span class="sd">        :param kwargs: extra args</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;mem_required&#39;</span><span class="p">,</span> <span class="s1">&#39;16GB&#39;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;mem_required&quot;</span><span class="p">,</span> <span class="s2">&quot;16GB&quot;</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">keep_candidate_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
-                <span class="s1">&#39;random_any&#39;</span><span class="p">,</span> <span class="s1">&#39;similar_one_simhash&#39;</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span>
-        <span class="p">]:</span>
+        <span class="k">if</span> <span class="n">keep_candidate_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;random_any&quot;</span><span class="p">,</span> <span class="s2">&quot;similar_one_simhash&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Keep strategy [</span><span class="si">{</span><span class="n">keep_candidate_mode</span><span class="si">}</span><span class="s1">] is not supported. &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;Can only be one of &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;[&quot;random_any&quot;, &quot;similar_one_simhash&quot;, &quot;all&quot;].&#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;Keep strategy [</span><span class="si">{</span><span class="n">keep_candidate_mode</span><span class="si">}</span><span class="s2">] is not supported. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Can only be one of &quot;</span>
+                <span class="sa">f</span><span class="s1">&#39;[&quot;random_any&quot;, &quot;similar_one_simhash&quot;, &quot;all&quot;].&#39;</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
-            <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
-            <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_img2seq</span><span class="p">,</span>
-            <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">)</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;huggingface&quot;</span><span class="p">,</span> <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_img2seq</span><span class="p">,</span> <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">caption_num</span> <span class="o">=</span> <span class="n">caption_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_candidate_mode</span> <span class="o">=</span> <span class="n">keep_candidate_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span> <span class="o">=</span> <span class="n">keep_original_sample</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="n">prompt</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prompt_key</span> <span class="o">=</span> <span class="n">prompt_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extra_args</span> <span class="o">=</span> <span class="n">kwargs</span>
-        <span class="k">if</span> <span class="n">keep_candidate_mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;random_any&#39;</span><span class="p">,</span> <span class="s1">&#39;similar_one_simhash&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">keep_candidate_mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;random_any&quot;</span><span class="p">,</span> <span class="s2">&quot;similar_one_simhash&quot;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">elif</span> <span class="n">keep_candidate_mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]:</span>
+        <span class="k">elif</span> <span class="n">keep_candidate_mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">caption_num</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span> <span class="o">=</span> <span class="mi">0</span>
@@ -467,8 +470,8 @@
         <span class="c1"># report a warning when both prompt and prompt_key are set</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_key</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s1">&#39;Both the parameter `prompt` and `prompt_key` are &#39;</span>
-                <span class="s1">&#39;set. Data-Juicer will consider `prompt_key` first.&#39;</span><span class="p">)</span></div>
+                <span class="s2">&quot;Both the parameter `prompt` and `prompt_key` are &quot;</span> <span class="s2">&quot;set. Data-Juicer will consider `prompt_key` first.&quot;</span>
+            <span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_process_single_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ori_sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -478,17 +481,13 @@
 <span class="sd">        :return: batched results after generation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># there is no image in this sample</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ori_sample</span> <span class="ow">or</span> \
-                <span class="ow">not</span> <span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ori_sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]:</span>
             <span class="k">return</span> <span class="p">[]</span>
 
         <span class="c1"># the generated results</span>
-        <span class="n">generated_samples</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span><span class="p">)</span>
-        <span class="p">]</span>
+        <span class="n">generated_samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span><span class="p">)]</span>
         <span class="k">for</span> <span class="n">generated_sample</span> <span class="ow">in</span> <span class="n">generated_samples</span><span class="p">:</span>
-            <span class="n">generated_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">generated_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
         <span class="c1"># 1. load all image(s)</span>
         <span class="n">loaded_image_keys</span> <span class="o">=</span> <span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span>
@@ -519,20 +518,18 @@
             <span class="n">img_count</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
             <span class="n">text_with_only_special_tokens</span> <span class="o">=</span> <span class="n">remove_non_special_tokens</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
             <span class="n">image_chunk</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">image_key</span> <span class="ow">in</span> <span class="n">loaded_image_keys</span><span class="p">[</span><span class="n">offset</span><span class="p">:</span><span class="n">offset</span> <span class="o">+</span> <span class="n">img_count</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">image_key</span> <span class="ow">in</span> <span class="n">loaded_image_keys</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">img_count</span><span class="p">]:</span>
                 <span class="n">image</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="n">image_key</span><span class="p">]</span>
                 <span class="n">image_chunk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 
             <span class="c1"># 2. generate candidate caption(s) in batch manner</span>
-            <span class="n">generated_text_candidates_single_chunk</span> <span class="o">=</span> \
-                <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caption_num</span><span class="p">)]</span>
+            <span class="n">generated_text_candidates_single_chunk</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caption_num</span><span class="p">)]</span>
             <span class="c1"># an assistant 2-D array,</span>
             <span class="c1"># generated_text_candidates_single_chunk[i][j] indicates</span>
             <span class="c1"># the $i$-th generated candidate for the $j$-th image</span>
 
             <span class="c1"># construct prompts</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_key</span> \
-                    <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_key</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_key</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_key</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="c1"># check prompt_key is not None, and it&#39;s a str in the sample</span>
                 <span class="n">prompt_texts</span> <span class="o">=</span> <span class="p">[</span><span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_key</span><span class="p">]]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_chunk</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -541,36 +538,26 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">prompt_texts</span> <span class="o">=</span> <span class="kc">None</span>
 
-            <span class="n">inputs</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span><span class="n">images</span><span class="o">=</span><span class="n">image_chunk</span><span class="p">,</span>
-                               <span class="n">text</span><span class="o">=</span><span class="n">prompt_texts</span><span class="p">,</span>
-                               <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span><span class="n">images</span><span class="o">=</span><span class="n">image_chunk</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">prompt_texts</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caption_num</span><span class="p">):</span>
-                <span class="n">generated_ids</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">,</span>
-                                               <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
-                                               <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">generated_text</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">batch_decode</span><span class="p">(</span>
-                    <span class="n">generated_ids</span><span class="p">,</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">generated_ids</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">generated_text</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">batch_decode</span><span class="p">(</span><span class="n">generated_ids</span><span class="p">,</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">generated_text_candidates_single_chunk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">generated_text</span>
 
             <span class="c1"># 3. insert a list of generated captions into the positions of</span>
             <span class="c1"># subsequent placeholders in the original string</span>
-            <span class="n">new_generated_text_all_images</span> <span class="o">=</span> \
-                <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span><span class="p">)]</span>
+            <span class="n">new_generated_text_all_images</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span><span class="p">)]</span>
             <span class="c1"># new_generated_text_all_images is a helper array, element [i][j]</span>
             <span class="c1"># denotes the reduced $i$-th result for the $j$-th image</span>
 
             <span class="c1"># reduce the captions according to given mode image by image</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">img_count</span><span class="p">):</span>
                 <span class="n">new_generated_text_per_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_captions_per_image</span><span class="p">(</span>
-                    <span class="n">chunk</span><span class="p">,</span> <span class="p">[</span>
-                        <span class="n">captions</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
-                        <span class="k">for</span> <span class="n">captions</span> <span class="ow">in</span> <span class="n">generated_text_candidates_single_chunk</span>
-                    <span class="p">])</span>
-                <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span> <span class="o">==</span> \
-                       <span class="nb">len</span><span class="p">(</span><span class="n">new_generated_text_per_image</span><span class="p">)</span>
+                    <span class="n">chunk</span><span class="p">,</span> <span class="p">[</span><span class="n">captions</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">captions</span> <span class="ow">in</span> <span class="n">generated_text_candidates_single_chunk</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_generated_text_per_image</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_generated_text_per_image</span><span class="p">)):</span>
-                    <span class="n">new_generated_text_all_images</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">new_generated_text_per_image</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">new_generated_text_all_images</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_generated_text_per_image</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
             <span class="c1"># insert the captions according to given mode</span>
             <span class="n">place_holders</span> <span class="o">=</span> <span class="p">[</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span><span class="p">]</span> <span class="o">*</span> <span class="n">img_count</span>
@@ -578,52 +565,42 @@
                 <span class="n">new_generated_text_per_chunk</span> <span class="o">=</span> <span class="n">insert_texts_after_placeholders</span><span class="p">(</span>
                     <span class="n">original_string</span><span class="o">=</span><span class="n">text_with_only_special_tokens</span><span class="p">,</span>
                     <span class="n">placeholders</span><span class="o">=</span><span class="n">place_holders</span><span class="p">,</span>
-                    <span class="n">new_texts</span><span class="o">=</span><span class="n">new_generated_text_all_images</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-                <span class="n">generated_samples</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">+=</span> \
-                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">new_generated_text_per_chunk</span><span class="si">}{</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="n">new_texts</span><span class="o">=</span><span class="n">new_generated_text_all_images</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="n">generated_samples</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_generated_text_per_chunk</span><span class="si">}{</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="n">offset</span> <span class="o">+=</span> <span class="n">img_count</span>
 
         <span class="k">return</span> <span class="n">generated_samples</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_captions_per_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span>
-                                   <span class="n">generated_text_candidates_single_chunk</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_captions_per_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">generated_text_candidates_single_chunk</span><span class="p">):</span>
         <span class="n">new_generated_text_per_chunk</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_candidate_mode</span> <span class="o">==</span> <span class="s1">&#39;random_any&#39;</span><span class="p">:</span>
-            <span class="n">new_generated_text_per_chunk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">generated_text_candidates_single_chunk</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_candidate_mode</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
-            <span class="n">new_generated_text_per_chunk</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-                <span class="n">generated_text_candidates_single_chunk</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_candidate_mode</span> <span class="o">==</span> <span class="s1">&#39;similar_one_simhash&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_candidate_mode</span> <span class="o">==</span> <span class="s2">&quot;random_any&quot;</span><span class="p">:</span>
+            <span class="n">new_generated_text_per_chunk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">generated_text_candidates_single_chunk</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_candidate_mode</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="n">new_generated_text_per_chunk</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">generated_text_candidates_single_chunk</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_candidate_mode</span> <span class="o">==</span> <span class="s2">&quot;similar_one_simhash&quot;</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">..deduplicator.document_simhash_deduplicator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+                <span class="n">DocumentSimhashDeduplicator</span><span class="p">,</span>
+            <span class="p">)</span>
 
-            <span class="kn">from</span><span class="w"> </span><span class="nn">..deduplicator.document_simhash_deduplicator</span><span class="w"> </span><span class="kn">import</span> \
-                <span class="n">DocumentSimhashDeduplicator</span>
             <span class="n">ori_normal_text</span> <span class="o">=</span> <span class="n">remove_special_tokens</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
             <span class="c1"># using a simhash OP to calculate their similarity</span>
             <span class="c1"># NOTE: simhash is just one method to calculate the similarities</span>
             <span class="c1"># between texts, but not the most accurate one. More methods (e.g.</span>
             <span class="c1"># embedding-based, ...) will be added.</span>
-            <span class="n">op_simhash</span> <span class="o">=</span> <span class="n">DocumentSimhashDeduplicator</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                                                     <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_args</span><span class="p">)</span>
-            <span class="n">ori_text_hash</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span>
-                <span class="n">op_simhash</span><span class="o">.</span><span class="n">compute_hash</span><span class="p">({</span><span class="n">op_simhash</span><span class="o">.</span><span class="n">text_key</span><span class="p">:</span>
-                                         <span class="n">ori_normal_text</span><span class="p">})[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">])</span>
+            <span class="n">op_simhash</span> <span class="o">=</span> <span class="n">DocumentSimhashDeduplicator</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_args</span><span class="p">)</span>
+            <span class="n">ori_text_hash</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="n">op_simhash</span><span class="o">.</span><span class="n">compute_hash</span><span class="p">({</span><span class="n">op_simhash</span><span class="o">.</span><span class="n">text_key</span><span class="p">:</span> <span class="n">ori_normal_text</span><span class="p">})[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">])</span>
             <span class="n">generated_text_hashes</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span>
-                    <span class="n">op_simhash</span><span class="o">.</span><span class="n">compute_hash</span><span class="p">(</span>
-                        <span class="p">{</span><span class="n">op_simhash</span><span class="o">.</span><span class="n">text_key</span><span class="p">:</span>
-                         <span class="n">candidate_text</span><span class="p">})[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">])</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="n">op_simhash</span><span class="o">.</span><span class="n">compute_hash</span><span class="p">({</span><span class="n">op_simhash</span><span class="o">.</span><span class="n">text_key</span><span class="p">:</span> <span class="n">candidate_text</span><span class="p">})[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">])</span>
                 <span class="k">for</span> <span class="n">candidate_text</span> <span class="ow">in</span> <span class="n">generated_text_candidates_single_chunk</span>
             <span class="p">]</span>
             <span class="n">hamming_distances</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">simhash</span><span class="o">.</span><span class="n">num_differing_bits</span><span class="p">(</span><span class="n">ori_text_hash</span><span class="p">,</span> <span class="n">generated_text_hash</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">generated_text_hash</span> <span class="ow">in</span> <span class="n">generated_text_hashes</span>
             <span class="p">]</span>
-            <span class="n">max_index</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hamming_distances</span><span class="p">)),</span>
-                            <span class="n">key</span><span class="o">=</span><span class="n">hamming_distances</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">)</span>
-            <span class="n">new_generated_text_per_chunk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">generated_text_candidates_single_chunk</span><span class="p">[</span><span class="n">max_index</span><span class="p">])</span>
+            <span class="n">max_index</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hamming_distances</span><span class="p">)),</span> <span class="n">key</span><span class="o">=</span><span class="n">hamming_distances</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">)</span>
+            <span class="n">new_generated_text_per_chunk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">generated_text_candidates_single_chunk</span><span class="p">[</span><span class="n">max_index</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">new_generated_text_per_chunk</span>
 
 <div class="viewcode-block" id="ImageCaptioningMapper.process_batched">
@@ -644,16 +621,13 @@
         <span class="c1"># reconstruct samples from &quot;dict of lists&quot; to &quot;list of dicts&quot;</span>
         <span class="n">reconstructed_samples</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])):</span>
-            <span class="n">reconstructed_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">})</span>
+            <span class="n">reconstructed_samples</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">})</span>
         <span class="n">samples_after_generation</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># do generation for each sample within the batch</span>
         <span class="k">for</span> <span class="n">ori_sample</span> <span class="ow">in</span> <span class="n">reconstructed_samples</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span><span class="p">:</span>
                 <span class="n">samples_after_generation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">)</span>
-            <span class="n">generated_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_single_sample</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">,</span>
-                                                            <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+            <span class="n">generated_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_single_sample</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">generated_samples</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">samples_after_generation</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">generated_samples</span><span class="p">)</span>
         <span class="c1"># reconstruct samples from &quot;list of dicts&quot; to &quot;dict of lists&quot;</span>

@@ -369,16 +369,16 @@
 <div class="viewcode-block" id="setup_mp">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.process_utils.setup_mp">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">setup_mp</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">mp</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;MainProcess&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">mp</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;MainProcess&quot;</span><span class="p">:</span>
         <span class="k">return</span>
 
     <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">method</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fork&#39;</span><span class="p">,</span> <span class="s1">&#39;forkserver&#39;</span><span class="p">,</span> <span class="s1">&#39;spawn&#39;</span><span class="p">]</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fork&quot;</span><span class="p">,</span> <span class="s2">&quot;forkserver&quot;</span><span class="p">,</span> <span class="s2">&quot;spawn&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
         <span class="n">method</span> <span class="o">=</span> <span class="p">[</span><span class="n">method</span><span class="p">]</span>
     <span class="n">method</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">method</span><span class="p">]</span>
 
-    <span class="n">env_method</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;MP_START_METHOD&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">env_method</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MP_START_METHOD&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">env_method</span> <span class="ow">in</span> <span class="n">method</span><span class="p">:</span>
         <span class="n">method</span> <span class="o">=</span> <span class="p">[</span><span class="n">env_method</span><span class="p">]</span>
 
@@ -389,7 +389,7 @@
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting multiprocess start method to &#39;</span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
                 <span class="n">mp</span><span class="o">.</span><span class="n">set_start_method</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error setting multiprocess start method: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error setting multiprocess start method: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">break</span></div>
 
 
@@ -399,13 +399,12 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">get_min_cuda_memory</span><span class="p">():</span>
     <span class="c1"># get cuda memory info using &quot;nvidia-smi&quot; command</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-    <span class="n">min_cuda_memory</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_properties</span><span class="p">(</span>
-        <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">total_memory</span> <span class="o">/</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">2</span>
-    <span class="n">nvidia_smi_output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span>
-        <span class="s1">&#39;nvidia-smi&#39;</span><span class="p">,</span> <span class="s1">&#39;--query-gpu=memory.free&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;--format=csv,noheader,nounits&#39;</span>
-    <span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">nvidia_smi_output</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+
+    <span class="n">min_cuda_memory</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_properties</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">total_memory</span> <span class="o">/</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">nvidia_smi_output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;nvidia-smi&quot;</span><span class="p">,</span> <span class="s2">&quot;--query-gpu=memory.free&quot;</span><span class="p">,</span> <span class="s2">&quot;--format=csv,noheader,nounits&quot;</span><span class="p">]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">nvidia_smi_output</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
         <span class="n">free_memory</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
         <span class="n">min_cuda_memory</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_cuda_memory</span><span class="p">,</span> <span class="n">free_memory</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">min_cuda_memory</span></div>
@@ -414,11 +413,7 @@
 
 <div class="viewcode-block" id="calculate_np">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.process_utils.calculate_np">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">calculate_np</span><span class="p">(</span><span class="n">name</span><span class="p">,</span>
-                 <span class="n">mem_required</span><span class="p">,</span>
-                 <span class="n">cpu_required</span><span class="p">,</span>
-                 <span class="n">num_proc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">use_cuda</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_np</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mem_required</span><span class="p">,</span> <span class="n">cpu_required</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the optimum number of processes for the given OP&quot;&quot;&quot;</span>
     <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-9</span>  <span class="c1"># about 1 byte</span>
 
@@ -426,37 +421,41 @@
         <span class="n">auto_num_proc</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">cuda_mem_available</span> <span class="o">=</span> <span class="n">get_min_cuda_memory</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1024</span>
         <span class="k">if</span> <span class="n">mem_required</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The required cuda memory of Op[</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">] &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;has not been specified. &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;Please specify the mem_required field in the &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;config file, or you might encounter CUDA &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;out of memory error. You can reference &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;the mem_required field in the &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;config_all.yaml file.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The required cuda memory of Op[</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">] &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;has not been specified. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Please specify the mem_required field in the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;config file, or you might encounter CUDA &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;out of memory error. You can reference &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;the mem_required field in the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;config_all.yaml file.&quot;</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">auto_num_proc</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span>
-                <span class="n">cuda_mem_available</span> <span class="o">/</span> <span class="n">mem_required</span><span class="p">)</span> <span class="o">*</span> <span class="n">cuda_device_count</span><span class="p">()</span>
+            <span class="n">auto_num_proc</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">cuda_mem_available</span> <span class="o">/</span> <span class="n">mem_required</span><span class="p">)</span> <span class="o">*</span> <span class="n">cuda_device_count</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">cuda_mem_available</span> <span class="o">/</span> <span class="n">mem_required</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;The required cuda memory:</span><span class="si">{</span><span class="n">mem_required</span><span class="si">}</span><span class="s1">GB might &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;be more than the available cuda memory:&#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cuda_mem_available</span><span class="si">}</span><span class="s1">GB.&#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;This Op[</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">] might &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;require more resource to run.&#39;</span><span class="p">)</span>
+                    <span class="sa">f</span><span class="s2">&quot;The required cuda memory:</span><span class="si">{</span><span class="n">mem_required</span><span class="si">}</span><span class="s2">GB might &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;be more than the available cuda memory:&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cuda_mem_available</span><span class="si">}</span><span class="s2">GB.&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;This Op[</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">] might &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;require more resource to run.&quot;</span>
+                <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">auto_num_proc</span> <span class="ow">and</span> <span class="n">num_proc</span><span class="p">:</span>
             <span class="n">op_proc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">auto_num_proc</span><span class="p">,</span> <span class="n">num_proc</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">num_proc</span> <span class="o">&gt;</span> <span class="n">auto_num_proc</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;The given num_proc: </span><span class="si">{</span><span class="n">num_proc</span><span class="si">}</span><span class="s1"> is greater than &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;the value </span><span class="si">{</span><span class="n">auto_num_proc</span><span class="si">}</span><span class="s1"> auto calculated based &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;on the mem_required of Op[</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">]. &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;Set the `num_proc` to </span><span class="si">{</span><span class="n">auto_num_proc</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+                    <span class="sa">f</span><span class="s2">&quot;The given num_proc: </span><span class="si">{</span><span class="n">num_proc</span><span class="si">}</span><span class="s2"> is greater than &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;the value </span><span class="si">{</span><span class="n">auto_num_proc</span><span class="si">}</span><span class="s2"> auto calculated based &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;on the mem_required of Op[</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">]. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Set the `num_proc` to </span><span class="si">{</span><span class="n">auto_num_proc</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">auto_num_proc</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">num_proc</span><span class="p">:</span>
             <span class="n">op_proc</span> <span class="o">=</span> <span class="n">cuda_device_count</span><span class="p">()</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Both mem_required and num_proc of Op[</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">] are not set.&#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;Set the `num_proc` to number of GPUs </span><span class="si">{</span><span class="n">op_proc</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;Both mem_required and num_proc of Op[</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">] are not set.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Set the `num_proc` to number of GPUs </span><span class="si">{</span><span class="n">op_proc</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">op_proc</span> <span class="o">=</span> <span class="n">auto_num_proc</span> <span class="k">if</span> <span class="n">auto_num_proc</span> <span class="k">else</span> <span class="n">num_proc</span>
 
@@ -471,15 +470,16 @@
         <span class="n">mem_available</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">available</span>
         <span class="n">mem_available</span> <span class="o">=</span> <span class="n">mem_available</span> <span class="o">/</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">3</span>
         <span class="n">op_proc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">op_proc</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">cpu_available</span> <span class="o">/</span> <span class="n">cpu_required</span> <span class="o">+</span> <span class="n">eps</span><span class="p">))</span>
-        <span class="n">op_proc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">op_proc</span><span class="p">,</span>
-                      <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">mem_available</span> <span class="o">/</span> <span class="p">(</span><span class="n">mem_required</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)))</span>
+        <span class="n">op_proc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">op_proc</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">mem_available</span> <span class="o">/</span> <span class="p">(</span><span class="n">mem_required</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">op_proc</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The required CPU number:</span><span class="si">{</span><span class="n">cpu_required</span><span class="si">}</span><span class="s1"> &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;and memory:</span><span class="si">{</span><span class="n">mem_required</span><span class="si">}</span><span class="s1">GB might &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;be more than the available CPU:</span><span class="si">{</span><span class="n">cpu_available</span><span class="si">}</span><span class="s1"> &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;and memory :</span><span class="si">{</span><span class="n">mem_available</span><span class="si">}</span><span class="s1">GB.&#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;This Op [</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">] might &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;require more resource to run.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The required CPU number:</span><span class="si">{</span><span class="n">cpu_required</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;and memory:</span><span class="si">{</span><span class="n">mem_required</span><span class="si">}</span><span class="s2">GB might &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;be more than the available CPU:</span><span class="si">{</span><span class="n">cpu_available</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;and memory :</span><span class="si">{</span><span class="n">mem_available</span><span class="si">}</span><span class="s2">GB.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;This Op [</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">] might &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;require more resource to run.&quot;</span>
+            <span class="p">)</span>
         <span class="n">op_proc</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">op_proc</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">op_proc</span></div>
 

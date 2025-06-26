@@ -364,12 +364,11 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">find_files_with_suffix</span><span class="p">,</span>
-                                          <span class="n">is_absolute_path</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_files_with_suffix</span><span class="p">,</span> <span class="n">is_absolute_path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecialTokens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Registry</span>
 
-<span class="n">FORMATTERS</span> <span class="o">=</span> <span class="n">Registry</span><span class="p">(</span><span class="s1">&#39;Formatters&#39;</span><span class="p">)</span>
+<span class="n">FORMATTERS</span> <span class="o">=</span> <span class="n">Registry</span><span class="p">(</span><span class="s2">&quot;Formatters&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="BaseFormatter">
@@ -433,26 +432,22 @@
 <span class="sd">        :param global_cfg: global cfg used in consequent processes,</span>
 <span class="sd">        :return: formatted dataset</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_num_proc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;num_proc&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">_num_proc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;num_proc&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">num_proc</span> <span class="o">=</span> <span class="n">num_proc</span> <span class="ow">or</span> <span class="n">_num_proc</span>
-        <span class="n">datasets</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
-                                <span class="n">data_files</span><span class="o">=</span><span class="p">{</span>
-                                    <span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-                                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span>
-                                <span class="p">},</span>
-                                <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
-                                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">datasets</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+            <span class="n">data_files</span><span class="o">=</span><span class="p">{</span><span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">},</span>
+            <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_suffix</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Add suffix info into dataset...&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Add suffix info into dataset...&quot;</span><span class="p">)</span>
             <span class="n">datasets</span> <span class="o">=</span> <span class="n">add_suffixes</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">num_proc</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedDataset</span>
-            <span class="n">datasets</span> <span class="o">=</span> <span class="n">NestedDataset</span><span class="p">(</span>
-                <span class="n">concatenate_datasets</span><span class="p">([</span><span class="n">ds</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()]))</span>
-        <span class="n">ds</span> <span class="o">=</span> <span class="n">unify_format</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span>
-                          <span class="n">text_keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text_keys</span><span class="p">,</span>
-                          <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
-                          <span class="n">global_cfg</span><span class="o">=</span><span class="n">global_cfg</span><span class="p">)</span>
+
+            <span class="n">datasets</span> <span class="o">=</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="n">concatenate_datasets</span><span class="p">([</span><span class="n">ds</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()]))</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">unify_format</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">text_keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text_keys</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span> <span class="n">global_cfg</span><span class="o">=</span><span class="n">global_cfg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ds</span></div>
 </div>
 
@@ -466,10 +461,7 @@
 
 <div class="viewcode-block" id="RemoteFormatter.__init__">
 <a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.RemoteFormatter.__init__">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">dataset_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                 <span class="n">text_keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">text_keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -493,14 +485,8 @@
 <span class="sd">        :param global_cfg: the global cfg used in consequent processes,</span>
 <span class="sd">        :return: formatted dataset</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
-                          <span class="n">split</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">,</span>
-                          <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
-                          <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">ds</span> <span class="o">=</span> <span class="n">unify_format</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span>
-                          <span class="n">text_keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text_keys</span><span class="p">,</span>
-                          <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
-                          <span class="n">global_cfg</span><span class="o">=</span><span class="n">global_cfg</span><span class="p">)</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">unify_format</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">text_keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text_keys</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span> <span class="n">global_cfg</span><span class="o">=</span><span class="n">global_cfg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ds</span></div>
 </div>
 
@@ -516,19 +502,20 @@
 <span class="sd">    :param num_proc: number of processes to add suffixes</span>
 <span class="sd">    :return: datasets with suffix features.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Add suffix column for dataset&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Add suffix column for dataset&quot;</span><span class="p">)</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_same_content_to_new_column</span>
+
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
-            <span class="n">datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">add_same_content_to_new_column</span><span class="p">,</span>
-                                   <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span>
-                                       <span class="s1">&#39;new_column_name&#39;</span><span class="p">:</span> <span class="n">Fields</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
-                                       <span class="s1">&#39;initial_value&#39;</span><span class="p">:</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">key</span>
-                                   <span class="p">},</span>
-                                   <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
-                                   <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Adding new column for suffix&#39;</span><span class="p">)</span>
+            <span class="n">datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+                <span class="n">add_same_content_to_new_column</span><span class="p">,</span>
+                <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;new_column_name&quot;</span><span class="p">:</span> <span class="n">Fields</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span> <span class="s2">&quot;initial_value&quot;</span><span class="p">:</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">},</span>
+                <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
+                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Adding new column for suffix&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
     <span class="n">datasets</span> <span class="o">=</span> <span class="n">concatenate_datasets</span><span class="p">([</span><span class="n">ds</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedDataset</span>
+
     <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span></div>
 
 
@@ -537,7 +524,7 @@
 <a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.unify_format">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">unify_format</span><span class="p">(</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
-    <span class="n">text_keys</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+    <span class="n">text_keys</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span>
     <span class="n">num_proc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">global_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
@@ -557,15 +544,14 @@
 <span class="sd">    :return: unified_format_dataset</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedDataset</span>
+
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">DatasetDict</span><span class="p">):</span>
         <span class="n">datasets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Please make sure the passed datasets &#39;</span> \
-                                   <span class="s1">&#39;contains only 1 dataset&#39;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Please make sure the passed datasets &quot;</span> <span class="s2">&quot;contains only 1 dataset&quot;</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">)</span> <span class="ow">or</span> \
-           <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">NestedDataset</span><span class="p">),</span> \
-           <span class="s1">&#39;Currently we only support processing data&#39;</span> \
-           <span class="s1">&#39;with huggingface-Dataset format&#39;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">NestedDataset</span><span class="p">),</span> <span class="p">(</span>
+        <span class="s2">&quot;Currently we only support processing data&quot;</span> <span class="s2">&quot;with huggingface-Dataset format&quot;</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">text_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">text_keys</span> <span class="o">=</span> <span class="p">[]</span>
@@ -573,22 +559,24 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">text_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">text_keys</span><span class="p">]</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Unifying the input dataset formats...&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Unifying the input dataset formats...&quot;</span><span class="p">)</span>
 
     <span class="n">dataset</span> <span class="o">=</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
     <span class="c1"># 1. check text related keys</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">text_keys</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
-            <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;There is no key [</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">] in dataset. You might set &#39;</span> \
-                      <span class="sa">f</span><span class="s1">&#39;wrong text_key in the config file for your dataset. &#39;</span> \
-                      <span class="sa">f</span><span class="s1">&#39;Please check and retry!&#39;</span>
+            <span class="n">err_msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;There is no key [</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">] in dataset. You might set &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;wrong text_key in the config file for your dataset. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Please check and retry!&quot;</span>
+            <span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
 
     <span class="c1"># 2. filter out those samples with empty or None text</span>
     <span class="c1"># TODO: optimize the filtering operation for better efficiency</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s1"> sample(s) in the original dataset.&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> sample(s) in the original dataset.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">non_empty_text</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">target_keys</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">target_key</span> <span class="ow">in</span> <span class="n">target_keys</span><span class="p">:</span>
@@ -599,25 +587,22 @@
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">non_empty_text</span><span class="p">,</span>
-                             <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
-                             <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;target_keys&#39;</span><span class="p">:</span> <span class="n">text_keys</span><span class="p">})</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples left after filtering empty text.&#39;</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">non_empty_text</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span> <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;target_keys&quot;</span><span class="p">:</span> <span class="n">text_keys</span><span class="p">})</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples left after filtering empty text.&quot;</span><span class="p">)</span>
 
     <span class="c1"># 3. convert relative paths to absolute paths</span>
     <span class="k">if</span> <span class="n">global_cfg</span><span class="p">:</span>
         <span class="c1"># check and get dataset dir</span>
-        <span class="k">if</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dataset_path&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
-                <span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dataset_path&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
                 <span class="n">ds_dir</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ds_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">ds_dir</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="n">image_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;image_key&#39;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
-        <span class="n">audio_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;audio_key&#39;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">audio</span><span class="p">)</span>
-        <span class="n">video_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;video_key&#39;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="p">)</span>
+            <span class="n">ds_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">image_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_key&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">audio_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_key&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">audio</span><span class="p">)</span>
+        <span class="n">video_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;video_key&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="p">)</span>
 
         <span class="n">data_path_keys</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">image_key</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
@@ -630,12 +615,14 @@
             <span class="c1"># no image/audio/video path list in dataset, no need to convert</span>
             <span class="k">return</span> <span class="n">dataset</span>
 
-        <span class="k">if</span> <span class="n">ds_dir</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ds_dir</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">dataset</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Converting relative paths in the dataset to their &#39;</span>
-                    <span class="s1">&#39;absolute version. (Based on the directory of input &#39;</span>
-                    <span class="s1">&#39;dataset file)&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Converting relative paths in the dataset to their &quot;</span>
+            <span class="s2">&quot;absolute version. (Based on the directory of input &quot;</span>
+            <span class="s2">&quot;dataset file)&quot;</span>
+        <span class="p">)</span>
 
         <span class="c1"># function to convert relative paths to absolute paths</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">rel2abs</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">path_keys</span><span class="p">,</span> <span class="n">dataset_dir</span><span class="p">):</span>
@@ -645,24 +632,20 @@
                 <span class="n">paths</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">path_key</span><span class="p">]</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">paths</span><span class="p">:</span>
                     <span class="k">continue</span>
-                <span class="n">new_paths</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="n">path</span> <span class="k">if</span> <span class="n">is_absolute_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                        <span class="n">dataset_dir</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span>
-                <span class="p">]</span>
+                <span class="n">new_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span> <span class="k">if</span> <span class="n">is_absolute_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
                 <span class="n">sample</span><span class="p">[</span><span class="n">path_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_paths</span>
             <span class="k">return</span> <span class="n">sample</span>
 
-        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">rel2abs</span><span class="p">,</span>
-                              <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
-                              <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span>
-                                  <span class="s1">&#39;path_keys&#39;</span><span class="p">:</span> <span class="n">data_path_keys</span><span class="p">,</span>
-                                  <span class="s1">&#39;dataset_dir&#39;</span><span class="p">:</span> <span class="n">ds_dir</span>
-                              <span class="p">})</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+            <span class="n">rel2abs</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span> <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;path_keys&quot;</span><span class="p">:</span> <span class="n">data_path_keys</span><span class="p">,</span> <span class="s2">&quot;dataset_dir&quot;</span><span class="p">:</span> <span class="n">ds_dir</span><span class="p">}</span>
+        <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No global config passed into unify_format function. &#39;</span>
-                       <span class="s1">&#39;Relative paths in the dataset might not be converted &#39;</span>
-                       <span class="s1">&#39;to their absolute versions. Data of other modalities &#39;</span>
-                       <span class="s1">&#39;might not be able to find by Data-Juicer.&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;No global config passed into unify_format function. &quot;</span>
+            <span class="s2">&quot;Relative paths in the dataset might not be converted &quot;</span>
+            <span class="s2">&quot;to their absolute versions. Data of other modalities &quot;</span>
+            <span class="s2">&quot;might not be able to find by Data-Juicer.&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">dataset</span></div>
 

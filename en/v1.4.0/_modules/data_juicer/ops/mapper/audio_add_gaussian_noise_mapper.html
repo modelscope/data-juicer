@@ -358,10 +358,10 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..op_fusion</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOADED_AUDIOS</span>
 
-<span class="n">audiomentations</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;audiomentations&#39;</span><span class="p">)</span>
-<span class="n">sf</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;soundfile&#39;</span><span class="p">)</span>
+<span class="n">audiomentations</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;audiomentations&quot;</span><span class="p">)</span>
+<span class="n">sf</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;audio_add_gaussian_noise_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;audio_add_gaussian_noise_mapper&quot;</span>
 
 
 <div class="viewcode-block" id="AudioAddGaussianNoiseMapper">
@@ -377,12 +377,7 @@
 
 <div class="viewcode-block" id="AudioAddGaussianNoiseMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.audio_add_gaussian_noise_mapper.AudioAddGaussianNoiseMapper.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">min_amplitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span>
-                 <span class="n">max_amplitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.015</span><span class="p">,</span>
-                 <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_amplitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">max_amplitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.015</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Initialization method.</span>
@@ -399,24 +394,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
 
         <span class="k">if</span> <span class="n">min_amplitude</span> <span class="o">&gt;=</span> <span class="n">max_amplitude</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;min_amplitude must be &lt; max_amplitude&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;min_amplitude must be &lt; max_amplitude&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;p must be in [0, 1]&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;p must be in [0, 1]&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_amplitude</span> <span class="o">=</span> <span class="n">min_amplitude</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_amplitude</span> <span class="o">=</span> <span class="n">max_amplitude</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">audio_transform</span> <span class="o">=</span> <span class="n">audiomentations</span><span class="o">.</span><span class="n">AddGaussianNoise</span><span class="p">(</span>
-            <span class="n">min_amplitude</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_amplitude</span><span class="p">,</span>
-            <span class="n">max_amplitude</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_amplitude</span><span class="p">,</span>
-            <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></div>
+            <span class="n">min_amplitude</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_amplitude</span><span class="p">,</span> <span class="n">max_amplitude</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_amplitude</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="AudioAddGaussianNoiseMapper.process_single">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.audio_add_gaussian_noise_mapper.AudioAddGaussianNoiseMapper.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># there is no audio in this sample</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> \
-                <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">audio_key</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">audio_key</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]:</span>
@@ -424,23 +417,19 @@
 
         <span class="c1"># load audio</span>
         <span class="n">loaded_audio_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">audio_key</span><span class="p">]</span>
-        <span class="n">sample</span><span class="p">,</span> <span class="n">audios</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span>
-                                                <span class="n">loaded_audio_keys</span><span class="p">,</span> <span class="n">load_audio</span><span class="p">)</span>
+        <span class="n">sample</span><span class="p">,</span> <span class="n">audios</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">loaded_audio_keys</span><span class="p">,</span> <span class="n">load_audio</span><span class="p">)</span>
         <span class="n">processed</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">for</span> <span class="n">audio_key</span> <span class="ow">in</span> <span class="n">loaded_audio_keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">audio_key</span> <span class="ow">in</span> <span class="n">processed</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="n">new_audio_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">audio_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
-                                              <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">new_audio_key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.ogg&#39;</span><span class="p">):</span>
-                <span class="n">new_audio_key</span> <span class="o">=</span> <span class="n">new_audio_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.ogg&#39;</span><span class="p">,</span> <span class="s1">&#39;.wav&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
-                    <span class="n">new_audio_key</span><span class="p">)</span> <span class="ow">or</span> <span class="n">new_audio_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">audios</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">new_audio_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">audio_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">new_audio_key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.ogg&quot;</span><span class="p">):</span>
+                <span class="n">new_audio_key</span> <span class="o">=</span> <span class="n">new_audio_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.ogg&quot;</span><span class="p">,</span> <span class="s2">&quot;.wav&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">new_audio_key</span><span class="p">)</span> <span class="ow">or</span> <span class="n">new_audio_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">audios</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">audio_array</span><span class="p">,</span> <span class="n">audio_sample_rate</span> <span class="o">=</span> <span class="n">audios</span><span class="p">[</span><span class="n">audio_key</span><span class="p">]</span>
-                <span class="n">audio_augment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio_transform</span><span class="p">(</span>
-                    <span class="n">audio_array</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="n">audio_sample_rate</span><span class="p">)</span>
+                <span class="n">audio_augment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio_transform</span><span class="p">(</span><span class="n">audio_array</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="n">audio_sample_rate</span><span class="p">)</span>
                 <span class="n">audio_augment</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">audio_augment</span><span class="p">)</span>
                 <span class="n">sf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_audio_key</span><span class="p">,</span> <span class="n">audio_augment</span><span class="p">,</span> <span class="n">audio_sample_rate</span><span class="p">)</span>
                 <span class="n">audios</span><span class="p">[</span><span class="n">new_audio_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">audio_augment</span><span class="p">,</span> <span class="n">audio_sample_rate</span><span class="p">)</span>
@@ -450,8 +439,7 @@
 
         <span class="c1"># when the file is modified, its source file needs to be updated.</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loaded_audio_keys</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span>
-                      <span class="n">source_file</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span> <span class="ow">and</span> <span class="n">processed</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span> <span class="ow">and</span> <span class="n">processed</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
                 <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">processed</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
         <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">audio_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">processed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loaded_audio_keys</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">sample</span></div>

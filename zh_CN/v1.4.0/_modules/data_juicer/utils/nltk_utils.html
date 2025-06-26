@@ -364,15 +364,14 @@
 <span class="c1"># Resource path mappings - direct replacements for problematic resources</span>
 <span class="n">path_mappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="c1"># If any path contains the key, replace with the value</span>
-    <span class="s1">&#39;taggers/averaged_perceptron_tagger_eng&#39;</span><span class="p">:</span>
-    <span class="s1">&#39;taggers/averaged_perceptron_tagger/english.pickle&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;tokenizers/punkt_tab&#39;</span><span class="p">:</span> <span class="s1">&#39;tokenizers/punkt/english.pickle&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;taggers/averaged_perceptron_tagger_eng&quot;</span><span class="p">:</span> <span class="s2">&quot;taggers/averaged_perceptron_tagger/english.pickle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tokenizers/punkt_tab&quot;</span><span class="p">:</span> <span class="s2">&quot;tokenizers/punkt/english.pickle&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="c1"># Resource mappings for fallbacks</span>
 <span class="n">resource_fallbacks</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;averaged_perceptron_tagger_eng&#39;</span><span class="p">:</span> <span class="s1">&#39;averaged_perceptron_tagger&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;punkt_tab&#39;</span><span class="p">:</span> <span class="s1">&#39;punkt&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;averaged_perceptron_tagger_eng&quot;</span><span class="p">:</span> <span class="s2">&quot;averaged_perceptron_tagger&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;punkt_tab&quot;</span><span class="p">:</span> <span class="s2">&quot;punkt&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -399,7 +398,8 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Resource path &#39;</span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s2">&#39; contains problematic &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;pattern &#39;</span><span class="si">{</span><span class="n">problematic_path</span><span class="si">}</span><span class="s2">&#39;, using &#39;</span><span class="si">{</span><span class="n">replacement_path</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
-                <span class="sa">f</span><span class="s1">&#39;instead&#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;instead&quot;</span>
+            <span class="p">)</span>
             <span class="n">resource_path</span> <span class="o">=</span> <span class="n">replacement_path</span>
             <span class="k">break</span>
 
@@ -407,16 +407,12 @@
     <span class="c1"># This ensures the resources are available before we try to access them</span>
     <span class="k">if</span> <span class="n">fallback_package</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Proactively downloading package &#39;</span><span class="si">{</span><span class="n">fallback_package</span><span class="si">}</span><span class="s2">&#39; for &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;resource &#39;</span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Proactively downloading package &#39;</span><span class="si">{</span><span class="n">fallback_package</span><span class="si">}</span><span class="s2">&#39; for &quot;</span> <span class="sa">f</span><span class="s2">&quot;resource &#39;</span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
             <span class="c1"># Try different download methods, prioritizing the default location</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">nltk_data_dir</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">path</span> <span class="k">else</span> <span class="kc">None</span>
                 <span class="k">if</span> <span class="n">nltk_data_dir</span><span class="p">:</span>
-                    <span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">fallback_package</span><span class="p">,</span>
-                                  <span class="n">download_dir</span><span class="o">=</span><span class="n">nltk_data_dir</span><span class="p">,</span>
-                                  <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">fallback_package</span><span class="p">,</span> <span class="n">download_dir</span><span class="o">=</span><span class="n">nltk_data_dir</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">fallback_package</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
@@ -433,14 +429,10 @@
         <span class="k">if</span> <span class="n">fallback_package</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="c1"># Try a different download method as a last resort</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Resource &#39;</span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s2">&#39; not found, trying one more &quot;</span>
-                    <span class="sa">f</span><span class="s1">&#39;download attempt&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resource &#39;</span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s2">&#39; not found, trying one more &quot;</span> <span class="sa">f</span><span class="s2">&quot;download attempt&quot;</span><span class="p">)</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># Download to default location w/o download_dir specified</span>
-                    <span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">fallback_package</span><span class="p">,</span>
-                                  <span class="n">download_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                  <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">fallback_package</span><span class="p">,</span> <span class="n">download_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="k">pass</span>
 
@@ -450,27 +442,21 @@
                     <span class="k">return</span> <span class="kc">True</span>
                 <span class="k">except</span> <span class="ne">LookupError</span><span class="p">:</span>
                     <span class="c1"># Special handling for certain resources</span>
-                    <span class="k">if</span> <span class="s1">&#39;averaged_perceptron_tagger&#39;</span> <span class="ow">in</span> <span class="n">resource_path</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s2">&quot;averaged_perceptron_tagger&quot;</span> <span class="ow">in</span> <span class="n">resource_path</span><span class="p">:</span>
                         <span class="c1"># Try the direct file location check</span>
-                        <span class="n">nltk_data_dir</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">path</span><span class="p">[</span>
-                            <span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">path</span> <span class="k">else</span> <span class="kc">None</span>
+                        <span class="n">nltk_data_dir</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">path</span> <span class="k">else</span> <span class="kc">None</span>
                         <span class="k">if</span> <span class="n">nltk_data_dir</span><span class="p">:</span>
                             <span class="n">alt_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                                <span class="n">nltk_data_dir</span><span class="p">,</span>
-                                <span class="s1">&#39;taggers/averaged_perceptron_tagger/english.pickle&#39;</span>  <span class="c1"># noqa: E501</span>
+                                <span class="n">nltk_data_dir</span><span class="p">,</span> <span class="s2">&quot;taggers/averaged_perceptron_tagger/english.pickle&quot;</span>  <span class="c1"># noqa: E501</span>
                             <span class="p">)</span>
                             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">alt_path</span><span class="p">):</span>
-                                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Found alternative resource at &#39;</span>
-                                            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">alt_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+                                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found alternative resource at &quot;</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">alt_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
                                 <span class="k">return</span> <span class="kc">True</span>
 
-                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Resource &#39;</span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s2">&#39; still not found despite &quot;</span>
-                        <span class="sa">f</span><span class="s1">&#39;download attempts&#39;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resource &#39;</span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s2">&#39; still not found despite &quot;</span> <span class="sa">f</span><span class="s2">&quot;download attempts&quot;</span><span class="p">)</span>
                     <span class="k">return</span> <span class="kc">False</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Error ensuring resource &#39;</span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error ensuring resource &#39;</span><span class="si">{</span><span class="n">resource_path</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
@@ -493,7 +479,7 @@
         <span class="c1"># Get the default NLTK data directory (usually the first in the path)</span>
         <span class="n">nltk_data_dirs</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">path</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">nltk_data_dirs</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No NLTK data directories found.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No NLTK data directories found.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="c1"># Process each NLTK data directory</span>
@@ -501,22 +487,19 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">nltk_data_dir</span><span class="p">):</span>
                 <span class="k">continue</span>
 
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;NLTK data directory: </span><span class="si">{</span><span class="n">nltk_data_dir</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NLTK data directory: </span><span class="si">{</span><span class="n">nltk_data_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="c1"># Complete reset - remove all NLTK data</span>
             <span class="k">if</span> <span class="n">complete_reset</span><span class="p">:</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">nltk_data_dir</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Completely reset NLTK data directory: </span><span class="si">{</span><span class="n">nltk_data_dir</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Completely reset NLTK data directory: </span><span class="si">{</span><span class="n">nltk_data_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">nltk_data_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">continue</span>
 
             <span class="c1"># Selective cleaning</span>
             <span class="k">if</span> <span class="n">packages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># Clean all cached packages</span>
-                <span class="n">subdirs</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="s1">&#39;tokenizers&#39;</span><span class="p">,</span> <span class="s1">&#39;taggers&#39;</span><span class="p">,</span> <span class="s1">&#39;chunkers&#39;</span><span class="p">,</span> <span class="s1">&#39;corpora&#39;</span><span class="p">,</span> <span class="s1">&#39;stemmers&#39;</span>
-                <span class="p">]</span>
+                <span class="n">subdirs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tokenizers&quot;</span><span class="p">,</span> <span class="s2">&quot;taggers&quot;</span><span class="p">,</span> <span class="s2">&quot;chunkers&quot;</span><span class="p">,</span> <span class="s2">&quot;corpora&quot;</span><span class="p">,</span> <span class="s2">&quot;stemmers&quot;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Clean only specified packages</span>
                 <span class="n">subdirs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -527,10 +510,10 @@
                 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">subdir_path</span><span class="p">):</span>
                     <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">subdir_path</span><span class="p">)</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">subdir_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cleaned </span><span class="si">{</span><span class="n">subdir</span><span class="si">}</span><span class="s1"> cache in </span><span class="si">{</span><span class="n">nltk_data_dir</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cleaned </span><span class="si">{</span><span class="n">subdir</span><span class="si">}</span><span class="s2"> cache in </span><span class="si">{</span><span class="n">nltk_data_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error cleaning NLTK cache: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error cleaning NLTK cache: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 
@@ -553,12 +536,12 @@
         <span class="kn">import</span><span class="w"> </span><span class="nn">nltk.data</span>
 
         <span class="c1"># Replace the restricted_pickle_load function with more permissive one</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;restricted_pickle_load&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;restricted_pickle_load&quot;</span><span class="p">):</span>
 
             <span class="k">def</span><span class="w"> </span><span class="nf">unrestricted_pickle_load</span><span class="p">(</span><span class="n">file_obj</span><span class="p">):</span>
 <span class="w">                </span><span class="sd">&quot;&quot;&quot;Modified pickle loader that allows our model classes.&quot;&quot;&quot;</span>
                 <span class="c1"># Handle both file-like objects and byte strings</span>
-                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">file_obj</span><span class="p">,</span> <span class="s1">&#39;read&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">file_obj</span><span class="p">,</span> <span class="s1">&#39;readline&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">file_obj</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">file_obj</span><span class="p">,</span> <span class="s2">&quot;readline&quot;</span><span class="p">):</span>
                     <span class="c1"># It&#39;s already a file-like object</span>
                     <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_obj</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file_obj</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
@@ -569,27 +552,23 @@
                     <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_obj</span><span class="p">)</span>
 
             <span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">restricted_pickle_load</span> <span class="o">=</span> <span class="n">unrestricted_pickle_load</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="s1">&#39;NLTK pickle security patched: replaced restricted_pickle_load&#39;</span>
-            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;NLTK pickle security patched: replaced restricted_pickle_load&quot;</span><span class="p">)</span>
 
         <span class="c1"># Add our needed classes to the allowed classes list</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ALLOWED_PICKLE_CLASSES&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;ALLOWED_PICKLE_CLASSES&quot;</span><span class="p">):</span>
             <span class="n">classes_to_allow</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="s1">&#39;nltk.tokenize.punkt.PunktSentenceTokenizer&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;nltk.tokenize.punkt.PunktParameters&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;nltk.tokenize.punkt.PunktTrainer&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;nltk.tokenize.punkt.PunktLanguageVars&#39;</span><span class="p">,</span>
+                <span class="s2">&quot;nltk.tokenize.punkt.PunktSentenceTokenizer&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;nltk.tokenize.punkt.PunktParameters&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;nltk.tokenize.punkt.PunktTrainer&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;nltk.tokenize.punkt.PunktLanguageVars&quot;</span><span class="p">,</span>
             <span class="p">]</span>
             <span class="k">for</span> <span class="n">cls_name</span> <span class="ow">in</span> <span class="n">classes_to_allow</span><span class="p">:</span>
                 <span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ALLOWED_PICKLE_CLASSES</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cls_name</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Added </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">classes_to_allow</span><span class="p">)</span><span class="si">}</span><span class="s2"> classes to NLTK&#39;s allowed &quot;</span>
-                <span class="sa">f</span><span class="s1">&#39;pickle classes list&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">classes_to_allow</span><span class="p">)</span><span class="si">}</span><span class="s2"> classes to NLTK&#39;s allowed &quot;</span> <span class="sa">f</span><span class="s2">&quot;pickle classes list&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to patch NLTK pickle security: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to patch NLTK pickle security: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
 
@@ -611,8 +590,7 @@
 <span class="sd">        bool: True if the alias was created successfully, False otherwise</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">source_path</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Source path &#39;</span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s2">&#39; does not exist, cannot create alias&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Source path &#39;</span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s2">&#39; does not exist, cannot create alias&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="c1"># Create the directory structure if it doesn&#39;t exist</span>
@@ -623,37 +601,35 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">alias_path</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Could not remove existing alias &#39;</span><span class="si">{</span><span class="n">alias_path</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not remove existing alias &#39;</span><span class="si">{</span><span class="n">alias_path</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># Try symlink first (most efficient)</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">os</span><span class="p">,</span> <span class="s1">&#39;symlink&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">os</span><span class="p">,</span> <span class="s2">&quot;symlink&quot;</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="n">source_path</span><span class="p">,</span> <span class="n">alias_path</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Created symlink from &#39;</span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s2">&#39; to &#39;</span><span class="si">{</span><span class="n">alias_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created symlink from &#39;</span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s2">&#39; to &#39;</span><span class="si">{</span><span class="n">alias_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">True</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to create symlink: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create symlink: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Try hard link next</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">source_path</span><span class="p">,</span> <span class="n">alias_path</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Created hard link from &#39;</span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s2">&#39; to &#39;</span><span class="si">{</span><span class="n">alias_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created hard link from &#39;</span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s2">&#39; to &#39;</span><span class="si">{</span><span class="n">alias_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to create hard link: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create hard link: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Fall back to copy</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+
         <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">source_path</span><span class="p">,</span> <span class="n">alias_path</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created copy from &#39;</span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s2">&#39; to &#39;</span><span class="si">{</span><span class="n">alias_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to create any type of alias: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create any type of alias: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
 
@@ -669,33 +645,27 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">nltk</span>
+
         <span class="n">nltk_data_dirs</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">path</span>
 
         <span class="k">for</span> <span class="n">nltk_data_dir</span> <span class="ow">in</span> <span class="n">nltk_data_dirs</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">nltk_data_dir</span><span class="p">):</span>
                 <span class="c1"># Map the averaged_perceptron_tagger english.pickle to</span>
                 <span class="c1"># averaged_perceptron_tagger_eng</span>
-                <span class="n">source</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">nltk_data_dir</span><span class="p">,</span>
-                    <span class="s1">&#39;taggers/averaged_perceptron_tagger/english.pickle&#39;</span><span class="p">)</span>
+                <span class="n">source</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nltk_data_dir</span><span class="p">,</span> <span class="s2">&quot;taggers/averaged_perceptron_tagger/english.pickle&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
                     <span class="c1"># Create a direct file alias</span>
-                    <span class="n">target</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                        <span class="n">nltk_data_dir</span><span class="p">,</span>
-                        <span class="s1">&#39;taggers/averaged_perceptron_tagger_eng&#39;</span><span class="p">)</span>
+                    <span class="n">target</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nltk_data_dir</span><span class="p">,</span> <span class="s2">&quot;taggers/averaged_perceptron_tagger_eng&quot;</span><span class="p">)</span>
                     <span class="n">create_physical_resource_alias</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
 
                     <span class="c1"># Also create a redundant mapping that matches the path</span>
                     <span class="c1"># NLTK might try to load</span>
-                    <span class="n">target2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                        <span class="n">nltk_data_dir</span><span class="p">,</span>
-                        <span class="s1">&#39;taggers/averaged_perceptron_tagger_eng/english.pickle&#39;</span>
-                    <span class="p">)</span>
+                    <span class="n">target2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nltk_data_dir</span><span class="p">,</span> <span class="s2">&quot;taggers/averaged_perceptron_tagger_eng/english.pickle&quot;</span><span class="p">)</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">target2</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="n">create_physical_resource_alias</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target2</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to create physical resource aliases: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create physical resource aliases: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
 </pre></div>

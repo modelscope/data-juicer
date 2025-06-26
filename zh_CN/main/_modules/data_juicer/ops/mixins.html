@@ -412,10 +412,7 @@
 
 <div class="viewcode-block" id="EventDrivenMixin.start_polling">
 <a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.mixins.EventDrivenMixin.start_polling">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">start_polling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                      <span class="n">event_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                      <span class="n">poll_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-                      <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start_polling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">poll_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Start polling for a specific event type.</span>
 
 <span class="sd">        Args:</span>
@@ -423,8 +420,7 @@
 <span class="sd">            poll_func: Function to call for polling</span>
 <span class="sd">            interval: Polling interval in seconds</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">event_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">polling_threads</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">polling_threads</span><span class="p">[</span>
-                <span class="n">event_type</span><span class="p">]</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">event_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">polling_threads</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">polling_threads</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
             <span class="k">return</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_polling_flags</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
@@ -437,7 +433,8 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">trigger_event</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error in polling for </span><span class="si">{</span><span class="n">event_type</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in polling for </span><span class="si">{</span><span class="n">event_type</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
 
         <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">polling_worker</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -470,11 +467,13 @@
 
 <div class="viewcode-block" id="EventDrivenMixin.wait_for_completion">
 <a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.mixins.EventDrivenMixin.wait_for_completion">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                            <span class="n">condition_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">bool</span><span class="p">],</span>
-                            <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">,</span>
-                            <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-                            <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Operation timed out&#39;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_completion</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">condition_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">bool</span><span class="p">],</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">,</span>
+        <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Operation timed out&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Wait for a condition to be met.</span>
 
 <span class="sd">        Args:</span>
@@ -654,30 +653,25 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Get notification configuration directly from kwargs</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;notification_config&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;notification_config&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
         <span class="c1"># Initialize notification handlers if configured</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">notification_handlers</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_email_notification</span><span class="p">,</span>
-            <span class="s1">&#39;slack&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_slack_notification</span><span class="p">,</span>
-            <span class="s1">&#39;dingtalk&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_dingtalk_notification</span><span class="p">,</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_email_notification</span><span class="p">,</span>
+            <span class="s2">&quot;slack&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_slack_notification</span><span class="p">,</span>
+            <span class="s2">&quot;dingtalk&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_dingtalk_notification</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="c1"># Check if notifications are enabled for this operator</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;enabled&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Notification is enabled for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Notification is enabled for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Notification is disabled for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Notification is disabled for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="NotificationMixin.send_notification">
 <a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.mixins.NotificationMixin.send_notification">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">send_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                          <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                          <span class="n">notification_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                          <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">notification_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Send a notification message.</span>
 
 <span class="sd">        Args:</span>
@@ -693,26 +687,22 @@
 <span class="sd">            bool: True if the notification was sent successfully, else False</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Check if notifications are enabled</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;notification_config&#39;</span>
-                       <span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;enabled&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;notification_config&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="c1"># Notifications are disabled, log and return</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Not sending notification: disabled for &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not sending notification: disabled for &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="c1"># Check if notification handlers are initialized</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;notification_handlers&#39;</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Notification handlers not initialized&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;notification_handlers&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Notification handlers not initialized&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="c1"># Apply any temporary overrides for this specific notification</span>
-        <span class="n">temp_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;notification_config&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="n">temp_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;notification_config&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
 
         <span class="c1"># Process the specific notification overrides from kwargs</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">temp_config</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
-                    <span class="n">temp_config</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">temp_config</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">temp_config</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="c1"># For dict values (like email settings), merge them</span>
                 <span class="n">temp_config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -725,22 +715,16 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">notification_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No notification type specified, ignoring... &#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No notification type specified, ignoring... &quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">notification_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_handlers</span><span class="p">:</span>
                 <span class="c1"># Check if this specific channel is enabled</span>
-                <span class="n">channel_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                    <span class="n">notification_type</span><span class="p">,</span> <span class="p">{})</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">channel_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">channel_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                        <span class="s1">&#39;enabled&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s1">&#39;Not sending </span><span class="si">{</span><span class="n">notification_type</span><span class="si">}</span><span class="s1"> notification: &#39;</span>
-                        <span class="sa">f</span><span class="s1">&#39;channel disabled&#39;</span><span class="p">)</span>
+                <span class="n">channel_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">notification_type</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">channel_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">channel_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not sending </span><span class="si">{</span><span class="n">notification_type</span><span class="si">}</span><span class="s2"> notification: &quot;</span> <span class="sa">f</span><span class="s2">&quot;channel disabled&quot;</span><span class="p">)</span>
                     <span class="k">return</span> <span class="kc">True</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_handlers</span><span class="p">[</span><span class="n">notification_type</span><span class="p">](</span><span class="n">message</span><span class="p">,</span>
-                                                                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_handlers</span><span class="p">[</span><span class="n">notification_type</span><span class="p">](</span><span class="n">message</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Unsupported notification type: </span><span class="si">{</span><span class="n">notification_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported notification type: </span><span class="si">{</span><span class="n">notification_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="c1"># Restore the original configuration</span>
@@ -764,7 +748,7 @@
             <span class="kn">import</span><span class="w"> </span><span class="nn">ssl</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">email.mime.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">MIMEText</span>
 
-            <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
             <span class="c1"># Get email configuration settings with priority order:</span>
             <span class="c1"># 1. kwargs (passed directly to the method)</span>
@@ -772,49 +756,35 @@
             <span class="c1"># 3. default values (Alibaba-specific defaults)</span>
 
             <span class="c1"># SMTP server configuration</span>
-            <span class="n">smtp_server</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;smtp_server&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;smtp_server&#39;</span><span class="p">))</span>
-            <span class="n">smtp_port</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;smtp_port&#39;</span><span class="p">,</span>
-                                   <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;smtp_port&#39;</span><span class="p">,</span>
-                                              <span class="mi">465</span><span class="p">))</span>  <span class="c1"># Default to 465 (SSL)</span>
-            <span class="n">use_ssl</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_ssl&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_ssl&#39;</span><span class="p">,</span>
-                                                       <span class="kc">True</span><span class="p">))</span>  <span class="c1"># Default to SSL</span>
+            <span class="n">smtp_server</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;smtp_server&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;smtp_server&quot;</span><span class="p">))</span>
+            <span class="n">smtp_port</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;smtp_port&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;smtp_port&quot;</span><span class="p">,</span> <span class="mi">465</span><span class="p">))</span>  <span class="c1"># Default to 465 (SSL)</span>
+            <span class="n">use_ssl</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_ssl&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_ssl&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>  <span class="c1"># Default to SSL</span>
 
             <span class="c1"># Some more defaults</span>
-            <span class="n">include_port_in_address</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                <span class="s1">&#39;include_port_in_address&#39;</span><span class="p">,</span>
-                <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;include_port_in_address&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
-            <span class="n">recipient_separator</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;recipient_separator&#39;</span><span class="p">,</span>
-                                             <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                                                 <span class="s1">&#39;recipient_separator&#39;</span><span class="p">,</span>
-                                                 <span class="s1">&#39;;&#39;</span><span class="p">))</span>  <span class="c1"># Default to semicolon</span>
-            <span class="n">message_encoding</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                <span class="s1">&#39;message_encoding&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;message_encoding&#39;</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="n">include_port_in_address</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;include_port_in_address&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;include_port_in_address&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+            <span class="n">recipient_separator</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;recipient_separator&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;recipient_separator&quot;</span><span class="p">,</span> <span class="s2">&quot;;&quot;</span><span class="p">)</span>
+            <span class="p">)</span>  <span class="c1"># Default to semicolon</span>
+            <span class="n">message_encoding</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;message_encoding&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;message_encoding&quot;</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
 
             <span class="c1"># Authentication method</span>
-            <span class="n">use_cert_auth</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_cert_auth&#39;</span><span class="p">,</span>
-                                       <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_cert_auth&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+            <span class="n">use_cert_auth</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_cert_auth&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_cert_auth&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
 
             <span class="c1"># Sender information</span>
-            <span class="n">sender_email</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sender_email&#39;</span><span class="p">,</span>
-                                      <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sender_email&#39;</span><span class="p">))</span>
-            <span class="n">sender_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sender_name&#39;</span><span class="p">,</span>
-                                     <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sender_name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="n">sender_email</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sender_email&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sender_email&quot;</span><span class="p">))</span>
+            <span class="n">sender_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sender_name&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sender_name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
 
             <span class="c1"># Format sender with name if provided</span>
             <span class="n">formatted_sender</span> <span class="o">=</span> <span class="n">sender_email</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">sender_name</span> <span class="ow">and</span> <span class="n">sender_name</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span>
-                    <span class="ow">and</span> <span class="s1">&#39;&lt;&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">formatted_sender</span><span class="p">):</span>
-                <span class="n">formatted_sender</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sender_name</span><span class="si">}</span><span class="s1">&lt;</span><span class="si">{</span><span class="n">sender_email</span><span class="si">}</span><span class="s1">&gt;&#39;</span>
+            <span class="k">if</span> <span class="n">sender_name</span> <span class="ow">and</span> <span class="n">sender_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="s2">&quot;&lt;&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">formatted_sender</span><span class="p">:</span>
+                <span class="n">formatted_sender</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sender_name</span><span class="si">}</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">sender_email</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
 
             <span class="c1"># Authentication credentials</span>
-            <span class="n">username</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span>
-                                  <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="n">sender_email</span><span class="p">))</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">sender_email</span><span class="p">))</span>
 
             <span class="c1"># Recipients and subject</span>
-            <span class="n">recipients</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;recipients&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;recipients&#39;</span><span class="p">,</span> <span class="p">[]))</span>
-            <span class="n">subject</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                <span class="s1">&#39;subject&#39;</span><span class="p">,</span>
-                <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subject&#39;</span><span class="p">,</span> <span class="s1">&#39;Notification from Data Juicer&#39;</span><span class="p">))</span>
+            <span class="n">recipients</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;recipients&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;recipients&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="n">subject</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="s2">&quot;Notification from Data Juicer&quot;</span><span class="p">))</span>
 
             <span class="c1"># Try to get password from environment var first (most secure)</span>
             <span class="c1"># Check for service-specific env vars first, then fall back to</span>
@@ -822,7 +792,7 @@
             <span class="n">password</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">env_password_keys</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="sa">f</span><span class="s2">&quot;DATA_JUICER_</span><span class="si">{</span><span class="n">smtp_server</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">_PASSWORD&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
-                <span class="s1">&#39;DATA_JUICER_EMAIL_PASSWORD&#39;</span>
+                <span class="s2">&quot;DATA_JUICER_EMAIL_PASSWORD&quot;</span><span class="p">,</span>
             <span class="p">]</span>
 
             <span class="k">for</span> <span class="n">env_key</span> <span class="ow">in</span> <span class="n">env_password_keys</span><span class="p">:</span>
@@ -832,87 +802,75 @@
 
             <span class="c1"># Fall back to config if no environment variable is set</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">password</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Email password environment variables not set. &#39;</span>
-                               <span class="sa">f</span><span class="s1">&#39;Tried: </span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">env_password_keys</span><span class="p">)</span><span class="si">}</span><span class="s1">. &#39;</span>
-                               <span class="s1">&#39;Falling back to configuration. Consider using &#39;</span>
-                               <span class="s1">&#39;environmentvariables for better security.&#39;</span><span class="p">)</span>
-                <span class="n">password</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Email password environment variables not set. &quot;</span>
+                    <span class="sa">f</span><span class="s1">&#39;Tried: </span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">env_password_keys</span><span class="p">)</span><span class="si">}</span><span class="s1">. &#39;</span>
+                    <span class="s2">&quot;Falling back to configuration. Consider using &quot;</span>
+                    <span class="s2">&quot;environmentvariables for better security.&quot;</span>
+                <span class="p">)</span>
+                <span class="n">password</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">))</span>
 
             <span class="c1"># Certificate authentication settings</span>
-            <span class="n">client_cert_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DATA_JUICER_EMAIL_CERT&#39;</span><span class="p">)</span>
-            <span class="n">client_key_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DATA_JUICER_EMAIL_KEY&#39;</span><span class="p">)</span>
+            <span class="n">client_cert_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DATA_JUICER_EMAIL_CERT&quot;</span><span class="p">)</span>
+            <span class="n">client_key_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DATA_JUICER_EMAIL_KEY&quot;</span><span class="p">)</span>
 
             <span class="c1"># Fall back to config if environment variables not set</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">client_cert_file</span><span class="p">:</span>
-                <span class="n">client_cert_file</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;client_cert_file&#39;</span><span class="p">,</span>
-                                              <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;client_cert_file&#39;</span><span class="p">))</span>
+                <span class="n">client_cert_file</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_cert_file&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_cert_file&quot;</span><span class="p">))</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">client_key_file</span><span class="p">:</span>
-                <span class="n">client_key_file</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;client_key_file&#39;</span><span class="p">,</span>
-                                             <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;client_key_file&#39;</span><span class="p">))</span>
+                <span class="n">client_key_file</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_key_file&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_key_file&quot;</span><span class="p">))</span>
 
             <span class="c1"># Validate required parameters</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">smtp_server</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">recipients</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                    <span class="s1">&#39;Missing required email configuration (server/recipients)&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Missing required email configuration (server/recipients)&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">use_cert_auth</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">username</span> <span class="ow">and</span> <span class="n">password</span><span class="p">):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                    <span class="s1">&#39;Missing credentials for password-based authentication&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Missing credentials for password-based authentication&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
             <span class="k">if</span> <span class="n">use_cert_auth</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">client_cert_file</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">client_key_file</span><span class="p">):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                    <span class="s1">&#39;Missing client certificate or key for authentication&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Missing client certificate or key for authentication&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
             <span class="c1"># Create SSL context for certificate authentication if needed</span>
             <span class="n">context</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">use_cert_auth</span> <span class="ow">and</span> <span class="n">client_cert_file</span> <span class="ow">and</span> <span class="n">client_key_file</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="s1">&#39;Using TLS client certificate authentication for email&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using TLS client certificate authentication for email&quot;</span><span class="p">)</span>
                 <span class="n">context</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">create_default_context</span><span class="p">(</span><span class="n">ssl</span><span class="o">.</span><span class="n">Purpose</span><span class="o">.</span><span class="n">SERVER_AUTH</span><span class="p">)</span>
-                <span class="n">context</span><span class="o">.</span><span class="n">load_cert_chain</span><span class="p">(</span><span class="n">certfile</span><span class="o">=</span><span class="n">client_cert_file</span><span class="p">,</span>
-                                        <span class="n">keyfile</span><span class="o">=</span><span class="n">client_key_file</span><span class="p">)</span>
+                <span class="n">context</span><span class="o">.</span><span class="n">load_cert_chain</span><span class="p">(</span><span class="n">certfile</span><span class="o">=</span><span class="n">client_cert_file</span><span class="p">,</span> <span class="n">keyfile</span><span class="o">=</span><span class="n">client_key_file</span><span class="p">)</span>
 
             <span class="c1"># Create email message</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="n">MIMEText</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="s1">&#39;plain&#39;</span><span class="p">,</span> <span class="n">message_encoding</span><span class="p">)</span>
-            <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;From&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatted_sender</span>
-            <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;To&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">recipient_separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">recipients</span><span class="p">)</span>
-            <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;Subject&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subject</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">MIMEText</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="s2">&quot;plain&quot;</span><span class="p">,</span> <span class="n">message_encoding</span><span class="p">)</span>
+            <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;From&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatted_sender</span>
+            <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;To&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">recipient_separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">recipients</span><span class="p">)</span>
+            <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;Subject&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subject</span>
 
             <span class="c1"># Determine connection type and send message</span>
             <span class="c1"># Port 465 is typically for SMTP over SSL</span>
             <span class="k">if</span> <span class="n">use_ssl</span> <span class="ow">or</span> <span class="n">smtp_port</span> <span class="o">==</span> <span class="mi">465</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Using direct SSL connection to </span><span class="si">{</span><span class="n">smtp_server</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">smtp_port</span><span class="si">}</span><span class="s1">&#39;</span>
-                <span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using direct SSL connection to </span><span class="si">{</span><span class="n">smtp_server</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">smtp_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
                 <span class="c1"># Handle different connection string formats</span>
                 <span class="n">server_address</span> <span class="o">=</span> <span class="n">smtp_server</span>
                 <span class="k">if</span> <span class="n">include_port_in_address</span><span class="p">:</span>
-                    <span class="n">server_address</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">smtp_server</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">smtp_port</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="n">server_address</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">smtp_server</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">smtp_port</span><span class="si">}</span><span class="s2">&quot;</span>
 
                 <span class="c1"># Use the SSL context if certificate authentication is enabled</span>
                 <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
                     <span class="k">with</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP_SSL</span><span class="p">(</span>
-                            <span class="n">server_address</span><span class="p">,</span>
-                            <span class="n">smtp_port</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">include_port_in_address</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                            <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+                        <span class="n">server_address</span><span class="p">,</span> <span class="n">smtp_port</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">include_port_in_address</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span>
+                    <span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
                         <span class="c1"># No login needed with client certificates</span>
                         <span class="n">server</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># Standard SSL connection with password</span>
-                    <span class="k">with</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP_SSL</span><span class="p">(</span>
-                            <span class="n">server_address</span><span class="p">,</span> <span class="n">smtp_port</span> <span class="k">if</span>
-                            <span class="ow">not</span> <span class="n">include_port_in_address</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP_SSL</span><span class="p">(</span><span class="n">server_address</span><span class="p">,</span> <span class="n">smtp_port</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">include_port_in_address</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
                         <span class="n">server</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
-                        <span class="n">server</span><span class="o">.</span><span class="n">sendmail</span><span class="p">(</span><span class="n">formatted_sender</span><span class="p">,</span> <span class="n">recipients</span><span class="p">,</span>
-                                        <span class="n">msg</span><span class="o">.</span><span class="n">as_string</span><span class="p">())</span>
+                        <span class="n">server</span><span class="o">.</span><span class="n">sendmail</span><span class="p">(</span><span class="n">formatted_sender</span><span class="p">,</span> <span class="n">recipients</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">as_string</span><span class="p">())</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Standard connection with STARTTLS upgrade</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Using STARTTLS connection to </span><span class="si">{</span><span class="n">smtp_server</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">smtp_port</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using STARTTLS connection to </span><span class="si">{</span><span class="n">smtp_server</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">smtp_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">use_cert_auth</span> <span class="ow">and</span> <span class="n">client_cert_file</span> <span class="ow">and</span> <span class="n">client_key_file</span><span class="p">:</span>
                     <span class="c1"># Connect with certificate authentication</span>
@@ -929,7 +887,7 @@
 
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to send email notification: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to send email notification: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_send_slack_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -948,36 +906,34 @@
 
             <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
-            <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;slack&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;slack&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
             <span class="c1"># Override config with kwargs if provided</span>
-            <span class="n">webhook_url</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;webhook_url&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;webhook_url&#39;</span><span class="p">))</span>
-            <span class="n">channel</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">))</span>
-            <span class="n">username</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span>
-                                  <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;Data Juicer&#39;</span><span class="p">))</span>
+            <span class="n">webhook_url</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;webhook_url&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;webhook_url&quot;</span><span class="p">))</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;channel&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;channel&quot;</span><span class="p">))</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;Data Juicer&quot;</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">webhook_url</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Missing required Slack webhook URL&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Missing required Slack webhook URL&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
             <span class="c1"># Prepare payload</span>
             <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span>
-                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+                <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span>
+                <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
             <span class="p">}</span>
 
             <span class="k">if</span> <span class="n">channel</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">channel</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;channel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">channel</span>
 
             <span class="c1"># Send notification</span>
             <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
-                <span class="n">webhook_url</span><span class="p">,</span>
-                <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">),</span>
-                <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">})</span>
+                <span class="n">webhook_url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">),</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+            <span class="p">)</span>
 
             <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to send Slack notification: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to send Slack notification: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_send_dingtalk_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1001,44 +957,38 @@
 
             <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
-            <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dingtalk&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dingtalk&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
             <span class="c1"># Override config with kwargs if provided</span>
-            <span class="n">access_token</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;access_token&#39;</span><span class="p">,</span>
-                                      <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;access_token&#39;</span><span class="p">))</span>
-            <span class="n">secret</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;secret&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;secret&#39;</span><span class="p">))</span>
+            <span class="n">access_token</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;access_token&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;access_token&quot;</span><span class="p">))</span>
+            <span class="n">secret</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;secret&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;secret&quot;</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">access_token</span><span class="p">:</span>
                 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Missing required DingTalk access token&#39;</span><span class="p">)</span>
+
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Missing required DingTalk access token&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
             <span class="c1"># Prepare URL with signature if secret is provided</span>
-            <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://oapi.dingtalk.com/robot/send?access_token=</span><span class="si">{</span><span class="n">access_token</span><span class="si">}</span><span class="s1">&#39;</span>  <span class="c1"># noqa: E501</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://oapi.dingtalk.com/robot/send?access_token=</span><span class="si">{</span><span class="n">access_token</span><span class="si">}</span><span class="s2">&quot;</span>  <span class="c1"># noqa: E501</span>
 
             <span class="k">if</span> <span class="n">secret</span><span class="p">:</span>
                 <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span>
-                <span class="n">string_to_sign</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">secret</span><span class="si">}</span><span class="s1">&#39;</span>
-                <span class="n">hmac_code</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">secret</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span>
-                                     <span class="n">string_to_sign</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span>
-                                     <span class="n">digestmod</span><span class="o">=</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
-                <span class="n">sign</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote_plus</span><span class="p">(</span>
-                    <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">hmac_code</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
-                <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1">&amp;timestamp=</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s1">&amp;sign=</span><span class="si">{</span><span class="n">sign</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">string_to_sign</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">secret</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">hmac_code</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">secret</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">string_to_sign</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">digestmod</span><span class="o">=</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+                <span class="n">sign</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote_plus</span><span class="p">(</span><span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">hmac_code</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&amp;timestamp=</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">&amp;sign=</span><span class="si">{</span><span class="n">sign</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="c1"># Prepare payload</span>
-            <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;msgtype&#39;</span><span class="p">:</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">message</span><span class="p">}}</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;msgtype&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">}}</span>
 
             <span class="c1"># Send notification</span>
-            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
-                <span class="n">url</span><span class="p">,</span>
-                <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">),</span>
-                <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">})</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">),</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">})</span>
 
             <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-            <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;errcode&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;errcode&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to send DingTalk notification: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to send DingTalk notification: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
 </pre></div>

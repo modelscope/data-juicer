@@ -375,7 +375,6 @@
 <div class="viewcode-block" id="Adapter">
 <a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Adapter</span><span class="p">:</span>
-
     <span class="n">MAX_BATCH_SIZE</span> <span class="o">=</span> <span class="mi">10000</span>
 
 <div class="viewcode-block" id="Adapter.__init__">
@@ -384,8 +383,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
 
         <span class="c1"># insight mining related</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">enable_insight_mining</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">open_insight_mining</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">,</span> <span class="s1">&#39;open_insight_mining&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_insight_mining</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">open_insight_mining</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;open_insight_mining&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
 
         <span class="c1"># resource probe related</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span> <span class="o">=</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">monitor_current_resources</span><span class="p">()</span></div>
@@ -418,14 +416,12 @@
         <span class="n">unforkable_operators</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">UNFORKABLE</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">operators</span><span class="p">:</span>
             <span class="c1"># select suitable mp method for each OP</span>
-            <span class="n">mp_context</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;forkserver&#39;</span><span class="p">,</span> <span class="s1">&#39;spawn&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span>
-                <span class="n">op</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">()</span> <span class="ow">or</span> <span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="n">unforkable_operators</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">mp_context</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;forkserver&quot;</span><span class="p">,</span> <span class="s2">&quot;spawn&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">()</span> <span class="ow">or</span> <span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="n">unforkable_operators</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="n">setup_mp</span><span class="p">(</span><span class="n">mp_context</span><span class="p">)</span>
             <span class="c1"># expand the test dataset according to the runtime number of</span>
             <span class="c1"># processes to ensure enough data for a batch and probe the true</span>
             <span class="c1"># resource utilization for each OP</span>
-            <span class="n">expanded_dataset</span> <span class="o">=</span> <span class="n">concatenate_datasets</span><span class="p">([</span><span class="n">dataset</span><span class="p">]</span> <span class="o">*</span>
-                                                    <span class="n">op</span><span class="o">.</span><span class="n">runtime_np</span><span class="p">())</span>
+            <span class="n">expanded_dataset</span> <span class="o">=</span> <span class="n">concatenate_datasets</span><span class="p">([</span><span class="n">dataset</span><span class="p">]</span> <span class="o">*</span> <span class="n">op</span><span class="o">.</span><span class="n">runtime_np</span><span class="p">())</span>
 
             <span class="c1"># set the test batch size and save the old one</span>
             <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">():</span>
@@ -434,13 +430,11 @@
 
             <span class="c1"># run single op and monitor the resource utilization</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">resource_util_per_op</span> <span class="o">=</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">monitor_func</span><span class="p">(</span>
-                <span class="n">op</span><span class="o">.</span><span class="n">run</span><span class="p">,</span>
-                <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">expanded_dataset</span><span class="p">,</span> <span class="p">),</span>
-                <span class="n">sample_interval</span><span class="o">=</span><span class="n">sample_interval</span><span class="p">)</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">expanded_dataset</span><span class="p">,),</span> <span class="n">sample_interval</span><span class="o">=</span><span class="n">sample_interval</span>
+            <span class="p">)</span>
 
             <span class="c1"># calculate speed</span>
-            <span class="n">resource_util_per_op</span><span class="p">[</span>
-                <span class="s1">&#39;speed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_num</span> <span class="o">/</span> <span class="n">resource_util_per_op</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
+            <span class="n">resource_util_per_op</span><span class="p">[</span><span class="s2">&quot;speed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_num</span> <span class="o">/</span> <span class="n">resource_util_per_op</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span>
             <span class="n">resource_util_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resource_util_per_op</span><span class="p">)</span>
 
             <span class="c1"># # restore the batch size</span>
@@ -462,7 +456,7 @@
 <span class="sd">        :return: An iterator of batches</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># get initial batch size</span>
-        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">,</span> <span class="n">DEFAULT_MAX_BATCH_SIZE</span><span class="p">)</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="n">DEFAULT_MAX_BATCH_SIZE</span><span class="p">)</span>
         <span class="c1"># should be in [1, 10000]</span>
         <span class="n">batch_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">Adapter</span><span class="o">.</span><span class="n">MAX_BATCH_SIZE</span><span class="p">)</span>
 
@@ -484,12 +478,10 @@
 <span class="sd">        :param operators: Operators in the data recipe</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO: set batch size to 1 for all OPs for probing</span>
-        <span class="n">load_analysis_res</span><span class="p">,</span> <span class="n">probed_batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">probe_small_batch</span><span class="p">(</span>
-            <span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">)</span>
+        <span class="n">load_analysis_res</span><span class="p">,</span> <span class="n">probed_batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">probe_small_batch</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">)</span>
 
         <span class="c1"># calculate batch size for each OP according to the analysis results</span>
-        <span class="n">bs_per_op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size_strategy</span><span class="p">(</span><span class="n">load_analysis_res</span><span class="p">,</span>
-                                             <span class="n">base_bs</span><span class="o">=</span><span class="n">probed_batch_size</span><span class="p">)</span>
+        <span class="n">bs_per_op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size_strategy</span><span class="p">(</span><span class="n">load_analysis_res</span><span class="p">,</span> <span class="n">base_bs</span><span class="o">=</span><span class="n">probed_batch_size</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">bs_per_op</span></div>
 
@@ -538,25 +530,23 @@
         <span class="c1"># compute left utils according to the util_th</span>
         <span class="n">left_utils</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;util.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="s1">&#39;GPU&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;util.&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="s2">&quot;GPU&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">left_utils</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">util_th</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">load_analysis_res</span><span class="p">:</span>
             <span class="n">max_util</span> <span class="o">=</span> <span class="mf">1e-5</span>
             <span class="n">max_key</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">left_utils</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">it</span><span class="p">:</span> <span class="n">it</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">analysis_res</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;resource_analysis&#39;</span><span class="p">]</span>
+            <span class="n">analysis_res</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;resource_analysis&quot;</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">analysis_res</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s1">&#39;util.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="s1">&#39;GPU&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;util.&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="s2">&quot;GPU&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
                     <span class="k">continue</span>
-                <span class="n">used_util</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
-                    <span class="mi">0</span><span class="p">,</span> <span class="n">analysis_res</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;max&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                <span class="n">used_util</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">analysis_res</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;max&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">used_util</span> <span class="o">&gt;</span> <span class="n">max_util</span><span class="p">:</span>
                     <span class="n">max_util</span> <span class="o">=</span> <span class="n">used_util</span>
                     <span class="n">max_key</span> <span class="o">=</span> <span class="n">key</span>
             <span class="n">load_factor</span> <span class="o">=</span> <span class="n">left_utils</span><span class="p">[</span><span class="n">max_key</span><span class="p">]</span> <span class="o">/</span> <span class="n">max_util</span>
-            <span class="n">bs_this_op</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">base_bs</span> <span class="o">*</span> <span class="n">load_factor</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span>
-                             <span class="bp">self</span><span class="o">.</span><span class="n">MAX_BATCH_SIZE</span><span class="p">)</span>
+            <span class="n">bs_this_op</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">base_bs</span> <span class="o">*</span> <span class="n">load_factor</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_BATCH_SIZE</span><span class="p">)</span>
             <span class="n">batch_size_per_op</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bs_this_op</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">batch_size_per_op</span></div>
@@ -585,20 +575,17 @@
         <span class="n">new_cfg</span><span class="o">.</span><span class="n">auto</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">new_cfg</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_cfg</span><span class="o">.</span><span class="n">op_list_to_mine</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">new_cfg</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="p">[{</span>
-                <span class="n">op_name</span><span class="p">:</span> <span class="p">{}</span>
-            <span class="p">}</span> <span class="k">for</span> <span class="n">op_name</span> <span class="ow">in</span> <span class="n">new_cfg</span><span class="o">.</span><span class="n">op_list_to_mine</span><span class="p">]</span>
+            <span class="n">new_cfg</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="p">[{</span><span class="n">op_name</span><span class="p">:</span> <span class="p">{}}</span> <span class="k">for</span> <span class="n">op_name</span> <span class="ow">in</span> <span class="n">new_cfg</span><span class="o">.</span><span class="n">op_list_to_mine</span><span class="p">]</span>
         <span class="c1"># update work dir</span>
-        <span class="n">new_cfg</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;insight_mining&#39;</span><span class="p">,</span>
-                                        <span class="n">current_state</span><span class="p">)</span>
-        <span class="n">new_cfg</span><span class="o">.</span><span class="n">export_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span>
-                                           <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">current_state</span><span class="si">}</span><span class="s1">.jsonl&#39;</span><span class="p">)</span>
+        <span class="n">new_cfg</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;insight_mining&quot;</span><span class="p">,</span> <span class="n">current_state</span><span class="p">)</span>
+        <span class="n">new_cfg</span><span class="o">.</span><span class="n">export_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_state</span><span class="si">}</span><span class="s2">.jsonl&quot;</span><span class="p">)</span>
         <span class="c1"># close insight mining and monitor for inner analysis</span>
         <span class="n">new_cfg</span><span class="o">.</span><span class="n">open_insight_mining</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">new_cfg</span><span class="o">.</span><span class="n">open_monitor</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># init the analyzer</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Analyzer</span>
+
         <span class="n">analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">new_cfg</span><span class="p">)</span>
 
         <span class="c1"># remove existing stats and meta in dataset</span>
@@ -622,19 +609,14 @@
 
 <span class="sd">        :param pval_th: the threshold of p-value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;insight_mining&#39;</span><span class="p">)</span>
-        <span class="n">res_order</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">work_dir</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
-        <span class="p">]</span>
+        <span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;insight_mining&quot;</span><span class="p">)</span>
+        <span class="n">res_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">work_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">d</span><span class="p">))]</span>
         <span class="n">res_order</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
 
         <span class="c1"># collect analysis results</span>
         <span class="n">analysis_results</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">res_dir</span> <span class="ow">in</span> <span class="n">res_order</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_dir</span><span class="p">,</span>
-                             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">res_dir</span><span class="si">}</span><span class="s1">_stats.jsonl&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">res_dir</span><span class="si">}</span><span class="s2">_stats.jsonl&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
             <span class="n">analysis_results</span><span class="p">[</span><span class="n">res_dir</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
 
         <span class="c1"># distribution change significance analysis</span>
@@ -647,21 +629,18 @@
             <span class="n">curr_res</span> <span class="o">=</span> <span class="n">analysis_results</span><span class="p">[</span><span class="n">res_order</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
 
             <span class="c1"># only consider common stats and meta</span>
-            <span class="n">common_features</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-                <span class="nb">set</span><span class="p">(</span><span class="n">prev_res</span><span class="o">.</span><span class="n">features</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">curr_res</span><span class="o">.</span><span class="n">features</span><span class="p">)))</span>
+            <span class="n">common_features</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">prev_res</span><span class="o">.</span><span class="n">features</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">curr_res</span><span class="o">.</span><span class="n">features</span><span class="p">)))</span>
             <span class="n">curr_sig_res</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="n">common_features</span><span class="p">:</span>
                 <span class="n">ttest_res</span> <span class="o">=</span> <span class="n">ttest_measure</span><span class="p">(</span><span class="n">prev_res</span><span class="p">[</span><span class="n">feat</span><span class="p">],</span> <span class="n">curr_res</span><span class="p">[</span><span class="n">feat</span><span class="p">])</span>
                 <span class="n">curr_sig_res</span><span class="p">[</span><span class="n">feat</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="s1">&#39;t-statistic (standardized mean difference)&#39;</span><span class="p">:</span>
-                    <span class="n">ttest_res</span><span class="o">.</span><span class="n">statistic</span><span class="p">,</span>
-                    <span class="s1">&#39;p-value&#39;</span><span class="p">:</span> <span class="n">ttest_res</span><span class="o">.</span><span class="n">pvalue</span><span class="p">,</span>
-                    <span class="s1">&#39;significant&#39;</span><span class="p">:</span>
-                    <span class="kc">True</span> <span class="k">if</span> <span class="n">ttest_res</span><span class="o">.</span><span class="n">pvalue</span> <span class="o">&lt;</span> <span class="n">pval_th</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;t-statistic (standardized mean difference)&quot;</span><span class="p">:</span> <span class="n">ttest_res</span><span class="o">.</span><span class="n">statistic</span><span class="p">,</span>
+                    <span class="s2">&quot;p-value&quot;</span><span class="p">:</span> <span class="n">ttest_res</span><span class="o">.</span><span class="n">pvalue</span><span class="p">,</span>
+                    <span class="s2">&quot;significant&quot;</span><span class="p">:</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">ttest_res</span><span class="o">.</span><span class="n">pvalue</span> <span class="o">&lt;</span> <span class="n">pval_th</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
                 <span class="p">}</span>
             <span class="n">sig_res</span><span class="p">[</span><span class="n">res_order</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">curr_sig_res</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;insight_mining.json&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;insight_mining.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">sig_res</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span></div>
 </div>
 

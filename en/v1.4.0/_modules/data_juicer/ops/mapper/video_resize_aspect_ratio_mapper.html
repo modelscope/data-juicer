@@ -357,36 +357,35 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
 
-<span class="n">ffmpeg</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;ffmpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;ffmpeg-python&#39;</span><span class="p">)</span>
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;video_resize_aspect_ratio_mapper&#39;</span>
+<span class="n">ffmpeg</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;ffmpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;ffmpeg-python&quot;</span><span class="p">)</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;video_resize_aspect_ratio_mapper&quot;</span>
 
 
 <div class="viewcode-block" id="rescale">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_resize_aspect_ratio_mapper.rescale">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">rescale</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">ori_ratio</span><span class="p">,</span> <span class="n">min_ratio</span><span class="p">,</span> <span class="n">max_ratio</span><span class="p">,</span> <span class="n">strategy</span><span class="p">):</span>
-
     <span class="n">scaled_width</span> <span class="o">=</span> <span class="n">width</span>
     <span class="n">scaled_height</span> <span class="o">=</span> <span class="n">height</span>
     <span class="n">ori_ratio</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">ori_ratio</span><span class="p">)</span>
     <span class="n">min_ratio</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">min_ratio</span><span class="p">)</span>
     <span class="n">max_ratio</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">max_ratio</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">ori_ratio</span> <span class="o">&lt;</span> <span class="n">min_ratio</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s1">&#39;increase&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;increase&quot;</span><span class="p">:</span>
             <span class="c1"># increase width to meet the min ratio</span>
             <span class="n">scaled_width</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">height</span> <span class="o">*</span> <span class="n">min_ratio</span><span class="p">)</span>
             <span class="n">scaled_width</span> <span class="o">+=</span> <span class="n">scaled_width</span> <span class="o">%</span> <span class="mi">2</span>
-        <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s1">&#39;decrease&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;decrease&quot;</span><span class="p">:</span>
             <span class="c1"># decrease height to meet the min ratio</span>
             <span class="n">scaled_height</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">min_ratio</span><span class="p">)</span>
             <span class="n">scaled_height</span> <span class="o">-=</span> <span class="n">scaled_height</span> <span class="o">%</span> <span class="mi">2</span>
 
     <span class="k">elif</span> <span class="n">ori_ratio</span> <span class="o">&gt;</span> <span class="n">max_ratio</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s1">&#39;increase&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;increase&quot;</span><span class="p">:</span>
             <span class="c1"># increase height to meet the max ratio</span>
             <span class="n">scaled_height</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">max_ratio</span><span class="p">)</span>
             <span class="n">scaled_height</span> <span class="o">+=</span> <span class="n">scaled_height</span> <span class="o">%</span> <span class="mi">2</span>
 
-        <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s1">&#39;decrease&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;decrease&quot;</span><span class="p">:</span>
             <span class="c1"># decrease width to meet the max ratio</span>
             <span class="n">scaled_width</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">height</span> <span class="o">*</span> <span class="n">max_ratio</span><span class="p">)</span>
             <span class="n">scaled_width</span> <span class="o">-=</span> <span class="n">scaled_width</span> <span class="o">%</span> <span class="mi">2</span>
@@ -409,15 +408,15 @@
 <span class="sd">    AspectRatio = W / H.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">STRATEGY</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;decrease&#39;</span><span class="p">,</span> <span class="s1">&#39;increase&#39;</span><span class="p">]</span>
+    <span class="n">STRATEGY</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;decrease&quot;</span><span class="p">,</span> <span class="s2">&quot;increase&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="VideoResizeAspectRatioMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_resize_aspect_ratio_mapper.VideoResizeAspectRatioMapper.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">min_ratio</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;9/21&#39;</span><span class="p">,</span>
-        <span class="n">max_ratio</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;21/9&#39;</span><span class="p">,</span>
-        <span class="n">strategy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;increase&#39;</span><span class="p">,</span>
+        <span class="n">min_ratio</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;9/21&quot;</span><span class="p">,</span>
+        <span class="n">max_ratio</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;21/9&quot;</span><span class="p">,</span>
+        <span class="n">strategy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;increase&quot;</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
@@ -445,11 +444,11 @@
         <span class="n">strategy</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">strategy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STRATEGY</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;force_original_aspect_ratio [</span><span class="si">{</span><span class="n">strategy</span><span class="si">}</span><span class="s1">] is not supported. &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;Can only be one of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">STRATEGY</span><span class="si">}</span><span class="s1">. &#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;force_original_aspect_ratio [</span><span class="si">{</span><span class="n">strategy</span><span class="si">}</span><span class="s2">] is not supported. &quot;</span> <span class="sa">f</span><span class="s2">&quot;Can only be one of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">STRATEGY</span><span class="si">}</span><span class="s2">. &quot;</span>
+            <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">min_ratio</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">max_ratio</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">min_ratio</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">max_ratio</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">strategy</span></div>
 
 
@@ -466,7 +465,6 @@
 
         <span class="n">loaded_video_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loaded_video_keys</span><span class="p">):</span>
-
             <span class="n">container</span> <span class="o">=</span> <span class="n">load_video</span><span class="p">(</span><span class="n">video_key</span><span class="p">)</span>
             <span class="n">video</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">video</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">original_width</span> <span class="o">=</span> <span class="n">video</span><span class="o">.</span><span class="n">codec_context</span><span class="o">.</span><span class="n">width</span>
@@ -474,8 +472,7 @@
             <span class="n">original_aspect_ratio</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">original_width</span><span class="p">,</span> <span class="n">original_height</span><span class="p">)</span>
             <span class="n">close_video</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="p">(</span><span class="n">original_aspect_ratio</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span>
-                    <span class="ow">and</span> <span class="n">original_aspect_ratio</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">original_aspect_ratio</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span> <span class="ow">and</span> <span class="n">original_aspect_ratio</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span><span class="p">:</span>
                 <span class="k">continue</span>
 
             <span class="n">scaled_width</span><span class="p">,</span> <span class="n">scaled_height</span> <span class="o">=</span> <span class="n">rescale</span><span class="p">(</span>
@@ -486,15 +483,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">resized_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
-                                                  <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">resized_video_key</span><span class="p">)</span>
-                    <span class="ow">or</span> <span class="n">resized_video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">):</span>
-                <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-nostdin&#39;</span><span class="p">,</span> <span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;quiet&#39;</span><span class="p">,</span> <span class="s1">&#39;-y&#39;</span><span class="p">]</span>
+            <span class="n">resized_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">resized_video_key</span><span class="p">)</span> <span class="ow">or</span> <span class="n">resized_video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-nostdin&quot;</span><span class="p">,</span> <span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;quiet&quot;</span><span class="p">,</span> <span class="s2">&quot;-y&quot;</span><span class="p">]</span>
                 <span class="n">stream</span> <span class="o">=</span> <span class="n">ffmpeg</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">video_key</span><span class="p">)</span>
-                <span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s1">&#39;scale&#39;</span><span class="p">,</span>
-                                       <span class="n">width</span><span class="o">=</span><span class="n">scaled_width</span><span class="p">,</span>
-                                       <span class="n">height</span><span class="o">=</span><span class="n">scaled_height</span><span class="p">)</span>
+                <span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">scaled_width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">scaled_height</span><span class="p">)</span>
                 <span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">resized_video_key</span><span class="p">)</span><span class="o">.</span><span class="n">global_args</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
                 <span class="n">stream</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
             <span class="n">loaded_video_keys</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">resized_video_key</span>

@@ -385,7 +385,7 @@
 <span class="sd">        :param show_num: the maximum number of samples to show in the</span>
 <span class="sd">            comparison result files.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;trace&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;trace&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span> <span class="o">=</span> <span class="n">show_num</span></div>
@@ -393,8 +393,7 @@
 
 <div class="viewcode-block" id="Tracer.trace_mapper">
 <a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.tracer.Tracer.trace_mapper">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">trace_mapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">previous_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
-                     <span class="n">processed_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trace_mapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">previous_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">processed_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compare datasets before and after a Mapper.</span>
 
@@ -417,37 +416,39 @@
             <span class="n">previous_sample</span> <span class="o">=</span> <span class="n">previous_ds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">text_key</span><span class="p">]</span>
             <span class="n">processed_sample</span> <span class="o">=</span> <span class="n">processed_ds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">text_key</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">previous_sample</span> <span class="o">!=</span> <span class="n">processed_sample</span><span class="p">:</span>
-                <span class="n">dif_dict</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-                    <span class="s1">&#39;original text&#39;</span><span class="p">:</span> <span class="n">previous_sample</span><span class="p">,</span>
-                    <span class="s1">&#39;processed_text&#39;</span><span class="p">:</span> <span class="n">processed_sample</span><span class="p">,</span>
-                <span class="p">})</span>
+                <span class="n">dif_dict</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;original text&quot;</span><span class="p">:</span> <span class="n">previous_sample</span><span class="p">,</span>
+                        <span class="s2">&quot;processed_text&quot;</span><span class="p">:</span> <span class="n">processed_sample</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
                 <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">if</span> <span class="n">num</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
                     <span class="k">break</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dif_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] are all &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;the same. Thus no comparison results would be &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;generated.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] are all &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;the same. Thus no comparison results would be &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;generated.&quot;</span>
+            <span class="p">)</span>
             <span class="k">return</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">dif_dict</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dif_dict</span><span class="p">)</span><span class="si">}</span><span class="s1"> different samples &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] -- less than &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dif_dict</span><span class="p">)</span><span class="si">}</span><span class="s2"> different samples &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] -- less than &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s2"> samples.&quot;</span>
+            <span class="p">)</span>
 
         <span class="c1"># export the tracer results.</span>
-        <span class="n">res_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;mapper-</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">.jsonl&#39;</span>
+        <span class="n">res_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;mapper-</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">.jsonl&quot;</span>
         <span class="n">dif_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dif_dict</span><span class="p">)</span>
-        <span class="n">dif_df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_name</span><span class="p">),</span>
-                       <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">,</span>
-                       <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                       <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="n">dif_df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_name</span><span class="p">),</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Tracer.trace_batch_mapper">
 <a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.tracer.Tracer.trace_batch_mapper">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">trace_batch_mapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">previous_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
-                           <span class="n">processed_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trace_batch_mapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">previous_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">processed_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compare datasets before and after a BatchMapper.</span>
 
@@ -470,27 +471,24 @@
                 <span class="k">break</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] are &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;empty. Thus no comparison results would be &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;generated.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] are &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;empty. Thus no comparison results would be &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;generated.&quot;</span>
+            <span class="p">)</span>
             <span class="k">return</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples -- less &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;than expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;There are only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples -- less &quot;</span> <span class="sa">f</span><span class="s2">&quot;than expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s2"> samples.&quot;</span><span class="p">)</span>
 
         <span class="c1"># export the tracer results.</span>
-        <span class="n">res_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;mapper-</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">.jsonl&#39;</span>
+        <span class="n">res_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;mapper-</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">.jsonl&quot;</span>
         <span class="n">dif_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span>
-        <span class="n">dif_df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_name</span><span class="p">),</span>
-                       <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">,</span>
-                       <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                       <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="n">dif_df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_name</span><span class="p">),</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Tracer.trace_filter">
 <a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.tracer.Tracer.trace_filter">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">trace_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">previous_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
-                     <span class="n">processed_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trace_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">previous_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">processed_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compare datasets before and after a Filter.</span>
 
@@ -502,9 +500,11 @@
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">previous_ds</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">processed_ds</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] are all &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;the same. Thus no comparison results would be &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;generated.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] are all &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;the same. Thus no comparison results would be &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;generated.&quot;</span>
+            <span class="p">)</span>
             <span class="k">return</span>
 
         <span class="c1"># get the number of filtered samples.</span>
@@ -516,8 +516,7 @@
         <span class="c1"># datasets as well.</span>
         <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">previous_ds</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">i</span> <span class="o">-</span> <span class="n">num</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">processed_ds</span><span class="p">)</span> <span class="ow">or</span> \
-                    <span class="n">previous_ds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">processed_ds</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">num</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">-</span> <span class="n">num</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">processed_ds</span><span class="p">)</span> <span class="ow">or</span> <span class="n">previous_ds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">processed_ds</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">num</span><span class="p">]:</span>
                 <span class="c1"># 1. If all samples in processed dataset are checked but there</span>
                 <span class="c1"># still some samples left in the previous dataset, all of these</span>
                 <span class="c1"># left samples are filtered.</span>
@@ -532,22 +531,23 @@
                 <span class="k">break</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] are all &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;the same. Thus no comparison results would be &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;generated.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] are all &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;the same. Thus no comparison results would be &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;generated.&quot;</span>
+            <span class="p">)</span>
             <span class="k">return</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span><span class="si">}</span><span class="s1"> filtered samples &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] -- less than &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span><span class="si">}</span><span class="s2"> filtered samples &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] -- less than &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s2"> samples.&quot;</span>
+            <span class="p">)</span>
 
         <span class="c1"># export the tracer results.</span>
-        <span class="n">res_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;filter-</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">.jsonl&#39;</span>
+        <span class="n">res_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;filter-</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">.jsonl&quot;</span>
         <span class="n">filter_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span>
-        <span class="n">filter_df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_name</span><span class="p">),</span>
-                          <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">,</span>
-                          <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                          <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="n">filter_df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_name</span><span class="p">),</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Tracer.trace_deduplicator">
@@ -568,35 +568,40 @@
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">dup_pairs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] does not generate dup_pairs &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;correctly, thus no comparison results can be &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;obtained from this op.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] does not generate dup_pairs &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;correctly, thus no comparison results can be &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;obtained from this op.&quot;</span>
+            <span class="p">)</span>
             <span class="k">return</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dup_pairs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] are all &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;the same. Thus no comparison results would be &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;generated.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] are all &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;the same. Thus no comparison results would be &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;generated.&quot;</span>
+            <span class="p">)</span>
             <span class="k">return</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">dup_pairs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dup_pairs</span><span class="p">)</span><span class="si">}</span><span class="s1"> filtered samples &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] -- less than &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dup_pairs</span><span class="p">)</span><span class="si">}</span><span class="s2"> filtered samples &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] -- less than &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s2"> samples.&quot;</span>
+            <span class="p">)</span>
 
         <span class="c1"># reorganize the duplicate pairs</span>
         <span class="n">dup_dict</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dup_pairs</span><span class="p">:</span>
-            <span class="n">dup_dict</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-                <span class="s1">&#39;dup1&#39;</span><span class="p">:</span> <span class="n">dup_pairs</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
-                <span class="s1">&#39;dup2&#39;</span><span class="p">:</span> <span class="n">dup_pairs</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
-            <span class="p">})</span>
+            <span class="n">dup_dict</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;dup1&quot;</span><span class="p">:</span> <span class="n">dup_pairs</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="s2">&quot;dup2&quot;</span><span class="p">:</span> <span class="n">dup_pairs</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
 
         <span class="c1"># export the tracer result.</span>
-        <span class="n">res_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;duplicate-</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">.jsonl&#39;</span>
+        <span class="n">res_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;duplicate-</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">.jsonl&quot;</span>
         <span class="n">dup_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dup_dict</span><span class="p">)</span>
-        <span class="n">dup_df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_name</span><span class="p">),</span>
-                       <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">,</span>
-                       <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                       <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="n">dup_df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_name</span><span class="p">),</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

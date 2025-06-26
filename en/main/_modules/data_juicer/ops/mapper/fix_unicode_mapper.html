@@ -359,9 +359,9 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
 
-<span class="n">ftfy</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;ftfy&#39;</span><span class="p">)</span>
+<span class="n">ftfy</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;ftfy&quot;</span><span class="p">)</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;fix_unicode_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;fix_unicode_mapper&quot;</span>
 
 
 <div class="viewcode-block" id="FixUnicodeMapper">
@@ -388,20 +388,21 @@
         <span class="k">if</span> <span class="n">normalization</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">normalization</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span> <span class="o">=</span> <span class="n">normalization</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span> <span class="o">=</span> <span class="s1">&#39;NFC&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span> <span class="o">=</span> <span class="s2">&quot;NFC&quot;</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;NFC&#39;</span><span class="p">,</span> <span class="s1">&#39;NFKC&#39;</span><span class="p">,</span> <span class="s1">&#39;NFD&#39;</span><span class="p">,</span> <span class="s1">&#39;NFKD&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Normalization mode [</span><span class="si">{</span><span class="n">normalization</span><span class="si">}</span><span class="s1">] is not &#39;</span>
-                             <span class="s1">&#39;supported. Can only be one of &#39;</span>
-                             <span class="s1">&#39;[&quot;NFC&quot;, &quot;NFKC&quot;, &quot;NFD&quot;, &quot;NFKD&quot;]&#39;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;NFC&quot;</span><span class="p">,</span> <span class="s2">&quot;NFKC&quot;</span><span class="p">,</span> <span class="s2">&quot;NFD&quot;</span><span class="p">,</span> <span class="s2">&quot;NFKD&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Normalization mode [</span><span class="si">{</span><span class="n">normalization</span><span class="si">}</span><span class="s2">] is not &quot;</span>
+                <span class="s2">&quot;supported. Can only be one of &quot;</span>
+                <span class="s1">&#39;[&quot;NFC&quot;, &quot;NFKC&quot;, &quot;NFD&quot;, &quot;NFKD&quot;]&#39;</span>
+            <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="FixUnicodeMapper.process_batched">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.fix_unicode_mapper.FixUnicodeMapper.process_batched">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">ftfy</span><span class="o">.</span><span class="n">fix_text</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">normalization</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
+            <span class="n">ftfy</span><span class="o">.</span><span class="n">fix_text</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">normalization</span><span class="p">)</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">samples</span></div>
 </div>

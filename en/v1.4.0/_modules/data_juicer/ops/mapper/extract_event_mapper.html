@@ -359,7 +359,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..common</span><span class="w"> </span><span class="kn">import</span> <span class="n">split_text_by_punctuation</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;extract_event_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;extract_event_mapper&quot;</span>
 
 
 <span class="c1"># TODO: LLM-based inference.</span>
@@ -374,26 +374,28 @@
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;给定一段文本，对文本的情节进行分点总结，并抽取与情节相关的人物。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;要求：</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- 尽量不要遗漏内容，不要添加文本中没有的情节，符合原文事实</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- 联系上下文说明前因后果，但仍然需要符合事实</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- 不要包含主观看法</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- 注意要尽可能保留文本的专有名词</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- 注意相关人物需要在对应情节中出现</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- 只抽取情节中的主要人物，不要遗漏情节的主要人物</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- 总结格式如下：</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;### 情节1：</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **情节描述**： ...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **相关人物**：人物1，人物2，人物3，...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;### 情节2：</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **情节描述**： ...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **相关人物**：人物1，人物2，...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;### 情节3：</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **情节描述**： ...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **相关人物**：人物1，...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;...</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">DEFAULT_INPUT_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;# 文本</span><span class="se">\n</span><span class="s1">```</span><span class="se">\n</span><span class="si">{text}</span><span class="se">\n</span><span class="s1">```</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;给定一段文本，对文本的情节进行分点总结，并抽取与情节相关的人物。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;要求：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 尽量不要遗漏内容，不要添加文本中没有的情节，符合原文事实</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 联系上下文说明前因后果，但仍然需要符合事实</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 不要包含主观看法</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 注意要尽可能保留文本的专有名词</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 注意相关人物需要在对应情节中出现</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 只抽取情节中的主要人物，不要遗漏情节的主要人物</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 总结格式如下：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;### 情节1：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **情节描述**： ...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **相关人物**：人物1，人物2，人物3，...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;### 情节2：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **情节描述**： ...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **相关人物**：人物1，人物2，...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;### 情节3：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **情节描述**： ...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **相关人物**：人物1，...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;...</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">DEFAULT_INPUT_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;# 文本</span><span class="se">\n</span><span class="s2">```</span><span class="se">\n</span><span class="si">{text}</span><span class="se">\n</span><span class="s2">```</span><span class="se">\n</span><span class="s2">&quot;</span>
     <span class="n">DEFAULT_OUTPUT_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        \#\#\#\s*情节(\d+)：\s*</span>
 <span class="s2">        -\s*\*\*情节描述\*\*\s*：\s*(.*?)\s*</span>
@@ -402,21 +404,23 @@
 
 <div class="viewcode-block" id="ExtractEventMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.extract_event_mapper.ExtractEventMapper.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
-                 <span class="o">*</span><span class="p">,</span>
-                 <span class="n">event_desc_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">event_description</span><span class="p">,</span>
-                 <span class="n">relevant_char_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relevant_characters</span><span class="p">,</span>
-                 <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">system_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">input_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">output_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-                 <span class="n">drop_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-                 <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">event_desc_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">event_description</span><span class="p">,</span>
+        <span class="n">relevant_char_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relevant_characters</span><span class="p">,</span>
+        <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">system_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">input_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">output_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">drop_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 <span class="sd">        :param api_model: API model name.</span>
@@ -449,11 +453,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">output_pattern</span> <span class="o">=</span> <span class="n">output_pattern</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_OUTPUT_PATTERN</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;api&#39;</span><span class="p">,</span>
-                                       <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span>
-                                       <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span>
-                                       <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
-                                       <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;api&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">=</span> <span class="n">drop_text</span></div>
@@ -477,17 +479,11 @@
         <span class="k">return</span> <span class="n">event_list</span><span class="p">,</span> <span class="n">character_list</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_process_single_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_single_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
 
         <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
-        <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;system&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span>
-        <span class="p">},</span> <span class="p">{</span>
-            <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">input_prompt</span>
-        <span class="p">}]</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">input_prompt</span><span class="p">}]</span>
 
         <span class="n">event_list</span><span class="p">,</span> <span class="n">character_list</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">try_num</span><span class="p">):</span>
@@ -497,23 +493,20 @@
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">break</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">event_list</span><span class="p">,</span> <span class="n">character_list</span>
 
 <div class="viewcode-block" id="ExtractEventMapper.process_batched">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.extract_event_mapper.ExtractEventMapper.process_batched">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="c1"># check if it&#39;s generated already</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_desc_key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span>
-                <span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_char_key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_desc_key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">relevant_char_key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">samples</span>
 
         <span class="n">events</span><span class="p">,</span> <span class="n">characters</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]:</span>
-            <span class="n">cur_events</span><span class="p">,</span> <span class="n">cur_characters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_single_sample</span><span class="p">(</span><span class="n">text</span><span class="p">,</span>
-                                                                     <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+            <span class="n">cur_events</span><span class="p">,</span> <span class="n">cur_characters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_single_sample</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
             <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_events</span><span class="p">)</span>
             <span class="n">characters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_characters</span><span class="p">)</span>
 
@@ -523,16 +516,13 @@
         <span class="n">new_samples</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)):</span>
             <span class="k">for</span> <span class="n">event</span><span class="p">,</span> <span class="n">character</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">events</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">characters</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
-                <span class="n">cur_sample</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="n">key</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
-                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">samples</span>
-                <span class="p">}</span>
+                <span class="n">cur_sample</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">}</span>
                 <span class="n">cur_sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">event_desc_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span>
                 <span class="n">cur_sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">relevant_char_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">character</span>
                 <span class="n">new_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_sample</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_samples</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Extract Not event in the batch of samples!&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Extract Not event in the batch of samples!&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">samples</span>
 
         <span class="n">res_samples</span> <span class="o">=</span> <span class="p">{}</span>

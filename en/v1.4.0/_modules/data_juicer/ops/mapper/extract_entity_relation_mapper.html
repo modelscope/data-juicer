@@ -365,7 +365,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..common</span><span class="w"> </span><span class="kn">import</span> <span class="n">split_text_by_punctuation</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;extract_entity_relation_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;extract_entity_relation_mapper&quot;</span>
 
 
 <span class="c1"># TODO: LLM-based inference.</span>
@@ -487,40 +487,44 @@
 <span class="s2">######################</span>
 <span class="s2">Output:</span>
 <span class="s2">&quot;&quot;&quot;</span>
-    <span class="n">DEFAULT_CONTINUE_PROMPT</span> <span class="o">=</span> <span class="s1">&#39;MANY entities were missed in the last extraction.  Add them below using the same format:</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="n">DEFAULT_IF_LOOP_PROMPT</span> <span class="o">=</span> <span class="s1">&#39;It appears some entities may have still been missed.  Answer YES | NO if there are still entities that need to be added.</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">DEFAULT_CONTINUE_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;MANY entities were missed in the last extraction.  Add them below using the same format:</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">DEFAULT_IF_LOOP_PROMPT</span> <span class="o">=</span> <span class="s2">&quot;It appears some entities may have still been missed.  Answer YES | NO if there are still entities that need to be added.</span><span class="se">\n</span><span class="s2">&quot;</span>
 
-    <span class="n">DEFAULT_ENTITY_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;organization&#39;</span><span class="p">,</span> <span class="s1">&#39;person&#39;</span><span class="p">,</span> <span class="s1">&#39;geo&#39;</span><span class="p">,</span> <span class="s1">&#39;event&#39;</span><span class="p">]</span>
-    <span class="n">DEFAULT_TUPLE_DELIMITER</span> <span class="o">=</span> <span class="s1">&#39;&lt;|&gt;&#39;</span>
-    <span class="n">DEFAULT_RECORD_DELIMITER</span> <span class="o">=</span> <span class="s1">&#39;##&#39;</span>
-    <span class="n">DEFAULT_COMPLETION_DELIMITER</span> <span class="o">=</span> <span class="s1">&#39;&lt;|COMPLETE|&gt;&#39;</span>
+    <span class="n">DEFAULT_ENTITY_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;organization&quot;</span><span class="p">,</span> <span class="s2">&quot;person&quot;</span><span class="p">,</span> <span class="s2">&quot;geo&quot;</span><span class="p">,</span> <span class="s2">&quot;event&quot;</span><span class="p">]</span>
+    <span class="n">DEFAULT_TUPLE_DELIMITER</span> <span class="o">=</span> <span class="s2">&quot;&lt;|&gt;&quot;</span>
+    <span class="n">DEFAULT_RECORD_DELIMITER</span> <span class="o">=</span> <span class="s2">&quot;##&quot;</span>
+    <span class="n">DEFAULT_COMPLETION_DELIMITER</span> <span class="o">=</span> <span class="s2">&quot;&lt;|COMPLETE|&gt;&quot;</span>
     <span class="n">DEFAULT_ENTITY_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\(&quot;entity&quot;(.*?)\)&#39;</span>
     <span class="n">DEFAULT_RELATION_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\(&quot;relationship&quot;(.*?)\)&#39;</span>
 
 <div class="viewcode-block" id="ExtractEntityRelationMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.extract_entity_relation_mapper.ExtractEntityRelationMapper.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
-                 <span class="n">entity_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="o">*</span><span class="p">,</span>
-                 <span class="n">entity_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity</span><span class="p">,</span>
-                 <span class="n">relation_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation</span><span class="p">,</span>
-                 <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">prompt_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">tuple_delimiter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">record_delimiter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">completion_delimiter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">max_gleaning</span><span class="p">:</span> <span class="n">NonNegativeInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="n">continue_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">if_loop_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">entity_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">relation_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-                 <span class="n">drop_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-                 <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+        <span class="n">entity_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">entity_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity</span><span class="p">,</span>
+        <span class="n">relation_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation</span><span class="p">,</span>
+        <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prompt_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">tuple_delimiter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">record_delimiter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">completion_delimiter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_gleaning</span><span class="p">:</span> <span class="n">NonNegativeInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">continue_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">if_loop_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">entity_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">relation_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">drop_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 <span class="sd">        :param api_model: API model name.</span>
@@ -563,21 +567,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">prompt_template</span> <span class="o">=</span> <span class="n">prompt_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_PROMPT_TEMPLATE</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tuple_delimiter</span> <span class="o">=</span> <span class="n">tuple_delimiter</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_TUPLE_DELIMITER</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">record_delimiter</span> <span class="o">=</span> <span class="n">record_delimiter</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_RECORD_DELIMITER</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">completion_delimiter</span> <span class="o">=</span> <span class="n">completion_delimiter</span> <span class="ow">or</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_COMPLETION_DELIMITER</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">completion_delimiter</span> <span class="o">=</span> <span class="n">completion_delimiter</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_COMPLETION_DELIMITER</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_gleaning</span> <span class="o">=</span> <span class="n">max_gleaning</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">continue_prompt</span> <span class="o">=</span> <span class="n">continue_prompt</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_CONTINUE_PROMPT</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">if_loop_prompt</span> <span class="o">=</span> <span class="n">if_loop_prompt</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_IF_LOOP_PROMPT</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">entity_pattern</span> <span class="o">=</span> <span class="n">entity_pattern</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_ENTITY_PATTERN</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">relation_pattern</span> <span class="o">=</span> <span class="n">relation_pattern</span> <span class="ow">or</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_RELATION_PATTERN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relation_pattern</span> <span class="o">=</span> <span class="n">relation_pattern</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_RELATION_PATTERN</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;api&#39;</span><span class="p">,</span>
-                                       <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span>
-                                       <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span>
-                                       <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
-                                       <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;api&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">=</span> <span class="n">drop_text</span></div>
@@ -591,8 +591,7 @@
         <span class="k">def</span><span class="w"> </span><span class="nf">remove_outer_quotes</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">text</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">text</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&quot;&#39;</span> <span class="ow">and</span> <span class="n">text</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&#39;&quot;</span>
-                                                        <span class="ow">and</span> <span class="n">text</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&quot;&#39;</span> <span class="ow">and</span> <span class="n">text</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&#39;&quot;</span> <span class="ow">and</span> <span class="n">text</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">text</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">text</span>
@@ -603,8 +602,7 @@
             <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
             <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
 
-        <span class="n">entity_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_pattern</span><span class="p">,</span>
-                                    <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+        <span class="n">entity_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
         <span class="n">matches</span> <span class="o">=</span> <span class="n">entity_pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">raw_output</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
             <span class="n">items</span> <span class="o">=</span> <span class="n">split_by_tuple_delimiter</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
@@ -612,14 +610,12 @@
                 <span class="k">continue</span>
             <span class="n">entities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
         <span class="n">entities</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">entities</span><span class="p">))</span>
-        <span class="n">entities</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity_name</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity_type</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity_description</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-        <span class="p">}</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">]</span>
+        <span class="n">entities</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span><span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity_name</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity_type</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity_description</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="mi">2</span><span class="p">]}</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entities</span>
+        <span class="p">]</span>
 
-        <span class="n">relation_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relation_pattern</span><span class="p">,</span>
-                                      <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+        <span class="n">relation_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relation_pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
         <span class="n">matches</span> <span class="o">=</span> <span class="n">relation_pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">raw_output</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
             <span class="n">items</span> <span class="o">=</span> <span class="n">split_by_tuple_delimiter</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
@@ -627,18 +623,16 @@
                 <span class="k">continue</span>
             <span class="n">relations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
         <span class="n">relations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">relations</span><span class="p">))</span>
-        <span class="n">relations</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">source_entity</span><span class="p">:</span>
-            <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">target_entity</span><span class="p">:</span>
-            <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_description</span><span class="p">:</span>
-            <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_keywords</span><span class="p">:</span>
-            <span class="n">split_text_by_punctuation</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_strength</span><span class="p">:</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
-        <span class="p">}</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">relations</span><span class="p">]</span>
+        <span class="n">relations</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">source_entity</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">target_entity</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_description</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_keywords</span><span class="p">:</span> <span class="n">split_text_by_punctuation</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_strength</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">4</span><span class="p">]),</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">relations</span>
+        <span class="p">]</span>
 
         <span class="k">return</span> <span class="n">entities</span><span class="p">,</span> <span class="n">relations</span></div>
 
@@ -646,7 +640,7 @@
 <div class="viewcode-block" id="ExtractEntityRelationMapper.add_message">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.extract_entity_relation_mapper.ExtractEntityRelationMapper.add_message">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">role</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">messages</span> <span class="o">+</span> <span class="p">[{</span><span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="n">role</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">content</span><span class="p">}]</span></div>
+        <span class="k">return</span> <span class="n">messages</span> <span class="o">+</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">role</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">content</span><span class="p">}]</span></div>
 
 
 <div class="viewcode-block" id="ExtractEntityRelationMapper.light_rag_extraction">
@@ -655,22 +649,21 @@
         <span class="n">client</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
 
         <span class="n">final_result</span> <span class="o">=</span> <span class="n">client</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
-        <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="s1">&#39;assistant&#39;</span><span class="p">,</span> <span class="n">final_result</span><span class="p">)</span>
+        <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span> <span class="n">final_result</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">glean_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_gleaning</span><span class="p">):</span>
-            <span class="n">messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">continue_prompt</span><span class="p">)</span>
+            <span class="n">messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">continue_prompt</span><span class="p">)</span>
             <span class="n">glean_result</span> <span class="o">=</span> <span class="n">client</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
-            <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="s1">&#39;assistant&#39;</span><span class="p">,</span> <span class="n">glean_result</span><span class="p">)</span>
+            <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span> <span class="n">glean_result</span><span class="p">)</span>
             <span class="n">final_result</span> <span class="o">+=</span> <span class="n">glean_result</span>
 
             <span class="k">if</span> <span class="n">glean_index</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_gleaning</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">break</span>
 
-            <span class="n">messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">if_loop_prompt</span><span class="p">)</span>
+            <span class="n">messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">if_loop_prompt</span><span class="p">)</span>
             <span class="n">if_loop_result</span> <span class="o">=</span> <span class="n">client</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
-            <span class="n">if_loop_result</span> <span class="o">=</span> <span class="n">if_loop_result</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span>
-                <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">if_loop_result</span> <span class="o">!=</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+            <span class="n">if_loop_result</span> <span class="o">=</span> <span class="n">if_loop_result</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">if_loop_result</span> <span class="o">!=</span> <span class="s2">&quot;yes&quot;</span><span class="p">:</span>
                 <span class="k">break</span>
 
         <span class="k">return</span> <span class="n">final_result</span></div>
@@ -679,32 +672,29 @@
 <div class="viewcode-block" id="ExtractEntityRelationMapper.process_single">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.extract_entity_relation_mapper.ExtractEntityRelationMapper.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="c1"># check if it&#39;s generated already</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span>
-                <span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">relation_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">relation_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">tuple_delimiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tuple_delimiter</span><span class="p">,</span>
             <span class="n">record_delimiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_delimiter</span><span class="p">,</span>
             <span class="n">completion_delimiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">completion_delimiter</span><span class="p">,</span>
-            <span class="n">entity_types</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_types</span><span class="p">),</span>
-            <span class="n">input_text</span><span class="o">=</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])</span>
-        <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">input_prompt</span><span class="p">}]</span>
+            <span class="n">entity_types</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_types</span><span class="p">),</span>
+            <span class="n">input_text</span><span class="o">=</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">input_prompt</span><span class="p">}]</span>
 
-        <span class="n">entities</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity_name</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity_type</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity_description</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-        <span class="p">}]</span>
-        <span class="n">relations</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">source_entity</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">target_entity</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_description</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_keywords</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_strength</span><span class="p">:</span> <span class="mf">.0</span>
-        <span class="p">}]</span>
+        <span class="n">entities</span> <span class="o">=</span> <span class="p">[{</span><span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity_name</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity_type</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">entity_description</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}]</span>
+        <span class="n">relations</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">source_entity</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">target_entity</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_description</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_keywords</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_strength</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">try_num</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">light_rag_extraction</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
@@ -715,7 +705,7 @@
                         <span class="n">relations</span> <span class="o">=</span> <span class="n">cur_relations</span>
                     <span class="k">break</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">entities</span>
         <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">relation_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">relations</span>

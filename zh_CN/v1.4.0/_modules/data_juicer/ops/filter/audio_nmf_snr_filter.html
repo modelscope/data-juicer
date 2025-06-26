@@ -361,7 +361,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Filter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..op_fusion</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOADED_AUDIOS</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;audio_nmf_snr_filter&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;audio_nmf_snr_filter&quot;</span>
 
 
 <span class="c1"># run NMF to decompose the signal and noise from the input audio</span>
@@ -372,11 +372,7 @@
     <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">librosa</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span><span class="n">audio</span><span class="p">))</span>
 
     <span class="c1"># run NMF to decompose the audio</span>
-    <span class="n">W</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">decompose</span><span class="p">(</span><span class="n">S</span><span class="p">,</span>
-                     <span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span>
-                     <span class="n">init</span><span class="o">=</span><span class="s1">&#39;random&#39;</span><span class="p">,</span>
-                     <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                     <span class="n">max_iter</span><span class="o">=</span><span class="n">nmf_iter</span><span class="p">)</span>
+    <span class="n">W</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">decompose</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">nmf_iter</span><span class="p">)</span>
 
     <span class="c1"># get signal and noise</span>
     <span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">],</span> <span class="n">H</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
@@ -395,9 +391,7 @@
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.compute_nmf_snr">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_nmf_snr</span><span class="p">(</span><span class="n">audio_data</span><span class="p">,</span> <span class="n">nmf_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
     <span class="c1"># separate the signal and noise parts from the original audio</span>
-    <span class="n">signal</span><span class="p">,</span> <span class="n">noise</span> <span class="o">=</span> <span class="n">separate_signal_noise</span><span class="p">(</span><span class="n">audio_data</span><span class="p">,</span>
-                                          <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                                          <span class="n">nmf_iter</span><span class="o">=</span><span class="n">nmf_iter</span><span class="p">)</span>
+    <span class="n">signal</span><span class="p">,</span> <span class="n">noise</span> <span class="o">=</span> <span class="n">separate_signal_noise</span><span class="p">(</span><span class="n">audio_data</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nmf_iter</span><span class="o">=</span><span class="n">nmf_iter</span><span class="p">)</span>
 
     <span class="c1"># compute the power of signal and noise</span>
     <span class="n">power_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">signal</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
@@ -424,13 +418,15 @@
 
 <div class="viewcode-block" id="AudioNMFSNRFilter.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.AudioNMFSNRFilter.__init__">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">min_snr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-                 <span class="n">max_snr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
-                 <span class="n">nmf_iter_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
-                 <span class="n">any_or_all</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;any&#39;</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">min_snr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">max_snr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
+        <span class="n">nmf_iter_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+        <span class="n">any_or_all</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -451,10 +447,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">min_snr</span> <span class="o">=</span> <span class="n">min_snr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_snr</span> <span class="o">=</span> <span class="n">max_snr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nmf_iter_num</span> <span class="o">=</span> <span class="n">nmf_iter_num</span>
-        <span class="k">if</span> <span class="n">any_or_all</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Keep strategy [</span><span class="si">{</span><span class="n">any_or_all</span><span class="si">}</span><span class="s1">] is not supported. &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;any&quot;, &quot;all&quot;].&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">any</span> <span class="o">=</span> <span class="p">(</span><span class="n">any_or_all</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">any_or_all</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keep strategy [</span><span class="si">{</span><span class="n">any_or_all</span><span class="si">}</span><span class="s2">] is not supported. &quot;</span> <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;any&quot;, &quot;all&quot;].&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">any</span> <span class="o">=</span> <span class="n">any_or_all</span> <span class="o">==</span> <span class="s2">&quot;any&quot;</span></div>
 
 
 <div class="viewcode-block" id="AudioNMFSNRFilter.compute_stats_single">
@@ -466,24 +461,17 @@
 
         <span class="c1"># there is no audio in this sample</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">audio_key</span><span class="p">]:</span>
-            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">audio_nmf_snr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">audio_nmf_snr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="c1"># load audios</span>
         <span class="n">loaded_audio_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">audio_key</span><span class="p">]</span>
-        <span class="n">sample</span><span class="p">,</span> <span class="n">audios</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span>
-                                                <span class="n">loaded_audio_keys</span><span class="p">,</span> <span class="n">load_audio</span><span class="p">)</span>
+        <span class="n">sample</span><span class="p">,</span> <span class="n">audios</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">loaded_audio_keys</span><span class="p">,</span> <span class="n">load_audio</span><span class="p">)</span>
 
-        <span class="n">audio_snrs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">audio_key</span><span class="p">:</span> <span class="n">compute_nmf_snr</span><span class="p">(</span><span class="n">audio</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">nmf_iter_num</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">audio_key</span><span class="p">,</span> <span class="n">audio</span> <span class="ow">in</span> <span class="n">audios</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-        <span class="p">}</span>
+        <span class="n">audio_snrs</span> <span class="o">=</span> <span class="p">{</span><span class="n">audio_key</span><span class="p">:</span> <span class="n">compute_nmf_snr</span><span class="p">(</span><span class="n">audio</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">nmf_iter_num</span><span class="p">)</span> <span class="k">for</span> <span class="n">audio_key</span><span class="p">,</span> <span class="n">audio</span> <span class="ow">in</span> <span class="n">audios</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
         <span class="c1"># get audio SNRs</span>
-        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">audio_nmf_snr</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">audio_snrs</span><span class="p">[</span><span class="n">audio_key</span><span class="p">]</span> <span class="k">for</span> <span class="n">audio_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">audio_key</span><span class="p">]</span>
-        <span class="p">]</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">audio_nmf_snr</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">audio_snrs</span><span class="p">[</span><span class="n">audio_key</span><span class="p">]</span> <span class="k">for</span> <span class="n">audio_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">audio_key</span><span class="p">]]</span>
 
         <span class="k">return</span> <span class="n">sample</span></div>
 
@@ -492,8 +480,7 @@
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.AudioNMFSNRFilter.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="n">audio_snrs</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">audio_nmf_snr</span><span class="p">]</span>
-        <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">min_snr</span> <span class="o">&lt;=</span> <span class="n">snr</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_snr</span> <span class="k">for</span> <span class="n">snr</span> <span class="ow">in</span> <span class="n">audio_snrs</span><span class="p">])</span>
+        <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">min_snr</span> <span class="o">&lt;=</span> <span class="n">snr</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_snr</span> <span class="k">for</span> <span class="n">snr</span> <span class="ow">in</span> <span class="n">audio_snrs</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keep_bools</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 

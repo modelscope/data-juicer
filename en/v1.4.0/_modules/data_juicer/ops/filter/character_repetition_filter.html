@@ -360,7 +360,7 @@
 
 <div class="viewcode-block" id="CharacterRepetitionFilter">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.character_repetition_filter.CharacterRepetitionFilter">[docs]</a>
-<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s1">&#39;character_repetition_filter&#39;</span><span class="p">)</span>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;character_repetition_filter&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CharacterRepetitionFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with char-level n-gram repetition ratio within a</span>
 <span class="sd">    specific range.&quot;&quot;&quot;</span>
@@ -369,12 +369,7 @@
 
 <div class="viewcode-block" id="CharacterRepetitionFilter.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.character_repetition_filter.CharacterRepetitionFilter.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">rep_len</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-                 <span class="n">min_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-                 <span class="n">max_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rep_len</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">min_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">max_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -406,30 +401,26 @@
                 <span class="k">continue</span>
 
             <span class="n">cur_text</span> <span class="o">=</span> <span class="n">samples_list</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-            <span class="n">char_ngrams</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">cur_text</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cur_text</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="p">]</span>
+            <span class="n">char_ngrams</span> <span class="o">=</span> <span class="p">[</span><span class="n">cur_text</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cur_text</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
             <span class="n">freq_char_ngrams</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">char_ngram</span> <span class="ow">in</span> <span class="n">char_ngrams</span><span class="p">:</span>
-                <span class="n">freq_char_ngrams</span><span class="p">[</span><span class="n">char_ngram</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">freq_char_ngrams</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">char_ngram</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">freq_char_ngrams</span><span class="p">[</span><span class="n">char_ngram</span><span class="p">]</span> <span class="o">=</span> <span class="n">freq_char_ngrams</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">char_ngram</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">freq_char_ngrams</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">samples_stats</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">char_rep_ratio</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
                 <span class="k">continue</span>
 
-            <span class="n">freq_char_ngrams</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">freq_char_ngrams</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
-                                      <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">num_no_rep_char_ngrams</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">freq_char_ngrams</span> <span class="k">if</span> <span class="n">el</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">freq_char_ngrams</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">freq_char_ngrams</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">num_no_rep_char_ngrams</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">freq_char_ngrams</span> <span class="k">if</span> <span class="n">el</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span>
             <span class="n">num_rep_char_ngrams</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">freq_char_ngrams</span><span class="p">))),</span>
                 <span class="nb">len</span><span class="p">(</span><span class="n">freq_char_ngrams</span><span class="p">)</span> <span class="o">-</span> <span class="n">num_no_rep_char_ngrams</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">samples_stats</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">char_rep_ratio</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="nb">sum</span><span class="p">(</span><span class="n">freq_char_ngrams</span><span class="p">[:</span><span class="n">num_rep_char_ngrams</span><span class="p">])</span> <span class="o">/</span>
-                <span class="nb">sum</span><span class="p">(</span><span class="n">freq_char_ngrams</span><span class="p">))</span> <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">freq_char_ngrams</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+                <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">freq_char_ngrams</span><span class="p">[:</span><span class="n">num_rep_char_ngrams</span><span class="p">])</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">freq_char_ngrams</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">freq_char_ngrams</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+                <span class="k">else</span> <span class="mf">0.0</span>
+            <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">samples</span></div>
 
@@ -439,12 +430,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">map</span><span class="p">(</span>
-                <span class="k">lambda</span> <span class="n">stat</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span> <span class="o">&lt;=</span> <span class="n">stat</span><span class="p">[</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">char_rep_ratio</span><span class="p">]</span>
-                <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span><span class="p">,</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">])</span>
+                <span class="k">lambda</span> <span class="n">stat</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span> <span class="o">&lt;=</span> <span class="n">stat</span><span class="p">[</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">char_rep_ratio</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span><span class="p">,</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># single sample for ray filter</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span> <span class="o">&lt;=</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span>
-                    <span class="n">StatsKeys</span><span class="o">.</span><span class="n">char_rep_ratio</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span> <span class="o">&lt;=</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">char_rep_ratio</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span></div>

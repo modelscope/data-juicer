@@ -366,7 +366,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_suffix_to_filename</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
 
-<span class="n">cv2</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;cv2&#39;</span><span class="p">,</span> <span class="s1">&#39;opencv-python&#39;</span><span class="p">)</span>
+<span class="n">cv2</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;cv2&quot;</span><span class="p">,</span> <span class="s2">&quot;opencv-python&quot;</span><span class="p">)</span>
 
 <span class="c1"># suppress most warnings from av</span>
 <span class="n">av</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">set_level</span><span class="p">(</span><span class="n">av</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">PANIC</span><span class="p">)</span>
@@ -378,16 +378,16 @@
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.SpecialTokens">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpecialTokens</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="c1"># modality</span>
-    <span class="n">image</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">DEFAULT_PREFIX</span><span class="si">}</span><span class="s1">image&gt;&#39;</span>
-    <span class="n">audio</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">DEFAULT_PREFIX</span><span class="si">}</span><span class="s1">audio&gt;&#39;</span>
-    <span class="n">video</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">DEFAULT_PREFIX</span><span class="si">}</span><span class="s1">video&gt;&#39;</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">DEFAULT_PREFIX</span><span class="si">}</span><span class="s2">image&gt;&quot;</span>
+    <span class="n">audio</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">DEFAULT_PREFIX</span><span class="si">}</span><span class="s2">audio&gt;&quot;</span>
+    <span class="n">video</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">DEFAULT_PREFIX</span><span class="si">}</span><span class="s2">video&gt;&quot;</span>
 
     <span class="c1"># others</span>
-    <span class="n">eoc</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;|</span><span class="si">{</span><span class="n">DEFAULT_PREFIX</span><span class="si">}</span><span class="s1">eoc|&gt;&#39;</span></div>
+    <span class="n">eoc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;|</span><span class="si">{</span><span class="n">DEFAULT_PREFIX</span><span class="si">}</span><span class="s2">eoc|&gt;&quot;</span></div>
 
 
 
-<span class="n">AV_STREAM_THREAD_TYPE</span> <span class="o">=</span> <span class="s1">&#39;AUTO&#39;</span>
+<span class="n">AV_STREAM_THREAD_TYPE</span> <span class="o">=</span> <span class="s2">&quot;AUTO&quot;</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    av stream thread type support &quot;SLICE&quot;, &quot;FRAME&quot;, &quot;AUTO&quot;.</span>
 
@@ -404,11 +404,7 @@
 <div class="viewcode-block" id="get_special_tokens">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.get_special_tokens">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_special_tokens</span><span class="p">():</span>
-    <span class="n">special_token_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">key</span><span class="p">:</span> <span class="n">value</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">)</span>
-    <span class="p">}</span>
+    <span class="n">special_token_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">)}</span>
     <span class="k">return</span> <span class="n">special_token_dict</span></div>
 
 
@@ -417,7 +413,7 @@
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.remove_special_tokens">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">remove_special_tokens</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">get_special_tokens</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">text</span></div>
 
 
@@ -426,9 +422,9 @@
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.remove_non_special_tokens">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">remove_non_special_tokens</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
     <span class="n">special_tokens</span> <span class="o">=</span> <span class="n">get_special_tokens</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-    <span class="n">patterns</span> <span class="o">=</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">special_tokens</span><span class="p">)</span>
+    <span class="n">patterns</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">special_tokens</span><span class="p">)</span>
     <span class="n">special_tokens_found</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">patterns</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
-    <span class="n">text_with_only_special_tokens</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">special_tokens_found</span><span class="p">)</span>
+    <span class="n">text_with_only_special_tokens</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">special_tokens_found</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">text_with_only_special_tokens</span></div>
 
@@ -477,7 +473,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">load_image</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="n">img_feature</span> <span class="o">=</span> <span class="n">Image</span><span class="p">()</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">img_feature</span><span class="o">.</span><span class="n">decode_example</span><span class="p">(</span><span class="n">img_feature</span><span class="o">.</span><span class="n">encode_example</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">img</span></div>
 
 
@@ -485,7 +481,7 @@
 <div class="viewcode-block" id="load_image_byte">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_image_byte">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_image_byte</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">image_file</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">image_file</span><span class="p">:</span>
         <span class="n">image_data</span> <span class="o">=</span> <span class="n">image_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">image_data</span></div>
 
@@ -494,23 +490,23 @@
 <div class="viewcode-block" id="image_path_to_base64">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.image_path_to_base64">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">image_path_to_base64</span><span class="p">(</span><span class="n">image_path</span><span class="p">):</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">image_file</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">image_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">image_file</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">image_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="image_byte_to_base64">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.image_byte_to_base64">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">image_byte_to_base64</span><span class="p">(</span><span class="n">image_byte</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">image_byte</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">image_byte</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="pil_to_opencv">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.pil_to_opencv">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">pil_to_opencv</span><span class="p">(</span><span class="n">pil_image</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">mode</span> <span class="o">!=</span> <span class="s1">&#39;RGB&#39;</span><span class="p">:</span>
-        <span class="n">pil_image</span> <span class="o">=</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;RGB&quot;</span><span class="p">:</span>
+        <span class="n">pil_image</span> <span class="o">=</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
     <span class="n">numpy_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pil_image</span><span class="p">)</span>
     <span class="c1"># RGB to BGR</span>
     <span class="n">opencv_image</span> <span class="o">=</span> <span class="n">numpy_image</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -525,7 +521,7 @@
     <span class="n">gray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
     <span class="n">dets</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">detectMultiScale</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">)</span>
     <span class="n">rectified_dets</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dets</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">dets</span><span class="p">:</span>
         <span class="n">x</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">w</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">width</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span>
@@ -539,6 +535,7 @@
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.get_file_size">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_file_size</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
 
@@ -563,10 +560,11 @@
 <div class="viewcode-block" id="calculate_resized_dimensions">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.calculate_resized_dimensions">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">calculate_resized_dimensions</span><span class="p">(</span>
-        <span class="n">original_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="n">PositiveInt</span><span class="p">],</span>
-        <span class="n">target_size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="n">PositiveInt</span><span class="p">]],</span>
-        <span class="n">max_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">divisible</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="n">original_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="n">PositiveInt</span><span class="p">],</span>
+    <span class="n">target_size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="n">PositiveInt</span><span class="p">]],</span>
+    <span class="n">max_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">divisible</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Resize dimensions based on specified constraints.</span>
 
@@ -583,7 +581,7 @@
 
     <span class="c1"># Normalize target_size to a tuple</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_size</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">target_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">target_size</span><span class="p">,</span> <span class="p">)</span>
+        <span class="n">target_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">target_size</span><span class="p">,)</span>
 
     <span class="c1"># Initialize new dimensions</span>
     <span class="k">if</span> <span class="n">target_size</span><span class="p">:</span>
@@ -603,13 +601,10 @@
         <span class="n">new_long_edge</span> <span class="o">=</span> <span class="n">max_length</span>
 
     <span class="c1"># Determine final dimensions based on original orientation</span>
-    <span class="n">resized_dimensions</span> <span class="o">=</span> <span class="p">((</span><span class="n">new_short_edge</span><span class="p">,</span>
-                           <span class="n">new_long_edge</span><span class="p">)</span> <span class="k">if</span> <span class="n">width</span> <span class="o">&gt;=</span> <span class="n">height</span> <span class="k">else</span>
-                          <span class="p">(</span><span class="n">new_long_edge</span><span class="p">,</span> <span class="n">new_short_edge</span><span class="p">))</span>
+    <span class="n">resized_dimensions</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_short_edge</span><span class="p">,</span> <span class="n">new_long_edge</span><span class="p">)</span> <span class="k">if</span> <span class="n">width</span> <span class="o">&gt;=</span> <span class="n">height</span> <span class="k">else</span> <span class="p">(</span><span class="n">new_long_edge</span><span class="p">,</span> <span class="n">new_short_edge</span><span class="p">)</span>
 
     <span class="c1"># Ensure final dimensions are divisible by the specified value</span>
-    <span class="n">resized_dimensions</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
-        <span class="nb">int</span><span class="p">(</span><span class="n">dim</span> <span class="o">/</span> <span class="n">divisible</span><span class="p">)</span> <span class="o">*</span> <span class="n">divisible</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">resized_dimensions</span><span class="p">)</span>
+    <span class="n">resized_dimensions</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dim</span> <span class="o">/</span> <span class="n">divisible</span><span class="p">)</span> <span class="o">*</span> <span class="n">divisible</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">resized_dimensions</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">resized_dimensions</span></div>
 
@@ -628,7 +623,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">load_audio</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">aud_feature</span> <span class="o">=</span> <span class="n">Audio</span><span class="p">(</span><span class="n">sampling_rate</span><span class="p">)</span>
     <span class="n">aud</span> <span class="o">=</span> <span class="n">aud_feature</span><span class="o">.</span><span class="n">decode_example</span><span class="p">(</span><span class="n">aud_feature</span><span class="o">.</span><span class="n">encode_example</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">aud</span><span class="p">[</span><span class="s1">&#39;array&#39;</span><span class="p">],</span> <span class="n">aud</span><span class="p">[</span><span class="s1">&#39;sampling_rate&#39;</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">aud</span><span class="p">[</span><span class="s2">&quot;array&quot;</span><span class="p">],</span> <span class="n">aud</span><span class="p">[</span><span class="s2">&quot;sampling_rate&quot;</span><span class="p">]</span></div>
 
 
 
@@ -642,7 +637,7 @@
 
 <div class="viewcode-block" id="load_video">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_video">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">load_video</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_video</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a video using its path.</span>
 
@@ -652,8 +647,8 @@
 <span class="sd">        in this video (video/audio/...) and can be used to decode these streams</span>
 <span class="sd">        to frames.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Video [</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">] does not exist!&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;r&quot;</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Video [</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">] does not exist!&quot;</span><span class="p">)</span>
     <span class="n">container</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">container</span></div>
 
@@ -661,8 +656,7 @@
 
 <div class="viewcode-block" id="get_video_duration">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.get_video_duration">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_video_duration</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span>
-                       <span class="n">video_stream_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_video_duration</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span> <span class="n">video_stream_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the video&#39;s duration from the container</span>
 
@@ -678,9 +672,11 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_video</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">):</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">input_video</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported type of input_video. Should be one of &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[str, av.container.InputContainer], but given &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_video</span><span class="p">)</span><span class="si">}</span><span class="s1">].&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unsupported type of input_video. Should be one of &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[str, av.container.InputContainer], but given &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_video</span><span class="p">)</span><span class="si">}</span><span class="s2">].&quot;</span>
+        <span class="p">)</span>
 
     <span class="n">input_video_stream</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">video</span><span class="p">[</span><span class="n">video_stream_index</span><span class="p">]</span>
     <span class="n">duration</span> <span class="o">=</span> <span class="n">input_video_stream</span><span class="o">.</span><span class="n">duration</span> <span class="o">*</span> <span class="n">input_video_stream</span><span class="o">.</span><span class="n">time_base</span>
@@ -690,9 +686,7 @@
 
 <div class="viewcode-block" id="get_decoded_frames_from_video">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.get_decoded_frames_from_video">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_decoded_frames_from_video</span><span class="p">(</span>
-        <span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span>
-        <span class="n">video_stream_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_decoded_frames_from_video</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span> <span class="n">video_stream_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the video&#39;s frames from the container</span>
 
@@ -741,10 +735,10 @@
 
     <span class="c1"># create the output video</span>
     <span class="k">if</span> <span class="n">output_video</span><span class="p">:</span>
-        <span class="n">output_container</span> <span class="o">=</span> <span class="n">load_video</span><span class="p">(</span><span class="n">output_video</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">output_container</span> <span class="o">=</span> <span class="n">load_video</span><span class="p">(</span><span class="n">output_video</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">output_buffer</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
-        <span class="n">output_container</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_buffer</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;mp4&#39;</span><span class="p">)</span>
+        <span class="n">output_container</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_buffer</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp4&quot;</span><span class="p">)</span>
 
     <span class="c1"># add the video stream into the output video according to input video</span>
     <span class="n">input_video_stream</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">video</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -764,9 +758,7 @@
 
     <span class="c1"># seek to the start time, time must be in microsecond if no</span>
     <span class="c1"># stream is specified</span>
-    <span class="n">container</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">start_seconds</span> <span class="o">*</span> <span class="mi">1000000</span><span class="p">),</span>
-                   <span class="n">any_frame</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                   <span class="n">backward</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">container</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">start_seconds</span> <span class="o">*</span> <span class="mi">1000000</span><span class="p">),</span> <span class="n">any_frame</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">backward</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># copy the video and audio streams until the end time</span>
     <span class="c1"># NOTICE: for different streams, the time have to be converted to be</span>
@@ -774,27 +766,25 @@
     <span class="n">video_at_the_end</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="c1"># compute the start/end pts for video/audio streams</span>
     <span class="n">video_start_pts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start_seconds</span> <span class="o">/</span> <span class="n">input_video_stream</span><span class="o">.</span><span class="n">time_base</span><span class="p">)</span>
-    <span class="n">video_end_pts</span> <span class="o">=</span> <span class="p">(</span><span class="n">end_seconds</span> <span class="o">/</span> <span class="n">input_video_stream</span><span class="o">.</span><span class="n">time_base</span>
-                     <span class="k">if</span> <span class="n">end_seconds</span> <span class="k">else</span> <span class="n">input_video_stream</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span>
+    <span class="n">video_end_pts</span> <span class="o">=</span> <span class="n">end_seconds</span> <span class="o">/</span> <span class="n">input_video_stream</span><span class="o">.</span><span class="n">time_base</span> <span class="k">if</span> <span class="n">end_seconds</span> <span class="k">else</span> <span class="n">input_video_stream</span><span class="o">.</span><span class="n">duration</span>
     <span class="k">if</span> <span class="n">input_audio_stream</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">audio_start_pts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start_seconds</span> <span class="o">/</span> <span class="n">input_audio_stream</span><span class="o">.</span><span class="n">time_base</span><span class="p">)</span>
-        <span class="n">audio_end_pts</span> <span class="o">=</span> <span class="p">(</span><span class="n">end_seconds</span> <span class="o">/</span> <span class="n">input_audio_stream</span><span class="o">.</span><span class="n">time_base</span>
-                         <span class="k">if</span> <span class="n">end_seconds</span> <span class="k">else</span> <span class="n">input_audio_stream</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span>
+        <span class="n">audio_end_pts</span> <span class="o">=</span> <span class="n">end_seconds</span> <span class="o">/</span> <span class="n">input_audio_stream</span><span class="o">.</span><span class="n">time_base</span> <span class="k">if</span> <span class="n">end_seconds</span> <span class="k">else</span> <span class="n">input_audio_stream</span><span class="o">.</span><span class="n">duration</span>
     <span class="k">for</span> <span class="n">packet</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">demux</span><span class="p">(</span><span class="n">input_video_stream</span><span class="p">,</span> <span class="n">input_audio_stream</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">packet</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;video&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">packet</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;video&quot;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">packet</span><span class="o">.</span><span class="n">decode</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">pts</span> <span class="o">&lt;</span> <span class="n">video_start_pts</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">pts</span> <span class="o">&gt;</span> <span class="n">video_end_pts</span><span class="p">:</span>
                     <span class="c1"># continue to check until the next P/I frame</span>
-                    <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">pict_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">}:</span>
+                    <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">pict_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">}:</span>
                         <span class="n">video_at_the_end</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="k">break</span>
                     <span class="k">continue</span>
                 <span class="n">frame</span><span class="o">.</span><span class="n">pts</span> <span class="o">-=</span> <span class="n">video_start_pts</span>  <span class="c1"># timestamp alignment</span>
                 <span class="k">for</span> <span class="n">inter_packet</span> <span class="ow">in</span> <span class="n">output_video_stream</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
                     <span class="n">output_container</span><span class="o">.</span><span class="n">mux</span><span class="p">(</span><span class="n">inter_packet</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">packet</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;audio&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">packet</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;audio&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">packet</span><span class="o">.</span><span class="n">pts</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">packet</span><span class="o">.</span><span class="n">dts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">packet</span><span class="o">.</span><span class="n">pts</span> <span class="o">&lt;</span> <span class="n">audio_start_pts</span> <span class="ow">or</span> <span class="n">packet</span><span class="o">.</span><span class="n">pts</span> <span class="o">&gt;</span> <span class="n">audio_end_pts</span><span class="p">:</span>
@@ -819,17 +809,18 @@
         <span class="k">return</span> <span class="n">output_buffer</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_video</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;This video could not be successfully cut in &#39;</span>
-                       <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="n">start_seconds</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">end_seconds</span><span class="si">}</span><span class="s1">] seconds. &#39;</span>
-                       <span class="sa">f</span><span class="s1">&#39;Please set more accurate parameters.&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;This video could not be successfully cut in &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">start_seconds</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">end_seconds</span><span class="si">}</span><span class="s2">] seconds. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Please set more accurate parameters.&quot;</span>
+        <span class="p">)</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_video</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="process_each_frame">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.process_each_frame">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">process_each_frame</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span>
-                       <span class="n">output_video</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">frame_func</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_each_frame</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span> <span class="n">output_video</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">frame_func</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Process each frame in video by replacing each frame by</span>
 <span class="sd">    `frame_func(frame)`.</span>
@@ -848,7 +839,7 @@
         <span class="n">container</span> <span class="o">=</span> <span class="n">input_video</span>
 
     <span class="c1"># create the output video</span>
-    <span class="n">output_container</span> <span class="o">=</span> <span class="n">load_video</span><span class="p">(</span><span class="n">output_video</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">output_container</span> <span class="o">=</span> <span class="n">load_video</span><span class="p">(</span><span class="n">output_video</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
 
     <span class="c1"># add the audio stream into the output video with template of input audio</span>
     <span class="k">for</span> <span class="n">input_audio_stream</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">audio</span><span class="p">:</span>
@@ -890,19 +881,16 @@
         <span class="k">return</span> <span class="n">output_video</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">output_video</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">input_video</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_video</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">input_video</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">input_video</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_video</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">input_video</span><span class="o">.</span><span class="n">name</span></div>
 
 
 
 <div class="viewcode-block" id="extract_key_frames_by_seconds">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.extract_key_frames_by_seconds">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">extract_key_frames_by_seconds</span><span class="p">(</span>
-        <span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span>
-        <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_key_frames_by_seconds</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract key frames by seconds.</span>
-<span class="sd">        :param input_video: input video path or av.container.InputContainer.</span>
-<span class="sd">        :param duration: duration of each video split in seconds.</span>
+<span class="sd">    :param input_video: input video path or av.container.InputContainer.</span>
+<span class="sd">    :param duration: duration of each video split in seconds.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># load the input video</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_video</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -910,19 +898,20 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_video</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">):</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">input_video</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported type of input_video. Should be one of &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[str, av.container.InputContainer], but given &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_video</span><span class="p">)</span><span class="si">}</span><span class="s1">].&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unsupported type of input_video. Should be one of &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[str, av.container.InputContainer], but given &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_video</span><span class="p">)</span><span class="si">}</span><span class="s2">].&quot;</span>
+        <span class="p">)</span>
 
     <span class="n">video_duration</span> <span class="o">=</span> <span class="n">get_video_duration</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
     <span class="n">timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">video_duration</span><span class="p">,</span> <span class="n">duration</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
     <span class="n">all_key_frames</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)):</span>
-        <span class="n">output_buffer</span> <span class="o">=</span> <span class="n">cut_video_by_seconds</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
-                                             <span class="n">timestamps</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">timestamps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">output_buffer</span> <span class="o">=</span> <span class="n">cut_video_by_seconds</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">timestamps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">output_buffer</span><span class="p">:</span>
-            <span class="n">cut_inp_container</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_buffer</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;mp4&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+            <span class="n">cut_inp_container</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_buffer</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp4&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
             <span class="n">key_frames</span> <span class="o">=</span> <span class="n">extract_key_frames</span><span class="p">(</span><span class="n">cut_inp_container</span><span class="p">)</span>
             <span class="n">all_key_frames</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">key_frames</span><span class="p">)</span>
             <span class="n">close_video</span><span class="p">(</span><span class="n">cut_inp_container</span><span class="p">)</span>
@@ -947,14 +936,16 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_video</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">):</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">input_video</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported type of input_video. Should be one of &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[str, av.container.InputContainer], but given &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_video</span><span class="p">)</span><span class="si">}</span><span class="s1">].&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unsupported type of input_video. Should be one of &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[str, av.container.InputContainer], but given &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_video</span><span class="p">)</span><span class="si">}</span><span class="s2">].&quot;</span>
+        <span class="p">)</span>
 
     <span class="n">key_frames</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">input_video_stream</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">video</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">ori_skip_method</span> <span class="o">=</span> <span class="n">input_video_stream</span><span class="o">.</span><span class="n">codec_context</span><span class="o">.</span><span class="n">skip_frame</span>
-    <span class="n">input_video_stream</span><span class="o">.</span><span class="n">codec_context</span><span class="o">.</span><span class="n">skip_frame</span> <span class="o">=</span> <span class="s1">&#39;NONKEY&#39;</span>
+    <span class="n">input_video_stream</span><span class="o">.</span><span class="n">codec_context</span><span class="o">.</span><span class="n">skip_frame</span> <span class="o">=</span> <span class="s2">&quot;NONKEY&quot;</span>
     <span class="c1"># restore to the beginning of the video</span>
     <span class="n">container</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">input_video_stream</span><span class="p">):</span>
@@ -963,8 +954,7 @@
     <span class="n">input_video_stream</span><span class="o">.</span><span class="n">codec_context</span><span class="o">.</span><span class="n">skip_frame</span> <span class="o">=</span> <span class="n">ori_skip_method</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_frames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No keyframes in this video [</span><span class="si">{</span><span class="n">input_video</span><span class="si">}</span><span class="s1">]. Return &#39;</span>
-                       <span class="sa">f</span><span class="s1">&#39;the first frame instead.&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No keyframes in this video [</span><span class="si">{</span><span class="n">input_video</span><span class="si">}</span><span class="s2">]. Return &quot;</span> <span class="sa">f</span><span class="s2">&quot;the first frame instead.&quot;</span><span class="p">)</span>
         <span class="n">container</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">input_video_stream</span><span class="p">):</span>
             <span class="n">key_frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
@@ -978,8 +968,7 @@
 
 <div class="viewcode-block" id="get_key_frame_seconds">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.get_key_frame_seconds">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_key_frame_seconds</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span>
-                                             <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_key_frame_seconds</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get seconds of key frames in the input video.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -993,14 +982,13 @@
 <div class="viewcode-block" id="extract_video_frames_uniformly_by_seconds">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.extract_video_frames_uniformly_by_seconds">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">extract_video_frames_uniformly_by_seconds</span><span class="p">(</span>
-        <span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span>
-        <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span><span class="p">,</span>
-        <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span> <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract video frames uniformly by seconds.</span>
-<span class="sd">        :param input_video: input video path or av.container.InputContainer.</span>
-<span class="sd">        :param frame_num: the number of frames to be extracted uniformly from</span>
-<span class="sd">            each video split by duration.</span>
-<span class="sd">        :param duration: duration of each video split in seconds.</span>
+<span class="sd">    :param input_video: input video path or av.container.InputContainer.</span>
+<span class="sd">    :param frame_num: the number of frames to be extracted uniformly from</span>
+<span class="sd">        each video split by duration.</span>
+<span class="sd">    :param duration: duration of each video split in seconds.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># load the input video</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_video</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -1008,21 +996,21 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_video</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">):</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">input_video</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported type of input_video. Should be one of &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[str, av.container.InputContainer], but given &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_video</span><span class="p">)</span><span class="si">}</span><span class="s1">].&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unsupported type of input_video. Should be one of &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[str, av.container.InputContainer], but given &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_video</span><span class="p">)</span><span class="si">}</span><span class="s2">].&quot;</span>
+        <span class="p">)</span>
 
     <span class="n">video_duration</span> <span class="o">=</span> <span class="n">get_video_duration</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
     <span class="n">timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">video_duration</span><span class="p">,</span> <span class="n">duration</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
     <span class="n">all_frames</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)):</span>
-        <span class="n">output_buffer</span> <span class="o">=</span> <span class="n">cut_video_by_seconds</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
-                                             <span class="n">timestamps</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">timestamps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">output_buffer</span> <span class="o">=</span> <span class="n">cut_video_by_seconds</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">timestamps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">output_buffer</span><span class="p">:</span>
-            <span class="n">cut_inp_container</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_buffer</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;mp4&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-            <span class="n">key_frames</span> <span class="o">=</span> <span class="n">extract_video_frames_uniformly</span><span class="p">(</span><span class="n">cut_inp_container</span><span class="p">,</span>
-                                                        <span class="n">frame_num</span><span class="o">=</span><span class="n">frame_num</span><span class="p">)</span>
+            <span class="n">cut_inp_container</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_buffer</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp4&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+            <span class="n">key_frames</span> <span class="o">=</span> <span class="n">extract_video_frames_uniformly</span><span class="p">(</span><span class="n">cut_inp_container</span><span class="p">,</span> <span class="n">frame_num</span><span class="o">=</span><span class="n">frame_num</span><span class="p">)</span>
             <span class="n">all_frames</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">key_frames</span><span class="p">)</span>
             <span class="n">close_video</span><span class="p">(</span><span class="n">cut_inp_container</span><span class="p">)</span>
 
@@ -1053,16 +1041,20 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_video</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">):</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">input_video</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported type of input_video. Should be one of &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[str, av.container.InputContainer], but given &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_video</span><span class="p">)</span><span class="si">}</span><span class="s1">].&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unsupported type of input_video. Should be one of &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[str, av.container.InputContainer], but given &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_video</span><span class="p">)</span><span class="si">}</span><span class="s2">].&quot;</span>
+        <span class="p">)</span>
 
     <span class="n">input_video_stream</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">video</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">total_frame_num</span> <span class="o">=</span> <span class="n">input_video_stream</span><span class="o">.</span><span class="n">frames</span>
     <span class="k">if</span> <span class="n">total_frame_num</span> <span class="o">&lt;</span> <span class="n">frame_num</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Number of frames to be extracted is larger than the &#39;</span>
-                       <span class="s1">&#39;total number of frames in this video. Set it to the &#39;</span>
-                       <span class="s1">&#39;total number of frames.&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Number of frames to be extracted is larger than the &quot;</span>
+            <span class="s2">&quot;total number of frames in this video. Set it to the &quot;</span>
+            <span class="s2">&quot;total number of frames.&quot;</span>
+        <span class="p">)</span>
         <span class="n">frame_num</span> <span class="o">=</span> <span class="n">total_frame_num</span>
     <span class="c1"># calculate the frame seconds to be extracted</span>
     <span class="n">duration</span> <span class="o">=</span> <span class="n">input_video_stream</span><span class="o">.</span><span class="n">duration</span> <span class="o">*</span> <span class="n">input_video_stream</span><span class="o">.</span><span class="n">time_base</span>
@@ -1186,14 +1178,18 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_video</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">):</span>
         <span class="n">input_container</span> <span class="o">=</span> <span class="n">input_video</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported type of input_video. Should be one of &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[str, av.container.InputContainer], but given &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_video</span><span class="p">)</span><span class="si">}</span><span class="s1">].&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unsupported type of input_video. Should be one of &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[str, av.container.InputContainer], but given &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_video</span><span class="p">)</span><span class="si">}</span><span class="s2">].&quot;</span>
+        <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">output_audio</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">output_audio</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;mp3&#39;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Now we only support export the audios into `mp3` &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;format, but given &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">output_audio</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">output_audio</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">output_audio</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;mp3&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Now we only support export the audios into `mp3` &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;format, but given &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">output_audio</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
     <span class="c1"># no audios in the video</span>
     <span class="n">num_audio_streams</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_container</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">audio</span><span class="p">)</span>
@@ -1203,9 +1199,7 @@
         <span class="n">valid_stream_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">stream_indexes</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># remove indexes that are larger than the total number of audio streams</span>
-        <span class="n">valid_stream_indexes</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">stream_indexes</span> <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="n">num_audio_streams</span>
-        <span class="p">]</span>
+        <span class="n">valid_stream_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">stream_indexes</span> <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="n">num_audio_streams</span><span class="p">]</span>
     <span class="c1"># no valid expected audio streams</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_stream_indexes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[],</span> <span class="p">[],</span> <span class="n">valid_stream_indexes</span>
@@ -1216,19 +1210,17 @@
         <span class="c1"># read the current audio stream</span>
         <span class="n">input_audio_stream</span> <span class="o">=</span> <span class="n">input_container</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">audio</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
         <span class="c1"># get the sampling rate</span>
-        <span class="n">audio_sampling_rate_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span>
-                                              <span class="n">input_audio_stream</span><span class="o">.</span><span class="n">time_base</span><span class="p">))</span>
+        <span class="n">audio_sampling_rate_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">input_audio_stream</span><span class="o">.</span><span class="n">time_base</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">output_audio</span><span class="p">:</span>
             <span class="c1"># if the output_audio is not None, prepare the output audio file</span>
-            <span class="n">this_output_audio</span> <span class="o">=</span> <span class="n">add_suffix_to_filename</span><span class="p">(</span><span class="n">output_audio</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">output_container</span> <span class="o">=</span> <span class="n">load_video</span><span class="p">(</span><span class="n">this_output_audio</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-            <span class="n">output_stream</span> <span class="o">=</span> <span class="n">output_container</span><span class="o">.</span><span class="n">add_stream</span><span class="p">(</span><span class="s1">&#39;mp3&#39;</span><span class="p">)</span>
+            <span class="n">this_output_audio</span> <span class="o">=</span> <span class="n">add_suffix_to_filename</span><span class="p">(</span><span class="n">output_audio</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">output_container</span> <span class="o">=</span> <span class="n">load_video</span><span class="p">(</span><span class="n">this_output_audio</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+            <span class="n">output_stream</span> <span class="o">=</span> <span class="n">output_container</span><span class="o">.</span><span class="n">add_stream</span><span class="p">(</span><span class="s2">&quot;mp3&quot;</span><span class="p">)</span>
 
         <span class="c1"># get the start/end pts</span>
         <span class="n">start_pts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start_seconds</span> <span class="o">/</span> <span class="n">input_audio_stream</span><span class="o">.</span><span class="n">time_base</span><span class="p">)</span>
-        <span class="n">end_pts</span> <span class="o">=</span> <span class="p">(</span><span class="n">end_seconds</span> <span class="o">/</span>
-                   <span class="n">input_audio_stream</span><span class="o">.</span><span class="n">time_base</span> <span class="k">if</span> <span class="n">end_seconds</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">end_pts</span> <span class="o">=</span> <span class="n">end_seconds</span> <span class="o">/</span> <span class="n">input_audio_stream</span><span class="o">.</span><span class="n">time_base</span> <span class="k">if</span> <span class="n">end_seconds</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="n">audio_data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">input_container</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">input_audio_stream</span><span class="p">):</span>
@@ -1272,65 +1264,63 @@
     <span class="n">numbers_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">char</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">size</span> <span class="k">if</span> <span class="n">char</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()]</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">numbers_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Your input `size` does not contain numbers: </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Your input `size` does not contain numbers: </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="n">size_numbers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">numbers_list</span><span class="p">)))</span>
+    <span class="n">size_numbers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">numbers_list</span><span class="p">)))</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">alphabets_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># by default, if users do not specify the units, the number will be</span>
         <span class="c1"># regarded as in bytes</span>
         <span class="k">return</span> <span class="n">size_numbers</span>
 
-    <span class="n">suffix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">alphabets_list</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">alphabets_list</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;kb&#39;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;kib&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;kb&quot;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;kib&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">size_numbers</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span>
-    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;mb&#39;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;mib&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;mb&quot;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;mib&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">size_numbers</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span>
-    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;gb&#39;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;gib&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;gb&quot;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;gib&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">size_numbers</span> <span class="o">&lt;&lt;</span> <span class="mi">30</span>
-    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;tb&#39;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;tib&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;tb&quot;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;tib&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">size_numbers</span> <span class="o">&lt;&lt;</span> <span class="mi">40</span>
-    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;pb&#39;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;pib&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;pb&quot;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;pib&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">size_numbers</span> <span class="o">&lt;&lt;</span> <span class="mi">50</span>
-    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;eb&#39;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;eib&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;eb&quot;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;eib&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">size_numbers</span> <span class="o">&lt;&lt;</span> <span class="mi">60</span>
-    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;zb&#39;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;zib&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;zb&quot;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;zib&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">size_numbers</span> <span class="o">&lt;&lt;</span> <span class="mi">70</span>
-    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;yb&#39;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;yib&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;yb&quot;</span> <span class="ow">or</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;yib&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">size_numbers</span> <span class="o">&lt;&lt;</span> <span class="mi">80</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;You specified unidentifiable unit: </span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s1">, &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;expected in [KB, MB, GB, TB, PB, EB, ZB, YB, &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;KiB, MiB, GiB, TiB, PiB, EiB, ZiB, YiB], &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;(case insensitive, counted by *Bytes*).&#39;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;You specified unidentifiable unit: </span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;expected in [KB, MB, GB, TB, PB, EB, ZB, YB, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;KiB, MiB, GiB, TiB, PiB, EiB, ZiB, YiB], &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;(case insensitive, counted by *Bytes*).&quot;</span>
+        <span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="insert_texts_after_placeholders">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.insert_texts_after_placeholders">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">insert_texts_after_placeholders</span><span class="p">(</span><span class="n">original_string</span><span class="p">,</span>
-                                    <span class="n">placeholders</span><span class="p">,</span>
-                                    <span class="n">new_texts</span><span class="p">,</span>
-                                    <span class="n">delimiter_in_insert_pos</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">insert_texts_after_placeholders</span><span class="p">(</span><span class="n">original_string</span><span class="p">,</span> <span class="n">placeholders</span><span class="p">,</span> <span class="n">new_texts</span><span class="p">,</span> <span class="n">delimiter_in_insert_pos</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholders</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_texts</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s1">&#39;The number of placeholders and new_texts must be equal&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of placeholders and new_texts must be equal&quot;</span><span class="p">)</span>
 
     <span class="n">modified_string</span> <span class="o">=</span> <span class="n">original_string</span>
     <span class="k">for</span> <span class="n">placeholder</span><span class="p">,</span> <span class="n">new_text</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">placeholders</span><span class="p">,</span> <span class="n">new_texts</span><span class="p">):</span>
         <span class="c1"># Find the index of the next occurrence of the placeholder</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">modified_string</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Placeholder &#39;</span><span class="si">{</span><span class="n">placeholder</span><span class="si">}</span><span class="s2">&#39; not found in the string&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Placeholder &#39;</span><span class="si">{</span><span class="n">placeholder</span><span class="si">}</span><span class="s2">&#39; not found in the string&quot;</span><span class="p">)</span>
         <span class="c1"># Insert new_text at the found index position</span>
-        <span class="n">modified_string</span> <span class="o">=</span> \
-            <span class="n">modified_string</span><span class="p">[:</span><span class="n">index</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)]</span> <span class="o">+</span> \
-            <span class="n">delimiter_in_insert_pos</span> <span class="o">+</span> \
-            <span class="n">new_text</span> <span class="o">+</span> \
-            <span class="n">delimiter_in_insert_pos</span> <span class="o">+</span> \
-            <span class="n">modified_string</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholder</span><span class="p">):]</span>
+        <span class="n">modified_string</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">modified_string</span><span class="p">[:</span> <span class="n">index</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)]</span>
+            <span class="o">+</span> <span class="n">delimiter_in_insert_pos</span>
+            <span class="o">+</span> <span class="n">new_text</span>
+            <span class="o">+</span> <span class="n">delimiter_in_insert_pos</span>
+            <span class="o">+</span> <span class="n">modified_string</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span> <span class="p">:]</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">modified_string</span></div>
 
@@ -1346,7 +1336,7 @@
 <span class="sd">        format.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># parse the timecode string</span>
-    <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">timecode</span><span class="p">,</span> <span class="s1">&#39;%H:%M:%S.</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">timecode</span><span class="p">,</span> <span class="s2">&quot;%H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># compute the start/end time in second</span>
     <span class="n">pts</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="mi">3600</span> <span class="o">+</span> <span class="n">dt</span><span class="o">.</span><span class="n">minute</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">dt</span><span class="o">.</span><span class="n">second</span> <span class="o">+</span> <span class="n">dt</span><span class="o">.</span><span class="n">microsecond</span> <span class="o">/</span> <span class="mf">1e6</span>
@@ -1356,7 +1346,7 @@
 
 <div class="viewcode-block" id="parse_string_to_roi">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.parse_string_to_roi">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">parse_string_to_roi</span><span class="p">(</span><span class="n">roi_string</span><span class="p">,</span> <span class="n">roi_type</span><span class="o">=</span><span class="s1">&#39;pixel&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_string_to_roi</span><span class="p">(</span><span class="n">roi_string</span><span class="p">,</span> <span class="n">roi_type</span><span class="o">=</span><span class="s2">&quot;pixel&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a roi string to four number x1, y1, x2, y2 stand for the region.</span>
 <span class="sd">    When the type is &#39;pixel&#39;, (x1, y1), (x2, y2) are the locations of pixels</span>
@@ -1371,23 +1361,24 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">roi_string</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^\s*[\[\(]?\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*[\]\)]?\s*$&#39;</span>  <span class="c1"># noqa: E501</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^\s*[\[\(]?\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*[\]\)]?\s*$&quot;</span>  <span class="c1"># noqa: E501</span>
 
     <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">roi_string</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">roi_type</span> <span class="o">==</span> <span class="s1">&#39;pixel&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">roi_type</span> <span class="o">==</span> <span class="s2">&quot;pixel&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num</span><span class="p">)</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">())</span>
-        <span class="k">elif</span> <span class="n">roi_type</span> <span class="o">==</span> <span class="s1">&#39;ratio&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">roi_type</span> <span class="o">==</span> <span class="s2">&quot;ratio&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">num</span><span class="p">))</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">())</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;The roi_type must be &quot;pixel&quot; or &quot;ratio&quot;.&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s1">&#39;The roi_string must be four no negative numbers in the &#39;</span>
+            <span class="s2">&quot;The roi_string must be four no negative numbers in the &quot;</span>
             <span class="s1">&#39;format of &quot;x1, y1, x2, y2&quot;, &quot;(x1, y1, x2, y2)&quot;, or &#39;</span>
-            <span class="s1">&#39;&quot;[x1, y1, x2, y2]&quot;.&#39;</span><span class="p">)</span>
+            <span class="s1">&#39;&quot;[x1, y1, x2, y2]&quot;.&#39;</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 

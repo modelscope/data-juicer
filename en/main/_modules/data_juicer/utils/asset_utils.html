@@ -368,12 +368,8 @@
 
 <span class="c1"># Default cached assets links for downloading</span>
 <span class="n">ASSET_LINKS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;flagged_words&#39;</span><span class="p">:</span>
-    <span class="s1">&#39;https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/&#39;</span>
-    <span class="s1">&#39;data_juicer/flagged_words.json&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;stopwords&#39;</span><span class="p">:</span>
-    <span class="s1">&#39;https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/&#39;</span>
-    <span class="s1">&#39;data_juicer/stopwords.json&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;flagged_words&quot;</span><span class="p">:</span> <span class="s2">&quot;https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/&quot;</span> <span class="s2">&quot;data_juicer/flagged_words.json&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;stopwords&quot;</span><span class="p">:</span> <span class="s2">&quot;https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/&quot;</span> <span class="s2">&quot;data_juicer/stopwords.json&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -394,8 +390,8 @@
 
     <span class="c1"># try to load words from `words_type` file</span>
     <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">words_dir</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.json&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">words_type</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">words_type</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
                 <span class="n">loaded_words</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loaded_words</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">words_dict</span><span class="p">:</span>
@@ -404,16 +400,18 @@
                         <span class="n">words_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">loaded_words</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="c1"># if the asset file is not found, then download it from ASSET_LINKS</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">words_dict</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Specified </span><span class="si">{</span><span class="n">words_dir</span><span class="si">}</span><span class="s1"> does not contain &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;any </span><span class="si">{</span><span class="n">words_type</span><span class="si">}</span><span class="s1"> files in json format, now &#39;</span>
-                    <span class="s1">&#39;download the one cached by data_juicer team&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Specified </span><span class="si">{</span><span class="n">words_dir</span><span class="si">}</span><span class="s2"> does not contain &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;any </span><span class="si">{</span><span class="n">words_type</span><span class="si">}</span><span class="s2"> files in json format, now &quot;</span>
+            <span class="s2">&quot;download the one cached by data_juicer team&quot;</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">words_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ASSET_LINKS</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">words_type</span><span class="si">}</span><span class="s1"> is not in remote server.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">words_type</span><span class="si">}</span><span class="s2"> is not in remote server.&quot;</span><span class="p">)</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ASSET_LINKS</span><span class="p">[</span><span class="n">words_type</span><span class="p">])</span>
         <span class="n">words_dict</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="c1"># cache the asset file locally</span>
-        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">words_type</span><span class="si">}</span><span class="s1">.json&#39;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">words_type</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">words_dict</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">words_dict</span></div>

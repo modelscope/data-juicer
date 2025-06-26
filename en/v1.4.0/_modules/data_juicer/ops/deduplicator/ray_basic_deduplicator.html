@@ -353,8 +353,8 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">Filter</span>
 
-<span class="n">ray</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;ray&#39;</span><span class="p">)</span>
-<span class="n">redis</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;redis&#39;</span><span class="p">)</span>
+<span class="n">ray</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;ray&quot;</span><span class="p">)</span>
+<span class="n">redis</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;redis&quot;</span><span class="p">)</span>
 
 <span class="n">MERSENNE_PRIME</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">61</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 
@@ -362,7 +362,6 @@
 <div class="viewcode-block" id="DedupSet">
 <a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_basic_deduplicator.DedupSet">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DedupSet</span><span class="p">:</span>
-
 <div class="viewcode-block" id="DedupSet.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_basic_deduplicator.DedupSet.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -385,7 +384,7 @@
 <a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_basic_deduplicator.get_remote_dedup_set">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_remote_dedup_set</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the remote version of DedupSet with Ray decorator applied at runtime.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">scheduling_strategy</span><span class="o">=</span><span class="s1">&#39;SPREAD&#39;</span><span class="p">)(</span><span class="n">DedupSet</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">scheduling_strategy</span><span class="o">=</span><span class="s2">&quot;SPREAD&quot;</span><span class="p">)(</span><span class="n">DedupSet</span><span class="p">)</span></div>
 
 
 
@@ -425,19 +424,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dedup_set_num</span> <span class="o">=</span> <span class="n">dedup_set_num</span>
         <span class="k">if</span> <span class="n">RemoteDedupSet</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">RemoteDedupSet</span> <span class="o">=</span> <span class="n">get_remote_dedup_set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dedup_sets</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">RemoteDedupSet</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dedup_set_num</span><span class="p">)</span>
-        <span class="p">]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dedup_sets</span> <span class="o">=</span> <span class="p">[</span><span class="n">RemoteDedupSet</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dedup_set_num</span><span class="p">)]</span></div>
 
 
 <div class="viewcode-block" id="ActorBackend.is_unique">
 <a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_basic_deduplicator.ActorBackend.is_unique">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">md5_value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">dedup_set_id</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span>
-            <span class="n">md5_value</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span>
-            <span class="n">byteorder</span><span class="o">=</span><span class="s1">&#39;little&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="n">MERSENNE_PRIME</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dedup_set_num</span>
-        <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dedup_sets</span><span class="p">[</span><span class="n">dedup_set_id</span><span class="p">]</span><span class="o">.</span><span class="n">is_unique</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">md5_value</span><span class="p">))</span></div>
+        <span class="n">dedup_set_id</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">md5_value</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">byteorder</span><span class="o">=</span><span class="s2">&quot;little&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">MERSENNE_PRIME</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dedup_set_num</span>
+        <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dedup_sets</span><span class="p">[</span><span class="n">dedup_set_id</span><span class="p">]</span><span class="o">.</span><span class="n">is_unique</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">md5_value</span><span class="p">))</span></div>
 </div>
 
 
@@ -475,15 +469,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># TODO: Set a more reasonable value</span>
-    <span class="n">EMPTY_HASH_VALUE</span> <span class="o">=</span> <span class="s1">&#39;EMPTY&#39;</span>
+    <span class="n">EMPTY_HASH_VALUE</span> <span class="o">=</span> <span class="s2">&quot;EMPTY&quot;</span>
 
 <div class="viewcode-block" id="RayBasicDeduplicator.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_basic_deduplicator.RayBasicDeduplicator.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ray_actor&#39;</span><span class="p">,</span>
-                 <span class="n">redis_address</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;redis://localhost:6379&#39;</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ray_actor&quot;</span><span class="p">,</span> <span class="n">redis_address</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;redis://localhost:6379&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization.</span>
 <span class="sd">        :param backend: the backend for dedup, either &#39;ray_actor&#39; or &#39;redis&#39;</span>
@@ -494,15 +484,15 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">redis_address</span> <span class="o">=</span> <span class="n">redis_address</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
-        <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;ray_actor&#39;</span><span class="p">:</span>
-            <span class="n">dedup_set_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">cluster_resources</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CPU&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;ray_actor&quot;</span><span class="p">:</span>
+            <span class="n">dedup_set_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">cluster_resources</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CPU&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">ActorBackend</span><span class="p">(</span><span class="n">dedup_set_num</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;redis&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;redis&quot;</span><span class="p">:</span>
             <span class="c1"># TODO: add a barrier to ensure that flushdb is performed before</span>
             <span class="c1"># the operator is called</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">RedisBackend</span><span class="p">(</span><span class="n">redis_address</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown backend: </span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown backend: </span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RayBasicDeduplicator.calculate_hash">

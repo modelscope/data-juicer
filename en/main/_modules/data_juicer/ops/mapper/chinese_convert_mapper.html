@@ -359,9 +359,9 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
 
-<span class="n">opencc</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;opencc&#39;</span><span class="p">)</span>
+<span class="n">opencc</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;opencc&quot;</span><span class="p">)</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;chinese_convert_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;chinese_convert_mapper&quot;</span>
 
 <span class="n">OPENCC_CONVERTER</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -369,7 +369,7 @@
 <div class="viewcode-block" id="prepare_converter">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.chinese_convert_mapper.prepare_converter">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_converter</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
-    <span class="n">mode_path</span> <span class="o">=</span> <span class="n">mode</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
+    <span class="n">mode_path</span> <span class="o">=</span> <span class="n">mode</span> <span class="o">+</span> <span class="s2">&quot;.json&quot;</span>
     <span class="k">global</span> <span class="n">OPENCC_CONVERTER</span>
     <span class="k">if</span> <span class="n">OPENCC_CONVERTER</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># empty converter</span>
@@ -392,7 +392,7 @@
 
 <div class="viewcode-block" id="ChineseConvertMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.chinese_convert_mapper.ChineseConvertMapper.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;s2t&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;s2t&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -439,11 +439,22 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">mode_list</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s1">&#39;s2t&#39;</span><span class="p">,</span> <span class="s1">&#39;t2s&#39;</span><span class="p">,</span> <span class="s1">&#39;s2tw&#39;</span><span class="p">,</span> <span class="s1">&#39;tw2s&#39;</span><span class="p">,</span> <span class="s1">&#39;s2hk&#39;</span><span class="p">,</span> <span class="s1">&#39;hk2s&#39;</span><span class="p">,</span> <span class="s1">&#39;s2twp&#39;</span><span class="p">,</span> <span class="s1">&#39;tw2sp&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;t2tw&#39;</span><span class="p">,</span> <span class="s1">&#39;tw2t&#39;</span><span class="p">,</span> <span class="s1">&#39;hk2t&#39;</span><span class="p">,</span> <span class="s1">&#39;t2hk&#39;</span><span class="p">,</span> <span class="s1">&#39;t2jp&#39;</span><span class="p">,</span> <span class="s1">&#39;jp2t&#39;</span>
+            <span class="s2">&quot;s2t&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;t2s&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;s2tw&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tw2s&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;s2hk&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hk2s&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;s2twp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tw2sp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;t2tw&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tw2t&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hk2t&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;t2hk&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;t2jp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;jp2t&quot;</span><span class="p">,</span>
         <span class="p">]</span>
-        <span class="k">assert</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">mode_list</span><span class="p">,</span> <span class="s1">&#39;Please make sure mode is one of </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">mode_list</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">mode_list</span><span class="p">,</span> <span class="s2">&quot;Please make sure mode is one of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode_list</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
         <span class="n">prepare_converter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span></div>
 
@@ -453,9 +464,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="n">prepare_converter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
 
-        <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">OPENCC_CONVERTER</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
-        <span class="p">]</span>
+        <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">OPENCC_CONVERTER</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]]</span>
         <span class="k">return</span> <span class="n">samples</span></div>
 </div>
 

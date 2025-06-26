@@ -353,9 +353,9 @@
 
 <div class="viewcode-block" id="NaiveGrouper">
 <a class="viewcode-back" href="../../../../data_juicer.ops.grouper.html#data_juicer.ops.grouper.naive_grouper.NaiveGrouper">[文档]</a>
-<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s1">&#39;naive_grouper&#39;</span><span class="p">)</span>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;naive_grouper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">NaiveGrouper</span><span class="p">(</span><span class="n">Grouper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Group all samples to one batched sample. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Group all samples to one batched sample.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="NaiveGrouper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.grouper.html#data_juicer.ops.grouper.naive_grouper.NaiveGrouper.__init__">[文档]</a>
@@ -372,7 +372,6 @@
 <div class="viewcode-block" id="NaiveGrouper.process">
 <a class="viewcode-back" href="../../../../data_juicer.ops.grouper.html#data_juicer.ops.grouper.naive_grouper.NaiveGrouper.process">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
-
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">dataset</span>
 

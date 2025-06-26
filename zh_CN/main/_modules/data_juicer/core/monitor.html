@@ -362,9 +362,12 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_context</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.resource_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">get_cpu_count</span><span class="p">,</span>
-                                              <span class="n">get_cpu_utilization</span><span class="p">,</span>
-                                              <span class="n">query_cuda_info</span><span class="p">,</span> <span class="n">query_mem_info</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.resource_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_cpu_count</span><span class="p">,</span>
+    <span class="n">get_cpu_utilization</span><span class="p">,</span>
+    <span class="n">query_cuda_info</span><span class="p">,</span>
+    <span class="n">query_mem_info</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="resource_monitor">
@@ -377,14 +380,14 @@
         <span class="n">this_states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Monitor</span><span class="o">.</span><span class="n">monitor_current_resources</span><span class="p">())</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">stop_sign</span> <span class="o">=</span> <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;stop&#39;</span><span class="p">]</span>
+            <span class="n">stop_sign</span> <span class="o">=</span> <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;stop&quot;</span><span class="p">]</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">BrokenPipeError</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">):</span>
             <span class="c1"># mdict crushes due to the main process is terminated already,</span>
             <span class="c1"># which is not the fault here</span>
             <span class="k">return</span>
         <span class="k">if</span> <span class="n">stop_sign</span><span class="p">:</span>
             <span class="k">break</span>
-    <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;resource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">this_states</span></div>
+    <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;resource&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">this_states</span></div>
 
 
 
@@ -438,14 +441,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">DYNAMIC_FIELDS</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;CPU util.&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Used mem.&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Free mem.&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Available mem.&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Mem. util.&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;GPU free mem.&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;GPU used mem.&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;GPU util.&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;CPU util.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Used mem.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Free mem.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Available mem.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mem. util.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;GPU free mem.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;GPU used mem.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;GPU util.&quot;</span><span class="p">,</span>
     <span class="p">}</span>
 
 <div class="viewcode-block" id="Monitor.__init__">
@@ -475,27 +478,24 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">resource_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="c1"># current time</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
         <span class="c1"># CPU</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;CPU count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_cpu_count</span><span class="p">()</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;CPU util.&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_cpu_utilization</span><span class="p">()</span> <span class="o">/</span> <span class="mf">100.0</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;Total mem.&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_mem_info</span><span class="p">(</span><span class="s1">&#39;total&#39;</span><span class="p">)</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;Used mem.&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_mem_info</span><span class="p">(</span><span class="s1">&#39;used&#39;</span><span class="p">)</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;Free mem.&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_mem_info</span><span class="p">(</span><span class="s1">&#39;free&#39;</span><span class="p">)</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;Available mem.&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_mem_info</span><span class="p">(</span><span class="s1">&#39;available&#39;</span><span class="p">)</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;Mem. util.&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">resource_dict</span><span class="p">[</span>
-            <span class="s1">&#39;Used mem.&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;Total mem.&#39;</span><span class="p">]</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;CPU count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_cpu_count</span><span class="p">()</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;CPU util.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_cpu_utilization</span><span class="p">()</span> <span class="o">/</span> <span class="mf">100.0</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;Total mem.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_mem_info</span><span class="p">(</span><span class="s2">&quot;total&quot;</span><span class="p">)</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;Used mem.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_mem_info</span><span class="p">(</span><span class="s2">&quot;used&quot;</span><span class="p">)</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;Free mem.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_mem_info</span><span class="p">(</span><span class="s2">&quot;free&quot;</span><span class="p">)</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;Available mem.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_mem_info</span><span class="p">(</span><span class="s2">&quot;available&quot;</span><span class="p">)</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;Mem. util.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;Used mem.&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;Total mem.&quot;</span><span class="p">]</span>
 
         <span class="c1"># GPU</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;GPU total mem.&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_cuda_info</span><span class="p">(</span><span class="s1">&#39;memory.total&#39;</span><span class="p">)</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;GPU free mem.&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_cuda_info</span><span class="p">(</span><span class="s1">&#39;memory.free&#39;</span><span class="p">)</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;GPU used mem.&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_cuda_info</span><span class="p">(</span><span class="s1">&#39;memory.used&#39;</span><span class="p">)</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;GPU util.&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_cuda_info</span><span class="p">(</span><span class="s1">&#39;utilization.gpu&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;GPU util.&#39;</span><span class="p">]:</span>
-            <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;GPU util.&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">x</span> <span class="o">/</span> <span class="mf">100.0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">resource_dict</span><span class="p">[</span><span class="s1">&#39;GPU util.&#39;</span><span class="p">]</span>
-            <span class="p">]</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;GPU total mem.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_cuda_info</span><span class="p">(</span><span class="s2">&quot;memory.total&quot;</span><span class="p">)</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;GPU free mem.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_cuda_info</span><span class="p">(</span><span class="s2">&quot;memory.free&quot;</span><span class="p">)</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;GPU used mem.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_cuda_info</span><span class="p">(</span><span class="s2">&quot;memory.used&quot;</span><span class="p">)</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;GPU util.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_cuda_info</span><span class="p">(</span><span class="s2">&quot;utilization.gpu&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;GPU util.&quot;</span><span class="p">]:</span>
+            <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;GPU util.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">/</span> <span class="mf">100.0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;GPU util.&quot;</span><span class="p">]]</span>
 
         <span class="k">return</span> <span class="n">resource_dict</span></div>
 
@@ -507,20 +507,19 @@
         <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
         <span class="c1"># avoid error when running on not-main process/thread</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">switch_backend</span><span class="p">(</span><span class="s1">&#39;agg&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">switch_backend</span><span class="p">(</span><span class="s2">&quot;agg&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">resource_util_dict</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">resource_util_list</span><span class="p">):</span>
-            <span class="n">resource_list</span> <span class="o">=</span> <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;resource&#39;</span><span class="p">]</span>
-            <span class="n">interval</span> <span class="o">=</span> <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;sampling interval&#39;</span><span class="p">]</span>
+            <span class="n">resource_list</span> <span class="o">=</span> <span class="n">resource_util_dict</span><span class="p">[</span><span class="s2">&quot;resource&quot;</span><span class="p">]</span>
+            <span class="n">interval</span> <span class="o">=</span> <span class="n">resource_util_dict</span><span class="p">[</span><span class="s2">&quot;sampling interval&quot;</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">focus_metric</span> <span class="ow">in</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">DYNAMIC_FIELDS</span><span class="p">:</span>
                 <span class="n">fn</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;func_</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">focus_metric</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">.jpg&#39;</span>
-                <span class="n">ylbl</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="k">if</span> <span class="n">focus_metric</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;util.&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;MB&#39;</span>
+                <span class="n">ylbl</span> <span class="o">=</span> <span class="s2">&quot;%&quot;</span> <span class="k">if</span> <span class="n">focus_metric</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;util.&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;MB&quot;</span>
                 <span class="n">metric_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="n">focus_metric</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">resource_list</span><span class="p">]</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="n">interval</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">metric_list</span><span class="p">))],</span>
-                         <span class="n">metric_list</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="n">interval</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">metric_list</span><span class="p">))],</span> <span class="n">metric_list</span><span class="p">)</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">focus_metric</span><span class="p">)</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time (s)&quot;</span><span class="p">)</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">ylbl</span><span class="p">)</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">store_dir</span><span class="p">,</span> <span class="n">fn</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">store_dir</span><span class="p">,</span> <span class="n">fn</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span></div>
 
 
@@ -548,7 +547,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">analysis_res</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">record_list</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;resource&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">resource_util_dict</span><span class="p">[</span><span class="s2">&quot;resource&quot;</span><span class="p">]:</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">DYNAMIC_FIELDS</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">record</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">record</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -561,11 +560,11 @@
         <span class="c1"># analyze the max, min, and avg</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">record_list</span><span class="p">:</span>
             <span class="n">analysis_res</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="n">record_list</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span>
-                <span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">record_list</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span>
-                <span class="s1">&#39;avg&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">record_list</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">record_list</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span>
+                <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="n">record_list</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span>
+                <span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">record_list</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span>
+                <span class="s2">&quot;avg&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">record_list</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">record_list</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span>
             <span class="p">}</span>
-        <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;resource_analysis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">analysis_res</span>
+        <span class="n">resource_util_dict</span><span class="p">[</span><span class="s2">&quot;resource_analysis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">analysis_res</span>
 
         <span class="k">return</span> <span class="n">resource_util_dict</span></div>
 
@@ -598,18 +597,20 @@
         <span class="n">resource_util_dict</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="c1"># start monitor</span>
-        <span class="n">start_method</span> <span class="o">=</span> <span class="s1">&#39;fork&#39;</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>  <span class="c1"># for Windows</span>
-            <span class="n">start_method</span> <span class="o">=</span> <span class="s1">&#39;spawn&#39;</span>
+        <span class="n">start_method</span> <span class="o">=</span> <span class="s2">&quot;fork&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;nt&quot;</span><span class="p">:</span>  <span class="c1"># for Windows</span>
+            <span class="n">start_method</span> <span class="o">=</span> <span class="s2">&quot;spawn&quot;</span>
         <span class="n">ctx</span> <span class="o">=</span> <span class="n">get_context</span><span class="p">(</span><span class="n">start_method</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">ctx</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span> <span class="k">as</span> <span class="n">manager</span><span class="p">:</span>
             <span class="n">mdict</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
-            <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;stop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">monitor_proc</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">resource_monitor</span><span class="p">,</span>
-                                       <span class="n">args</span><span class="o">=</span><span class="p">(</span>
-                                           <span class="n">mdict</span><span class="p">,</span>
-                                           <span class="n">sample_interval</span><span class="p">,</span>
-                                       <span class="p">))</span>
+            <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;stop&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">monitor_proc</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span>
+                <span class="n">target</span><span class="o">=</span><span class="n">resource_monitor</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">mdict</span><span class="p">,</span>
+                    <span class="n">sample_interval</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
             <span class="n">monitor_proc</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="c1"># start timer</span>
             <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -621,16 +622,16 @@
             <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
             <span class="c1"># stop monitor</span>
-            <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;stop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;stop&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">monitor_proc</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 
-            <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;resource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;resource&#39;</span><span class="p">]</span>
+            <span class="n">resource_util_dict</span><span class="p">[</span><span class="s2">&quot;resource&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;resource&quot;</span><span class="p">]</span>
 
             <span class="c1"># record interval</span>
-            <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;sampling interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_interval</span>
+            <span class="n">resource_util_dict</span><span class="p">[</span><span class="s2">&quot;sampling interval&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_interval</span>
 
             <span class="c1"># calculate speed</span>
-            <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+            <span class="n">resource_util_dict</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
 
         <span class="k">return</span> <span class="n">ret</span><span class="p">,</span> <span class="n">resource_util_dict</span></div>
 </div>

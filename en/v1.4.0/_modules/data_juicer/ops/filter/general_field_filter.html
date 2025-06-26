@@ -352,7 +352,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">...utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">StatsKeys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Filter</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;general_field_filter&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;general_field_filter&quot;</span>
 
 
 <div class="viewcode-block" id="GeneralFieldFilter">
@@ -366,7 +366,7 @@
 
 <div class="viewcode-block" id="GeneralFieldFilter.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.general_field_filter.GeneralFieldFilter.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_condition</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_condition</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 <span class="sd">        :param filter_condition: The filter condition as a string.</span>
@@ -378,18 +378,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ast_tree</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">Expression</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">filter_condition</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">ast_tree</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filter_condition</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;eval&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ast_tree</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filter_condition</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;eval&quot;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">SyntaxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Invalid filter condition: </span><span class="si">{</span><span class="n">filter_condition</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid filter condition: </span><span class="si">{</span><span class="n">filter_condition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
 
 
 <div class="viewcode-block" id="GeneralFieldFilter.compute_stats_single">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.general_field_filter.GeneralFieldFilter.compute_stats_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_condition</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_condition</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span>
-                <span class="ow">or</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">general_field_filter_condition</span>
-                <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_condition</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_condition</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span>
+            <span class="ow">or</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">general_field_filter_condition</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]</span>
+        <span class="p">):</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="n">transformer</span> <span class="o">=</span> <span class="n">ExpressionTransformer</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
@@ -402,9 +403,7 @@
 <div class="viewcode-block" id="GeneralFieldFilter.process_single">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.general_field_filter.GeneralFieldFilter.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span>
-                          <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">general_field_filter_condition</span><span class="p">,</span>
-                                  <span class="kc">True</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">general_field_filter_condition</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
 </div>
 
 
@@ -413,18 +412,12 @@
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.general_field_filter.ExpressionTransformer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExpressionTransformer</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">NodeVisitor</span><span class="p">):</span>
     <span class="n">_COMPARE_OPERATORS</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">ast</span><span class="o">.</span><span class="n">Gt</span><span class="p">:</span>
-        <span class="k">lambda</span> <span class="n">left_operand</span><span class="p">,</span> <span class="n">right_operand</span><span class="p">:</span> <span class="n">left_operand</span> <span class="o">&gt;</span> <span class="n">right_operand</span><span class="p">,</span>
-        <span class="n">ast</span><span class="o">.</span><span class="n">Lt</span><span class="p">:</span>
-        <span class="k">lambda</span> <span class="n">left_operand</span><span class="p">,</span> <span class="n">right_operand</span><span class="p">:</span> <span class="n">left_operand</span> <span class="o">&lt;</span> <span class="n">right_operand</span><span class="p">,</span>
-        <span class="n">ast</span><span class="o">.</span><span class="n">Eq</span><span class="p">:</span>
-        <span class="k">lambda</span> <span class="n">left_operand</span><span class="p">,</span> <span class="n">right_operand</span><span class="p">:</span> <span class="n">left_operand</span> <span class="o">==</span> <span class="n">right_operand</span><span class="p">,</span>
-        <span class="n">ast</span><span class="o">.</span><span class="n">NotEq</span><span class="p">:</span>
-        <span class="k">lambda</span> <span class="n">left_operand</span><span class="p">,</span> <span class="n">right_operand</span><span class="p">:</span> <span class="n">left_operand</span> <span class="o">!=</span> <span class="n">right_operand</span><span class="p">,</span>
-        <span class="n">ast</span><span class="o">.</span><span class="n">GtE</span><span class="p">:</span>
-        <span class="k">lambda</span> <span class="n">left_operand</span><span class="p">,</span> <span class="n">right_operand</span><span class="p">:</span> <span class="n">left_operand</span> <span class="o">&gt;=</span> <span class="n">right_operand</span><span class="p">,</span>
-        <span class="n">ast</span><span class="o">.</span><span class="n">LtE</span><span class="p">:</span>
-        <span class="k">lambda</span> <span class="n">left_operand</span><span class="p">,</span> <span class="n">right_operand</span><span class="p">:</span> <span class="n">left_operand</span> <span class="o">&lt;=</span> <span class="n">right_operand</span><span class="p">,</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">Gt</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">left_operand</span><span class="p">,</span> <span class="n">right_operand</span><span class="p">:</span> <span class="n">left_operand</span> <span class="o">&gt;</span> <span class="n">right_operand</span><span class="p">,</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">Lt</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">left_operand</span><span class="p">,</span> <span class="n">right_operand</span><span class="p">:</span> <span class="n">left_operand</span> <span class="o">&lt;</span> <span class="n">right_operand</span><span class="p">,</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">Eq</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">left_operand</span><span class="p">,</span> <span class="n">right_operand</span><span class="p">:</span> <span class="n">left_operand</span> <span class="o">==</span> <span class="n">right_operand</span><span class="p">,</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">NotEq</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">left_operand</span><span class="p">,</span> <span class="n">right_operand</span><span class="p">:</span> <span class="n">left_operand</span> <span class="o">!=</span> <span class="n">right_operand</span><span class="p">,</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">GtE</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">left_operand</span><span class="p">,</span> <span class="n">right_operand</span><span class="p">:</span> <span class="n">left_operand</span> <span class="o">&gt;=</span> <span class="n">right_operand</span><span class="p">,</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">LtE</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">left_operand</span><span class="p">,</span> <span class="n">right_operand</span><span class="p">:</span> <span class="n">left_operand</span> <span class="o">&lt;=</span> <span class="n">right_operand</span><span class="p">,</span>
     <span class="p">}</span>
 
 <div class="viewcode-block" id="ExpressionTransformer.__init__">
@@ -441,8 +434,7 @@
             <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Or</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;Unsupported logical operator: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported logical operator: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ExpressionTransformer.visit_Compare">
@@ -469,19 +461,18 @@
         <span class="n">op_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">op_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_COMPARE_OPERATORS</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_COMPARE_OPERATORS</span><span class="p">[</span><span class="n">op_type</span><span class="p">](</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;Unsupported comparison operator: </span><span class="si">{</span><span class="n">op_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported comparison operator: </span><span class="si">{</span><span class="n">op_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ExpressionTransformer.visit_Name">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.general_field_filter.ExpressionTransformer.visit_Name">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">visit_Name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
-            <span class="n">prefix</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+            <span class="n">prefix</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">prefix</span> <span class="o">==</span> <span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">prefix</span> <span class="o">==</span> <span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported prefix: </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported prefix: </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">)</span></div>
 
 
@@ -505,9 +496,7 @@
 <div class="viewcode-block" id="ExpressionTransformer.generic_visit">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.general_field_filter.ExpressionTransformer.generic_visit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">generic_visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">AST</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;Unsupported node type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">, details: </span><span class="si">{</span><span class="n">ast</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported node type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, details: </span><span class="si">{</span><span class="n">ast</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ExpressionTransformer.transform">

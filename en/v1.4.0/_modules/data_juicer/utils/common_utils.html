@@ -356,15 +356,15 @@
 <div class="viewcode-block" id="stats_to_number">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.common_utils.stats_to_number">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">stats_to_number</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        convert a stats value which can be string</span>
-<span class="sd">        of list to a float.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    convert a stats value which can be string</span>
+<span class="sd">    of list to a float.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">s</span> <span class="o">==</span> <span class="p">[]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;empty value&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;empty value&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">reverse</span><span class="p">:</span>
@@ -378,9 +378,9 @@
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.common_utils.dict_to_hash">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">dict_to_hash</span><span class="p">(</span><span class="n">input_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">hash_length</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        hash a dict to a string with length hash_length</span>
+<span class="sd">    hash a dict to a string with length hash_length</span>
 
-<span class="sd">        :param input_dict: the given dict</span>
+<span class="sd">    :param input_dict: the given dict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sorted_items</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
     <span class="n">dict_string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sorted_items</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
@@ -407,14 +407,14 @@
 <span class="sd">    :return: The value located at the specified path, or raises a KeyError</span>
 <span class="sd">                or IndexError if the path does not exist.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">keys</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
         <span class="c1"># Convert string keys to integers if they are numeric</span>
         <span class="n">key</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">and</span> <span class="n">digit_allowed</span> <span class="k">else</span> <span class="n">key</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unaccessible dot-separated path: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unaccessible dot-separated path: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
@@ -424,9 +424,9 @@
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.common_utils.is_string_list">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">is_string_list</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        return if the var is list of string.</span>
+<span class="sd">    return if the var is list of string.</span>
 
-<span class="sd">        :param var: input variance</span>
+<span class="sd">    :param var: input variance</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">var</span><span class="p">)</span></div>
 
@@ -434,23 +434,21 @@
 
 <div class="viewcode-block" id="avg_split_string_list_under_limit">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.common_utils.avg_split_string_list_under_limit">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">avg_split_string_list_under_limit</span><span class="p">(</span><span class="n">str_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
-                                      <span class="n">token_nums</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
-                                      <span class="n">max_token_num</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">avg_split_string_list_under_limit</span><span class="p">(</span><span class="n">str_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">token_nums</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">max_token_num</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Split the string list to several sub str_list, such that the total</span>
-<span class="sd">        token num of each sub string list is less than max_token_num, keeping</span>
-<span class="sd">        the total token nums of sub string lists are similar.</span>
+<span class="sd">    Split the string list to several sub str_list, such that the total</span>
+<span class="sd">    token num of each sub string list is less than max_token_num, keeping</span>
+<span class="sd">    the total token nums of sub string lists are similar.</span>
 
-<span class="sd">        :param str_list: input string list.</span>
-<span class="sd">        :param token_nums: token num of each string list.</span>
-<span class="sd">        :param max_token_num: max token num of each sub string list.</span>
+<span class="sd">    :param str_list: input string list.</span>
+<span class="sd">    :param token_nums: token num of each string list.</span>
+<span class="sd">    :param max_token_num: max token num of each sub string list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">max_token_num</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">str_list</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">str_list</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">token_nums</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;The length of str_list and token_nums must be equal!&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The length of str_list and token_nums must be equal!&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">str_list</span><span class="p">]</span>
 
     <span class="n">total_num</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">token_nums</span><span class="p">)</span>
@@ -464,8 +462,7 @@
     <span class="n">cur_sum</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">text</span><span class="p">,</span> <span class="n">token_num</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">str_list</span><span class="p">,</span> <span class="n">token_nums</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">token_num</span> <span class="o">&gt;</span> <span class="n">max_token_num</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s1">&#39;Token num is greater than max_token_num in one sample!&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Token num is greater than max_token_num in one sample!&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cur_sum</span> <span class="o">+</span> <span class="n">token_num</span> <span class="o">&gt;</span> <span class="n">max_token_num</span> <span class="ow">and</span> <span class="n">cur_list</span><span class="p">:</span>
             <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_list</span><span class="p">)</span>
             <span class="n">cur_list</span> <span class="o">=</span> <span class="p">[]</span>

@@ -365,16 +365,13 @@
 
 <div class="viewcode-block" id="KeyValueGrouper">
 <a class="viewcode-back" href="../../../../data_juicer.ops.grouper.html#data_juicer.ops.grouper.key_value_grouper.KeyValueGrouper">[docs]</a>
-<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s1">&#39;key_value_grouper&#39;</span><span class="p">)</span>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;key_value_grouper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">KeyValueGrouper</span><span class="p">(</span><span class="n">Grouper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Group samples to batched samples according values in given keys. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Group samples to batched samples according values in given keys.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="KeyValueGrouper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.grouper.html#data_juicer.ops.grouper.key_value_grouper.KeyValueGrouper.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">group_by_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_by_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -393,7 +390,6 @@
 <div class="viewcode-block" id="KeyValueGrouper.process">
 <a class="viewcode-back" href="../../../../data_juicer.ops.grouper.html#data_juicer.ops.grouper.key_value_grouper.KeyValueGrouper.process">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
-
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">dataset</span>
 
@@ -408,9 +404,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">sample_map</span><span class="p">[</span><span class="n">sample_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample</span><span class="p">]</span>
 
-        <span class="n">batched_samples</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">convert_list_dict_to_dict_list</span><span class="p">(</span><span class="n">sample_map</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sample_map</span>
-        <span class="p">]</span>
+        <span class="n">batched_samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">convert_list_dict_to_dict_list</span><span class="p">(</span><span class="n">sample_map</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sample_map</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">batched_samples</span></div>
 </div>

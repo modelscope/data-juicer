@@ -358,7 +358,7 @@
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops.base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops.mapper.optimize_qa_mapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizeQAMapper</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;optimize_response_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;optimize_response_mapper&quot;</span>
 
 
 <span class="c1"># TODO: Extend LLM-based OPs into API-based implementation.</span>
@@ -370,9 +370,11 @@
 <span class="sd">    Mapper to optimize response in question-answer pairs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="s1">&#39;请优化问答对中的回答，将其更加详细具体，但仍可以回答原问题。只输出优化后的回答，不要输出多余内容。&#39;</span>
+    <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;请优化问答对中的回答，将其更加详细具体，但仍可以回答原问题。只输出优化后的回答，不要输出多余内容。&quot;</span>
+    <span class="p">)</span>
 
-    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
 <div class="viewcode-block" id="OptimizeResponseMapper.parse_output">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.optimize_response_mapper.OptimizeResponseMapper.parse_output">[docs]</a>

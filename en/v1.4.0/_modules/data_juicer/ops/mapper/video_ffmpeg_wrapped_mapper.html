@@ -354,16 +354,15 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
 
-<span class="n">ffmpeg</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;ffmpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;ffmpeg-python&#39;</span><span class="p">)</span>
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;video_ffmpeg_wrapped_mapper&#39;</span>
+<span class="n">ffmpeg</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;ffmpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;ffmpeg-python&quot;</span><span class="p">)</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;video_ffmpeg_wrapped_mapper&quot;</span>
 
 
 <div class="viewcode-block" id="VideoFFmpegWrappedMapper">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper.VideoFFmpegWrappedMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoFFmpegWrappedMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple wrapper for FFmpeg video filters.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple wrapper for FFmpeg video filters.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="VideoFFmpegWrappedMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper.VideoFFmpegWrappedMapper.__init__">[docs]</a>
@@ -418,14 +417,11 @@
             <span class="k">if</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="n">processed</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="n">output_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
-                                           <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
-            <span class="n">stream</span> <span class="o">=</span> <span class="p">(</span><span class="n">ffmpeg</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">video_key</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">output_key</span><span class="p">))</span>
+            <span class="n">output_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="n">ffmpeg</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">video_key</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">output_key</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">global_args</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">global_args</span><span class="p">)</span>
-            <span class="n">stream</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">capture_stderr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">capture_stderr</span><span class="p">,</span>
-                       <span class="n">overwrite_output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">overwrite_output</span><span class="p">)</span>
+            <span class="n">stream</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">capture_stderr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">capture_stderr</span><span class="p">,</span> <span class="n">overwrite_output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">overwrite_output</span><span class="p">)</span>
             <span class="n">processed</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_key</span>
 
         <span class="c1"># when the file is modified, its source file needs to be updated.</span>

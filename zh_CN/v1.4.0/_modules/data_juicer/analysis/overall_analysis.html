@@ -402,16 +402,18 @@
 <div class="viewcode-block" id="OverallAnalysis.refine_single_column">
 <a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.overall_analysis.OverallAnalysis.refine_single_column">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">refine_single_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="s1">&#39;object&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="s2">&quot;object&quot;</span><span class="p">:</span>
             <span class="c1"># not an object, return directly</span>
             <span class="k">return</span> <span class="n">col</span>
         <span class="c1"># if the type of this column is object, we can decide the actual type</span>
         <span class="c1"># according to the first element.</span>
         <span class="n">first</span> <span class="o">=</span> <span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">first</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">supported_object_types</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There is a column of stats with type &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">first</span><span class="p">)</span><span class="si">}</span><span class="s1">], which is not supported to be &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;analyzed for now.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;There is a column of stats with type &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">first</span><span class="p">)</span><span class="si">}</span><span class="s2">], which is not supported to be &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;analyzed for now.&quot;</span>
+            <span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">first</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
             <span class="c1"># describe(include = &#39;all&#39;) can analyze the string type</span>
@@ -447,12 +449,14 @@
             <span class="n">this_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">refine_single_column</span><span class="p">(</span><span class="n">stats_and_meta</span><span class="p">[</span><span class="n">col_name</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">this_col</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">_single_column_analysis</span><span class="p">,</span>
-                                   <span class="n">kwds</span><span class="o">=</span><span class="p">{</span>
-                                       <span class="s1">&#39;col&#39;</span><span class="p">:</span> <span class="n">this_col</span><span class="p">,</span>
-                                       <span class="s1">&#39;percentiles&#39;</span><span class="p">:</span> <span class="n">percentiles</span><span class="p">,</span>
-                                       <span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-                                   <span class="p">})</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span>
+                <span class="n">_single_column_analysis</span><span class="p">,</span>
+                <span class="n">kwds</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="n">this_col</span><span class="p">,</span>
+                    <span class="s2">&quot;percentiles&quot;</span><span class="p">:</span> <span class="n">percentiles</span><span class="p">,</span>
+                    <span class="s2">&quot;include&quot;</span><span class="p">:</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
         <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
@@ -461,8 +465,8 @@
 
         <span class="c1"># export to result report file</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_export</span><span class="p">:</span>
-            <span class="n">overall</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;overall.csv&#39;</span><span class="p">))</span>
-            <span class="n">overall</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;overall.md&#39;</span><span class="p">))</span>
+            <span class="n">overall</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;overall.csv&quot;</span><span class="p">))</span>
+            <span class="n">overall</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;overall.md&quot;</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">overall</span></div>
 </div>

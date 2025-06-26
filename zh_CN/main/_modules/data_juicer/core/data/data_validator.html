@@ -388,8 +388,7 @@
 <span class="sd">            DataValidationError: If validation fails</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">DJDataset</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span>
-                <span class="s1">&#39;unsupported dataset type; must be a DJDataset&#39;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="s2">&quot;unsupported dataset type; must be a DJDataset&quot;</span><span class="p">)</span></div>
 </div>
 
 
@@ -398,6 +397,7 @@
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.data_validator.DataValidationError">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DataValidationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Custom exception for data validation errors&quot;&quot;&quot;</span>
+
     <span class="k">pass</span></div>
 
 
@@ -413,7 +413,6 @@
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.data_validator.DataValidatorRegistry.register">[文档]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">validator_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-
         <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">validator_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataValidator</span><span class="p">]):</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">_validators</span><span class="p">[</span><span class="n">validator_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">validator_class</span>
             <span class="k">return</span> <span class="n">validator_class</span>
@@ -424,8 +423,7 @@
 <div class="viewcode-block" id="DataValidatorRegistry.get_validator">
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.data_validator.DataValidatorRegistry.get_validator">[文档]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_validator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
-                      <span class="n">validator_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataValidator</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_validator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">validator_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataValidator</span><span class="p">]]:</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_validators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">validator_type</span><span class="p">)</span></div>
 </div>
 
@@ -440,9 +438,9 @@
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.data_validator.BaseConversationValidator.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">min_turns</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;min_turns&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_turns</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;max_turns&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sample_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sample_size&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_turns</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_turns&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_turns</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_turns&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sample_size&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BaseConversationValidator.validate">
@@ -467,7 +465,7 @@
 
 <div class="viewcode-block" id="SwiftMessagesValidator">
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.data_validator.SwiftMessagesValidator">[文档]</a>
-<span class="nd">@DataValidatorRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;swift_messages&#39;</span><span class="p">)</span>
+<span class="nd">@DataValidatorRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;swift_messages&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SwiftMessagesValidator</span><span class="p">(</span><span class="n">BaseConversationValidator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validator for Swift Messages conversation format.</span>
 
@@ -507,26 +505,26 @@
 <div class="viewcode-block" id="SwiftMessagesValidator.validate_conversation">
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.data_validator.SwiftMessagesValidator.validate_conversation">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate_conversation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;messages&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;messages&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="s2">&quot;Missing &#39;messages&#39; field&quot;</span><span class="p">)</span>
 
-        <span class="n">messages</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;messages&#39;</span><span class="p">]</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="s2">&quot;&#39;messages&#39; must be an array&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_turns</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_turns</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Conversation must have between </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_turns</span><span class="si">}</span><span class="s1"> and &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_turns</span><span class="si">}</span><span class="s1"> messages&#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;Conversation must have between </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_turns</span><span class="si">}</span><span class="s2"> and &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_turns</span><span class="si">}</span><span class="s2"> messages&quot;</span>
+            <span class="p">)</span>
 
         <span class="c1"># each message should have a role and content</span>
         <span class="c1"># and role should be one of system, user, assistant</span>
         <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;role&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;role&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;role&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;role&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="s2">&quot;Missing &#39;role&#39; field&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;role&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;assistant&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;role&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;assistant&quot;</span><span class="p">]:</span>
                 <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="s2">&quot;Invalid &#39;role&#39; field&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="s1">&#39;content&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;content&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="s2">&quot;Missing &#39;content&#39; field&quot;</span><span class="p">)</span></div>
 </div>
 
@@ -534,7 +532,7 @@
 
 <div class="viewcode-block" id="DataJuicerFormatValidator">
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.data_validator.DataJuicerFormatValidator">[文档]</a>
-<span class="nd">@DataValidatorRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;dj_conversation&#39;</span><span class="p">)</span>
+<span class="nd">@DataValidatorRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;dj_conversation&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DataJuicerFormatValidator</span><span class="p">(</span><span class="n">BaseConversationValidator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validator for Data-Juicer default conversation format.</span>
 
@@ -576,47 +574,44 @@
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.data_validator.DataJuicerFormatValidator.validate_conversation">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate_conversation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Validate system if present</span>
-        <span class="k">if</span> <span class="s1">&#39;system&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;system&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;system&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="s2">&quot;&#39;system&#39; must be string&quot;</span><span class="p">)</span>
 
         <span class="c1"># Validate required fields</span>
-        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;instruction&#39;</span><span class="p">,</span> <span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="s1">&#39;response&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;instruction&quot;</span><span class="p">,</span> <span class="s2">&quot;query&quot;</span><span class="p">,</span> <span class="s2">&quot;response&quot;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing &#39;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&#39; field&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">field</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&#39; must be string&quot;</span><span class="p">)</span>
 
         <span class="c1"># Validate history if present</span>
-        <span class="k">if</span> <span class="s1">&#39;history&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;history&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;history&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="s2">&quot;&#39;history&#39; must be an array&quot;</span><span class="p">)</span>
 
             <span class="c1"># Count total turns including current query/response</span>
-            <span class="n">total_turns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">total_turns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;history&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_turns</span> <span class="o">&lt;=</span> <span class="n">total_turns</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_turns</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Conversation must have between </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_turns</span><span class="si">}</span><span class="s1"> and &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_turns</span><span class="si">}</span><span class="s1"> turns including history&#39;</span><span class="p">)</span>
+                    <span class="sa">f</span><span class="s2">&quot;Conversation must have between </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_turns</span><span class="si">}</span><span class="s2"> and &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_turns</span><span class="si">}</span><span class="s2"> turns including history&quot;</span>
+                <span class="p">)</span>
 
             <span class="c1"># Validate each history turn</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">turn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">turn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;history&quot;</span><span class="p">]):</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">turn</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">turn</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s1">&#39;History turn </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1"> must be [query, response] pair&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;History turn </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> must be [query, response] pair&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">turn</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s1">&#39;Query in history turn </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1"> must be string&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query in history turn </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> must be string&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">turn</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s1">&#39;Response in history turn </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1"> must be string&#39;</span><span class="p">)</span></div>
+                    <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response in history turn </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> must be string&quot;</span><span class="p">)</span></div>
 </div>
 
 
 
 <div class="viewcode-block" id="CodeDataValidator">
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.data_validator.CodeDataValidator">[文档]</a>
-<span class="nd">@DataValidatorRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">)</span>
+<span class="nd">@DataValidatorRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;code&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CodeDataValidator</span><span class="p">(</span><span class="n">DataValidator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validator for code data&quot;&quot;&quot;</span>
 
@@ -625,8 +620,8 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">required_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">supported_languages</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;supported_languages&#39;</span><span class="p">,</span> <span class="p">[])</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">required_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;code&quot;</span><span class="p">,</span> <span class="s2">&quot;language&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supported_languages</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;supported_languages&quot;</span><span class="p">,</span> <span class="p">[])</span></div>
 
 
 <div class="viewcode-block" id="CodeDataValidator.validate">
@@ -640,7 +635,7 @@
 
 <div class="viewcode-block" id="RequiredFieldsValidator">
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.data_validator.RequiredFieldsValidator">[文档]</a>
-<span class="nd">@DataValidatorRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;required_fields&#39;</span><span class="p">)</span>
+<span class="nd">@DataValidatorRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;required_fields&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RequiredFieldsValidator</span><span class="p">(</span><span class="n">DataValidator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validator that checks for required fields in dataset.</span>
 
@@ -681,11 +676,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">required_fields</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;required_fields&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">field_types</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;field_types&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">required_fields</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;required_fields&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">field_types</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;field_types&quot;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="c1"># Default no missing allowed</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">allow_missing</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;allow_missing&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sample_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sample_size&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allow_missing</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;allow_missing&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sample_size&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RequiredFieldsValidator.validate">
@@ -707,8 +702,7 @@
 
         <span class="n">missing_fields</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">required_fields</span><span class="p">)</span> <span class="o">-</span> <span class="n">available_fields</span>
         <span class="k">if</span> <span class="n">missing_fields</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Dataset missing required fields: </span><span class="si">{</span><span class="n">missing_fields</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset missing required fields: </span><span class="si">{</span><span class="n">missing_fields</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Check field types and missing values</span>
         <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_fields</span><span class="p">:</span>
@@ -724,19 +718,18 @@
             <span class="k">if</span> <span class="n">missing_ratio</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_missing</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Field &#39;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&#39; has </span><span class="si">{</span><span class="n">missing_ratio</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2"> missing values, &quot;</span>
-                    <span class="sa">f</span><span class="s1">&#39;exceeding allowed </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_missing</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="sa">f</span><span class="s2">&quot;exceeding allowed </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_missing</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
 
             <span class="c1"># Check types if specified</span>
             <span class="k">if</span> <span class="n">expected_type</span><span class="p">:</span>
-                <span class="n">invalid_types</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sample_values</span>
-                    <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">)</span>
-                <span class="p">]</span>
+                <span class="n">invalid_types</span> <span class="o">=</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sample_values</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">)]</span>
                 <span class="k">if</span> <span class="n">invalid_types</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">DataValidationError</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Field &#39;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&#39; contains values of incorrect type. &quot;</span>
-                        <span class="sa">f</span><span class="s1">&#39;Expected </span><span class="si">{</span><span class="n">expected_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">, &#39;</span>
-                        <span class="sa">f</span><span class="s1">&#39;got </span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="vm">__name__</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">invalid_types</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+                        <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">expected_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="vm">__name__</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">invalid_types</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span></div>
 </div>
 
 </pre></div>

@@ -358,7 +358,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
 
-<span class="n">NAME</span> <span class="o">=</span> <span class="s1">&#39;video_captioning_from_summarizer_mapper&#39;</span>
+<span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;video_captioning_from_summarizer_mapper&quot;</span>
 
 
 <div class="viewcode-block" id="VideoCaptioningFromSummarizerMapper">
@@ -370,27 +370,29 @@
 <span class="sd">    texts (captions from video/audio/frames, tags from audio/frames, ...)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="VideoCaptioningFromSummarizerMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_captioning_from_summarizer_mapper.VideoCaptioningFromSummarizerMapper.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">hf_summarizer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">trust_remote_code</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">consider_video_caption_from_video</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="n">consider_video_caption_from_audio</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="n">consider_video_caption_from_frames</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="n">consider_video_tags_from_audio</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="n">consider_video_tags_from_frames</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="n">vid_cap_from_vid_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">vid_cap_from_frm_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">vid_tag_from_aud_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">vid_tag_from_frm_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">keep_tag_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-                 <span class="n">keep_original_sample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">hf_summarizer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">trust_remote_code</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">consider_video_caption_from_video</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">consider_video_caption_from_audio</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">consider_video_caption_from_frames</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">consider_video_tags_from_audio</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">consider_video_tags_from_frames</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">vid_cap_from_vid_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vid_cap_from_frm_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vid_tag_from_aud_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vid_tag_from_frm_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">keep_tag_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">keep_original_sample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -433,27 +435,32 @@
 <span class="sd">        :param args: extra args</span>
 <span class="sd">        :param kwargs: extra args</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;mem_required&#39;</span><span class="p">,</span> <span class="s1">&#39;40GB&#39;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;mem_required&quot;</span><span class="p">,</span> <span class="s2">&quot;40GB&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">LazyLoader</span><span class="o">.</span><span class="n">check_packages</span><span class="p">([</span>
-            <span class="s1">&#39;torch&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;transformers&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;transformers_stream_generator&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;einops&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;accelerate&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;tiktoken&#39;</span><span class="p">,</span>  <span class="c1"># by audio caption</span>
-            <span class="s1">&#39;torchaudio&#39;</span><span class="p">,</span>  <span class="c1"># by audio tag</span>
-        <span class="p">])</span>
+        <span class="n">LazyLoader</span><span class="o">.</span><span class="n">check_packages</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;torch&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;transformers&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;transformers_stream_generator&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;einops&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;accelerate&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;tiktoken&quot;</span><span class="p">,</span>  <span class="c1"># by audio caption</span>
+                <span class="s2">&quot;torchaudio&quot;</span><span class="p">,</span>  <span class="c1"># by audio tag</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span> <span class="o">=</span> <span class="n">keep_original_sample</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extra_args</span> <span class="o">=</span> <span class="n">kwargs</span>
 
         <span class="c1"># prepare summarizer</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_hf_summarizer</span> <span class="o">=</span> <span class="n">hf_summarizer</span> <span class="k">if</span> <span class="n">hf_summarizer</span> <span class="k">else</span> <span class="s1">&#39;mrm8488/flan-t5-large-finetuned-openai-summarize_from_feedback&#39;</span>  <span class="c1"># noqa: E501</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hf_summarizer</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">hf_summarizer</span> <span class="k">if</span> <span class="n">hf_summarizer</span> <span class="k">else</span> <span class="s2">&quot;mrm8488/flan-t5-large-finetuned-openai-summarize_from_feedback&quot;</span>
+        <span class="p">)</span>  <span class="c1"># noqa: E501</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
-            <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;huggingface&quot;</span><span class="p">,</span>
             <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hf_summarizer</span><span class="p">,</span>
-            <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">)</span>
+            <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="c1"># prepare input texts ops</span>
         <span class="k">if</span> <span class="n">vid_cap_from_vid_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -465,42 +472,54 @@
         <span class="k">if</span> <span class="n">vid_tag_from_frm_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">vid_tag_from_frm_args</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">FIXED_ARGS</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;caption_num&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s1">&#39;keep_candidate_mode&#39;</span><span class="p">:</span> <span class="s1">&#39;random_any&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;keep_original_sample&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;caption_num&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;keep_candidate_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;random_any&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;keep_original_sample&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cap_op_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tag_op_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">consider_video_caption_from_video</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">.video_captioning_from_video_mapper</span><span class="w"> </span><span class="kn">import</span> \
-                <span class="n">VideoCaptioningFromVideoMapper</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.video_captioning_from_video_mapper</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+                <span class="n">VideoCaptioningFromVideoMapper</span><span class="p">,</span>
+            <span class="p">)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">cap_op_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">VideoCaptioningFromVideoMapper</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_prepare_op_args</span><span class="p">(</span>
-                    <span class="n">VideoCaptioningFromVideoMapper</span><span class="p">,</span> <span class="n">vid_cap_from_vid_args</span><span class="p">)))</span>
+                <span class="n">VideoCaptioningFromVideoMapper</span><span class="p">(</span>
+                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_prepare_op_args</span><span class="p">(</span><span class="n">VideoCaptioningFromVideoMapper</span><span class="p">,</span> <span class="n">vid_cap_from_vid_args</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">consider_video_caption_from_audio</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">.video_captioning_from_audio_mapper</span><span class="w"> </span><span class="kn">import</span> \
-                <span class="n">VideoCaptioningFromAudioMapper</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.video_captioning_from_audio_mapper</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+                <span class="n">VideoCaptioningFromAudioMapper</span><span class="p">,</span>
+            <span class="p">)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">cap_op_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">VideoCaptioningFromAudioMapper</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_prepare_op_args</span><span class="p">(</span>
-                    <span class="n">VideoCaptioningFromAudioMapper</span><span class="p">,</span> <span class="p">{})))</span>
+                <span class="n">VideoCaptioningFromAudioMapper</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_prepare_op_args</span><span class="p">(</span><span class="n">VideoCaptioningFromAudioMapper</span><span class="p">,</span> <span class="p">{}))</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">consider_video_caption_from_frames</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">.video_captioning_from_frames_mapper</span><span class="w"> </span><span class="kn">import</span> \
-                <span class="n">VideoCaptioningFromFramesMapper</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.video_captioning_from_frames_mapper</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+                <span class="n">VideoCaptioningFromFramesMapper</span><span class="p">,</span>
+            <span class="p">)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">cap_op_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">VideoCaptioningFromFramesMapper</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_prepare_op_args</span><span class="p">(</span>
-                    <span class="n">VideoCaptioningFromFramesMapper</span><span class="p">,</span> <span class="n">vid_cap_from_frm_args</span><span class="p">)))</span>
+                <span class="n">VideoCaptioningFromFramesMapper</span><span class="p">(</span>
+                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_prepare_op_args</span><span class="p">(</span><span class="n">VideoCaptioningFromFramesMapper</span><span class="p">,</span> <span class="n">vid_cap_from_frm_args</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">consider_video_tags_from_audio</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">.video_tagging_from_audio_mapper</span><span class="w"> </span><span class="kn">import</span> \
-                <span class="n">VideoTaggingFromAudioMapper</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.video_tagging_from_audio_mapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">VideoTaggingFromAudioMapper</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">tag_op_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">VideoTaggingFromAudioMapper</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_prepare_op_args</span><span class="p">(</span>
-                    <span class="n">VideoTaggingFromAudioMapper</span><span class="p">,</span> <span class="n">vid_tag_from_aud_args</span><span class="p">)))</span>
+                <span class="n">VideoTaggingFromAudioMapper</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_prepare_op_args</span><span class="p">(</span><span class="n">VideoTaggingFromAudioMapper</span><span class="p">,</span> <span class="n">vid_tag_from_aud_args</span><span class="p">))</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">consider_video_tags_from_frames</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">.video_tagging_from_frames_mapper</span><span class="w"> </span><span class="kn">import</span> \
-                <span class="n">VideoTaggingFromFramesMapper</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.video_tagging_from_frames_mapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">VideoTaggingFromFramesMapper</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">tag_op_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">VideoTaggingFromFramesMapper</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_prepare_op_args</span><span class="p">(</span>
-                    <span class="n">VideoTaggingFromFramesMapper</span><span class="p">,</span> <span class="n">vid_tag_from_frm_args</span><span class="p">)))</span>
+                <span class="n">VideoTaggingFromFramesMapper</span><span class="p">(</span>
+                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_prepare_op_args</span><span class="p">(</span><span class="n">VideoTaggingFromFramesMapper</span><span class="p">,</span> <span class="n">vid_tag_from_frm_args</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_tag_num</span> <span class="o">=</span> <span class="n">keep_tag_num</span></div>
 
@@ -512,7 +531,7 @@
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">temp_args</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">required_args</span><span class="p">:</span>
                 <span class="n">args_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-        <span class="n">args_dict</span><span class="p">[</span><span class="s1">&#39;accelerator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span>
+        <span class="n">args_dict</span><span class="p">[</span><span class="s2">&quot;accelerator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span>
         <span class="k">return</span> <span class="n">args_dict</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_process_single_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -532,7 +551,7 @@
 
         <span class="n">captioned_sample</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
         <span class="c1"># generate for each video chunk by chunk</span>
-        <span class="n">captioned_texts</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">captioned_texts</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="p">):</span>
             <span class="c1"># skip empty chunks</span>
@@ -543,13 +562,13 @@
 
             <span class="k">if</span> <span class="n">vid_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># add special tokens</span>
-                <span class="n">captioned_texts</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">chunk</span><span class="si">}{</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">captioned_texts</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">chunk</span><span class="si">}{</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="k">continue</span>
 
             <span class="c1"># make a temporary sample</span>
             <span class="n">temp_sample</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">:</span> <span class="n">chunk</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">:</span> <span class="n">loaded_video_keys</span><span class="p">[</span><span class="n">offset</span><span class="p">:</span><span class="n">offset</span> <span class="o">+</span> <span class="n">vid_count</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">:</span> <span class="n">loaded_video_keys</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">vid_count</span><span class="p">],</span>
                 <span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span> <span class="p">{},</span>
             <span class="p">}</span>
 
@@ -558,33 +577,27 @@
             <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_op_list</span><span class="p">:</span>
                 <span class="n">temp_sample</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">temp_sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">video_audio_tags</span> <span class="ow">in</span> <span class="n">temp_sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]:</span>
-                <span class="n">captioned_text_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-                    <span class="n">temp_sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="n">MetaKeys</span><span class="o">.</span><span class="n">video_audio_tags</span><span class="p">])</span>
+                <span class="n">captioned_text_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">temp_sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="n">MetaKeys</span><span class="o">.</span><span class="n">video_audio_tags</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">video_frame_tags</span> <span class="ow">in</span> <span class="n">temp_sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]:</span>
-                <span class="k">for</span> <span class="n">tag_list</span> <span class="ow">in</span> <span class="n">temp_sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span>
-                        <span class="n">MetaKeys</span><span class="o">.</span><span class="n">video_frame_tags</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">tag_list</span> <span class="ow">in</span> <span class="n">temp_sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="n">MetaKeys</span><span class="o">.</span><span class="n">video_frame_tags</span><span class="p">]:</span>
                     <span class="n">captioned_text_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tag_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keep_tag_num</span><span class="p">])</span>
             <span class="c1"># cap ops</span>
             <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cap_op_list</span><span class="p">:</span>
                 <span class="n">captioned_text_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">remove_special_tokens</span><span class="p">(</span>
-                        <span class="n">op</span><span class="o">.</span><span class="n">_process_single_sample</span><span class="p">(</span><span class="n">temp_sample</span><span class="p">,</span>
-                                                  <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">]))</span>
+                    <span class="n">remove_special_tokens</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_process_single_sample</span><span class="p">(</span><span class="n">temp_sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
+                <span class="p">)</span>
 
             <span class="c1"># summarization</span>
-            <span class="n">all_texts</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">captioned_text_list</span><span class="p">)</span>
-            <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">all_texts</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
-                <span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">all_texts</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">captioned_text_list</span><span class="p">)</span>
+            <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">all_texts</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
             <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-            <span class="n">summarized_text</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                               <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">summarized_text</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
             <span class="n">offset</span> <span class="o">+=</span> <span class="n">vid_count</span>
-            <span class="n">captioned_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vid_count</span><span class="si">}</span><span class="s1"> &#39;</span> \
-                             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">summarized_text</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">captioned_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vid_count</span><span class="si">}</span><span class="s2"> &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">summarized_text</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="c1"># add special tokens</span>
-            <span class="n">captioned_texts</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">captioned_text</span><span class="si">}{</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">captioned_texts</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">captioned_text</span><span class="si">}{</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="si">}</span><span class="s2">&quot;</span>
 
         <span class="n">captioned_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">captioned_texts</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">captioned_sample</span><span class="p">]</span>
@@ -595,16 +608,13 @@
         <span class="c1"># reconstruct samples from &quot;dict of lists&quot; to &quot;list of dicts&quot;</span>
         <span class="n">reconstructed_samples</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])):</span>
-            <span class="n">reconstructed_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">})</span>
+            <span class="n">reconstructed_samples</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">})</span>
         <span class="n">samples_after_split</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># do split for each sample within the batch</span>
         <span class="k">for</span> <span class="n">ori_sample</span> <span class="ow">in</span> <span class="n">reconstructed_samples</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span><span class="p">:</span>
                 <span class="n">samples_after_split</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">)</span>
-            <span class="n">generated_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_single_sample</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">,</span>
-                                                            <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+            <span class="n">generated_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_single_sample</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">generated_samples</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">samples_after_split</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">generated_samples</span><span class="p">)</span>
         <span class="c1"># reconstruct samples from &quot;list of dicts&quot; to &quot;dict of lists&quot;</span>

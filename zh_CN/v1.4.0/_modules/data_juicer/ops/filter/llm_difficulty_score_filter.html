@@ -353,10 +353,10 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">StatsKeys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
 
-<span class="n">torch</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;torch&#39;</span><span class="p">)</span>
-<span class="n">vllm</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;vllm&#39;</span><span class="p">)</span>
+<span class="n">torch</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
+<span class="n">vllm</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;vllm&quot;</span><span class="p">)</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;llm_difficulty_score_filter&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;llm_difficulty_score_filter&quot;</span>
 
 
 <div class="viewcode-block" id="LLMDifficultyScoreFilter">
@@ -416,11 +416,11 @@
 <span class="s2">}</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="n">DEFAULT_DIM_REQUIRED_KEYS</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;linguistic_complexity&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;conceptual_depth&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;prior_knowledge&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;step_complexity&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;ambiguity&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;linguistic_complexity&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;conceptual_depth&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;prior_knowledge&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;step_complexity&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ambiguity&quot;</span><span class="p">,</span>
     <span class="p">]</span>
 
 <div class="viewcode-block" id="LLMDifficultyScoreFilter.compute_stats_single">

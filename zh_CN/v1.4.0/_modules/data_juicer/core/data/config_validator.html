@@ -355,6 +355,7 @@
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.config_validator.ConfigValidationError">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConfigValidationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Custom exception for validation errors&quot;&quot;&quot;</span>
+
     <span class="k">pass</span></div>
 
 
@@ -366,10 +367,10 @@
 
     <span class="c1"># Define validation rules for each strategy type</span>
     <span class="n">CONFIG_VALIDATION_RULES</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;required_fields&#39;</span><span class="p">:</span> <span class="p">[],</span>  <span class="c1"># Fields that must be present</span>
-        <span class="s1">&#39;optional_fields&#39;</span><span class="p">:</span> <span class="p">[],</span>  <span class="c1"># Fields that are optional</span>
-        <span class="s1">&#39;field_types&#39;</span><span class="p">:</span> <span class="p">{},</span>  <span class="c1"># Expected types for fields</span>
-        <span class="s1">&#39;custom_validators&#39;</span><span class="p">:</span> <span class="p">{}</span>  <span class="c1"># Custom validation functions</span>
+        <span class="s2">&quot;required_fields&quot;</span><span class="p">:</span> <span class="p">[],</span>  <span class="c1"># Fields that must be present</span>
+        <span class="s2">&quot;optional_fields&quot;</span><span class="p">:</span> <span class="p">[],</span>  <span class="c1"># Fields that are optional</span>
+        <span class="s2">&quot;field_types&quot;</span><span class="p">:</span> <span class="p">{},</span>  <span class="c1"># Expected types for fields</span>
+        <span class="s2">&quot;custom_validators&quot;</span><span class="p">:</span> <span class="p">{},</span>  <span class="c1"># Custom validation functions</span>
     <span class="p">}</span>
 
 <div class="viewcode-block" id="ConfigValidator.validate_config">
@@ -385,37 +386,31 @@
 <span class="sd">            ValidationError: If validation fails</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Check required fields</span>
-        <span class="n">missing_fields</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">field</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_VALIDATION_RULES</span><span class="p">[</span><span class="s1">&#39;required_fields&#39;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds_config</span>
-        <span class="p">]</span>
+        <span class="n">missing_fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">field</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_VALIDATION_RULES</span><span class="p">[</span><span class="s2">&quot;required_fields&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds_config</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">missing_fields</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Missing required fields: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_fields</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing required fields: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_fields</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Optional fields</span>
         <span class="c1"># no need for any special checks</span>
 
         <span class="c1"># Check field types</span>
-        <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">expected_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_VALIDATION_RULES</span><span class="p">[</span>
-                <span class="s1">&#39;field_types&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">expected_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_VALIDATION_RULES</span><span class="p">[</span><span class="s2">&quot;field_types&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">ds_config</span><span class="p">:</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">ds_config</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Field &#39;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&#39; must be of &quot;</span>
                         <span class="s2">&quot;type &#39;</span><span class="si">{expected_type.__name__}</span><span class="s2">&#39;, &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;got &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+                        <span class="sa">f</span><span class="s2">&quot;got &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                    <span class="p">)</span>
 
         <span class="c1"># Run custom validators</span>
-        <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">validator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_VALIDATION_RULES</span><span class="p">[</span>
-                <span class="s1">&#39;custom_validators&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">validator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_VALIDATION_RULES</span><span class="p">[</span><span class="s2">&quot;custom_validators&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">ds_config</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">validator</span><span class="p">(</span><span class="n">ds_config</span><span class="p">[</span><span class="n">field</span><span class="p">])</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Validation failed for field &#39;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+                    <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation failed for field &#39;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

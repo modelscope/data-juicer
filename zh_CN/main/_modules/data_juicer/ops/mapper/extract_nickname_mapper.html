@@ -368,7 +368,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">MetaKeys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;extract_nickname_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;extract_nickname_mapper&quot;</span>
 
 
 <span class="c1"># TODO: LLM-based inference.</span>
@@ -381,28 +381,30 @@
 <span class="sd">    Extract nickname relationship in the text.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;给定你一段文本，你的任务是将人物之间的称呼方式（昵称）提取出来。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;要求：</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- 需要给出说话人对被称呼人的称呼，不要搞反了。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- 相同的说话人和被称呼人最多给出一个最常用的称呼。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- 请不要输出互相没有昵称的称呼方式。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- 输出格式如下：</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;```</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;### 称呼方式1</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **说话人**：...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **被称呼人**：...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **...对...的昵称**：...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;### 称呼方式2</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **说话人**：...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **被称呼人**：...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **...对...的昵称**：...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;### 称呼方式3</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **说话人**：...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **被称呼人**：...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- **...对...的昵称**：...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;...</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;```</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">DEFAULT_INPUT_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;# 文本</span><span class="se">\n</span><span class="s1">```</span><span class="se">\n</span><span class="si">{text}</span><span class="se">\n</span><span class="s1">```</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;给定你一段文本，你的任务是将人物之间的称呼方式（昵称）提取出来。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;要求：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 需要给出说话人对被称呼人的称呼，不要搞反了。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 相同的说话人和被称呼人最多给出一个最常用的称呼。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 请不要输出互相没有昵称的称呼方式。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 输出格式如下：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;```</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;### 称呼方式1</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **说话人**：...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **被称呼人**：...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **...对...的昵称**：...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;### 称呼方式2</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **说话人**：...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **被称呼人**：...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **...对...的昵称**：...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;### 称呼方式3</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **说话人**：...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **被称呼人**：...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- **...对...的昵称**：...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;```</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">DEFAULT_INPUT_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;# 文本</span><span class="se">\n</span><span class="s2">```</span><span class="se">\n</span><span class="si">{text}</span><span class="se">\n</span><span class="s2">```</span><span class="se">\n</span><span class="s2">&quot;</span>
     <span class="n">DEFAULT_OUTPUT_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        \#\#\#\s*称呼方式(\d+)\s*</span>
 <span class="s2">        -\s*\*\*说话人\*\*\s*：\s*(.*?)\s*</span>
@@ -412,20 +414,22 @@
 
 <div class="viewcode-block" id="ExtractNicknameMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.extract_nickname_mapper.ExtractNicknameMapper.__init__">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
-                 <span class="o">*</span><span class="p">,</span>
-                 <span class="n">nickname_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">nickname</span><span class="p">,</span>
-                 <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">system_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">input_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">output_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-                 <span class="n">drop_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-                 <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">nickname_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">nickname</span><span class="p">,</span>
+        <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">system_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">input_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">output_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">drop_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 <span class="sd">        :param api_model: API model name.</span>
@@ -454,11 +458,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">output_pattern</span> <span class="o">=</span> <span class="n">output_pattern</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_OUTPUT_PATTERN</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;api&#39;</span><span class="p">,</span>
-                                       <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span>
-                                       <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span>
-                                       <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
-                                       <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;api&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">=</span> <span class="n">drop_text</span></div>
@@ -475,8 +477,7 @@
         <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">role1</span><span class="p">,</span> <span class="n">role2</span><span class="p">,</span> <span class="n">role1_tmp</span><span class="p">,</span> <span class="n">role2_tmp</span><span class="p">,</span> <span class="n">nickname</span> <span class="o">=</span> <span class="n">match</span>
             <span class="c1"># for double check</span>
-            <span class="k">if</span> <span class="n">role1</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="n">role1_tmp</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span> <span class="n">role2</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span>
-            <span class="p">)</span> <span class="o">!=</span> <span class="n">role2_tmp</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">role1</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="n">role1_tmp</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span> <span class="n">role2</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="n">role2_tmp</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
                 <span class="k">continue</span>
             <span class="n">role1</span> <span class="o">=</span> <span class="n">role1</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="n">role2</span> <span class="o">=</span> <span class="n">role2</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -488,13 +489,16 @@
                 <span class="n">nickname_relations</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">role1</span><span class="p">,</span> <span class="n">role2</span><span class="p">,</span> <span class="n">nickname</span><span class="p">))</span>
         <span class="n">nickname_relations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">nickname_relations</span><span class="p">))</span>
 
-        <span class="n">nickname_relations</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">source_entity</span><span class="p">:</span> <span class="n">nr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">target_entity</span><span class="p">:</span> <span class="n">nr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_description</span><span class="p">:</span> <span class="n">nr</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_keywords</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;nickname&#39;</span><span class="p">],</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_strength</span><span class="p">:</span> <span class="kc">None</span>
-        <span class="p">}</span> <span class="k">for</span> <span class="n">nr</span> <span class="ow">in</span> <span class="n">nickname_relations</span><span class="p">]</span>
+        <span class="n">nickname_relations</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">source_entity</span><span class="p">:</span> <span class="n">nr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">target_entity</span><span class="p">:</span> <span class="n">nr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_description</span><span class="p">:</span> <span class="n">nr</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_keywords</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;nickname&quot;</span><span class="p">],</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_strength</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">nr</span> <span class="ow">in</span> <span class="n">nickname_relations</span>
+        <span class="p">]</span>
 
         <span class="k">return</span> <span class="n">nickname_relations</span></div>
 
@@ -502,7 +506,6 @@
 <div class="viewcode-block" id="ExtractNicknameMapper.process_single">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.extract_nickname_mapper.ExtractNicknameMapper.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="c1"># check if it&#39;s generated already</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nickname_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">sample</span>
@@ -510,25 +513,16 @@
         <span class="n">client</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
 
         <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])</span>
-        <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;system&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span>
-        <span class="p">},</span> <span class="p">{</span>
-            <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">input_prompt</span>
-        <span class="p">}]</span>
-        <span class="n">nickname_relations</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">source_entity</span><span class="p">:</span>
-            <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">target_entity</span><span class="p">:</span>
-            <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_description</span><span class="p">:</span>
-            <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_keywords</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span>
-            <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_strength</span><span class="p">:</span>
-            <span class="kc">None</span>
-        <span class="p">}]</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">input_prompt</span><span class="p">}]</span>
+        <span class="n">nickname_relations</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">source_entity</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">target_entity</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_description</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_keywords</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span>
+                <span class="n">MetaKeys</span><span class="o">.</span><span class="n">relation_strength</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">try_num</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">output</span> <span class="o">=</span> <span class="n">client</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
@@ -537,7 +531,7 @@
                     <span class="n">nickname_relations</span> <span class="o">=</span> <span class="n">results</span>
                     <span class="k">break</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">nickname_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">nickname_relations</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span><span class="p">:</span>

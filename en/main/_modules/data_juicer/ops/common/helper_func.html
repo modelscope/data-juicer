@@ -366,7 +366,6 @@
 <div class="viewcode-block" id="UnionFind">
 <a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.helper_func.UnionFind">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UnionFind</span><span class="p">:</span>
-
 <div class="viewcode-block" id="UnionFind.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.helper_func.UnionFind.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -436,8 +435,8 @@
 <span class="sd">    :param tag: whether to split document with &#39;\\\\t&#39;</span>
 <span class="sd">    :return: word list obtained after splitting document</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">sep</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">new_line</span> <span class="o">*</span> <span class="p">[</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">tab</span> <span class="o">*</span> <span class="p">[</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">]</span>
-    <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sep</span><span class="p">)</span>
+    <span class="n">sep</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot; &quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">new_line</span> <span class="o">*</span> <span class="p">[</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">tab</span> <span class="o">*</span> <span class="p">[</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">]</span>
+    <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sep</span><span class="p">)</span>
     <span class="n">split_document</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
     <span class="n">split_document</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">split_document</span> <span class="k">if</span> <span class="n">word</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">split_document</span></div>
@@ -455,11 +454,9 @@
 <span class="sd">    :param document: document to be split</span>
 <span class="sd">    :return: sentence list obtained after splitting document</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">sentences</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">sentences</span> <span class="o">=</span> <span class="p">[</span><span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
-    <span class="n">sentences</span> <span class="o">=</span> <span class="p">[[</span>
-        <span class="n">split_on_whitespace</span><span class="p">(</span><span class="n">subsentence</span><span class="p">)</span> <span class="k">for</span> <span class="n">subsentence</span> <span class="ow">in</span> <span class="n">sentence</span>
-    <span class="p">]</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
+    <span class="n">sentences</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">sentences</span> <span class="o">=</span> <span class="p">[</span><span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
+    <span class="n">sentences</span> <span class="o">=</span> <span class="p">[[</span><span class="n">split_on_whitespace</span><span class="p">(</span><span class="n">subsentence</span><span class="p">)</span> <span class="k">for</span> <span class="n">subsentence</span> <span class="ow">in</span> <span class="n">sentence</span><span class="p">]</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">sentences</span></div>
 
 
@@ -475,13 +472,11 @@
 <span class="sd">    :param sentences: sentence list to be merged</span>
 <span class="sd">    :return: document obtained after merging sub-sentences</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">sentences</span> <span class="o">=</span> <span class="p">[[</span>
-        <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subsentence</span><span class="p">)</span> <span class="k">for</span> <span class="n">subsentence</span> <span class="ow">in</span> <span class="n">sentence</span> <span class="k">if</span> <span class="n">subsentence</span>
-    <span class="p">]</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
-    <span class="n">sentences</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span> <span class="k">if</span> <span class="n">sentence</span><span class="p">]</span>
+    <span class="n">sentences</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subsentence</span><span class="p">)</span> <span class="k">for</span> <span class="n">subsentence</span> <span class="ow">in</span> <span class="n">sentence</span> <span class="k">if</span> <span class="n">subsentence</span><span class="p">]</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
+    <span class="n">sentences</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span> <span class="k">if</span> <span class="n">sentence</span><span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">sentences</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
-    <span class="n">document</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">document</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">document</span></div>
 
 
@@ -498,10 +493,7 @@
 <span class="sd">    :param join_char: characters to be added between word group</span>
 <span class="sd">    :return: word list after augment</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">augmentation</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">join_char</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">group_size</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">-</span> <span class="n">group_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="p">]</span>
+    <span class="n">augmentation</span> <span class="o">=</span> <span class="p">[</span><span class="n">join_char</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">group_size</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">-</span> <span class="n">group_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
     <span class="k">return</span> <span class="n">augmentation</span></div>
 
 
@@ -535,12 +527,9 @@
 
 <div class="viewcode-block" id="words_refinement">
 <a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.helper_func.words_refinement">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">words_refinement</span><span class="p">(</span><span class="n">words</span><span class="p">,</span>
-                     <span class="n">lower_case</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                     <span class="n">strip_chars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="n">use_words_aug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                     <span class="n">words_aug_group_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-                     <span class="n">words_aug_join_char</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">words_refinement</span><span class="p">(</span>
+    <span class="n">words</span><span class="p">,</span> <span class="n">lower_case</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">strip_chars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_words_aug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">words_aug_group_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">words_aug_join_char</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Refine split words. Non reversible since the document is split on</span>
 <span class="sd">    multiple characters, words are stripped of special characters and</span>
@@ -564,8 +553,7 @@
         <span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span> <span class="k">if</span> <span class="n">word</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">use_words_aug</span><span class="p">:</span>
         <span class="n">augmentation</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">words_augmentation</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">group_size</span><span class="p">,</span> <span class="n">words_aug_join_char</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">group_size</span> <span class="ow">in</span> <span class="n">words_aug_group_sizes</span>
+            <span class="n">words_augmentation</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">group_size</span><span class="p">,</span> <span class="n">words_aug_join_char</span><span class="p">)</span> <span class="k">for</span> <span class="n">group_size</span> <span class="ow">in</span> <span class="n">words_aug_group_sizes</span>
         <span class="p">]</span>
         <span class="n">augmentation</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">augm</span> <span class="ow">in</span> <span class="n">augmentation</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">augm</span><span class="p">]</span>
         <span class="n">words</span> <span class="o">=</span> <span class="n">words</span> <span class="o">+</span> <span class="n">augmentation</span>
@@ -589,7 +577,7 @@
         <span class="n">sentences</span> <span class="o">=</span> <span class="n">model_func</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">sentences</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
-    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span></div>
 
 
 

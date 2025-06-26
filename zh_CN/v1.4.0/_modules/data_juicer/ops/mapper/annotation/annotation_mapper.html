@@ -361,15 +361,15 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">...base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">...mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventDrivenMixin</span><span class="p">,</span> <span class="n">NotificationMixin</span>
 
-<span class="n">label_studio_sdk</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;label_studio_sdk&#39;</span><span class="p">)</span>
+<span class="n">label_studio_sdk</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;label_studio_sdk&quot;</span><span class="p">)</span>
 
 <span class="c1"># Common annotation event types</span>
 <span class="n">ANNOTATION_EVENTS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;TASK_CREATED&#39;</span><span class="p">:</span> <span class="s1">&#39;task_created&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;BATCH_CREATED&#39;</span><span class="p">:</span> <span class="s1">&#39;batch_created&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;ANNOTATION_COMPLETED&#39;</span><span class="p">:</span> <span class="s1">&#39;annotation_completed&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;BATCH_ANNOTATION_COMPLETED&#39;</span><span class="p">:</span> <span class="s1">&#39;batch_annotation_completed&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;ERROR_OCCURRED&#39;</span><span class="p">:</span> <span class="s1">&#39;error_occurred&#39;</span>
+    <span class="s2">&quot;TASK_CREATED&quot;</span><span class="p">:</span> <span class="s2">&quot;task_created&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BATCH_CREATED&quot;</span><span class="p">:</span> <span class="s2">&quot;batch_created&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ANNOTATION_COMPLETED&quot;</span><span class="p">:</span> <span class="s2">&quot;annotation_completed&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BATCH_ANNOTATION_COMPLETED&quot;</span><span class="p">:</span> <span class="s2">&quot;batch_annotation_completed&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ERROR_OCCURRED&quot;</span><span class="p">:</span> <span class="s2">&quot;error_occurred&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -399,17 +399,19 @@
 
 <div class="viewcode-block" id="BaseAnnotationMapper.__init__">
 <a class="viewcode-back" href="../../../../../data_juicer.ops.mapper.annotation.html#data_juicer.ops.mapper.annotation.annotation_mapper.BaseAnnotationMapper.__init__">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">project_name_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;DataJuicer_Annotation&#39;</span><span class="p">,</span>
-                 <span class="n">wait_for_annotations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">,</span>
-                 <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
-                 <span class="n">samples_per_task</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="n">max_tasks_per_batch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
-                 <span class="n">project_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">notification_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">notification_events</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">project_name_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;DataJuicer_Annotation&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_annotations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">,</span>
+        <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
+        <span class="n">samples_per_task</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">max_tasks_per_batch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">project_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">notification_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">notification_events</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the base annotation operation</span>
 
 <span class="sd">        Args:</span>
@@ -424,13 +426,13 @@
 <span class="sd">            notification_events: Events that should trigger notifications</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Ensure notification_config is passed to kwargs for NotificationMixin</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;notification_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">notification_config</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;notification_config&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">notification_config</span> <span class="ow">or</span> <span class="p">{}</span>
 
         <span class="c1"># Initialize parent classes</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Store configuration</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="n">project_name_prefix</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())[:</span><span class="mi">6</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="n">project_name_prefix</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())[:</span><span class="mi">6</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span> <span class="o">=</span> <span class="n">project_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_annotations</span> <span class="o">=</span> <span class="n">wait_for_annotations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span>
@@ -440,11 +442,11 @@
 
         <span class="c1"># Configure which events should trigger notifications</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">notification_events</span> <span class="o">=</span> <span class="n">notification_events</span> <span class="ow">or</span> <span class="p">{</span>
-            <span class="s1">&#39;task_created&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s1">&#39;batch_created&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s1">&#39;annotation_completed&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s1">&#39;batch_annotation_completed&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s1">&#39;error_occurred&#39;</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="s2">&quot;task_created&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;batch_created&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;annotation_completed&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;batch_annotation_completed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;error_occurred&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="c1"># Track task IDs and sample mappings</span>
@@ -460,123 +462,114 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_setup_event_handlers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up default event handlers&quot;&quot;&quot;</span>
         <span class="c1"># Register event handlers with notification support</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">register_event_handler</span><span class="p">(</span><span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s1">&#39;TASK_CREATED&#39;</span><span class="p">],</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">_handle_task_created</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">register_event_handler</span><span class="p">(</span><span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s1">&#39;BATCH_CREATED&#39;</span><span class="p">],</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">_handle_batch_created</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">register_event_handler</span><span class="p">(</span><span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s1">&#39;ANNOTATION_COMPLETED&#39;</span><span class="p">],</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">_handle_annotation_completed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_event_handler</span><span class="p">(</span><span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s2">&quot;TASK_CREATED&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_task_created</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_event_handler</span><span class="p">(</span><span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s2">&quot;BATCH_CREATED&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_batch_created</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_event_handler</span><span class="p">(</span><span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s2">&quot;ANNOTATION_COMPLETED&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_annotation_completed</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_event_handler</span><span class="p">(</span>
-            <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s1">&#39;BATCH_ANNOTATION_COMPLETED&#39;</span><span class="p">],</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_handle_batch_annotation_completed</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">register_event_handler</span><span class="p">(</span><span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s1">&#39;ERROR_OCCURRED&#39;</span><span class="p">],</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">_handle_error</span><span class="p">)</span>
+            <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s2">&quot;BATCH_ANNOTATION_COMPLETED&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_batch_annotation_completed</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_event_handler</span><span class="p">(</span><span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s2">&quot;ERROR_OCCURRED&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_error</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_handle_task_created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle task created event with notification&quot;&quot;&quot;</span>
-        <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;task_id&#39;</span><span class="p">)</span>
-        <span class="n">sample_ids</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sample_ids&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task_id&quot;</span><span class="p">)</span>
+        <span class="n">sample_ids</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sample_ids&quot;</span><span class="p">,</span> <span class="p">[])</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s1"> created with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sample_ids</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> created with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sample_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
 
         <span class="c1"># Send notification if configured</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_events</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;task_created&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_events</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task_created&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_notification</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s1"> created with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sample_ids</span><span class="p">)</span><span class="si">}</span><span class="s1"> &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;samples for annotation in project </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
-                <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;New Annotation Task Created - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> created with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sample_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;samples for annotation in project </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;New Annotation Task Created - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_handle_batch_created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle batch created event with notification&quot;&quot;&quot;</span>
-        <span class="n">batch_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_id&#39;</span><span class="p">)</span>
-        <span class="n">task_count</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;task_count&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">sample_count</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sample_count&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">batch_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_id&quot;</span><span class="p">)</span>
+        <span class="n">task_count</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">sample_count</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sample_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;Batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s1"> created with </span><span class="si">{</span><span class="n">task_count</span><span class="si">}</span><span class="s1"> tasks containing &#39;</span>
-            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sample_count</span><span class="si">}</span><span class="s1"> samples&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s2"> created with </span><span class="si">{</span><span class="n">task_count</span><span class="si">}</span><span class="s2"> tasks containing &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_count</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
 
         <span class="c1"># Send notification if configured</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_events</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_created&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_events</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_created&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="c1"># Build message with or without URL</span>
             <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s1"> created with </span><span class="si">{</span><span class="n">task_count</span><span class="si">}</span><span class="s1"> tasks containing &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sample_count</span><span class="si">}</span><span class="s1"> samples in project </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;Batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s2"> created with </span><span class="si">{</span><span class="n">task_count</span><span class="si">}</span><span class="s2"> tasks containing &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_count</span><span class="si">}</span><span class="s2"> samples in project </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
 
             <span class="n">project_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_url</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">project_url</span><span class="p">:</span>
-                <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Annotation URL: </span><span class="si">{</span><span class="n">project_url</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Annotation URL: </span><span class="si">{</span><span class="n">project_url</span><span class="si">}</span><span class="s2">&quot;</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">send_notification</span><span class="p">(</span>
-                <span class="n">message</span><span class="p">,</span>
-                <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;New Annotation Batch Created - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_notification</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;New Annotation Batch Created - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_handle_annotation_completed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle annotation completed event with notification&quot;&quot;&quot;</span>
-        <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;task_id&#39;</span><span class="p">)</span>
-        <span class="n">annotation_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;annotation_id&#39;</span><span class="p">)</span>
+        <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task_id&quot;</span><span class="p">)</span>
+        <span class="n">annotation_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;annotation_id&quot;</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;Annotation </span><span class="si">{</span><span class="n">annotation_id</span><span class="si">}</span><span class="s1"> completed for task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annotation </span><span class="si">{</span><span class="n">annotation_id</span><span class="si">}</span><span class="s2"> completed for task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Mark this task as processed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processed_annotations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 
         <span class="c1"># Send notification if configured</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_events</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;annotation_completed&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_events</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;annotation_completed&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="n">sample_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_to_samples</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="p">[]))</span>
 
             <span class="c1"># Build message with or without URL</span>
             <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Annotation </span><span class="si">{</span><span class="n">annotation_id</span><span class="si">}</span><span class="s1"> completed for task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s1"> &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;with </span><span class="si">{</span><span class="n">sample_count</span><span class="si">}</span><span class="s1"> samples in project </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;Annotation </span><span class="si">{</span><span class="n">annotation_id</span><span class="si">}</span><span class="s2"> completed for task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;with </span><span class="si">{</span><span class="n">sample_count</span><span class="si">}</span><span class="s2"> samples in project </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
 
             <span class="c1"># Add URL if configured to include it</span>
             <span class="n">task_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_url</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">task_url</span><span class="p">:</span>
-                <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Task URL: </span><span class="si">{</span><span class="n">task_url</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Task URL: </span><span class="si">{</span><span class="n">task_url</span><span class="si">}</span><span class="s2">&quot;</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">send_notification</span><span class="p">(</span>
-                <span class="n">message</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Annotation Completed - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_notification</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Annotation Completed - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_handle_batch_annotation_completed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle batch annotation completed event with notification&quot;&quot;&quot;</span>
-        <span class="n">batch_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_id&#39;</span><span class="p">)</span>
-        <span class="n">task_count</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;task_count&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">sample_count</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sample_count&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">batch_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_id&quot;</span><span class="p">)</span>
+        <span class="n">task_count</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">sample_count</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sample_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_events</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_annotation_completed&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_events</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_annotation_completed&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="c1"># Build message with or without URL</span>
             <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s1"> done with </span><span class="si">{</span><span class="n">task_count</span><span class="si">}</span><span class="s1"> tasks containing &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sample_count</span><span class="si">}</span><span class="s1"> samples in project </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;Batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s2"> done with </span><span class="si">{</span><span class="n">task_count</span><span class="si">}</span><span class="s2"> tasks containing &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_count</span><span class="si">}</span><span class="s2"> samples in project </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
 
             <span class="n">project_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_url</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">project_url</span><span class="p">:</span>
-                <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Project URL: </span><span class="si">{</span><span class="n">project_url</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Project URL: </span><span class="si">{</span><span class="n">project_url</span><span class="si">}</span><span class="s2">&quot;</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">send_notification</span><span class="p">(</span>
-                <span class="n">message</span><span class="p">,</span>
-                <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Batch Annotation Completed - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_notification</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Batch Annotation Completed - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_handle_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle error event with notification&quot;&quot;&quot;</span>
-        <span class="n">error_message</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="s1">&#39;Unknown error&#39;</span><span class="p">)</span>
-        <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;task_id&#39;</span><span class="p">,</span> <span class="s1">&#39;Unknown task&#39;</span><span class="p">)</span>
+        <span class="n">error_message</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="s2">&quot;Unknown error&quot;</span><span class="p">)</span>
+        <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Unknown task&quot;</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error in annotation task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">error_message</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in annotation task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Send notification if configured</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_events</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;error_occurred&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_events</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;error_occurred&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_notification</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Error in annotation task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">error_message</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
-                <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Annotation Error - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
-                <span class="n">notification_type</span><span class="o">=</span><span class="s1">&#39;email&#39;</span>  <span class="c1"># Always send errors via email</span>
+                <span class="sa">f</span><span class="s2">&quot;Error in annotation task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Annotation Error - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">notification_type</span><span class="o">=</span><span class="s2">&quot;email&quot;</span><span class="p">,</span>  <span class="c1"># Always send errors via email</span>
             <span class="p">)</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_create_tasks_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tasks_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span>
-                            <span class="n">sample_ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_tasks_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tasks_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">sample_ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create multiple tasks in the annotation platform</span>
 
 <span class="sd">        Args:</span>
@@ -606,8 +599,7 @@
         <span class="k">pass</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_process_annotation_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
-                                   <span class="n">sample</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_annotation_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Process annotation result and update the sample</span>
 
 <span class="sd">        Args:</span>
@@ -649,20 +641,18 @@
         <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
 
         <span class="c1"># Step 1: Convert to row-oriented format (list of sample dictionaries)</span>
-        <span class="n">sample_list</span> <span class="o">=</span> <span class="p">[{</span><span class="n">key</span><span class="p">:</span> <span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-                        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)]</span>
+        <span class="n">sample_list</span> <span class="o">=</span> <span class="p">[{</span><span class="n">key</span><span class="p">:</span> <span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)]</span>
 
         <span class="c1"># Step 2: Retrieve or generate unique IDs for each sample</span>
         <span class="c1"># TODO: Use ID from database or metadata if not present</span>
-        <span class="k">if</span> <span class="s1">&#39;id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;id&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
             <span class="n">sample_ids</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">sample_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">sample_list</span><span class="p">]</span>
+            <span class="n">sample_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">sample_list</span><span class="p">]</span>
 
         <span class="c1"># Step 3: Process samples in batches</span>
         <span class="k">for</span> <span class="n">batch_start</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_tasks_per_batch</span><span class="p">):</span>
-            <span class="n">batch_end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">batch_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_tasks_per_batch</span><span class="p">,</span>
-                            <span class="n">num_samples</span><span class="p">)</span>
+            <span class="n">batch_end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">batch_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_tasks_per_batch</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
 
             <span class="c1"># Prepare tasks for this batch</span>
             <span class="n">tasks_data</span> <span class="o">=</span> <span class="p">[]</span>
@@ -688,13 +678,11 @@
                 <span class="n">task_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_to_task_id</span><span class="p">[</span><span class="n">sample_id</span><span class="p">]</span>
 
                 <span class="c1"># If waiting for annotations and they&#39;re available, add them</span>
-                <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wait_for_annotations</span>
-                        <span class="ow">and</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">processed_annotations</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_annotations</span> <span class="ow">and</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">processed_annotations</span><span class="p">:</span>
                     <span class="n">annotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_annotation</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">annotation</span><span class="p">:</span>
                         <span class="c1"># Process the annotation result</span>
-                        <span class="n">sample_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_annotation_result</span><span class="p">(</span>
-                            <span class="n">annotation</span><span class="p">,</span> <span class="n">sample_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                        <span class="n">sample_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_annotation_result</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">sample_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                         <span class="n">processed_count</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="c1"># Step 5: Convert back to column-oriented format efficiently</span>
@@ -707,8 +695,7 @@
             <span class="c1"># Use a list comprehension for better performance</span>
             <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">sample_list</span><span class="p">]</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Processed </span><span class="si">{</span><span class="n">num_samples</span><span class="si">}</span><span class="s1"> samples with </span><span class="si">{</span><span class="n">processed_count</span><span class="si">}</span><span class="s1"> &#39;</span>
-                    <span class="s1">&#39;annotations&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processed </span><span class="si">{</span><span class="n">num_samples</span><span class="si">}</span><span class="s2"> samples with </span><span class="si">{</span><span class="n">processed_count</span><span class="si">}</span><span class="s2"> &quot;</span> <span class="s2">&quot;annotations&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span></div>
 
 
@@ -718,7 +705,7 @@
             <span class="k">return</span>
 
         <span class="c1"># Generate a batch ID</span>
-        <span class="n">batch_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;batch_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_counter</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">batch_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;batch_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_counter</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_counter</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="c1"># Flatten the sample IDs for this batch</span>
@@ -726,8 +713,7 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Create the tasks in the annotation platform</span>
-            <span class="n">task_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_tasks_batch</span><span class="p">(</span><span class="n">tasks_data</span><span class="p">,</span>
-                                                <span class="n">all_batch_sample_ids</span><span class="p">)</span>
+            <span class="n">task_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_tasks_batch</span><span class="p">(</span><span class="n">tasks_data</span><span class="p">,</span> <span class="n">all_batch_sample_ids</span><span class="p">)</span>
 
             <span class="c1"># Map sample IDs to task IDs</span>
             <span class="k">for</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">sample_id_list</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">task_ids</span><span class="p">,</span> <span class="n">task_sample_ids</span><span class="p">):</span>
@@ -736,57 +722,45 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">task_to_samples</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_id_list</span>
 
                 <span class="c1"># Trigger task created event</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">trigger_event</span><span class="p">(</span><span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s1">&#39;TASK_CREATED&#39;</span><span class="p">],</span> <span class="p">{</span>
-                    <span class="s1">&#39;task_id&#39;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span>
-                    <span class="s1">&#39;sample_ids&#39;</span><span class="p">:</span> <span class="n">sample_id_list</span>
-                <span class="p">})</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trigger_event</span><span class="p">(</span>
+                    <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s2">&quot;TASK_CREATED&quot;</span><span class="p">],</span> <span class="p">{</span><span class="s2">&quot;task_id&quot;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span> <span class="s2">&quot;sample_ids&quot;</span><span class="p">:</span> <span class="n">sample_id_list</span><span class="p">}</span>
+                <span class="p">)</span>
 
             <span class="c1"># Trigger batch created event</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">trigger_event</span><span class="p">(</span>
-                <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s1">&#39;BATCH_CREATED&#39;</span><span class="p">],</span> <span class="p">{</span>
-                    <span class="s1">&#39;batch_id&#39;</span><span class="p">:</span> <span class="n">batch_id</span><span class="p">,</span>
-                    <span class="s1">&#39;task_count&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">),</span>
-                    <span class="s1">&#39;sample_count&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_batch_sample_ids</span><span class="p">)</span>
-                <span class="p">})</span>
+                <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s2">&quot;BATCH_CREATED&quot;</span><span class="p">],</span>
+                <span class="p">{</span><span class="s2">&quot;batch_id&quot;</span><span class="p">:</span> <span class="n">batch_id</span><span class="p">,</span> <span class="s2">&quot;task_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">),</span> <span class="s2">&quot;sample_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_batch_sample_ids</span><span class="p">)},</span>
+            <span class="p">)</span>
 
             <span class="c1"># If waiting for annotations, wait for them directly</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_annotations</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># Wait for all tasks in this batch to be annotated</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Waiting for annotations for batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">completed_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wait_for_batch_annotations</span><span class="p">(</span><span class="n">task_ids</span><span class="p">)</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s1">&#39;Waiting for annotations for batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                    <span class="n">completed_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wait_for_batch_annotations</span><span class="p">(</span>
-                        <span class="n">task_ids</span><span class="p">)</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s1">&#39;Completed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">completed_tasks</span><span class="p">)</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">)</span><span class="si">}</span><span class="s1"> &#39;</span>
-                        <span class="sa">f</span><span class="s1">&#39;annotations for batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="sa">f</span><span class="s2">&quot;Completed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">completed_tasks</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span> <span class="sa">f</span><span class="s2">&quot;annotations for batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
                 <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="c1"># Trigger error event but continue processing</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">trigger_event</span><span class="p">(</span>
-                        <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s1">&#39;ERROR_OCCURRED&#39;</span><span class="p">],</span> <span class="p">{</span>
-                            <span class="s1">&#39;message&#39;</span><span class="p">:</span>
-                            <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Timeout waiting for batch annotations: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
-                             <span class="p">),</span>
-                            <span class="s1">&#39;batch_id&#39;</span><span class="p">:</span>
-                            <span class="n">batch_id</span>
-                        <span class="p">})</span>
+                        <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s2">&quot;ERROR_OCCURRED&quot;</span><span class="p">],</span>
+                        <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Timeout waiting for batch annotations: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="s2">&quot;batch_id&quot;</span><span class="p">:</span> <span class="n">batch_id</span><span class="p">},</span>
+                    <span class="p">)</span>
 
             <span class="c1"># Trigger batch created event</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">trigger_event</span><span class="p">(</span>
-                <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s1">&#39;BATCH_ANNOTATION_COMPLETED&#39;</span><span class="p">],</span> <span class="p">{</span>
-                    <span class="s1">&#39;batch_id&#39;</span><span class="p">:</span> <span class="n">batch_id</span><span class="p">,</span>
-                    <span class="s1">&#39;task_count&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">),</span>
-                    <span class="s1">&#39;sample_count&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_batch_sample_ids</span><span class="p">)</span>
-                <span class="p">})</span>
+                <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s2">&quot;BATCH_ANNOTATION_COMPLETED&quot;</span><span class="p">],</span>
+                <span class="p">{</span><span class="s2">&quot;batch_id&quot;</span><span class="p">:</span> <span class="n">batch_id</span><span class="p">,</span> <span class="s2">&quot;task_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">),</span> <span class="s2">&quot;sample_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_batch_sample_ids</span><span class="p">)},</span>
+            <span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="c1"># Trigger error event</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">trigger_event</span><span class="p">(</span>
-                <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s1">&#39;ERROR_OCCURRED&#39;</span><span class="p">],</span> <span class="p">{</span>
-                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;Failed to create batch: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;batch_id&#39;</span><span class="p">:</span> <span class="n">batch_id</span>
-                <span class="p">})</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error creating batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s2">&quot;ERROR_OCCURRED&quot;</span><span class="p">],</span>
+                <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Failed to create batch: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;batch_id&quot;</span><span class="p">:</span> <span class="n">batch_id</span><span class="p">},</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error creating batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_wait_for_batch_annotations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Wait for all tasks in a batch to be annotated.</span>
@@ -800,13 +774,12 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_annotations</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">task_ids</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{}</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Waiting for annotations for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">)</span><span class="si">}</span><span class="s1"> tasks&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Waiting for annotations for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> tasks&quot;</span><span class="p">)</span>
 
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">completed_tasks</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">task_id_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">task_ids</span><span class="p">)</span>
-        <span class="n">remaining_tasks</span> <span class="o">=</span> <span class="p">(</span><span class="n">task_id_set</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">completed_tasks</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span>
-                           <span class="bp">self</span><span class="o">.</span><span class="n">processed_annotations</span><span class="p">)</span>
+        <span class="n">remaining_tasks</span> <span class="o">=</span> <span class="n">task_id_set</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">completed_tasks</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">processed_annotations</span>
 
         <span class="c1"># Track the last time we saw a change in annotations</span>
         <span class="n">last_change_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -815,8 +788,7 @@
         <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="ow">and</span> <span class="n">remaining_tasks</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="c1"># Check for new annotations using the platform-specific method</span>
-                <span class="n">has_changes</span><span class="p">,</span> <span class="n">new_completed_tasks</span> <span class="o">=</span> \
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_check_annotation_status</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">remaining_tasks</span><span class="p">))</span>
+                <span class="n">has_changes</span><span class="p">,</span> <span class="n">new_completed_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_annotation_status</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">remaining_tasks</span><span class="p">))</span>
 
                 <span class="c1"># Update our completed tasks</span>
                 <span class="n">completed_tasks</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_completed_tasks</span><span class="p">)</span>
@@ -830,29 +802,28 @@
                         <span class="c1"># Trigger annotation completed event</span>
                         <span class="n">annotation</span> <span class="o">=</span> <span class="n">new_completed_tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">trigger_event</span><span class="p">(</span>
-                            <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s1">&#39;ANNOTATION_COMPLETED&#39;</span><span class="p">],</span> <span class="p">{</span>
-                                <span class="s1">&#39;task_id&#39;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span>
-                                <span class="s1">&#39;annotation_id&#39;</span><span class="p">:</span> <span class="n">annotation</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                                    <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">),</span>
-                                <span class="s1">&#39;annotation&#39;</span><span class="p">:</span> <span class="n">annotation</span><span class="p">,</span>
-                                <span class="s1">&#39;sample_ids&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_to_samples</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                                    <span class="n">task_id</span><span class="p">,</span> <span class="p">[])</span>
-                            <span class="p">})</span>
+                            <span class="n">ANNOTATION_EVENTS</span><span class="p">[</span><span class="s2">&quot;ANNOTATION_COMPLETED&quot;</span><span class="p">],</span>
+                            <span class="p">{</span>
+                                <span class="s2">&quot;task_id&quot;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span>
+                                <span class="s2">&quot;annotation_id&quot;</span><span class="p">:</span> <span class="n">annotation</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">),</span>
+                                <span class="s2">&quot;annotation&quot;</span><span class="p">:</span> <span class="n">annotation</span><span class="p">,</span>
+                                <span class="s2">&quot;sample_ids&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_to_samples</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="p">[]),</span>
+                            <span class="p">},</span>
+                        <span class="p">)</span>
 
                 <span class="c1"># If no changes for a while, do a full check</span>
                 <span class="n">poll_timeout</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">poll_interval</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">has_changes</span> <span class="ow">and</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(</span>
-                <span class="p">)</span> <span class="o">-</span> <span class="n">last_change_time</span> <span class="o">&gt;</span> <span class="n">poll_timeout</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No new annotations detected for a while, &#39;</span>
-                                <span class="s1">&#39;performing full check&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">has_changes</span> <span class="ow">and</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">last_change_time</span> <span class="o">&gt;</span> <span class="n">poll_timeout</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No new annotations detected for a while, &quot;</span> <span class="s2">&quot;performing full check&quot;</span><span class="p">)</span>
                     <span class="n">last_change_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>  <span class="c1"># Reset the timer</span>
                 <span class="k">elif</span> <span class="n">has_changes</span><span class="p">:</span>
                     <span class="n">last_change_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
                 <span class="c1"># Log progress periodically</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Completed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">completed_tasks</span><span class="p">)</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">)</span><span class="si">}</span><span class="s1"> &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;annotations, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">remaining_tasks</span><span class="p">)</span><span class="si">}</span><span class="s1"> remaining&#39;</span><span class="p">)</span>
+                    <span class="sa">f</span><span class="s2">&quot;Completed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">completed_tasks</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;annotations, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">remaining_tasks</span><span class="p">)</span><span class="si">}</span><span class="s2"> remaining&quot;</span>
+                <span class="p">)</span>
 
                 <span class="c1"># If all tasks are annotated, we&#39;re done</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">remaining_tasks</span><span class="p">:</span>
@@ -862,13 +833,12 @@
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">poll_interval</span><span class="p">)</span>
 
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error polling for annotations: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error polling for annotations: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">poll_interval</span><span class="p">)</span>
 
         <span class="c1"># If we get here, we timed out or completed all annotations</span>
         <span class="k">if</span> <span class="n">remaining_tasks</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Timed out waiting for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">remaining_tasks</span><span class="p">)</span><span class="si">}</span><span class="s1"> annotations&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Timed out waiting for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">remaining_tasks</span><span class="p">)</span><span class="si">}</span><span class="s2"> annotations&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">completed_tasks</span>
 
@@ -900,11 +870,7 @@
 
 <div class="viewcode-block" id="LabelStudioAnnotationMapper.__init__">
 <a class="viewcode-back" href="../../../../../data_juicer.ops.mapper.annotation.html#data_juicer.ops.mapper.annotation.annotation_mapper.LabelStudioAnnotationMapper.__init__">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">api_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">label_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the Label Studio annotation operation</span>
 
 <span class="sd">        Args:</span>
@@ -920,9 +886,10 @@
         <span class="c1"># Label studio only supports 1 sample per task</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_task</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s1">&#39;Label Studio Annotation Mapper only supports 1 sample &#39;</span>
-                <span class="s1">&#39;per task, but samples_per_task is set to &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">samples_per_task</span><span class="si">}</span><span class="s1">. Setting samples_per_task to 1.&#39;</span><span class="p">)</span>
+                <span class="s2">&quot;Label Studio Annotation Mapper only supports 1 sample &quot;</span>
+                <span class="s2">&quot;per task, but samples_per_task is set to &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">samples_per_task</span><span class="si">}</span><span class="s2">. Setting samples_per_task to 1.&quot;</span>
+            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_task</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="c1"># Store Label Studio specific configuration</span>
@@ -932,15 +899,11 @@
 
         <span class="c1"># Initialize Label Studio client</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">label_studio_sdk</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="p">,</span>
-                                                  <span class="n">api_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Connected to Label Studio at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">label_studio_sdk</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connected to Label Studio at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="s1">&#39;Failed to import label_studio_sdk. Please install it with: &#39;</span>
-                <span class="s1">&#39;pip install label-studio-sdk&#39;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                <span class="s1">&#39;label-studio-sdk is required for LabelStudioAnnotationMapper&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to import label_studio_sdk. Please install it with: &quot;</span> <span class="s2">&quot;pip install label-studio-sdk&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;label-studio-sdk is required for LabelStudioAnnotationMapper&quot;</span><span class="p">)</span>
 
         <span class="c1"># Initialize project</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -949,11 +912,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_project</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Using existing project with ID: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using existing project with ID: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Failed to get project with ID </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get project with ID </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">raise</span></div>
 
 
@@ -963,25 +924,21 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new project or use existing one&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Create new project</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Creating new Label Studio project: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating new Label Studio project: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="n">project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">create_project</span><span class="p">(</span>
-                <span class="n">title</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">,</span>
-                <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Created by Data Juicer&#39;</span><span class="p">,</span>
-                <span class="n">label_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label_config</span><span class="p">)</span>
+                <span class="n">title</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Created by Data Juicer&quot;</span><span class="p">,</span> <span class="n">label_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label_config</span>
+            <span class="p">)</span>
 
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Created new Label Studio project with ID: </span><span class="si">{</span><span class="n">project</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created new Label Studio project with ID: </span><span class="si">{</span><span class="n">project</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">project</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to create project: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create project: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_create_tasks_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tasks_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span>
-                            <span class="n">sample_ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_tasks_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tasks_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">sample_ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create multiple tasks in Label Studio</span>
 
 <span class="sd">        Args:</span>
@@ -994,12 +951,11 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Create tasks in the project</span>
             <span class="n">created_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="o">.</span><span class="n">import_tasks</span><span class="p">(</span><span class="n">tasks_data</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Created </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">created_tasks</span><span class="p">)</span><span class="si">}</span><span class="s1"> tasks in project &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">created_tasks</span><span class="p">)</span><span class="si">}</span><span class="s2"> tasks in project &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">created_tasks</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to create tasks: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create tasks: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_annotation_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1023,67 +979,58 @@
         <span class="n">completed_tasks</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="c1"># Filter out tasks we already know are completed</span>
-        <span class="n">remaining_tasks</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">tid</span> <span class="k">for</span> <span class="n">tid</span> <span class="ow">in</span> <span class="n">task_ids</span> <span class="k">if</span> <span class="n">tid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">processed_annotations</span>
-        <span class="p">]</span>
+        <span class="n">remaining_tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">tid</span> <span class="k">for</span> <span class="n">tid</span> <span class="ow">in</span> <span class="n">task_ids</span> <span class="k">if</span> <span class="n">tid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">processed_annotations</span><span class="p">]</span>
 
         <span class="c1"># If all tasks are already processed, return immediately</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">remaining_tasks</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">{}</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;Checking </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">remaining_tasks</span><span class="p">)</span><span class="si">}</span><span class="s1"> tasks (skipping &#39;</span>
-            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">remaining_tasks</span><span class="p">)</span><span class="si">}</span><span class="s1"> already processed)&#39;</span><span class="p">)</span>
+            <span class="sa">f</span><span class="s2">&quot;Checking </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">remaining_tasks</span><span class="p">)</span><span class="si">}</span><span class="s2"> tasks (skipping &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">remaining_tasks</span><span class="p">)</span><span class="si">}</span><span class="s2"> already processed)&quot;</span>
+        <span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Use filters to get completed tasks efficiently</span>
             <span class="n">completed_task_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="o">.</span><span class="n">get_tasks</span><span class="p">(</span>
                 <span class="n">filters</span><span class="o">=</span><span class="p">{</span>
-                    <span class="s1">&#39;conjunction&#39;</span><span class="p">:</span>
-                    <span class="s1">&#39;and&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[{</span>
-                        <span class="s1">&#39;filter&#39;</span><span class="p">:</span> <span class="s1">&#39;filter:tasks:completed_at&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;operator&#39;</span><span class="p">:</span> <span class="s1">&#39;empty&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;Datetime&#39;</span>
-                    <span class="p">}]</span>
-                <span class="p">})</span>
+                    <span class="s2">&quot;conjunction&quot;</span><span class="p">:</span> <span class="s2">&quot;and&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="p">{</span><span class="s2">&quot;filter&quot;</span><span class="p">:</span> <span class="s2">&quot;filter:tasks:completed_at&quot;</span><span class="p">,</span> <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="s2">&quot;empty&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Datetime&quot;</span><span class="p">}</span>
+                    <span class="p">],</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
 
             <span class="c1"># Process newly completed tasks</span>
             <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">completed_task_data</span><span class="p">:</span>
-                <span class="n">task_id</span> <span class="o">=</span> <span class="n">task</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+                <span class="n">task_id</span> <span class="o">=</span> <span class="n">task</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
                 <span class="n">has_changes</span> <span class="o">=</span> <span class="kc">True</span>
 
                 <span class="c1"># Get the annotations for this task</span>
-                <span class="k">if</span> <span class="s1">&#39;annotations&#39;</span> <span class="ow">in</span> <span class="n">task</span> <span class="ow">and</span> <span class="n">task</span><span class="p">[</span><span class="s1">&#39;annotations&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s2">&quot;annotations&quot;</span> <span class="ow">in</span> <span class="n">task</span> <span class="ow">and</span> <span class="n">task</span><span class="p">[</span><span class="s2">&quot;annotations&quot;</span><span class="p">]:</span>
                     <span class="c1"># Use the latest annotation</span>
-                    <span class="n">annotation</span> <span class="o">=</span> <span class="n">task</span><span class="p">[</span><span class="s1">&#39;annotations&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">annotation</span> <span class="o">=</span> <span class="n">task</span><span class="p">[</span><span class="s2">&quot;annotations&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">completed_tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">annotation</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># If task is marked as completed but has no annotations,</span>
                     <span class="c1"># fetch the full task to get annotations</span>
                     <span class="n">full_task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="s1">&#39;annotations&#39;</span> <span class="ow">in</span> <span class="n">full_task</span> <span class="ow">and</span> <span class="n">full_task</span><span class="p">[</span><span class="s1">&#39;annotations&#39;</span><span class="p">]:</span>
-                        <span class="n">annotation</span> <span class="o">=</span> <span class="n">full_task</span><span class="p">[</span><span class="s1">&#39;annotations&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="s2">&quot;annotations&quot;</span> <span class="ow">in</span> <span class="n">full_task</span> <span class="ow">and</span> <span class="n">full_task</span><span class="p">[</span><span class="s2">&quot;annotations&quot;</span><span class="p">]:</span>
+                        <span class="n">annotation</span> <span class="o">=</span> <span class="n">full_task</span><span class="p">[</span><span class="s2">&quot;annotations&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
                         <span class="n">completed_tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">annotation</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="c1"># Task is completed but has no annotations (unusual)</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s1">&#39;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s1"> is marked as completed but has &#39;</span>
-                            <span class="s1">&#39;no annotations&#39;</span><span class="p">)</span>
-                        <span class="n">completed_tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                            <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;no_annotation&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;result&#39;</span><span class="p">:</span> <span class="p">[]</span>
-                        <span class="p">}</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> is marked as completed but has &quot;</span> <span class="s2">&quot;no annotations&quot;</span><span class="p">)</span>
+                        <span class="n">completed_tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;no_annotation&quot;</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="p">[]}</span>
 
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s1"> is newly completed&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> is newly completed&quot;</span><span class="p">)</span>
 
             <span class="c1"># Update our class-level cache of processed annotations</span>
             <span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="n">completed_tasks</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">processed_annotations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error checking annotation status: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error checking annotation status: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">has_changes</span><span class="p">,</span> <span class="n">completed_tasks</span>
 
@@ -1101,13 +1048,13 @@
             <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 
             <span class="c1"># Check if task has annotations</span>
-            <span class="k">if</span> <span class="n">task</span> <span class="ow">and</span> <span class="s1">&#39;annotations&#39;</span> <span class="ow">in</span> <span class="n">task</span> <span class="ow">and</span> <span class="n">task</span><span class="p">[</span><span class="s1">&#39;annotations&#39;</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="n">task</span><span class="p">[</span><span class="s1">&#39;annotations&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Return the first annotation</span>
+            <span class="k">if</span> <span class="n">task</span> <span class="ow">and</span> <span class="s2">&quot;annotations&quot;</span> <span class="ow">in</span> <span class="n">task</span> <span class="ow">and</span> <span class="n">task</span><span class="p">[</span><span class="s2">&quot;annotations&quot;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="n">task</span><span class="p">[</span><span class="s2">&quot;annotations&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Return the first annotation</span>
 
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to get task annotation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get task annotation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="LabelStudioAnnotationMapper.get_all_annotations">
@@ -1134,10 +1081,10 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Control how the object is pickled&quot;&quot;&quot;</span>
         <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1"># Remove unpicklable attributes</span>
-        <span class="k">if</span> <span class="s1">&#39;client&#39;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="k">del</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;client&#39;</span><span class="p">]</span>  <span class="c1"># Remove Label Studio client</span>
-        <span class="k">if</span> <span class="s1">&#39;project&#39;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="k">del</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">]</span>  <span class="c1"># Remove project reference</span>
+        <span class="k">if</span> <span class="s2">&quot;client&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;client&quot;</span><span class="p">]</span>  <span class="c1"># Remove Label Studio client</span>
+        <span class="k">if</span> <span class="s2">&quot;project&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;project&quot;</span><span class="p">]</span>  <span class="c1"># Remove project reference</span>
         <span class="k">return</span> <span class="n">state</span>
 
     <span class="c1"># for unpickling</span>
@@ -1145,11 +1092,10 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Control how the object is unpickled&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
         <span class="c1"># Reconnect to Label Studio if needed</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;api_url&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;api_key&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;api_url&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;api_key&quot;</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">label_studio_sdk</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="p">,</span>
-                                                      <span class="n">api_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;project_id&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">label_studio_sdk</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;project_id&quot;</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_project</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
                 <span class="k">pass</span>
@@ -1160,18 +1106,17 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            str: URL to the Label Studio project, or None if not available</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                       <span class="s1">&#39;api_url&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;api_url&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># Remove trailing slash if present</span>
-        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
 
         <span class="c1"># Label Studio web UI URL format (remove /api if present in the URL)</span>
-        <span class="k">if</span> <span class="s1">&#39;/api&#39;</span> <span class="ow">in</span> <span class="n">base_url</span><span class="p">:</span>
-            <span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/api&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;/api&quot;</span> <span class="ow">in</span> <span class="n">base_url</span><span class="p">:</span>
+            <span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/api&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s1">/projects/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_task_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get URL to a specific Label Studio task</span>
@@ -1182,18 +1127,17 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            str: URL to the task in Label Studio, or None if not available</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                       <span class="s1">&#39;api_url&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;api_url&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># Remove trailing slash if present</span>
-        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
 
         <span class="c1"># Label Studio web UI URL format (remove /api if present in the URL)</span>
-        <span class="k">if</span> <span class="s1">&#39;/api&#39;</span> <span class="ow">in</span> <span class="n">base_url</span><span class="p">:</span>
-            <span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/api&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;/api&quot;</span> <span class="ow">in</span> <span class="n">base_url</span><span class="p">:</span>
+            <span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/api&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s1">/projects/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="si">}</span><span class="s1">/data?task=</span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s1">&#39;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="si">}</span><span class="s2">/data?task=</span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 </pre></div>
         </article>

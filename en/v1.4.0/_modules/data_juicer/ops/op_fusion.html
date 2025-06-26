@@ -372,13 +372,10 @@
 <span class="n">INTER_SAMPLED_FRAMES</span> <span class="o">=</span> <span class="n">Registry</span><span class="p">(</span><span class="n">InterVars</span><span class="o">.</span><span class="n">sampled_frames</span><span class="p">)</span>
 
 <span class="c1"># all</span>
-<span class="n">ALL_INTER_VARS</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">INTER_LINES</span><span class="p">,</span> <span class="n">INTER_WORDS</span><span class="p">,</span> <span class="n">LOADED_AUDIOS</span><span class="p">,</span> <span class="n">LOADED_IMAGES</span><span class="p">,</span> <span class="n">LOADED_VIDEOS</span><span class="p">,</span>
-    <span class="n">INTER_SAMPLED_FRAMES</span>
-<span class="p">]</span>
+<span class="n">ALL_INTER_VARS</span> <span class="o">=</span> <span class="p">[</span><span class="n">INTER_LINES</span><span class="p">,</span> <span class="n">INTER_WORDS</span><span class="p">,</span> <span class="n">LOADED_AUDIOS</span><span class="p">,</span> <span class="n">LOADED_IMAGES</span><span class="p">,</span> <span class="n">LOADED_VIDEOS</span><span class="p">,</span> <span class="n">INTER_SAMPLED_FRAMES</span><span class="p">]</span>
 
 <span class="c1"># supported fusion strategies</span>
-<span class="n">FUSION_STRATEGIES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;greedy&#39;</span><span class="p">,</span> <span class="s1">&#39;probe&#39;</span><span class="p">}</span>
+<span class="n">FUSION_STRATEGIES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;greedy&quot;</span><span class="p">,</span> <span class="s2">&quot;probe&quot;</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="fuse_operators">
@@ -426,10 +423,7 @@
     <span class="n">fused_group</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">group_speed</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">all_intermediate_vars</span> <span class="o">=</span> <span class="n">ALL_INTER_VARS</span>
-    <span class="n">all_fused_filters</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">inter_vars</span><span class="p">:</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">inter_vars</span> <span class="ow">in</span> <span class="n">all_intermediate_vars</span>
-    <span class="p">}</span>
+    <span class="n">all_fused_filters</span> <span class="o">=</span> <span class="p">{</span><span class="n">inter_vars</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">inter_vars</span> <span class="ow">in</span> <span class="n">all_intermediate_vars</span><span class="p">}</span>
     <span class="c1"># group these filters by their intermediate vars</span>
     <span class="k">for</span> <span class="n">op</span><span class="p">,</span> <span class="n">probe_res</span> <span class="ow">in</span> <span class="n">original_filter_group</span><span class="p">:</span>
         <span class="n">op_name</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">_name</span>
@@ -441,7 +435,7 @@
             <span class="c1"># first apply other filters to decrease the number of samples, so</span>
             <span class="c1"># we add them into the fused_group list directly</span>
             <span class="n">fused_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
-            <span class="n">group_speed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probe_res</span><span class="p">[</span><span class="s1">&#39;speed&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">probe_res</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">group_speed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probe_res</span><span class="p">[</span><span class="s2">&quot;speed&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">probe_res</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
 
     <span class="c1"># try to fuse ops for each type of intermediate vars</span>
     <span class="k">for</span> <span class="n">inter_vars</span> <span class="ow">in</span> <span class="n">all_intermediate_vars</span><span class="p">:</span>
@@ -453,20 +447,13 @@
             <span class="c1"># more than 1 ops share the same intermediate var, try to fuse them</span>
             <span class="n">ops</span><span class="p">,</span> <span class="n">probe_res_list</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">inter_vars_filter</span><span class="p">)</span>
             <span class="c1"># new definition: new name and a definition list of fused op list</span>
-            <span class="n">fused_filter_name</span> <span class="o">=</span> <span class="s1">&#39;OpFusion:(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">ops</span><span class="p">])</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Ops are fused into one op &#39;</span>
-                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">fused_filter_name</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="n">fused_filter_name</span> <span class="o">=</span> <span class="s2">&quot;OpFusion:(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">ops</span><span class="p">])</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ops are fused into one op &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fused_filter_name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
             <span class="c1"># use these ops to create a FusedFilter object, and add the fused</span>
             <span class="c1"># definition and op into the fused group</span>
             <span class="n">fused_filter</span> <span class="o">=</span> <span class="n">FusedFilter</span><span class="p">(</span><span class="n">fused_filter_name</span><span class="p">,</span> <span class="n">ops</span><span class="p">)</span>
-            <span class="n">fused_filter</span><span class="o">.</span><span class="n">_op_cfg</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">fused_filter_name</span><span class="p">:</span> <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">_op_cfg</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">ops</span><span class="p">]</span>
-            <span class="p">}</span>
-            <span class="n">fused_filter_speed</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span>
-                <span class="mf">1.0</span> <span class="o">/</span> <span class="n">probe_res</span><span class="p">[</span><span class="s1">&#39;speed&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">probe_res</span> <span class="ow">in</span> <span class="n">probe_res_list</span>
-                <span class="k">if</span> <span class="n">probe_res</span>
-            <span class="p">])</span>
+            <span class="n">fused_filter</span><span class="o">.</span><span class="n">_op_cfg</span> <span class="o">=</span> <span class="p">{</span><span class="n">fused_filter_name</span><span class="p">:</span> <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">_op_cfg</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">ops</span><span class="p">]}</span>
+            <span class="n">fused_filter_speed</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">probe_res</span><span class="p">[</span><span class="s2">&quot;speed&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">probe_res</span> <span class="ow">in</span> <span class="n">probe_res_list</span> <span class="k">if</span> <span class="n">probe_res</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">fused_filter_speed</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">fused_filter_speed</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">fused_filter_speed</span>
             <span class="n">fused_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fused_filter</span><span class="p">)</span>
@@ -476,17 +463,14 @@
             <span class="c1"># group directly without fusion</span>
             <span class="n">fused_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inter_vars_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">probe_res</span> <span class="o">=</span> <span class="n">inter_vars_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">group_speed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probe_res</span><span class="p">[</span><span class="s1">&#39;speed&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">probe_res</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">group_speed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probe_res</span><span class="p">[</span><span class="s2">&quot;speed&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">probe_res</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
 
     <span class="c1"># reorder according to the probed speed results in group_speed</span>
     <span class="c1"># &#39;greedy&#39;: all speed data in group_speed will be 0, which will keep the</span>
     <span class="c1">#   current order of fused group</span>
     <span class="c1"># &#39;probe&#39;: OPs in fused group will be reordered according to the speed data</span>
     <span class="c1">#   in group_speed in descending order</span>
-    <span class="n">fused_group</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">op</span> <span class="k">for</span> <span class="n">op</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
-            <span class="nb">zip</span><span class="p">(</span><span class="n">fused_group</span><span class="p">,</span> <span class="n">group_speed</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">it</span><span class="p">:</span> <span class="n">it</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="p">]</span>
+    <span class="n">fused_group</span> <span class="o">=</span> <span class="p">[</span><span class="n">op</span> <span class="k">for</span> <span class="n">op</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">fused_group</span><span class="p">,</span> <span class="n">group_speed</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">it</span><span class="p">:</span> <span class="n">it</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
 
     <span class="k">return</span> <span class="n">fused_group</span></div>
 
@@ -512,10 +496,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fused_filters</span> <span class="o">=</span> <span class="n">fused_filters</span>
         <span class="c1"># set accelerator to &#39;cuda&#39; if there exists any ops whose accelerator</span>
         <span class="c1"># is &#39;cuda&#39;</span>
-        <span class="n">accelerator_methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">accelerator</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_filters</span><span class="p">])</span>
-        <span class="k">if</span> <span class="s1">&#39;cuda&#39;</span> <span class="ow">in</span> <span class="n">accelerator_methods</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+        <span class="n">accelerator_methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">op</span><span class="o">.</span><span class="n">accelerator</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_filters</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;cuda&quot;</span> <span class="ow">in</span> <span class="n">accelerator_methods</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
         <span class="c1"># update num_proc with the min num_proc of all fusible filters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">op</span><span class="o">.</span><span class="n">runtime_np</span><span class="p">()</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_filters</span><span class="p">])</span></div>
@@ -531,10 +514,8 @@
         <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{}</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)]</span>
         <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_filters</span><span class="p">:</span>
             <span class="c1"># open the context for these fused ops</span>
-            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">==</span> <span class="s1">&#39;cuda&#39;</span><span class="p">:</span>
-                <span class="n">samples</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">compute_stats_batched</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span>
-                                                   <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
-                                                   <span class="n">context</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span>
+                <span class="n">samples</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">compute_stats_batched</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">samples</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">compute_stats_batched</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># clean up the contexts after processing</span>
@@ -566,7 +547,7 @@
 
 <div class="viewcode-block" id="GeneralFusedOP">
 <a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.GeneralFusedOP">[docs]</a>
-<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s1">&#39;general_fused_op&#39;</span><span class="p">)</span>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;general_fused_op&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">GeneralFusedOP</span><span class="p">(</span><span class="n">OP</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An explicitly fused operator designed to execute multiple sequential</span>
 <span class="sd">    operations (OPs) on the same batch, enabling fine-grained control over</span>
@@ -576,34 +557,28 @@
 
 <div class="viewcode-block" id="GeneralFusedOP.__init__">
 <a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.GeneralFusedOP.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="n">fused_op_list</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fused_op_list</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
         <span class="k">if</span> <span class="n">fused_op_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fused_op_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fused_ops</span> <span class="o">=</span> <span class="n">load_ops</span><span class="p">(</span><span class="n">fused_op_list</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s1">&#39;GeneralFusedOP:(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_ops</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;GeneralFusedOP:(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_ops</span><span class="p">])</span>
         <span class="c1"># set accelerator to &#39;cuda&#39; if there exists any ops whose accelerator</span>
         <span class="c1"># is &#39;cuda&#39;</span>
         <span class="n">accelerator_methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">op</span><span class="o">.</span><span class="n">accelerator</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_ops</span><span class="p">])</span>
-        <span class="k">if</span> <span class="s1">&#39;cuda&#39;</span> <span class="ow">in</span> <span class="n">accelerator_methods</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+        <span class="k">if</span> <span class="s2">&quot;cuda&quot;</span> <span class="ow">in</span> <span class="n">accelerator_methods</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
         <span class="c1"># update num_proc with the min num_proc of all fusible filters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">op</span><span class="o">.</span><span class="n">runtime_np</span><span class="p">()</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_ops</span><span class="p">])</span> \
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_ops</span> <span class="k">else</span> <span class="mi">1</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">op</span><span class="o">.</span><span class="n">runtime_np</span><span class="p">()</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_ops</span><span class="p">])</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_ops</span> <span class="k">else</span> <span class="mi">1</span></div>
 
 
 <div class="viewcode-block" id="GeneralFusedOP.process_batched">
 <a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.GeneralFusedOP.process_batched">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_ops</span><span class="p">:</span>
-            <span class="n">process_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rank&#39;</span><span class="p">:</span> <span class="n">rank</span><span class="p">}</span> <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">==</span> <span class="s1">&#39;cuda&#39;</span> <span class="k">else</span> <span class="p">{}</span>
+            <span class="n">process_args</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rank&quot;</span><span class="p">:</span> <span class="n">rank</span><span class="p">}</span> <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span> <span class="k">else</span> <span class="p">{}</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">Mapper</span><span class="p">):</span>
                 <span class="n">samples</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">process_batched</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="o">**</span><span class="n">process_args</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">Filter</span><span class="p">):</span>
@@ -611,15 +586,13 @@
                 <span class="n">indicators</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">process_batched</span><span class="p">(</span><span class="n">samples</span><span class="p">))</span>
                 <span class="n">new_samples</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
-                    <span class="n">new_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-                        <span class="n">val</span> <span class="k">for</span> <span class="n">val</span><span class="p">,</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">indicators</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">indicator</span>
-                    <span class="p">]</span>
+                    <span class="n">new_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span> <span class="k">for</span> <span class="n">val</span><span class="p">,</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">indicators</span><span class="p">)</span> <span class="k">if</span> <span class="n">indicator</span><span class="p">]</span>
                 <span class="n">samples</span> <span class="o">=</span> <span class="n">new_samples</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;FusedOP does not support OP </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s1"> of type &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">op</span><span class="p">)</span><span class="si">}</span><span class="s1"> and only supports Mapper and Filter now.&#39;</span><span class="p">)</span>
+                    <span class="sa">f</span><span class="s2">&quot;FusedOP does not support OP </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s2"> of type &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">op</span><span class="p">)</span><span class="si">}</span><span class="s2"> and only supports Mapper and Filter now.&quot;</span>
+                <span class="p">)</span>
         <span class="k">return</span> <span class="n">samples</span></div>
 
 
@@ -628,6 +601,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">exporter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tracer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># prepare the dataset</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedDataset</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">NestedDataset</span><span class="p">):</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_ops</span><span class="p">:</span>
@@ -641,7 +615,7 @@
             <span class="n">num_proc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span><span class="p">,</span>
             <span class="n">with_rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">(),</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
-            <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">+</span> <span class="s1">&#39;_process&#39;</span><span class="p">,</span>
+            <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">+</span> <span class="s2">&quot;_process&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">new_dataset</span></div>
 </div>

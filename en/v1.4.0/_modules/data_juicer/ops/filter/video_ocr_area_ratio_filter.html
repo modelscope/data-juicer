@@ -354,16 +354,19 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer</span><span class="w"> </span><span class="kn">import</span> <span class="n">cuda_device_count</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">StatsKeys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">close_video</span><span class="p">,</span>
-                                        <span class="n">extract_video_frames_uniformly</span><span class="p">,</span>
-                                        <span class="n">load_data_with_context</span><span class="p">,</span> <span class="n">load_video</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">close_video</span><span class="p">,</span>
+    <span class="n">extract_video_frames_uniformly</span><span class="p">,</span>
+    <span class="n">load_data_with_context</span><span class="p">,</span>
+    <span class="n">load_video</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">UNFORKABLE</span><span class="p">,</span> <span class="n">Filter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..op_fusion</span><span class="w"> </span><span class="kn">import</span> <span class="n">INTER_SAMPLED_FRAMES</span><span class="p">,</span> <span class="n">LOADED_VIDEOS</span>
 
-<span class="n">easyocr</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;easyocr&#39;</span><span class="p">)</span>
+<span class="n">easyocr</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;easyocr&quot;</span><span class="p">)</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;video_ocr_area_ratio_filter&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;video_ocr_area_ratio_filter&quot;</span>
 
 
 <div class="viewcode-block" id="triangle_area">
@@ -375,8 +378,7 @@
     <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">p1</span>
     <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">p2</span>
     <span class="n">x3</span><span class="p">,</span> <span class="n">y3</span> <span class="o">=</span> <span class="n">p3</span>
-    <span class="n">tri_area</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x1</span> <span class="o">*</span> <span class="n">y2</span> <span class="o">+</span> <span class="n">x2</span> <span class="o">*</span> <span class="n">y3</span> <span class="o">+</span> <span class="n">x3</span> <span class="o">*</span> <span class="n">y1</span> <span class="o">-</span> <span class="n">x2</span> <span class="o">*</span> <span class="n">y1</span> <span class="o">-</span> <span class="n">x3</span> <span class="o">*</span> <span class="n">y2</span> <span class="o">-</span>
-                            <span class="n">x1</span> <span class="o">*</span> <span class="n">y3</span><span class="p">)</span>
+    <span class="n">tri_area</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x1</span> <span class="o">*</span> <span class="n">y2</span> <span class="o">+</span> <span class="n">x2</span> <span class="o">*</span> <span class="n">y3</span> <span class="o">+</span> <span class="n">x3</span> <span class="o">*</span> <span class="n">y1</span> <span class="o">-</span> <span class="n">x2</span> <span class="o">*</span> <span class="n">y1</span> <span class="o">-</span> <span class="n">x3</span> <span class="o">*</span> <span class="n">y2</span> <span class="o">-</span> <span class="n">x1</span> <span class="o">*</span> <span class="n">y3</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">tri_area</span></div>
 
 
@@ -392,18 +394,20 @@
 <span class="sd">    in the video are within a specified range.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
 <div class="viewcode-block" id="VideoOcrAreaRatioFilter.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.video_ocr_area_ratio_filter.VideoOcrAreaRatioFilter.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">min_area_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-                 <span class="n">max_area_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
-                 <span class="n">frame_sample_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-                 <span class="n">languages_to_detect</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ch_sim&#39;</span><span class="p">,</span> <span class="s1">&#39;en&#39;</span><span class="p">],</span>
-                 <span class="n">any_or_all</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;any&#39;</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">min_area_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">max_area_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">frame_sample_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">languages_to_detect</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ch_sim&quot;</span><span class="p">,</span> <span class="s2">&quot;en&quot;</span><span class="p">],</span>
+        <span class="n">any_or_all</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -430,10 +434,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">min_area_ratio</span> <span class="o">=</span> <span class="n">min_area_ratio</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_area_ratio</span> <span class="o">=</span> <span class="n">max_area_ratio</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">frame_sample_num</span> <span class="o">=</span> <span class="n">frame_sample_num</span>
-        <span class="k">if</span> <span class="n">any_or_all</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Keep strategy [</span><span class="si">{</span><span class="n">any_or_all</span><span class="si">}</span><span class="s1">] is not supported. &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;any&quot;, &quot;all&quot;].&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">any</span> <span class="o">=</span> <span class="p">(</span><span class="n">any_or_all</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">any_or_all</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keep strategy [</span><span class="si">{</span><span class="n">any_or_all</span><span class="si">}</span><span class="s2">] is not supported. &quot;</span> <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;any&quot;, &quot;all&quot;].&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">any</span> <span class="o">=</span> <span class="n">any_or_all</span> <span class="o">==</span> <span class="s2">&quot;any&quot;</span>
         <span class="c1"># initialize easyocr reader</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">languages_to_detect</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">languages_to_detect</span> <span class="o">=</span> <span class="p">[</span><span class="n">languages_to_detect</span><span class="p">]</span>
@@ -445,7 +448,7 @@
         <span class="p">)</span>
 
         <span class="c1"># only uniformly sampling method is supported in this OP</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sampled_frames_key_suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;-uniform-</span><span class="si">{</span><span class="n">frame_sample_num</span><span class="si">}</span><span class="s1">&#39;</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampled_frames_key_suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;-uniform-</span><span class="si">{</span><span class="n">frame_sample_num</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 
 <div class="viewcode-block" id="VideoOcrAreaRatioFilter.get_reader">
@@ -453,7 +456,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">get_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">():</span>
             <span class="n">rank</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">rank</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rank</span>
-            <span class="n">device</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;cuda:</span><span class="si">{</span><span class="n">rank</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">cuda_device_count</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;cuda:</span><span class="si">{</span><span class="n">rank</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">cuda_device_count</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span></div>
@@ -468,14 +471,12 @@
 
         <span class="c1"># there is no video in this sample</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]:</span>
-            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">video_ocr_area_ratio</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">video_ocr_area_ratio</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="c1"># load videos</span>
         <span class="n">loaded_video_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
-        <span class="n">sample</span><span class="p">,</span> <span class="n">videos</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span>
-                                                <span class="n">loaded_video_keys</span><span class="p">,</span> <span class="n">load_video</span><span class="p">)</span>
+        <span class="n">sample</span><span class="p">,</span> <span class="n">videos</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">loaded_video_keys</span><span class="p">,</span> <span class="n">load_video</span><span class="p">)</span>
 
         <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span>
         <span class="c1"># compute ocr area ratios</span>
@@ -485,8 +486,7 @@
             <span class="k">if</span> <span class="n">context</span> <span class="ow">and</span> <span class="n">sampled_frames_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">]:</span>
                 <span class="n">sampled_frames</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">sampled_frames_key</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">sampled_frames</span> <span class="o">=</span> <span class="n">extract_video_frames_uniformly</span><span class="p">(</span>
-                    <span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_sample_num</span><span class="p">)</span>
+                <span class="n">sampled_frames</span> <span class="o">=</span> <span class="n">extract_video_frames_uniformly</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_sample_num</span><span class="p">)</span>
                 <span class="c1"># store the sampled frames in the context</span>
                 <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
                     <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">sampled_frames_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">sampled_frames</span>
@@ -536,8 +536,7 @@
 
         <span class="c1"># get video durations</span>
         <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">video_ocr_area_ratio</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">video_ocr_area_ratios</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
+            <span class="n">video_ocr_area_ratios</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span> <span class="k">for</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
         <span class="p">]</span>
 
         <span class="k">return</span> <span class="n">sample</span></div>
@@ -546,12 +545,10 @@
 <div class="viewcode-block" id="VideoOcrAreaRatioFilter.process_single">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.video_ocr_area_ratio_filter.VideoOcrAreaRatioFilter.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
-        <span class="n">video_ocr_area_ratios</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span>
-            <span class="n">StatsKeys</span><span class="o">.</span><span class="n">video_ocr_area_ratio</span><span class="p">]</span>
-        <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">min_area_ratio</span> <span class="o">&lt;=</span> <span class="n">ocr_area_ratio</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_area_ratio</span>
-            <span class="k">for</span> <span class="n">ocr_area_ratio</span> <span class="ow">in</span> <span class="n">video_ocr_area_ratios</span>
-        <span class="p">])</span>
+        <span class="n">video_ocr_area_ratios</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">video_ocr_area_ratio</span><span class="p">]</span>
+        <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">min_area_ratio</span> <span class="o">&lt;=</span> <span class="n">ocr_area_ratio</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_area_ratio</span> <span class="k">for</span> <span class="n">ocr_area_ratio</span> <span class="ow">in</span> <span class="n">video_ocr_area_ratios</span><span class="p">]</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keep_bools</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 

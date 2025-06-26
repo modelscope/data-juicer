@@ -360,10 +360,10 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">StatsKeys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
 
-<span class="n">torch</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;torch&#39;</span><span class="p">)</span>
-<span class="n">vllm</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;vllm&#39;</span><span class="p">)</span>
+<span class="n">torch</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
+<span class="n">vllm</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;vllm&quot;</span><span class="p">)</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;llm_quality_score_filter&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;llm_quality_score_filter&quot;</span>
 
 
 <div class="viewcode-block" id="LLMQualityScoreFilter">
@@ -425,9 +425,7 @@
 <span class="s2">  &quot;recommendation&quot;: &quot;review&quot;</span>
 <span class="s2">}</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
-    <span class="n">DEFAULT_DIM_REQUIRED_KEYS</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="s1">&#39;grammar&#39;</span><span class="p">,</span> <span class="s1">&#39;informativeness&#39;</span><span class="p">,</span> <span class="s1">&#39;coherence&#39;</span>
-    <span class="p">]</span>
+    <span class="n">DEFAULT_DIM_REQUIRED_KEYS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="s2">&quot;grammar&quot;</span><span class="p">,</span> <span class="s2">&quot;informativeness&quot;</span><span class="p">,</span> <span class="s2">&quot;coherence&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="LLMQualityScoreFilter.compute_stats_single">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.llm_quality_score_filter.LLMQualityScoreFilter.compute_stats_single">[docs]</a>

@@ -356,7 +356,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">MetaKeys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;dialog_sentiment_detection_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;dialog_sentiment_detection_mapper&quot;</span>
 
 
 <span class="c1"># TODO: LLM-based inference.</span>
@@ -371,56 +371,60 @@
 <span class="sd">    labels and analysis for queries in the dialog.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;请判断用户和LLM多轮对话中用户所具有的情绪。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;要求：</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;- 需要先进行分析，然后罗列用户所具有的情绪，下面是一个样例，请模仿样例格式输出&#39;</span>
-                             <span class="s1">&#39;。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;用户：最近工作压力好大，我觉得整个人都快被压垮了。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;情感分析：用户的言语中透露出明显的压力和疲惫感，可能还夹杂着一些无助和焦虑。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;情感类别：压力、疲惫、无助、焦虑</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;LLM：听起来你真的承受了很多，面临这种情况确实不容易。有没有考虑过找一些放松的&#39;</span>
-                             <span class="s1">&#39;方式，比如听音乐或者散步来减轻压力呢？</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;用户：试过了，但是好像没什么效果，每天的事情都堆积如山。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;情感分析：用户感到无力解决现状，有挫败感，并且对尝试放松的方式失去信心。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;情感类别：无力、挫败</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;LLM：我理解你的感受，有时候压力积累到一定程度确实让人难以承受。或许你可以尝试&#39;</span>
-                             <span class="s1">&#39;规划一下时间，把任务分成小块来完成，这样可能会减少一些压力感。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;用户：这个主意不错，我会试着让自己更有条理一些，谢谢你的建议。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;情感分析：用户对建议表现出认同和感激，同时展现出试图积极面对问题的态度。</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;情感类别：认同、感激、积极</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="s1">&#39;LLM：不用谢，我很高兴能帮到你。记得给自己一些时间去适应新的计划，有任何需要&#39;</span>
-                             <span class="s1">&#39;随时可以跟我说哦！</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">DEFAULT_QUERY_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;用户：</span><span class="si">{query}</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="n">DEFAULT_RESPONSE_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;LLM：</span><span class="si">{response}</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="n">DEFAULT_CANDIDATES_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;备选情感类别：[</span><span class="si">{candidate_str}</span><span class="s1">]&#39;</span>
-    <span class="n">DEFAULT_ANALYSIS_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;情感分析：</span><span class="si">{analysis}</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="n">DEFAULT_LABELS_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;情感类别：</span><span class="si">{labels}</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="n">DEFAULT_ANALYSIS_PATTERN</span> <span class="o">=</span> <span class="s1">&#39;情感分析：(.*?)</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="n">DEFAULT_LABELS_PATTERN</span> <span class="o">=</span> <span class="s1">&#39;情感类别：(.*?)($|</span><span class="se">\n</span><span class="s1">)&#39;</span>
+    <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;请判断用户和LLM多轮对话中用户所具有的情绪。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;要求：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 需要先进行分析，然后罗列用户所具有的情绪，下面是一个样例，请模仿样例格式输出&quot;</span>
+        <span class="s2">&quot;。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;用户：最近工作压力好大，我觉得整个人都快被压垮了。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;情感分析：用户的言语中透露出明显的压力和疲惫感，可能还夹杂着一些无助和焦虑。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;情感类别：压力、疲惫、无助、焦虑</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;LLM：听起来你真的承受了很多，面临这种情况确实不容易。有没有考虑过找一些放松的&quot;</span>
+        <span class="s2">&quot;方式，比如听音乐或者散步来减轻压力呢？</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;用户：试过了，但是好像没什么效果，每天的事情都堆积如山。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;情感分析：用户感到无力解决现状，有挫败感，并且对尝试放松的方式失去信心。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;情感类别：无力、挫败</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;LLM：我理解你的感受，有时候压力积累到一定程度确实让人难以承受。或许你可以尝试&quot;</span>
+        <span class="s2">&quot;规划一下时间，把任务分成小块来完成，这样可能会减少一些压力感。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;用户：这个主意不错，我会试着让自己更有条理一些，谢谢你的建议。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;情感分析：用户对建议表现出认同和感激，同时展现出试图积极面对问题的态度。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;情感类别：认同、感激、积极</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;LLM：不用谢，我很高兴能帮到你。记得给自己一些时间去适应新的计划，有任何需要&quot;</span>
+        <span class="s2">&quot;随时可以跟我说哦！</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">DEFAULT_QUERY_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;用户：</span><span class="si">{query}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">DEFAULT_RESPONSE_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;LLM：</span><span class="si">{response}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">DEFAULT_CANDIDATES_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;备选情感类别：[</span><span class="si">{candidate_str}</span><span class="s2">]&quot;</span>
+    <span class="n">DEFAULT_ANALYSIS_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;情感分析：</span><span class="si">{analysis}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">DEFAULT_LABELS_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;情感类别：</span><span class="si">{labels}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">DEFAULT_ANALYSIS_PATTERN</span> <span class="o">=</span> <span class="s2">&quot;情感分析：(.*?)</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">DEFAULT_LABELS_PATTERN</span> <span class="o">=</span> <span class="s2">&quot;情感类别：(.*?)($|</span><span class="se">\n</span><span class="s2">)&quot;</span>
 
 <div class="viewcode-block" id="DialogSentimentDetectionMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.dialog_sentiment_detection_mapper.DialogSentimentDetectionMapper.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
-                 <span class="n">sentiment_candidates</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">max_round</span><span class="p">:</span> <span class="n">NonNegativeInt</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-                 <span class="o">*</span><span class="p">,</span>
-                 <span class="n">labels_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">dialog_sentiment_labels</span><span class="p">,</span>
-                 <span class="n">analysis_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">dialog_sentiment_labels_analysis</span><span class="p">,</span>
-                 <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">system_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">query_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">response_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">candidate_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">analysis_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">labels_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">analysis_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">labels_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-                 <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-                 <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+        <span class="n">sentiment_candidates</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_round</span><span class="p">:</span> <span class="n">NonNegativeInt</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">labels_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">dialog_sentiment_labels</span><span class="p">,</span>
+        <span class="n">analysis_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">dialog_sentiment_labels_analysis</span><span class="p">,</span>
+        <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">system_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">query_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">response_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">candidate_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">analysis_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">labels_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">analysis_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">labels_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -468,26 +472,18 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span> <span class="o">=</span> <span class="n">system_prompt</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SYSTEM_PROMPT</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">query_template</span> <span class="o">=</span> <span class="n">query_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_QUERY_TEMPLATE</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">response_template</span> <span class="o">=</span> <span class="n">response_template</span> <span class="ow">or</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_RESPONSE_TEMPLATE</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">candidate_template</span> <span class="o">=</span> <span class="n">candidate_template</span> <span class="ow">or</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_CANDIDATES_TEMPLATE</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">analysis_template</span> <span class="o">=</span> <span class="n">analysis_template</span> <span class="ow">or</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_ANALYSIS_TEMPLATE</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">labels_template</span> <span class="o">=</span> <span class="n">labels_template</span> <span class="ow">or</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_LABELS_TEMPLATE</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">analysis_pattern</span> <span class="o">=</span> <span class="n">analysis_pattern</span> <span class="ow">or</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_ANALYSIS_PATTERN</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">labels_pattern</span> <span class="o">=</span> <span class="n">labels_pattern</span> <span class="ow">or</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_LABELS_PATTERN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response_template</span> <span class="o">=</span> <span class="n">response_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_RESPONSE_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">candidate_template</span> <span class="o">=</span> <span class="n">candidate_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_CANDIDATES_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis_template</span> <span class="o">=</span> <span class="n">analysis_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_ANALYSIS_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_template</span> <span class="o">=</span> <span class="n">labels_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_LABELS_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis_pattern</span> <span class="o">=</span> <span class="n">analysis_pattern</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_ANALYSIS_PATTERN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_pattern</span> <span class="o">=</span> <span class="n">labels_pattern</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_LABELS_PATTERN</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;api&#39;</span><span class="p">,</span>
-                                       <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span>
-                                       <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span>
-                                       <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
-                                       <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;api&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span></div>
 
@@ -495,15 +491,13 @@
 <div class="viewcode-block" id="DialogSentimentDetectionMapper.build_input">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.dialog_sentiment_detection_mapper.DialogSentimentDetectionMapper.build_input">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">history</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentiment_candidates</span><span class="p">:</span>
-            <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">candidate_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">candidate_str</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentiment_candidates</span><span class="p">))</span>
+            <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">candidate_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">candidate_str</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentiment_candidates</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">input_prompt</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">input_prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_round</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">input_prompt</span> <span class="o">+=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">max_round</span> <span class="o">*</span> <span class="mi">4</span><span class="p">:])</span>
+            <span class="n">input_prompt</span> <span class="o">+=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">max_round</span> <span class="o">*</span> <span class="mi">4</span> <span class="p">:])</span>
 
         <span class="n">input_prompt</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
@@ -513,8 +507,8 @@
 <div class="viewcode-block" id="DialogSentimentDetectionMapper.parse_output">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.dialog_sentiment_detection_mapper.DialogSentimentDetectionMapper.parse_output">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
-        <span class="n">analysis</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">analysis</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
         <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">analysis_pattern</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
@@ -530,7 +524,6 @@
 <div class="viewcode-block" id="DialogSentimentDetectionMapper.process_single">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.dialog_sentiment_detection_mapper.DialogSentimentDetectionMapper.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="n">meta</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels_key</span> <span class="ow">in</span> <span class="n">meta</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis_key</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sample</span>
@@ -544,20 +537,22 @@
         <span class="n">dialog</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">history_key</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_key</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">and</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">query_key</span><span class="p">]:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_key</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">and</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">response_key</span><span class="p">]:</span>
-                <span class="n">dialog</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">query_key</span><span class="p">],</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">response_key</span><span class="p">]))</span>
+                <span class="n">dialog</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">query_key</span><span class="p">],</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">response_key</span><span class="p">]))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">dialog</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">query_key</span><span class="p">],</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+                <span class="n">dialog</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">query_key</span><span class="p">],</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">qa</span> <span class="ow">in</span> <span class="n">dialog</span><span class="p">:</span>
             <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="n">qa</span><span class="p">)</span>
-            <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span>
-                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;system&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span><span class="p">,</span>
-            <span class="p">},</span> <span class="p">{</span>
-                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">input_prompt</span><span class="p">,</span>
-            <span class="p">}]</span>
+            <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">input_prompt</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">]</span>
 
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">try_num</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -566,7 +561,7 @@
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="k">break</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="n">analysis_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
             <span class="n">labels_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>

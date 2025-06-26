@@ -364,9 +364,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..op_fusion</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOADED_VIDEOS</span>
 
 <span class="k">with</span> <span class="n">HiddenPrints</span><span class="p">():</span>
-    <span class="n">ffmpeg</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;ffmpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;ffmpeg-python&#39;</span><span class="p">)</span>
+    <span class="n">ffmpeg</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;ffmpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;ffmpeg-python&quot;</span><span class="p">)</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;video_resize_resolution_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;video_resize_resolution_mapper&quot;</span>
 
 
 <div class="viewcode-block" id="VideoResizeResolutionMapper">
@@ -375,21 +375,23 @@
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoResizeResolutionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Mapper to resize videos resolution. We leave the super resolution</span>
-<span class="sd">        with deep learning for future works.</span>
+<span class="sd">    Mapper to resize videos resolution. We leave the super resolution</span>
+<span class="sd">    with deep learning for future works.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="VideoResizeResolutionMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_resize_resolution_mapper.VideoResizeResolutionMapper.__init__">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">min_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="n">max_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
-                 <span class="n">min_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="n">max_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
-                 <span class="n">force_original_aspect_ratio</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span>
-                 <span class="n">force_divisible_by</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">min_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">max_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
+        <span class="n">min_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">max_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
+        <span class="n">force_original_aspect_ratio</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;disable&quot;</span><span class="p">,</span>
+        <span class="n">force_divisible_by</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -417,24 +419,20 @@
 
         <span class="n">force_original_aspect_ratio</span> <span class="o">=</span> <span class="n">force_original_aspect_ratio</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">force_original_aspect_ratio</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
-                <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;decrease&#39;</span><span class="p">,</span> <span class="s1">&#39;increase&#39;</span>
-        <span class="p">]:</span>
+        <span class="k">if</span> <span class="n">force_original_aspect_ratio</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;disable&quot;</span><span class="p">,</span> <span class="s2">&quot;decrease&quot;</span><span class="p">,</span> <span class="s2">&quot;increase&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;force_original_aspect_ratio [</span><span class="si">{</span><span class="n">force_original_aspect_ratio</span><span class="si">}</span><span class="s1">]&#39;</span>
-                <span class="sa">f</span><span class="s1">&#39; is not supported. &#39;</span>
-                <span class="sa">f</span><span class="s2">&quot;Can only be one of [&#39;disable&#39;, &#39;decrease&#39;, &#39;increase&#39;]. &quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">force_divisible_by</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">force_divisible_by</span> <span class="o">%</span> <span class="mi">2</span>
-                <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">force_original_aspect_ratio</span> <span class="o">!=</span> <span class="s1">&#39;disable&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;force_divisible_by [</span><span class="si">{</span><span class="n">force_divisible_by</span><span class="si">}</span><span class="s1">] must be a positive&#39;</span>
-                <span class="sa">f</span><span class="s1">&#39; even number. &#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;force_original_aspect_ratio [</span><span class="si">{</span><span class="n">force_original_aspect_ratio</span><span class="si">}</span><span class="s2">]&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; is not supported. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Can only be one of [&#39;disable&#39;, &#39;decrease&#39;, &#39;increase&#39;]. &quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">force_divisible_by</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">force_divisible_by</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">force_original_aspect_ratio</span> <span class="o">!=</span> <span class="s2">&quot;disable&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;force_divisible_by [</span><span class="si">{</span><span class="n">force_divisible_by</span><span class="si">}</span><span class="s2">] must be a positive&quot;</span> <span class="sa">f</span><span class="s2">&quot; even number. &quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">min_width</span> <span class="o">=</span> <span class="n">min_width</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_width</span> <span class="o">=</span> <span class="n">max_width</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_height</span> <span class="o">=</span> <span class="n">min_height</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_height</span> <span class="o">=</span> <span class="n">max_height</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scale_method</span> <span class="o">=</span> <span class="s1">&#39;scale&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_method</span> <span class="o">=</span> <span class="s2">&quot;scale&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">force_original_aspect_ratio</span> <span class="o">=</span> <span class="n">force_original_aspect_ratio</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">force_divisible_by</span> <span class="o">=</span> <span class="n">force_divisible_by</span></div>
 
@@ -453,7 +451,6 @@
         <span class="n">loaded_video_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loaded_video_keys</span><span class="p">):</span>
-
             <span class="n">container</span> <span class="o">=</span> <span class="n">load_video</span><span class="p">(</span><span class="n">video_key</span><span class="p">)</span>
             <span class="n">video</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">video</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">width</span> <span class="o">=</span> <span class="n">video</span><span class="o">.</span><span class="n">codec_context</span><span class="o">.</span><span class="n">width</span>
@@ -461,8 +458,12 @@
             <span class="n">origin_ratio</span> <span class="o">=</span> <span class="n">width</span> <span class="o">/</span> <span class="n">height</span>
             <span class="n">close_video</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">width</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_width</span> <span class="ow">and</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_width</span> <span class="ow">and</span> \
-               <span class="n">height</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_height</span> <span class="ow">and</span> <span class="n">height</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_height</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">width</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_width</span>
+                <span class="ow">and</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_width</span>
+                <span class="ow">and</span> <span class="n">height</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_height</span>
+                <span class="ow">and</span> <span class="n">height</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_height</span>
+            <span class="p">):</span>
                 <span class="k">continue</span>
 
             <span class="c1"># keep the original aspect ratio as possible</span>
@@ -480,7 +481,7 @@
                 <span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_height</span>
 
             <span class="c1"># the width and height of a video must be divisible by 2.</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_original_aspect_ratio</span> <span class="o">==</span> <span class="s1">&#39;disable&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_original_aspect_ratio</span> <span class="o">==</span> <span class="s2">&quot;disable&quot;</span><span class="p">:</span>
                 <span class="n">force_divisible_by</span> <span class="o">=</span> <span class="mi">2</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">force_divisible_by</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_divisible_by</span>
@@ -491,35 +492,30 @@
             <span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_width</span><span class="p">))</span>
             <span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">force_divisible_by</span><span class="p">)</span> <span class="o">*</span> <span class="n">force_divisible_by</span>
             <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_height</span><span class="p">))</span>
-            <span class="n">height</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
-                <span class="n">height</span> <span class="o">/</span> <span class="n">force_divisible_by</span><span class="p">)</span> <span class="o">*</span> <span class="n">force_divisible_by</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">height</span> <span class="o">/</span> <span class="n">force_divisible_by</span><span class="p">)</span> <span class="o">*</span> <span class="n">force_divisible_by</span>
             <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_height</span><span class="p">))</span>
             <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">height</span> <span class="o">/</span> <span class="n">force_divisible_by</span><span class="p">)</span> <span class="o">*</span> <span class="n">force_divisible_by</span>
 
             <span class="c1"># keep the origin aspect ratio</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_original_aspect_ratio</span> <span class="o">==</span> <span class="s1">&#39;increase&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_original_aspect_ratio</span> <span class="o">==</span> <span class="s2">&quot;increase&quot;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">width</span> <span class="o">/</span> <span class="n">height</span> <span class="o">&lt;</span> <span class="n">origin_ratio</span><span class="p">:</span>
                     <span class="n">width</span> <span class="o">=</span> <span class="n">height</span> <span class="o">*</span> <span class="n">origin_ratio</span>
                 <span class="k">elif</span> <span class="n">width</span> <span class="o">/</span> <span class="n">height</span> <span class="o">&gt;</span> <span class="n">origin_ratio</span><span class="p">:</span>
                     <span class="n">height</span> <span class="o">=</span> <span class="n">width</span> <span class="o">/</span> <span class="n">origin_ratio</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_original_aspect_ratio</span> <span class="o">==</span> <span class="s1">&#39;decrease&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_original_aspect_ratio</span> <span class="o">==</span> <span class="s2">&quot;decrease&quot;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">width</span> <span class="o">/</span> <span class="n">height</span> <span class="o">&lt;</span> <span class="n">origin_ratio</span><span class="p">:</span>
                     <span class="n">height</span> <span class="o">=</span> <span class="n">width</span> <span class="o">/</span> <span class="n">origin_ratio</span>
                 <span class="k">elif</span> <span class="n">width</span> <span class="o">/</span> <span class="n">height</span> <span class="o">&gt;</span> <span class="n">origin_ratio</span><span class="p">:</span>
                     <span class="n">width</span> <span class="o">=</span> <span class="n">height</span> <span class="o">*</span> <span class="n">origin_ratio</span>
             <span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">force_divisible_by</span><span class="p">))</span> <span class="o">*</span> <span class="n">force_divisible_by</span>
-            <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span>
-                <span class="n">height</span> <span class="o">/</span> <span class="n">force_divisible_by</span><span class="p">))</span> <span class="o">*</span> <span class="n">force_divisible_by</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">height</span> <span class="o">/</span> <span class="n">force_divisible_by</span><span class="p">))</span> <span class="o">*</span> <span class="n">force_divisible_by</span>
 
             <span class="c1"># resize</span>
-            <span class="n">resized_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
-                                                  <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">resized_video_key</span><span class="p">)</span>
-                    <span class="ow">or</span> <span class="n">resized_video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">):</span>
-                <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-nostdin&#39;</span><span class="p">,</span> <span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;quiet&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;-y&#39;</span><span class="p">]</span>  <span class="c1"># close the ffmpeg log</span>
+            <span class="n">resized_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">resized_video_key</span><span class="p">)</span> <span class="ow">or</span> <span class="n">resized_video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-nostdin&quot;</span><span class="p">,</span> <span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;quiet&quot;</span><span class="p">,</span> <span class="s2">&quot;-y&quot;</span><span class="p">]</span>  <span class="c1"># close the ffmpeg log</span>
                 <span class="n">stream</span> <span class="o">=</span> <span class="n">ffmpeg</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">video_key</span><span class="p">)</span>
-                <span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s1">&#39;scale&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+                <span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
                 <span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">resized_video_key</span><span class="p">)</span><span class="o">.</span><span class="n">global_args</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
                 <span class="n">stream</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 

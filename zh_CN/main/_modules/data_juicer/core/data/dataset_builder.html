@@ -383,107 +383,91 @@
 
 <div class="viewcode-block" id="DatasetBuilder.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.dataset_builder.DatasetBuilder.__init__">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">executor_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">executor_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_generated_dataset_config</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">executor_type</span> <span class="o">=</span> <span class="n">executor_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">require_dataset_arg</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># priority: generated_dataset_config &gt; dataset_path &gt; dataset</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span>
-                <span class="n">cfg</span><span class="p">,</span>
-                <span class="s1">&#39;generated_dataset_config&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">generated_dataset_config</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;generated_dataset_config&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">generated_dataset_config</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">use_generated_dataset_config</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">generated_dataset_config</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">generated_dataset_config</span>
             <span class="k">return</span>
-        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s1">&#39;dataset_path&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;found dataset_path setting: </span><span class="si">{</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;dataset_path&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;found dataset_path setting: </span><span class="si">{</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">ds_configs</span> <span class="o">=</span> <span class="n">rewrite_cli_datapath</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s1">&#39;dataset&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;found dataset setting: </span><span class="si">{</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;dataset&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;found dataset setting: </span><span class="si">{</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">ds_configs</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dataset</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s1">&#39;No dataset setting found in configurations. Will &#39;</span>
-                <span class="s1">&#39;check the dataset argument before loading dataset.&#39;</span><span class="p">)</span>
+                <span class="s2">&quot;No dataset setting found in configurations. Will &quot;</span> <span class="s2">&quot;check the dataset argument before loading dataset.&quot;</span>
+            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">require_dataset_arg</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">return</span>
 
         <span class="c1"># validate dataset config for type constraints</span>
         <span class="c1"># TODO other constraints; ray dataset only supports local, etc.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds_configs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
-                <span class="s1">&#39;Dataset config should be a dictionary&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s1">&#39;configs&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds_configs</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
-                <span class="s1">&#39;Dataset config should have a &quot;configs&quot; key&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds_configs</span><span class="p">[</span><span class="s1">&#39;configs&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span>
-                <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds_configs</span><span class="p">[</span><span class="s1">&#39;configs&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
-                <span class="s1">&#39;Dataset config &quot;configs&quot; should be a non-empty list&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;max_sample_num&#39;</span> <span class="ow">in</span> <span class="n">ds_configs</span>
-                <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds_configs</span><span class="p">[</span><span class="s1">&#39;max_sample_num&#39;</span><span class="p">],</span> <span class="nb">int</span><span class="p">)</span>
-                     <span class="ow">or</span> <span class="n">ds_configs</span><span class="p">[</span><span class="s1">&#39;max_sample_num&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
-                <span class="s1">&#39;Dataset config &quot;max_sample_num&quot; should be a positive integer&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">ds_config</span> <span class="ow">in</span> <span class="n">ds_configs</span><span class="p">[</span><span class="s1">&#39;configs&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span><span class="s2">&quot;Dataset config should be a dictionary&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;configs&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds_configs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span><span class="s1">&#39;Dataset config should have a &quot;configs&quot; key&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds_configs</span><span class="p">[</span><span class="s2">&quot;configs&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds_configs</span><span class="p">[</span><span class="s2">&quot;configs&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span><span class="s1">&#39;Dataset config &quot;configs&quot; should be a non-empty list&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;max_sample_num&quot;</span> <span class="ow">in</span> <span class="n">ds_configs</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds_configs</span><span class="p">[</span><span class="s2">&quot;max_sample_num&quot;</span><span class="p">],</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">ds_configs</span><span class="p">[</span><span class="s2">&quot;max_sample_num&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span><span class="s1">&#39;Dataset config &quot;max_sample_num&quot; should be a positive integer&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ds_config</span> <span class="ow">in</span> <span class="n">ds_configs</span><span class="p">[</span><span class="s2">&quot;configs&quot;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
-                    <span class="s1">&#39;Dataset configs should be dictionaries&#39;</span><span class="p">)</span>
-        <span class="n">types</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">ds_config</span> <span class="ow">in</span> <span class="n">ds_configs</span><span class="p">[</span><span class="s1">&#39;configs&#39;</span><span class="p">]</span>
-        <span class="p">]</span>
+                <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span><span class="s2">&quot;Dataset configs should be dictionaries&quot;</span><span class="p">)</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">ds_config</span> <span class="ow">in</span> <span class="n">ds_configs</span><span class="p">[</span><span class="s2">&quot;configs&quot;</span><span class="p">]]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">types</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
-                <span class="s1">&#39;Mixture of diff types (LOCAL/REMOTE/...) are not supported&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">types</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;remote&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds_configs</span><span class="p">[</span><span class="s1">&#39;configs&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
-                <span class="s1">&#39;Multiple remote datasets are not supported&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span><span class="s2">&quot;Mixture of diff types (LOCAL/REMOTE/...) are not supported&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">types</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;remote&quot;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds_configs</span><span class="p">[</span><span class="s2">&quot;configs&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span><span class="s2">&quot;Multiple remote datasets are not supported&quot;</span><span class="p">)</span>
 
         <span class="c1"># initialize the data load strategies</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">ds_config</span> <span class="ow">in</span> <span class="n">ds_configs</span><span class="p">[</span><span class="s1">&#39;configs&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">ds_config</span> <span class="ow">in</span> <span class="n">ds_configs</span><span class="p">[</span><span class="s2">&quot;configs&quot;</span><span class="p">]:</span>
             <span class="c1"># initialize data loading strategy</span>
-            <span class="n">data_type</span> <span class="o">=</span> <span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">data_source</span> <span class="o">=</span> <span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">stra</span> <span class="o">=</span> <span class="n">DataLoadStrategyRegistry</span><span class="o">.</span><span class="n">get_strategy_class</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">executor_type</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">data_source</span><span class="p">)(</span><span class="n">ds_config</span><span class="p">,</span>
-                                                            <span class="n">cfg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">)</span>
+            <span class="n">data_type</span> <span class="o">=</span> <span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">data_source</span> <span class="o">=</span> <span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">stra</span> <span class="o">=</span> <span class="n">DataLoadStrategyRegistry</span><span class="o">.</span><span class="n">get_strategy_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">executor_type</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">data_source</span><span class="p">)(</span>
+                <span class="n">ds_config</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="n">stra</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No data load strategy found for&#39;</span>
-                                 <span class="sa">f</span><span class="s1">&#39; </span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">data_source</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No data load strategy found for&quot;</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">data_source</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stra</span><span class="p">)</span>
 
         <span class="c1"># failed to initialize any load strategy</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No data load strategies found for </span><span class="si">{</span><span class="n">ds_configs</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span><span class="s1">&#39;No data load strategies found&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No data load strategies found for </span><span class="si">{</span><span class="n">ds_configs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span><span class="s2">&quot;No data load strategies found&quot;</span><span class="p">)</span>
 
         <span class="c1"># initialzie the sample numbers</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_sample_num</span> <span class="o">=</span> <span class="n">ds_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;max_sample_num&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_sample_num</span> <span class="o">=</span> <span class="n">ds_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_sample_num&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="c1"># get weights and sample numbers</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_sample_num</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">stra</span><span class="o">.</span><span class="n">weight</span> <span class="k">for</span> <span class="n">stra</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sample_numbers</span> <span class="o">=</span> <span class="n">get_sample_numbers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span>
-                                                     <span class="bp">self</span><span class="o">.</span><span class="n">max_sample_num</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sample_numbers</span> <span class="o">=</span> <span class="n">get_sample_numbers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_sample_num</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span> <span class="k">for</span> <span class="n">stra</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sample_numbers</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">stra</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span><span class="p">]</span>
 
         <span class="c1"># initialize data validators</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validators</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s1">&#39;validators&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;validators&quot;</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">validator_config</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">validators</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">validator_config</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">validator_config</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Validator config must have a &quot;type&quot; key&#39;</span><span class="p">)</span>
-                <span class="n">validator_type</span> <span class="o">=</span> <span class="n">validator_config</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
-                <span class="n">validator_cls</span> <span class="o">=</span> <span class="n">DataValidatorRegistry</span><span class="o">.</span><span class="n">get_validator</span><span class="p">(</span>
-                    <span class="n">validator_type</span><span class="p">)</span>
+                <span class="n">validator_type</span> <span class="o">=</span> <span class="n">validator_config</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+                <span class="n">validator_cls</span> <span class="o">=</span> <span class="n">DataValidatorRegistry</span><span class="o">.</span><span class="n">get_validator</span><span class="p">(</span><span class="n">validator_type</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">validator_cls</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">validator_cls</span><span class="p">(</span><span class="n">validator_config</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s1">&#39;No data validator found for </span><span class="si">{</span><span class="n">validator_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No data validator found for </span><span class="si">{</span><span class="n">validator_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DatasetBuilder.load_dataset">
@@ -492,20 +476,19 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">require_dataset_arg</span><span class="p">:</span>
             <span class="c1"># should not get into this method</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s1">&#39;Unable to load dataset; should have one of &#39;</span>
-                <span class="s1">&#39;generated_dataset_config, dataset_path, or dataset &#39;</span>
-                <span class="s1">&#39;in configurations, or pass the `dataset` object through `run`&#39;</span>
-                <span class="s1">&#39; method&#39;</span><span class="p">)</span>
+                <span class="s2">&quot;Unable to load dataset; should have one of &quot;</span>
+                <span class="s2">&quot;generated_dataset_config, dataset_path, or dataset &quot;</span>
+                <span class="s2">&quot;in configurations, or pass the `dataset` object through `run`&quot;</span>
+                <span class="s2">&quot; method&quot;</span>
+            <span class="p">)</span>
 
         <span class="c1"># if generated_dataset_config present, prioritize</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_generated_dataset_config</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">DatasetBuilder</span><span class="o">.</span><span class="n">load_dataset_by_generated_config</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">generated_dataset_config</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">DatasetBuilder</span><span class="o">.</span><span class="n">load_dataset_by_generated_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generated_dataset_config</span><span class="p">)</span>
 
         <span class="n">_datasets</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># load datasets with sample numbers</span>
-        <span class="k">for</span> <span class="n">stra</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">sample_num</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span>
-                                            <span class="bp">self</span><span class="o">.</span><span class="n">sample_numbers</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">stra</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">sample_num</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_numbers</span><span class="p">):</span>
             <span class="c1"># load dataset with its load strategy</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">stra</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -520,12 +503,11 @@
             <span class="n">_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
         <span class="c1"># handle data mixture</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">executor_type</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">executor_type</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="n">concatenate_datasets</span><span class="p">(</span><span class="n">_datasets</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">executor_type</span> <span class="o">==</span> <span class="s1">&#39;ray&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">executor_type</span> <span class="o">==</span> <span class="s2">&quot;ray&quot;</span><span class="p">:</span>
             <span class="c1"># TODO: support multiple datasets and mixing for ray</span>
-            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span>
-                <span class="n">_datasets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Ray setup only supports one dataset now&#39;</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">_datasets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Ray setup only supports one dataset now&quot;</span>
             <span class="k">return</span> <span class="n">_datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
@@ -536,13 +518,13 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        load dataset by generated config</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">generated_dataset_config</span><span class="p">,</span>
-                          <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">generated_dataset_config</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">generated_dataset_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;type&quot;</span> <span class="ow">in</span> <span class="n">generated_dataset_config</span>
         <span class="n">args</span> <span class="o">=</span> <span class="n">generated_dataset_config</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="c1"># TODO finish the auto local dataset part</span>
-        <span class="n">obj_name</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span>
+        <span class="n">obj_name</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.format.formatter</span><span class="w"> </span><span class="kn">import</span> <span class="n">FORMATTERS</span>
+
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">FORMATTERS</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">obj_name</span><span class="p">](</span><span class="o">**</span><span class="n">args</span><span class="p">)</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">dataset</span></div>
 </div>
@@ -563,30 +545,21 @@
 <span class="sd">    :return: list of dataset configs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">paths</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">parse_cli_datapath</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">)</span>
-    <span class="n">ret</span> <span class="o">=</span> <span class="p">({</span>
-        <span class="s1">&#39;configs&#39;</span><span class="p">:</span> <span class="p">[],</span>
-        <span class="s1">&#39;max_sample_num&#39;</span><span class="p">:</span> <span class="n">max_sample_num</span>
-    <span class="p">}</span> <span class="k">if</span> <span class="n">max_sample_num</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="s1">&#39;configs&#39;</span><span class="p">:</span> <span class="p">[]</span>
-    <span class="p">})</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;configs&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;max_sample_num&quot;</span><span class="p">:</span> <span class="n">max_sample_num</span><span class="p">}</span> <span class="k">if</span> <span class="n">max_sample_num</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;configs&quot;</span><span class="p">:</span> <span class="p">[]}</span>
     <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
             <span class="c1"># local files</span>
-            <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;configs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;local&#39;</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">:</span> <span class="n">w</span><span class="p">})</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_absolute_path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
-              <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">ret</span><span class="p">[</span><span class="s2">&quot;configs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="n">w</span><span class="p">})</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">is_absolute_path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># remote huggingface</span>
-            <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;configs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span>
-                <span class="s1">&#39;split&#39;</span><span class="p">:</span> <span class="s1">&#39;train&#39;</span>
-            <span class="p">})</span>
+            <span class="n">ret</span><span class="p">[</span><span class="s2">&quot;configs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;huggingface&quot;</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s2">&quot;split&quot;</span><span class="p">:</span> <span class="s2">&quot;train&quot;</span><span class="p">})</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1">#</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Unable to load the dataset from [</span><span class="si">{</span><span class="n">dataset_path</span><span class="si">}</span><span class="s1">]. &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;Data-Juicer CLI mode only supports local files &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;w or w/o weights, or huggingface path&#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;Unable to load the dataset from [</span><span class="si">{</span><span class="n">dataset_path</span><span class="si">}</span><span class="s2">]. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Data-Juicer CLI mode only supports local files &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;w or w/o weights, or huggingface path&quot;</span>
+            <span class="p">)</span>
     <span class="k">return</span> <span class="n">ret</span></div>
 
 
@@ -609,7 +582,7 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">tokens</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid dataset path format: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid dataset path format: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">prefixes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">weights</span> <span class="o">=</span> <span class="p">[]</span>
@@ -639,15 +612,12 @@
     <span class="n">sum_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">sum_weights</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
     <span class="n">weights</span> <span class="o">/=</span> <span class="n">sum_weights</span>
-    <span class="n">sample_num_per_dataset</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">max_sample_num</span> <span class="o">*</span> <span class="n">weight</span><span class="p">))</span> <span class="k">for</span> <span class="n">weight</span> <span class="ow">in</span> <span class="n">weights</span>
-    <span class="p">]</span>
+    <span class="n">sample_num_per_dataset</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">max_sample_num</span> <span class="o">*</span> <span class="n">weight</span><span class="p">))</span> <span class="k">for</span> <span class="n">weight</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">]</span>
 
     <span class="c1"># Adjust</span>
     <span class="n">acc_sample_numbers</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sample_num_per_dataset</span><span class="p">)):</span>
-        <span class="n">sample_numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sample_num_per_dataset</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                                <span class="n">max_sample_num</span> <span class="o">-</span> <span class="n">acc_sample_numbers</span><span class="p">)</span>
+        <span class="n">sample_numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sample_num_per_dataset</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">max_sample_num</span> <span class="o">-</span> <span class="n">acc_sample_numbers</span><span class="p">)</span>
         <span class="n">acc_sample_numbers</span> <span class="o">+=</span> <span class="n">sample_numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">sample_numbers</span></div>

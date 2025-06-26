@@ -369,7 +369,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..common</span><span class="w"> </span><span class="kn">import</span> <span class="n">split_text_by_punctuation</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;most_relevant_entities_aggregator&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;most_relevant_entities_aggregator&quot;</span>
 
 
 <span class="c1"># TODO: LLM-based inference.</span>
@@ -383,42 +383,43 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_TEMPLATE</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s1">&#39;给定与`</span><span class="si">{entity}</span><span class="s1">`相关的一些文档，&#39;</span>
-        <span class="s1">&#39;总结一些与`</span><span class="si">{entity}</span><span class="s1">`最为相关的`</span><span class="si">{entity_type}</span><span class="s1">`。</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;要求：</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;- 不用包含与</span><span class="si">{entity}</span><span class="s1">为同一</span><span class="si">{entity_type}</span><span class="s1">的</span><span class="si">{entity_type}</span><span class="s1">。</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;- 请按照人物的重要性进行排序，**越重要人物在列表越前面**。</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;- 你的返回格式如下：</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;## 分析</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;你对各个</span><span class="si">{entity_type}</span><span class="s1">与</span><span class="si">{entity}</span><span class="s1">关联度的分析</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;## 列表</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;人物1, 人物2, 人物3, ...&#39;</span><span class="p">)</span>
+        <span class="s2">&quot;给定与`</span><span class="si">{entity}</span><span class="s2">`相关的一些文档，&quot;</span>
+        <span class="s2">&quot;总结一些与`</span><span class="si">{entity}</span><span class="s2">`最为相关的`</span><span class="si">{entity_type}</span><span class="s2">`。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;要求：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 不用包含与</span><span class="si">{entity}</span><span class="s2">为同一</span><span class="si">{entity_type}</span><span class="s2">的</span><span class="si">{entity_type}</span><span class="s2">。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 请按照人物的重要性进行排序，**越重要人物在列表越前面**。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 你的返回格式如下：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;## 分析</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;你对各个</span><span class="si">{entity_type}</span><span class="s2">与</span><span class="si">{entity}</span><span class="s2">关联度的分析</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;## 列表</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;人物1, 人物2, 人物3, ...&quot;</span>
+    <span class="p">)</span>
 
-    <span class="n">DEFAULT_INPUT_TEMPLATE</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;`</span><span class="si">{entity}</span><span class="s1">`的相关文档：</span><span class="se">\n</span><span class="s1">&#39;</span>
-                              <span class="s1">&#39;</span><span class="si">{sub_docs}</span><span class="se">\n\n</span><span class="s1">&#39;</span>
-                              <span class="s1">&#39;与`</span><span class="si">{entity}</span><span class="s1">`最相关的一些`</span><span class="si">{entity_type}</span><span class="s1">`：</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">DEFAULT_INPUT_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;`</span><span class="si">{entity}</span><span class="s2">`的相关文档：</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="si">{sub_docs}</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="s2">&quot;与`</span><span class="si">{entity}</span><span class="s2">`最相关的一些`</span><span class="si">{entity_type}</span><span class="s2">`：</span><span class="se">\n</span><span class="s2">&quot;</span>
 
-    <span class="n">DEFAULT_OUTPUT_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\#\#\s*列表\s*(.*?)\Z&#39;</span>
+    <span class="n">DEFAULT_OUTPUT_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\#\#\s*列表\s*(.*?)\Z&quot;</span>
 
 <div class="viewcode-block" id="MostRelevantEntitiesAggregator.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.most_relevant_entities_aggregator.MostRelevantEntitiesAggregator.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
-                 <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">query_entity_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">input_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">event_description</span><span class="p">,</span>
-                 <span class="n">output_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BatchMetaKeys</span><span class="o">.</span><span class="n">most_relevant_entities</span><span class="p">,</span>
-                 <span class="n">max_token_num</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="o">*</span><span class="p">,</span>
-                 <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">system_prompt_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">input_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">output_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-                 <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-                 <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+        <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">query_entity_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">input_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">event_description</span><span class="p">,</span>
+        <span class="n">output_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BatchMetaKeys</span><span class="o">.</span><span class="n">most_relevant_entities</span><span class="p">,</span>
+        <span class="n">max_token_num</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">system_prompt_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">input_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">output_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 <span class="sd">        :param api_model: API model name.</span>
@@ -446,8 +447,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">entity</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">query_entity_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s1">&#39;The entity and query_entity_type cannot be None!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The entity and query_entity_type cannot be None!&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">entity</span> <span class="o">=</span> <span class="n">entity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">query_entity_type</span> <span class="o">=</span> <span class="n">query_entity_type</span>
@@ -455,20 +455,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">output_key</span> <span class="o">=</span> <span class="n">output_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_token_num</span> <span class="o">=</span> <span class="n">max_token_num</span>
 
-        <span class="n">system_prompt_template</span> <span class="o">=</span> <span class="n">system_prompt_template</span> <span class="ow">or</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SYSTEM_TEMPLATE</span>
+        <span class="n">system_prompt_template</span> <span class="o">=</span> <span class="n">system_prompt_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SYSTEM_TEMPLATE</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_template</span> <span class="o">=</span> <span class="n">input_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_INPUT_TEMPLATE</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_pattern</span> <span class="o">=</span> <span class="n">output_pattern</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_OUTPUT_PATTERN</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span> <span class="o">=</span> <span class="n">system_prompt_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">entity</span><span class="o">=</span><span class="n">entity</span><span class="p">,</span> <span class="n">entity_type</span><span class="o">=</span><span class="n">query_entity_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span> <span class="o">=</span> <span class="n">system_prompt_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">entity</span><span class="o">=</span><span class="n">entity</span><span class="p">,</span> <span class="n">entity_type</span><span class="o">=</span><span class="n">query_entity_type</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;api&#39;</span><span class="p">,</span>
-                                       <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span>
-                                       <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span>
-                                       <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
-                                       <span class="n">return_processor</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                       <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;api&quot;</span><span class="p">,</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span>
+            <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span>
+            <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
+            <span class="n">return_processor</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">model_params</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span></div>
 
@@ -481,7 +481,7 @@
         <span class="k">if</span> <span class="n">matches</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">split_text_by_punctuation</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">result</span></div>
@@ -491,7 +491,7 @@
 <a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.most_relevant_entities_aggregator.MostRelevantEntitiesAggregator.query_most_relevant_entities">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">query_most_relevant_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_docs</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">sub_docs</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
 
         <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
         <span class="n">token_nums</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sub_doc</span><span class="p">))</span> <span class="k">for</span> <span class="n">sub_doc</span> <span class="ow">in</span> <span class="n">sub_docs</span><span class="p">]</span>
@@ -506,19 +506,12 @@
                     <span class="k">break</span>
                 <span class="n">final_docs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
 
-        <span class="n">doc_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">final_docs</span><span class="p">)</span>
+        <span class="n">doc_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">final_docs</span><span class="p">)</span>
         <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">entity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">entity</span><span class="p">,</span>
-            <span class="n">entity_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_entity_type</span><span class="p">,</span>
-            <span class="n">sub_docs</span><span class="o">=</span><span class="n">doc_str</span><span class="p">)</span>
+            <span class="n">entity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">entity</span><span class="p">,</span> <span class="n">entity_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_entity_type</span><span class="p">,</span> <span class="n">sub_docs</span><span class="o">=</span><span class="n">doc_str</span>
+        <span class="p">)</span>
 
-        <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;system&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span>
-        <span class="p">},</span> <span class="p">{</span>
-            <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">input_prompt</span>
-        <span class="p">}]</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">input_prompt</span><span class="p">}]</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">try_num</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
@@ -528,7 +521,7 @@
                     <span class="n">result</span> <span class="o">=</span> <span class="n">cur_result</span>
                     <span class="k">break</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">result</span></div>
 
@@ -536,13 +529,11 @@
 <div class="viewcode-block" id="MostRelevantEntitiesAggregator.process_single">
 <a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.most_relevant_entities_aggregator.MostRelevantEntitiesAggregator.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">batch_meta</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">sample</span>
 
-        <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">meta</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span>
-                <span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;The input key does not exist in the sample!&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">meta</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The input key does not exist in the sample!&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="n">sub_docs</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">input_key</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]]</span>
@@ -551,9 +542,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_string_list</span><span class="p">(</span><span class="n">sub_docs</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">sample</span>
 
-        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">batch_meta</span><span class="p">][</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">output_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_most_relevant_entities</span><span class="p">(</span><span class="n">sub_docs</span><span class="p">,</span>
-                                                                 <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">batch_meta</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">output_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_most_relevant_entities</span><span class="p">(</span><span class="n">sub_docs</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">sample</span></div>
 </div>

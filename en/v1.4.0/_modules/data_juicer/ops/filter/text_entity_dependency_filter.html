@@ -355,7 +355,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Filter</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;text_entity_dependency_filter&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;text_entity_dependency_filter&quot;</span>
 
 
 <div class="viewcode-block" id="TextEntityDependencyFilter">
@@ -369,12 +369,7 @@
 
 <div class="viewcode-block" id="TextEntityDependencyFilter.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.text_entity_dependency_filter.TextEntityDependencyFilter.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
-                 <span class="n">min_dependency_num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="n">any_or_all</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">min_dependency_num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">any_or_all</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -389,21 +384,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># &#39;--no-deps&#39; do not update numpy</span>
-        <span class="n">LazyLoader</span><span class="o">.</span><span class="n">check_packages</span><span class="p">([</span><span class="s1">&#39;spacy-pkuseg&#39;</span><span class="p">],</span> <span class="s1">&#39;--no-deps&#39;</span><span class="p">)</span>
+        <span class="n">LazyLoader</span><span class="o">.</span><span class="n">check_packages</span><span class="p">([</span><span class="s2">&quot;spacy-pkuseg&quot;</span><span class="p">],</span> <span class="s2">&quot;--no-deps&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">lang</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;en&#39;</span><span class="p">,</span> <span class="s1">&#39;zh&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">lang</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="s2">&quot;zh&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Language [</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s1">] is not supported in entities detection.&#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;en&quot;, &quot;zh&quot;].&#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;Language [</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s2">] is not supported in entities detection.&quot;</span> <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;en&quot;, &quot;zh&quot;].&#39;</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;spacy&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">entity_poss</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NOUN&#39;</span><span class="p">,</span> <span class="s1">&#39;PROPN&#39;</span><span class="p">,</span> <span class="s1">&#39;PRON&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">entity_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NN&#39;</span><span class="p">,</span> <span class="s1">&#39;NR&#39;</span><span class="p">,</span> <span class="s1">&#39;PN&#39;</span><span class="p">,</span> <span class="s1">&#39;NNS&#39;</span><span class="p">,</span> <span class="s1">&#39;NNP&#39;</span><span class="p">,</span> <span class="s1">&#39;NNPS&#39;</span><span class="p">,</span> <span class="s1">&#39;PRP&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;spacy&quot;</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entity_poss</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;NOUN&quot;</span><span class="p">,</span> <span class="s2">&quot;PROPN&quot;</span><span class="p">,</span> <span class="s2">&quot;PRON&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entity_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;NN&quot;</span><span class="p">,</span> <span class="s2">&quot;NR&quot;</span><span class="p">,</span> <span class="s2">&quot;PN&quot;</span><span class="p">,</span> <span class="s2">&quot;NNS&quot;</span><span class="p">,</span> <span class="s2">&quot;NNP&quot;</span><span class="p">,</span> <span class="s2">&quot;NNPS&quot;</span><span class="p">,</span> <span class="s2">&quot;PRP&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_dependency_num</span> <span class="o">=</span> <span class="n">min_dependency_num</span>
-        <span class="k">if</span> <span class="n">any_or_all</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Keep strategy [</span><span class="si">{</span><span class="n">any_or_all</span><span class="si">}</span><span class="s1">] is not supported. &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;any&quot;, &quot;all&quot;].&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">any</span> <span class="o">=</span> <span class="p">(</span><span class="n">any_or_all</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">any_or_all</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keep strategy [</span><span class="si">{</span><span class="n">any_or_all</span><span class="si">}</span><span class="s2">] is not supported. &quot;</span> <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;any&quot;, &quot;all&quot;].&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">any</span> <span class="o">=</span> <span class="n">any_or_all</span> <span class="o">==</span> <span class="s2">&quot;any&quot;</span></div>
 
 
 <div class="viewcode-block" id="TextEntityDependencyFilter.compute_stats_single">
@@ -420,26 +414,22 @@
         <span class="n">doc</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="n">entity_to_dependency_nums</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">pos_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_poss</span> \
-             <span class="ow">and</span> <span class="n">token</span><span class="o">.</span><span class="n">tag_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_tags</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">pos_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_poss</span> <span class="ow">and</span> <span class="n">token</span><span class="o">.</span><span class="n">tag_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_tags</span><span class="p">:</span>
                 <span class="n">entity_to_dependency_nums</span><span class="p">[</span><span class="n">token</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="c1"># count the edges of each entity in dependency tree</span>
         <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">entity_to_dependency_nums</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">dep_</span> <span class="o">!=</span> <span class="s1">&#39;ROOT&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">dep_</span> <span class="o">!=</span> <span class="s2">&quot;ROOT&quot;</span><span class="p">:</span>
                 <span class="n">entity_to_dependency_nums</span><span class="p">[</span><span class="n">obj</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">:</span>
             <span class="c1"># the punctuation mark such as &#39;,&#39;, &#39;.&#39;</span>
-            <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">pos_</span> <span class="o">==</span> <span class="s1">&#39;PUNCT&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">pos_</span> <span class="o">==</span> <span class="s2">&quot;PUNCT&quot;</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">head</span> <span class="ow">in</span> <span class="n">entity_to_dependency_nums</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span>
-            <span class="p">)</span> <span class="ow">and</span> <span class="n">token</span><span class="o">.</span><span class="n">dep_</span> <span class="o">!=</span> <span class="s1">&#39;ROOT&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">head</span> <span class="ow">in</span> <span class="n">entity_to_dependency_nums</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">token</span><span class="o">.</span><span class="n">dep_</span> <span class="o">!=</span> <span class="s2">&quot;ROOT&quot;</span><span class="p">:</span>
                 <span class="n">entity_to_dependency_nums</span><span class="p">[</span><span class="n">token</span><span class="o">.</span><span class="n">head</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">num_dependency_edges</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">n</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">entity_to_dependency_nums</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-        <span class="p">]</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">num_dependency_edges</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">entity_to_dependency_nums</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
 
         <span class="k">return</span> <span class="n">sample</span></div>
 
@@ -447,12 +437,8 @@
 <div class="viewcode-block" id="TextEntityDependencyFilter.process_single">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.text_entity_dependency_filter.TextEntityDependencyFilter.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
-        <span class="n">num_dependency_edges</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span>
-            <span class="n">StatsKeys</span><span class="o">.</span><span class="n">num_dependency_edges</span><span class="p">]</span>
-        <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">min_dependency_num</span> <span class="o">&lt;=</span> <span class="n">num_edge</span>
-            <span class="k">for</span> <span class="n">num_edge</span> <span class="ow">in</span> <span class="n">num_dependency_edges</span>
-        <span class="p">])</span>
+        <span class="n">num_dependency_edges</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">num_dependency_edges</span><span class="p">]</span>
+        <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">min_dependency_num</span> <span class="o">&lt;=</span> <span class="n">num_edge</span> <span class="k">for</span> <span class="n">num_edge</span> <span class="ow">in</span> <span class="n">num_dependency_edges</span><span class="p">])</span>
         <span class="c1"># omit the samples without entity</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keep_bools</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>

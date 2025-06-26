@@ -359,7 +359,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">MetaKeys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;extract_entity_attribute_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;extract_entity_attribute_mapper&quot;</span>
 
 
 <span class="c1"># TODO: LLM-based inference.</span>
@@ -373,49 +373,52 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT_TEMPLATE</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s1">&#39;给定一段文本，从文本中总结</span><span class="si">{entity}</span><span class="s1">的</span><span class="si">{attribute}</span><span class="s1">，并且从原文摘录最能说明该</span><span class="si">{attribute}</span><span class="s1">的代表性示例。</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;要求：</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;- 摘录的示例应该简短。</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;- 遵循如下的回复格式：</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;# </span><span class="si">{entity}</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;## </span><span class="si">{attribute}</span><span class="s1">：</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;...</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;### 代表性示例摘录1：</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;```</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;...</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;```</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;### 代表性示例摘录2：</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;```</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;...</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;```</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;...</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="s2">&quot;给定一段文本，从文本中总结</span><span class="si">{entity}</span><span class="s2">的</span><span class="si">{attribute}</span><span class="s2">，并且从原文摘录最能说明该</span><span class="si">{attribute}</span><span class="s2">的代表性示例。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;要求：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 摘录的示例应该简短。</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;- 遵循如下的回复格式：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;# </span><span class="si">{entity}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;## </span><span class="si">{attribute}</span><span class="s2">：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;### 代表性示例摘录1：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;```</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;```</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;### 代表性示例摘录2：</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;```</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;...</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;```</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;...</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
 
-    <span class="n">DEFAULT_INPUT_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;# 文本</span><span class="se">\n</span><span class="s1">```</span><span class="se">\n</span><span class="si">{text}</span><span class="se">\n</span><span class="s1">```</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="n">DEFAULT_ATTR_PATTERN_TEMPLATE</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\#\#\s*</span><span class="si">{attribute}</span><span class="s1">：\s*(.*?)(?=\#\#\#|\Z)&#39;</span>
-    <span class="n">DEFAULT_DEMON_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\#\#\#\s*代表性示例摘录(\d+)：\s*```\s*(.*?)```\s*(?=\#\#\#|\Z)&#39;</span>  <span class="c1"># noqa: E501</span>
+    <span class="n">DEFAULT_INPUT_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;# 文本</span><span class="se">\n</span><span class="s2">```</span><span class="se">\n</span><span class="si">{text}</span><span class="se">\n</span><span class="s2">```</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">DEFAULT_ATTR_PATTERN_TEMPLATE</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\#\#\s*</span><span class="si">{attribute}</span><span class="s2">：\s*(.*?)(?=\#\#\#|\Z)&quot;</span>
+    <span class="n">DEFAULT_DEMON_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\#\#\#\s*代表性示例摘录(\d+)：\s*```\s*(.*?)```\s*(?=\#\#\#|\Z)&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <div class="viewcode-block" id="ExtractEntityAttributeMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.extract_entity_attribute_mapper.ExtractEntityAttributeMapper.__init__">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
-                 <span class="n">query_entities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
-                 <span class="n">query_attributes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
-                 <span class="o">*</span><span class="p">,</span>
-                 <span class="n">entity_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">main_entities</span><span class="p">,</span>
-                 <span class="n">attribute_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">attributes</span><span class="p">,</span>
-                 <span class="n">attribute_desc_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">attribute_descriptions</span><span class="p">,</span>
-                 <span class="n">support_text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">attribute_support_texts</span><span class="p">,</span>
-                 <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">system_prompt_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">input_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">attr_pattern_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">demo_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-                 <span class="n">drop_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-                 <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+        <span class="n">query_entities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="n">query_attributes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">entity_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">main_entities</span><span class="p">,</span>
+        <span class="n">attribute_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">attributes</span><span class="p">,</span>
+        <span class="n">attribute_desc_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">attribute_descriptions</span><span class="p">,</span>
+        <span class="n">support_text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">attribute_support_texts</span><span class="p">,</span>
+        <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">system_prompt_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">input_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">attr_pattern_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">demo_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">drop_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 <span class="sd">        :param api_model: API model name.</span>
@@ -461,19 +464,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">attribute_desc_key</span> <span class="o">=</span> <span class="n">attribute_desc_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">support_text_key</span> <span class="o">=</span> <span class="n">support_text_key</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt_template</span> <span class="o">=</span> <span class="n">system_prompt_template</span> \
-            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SYSTEM_PROMPT_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt_template</span> <span class="o">=</span> <span class="n">system_prompt_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SYSTEM_PROMPT_TEMPLATE</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_template</span> <span class="o">=</span> <span class="n">input_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_INPUT_TEMPLATE</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">attr_pattern_template</span> <span class="o">=</span> <span class="n">attr_pattern_template</span> \
-            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_ATTR_PATTERN_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr_pattern_template</span> <span class="o">=</span> <span class="n">attr_pattern_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_ATTR_PATTERN_TEMPLATE</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">demo_pattern</span> <span class="o">=</span> <span class="n">demo_pattern</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_DEMON_PATTERN</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;api&#39;</span><span class="p">,</span>
-                                       <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span>
-                                       <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span>
-                                       <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
-                                       <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;api&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">=</span> <span class="n">drop_text</span></div>
@@ -482,15 +481,13 @@
 <div class="viewcode-block" id="ExtractEntityAttributeMapper.parse_output">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.extract_entity_attribute_mapper.ExtractEntityAttributeMapper.parse_output">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_output</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">):</span>
-
-        <span class="n">attribute_pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr_pattern_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">attribute</span><span class="o">=</span><span class="n">attribute_name</span><span class="p">)</span>
+        <span class="n">attribute_pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr_pattern_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attribute</span><span class="o">=</span><span class="n">attribute_name</span><span class="p">)</span>
         <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">attribute_pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
         <span class="n">matches</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">raw_output</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">matches</span><span class="p">:</span>
             <span class="n">attribute</span> <span class="o">=</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">attribute</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">attribute</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
         <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">demo_pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
         <span class="n">matches</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">raw_output</span><span class="p">)</span>
@@ -499,35 +496,27 @@
         <span class="k">return</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">demos</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_process_single_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_single_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
 
         <span class="n">entities</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">descs</span><span class="p">,</span> <span class="n">demo_lists</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_entities</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_attributes</span><span class="p">:</span>
-                <span class="n">system_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">entity</span><span class="o">=</span><span class="n">entity</span><span class="p">,</span> <span class="n">attribute</span><span class="o">=</span><span class="n">attribute</span><span class="p">)</span>
+                <span class="n">system_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">entity</span><span class="o">=</span><span class="n">entity</span><span class="p">,</span> <span class="n">attribute</span><span class="o">=</span><span class="n">attribute</span><span class="p">)</span>
                 <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
-                <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span>
-                    <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;system&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">system_prompt</span>
-                <span class="p">},</span> <span class="p">{</span>
-                    <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">input_prompt</span>
-                <span class="p">}]</span>
+                <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">system_prompt</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">input_prompt</span><span class="p">}]</span>
 
-                <span class="n">desc</span><span class="p">,</span> <span class="n">demos</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+                <span class="n">desc</span><span class="p">,</span> <span class="n">demos</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">try_num</span><span class="p">):</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">output</span> <span class="o">=</span> <span class="n">client</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
-                        <span class="n">cur_desc</span><span class="p">,</span> <span class="n">cur_demos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_output</span><span class="p">(</span>
-                            <span class="n">output</span><span class="p">,</span> <span class="n">attribute</span><span class="p">)</span>
+                        <span class="n">cur_desc</span><span class="p">,</span> <span class="n">cur_demos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_output</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">attribute</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">cur_desc</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur_demos</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">desc</span> <span class="o">=</span> <span class="n">cur_desc</span>
                             <span class="n">demos</span> <span class="o">=</span> <span class="n">cur_demos</span>
                             <span class="k">break</span>
                     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">entities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span>
                 <span class="n">attributes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span>
                 <span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
@@ -538,12 +527,10 @@
 <div class="viewcode-block" id="ExtractEntityAttributeMapper.process_single">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.extract_entity_attribute_mapper.ExtractEntityAttributeMapper.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="c1"># check if it&#39;s generated already</span>
-        <span class="k">if</span> <span class="nb">set</span><span class="p">([</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">entity_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute_desc_key</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">support_text_key</span>
-        <span class="p">])</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute_desc_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">support_text_key</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">):</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_single_text</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">],</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>

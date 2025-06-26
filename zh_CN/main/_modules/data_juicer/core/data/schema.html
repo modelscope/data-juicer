@@ -374,6 +374,7 @@
 <span class="sd">        column_types: Mapping of column names to their types</span>
 <span class="sd">        columns: List of column names in order</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">column_types</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
@@ -398,12 +399,8 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_ray_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
         <span class="c1"># convert schema to proper list and dict</span>
-        <span class="n">column_types</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">Schema</span><span class="o">.</span><span class="n">map_ray_type_to_python</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">names</span><span class="p">,</span> <span class="n">schema</span><span class="o">.</span><span class="n">types</span><span class="p">)</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">Schema</span><span class="p">(</span><span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
-                      <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">column_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span></div>
+        <span class="n">column_types</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">Schema</span><span class="o">.</span><span class="n">map_ray_type_to_python</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">names</span><span class="p">,</span> <span class="n">schema</span><span class="o">.</span><span class="n">types</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="n">Schema</span><span class="p">(</span><span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">column_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span></div>
 
 
 <div class="viewcode-block" id="Schema.map_hf_type_to_python">
@@ -426,13 +423,13 @@
 <span class="sd">            Corresponding Python type</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">type_mapping</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;string&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="s1">&#39;int32&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-            <span class="s1">&#39;int64&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-            <span class="s1">&#39;float32&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-            <span class="s1">&#39;float64&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-            <span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-            <span class="s1">&#39;binary&#39;</span><span class="p">:</span> <span class="nb">bytes</span>
+            <span class="s2">&quot;string&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;int32&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;int64&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;float32&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;float64&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;bool&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="s2">&quot;binary&quot;</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">Value</span><span class="p">):</span>
             <span class="c1"># Map Value types</span>
@@ -445,7 +442,7 @@
             <span class="k">return</span> <span class="n">List</span><span class="p">[</span><span class="n">type_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Any</span><span class="p">)]</span>
 
         <span class="c1"># Dictionary types - check if it&#39;s a dictionary feature</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">feature</span><span class="p">))</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Dict&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">feature</span><span class="p">))</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Dict&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">Schema</span><span class="o">.</span><span class="n">from_hf_features</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">ClassLabel</span><span class="p">):</span>
@@ -493,9 +490,7 @@
         <span class="c1"># Dictionary/Struct types</span>
         <span class="k">if</span> <span class="n">pa</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_struct</span><span class="p">(</span><span class="n">ray_type</span><span class="p">):</span>
             <span class="n">names</span> <span class="o">=</span> <span class="n">ray_type</span><span class="o">.</span><span class="n">names</span>
-            <span class="n">types</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">Schema</span><span class="o">.</span><span class="n">map_ray_type_to_python</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ray_type</span><span class="o">.</span><span class="n">fields</span>
-            <span class="p">]</span>
+            <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="n">Schema</span><span class="o">.</span><span class="n">map_ray_type_to_python</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ray_type</span><span class="o">.</span><span class="n">fields</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">Schema</span><span class="p">(</span><span class="n">column_types</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">types</span><span class="p">)),</span> <span class="n">columns</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">pa</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_map</span><span class="p">(</span><span class="n">ray_type</span><span class="p">):</span>
@@ -510,16 +505,15 @@
         <span class="c1"># Ensure all columns are in column_types</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_types</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
             <span class="n">missing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Missing type definitions for columns: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing type definitions for columns: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return formatted string representation of schema&quot;&quot;&quot;</span>
-        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Dataset Schema:&#39;</span><span class="p">]</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Dataset Schema:&quot;</span><span class="p">]</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
 </pre></div>
         </article>

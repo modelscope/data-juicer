@@ -362,8 +362,10 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeautifulSoup</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">read_single_partition</span><span class="p">,</span>
-                                          <span class="n">single_partition_write_with_filename</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">read_single_partition</span><span class="p">,</span>
+    <span class="n">single_partition_write_with_filename</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="DocumentDownloader">
@@ -429,22 +431,22 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_download_and_extract_single_partition</span><span class="p">(</span><span class="n">paths</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-                                           <span class="n">downloader</span><span class="p">:</span> <span class="n">DocumentDownloader</span><span class="p">,</span>
-                                           <span class="n">iterator</span><span class="p">:</span> <span class="n">DocumentIterator</span><span class="p">,</span>
-                                           <span class="n">extractor</span><span class="p">:</span> <span class="n">DocumentExtractor</span><span class="p">,</span>
-                                           <span class="n">output_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                                           <span class="n">keep_raw_download</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-                                           <span class="n">force_download</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-                                           <span class="n">input_meta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                                           <span class="n">meta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                                           <span class="n">item_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_download_and_extract_single_partition</span><span class="p">(</span>
+    <span class="n">paths</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+    <span class="n">downloader</span><span class="p">:</span> <span class="n">DocumentDownloader</span><span class="p">,</span>
+    <span class="n">iterator</span><span class="p">:</span> <span class="n">DocumentIterator</span><span class="p">,</span>
+    <span class="n">extractor</span><span class="p">:</span> <span class="n">DocumentExtractor</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">keep_raw_download</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">force_download</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">input_meta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">meta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">item_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="n">url</span><span class="p">,</span> <span class="n">output_path</span> <span class="o">=</span> <span class="n">paths</span>
 
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force_download</span><span class="p">:</span>
-        <span class="n">partition</span> <span class="o">=</span> <span class="n">read_single_partition</span><span class="p">([</span><span class="n">output_path</span><span class="p">],</span>
-                                          <span class="n">filetype</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
-                                          <span class="n">add_filename</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">partition</span> <span class="o">=</span> <span class="n">read_single_partition</span><span class="p">([</span><span class="n">output_path</span><span class="p">],</span> <span class="n">filetype</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span> <span class="n">add_filename</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">partition</span>
 
     <span class="n">downloaded_file</span> <span class="o">=</span> <span class="n">downloader</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -462,7 +464,7 @@
             <span class="n">text_meta</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="n">extracted</span>
             <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span>
+                    <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span>
                     <span class="o">**</span><span class="n">text_meta</span><span class="p">,</span>
                     <span class="o">**</span><span class="n">record_meta</span><span class="p">,</span>
                 <span class="p">}</span>
@@ -471,10 +473,8 @@
     <span class="n">partition</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
     <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
     <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
-    <span class="n">partition</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
-    <span class="n">single_partition_write_with_filename</span><span class="p">(</span><span class="n">partition</span><span class="p">,</span>
-                                         <span class="n">output_dir</span><span class="p">,</span>
-                                         <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">)</span>
+    <span class="n">partition</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+    <span class="n">single_partition_write_with_filename</span><span class="p">(</span><span class="n">partition</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_raw_download</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">downloaded_file</span><span class="p">)</span>
 
@@ -483,17 +483,19 @@
 
 <div class="viewcode-block" id="download_and_extract">
 <a class="viewcode-back" href="../../../data_juicer.download.html#data_juicer.download.downloader.download_and_extract">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">download_and_extract</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-                         <span class="n">output_paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-                         <span class="n">downloader</span><span class="p">:</span> <span class="n">DocumentDownloader</span><span class="p">,</span>
-                         <span class="n">iterator</span><span class="p">:</span> <span class="n">DocumentIterator</span><span class="p">,</span>
-                         <span class="n">extractor</span><span class="p">:</span> <span class="n">DocumentExtractor</span><span class="p">,</span>
-                         <span class="n">output_format</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-                         <span class="n">output_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;jsonl&#39;</span><span class="p">,</span>
-                         <span class="n">keep_raw_download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                         <span class="n">force_download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                         <span class="n">input_meta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                         <span class="n">item_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_and_extract</span><span class="p">(</span>
+    <span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">output_paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">downloader</span><span class="p">:</span> <span class="n">DocumentDownloader</span><span class="p">,</span>
+    <span class="n">iterator</span><span class="p">:</span> <span class="n">DocumentIterator</span><span class="p">,</span>
+    <span class="n">extractor</span><span class="p">:</span> <span class="n">DocumentExtractor</span><span class="p">,</span>
+    <span class="n">output_format</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;jsonl&quot;</span><span class="p">,</span>
+    <span class="n">keep_raw_download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">force_download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">input_meta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">item_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Downloads and extracts a dataset</span>
 
@@ -517,26 +519,27 @@
 <span class="sd">      A HuggingFace DataSet of the downloaded data</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No urls were provided to download&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No urls were provided to download&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_paths</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;Different number of urls and output_paths. &#39;</span>
-            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span><span class="si">}</span><span class="s1"> urls vs </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">output_paths</span><span class="p">)</span><span class="si">}</span><span class="s1"> output_paths&#39;</span><span class="p">)</span>
+            <span class="sa">f</span><span class="s2">&quot;Different number of urls and output_paths. &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span><span class="si">}</span><span class="s2"> urls vs </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">output_paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> output_paths&quot;</span>
+        <span class="p">)</span>
 
     <span class="n">output_format</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">output_format</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
-    <span class="n">part</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_download_and_extract_single_partition</span><span class="p">,</span>
-                   <span class="n">downloader</span><span class="o">=</span><span class="n">downloader</span><span class="p">,</span>
-                   <span class="n">iterator</span><span class="o">=</span><span class="n">iterator</span><span class="p">,</span>
-                   <span class="n">extractor</span><span class="o">=</span><span class="n">extractor</span><span class="p">,</span>
-                   <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
-                   <span class="n">keep_raw_download</span><span class="o">=</span><span class="n">keep_raw_download</span><span class="p">,</span>
-                   <span class="n">force_download</span><span class="o">=</span><span class="n">force_download</span><span class="p">,</span>
-                   <span class="n">input_meta</span><span class="o">=</span><span class="n">input_meta</span><span class="p">,</span>
-                   <span class="n">meta</span><span class="o">=</span><span class="n">output_format</span><span class="p">,</span>
-                   <span class="n">item_limit</span><span class="o">=</span><span class="n">item_limit</span><span class="p">)</span>
-    <span class="n">combined_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">part</span><span class="p">,</span> <span class="nb">zip</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span>
-                                          <span class="n">output_paths</span><span class="p">)))</span>  <span class="c1"># list of DataFrames</span>
+    <span class="n">part</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">_download_and_extract_single_partition</span><span class="p">,</span>
+        <span class="n">downloader</span><span class="o">=</span><span class="n">downloader</span><span class="p">,</span>
+        <span class="n">iterator</span><span class="o">=</span><span class="n">iterator</span><span class="p">,</span>
+        <span class="n">extractor</span><span class="o">=</span><span class="n">extractor</span><span class="p">,</span>
+        <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
+        <span class="n">keep_raw_download</span><span class="o">=</span><span class="n">keep_raw_download</span><span class="p">,</span>
+        <span class="n">force_download</span><span class="o">=</span><span class="n">force_download</span><span class="p">,</span>
+        <span class="n">input_meta</span><span class="o">=</span><span class="n">input_meta</span><span class="p">,</span>
+        <span class="n">meta</span><span class="o">=</span><span class="n">output_format</span><span class="p">,</span>
+        <span class="n">item_limit</span><span class="o">=</span><span class="n">item_limit</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">combined_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">part</span><span class="p">,</span> <span class="nb">zip</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">output_paths</span><span class="p">)))</span>  <span class="c1"># list of DataFrames</span>
     <span class="k">return</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">combined_df</span><span class="p">)</span></div>
 
 
@@ -544,8 +547,8 @@
 <div class="viewcode-block" id="get_wikipedia_urls">
 <a class="viewcode-back" href="../../../data_juicer.download.html#data_juicer.download.downloader.get_wikipedia_urls">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_wikipedia_urls</span><span class="p">(</span>
-    <span class="n">language</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">,</span>
-    <span class="n">wikidumps_index_prefix</span><span class="o">=</span><span class="s1">&#39;https://dumps.wikimedia.org&#39;</span><span class="p">,</span>
+    <span class="n">language</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span>
+    <span class="n">wikidumps_index_prefix</span><span class="o">=</span><span class="s2">&quot;https://dumps.wikimedia.org&quot;</span><span class="p">,</span>
     <span class="n">dump_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -557,33 +560,33 @@
 <span class="sd">        dump_date: A string formatted as &quot;YYYYMMDD&quot; for the wikipedia dump to use.</span>
 <span class="sd">          If None, latest dump is used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
-    <span class="n">wiki_index_url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">wikidumps_index_prefix</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">language</span><span class="si">}</span><span class="s1">wiki&#39;</span><span class="p">)</span>
+    <span class="n">wiki_index_url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">wikidumps_index_prefix</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">language</span><span class="si">}</span><span class="s2">wiki&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">dump_date</span><span class="p">:</span>
         <span class="c1"># First get the index</span>
         <span class="n">raw_wiki_index</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">wiki_index_url</span><span class="p">)</span>
-        <span class="n">wiki_index</span> <span class="o">=</span> <span class="n">raw_wiki_index</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
-        <span class="n">wiki_index_parsed</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">wiki_index</span><span class="p">,</span> <span class="s1">&#39;lxml&#39;</span><span class="p">)</span>
+        <span class="n">wiki_index</span> <span class="o">=</span> <span class="n">raw_wiki_index</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="n">wiki_index_parsed</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">wiki_index</span><span class="p">,</span> <span class="s2">&quot;lxml&quot;</span><span class="p">)</span>
 
         <span class="c1"># Get all dumps available in the index</span>
-        <span class="n">dumps</span> <span class="o">=</span> <span class="n">wiki_index_parsed</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+        <span class="n">dumps</span> <span class="o">=</span> <span class="n">wiki_index_parsed</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
         <span class="n">dump_date</span> <span class="o">=</span> <span class="n">dumps</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># A trailing / is needed for the url</span>
-        <span class="n">dump_date</span> <span class="o">=</span> <span class="n">dump_date</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
+        <span class="n">dump_date</span> <span class="o">=</span> <span class="n">dump_date</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
 
     <span class="c1"># Get the json dump data</span>
-    <span class="n">wiki_latest_dump</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">wiki_index_url</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">dump_date</span><span class="p">)</span>
-    <span class="n">wiki_latest_dump_status</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">wiki_latest_dump</span><span class="p">,</span> <span class="s1">&#39;dumpstatus.json&#39;</span><span class="p">)</span>
+    <span class="n">wiki_latest_dump</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">wiki_index_url</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">dump_date</span><span class="p">)</span>
+    <span class="n">wiki_latest_dump_status</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">wiki_latest_dump</span><span class="p">,</span> <span class="s2">&quot;dumpstatus.json&quot;</span><span class="p">)</span>
     <span class="n">raw_dump_data</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">wiki_latest_dump_status</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">dump_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">raw_dump_data</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No wikipedia dump found for </span><span class="si">{</span><span class="n">dump_date</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No wikipedia dump found for </span><span class="si">{</span><span class="n">dump_date</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Get all multistream files within the dump data</span>
     <span class="n">wikipedia_urls</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">ifile</span> <span class="ow">in</span> <span class="n">dump_data</span><span class="p">[</span><span class="s1">&#39;jobs&#39;</span><span class="p">][</span><span class="s1">&#39;articlesmultistreamdump&#39;</span><span class="p">][</span><span class="s1">&#39;files&#39;</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="s1">&#39;xml&#39;</span> <span class="ow">in</span> <span class="n">ifile</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">ifile</span> <span class="ow">in</span> <span class="n">dump_data</span><span class="p">[</span><span class="s2">&quot;jobs&quot;</span><span class="p">][</span><span class="s2">&quot;articlesmultistreamdump&quot;</span><span class="p">][</span><span class="s2">&quot;files&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s2">&quot;xml&quot;</span> <span class="ow">in</span> <span class="n">ifile</span><span class="p">:</span>
             <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">wiki_latest_dump</span><span class="p">,</span> <span class="n">ifile</span><span class="p">)</span>
             <span class="n">wikipedia_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 
@@ -594,15 +597,11 @@
 <div class="viewcode-block" id="get_arxiv_urls">
 <a class="viewcode-back" href="../../../data_juicer.download.html#data_juicer.download.downloader.get_arxiv_urls">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_arxiv_urls</span><span class="p">():</span>
-    <span class="n">command</span> <span class="o">=</span>\
-        <span class="s2">&quot;s5cmd --request-payer=requester ls s3://arxiv/src/ | grep &#39;.tar&#39;&quot;</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span>
-                            <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                            <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                            <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="s2">&quot;s5cmd --request-payer=requester ls s3://arxiv/src/ | grep &#39;.tar&#39;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unable to get arxiv urls: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to get arxiv urls: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">urls</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">3</span><span class="p">::</span><span class="mi">4</span><span class="p">]</span>
     <span class="n">urls</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
@@ -627,28 +626,26 @@
         <span class="k">return</span>
 
     <span class="c1"># Check basic format with regex</span>
-    <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^\d</span><span class="si">{4}</span><span class="s1">-\d</span><span class="si">{2}</span><span class="s1">$&#39;</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^\d</span><span class="si">{4}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">$&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid snapshot format: </span><span class="si">{</span><span class="n">snapshot</span><span class="si">}</span><span class="s1">. &#39;</span>
-                         <span class="s2">&quot;Expected format: &#39;YYYY-WW&#39; (e.g., &#39;2020-50&#39;)&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid snapshot format: </span><span class="si">{</span><span class="n">snapshot</span><span class="si">}</span><span class="s2">. &quot;</span> <span class="s2">&quot;Expected format: &#39;YYYY-WW&#39; (e.g., &#39;2020-50&#39;)&quot;</span><span class="p">)</span>
 
     <span class="c1"># Parse year and week</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">year</span><span class="p">,</span> <span class="n">week</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span>
+        <span class="n">year</span><span class="p">,</span> <span class="n">week</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span>
 
         <span class="c1"># Validate year</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">2000</span> <span class="o">&lt;=</span> <span class="n">year</span> <span class="o">&lt;=</span> <span class="mi">2100</span><span class="p">):</span>  <span class="c1"># Reasonable year range</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Year must be between 2000 and 2100, got </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Year must be between 2000 and 2100, got </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Validate week number (1-53)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">week</span> <span class="o">&lt;=</span> <span class="mi">53</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Week must be between 1 and 53, got </span><span class="si">{</span><span class="n">week</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Week must be between 1 and 53, got </span><span class="si">{</span><span class="n">week</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Week&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Week&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Year&quot;</span><span class="p">):</span>
             <span class="k">raise</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid snapshot format: </span><span class="si">{</span><span class="n">snapshot</span><span class="si">}</span><span class="s1">. &#39;</span>
-                         <span class="s2">&quot;Expected format: &#39;YYYY-WW&#39; (e.g., &#39;2020-50&#39;)&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid snapshot format: </span><span class="si">{</span><span class="n">snapshot</span><span class="si">}</span><span class="s2">. &quot;</span> <span class="s2">&quot;Expected format: &#39;YYYY-WW&#39; (e.g., &#39;2020-50&#39;)&quot;</span><span class="p">)</span></div>
 
 </pre></div>
         </article>

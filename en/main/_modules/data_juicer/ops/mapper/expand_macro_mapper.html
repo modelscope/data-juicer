@@ -366,7 +366,7 @@
 
 <div class="viewcode-block" id="ExpandMacroMapper">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper">[docs]</a>
-<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s1">&#39;expand_macro_mapper&#39;</span><span class="p">)</span>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;expand_macro_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExpandMacroMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to expand macro definitions in the document body of Latex</span>
 <span class="sd">    samples.&quot;&quot;&quot;</span>
@@ -393,8 +393,9 @@
             <span class="c1"># \newcommand*{\macro_name}{macro_value}</span>
             <span class="c1"># where macro_name is only allowed to contain letters and numbers;</span>
             <span class="c1"># macro_value can contain any character.</span>
-            <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">\bnewcommand\b\*?\{(</span><span class="se">\\</span><span class="s1">[a-zA-Z0-9]+?)\}\{(.*?)\}$&#39;</span><span class="p">,</span>
-            <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
+            <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">\bnewcommand\b\*?\{(</span><span class="se">\\</span><span class="s2">[a-zA-Z0-9]+?)\}\{(.*?)\}$&quot;</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="c1"># regex for extracting \def macros without arguments</span>
         <span class="n">non_arg_def_reg</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
@@ -402,8 +403,9 @@
             <span class="c1"># \def\macro_name{macro_value}</span>
             <span class="c1"># where macro_name is only allowed to contain letters and numbers;</span>
             <span class="c1"># macro_value can contain any character.</span>
-            <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">def\s*(</span><span class="se">\\</span><span class="s1">[a-zA-Z0-9]+?)\s*\{(.*?)\}$&#39;</span><span class="p">,</span>
-            <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
+            <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">def\s*(</span><span class="se">\\</span><span class="s2">[a-zA-Z0-9]+?)\s*\{(.*?)\}$&quot;</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="c1"># Extract all user-defined LaTeX macros from the preamble</span>
         <span class="n">macros</span> <span class="o">=</span> <span class="p">{}</span>
@@ -411,10 +413,8 @@
             <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">reg</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">file_content</span><span class="p">):</span>
                 <span class="c1"># convert the macro name and value to a raw string that can be</span>
                 <span class="c1"># used in re.sub</span>
-                <span class="n">macro_name</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;unicode-escape&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
-                    <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
-                <span class="n">macro_val</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;unicode-escape&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
-                    <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="n">macro_name</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;unicode-escape&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                <span class="n">macro_val</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;unicode-escape&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
                 <span class="n">macros</span><span class="p">[</span><span class="n">macro_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">macro_val</span>
         <span class="k">return</span> <span class="n">macros</span>
@@ -433,11 +433,12 @@
                 <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
                     <span class="c1"># make pattern grouped to make sure that the macro</span>
                     <span class="c1"># is not part of a longer alphanumeric word</span>
-                    <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="n">macro_name</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;)&#39;</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;([^a-zA-Z0-9])&#39;</span><span class="p">,</span>
+                    <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">macro_name</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;)&quot;</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;([^a-zA-Z0-9])&quot;</span><span class="p">,</span>
                     <span class="c1"># replace the macro with its value and add back the</span>
                     <span class="c1"># character that was matched after the macro</span>
-                    <span class="n">repl</span><span class="o">=</span><span class="n">macro_value</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;\2&#39;</span><span class="p">,</span>
-                    <span class="n">string</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
+                    <span class="n">repl</span><span class="o">=</span><span class="n">macro_value</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\2&quot;</span><span class="p">,</span>
+                    <span class="n">string</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
+                <span class="p">)</span>
 
             <span class="c1"># inline-expand all macros that use args</span>
             <span class="c1"># TODO: inline-expand macros with args</span>

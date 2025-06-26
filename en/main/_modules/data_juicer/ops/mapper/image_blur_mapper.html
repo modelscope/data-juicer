@@ -366,7 +366,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..op_fusion</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOADED_IMAGES</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;image_blur_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;image_blur_mapper&quot;</span>
 
 
 <div class="viewcode-block" id="ImageBlurMapper">
@@ -374,17 +374,11 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageBlurMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to blur images.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to blur images.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ImageBlurMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_blur_mapper.ImageBlurMapper.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
-                 <span class="n">blur_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">,</span>
-                 <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">blur_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -397,19 +391,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
-        <span class="k">if</span> <span class="n">blur_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;box&#39;</span><span class="p">,</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">blur_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;box&quot;</span><span class="p">,</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Blur_type [</span><span class="si">{</span><span class="n">blur_type</span><span class="si">}</span><span class="s1">] is not supported. &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;mean&quot;, &quot;box&quot;, &quot;gaussian&quot;]. &#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;Blur_type [</span><span class="si">{</span><span class="n">blur_type</span><span class="si">}</span><span class="s2">] is not supported. &quot;</span> <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;mean&quot;, &quot;box&quot;, &quot;gaussian&quot;]. &#39;</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">radius</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Radius must be &gt;= 0. &#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Radius must be &gt;= 0. &quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
 
         <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageFilter</span>
-        <span class="k">if</span> <span class="n">blur_type</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">blur_type</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">blur</span> <span class="o">=</span> <span class="n">ImageFilter</span><span class="o">.</span><span class="n">BLUR</span>
-        <span class="k">elif</span> <span class="n">blur_type</span> <span class="o">==</span> <span class="s1">&#39;box&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">blur_type</span> <span class="o">==</span> <span class="s2">&quot;box&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">blur</span> <span class="o">=</span> <span class="n">ImageFilter</span><span class="o">.</span><span class="n">BoxBlur</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">blur</span> <span class="o">=</span> <span class="n">ImageFilter</span><span class="o">.</span><span class="n">GaussianBlur</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span></div>
@@ -428,8 +423,7 @@
 
         <span class="c1"># load images</span>
         <span class="n">loaded_image_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span>
-        <span class="n">sample</span><span class="p">,</span> <span class="n">images</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span>
-                                                <span class="n">loaded_image_keys</span><span class="p">,</span> <span class="n">load_image</span><span class="p">)</span>
+        <span class="n">sample</span><span class="p">,</span> <span class="n">images</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">loaded_image_keys</span><span class="p">,</span> <span class="n">load_image</span><span class="p">)</span>
         <span class="n">processed</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">image_key</span> <span class="ow">in</span> <span class="n">loaded_image_keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">image_key</span> <span class="ow">in</span> <span class="n">processed</span><span class="p">:</span>
@@ -438,12 +432,9 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">():</span>
                 <span class="n">processed</span><span class="p">[</span><span class="n">image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">image_key</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">blured_image_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">image_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
-                                                     <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
-                        <span class="n">blured_image_key</span><span class="p">)</span> <span class="ow">or</span> <span class="n">blured_image_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
-                    <span class="n">blured_image</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="n">image_key</span><span class="p">]</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">blur</span><span class="p">)</span>
+                <span class="n">blured_image_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">image_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">blured_image_key</span><span class="p">)</span> <span class="ow">or</span> <span class="n">blured_image_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
+                    <span class="n">blured_image</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="n">image_key</span><span class="p">]</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blur</span><span class="p">)</span>
                     <span class="n">images</span><span class="p">[</span><span class="n">blured_image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">blured_image</span>
                     <span class="n">blured_image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">blured_image_key</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">context</span><span class="p">:</span>

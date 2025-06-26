@@ -368,9 +368,9 @@
 
 <div class="viewcode-block" id="NaiveReverseGrouper">
 <a class="viewcode-back" href="../../../../data_juicer.ops.grouper.html#data_juicer.ops.grouper.naive_reverse_grouper.NaiveReverseGrouper">[文档]</a>
-<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s1">&#39;naive_reverse_grouper&#39;</span><span class="p">)</span>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;naive_reverse_grouper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">NaiveReverseGrouper</span><span class="p">(</span><span class="n">Grouper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split batched samples to samples. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split batched samples to samples.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="NaiveReverseGrouper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.grouper.html#data_juicer.ops.grouper.naive_reverse_grouper.NaiveReverseGrouper.__init__">[文档]</a>
@@ -390,7 +390,6 @@
 <div class="viewcode-block" id="NaiveReverseGrouper.process">
 <a class="viewcode-back" href="../../../../data_juicer.ops.grouper.html#data_juicer.ops.grouper.naive_reverse_grouper.NaiveReverseGrouper.process">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
-
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">dataset</span>
 
@@ -399,17 +398,13 @@
         <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">batch_meta</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
                 <span class="n">batch_metas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">batch_meta</span><span class="p">])</span>
-                <span class="n">sample</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="n">k</span><span class="p">:</span> <span class="n">sample</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sample</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">Fields</span><span class="o">.</span><span class="n">batch_meta</span>
-                <span class="p">}</span>
+                <span class="n">sample</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">sample</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sample</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">Fields</span><span class="o">.</span><span class="n">batch_meta</span><span class="p">}</span>
             <span class="n">samples</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">convert_dict_list_to_list_dict</span><span class="p">(</span><span class="n">sample</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_meta_export_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">create_directory_if_not_exists</span><span class="p">(</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_meta_export_path</span><span class="p">))</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_meta_export_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">create_directory_if_not_exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_meta_export_path</span><span class="p">))</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_meta_export_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">batch_meta</span> <span class="ow">in</span> <span class="n">batch_metas</span><span class="p">:</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">batch_meta</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">batch_meta</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">samples</span></div>
 </div>

@@ -356,9 +356,9 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
 
-<span class="n">nlpcda</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;nlpcda&#39;</span><span class="p">)</span>
+<span class="n">nlpcda</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;nlpcda&quot;</span><span class="p">)</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;nlpcda_zh_mapper&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;nlpcda_zh_mapper&quot;</span>
 
 
 <div class="viewcode-block" id="NlpcdaZhMapper">
@@ -371,17 +371,19 @@
 
 <div class="viewcode-block" id="NlpcdaZhMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.nlpcda_zh_mapper.NlpcdaZhMapper.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">sequential</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">aug_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="n">keep_original_sample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="n">replace_similar_word</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">replace_homophone_char</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">delete_random_char</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">swap_random_char</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">replace_equivalent_num</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sequential</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">aug_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">keep_original_sample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">replace_similar_word</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">replace_homophone_char</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">delete_random_char</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">swap_random_char</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">replace_equivalent_num</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method. All augmentation methods use default parameters</span>
 <span class="sd">        in default. We recommend you to only use 1-3 augmentation methods at a</span>
@@ -425,16 +427,19 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">=</span> <span class="n">aug_num</span>
         <span class="k">if</span> <span class="n">aug_num</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Relatively large augmentation number [</span><span class="si">{</span><span class="n">aug_num</span><span class="si">}</span><span class="s1">]&#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39; might generate large number of new samples and &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;requires more memory and disk space.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Relatively large augmentation number [</span><span class="si">{</span><span class="n">aug_num</span><span class="si">}</span><span class="s2">]&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; might generate large number of new samples and &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;requires more memory and disk space.&quot;</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="o">=</span> <span class="n">sequential</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span> <span class="o">=</span> <span class="n">keep_original_sample</span>
 
         <span class="c1"># hide the redundant outputs from nlpcda library</span>
         <span class="k">with</span> <span class="n">HiddenPrints</span><span class="p">():</span>
             <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+            <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="c1"># sample level</span>
@@ -445,41 +450,25 @@
                 <span class="c1"># original sample, so we need generate one more augmented</span>
                 <span class="c1"># sample to get the expected number of augmented samples. Same</span>
                 <span class="c1"># below</span>
-                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> \
-                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
-                    <span class="k">else</span> <span class="mi">2</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">nlpcda</span><span class="o">.</span><span class="n">Similarword</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span>
+                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nlpcda</span><span class="o">.</span><span class="n">Similarword</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span>
 
             <span class="c1"># char level</span>
             <span class="k">if</span> <span class="n">replace_homophone_char</span><span class="p">:</span>
-                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> \
-                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
-                    <span class="k">else</span> <span class="mi">2</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">nlpcda</span><span class="o">.</span><span class="n">Homophone</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span>
+                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nlpcda</span><span class="o">.</span><span class="n">Homophone</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">delete_random_char</span><span class="p">:</span>
-                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> \
-                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
-                    <span class="k">else</span> <span class="mi">2</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">nlpcda</span><span class="o">.</span><span class="n">RandomDeleteChar</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span>
+                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nlpcda</span><span class="o">.</span><span class="n">RandomDeleteChar</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">swap_random_char</span><span class="p">:</span>
-                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> \
-                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
-                    <span class="k">else</span> <span class="mi">2</span>
+                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span>
                 <span class="c1"># only use char_gram=1 for relatively minor changes</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">nlpcda</span><span class="o">.</span><span class="n">CharPositionExchange</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">,</span>
-                                                <span class="n">char_gram</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nlpcda</span><span class="o">.</span><span class="n">CharPositionExchange</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">,</span> <span class="n">char_gram</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
 
             <span class="c1"># only for numbers now</span>
             <span class="k">if</span> <span class="n">replace_equivalent_num</span><span class="p">:</span>
-                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> \
-                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
-                    <span class="k">else</span> <span class="mi">2</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">nlpcda</span><span class="o">.</span><span class="n">EquivalentChar</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span></div>
+                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nlpcda</span><span class="o">.</span><span class="n">EquivalentChar</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="NlpcdaZhMapper.process_batched">
@@ -521,8 +510,7 @@
         <span class="c1"># add other replicate fields</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">res_samples</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">:</span>
-                <span class="n">res_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">res_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">*</span> \
-                                   <span class="nb">len</span><span class="p">(</span><span class="n">res_samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])</span>
+                <span class="n">res_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">res_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">res_samples</span></div>
 </div>
 
