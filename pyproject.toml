@@ -70,6 +70,7 @@ generic = [
     "accelerate",  # Model acceleration
     "vllm==0.8.5.post1",  # LLM serving
     "onnxruntime",  # ONNX runtime
+    "cudf-cu12", # dataframe on GPU
 ]
 
 # Computer Vision
@@ -96,7 +97,7 @@ nlp = [
     "nlpaug",  # Text augmentation
     "nlpcda",  # Chinese text augmentation
     "tiktoken",  # Token counting
-    "opencc==1.1.6",  # Chinese conversion
+    "opencc==1.1.9",  # Chinese conversion
     "spacy-pkuseg",  # Chinese segmentation
     "rouge",  # Text evaluation
 ]
@@ -136,6 +137,8 @@ dev = [
     "pytest",  # testing framework
     "pytest-cov",  # coverage reporting
     "build",  # package building
+    "black>=25.1.0",
+    "flake8-black",
 ]
 
 # AI Services & APIs
@@ -177,6 +180,9 @@ dj-install = "data_juicer.tools.dj_install:main"
 requires = ["hatchling", "uv>=0.1.0"]
 build-backend = "hatchling.build"
 
+[tool.hatch.version]
+path = "data_juicer/__init__.py"
+
 [tool.hatch.build.targets.wheel]
 packages = ["data_juicer"]
 include = ["uv.lock", "pyproject.toml"]
@@ -193,6 +199,15 @@ per-file-ignores = [
     "*/__init__.py: F401"
 ]
 max-line-length = 120
+extend-ignore = [
+    "E203",  # whitespace before ':' (black handles this)
+    "E501",  # line too long (black handles this)
+    "BLK100",  # black would make changes (black handles this)
+]
 
-[tool.hatch.version]
-path = "data_juicer/__init__.py"
+[tool.black]
+line-length = 120
+target-version = ['py310']
+
+[tool.isort]
+profile = "black"
