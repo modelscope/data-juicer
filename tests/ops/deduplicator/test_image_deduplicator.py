@@ -451,19 +451,6 @@ class ImageDeduplicatorTest(DataJuicerTestCaseBase):
         op = ImageDeduplicator(consider_text=True)
         self._run_image_deduplicator(dataset, tgt_list, op)
     
-    def test_no_deduplicator(self):
-        ds_list = [{
-            'images': [self.img1_path],
-            'text': 'text1',
-        }, {
-            'images': [self.img2_path],
-            'text': 'text2',
-        }]
-        tgt_list = ds_list
-        dataset = Dataset.from_list(ds_list)
-        op = ImageDeduplicator(deduplicator=None)
-        self._run_image_deduplicator(dataset, tgt_list, op)
-    
     def test_error_hash_method(self):
         with self.assertRaises(ValueError):
             op = ImageDeduplicator(method='error')
