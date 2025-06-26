@@ -65,15 +65,14 @@ class RayExecutor(ExecutorBase):
         # init dataset builder
         self.datasetbuilder = DatasetBuilder(self.cfg, executor_type="ray")
 
-        logger.info('Preparing exporter...')
+        logger.info("Preparing exporter...")
         self.exporter = RayExporter(
             self.cfg.export_path,
             keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
-            keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds)
+            keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
+        )
 
-    def run(self,
-            load_data_np: Optional[PositiveInt] = None,
-            skip_return=False):
+    def run(self, load_data_np: Optional[PositiveInt] = None, skip_return=False):
         """
         Running the dataset process pipeline
 
@@ -105,7 +104,7 @@ class RayExecutor(ExecutorBase):
             dataset.process(ops)
 
             # 4. data export
-            logger.info('Exporting dataset to disk...')
+            logger.info("Exporting dataset to disk...")
             self.exporter.export(dataset.data)
             tend = time.time()
             logger.info(f"All Ops are done in {tend - tstart:.3f}s.")

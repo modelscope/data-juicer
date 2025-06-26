@@ -11,21 +11,18 @@ class RayExporter:
 
     # TODO: support config for export, some export methods require additional args
     _SUPPORTED_FORMATS = {
-        'json',
-        'jsonl',
-        'parquet',
-        'csv',
-        'tfrecords',
-        'webdataset',
-        'lance',
+        "json",
+        "jsonl",
+        "parquet",
+        "csv",
+        "tfrecords",
+        "webdataset",
+        "lance",
         # 'images',
         # 'numpy',
     }
 
-    def __init__(self,
-                 export_path,
-                 keep_stats_in_res_ds=True,
-                 keep_hashes_in_res_ds=False):
+    def __init__(self, export_path, keep_stats_in_res_ds=True, keep_hashes_in_res_ds=False):
         """
         Initialization method.
 
@@ -48,18 +45,20 @@ class RayExporter:
         :param export_path: the path to export datasets.
         :return: the export data format.
         """
-        suffix = os.path.splitext(export_path)[-1].strip('.')
+        suffix = os.path.splitext(export_path)[-1].strip(".")
         if not suffix:
             logger.warning(
                 f'export_path "{export_path}" does not have a suffix. '
-                f'We will use "jsonl" as the default export type.')
-            suffix = 'jsonl'
+                f'We will use "jsonl" as the default export type.'
+            )
+            suffix = "jsonl"
 
         export_format = suffix
         if export_format not in self._SUPPORTED_FORMATS:
             raise NotImplementedError(
                 f'export data format "{export_format}" is not supported '
-                f'for now. Only support {self._SUPPORTED_FORMATS}.')
+                f"for now. Only support {self._SUPPORTED_FORMATS}."
+            )
         return export_format
 
     def _export_impl(self, dataset, export_path):
@@ -88,10 +87,10 @@ class RayExporter:
             removed_fields = extra_fields.intersection(feature_fields)
             dataset = dataset.drop_columns(removed_fields)
 
-        if self.export_format in {'json', 'jsonl'}:
+        if self.export_format in {"json", "jsonl"}:
             return dataset.write_json(export_path, force_ascii=False)
         else:
-            return getattr(dataset, f'write_{self.export_format}')(export_path)
+            return getattr(dataset, f"write_{self.export_format}")(export_path)
 
     def export(self, dataset):
         """
