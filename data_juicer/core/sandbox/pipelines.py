@@ -34,9 +34,8 @@ class SandBoxWatcher:
             os.makedirs(self.sandbox_cfg.work_dir, exist_ok=True)
 
         self.wandb_run = wandb.init(project=project_name, name=experiment_name)
-        if (hpo_config is not None and 'metric' in hpo_config
-                and 'name' in hpo_config['metric']):
-            self.object_name_in_hpo = hpo_config['metric']['name']
+        if hpo_config is not None and "metric" in hpo_config and "name" in hpo_config["metric"]:
+            self.object_name_in_hpo = hpo_config["metric"]["name"]
         else:
             self.object_name_in_hpo = None
         self.logged_res = {}
@@ -47,7 +46,7 @@ class SandBoxWatcher:
         """
         return self.logged_res.get(meta_name)
 
-    def watch(self, res, meta_name: str = ''):
+    def watch(self, res, meta_name: str = ""):
         """
         Flatten the result in dot structure and log it into WandB.
         """
@@ -55,13 +54,13 @@ class SandBoxWatcher:
             for key, value in res.items():
                 # getting the left nodes of the given res dictionary.
                 if isinstance(value, dict):
-                    self.watch(value, f'{meta_name}.{key}')
+                    self.watch(value, f"{meta_name}.{key}")
                 else:
-                    self.logged_res[f'{meta_name}.{key}'] = value
-                    if self.object_name_in_hpo == f'{meta_name}.{key}':
+                    self.logged_res[f"{meta_name}.{key}"] = value
+                    if self.object_name_in_hpo == f"{meta_name}.{key}":
                         # Ensuring float results for HPO experiments
                         value = float(value)
-                    self.wandb_run.log({f'{meta_name}.{key}': value})
+                    self.wandb_run.log({f"{meta_name}.{key}": value})
         else:
             self.logged_res[meta_name] = res
             if meta_name == self.object_name_in_hpo:
@@ -77,9 +76,8 @@ class SandBoxWatcher:
         if project_name is None:
             project_name = self.sandbox_cfg.project_name
         sweep_id = wandb.sweep(sweep=hpo_config, project=project_name)
-        if (hpo_config is not None and 'metric' in hpo_config
-                and 'name' in hpo_config['metric']):
-            self.object_name_in_hpo = hpo_config['metric']['name']
+        if hpo_config is not None and "metric" in hpo_config and "name" in hpo_config["metric"]:
+            self.object_name_in_hpo = hpo_config["metric"]["name"]
         return sweep_id
 
     def watch_cfgs(self, cfgs: List[tuple] = None):
@@ -97,10 +95,9 @@ class SandBoxWatcher:
                 elif isinstance(cfg, dict):
                     converged_cfg = cfg
                 else:
-                    raise ValueError(
-                        f'Expected dict or JsonNamespace, got {type(cfg)}')
+                    raise ValueError(f"Expected dict or JsonNamespace, got {type(cfg)}")
                 for key, val in converged_cfg.items():
-                    merged_cfgs[f'{cfg_prefix}.{key}'] = val
+                    merged_cfgs[f"{cfg_prefix}.{key}"] = val
         else:
             merged_cfgs = namespace_to_dict(self.sandbox_cfg)
 
@@ -108,11 +105,7 @@ class SandBoxWatcher:
 
 
 class SandboxPipeline:
-
-    def __init__(self,
-                 pipeline_name='anonymous',
-                 pipeline_cfg=None,
-                 watcher=None):
+    def __init__(self, pipeline_name="anonymous", pipeline_cfg=None, watcher=None):
         """
         Initialization method.
         """
@@ -130,27 +123,25 @@ class SandboxPipeline:
         self.register_jobs()
 
     def register_jobs(self):
-
         # register probe_jobs
-        for job_cfg in self.cfg.get('probe_job_configs', []):
+        for job_cfg in self.cfg.get("probe_job_configs", []):
             self.probe_jobs.append(register_hook(job_cfg, self.watcher))
 
         # register refine_recipe_jobs
-        for job_cfg in self.cfg.get('refine_recipe_job_configs', []):
-            self.refine_recipe_jobs.append(register_hook(
-                job_cfg, self.watcher))
+        for job_cfg in self.cfg.get("refine_recipe_job_configs", []):
+            self.refine_recipe_jobs.append(register_hook(job_cfg, self.watcher))
 
         # register execution_jobs
-        for job_cfg in self.cfg.get('execution_job_configs', []):
+        for job_cfg in self.cfg.get("execution_job_configs", []):
             self.execution_jobs.append(register_hook(job_cfg, self.watcher))
 
         # register evaluation_jobs
-        for job_cfg in self.cfg.get('evaluation_job_configs', []):
+        for job_cfg in self.cfg.get("evaluation_job_configs", []):
             self.evaluation_jobs.append(register_hook(job_cfg, self.watcher))
 
     def run(self, **pipeline_infos):
         """
-         Running the sandbox pipeline at once or in HPO style.
+        Running the sandbox pipeline at once or in HPO style.
         """
         if self.cfg.hpo_config is not None:
             # execute_hpo_wandb contains running one_trail with HPO scheduler
@@ -171,43 +162,33 @@ class SandboxPipeline:
         if self.watcher.object_name_in_hpo is not None:
             # merge the new hyper-parameters produced by HPO scheduler
             self.cfg = merge_config(self.cfg, wandb.config)
-            self.watcher.watch_cfgs([self.cfg, 'after_hpo'])
+            self.watcher.watch_cfgs([self.cfg, "after_hpo"])
 
         if self.name in context_infos:
-            raise ValueError(
-                f'There are different pipelines with the same pipeline name {self.name}.'
-            )
+            raise ValueError(f"There are different pipelines with the same pipeline name {self.name}.")
         context_infos[self.name] = []
 
         # ====== Data & model probe ======
         for probe_hook in self.probe_jobs:
-            logger.info(
-                f'======= Pipeline [{self.name}]: Start Probe Hook [{probe_hook.meta_name}] ======='
-            )
+            logger.info(f"======= Pipeline [{self.name}]: Start Probe Hook [{probe_hook.meta_name}] =======")
             new_job_infos = probe_hook.run(**context_infos)
             context_infos[self.name].append(new_job_infos)
 
         # ====== Data-model recipes iteration based on probe results ======
         for refine_hook in self.refine_recipe_jobs:
-            logger.info(
-                f'======= Pipeline [{self.name}]: Start Refine Hook [{refine_hook.meta_name}] ======='
-            )
+            logger.info(f"======= Pipeline [{self.name}]: Start Refine Hook [{refine_hook.meta_name}] =======")
             new_job_infos = refine_hook.run(**context_infos)
             context_infos[self.name].append(new_job_infos)
 
         # ====== Data processing & model training ======
         for exec_hook in self.execution_jobs:
-            logger.info(
-                f'======= Pipeline [{self.name}]: Start Execution Hook [{exec_hook.meta_name}] ======='
-            )
+            logger.info(f"======= Pipeline [{self.name}]: Start Execution Hook [{exec_hook.meta_name}] =======")
             new_job_infos = exec_hook.run(**context_infos)
             context_infos[self.name].append(new_job_infos)
 
         # ====== Evaluation on processed data or trained model ======
         for eval_hook in self.evaluation_jobs:
-            logger.info(
-                f'======= Pipeline [{self.name}]: Start Evaluation Hook [{eval_hook.meta_name}] ======='
-            )
+            logger.info(f"======= Pipeline [{self.name}]: Start Evaluation Hook [{eval_hook.meta_name}] =======")
             new_job_infos = eval_hook.run(**context_infos)
             context_infos[self.name].append(new_job_infos)
 
@@ -224,10 +205,11 @@ class SandboxPipeline:
         with open(self.cfg.hpo_config) as file:
             hpo_configuration = yaml.safe_load(file)
             sweep_id = self.watcher.setup_sweep(hpo_configuration)
-            wandb.agent(sweep_id,
-                        function=self.one_trial,
-                        count=hpo_configuration['sweep_max_count']
-                        if 'sweep_max_count' in hpo_configuration else None)
+            wandb.agent(
+                sweep_id,
+                function=self.one_trial,
+                count=hpo_configuration["sweep_max_count"] if "sweep_max_count" in hpo_configuration else None,
+            )
         return None
 
 
@@ -256,11 +238,11 @@ class SandBoxExecutor:
         self.cfg = cfg
 
         self.watcher = SandBoxWatcher(self.cfg)
-        self.watcher.watch_cfgs([(cfg, 'sandbox')])
+        self.watcher.watch_cfgs([(cfg, "sandbox")])
 
         self.pipelines = self.parse_pipelines(self.cfg)
 
-        self.resume = self.cfg.get('resume', False)
+        self.resume = self.cfg.get("resume", False)
 
     def parse_pipelines(self, cfg):
         """
@@ -271,8 +253,11 @@ class SandBoxExecutor:
         """
         pipelines = []
         pipeline_keys = [
-            'pipelines', 'probe_job_configs', 'refine_recipe_job_configs',
-            'execution_job_configs', 'evaluation_job_configs'
+            "pipelines",
+            "probe_job_configs",
+            "refine_recipe_job_configs",
+            "execution_job_configs",
+            "evaluation_job_configs",
         ]
         global_cfgs = deepcopy(cfg)
         for pipeline_key in pipeline_keys:
@@ -283,25 +268,18 @@ class SandBoxExecutor:
             for pipeline in cfg.pipelines:
                 pipeline_name, pipeline_cfg = list(pipeline.items())[0]
                 pipeline_cfg.update(global_cfgs)
-                pipelines.append(
-                    SandboxPipeline(pipeline_name,
-                                    self.specify_jobs_configs(pipeline_cfg),
-                                    self.watcher))
+                pipelines.append(SandboxPipeline(pipeline_name, self.specify_jobs_configs(pipeline_cfg), self.watcher))
         else:
-            pipeline = SandboxPipeline(
-                pipeline_cfg=self.specify_jobs_configs(cfg),
-                watcher=self.watcher)
+            pipeline = SandboxPipeline(pipeline_cfg=self.specify_jobs_configs(cfg), watcher=self.watcher)
             pipelines.append(pipeline)
         return pipelines
 
     def specify_job_configs(self, ori_config):
-
         config = prepare_side_configs(ori_config)
 
         for key in JobRequiredKeys:
             if key.value not in config:
-                logger.debug(
-                    f'The key "{key.value}" is not specified in {ori_config}')
+                logger.debug(f'The key "{key.value}" is not specified in {ori_config}')
 
         return dict_to_namespace(config)
 
@@ -316,34 +294,28 @@ class SandBoxExecutor:
         def configs_to_job_list(cfgs):
             job_cfgs = []
             if cfgs:
-                job_cfgs = [
-                    self.specify_job_configs(job_cfg) for job_cfg in cfgs
-                ]
+                job_cfgs = [self.specify_job_configs(job_cfg) for job_cfg in cfgs]
             return job_cfgs
 
         if isinstance(cfg, dict):
             cfg = dict_to_namespace(cfg)
 
-        if 'probe_job_configs' in cfg:
+        if "probe_job_configs" in cfg:
             cfg.probe_job_configs = configs_to_job_list(cfg.probe_job_configs)
-        if 'refine_recipe_job_configs' in cfg:
-            cfg.refine_recipe_job_configs = configs_to_job_list(
-                cfg.refine_recipe_job_configs)
-        if 'execution_job_configs' in cfg:
-            cfg.execution_job_configs = configs_to_job_list(
-                cfg.execution_job_configs)
-        if 'evaluation_job_configs' in cfg:
-            cfg.evaluation_job_configs = configs_to_job_list(
-                cfg.evaluation_job_configs)
+        if "refine_recipe_job_configs" in cfg:
+            cfg.refine_recipe_job_configs = configs_to_job_list(cfg.refine_recipe_job_configs)
+        if "execution_job_configs" in cfg:
+            cfg.execution_job_configs = configs_to_job_list(cfg.execution_job_configs)
+        if "evaluation_job_configs" in cfg:
+            cfg.evaluation_job_configs = configs_to_job_list(cfg.evaluation_job_configs)
 
         return cfg
 
     def run(self):
-        context_infos_path = os.path.join(self.cfg.work_dir,
-                                          'context_infos.json')
+        context_infos_path = os.path.join(self.cfg.work_dir, "context_infos.json")
         if self.resume and os.path.exists(context_infos_path):
             # load context infos from the existing one
-            context_infos = json.load(open(context_infos_path, 'r'))
+            context_infos = json.load(open(context_infos_path, "r"))
             # find those finished pipelines
             finished_pipelines = set(context_infos.keys())
             left_pipelines = []
@@ -353,13 +325,15 @@ class SandBoxExecutor:
                     # check if the number of job infos is the same as the number of all kinds of jobs,
                     # which means all jobs are finished
                     num_job_infos = len(context_infos[pipeline.name])
-                    num_jobs = len(pipeline.probe_jobs) + len(
-                        pipeline.refine_recipe_jobs) + len(
-                            pipeline.execution_jobs) + len(
-                                pipeline.evaluation_jobs)
+                    num_jobs = (
+                        len(pipeline.probe_jobs)
+                        + len(pipeline.refine_recipe_jobs)
+                        + len(pipeline.execution_jobs)
+                        + len(pipeline.evaluation_jobs)
+                    )
                     if num_job_infos == num_jobs:
                         logger.info(
-                            f'Pipeline {pipeline.name} is finished and loaded from the existing context infos. Skip it!'
+                            f"Pipeline {pipeline.name} is finished and loaded from the existing context infos. Skip it!"
                         )
                         continue
                 left_pipelines.append(pipeline)
@@ -372,5 +346,5 @@ class SandBoxExecutor:
                 context_infos = pipeline.run(**context_infos)
         finally:
             # export context infos
-            with open(context_infos_path, 'w') as fout:
+            with open(context_infos_path, "w") as fout:
                 json.dump(context_infos, fout, indent=4)
