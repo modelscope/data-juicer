@@ -7,7 +7,7 @@ import regex as re
 from ..base_op import OPERATORS, Mapper
 
 
-@OPERATORS.register_module('remove_header_mapper')
+@OPERATORS.register_module("remove_header_mapper")
 class RemoveHeaderMapper(Mapper):
     """Mapper to remove headers at the beginning of documents in Latex
     samples."""
@@ -24,15 +24,15 @@ class RemoveHeaderMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.pattern = r'^(.*?)('
-        self.pattern += r'\\\bchapter\b\*?(?:\[(.*?)\])?\{(.*?)\}|'
-        self.pattern += r'\\\bpart\b\*?(?:\[(.*?)\])?\{(.*?)\}|'
-        self.pattern += r'\\\bsection\b\*?(?:\[(.*?)\])?\{(.*?)\}|'
-        self.pattern += r'\\\bsubsection\b\*?(?:\[(.*?)\])?\{(.*?)\}|'
-        self.pattern += r'\\\bsubsubsection\b\*?(?:\[(.*?)\])?\{(.*?)\}|'
-        self.pattern += r'\\\bparagraph\b\*?(?:\[(.*?)\])?\{(.*?)\}'
-        self.pattern += r'\\\bsubparagraph\b\*?(?:\[(.*?)\])?\{(.*?)\}'
-        self.pattern += r')'
+        self.pattern = r"^(.*?)("
+        self.pattern += r"\\\bchapter\b\*?(?:\[(.*?)\])?\{(.*?)\}|"
+        self.pattern += r"\\\bpart\b\*?(?:\[(.*?)\])?\{(.*?)\}|"
+        self.pattern += r"\\\bsection\b\*?(?:\[(.*?)\])?\{(.*?)\}|"
+        self.pattern += r"\\\bsubsection\b\*?(?:\[(.*?)\])?\{(.*?)\}|"
+        self.pattern += r"\\\bsubsubsection\b\*?(?:\[(.*?)\])?\{(.*?)\}|"
+        self.pattern += r"\\\bparagraph\b\*?(?:\[(.*?)\])?\{(.*?)\}"
+        self.pattern += r"\\\bsubparagraph\b\*?(?:\[(.*?)\])?\{(.*?)\}"
+        self.pattern += r")"
 
         self.drop_no_head = drop_no_head
 
@@ -40,12 +40,9 @@ class RemoveHeaderMapper(Mapper):
         for idx, text in enumerate(samples[self.text_key]):
             if not re.search(self.pattern, text, flags=re.DOTALL):
                 if self.drop_no_head:
-                    text = ''
+                    text = ""
                 continue
-            text = re.sub(pattern=self.pattern,
-                          repl=r'\2',
-                          string=text,
-                          flags=re.DOTALL)
+            text = re.sub(pattern=self.pattern, repl=r"\2", string=text, flags=re.DOTALL)
 
             samples[self.text_key][idx] = text
 

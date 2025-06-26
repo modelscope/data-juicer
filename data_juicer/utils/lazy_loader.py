@@ -16,30 +16,26 @@ def get_toml_file_path():
     """Get the path to pyproject.toml file."""
     try:
         # First try to find it in the installed package data
-        with importlib.resources.path('py_data_juicer',
-                                      'pyproject.toml') as toml_path:
+        with importlib.resources.path("py_data_juicer", "pyproject.toml") as toml_path:
             return toml_path
     except (ImportError, FileNotFoundError):
         # If not found in package data, try project root
-        with importlib.resources.path('data_juicer',
-                                      '__init__.py') as init_path:
+        with importlib.resources.path("data_juicer", "__init__.py") as init_path:
             project_root = init_path.parent.parent
-            return project_root / 'pyproject.toml'
+            return project_root / "pyproject.toml"
 
 
 def get_uv_lock_path():
     """Get the path to uv.lock file."""
     try:
         # First try to find it in the installed package data
-        with importlib.resources.path('py_data_juicer',
-                                      'uv.lock') as lock_path:
+        with importlib.resources.path("py_data_juicer", "uv.lock") as lock_path:
             return lock_path
     except (ImportError, FileNotFoundError):
         # If not found in package data, try project root
-        with importlib.resources.path('data_juicer',
-                                      '__init__.py') as init_path:
+        with importlib.resources.path("data_juicer", "__init__.py") as init_path:
             project_root = init_path.parent.parent
-            return project_root / 'uv.lock'
+            return project_root / "uv.lock"
 
 
 class LazyLoader(types.ModuleType):
@@ -53,12 +49,12 @@ class LazyLoader(types.ModuleType):
 
     # Mapping of module names to their corresponding package names
     _module_to_package = {
-        'cv2': 'opencv-python',
-        'PIL': 'Pillow',
-        'bs4': 'beautifulsoup4',
-        'sklearn': 'scikit-learn',
-        'yaml': 'PyYAML',
-        'git': 'gitpython',
+        "cv2": "opencv-python",
+        "PIL": "Pillow",
+        "bs4": "beautifulsoup4",
+        "sklearn": "scikit-learn",
+        "yaml": "PyYAML",
+        "git": "gitpython",
     }
 
     @classmethod
@@ -101,78 +97,74 @@ class LazyLoader(types.ModuleType):
         try:
             lock_path = get_uv_lock_path()
             if lock_path.exists():
-                with open(lock_path, 'rb') as f:
+                with open(lock_path, "rb") as f:
                     try:
                         lock_data = tomli.load(f)
                     except Exception as e:
-                        logger.debug(f'Failed to parse uv.lock: {str(e)}')
+                        logger.debug(f"Failed to parse uv.lock: {str(e)}")
                         # Don't return empty dict here, fall back to pyproject.toml
                         pass
                     else:
                         result = {}
                         # Extract package versions from uv.lock
-                        if 'package' in lock_data:
-                            for pkg in lock_data['package']:
-                                if 'name' in pkg and 'version' in pkg:
-                                    name = pkg['name']
-                                    version = pkg['version']
-                                    result[name] = f'{name}=={version}'
+                        if "package" in lock_data:
+                            for pkg in lock_data["package"]:
+                                if "name" in pkg and "version" in pkg:
+                                    name = pkg["name"]
+                                    version = pkg["version"]
+                                    result[name] = f"{name}=={version}"
 
                         if result:
                             cls._dependencies = result
                             return cls._dependencies
         except Exception as e:
-            logger.debug(f'Failed to read dependencies from uv.lock: {str(e)}')
+            logger.debug(f"Failed to read dependencies from uv.lock: {str(e)}")
 
         # Fall back to pyproject.toml if uv.lock is not available or empty
         try:
             pyproject_path = get_toml_file_path()
 
             if not pyproject_path.exists():
-                logger.debug('pyproject.toml not found')
+                logger.debug("pyproject.toml not found")
                 cls._dependencies = {}
                 return cls._dependencies
 
-            with open(pyproject_path, 'rb') as f:
+            with open(pyproject_path, "rb") as f:
                 try:
                     pyproject = tomli.load(f)
                 except Exception as e:
-                    logger.debug(f'Failed to parse pyproject.toml: {str(e)}')
+                    logger.debug(f"Failed to parse pyproject.toml: {str(e)}")
                     cls._dependencies = {}
                     return cls._dependencies
 
             result = {}
 
             # Get main dependencies
-            if 'project' in pyproject and 'dependencies' in pyproject[
-                    'project']:
-                for dep in pyproject['project']['dependencies']:
-                    if '>=' in dep or '<=' in dep or '==' in dep or '>' in dep or '<' in dep:
+            if "project" in pyproject and "dependencies" in pyproject["project"]:
+                for dep in pyproject["project"]["dependencies"]:
+                    if ">=" in dep or "<=" in dep or "==" in dep or ">" in dep or "<" in dep:
                         # Find the first occurrence of any version operator
-                        for op in ['>=', '<=', '==', '>', '<']:
+                        for op in [">=", "<=", "==", ">", "<"]:
                             if op in dep:
                                 name, version = dep.split(op, 1)
                                 name = name.strip()
-                                result[name] = f'{name}{op}{version.strip()}'
+                                result[name] = f"{name}{op}{version.strip()}"
                                 break
                     else:
                         name = dep.strip()
                         result[name] = name
 
             # Get optional dependencies
-            if 'project' in pyproject and 'optional-dependencies' in pyproject[
-                    'project']:
-                for group in pyproject['project'][
-                        'optional-dependencies'].values():
+            if "project" in pyproject and "optional-dependencies" in pyproject["project"]:
+                for group in pyproject["project"]["optional-dependencies"].values():
                     for dep in group:
-                        if '>=' in dep or '<=' in dep or '==' in dep or '>' in dep or '<' in dep:
+                        if ">=" in dep or "<=" in dep or "==" in dep or ">" in dep or "<" in dep:
                             # Find the first occurrence of any version operator
-                            for op in ['>=', '<=', '==', '>', '<']:
+                            for op in [">=", "<=", "==", ">", "<"]:
                                 if op in dep:
                                     name, version = dep.split(op, 1)
                                     name = name.strip()
-                                    result[
-                                        name] = f'{name}{op}{version.strip()}'
+                                    result[name] = f"{name}{op}{version.strip()}"
                                     break
                         else:
                             name = dep.strip()
@@ -183,8 +175,7 @@ class LazyLoader(types.ModuleType):
             return cls._dependencies
 
         except Exception as e:
-            logger.debug(
-                f'Failed to read dependencies from pyproject.toml: {str(e)}')
+            logger.debug(f"Failed to read dependencies from pyproject.toml: {str(e)}")
             cls._dependencies = {}
             return cls._dependencies
 
@@ -202,12 +193,12 @@ class LazyLoader(types.ModuleType):
 
         def _is_package_installed(package_name):
             """Check if a package is installed by attempting to import it."""
-            if '@' in package_name:
-                package_name = package_name.split('@')[0]
-            if '[' in package_name:
-                package_name = package_name.split('[')[0]
-            if '/' in package_name:  # Handle GitHub URLs
-                package_name = package_name.split('/')[-1].replace('.git', '')
+            if "@" in package_name:
+                package_name = package_name.split("@")[0]
+            if "[" in package_name:
+                package_name = package_name.split("[")[0]
+            if "/" in package_name:  # Handle GitHub URLs
+                package_name = package_name.split("/")[-1].replace(".git", "")
             try:
                 importlib.import_module(package_name)
                 return True
@@ -220,25 +211,20 @@ class LazyLoader(types.ModuleType):
 
         for package_spec in package_specs:
             if not _is_package_installed(package_spec):
-                logger.info(
-                    f'Package [{package_spec}] not found, installing...')
+                logger.info(f"Package [{package_spec}] not found, installing...")
                 try:
                     cls._install_package(package_spec, pip_args)
                 except subprocess.CalledProcessError as e:
                     raise ImportError(
-                        f'Failed to install {package_spec}. This package may '
-                        f'require system-level dependencies. Please try '
-                        f'installing it manually with: pip install {package_spec}\n'
-                        f'Error details: {str(e)}')
+                        f"Failed to install {package_spec}. This package may "
+                        f"require system-level dependencies. Please try "
+                        f"installing it manually with: pip install {package_spec}\n"
+                        f"Error details: {str(e)}"
+                    )
             else:
-                logger.info(
-                    f'Package [{package_spec}] already installed, carry on..')
+                logger.info(f"Package [{package_spec}] already installed, carry on..")
 
-    def __init__(self,
-                 module_name: str,
-                 package_name: str = None,
-                 package_url: str = None,
-                 auto_install: bool = True):
+    def __init__(self, module_name: str, package_name: str = None, package_url: str = None, auto_install: bool = True):
         """
         Initialize the LazyLoader.
 
@@ -253,15 +239,15 @@ class LazyLoader(types.ModuleType):
 
         # For installation, use the provided package_name or get it from mapping
         if package_name is None:
-            base_module = module_name.split('.')[0]
+            base_module = module_name.split(".")[0]
             self._package_name = self.get_package_name(base_module)
         else:
             self._package_name = package_name
 
         # Standardize package_url to use git+ format
-        if package_url and '@' in package_url:
+        if package_url and "@" in package_url:
             # Convert from package@git+ format to git+ format
-            self._package_url = package_url.split('@', 1)[1]
+            self._package_url = package_url.split("@", 1)[1]
         else:
             self._package_url = package_url
 
@@ -287,18 +273,17 @@ class LazyLoader(types.ModuleType):
     def _install_package(cls, package_spec, pip_args=None):
         """Install a package using uv if available, otherwise pip."""
         # Print trace information for package installation
-        logger.debug(f'Installing package: {package_spec}')
+        logger.debug(f"Installing package: {package_spec}")
         # Get last 3 frames of the stack trace
         stack = traceback.extract_stack()[-3:]
-        logger.debug('Package installation triggered from:\n' +
-                     ''.join(traceback.format_list(stack)))
+        logger.debug("Package installation triggered from:\n" + "".join(traceback.format_list(stack)))
 
         # Convert pip_args to list if it's a string
         if isinstance(pip_args, str):
             pip_args = [pip_args]
 
         # For GitHub repositories, clone only to get dependencies
-        if package_spec.startswith(('git+', 'https://github.com/')):
+        if package_spec.startswith(("git+", "https://github.com/")):
             import os
             import shutil
             import tempfile
@@ -309,8 +294,8 @@ class LazyLoader(types.ModuleType):
             temp_dir = tempfile.mkdtemp()
             try:
                 # Clone the repository
-                logger.info(f'Cloning {package_spec} to get dependencies...')
-                if package_spec.startswith('git+'):
+                logger.info(f"Cloning {package_spec} to get dependencies...")
+                if package_spec.startswith("git+"):
                     repo_url = package_spec[4:]  # Remove 'git+' prefix
                 else:
                     repo_url = package_spec
@@ -318,15 +303,12 @@ class LazyLoader(types.ModuleType):
 
                 # Define all possible dependency files
                 dep_files = {
-                    'requirements.txt':
-                    'Installing requirements from requirements.txt...',
-                    'pyproject.toml':
-                    'Installing dependencies from pyproject.toml...',
-                    'setup.py': 'Installing dependencies from setup.py...',
-                    'setup.cfg': 'Installing dependencies from setup.cfg...',
-                    'Pipfile': 'Installing dependencies from Pipfile...',
-                    'poetry.lock':
-                    'Installing dependencies from poetry.lock...'
+                    "requirements.txt": "Installing requirements from requirements.txt...",
+                    "pyproject.toml": "Installing dependencies from pyproject.toml...",
+                    "setup.py": "Installing dependencies from setup.py...",
+                    "setup.cfg": "Installing dependencies from setup.cfg...",
+                    "Pipfile": "Installing dependencies from Pipfile...",
+                    "poetry.lock": "Installing dependencies from poetry.lock...",
                 }
 
                 # Try to install dependencies from each file if it exists
@@ -336,85 +318,46 @@ class LazyLoader(types.ModuleType):
                         logger.info(log_msg)
                         try:
                             # Try uv first
-                            if dep_file in [
-                                    'pyproject.toml', 'setup.py', 'setup.cfg'
-                            ]:
+                            if dep_file in ["pyproject.toml", "setup.py", "setup.cfg"]:
                                 # For these files, install dependencies only
-                                cmd = [
-                                    sys.executable, '-m', 'uv', 'pip',
-                                    'install', temp_dir
-                                ]
-                            elif dep_file == 'Pipfile':
+                                cmd = [sys.executable, "-m", "uv", "pip", "install", temp_dir]
+                            elif dep_file == "Pipfile":
                                 # For Pipfile, use pipenv
-                                cmd = [
-                                    sys.executable, '-m', 'pipenv', 'install',
-                                    '--deploy', '--skip-lock'
-                                ]
-                            elif dep_file == 'poetry.lock':
+                                cmd = [sys.executable, "-m", "pipenv", "install", "--deploy", "--skip-lock"]
+                            elif dep_file == "poetry.lock":
                                 # For poetry.lock, use poetry
-                                cmd = [
-                                    sys.executable, '-m', 'poetry', 'install',
-                                    '--no-root', '--no-sync'
-                                ]
+                                cmd = [sys.executable, "-m", "poetry", "install", "--no-root", "--no-sync"]
                             else:
                                 # For requirements.txt, use standard pip install
-                                cmd = [
-                                    sys.executable, '-m', 'uv', 'pip',
-                                    'install', '-r', dep_path
-                                ]
+                                cmd = [sys.executable, "-m", "uv", "pip", "install", "-r", dep_path]
 
                             if pip_args:
                                 cmd.extend(pip_args)
                             subprocess.check_call(cmd)
-                        except (subprocess.CalledProcessError,
-                                FileNotFoundError):
-                            logger.warning(
-                                'uv not found or failed, falling back to pip...'
-                            )
-                            if dep_file in [
-                                    'pyproject.toml', 'setup.py', 'setup.cfg'
-                            ]:
-                                cmd = [
-                                    sys.executable, '-m', 'pip', 'install',
-                                    temp_dir
-                                ]
-                            elif dep_file == 'Pipfile':
-                                cmd = [
-                                    sys.executable, '-m', 'pipenv', 'install',
-                                    '--deploy', '--skip-lock'
-                                ]
-                            elif dep_file == 'poetry.lock':
-                                cmd = [
-                                    sys.executable, '-m', 'poetry', 'install',
-                                    '--no-root', '--no-sync'
-                                ]
+                        except (subprocess.CalledProcessError, FileNotFoundError):
+                            logger.warning("uv not found or failed, falling back to pip...")
+                            if dep_file in ["pyproject.toml", "setup.py", "setup.cfg"]:
+                                cmd = [sys.executable, "-m", "pip", "install", temp_dir]
+                            elif dep_file == "Pipfile":
+                                cmd = [sys.executable, "-m", "pipenv", "install", "--deploy", "--skip-lock"]
+                            elif dep_file == "poetry.lock":
+                                cmd = [sys.executable, "-m", "poetry", "install", "--no-root", "--no-sync"]
                             else:
-                                cmd = [
-                                    sys.executable, '-m', 'pip', 'install',
-                                    '-r', dep_path
-                                ]
+                                cmd = [sys.executable, "-m", "pip", "install", "-r", dep_path]
                             if pip_args:
                                 cmd.extend(pip_args)
                             subprocess.check_call(cmd)
 
                 # Install the package directly from remote
                 try:
-                    logger.info(
-                        f'Installing {package_spec} directly from remote...')
-                    cmd = [
-                        sys.executable, '-m', 'uv', 'pip', 'install',
-                        '--force-reinstall', package_spec
-                    ]
+                    logger.info(f"Installing {package_spec} directly from remote...")
+                    cmd = [sys.executable, "-m", "uv", "pip", "install", "--force-reinstall", package_spec]
                     if pip_args:
                         cmd.extend(pip_args)
                     subprocess.check_call(cmd)
                 except (subprocess.CalledProcessError, FileNotFoundError):
-                    logger.warning(
-                        'uv not found or failed, falling back to pip...')
-                    cmd = [
-                        sys.executable, '-m', 'pip', 'install',
-                        '--force-reinstall', package_spec
-                    ]
+                    logger.warning("uv not found or failed, falling back to pip...")
+                    cmd = [sys.executable, "-m", "pip", "install", "--force-reinstall", package_spec]
                     if pip_args:
                         cmd.extend(pip_args)
                     subprocess.check_call(cmd)
@@ -425,37 +368,34 @@ class LazyLoader(types.ModuleType):
         else:
             # Get the full package spec from dependencies
             deps = cls.get_all_dependencies()
-            package_name = package_spec.split(
-                '@')[0] if '@' in package_spec else package_spec
-            if '[' in package_name:
-                package_name = package_name.split('[')[0]
-            if '/' in package_name:  # Handle GitHub URLs
-                package_name = package_name.split('/')[-1].replace('.git', '')
+            package_name = package_spec.split("@")[0] if "@" in package_spec else package_spec
+            if "[" in package_name:
+                package_name = package_name.split("[")[0]
+            if "/" in package_name:  # Handle GitHub URLs
+                package_name = package_name.split("/")[-1].replace(".git", "")
 
             # Use the version from dependencies if available and not a URL
-            is_url = package_spec.startswith(('git+', 'https://'))
+            is_url = package_spec.startswith(("git+", "https://"))
             if package_name in deps and not is_url:
                 package_spec = deps[package_name]
-                logger.info(f'Using version from dependencies: {package_spec}')
+                logger.info(f"Using version from dependencies: {package_spec}")
             else:
                 logger.warning(
-                    f'No version constraint found in pyproject.toml for {package_name}, '
-                    f'using original spec: {package_spec}')
+                    f"No version constraint found in pyproject.toml for {package_name}, "
+                    f"using original spec: {package_spec}"
+                )
 
             # For non-GitHub packages, use direct installation
             try:
-                logger.info(f'Installing {package_spec} using uv...')
-                cmd = [
-                    sys.executable, '-m', 'uv', 'pip', 'install', package_spec
-                ]
+                logger.info(f"Installing {package_spec} using uv...")
+                cmd = [sys.executable, "-m", "uv", "pip", "install", package_spec]
                 if pip_args:
                     cmd.extend(pip_args)
                 subprocess.check_call(cmd)
                 return True
             except (subprocess.CalledProcessError, FileNotFoundError):
-                logger.warning(
-                    'uv not found or failed, falling back to pip...')
-                cmd = [sys.executable, '-m', 'pip', 'install', package_spec]
+                logger.warning("uv not found or failed, falling back to pip...")
+                cmd = [sys.executable, "-m", "pip", "install", package_spec]
                 if pip_args:
                     cmd.extend(pip_args)
                 subprocess.check_call(cmd)
@@ -463,7 +403,7 @@ class LazyLoader(types.ModuleType):
 
     def _load(self):
         """Load the module and handle any missing dependencies."""
-        logger.debug(f'Loading {self._module_name}...')
+        logger.debug(f"Loading {self._module_name}...")
 
         if self._module is not None:
             return self._module
@@ -483,19 +423,21 @@ class LazyLoader(types.ModuleType):
                 self._install_package(package_spec)
             except subprocess.CalledProcessError as e:
                 raise ImportError(
-                    f'Failed to install {package_spec}. This package may '
-                    f'require system-level dependencies. Please try '
-                    f'installing it manually with: pip install {package_spec}\n'
-                    f'Error details: {str(e)}')
+                    f"Failed to install {package_spec}. This package may "
+                    f"require system-level dependencies. Please try "
+                    f"installing it manually with: pip install {package_spec}\n"
+                    f"Error details: {str(e)}"
+                )
 
             # Try importing again
             try:
                 self._module = importlib.import_module(self._module_name)
             except ImportError as import_error:
                 raise ImportError(
-                    f'Failed to import {self._module_name} after '
-                    f'installing {package_spec}. '
-                    f'Error details: {str(import_error)}')
+                    f"Failed to import {self._module_name} after "
+                    f"installing {package_spec}. "
+                    f"Error details: {str(import_error)}"
+                )
 
         # Update the parent module's globals with the loaded module
         self._parent_module_globals[self._module_name] = self._module
@@ -513,13 +455,11 @@ class LazyLoader(types.ModuleType):
         except AttributeError:
             # If not found, try importing it as a submodule
             try:
-                submodule = importlib.import_module(
-                    f'{self._module_name}.{item}')
+                submodule = importlib.import_module(f"{self._module_name}.{item}")
                 setattr(self._module, item, submodule)
                 return submodule
             except ImportError:
-                raise AttributeError(
-                    f"module '{self._module_name}' has no attribute '{item}'")
+                raise AttributeError(f"module '{self._module_name}' has no attribute '{item}'")
 
     def __dir__(self):
         if self._module is None:

@@ -3,10 +3,10 @@ from data_juicer.ops.filter import LLMAnalysisFilter
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 
-torch = LazyLoader('torch')
-vllm = LazyLoader('vllm')
+torch = LazyLoader("torch")
+vllm = LazyLoader("vllm")
 
-OP_NAME = 'llm_quality_score_filter'
+OP_NAME = "llm_quality_score_filter"
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -66,9 +66,7 @@ json
   "recommendation": "review"
 }
 """  # noqa: E501
-    DEFAULT_DIM_REQUIRED_KEYS = [
-        'accuracy', 'grammar', 'informativeness', 'coherence'
-    ]
+    DEFAULT_DIM_REQUIRED_KEYS = ["accuracy", "grammar", "informativeness", "coherence"]
 
     def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
