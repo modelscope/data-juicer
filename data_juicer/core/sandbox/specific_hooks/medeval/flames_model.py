@@ -14,9 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """ PyTorch InternLM model."""
+# Modified from https://huggingface.co/CaasiHUANG/flames-scorer/tree/main
 import math
-import queue
-import threading
 from typing import List, Optional, Tuple, Union
 
 import torch
@@ -38,10 +37,8 @@ except:  # noqa # pylint: disable=bare-except
     BaseStreamer = None
 
 from transformers.configuration_utils import PretrainedConfig
-from transformers.utils import logging
 
 
-# Modified from transformers.model.llama.configuration_llama.LlamaConfig
 class InternLMConfig(PretrainedConfig):
     r"""
     This is the configuration class to store the configuration of a [`InternLMModel`]. It is used to instantiate
@@ -85,60 +82,6 @@ class InternLMConfig(PretrainedConfig):
     >>> # Accessing the model configuration
     >>> configuration = model.config
     ```"""
-    model_type = 'internlm'
-    _auto_class = 'AutoConfig'
-
-    def __init__(  # pylint: disable=W0102
-        self,
-        vocab_size=103168,
-        hidden_size=4096,
-        intermediate_size=11008,
-        num_hidden_layers=32,
-        num_attention_heads=32,
-        hidden_act='silu',
-        max_position_embeddings=2048,
-        initializer_range=0.02,
-        rms_norm_eps=1e-6,
-        use_cache=True,
-        pad_token_id=0,
-        bos_token_id=1,
-        eos_token_id=2,
-        tie_word_embeddings=False,
-        bias=True,
-        rotary={
-            'base': 10000,
-            'type': 'dynamic'
-        },  # pylint: disable=W0102
-        attn_implementation='eager',
-        **kwargs,
-    ):
-        self.vocab_size = vocab_size
-        self.max_position_embeddings = max_position_embeddings
-        self.hidden_size = hidden_size
-        self.intermediate_size = intermediate_size
-        self.num_hidden_layers = num_hidden_layers
-        self.num_attention_heads = num_attention_heads
-        self.hidden_act = hidden_act
-        self.initializer_range = initializer_range
-        self.rms_norm_eps = rms_norm_eps
-        self.use_cache = use_cache
-        self.bias = bias
-        self.rotary = rotary
-        self.attn_implementation = attn_implementation
-        if self.attn_implementation is None:
-            self.attn_implementation = 'eager'
-        super().__init__(
-            pad_token_id=pad_token_id,
-            bos_token_id=bos_token_id,
-            eos_token_id=eos_token_id,
-            tie_word_embeddings=tie_word_embeddings,
-            **kwargs,
-        )
-
-
-# Modified from transformers.model.llama.configuration_llama.LlamaConfig
-class InternLMConfig(PretrainedConfig):
-
     model_type = 'internlm'
     _auto_class = 'AutoConfig'
 
@@ -316,8 +259,9 @@ class InternLMRotaryEmbedding(torch.nn.Module):
                  base=10000,
                  device=None):
         super().__init__()
-        inv_freq = 1.0 / (base
-                          **(torch.arange(0, dim, 2).float().to(device) / dim))
+        exponent = torch.arange(0, dim, 2).float().to(device) / dim
+        base_exp = base**exponent
+        inv_freq = 1.0 / base_exp
         self.register_buffer('inv_freq', inv_freq, persistent=False)
 
         # Build here to make `torch.jit.trace` work.
@@ -373,8 +317,9 @@ class InternLMDynamicNTKScalingRotaryEmbedding(torch.nn.Module):
                  device=None,
                  scaling_factor=1.0):
         super().__init__()
-        inv_freq = 1.0 / (base
-                          **(torch.arange(0, dim, 2).float().to(device) / dim))
+        exponent = torch.arange(0, dim, 2).float().to(device) / dim
+        base_exp = base**exponent
+        inv_freq = 1.0 / base_exp
         self.register_buffer('inv_freq', inv_freq, persistent=False)
         self.dim = dim
         self.base = base

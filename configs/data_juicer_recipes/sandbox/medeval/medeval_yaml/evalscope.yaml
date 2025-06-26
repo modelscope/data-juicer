@@ -1,0 +1,25 @@
+type: evalscope_evaluator
+
+# env related
+env_name: 'dj-evalscope'
+env_manager: 'conda'
+
+evalscope_type: 'config'
+config_path: 'configs/data_juicer_recipes/sandbox/medeval/evalscope_configs/demo.py'
+output_path: 'medeval/res/evalscope'
+
+# # For pt backend
+# evalscope_type: 'command'
+# model: INFER_MODEL_PATH
+# datasets: 'gsm8k'
+# output_path: 'medeval/res/evalscope/test'
+# limits: 10
+
+# For vllm backend
+# evalscope_type: 'command'
+# eval_service: 'service'
+# model: 'qwen25-1.5b'
+# datasets: 'arc'
+# api_url: 'http://127.0.0.1:8901/v1/chat/completions'
+# output_path: 'medeval/res/evalscope/test'
+# limits: 10

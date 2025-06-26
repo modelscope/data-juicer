@@ -1,9 +1,7 @@
 import json
 import os
 import shutil
-import subprocess
-from datetime import datetime
-from typing import Any, Dict, List, Union
+from typing import Any, Dict
 
 from loguru import logger
 
@@ -242,7 +240,7 @@ class EvalscopeEvaluator(BaseEvaluator):
             }
 
             merged_result_path = os.path.join(self.output_path,
-                                              f'eval_results.json')
+                                              'eval_results.json')
             with open(merged_result_path, 'w') as f:
                 json.dump(result_dict, f, indent=2)
             return result_dict, 0.0
@@ -295,7 +293,7 @@ class EvalscopeEvaluator(BaseEvaluator):
             result_dict['mean_score'] = mean_score
 
         merged_result_path = os.path.join(self.output_path,
-                                          f'eval_results.json')
+                                          'eval_results.json')
         with open(merged_result_path, 'w') as f:
             json.dump(result_dict, f, indent=2)
 
