@@ -1,0 +1,95 @@
+# Flames Eval
+type: med_evaluator
+med_task: 'flames'
+infer_model: 'qwen25-1.5b'
+infer_api_url: 'http://127.0.0.1:8901/v1'
+flames_model_path: "CaasiHUANG/flames-scorer"
+input_file: 'medeval/data/med_data_sub/flames/data.jsonl'
+output_path: 'medeval/res_sub_test/flames'
+infer_concurrency: 16
+flames_batch_size: 4
+
+
+# # MedHallu Eval
+# type: med_evaluator
+# med_task: 'medhallu'
+# infer_model: 'qwen25-1.5b'
+# infer_api_url: 'http://127.0.0.1:8901/v1'
+# input_file: 'medeval/data/med_data_sub/medhallu/data.parquet'
+# output_path: 'medeval/res_sub_test/medhallu'
+# infer_concurrency: 16
+
+
+# # MedSafety Eval
+# type: med_evaluator
+# med_task: 'medsafety'
+# infer_model: 'qwen25-1.5b'
+# infer_api_url: 'http://127.0.0.1:8901/v1'
+# eval_model: 'qwen3-32b'
+# eval_api_url: "http://127.0.0.1:8902/v1"
+# input_file: 'medeval/data/med_data_sub/medsafety/data.jsonl'
+# output_path: 'medeval/res_sub_test/medsafety'
+# infer_concurrency: 16
+# eval_concurrency: 16
+
+
+# # InfoBench Eval
+# type: 'med_evaluator'
+# med_task: 'infobench'
+# infer_model: 'qwen25-1.5b'
+# infer_api_url: 'http://127.0.0.1:8901/v1'
+# eval_model: 'qwen3-32b'
+# eval_api_url: "http://127.0.0.1:8902/v1"
+# input_file: 'medeval/data/med_data_sub/infobench/data.jsonl'
+# output_path: 'medeval/res_sub_test/infobench'
+# infer_concurrency: 16
+# eval_concurrency: 16
+
+
+# # StructFlow Eval
+# type: med_evaluator
+# med_task: 'structflow'
+# infer_model: 'qwen25-1.5b'
+# infer_api_url: 'http://127.0.0.1:8901/v1'
+# eval_model: 'qwen3-32b'
+# eval_api_url: "http://127.0.0.1:8902/v1"
+# input_file: 'medeval/data/med_data_sub/structflow/data.json'
+# output_path: 'medeval/res_sub_test/structflow'
+# infer_concurrency: 16
+# eval_concurrency: 16
+
+
+# # MedJourney Eval
+# type: 'med_evaluator'
+# med_task: 'medjourney'
+# env_name: 'dj-evalscope'
+# evalscope_type: 'config'
+# config_path: 'medeval/configs/medjourney.py'
+# output_path: 'medeval/res_sub_test/medjourney'
+
+
+# # MedAgents Eval
+# type: 'med_evaluator'
+# med_task: 'medagents'
+# env_name: 'dj-evalscope'
+# evalscope_type: 'config'
+# config_path: 'medeval/configs/medagents.py'
+# output_path: 'medeval/res_sub_test/medagents'
+
+
+# # IFEval Eval
+# type: 'med_evaluator'
+# med_task: 'ifeval'
+# env_name: 'dj-evalscope'
+# evalscope_type: 'config'
+# config_path: 'medeval/configs/ifeval.py'
+# output_path: 'medeval/res_sub_test/ifeval'
+
+
+# # Perf Eval
+# type: 'med_evaluator'
+# med_task: 'perf'
+# env_name: 'dj-evalscope'
+# evalscope_type: 'config'
+# config_path: 'medeval/configs/perf.py'
+# output_path: 'medeval/res_sub_test/perf'

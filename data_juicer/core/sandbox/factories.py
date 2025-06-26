@@ -146,6 +146,13 @@ class ModelEvaluatorFactory(object):
             from data_juicer.core.sandbox.specific_hooks.intervl_coco_captioning.model_hooks import \
                 InternVLCOCOCaptionEvaluator
             evaluator = InternVLCOCOCaptionEvaluator(eval_cfg)
+        elif eval_cfg.type == 'evalscope_evaluator':
+            from data_juicer.core.sandbox.evaluators import EvalscopeEvaluator
+            evaluator = EvalscopeEvaluator(eval_cfg)
+        elif eval_cfg.type == 'med_evaluator':
+            from data_juicer.core.sandbox.specific_hooks.medeval.model_hooks import \
+                MedEvaluator
+            evaluator = MedEvaluator(eval_cfg)
 
         return evaluator
 
