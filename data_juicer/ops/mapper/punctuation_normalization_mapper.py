@@ -5,7 +5,7 @@
 from ..base_op import OPERATORS, Mapper
 
 
-@OPERATORS.register_module('punctuation_normalization_mapper')
+@OPERATORS.register_module("punctuation_normalization_mapper")
 class PunctuationNormalizationMapper(Mapper):
     """Mapper to normalize unicode punctuations to English punctuations in text
     samples."""
@@ -21,45 +21,44 @@ class PunctuationNormalizationMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self.punctuation_unicode = {
-            '，': ',',
-            '。': '.',
-            '、': ',',
-            '„': '"',
-            '”': '"',
-            '“': '"',
-            '«': '"',
-            '»': '"',
-            '１': '"',
-            '」': '"',
-            '「': '"',
-            '《': '"',
-            '》': '"',
-            '´': "'",
-            '∶': ':',
-            '：': ':',
-            '？': '?',
-            '！': '!',
-            '（': '(',
-            '）': ')',
-            '；': ';',
-            '–': '-',
-            '—': ' - ',
-            '．': '. ',
-            '～': '~',
-            '’': "'",
-            '…': '...',
-            '━': '-',
-            '〈': '<',
-            '〉': '>',
-            '【': '[',
-            '】': ']',
-            '％': '%',
-            '►': '-',
+            "，": ",",
+            "。": ".",
+            "、": ",",
+            "„": '"',
+            "”": '"',
+            "“": '"',
+            "«": '"',
+            "»": '"',
+            "１": '"',
+            "」": '"',
+            "「": '"',
+            "《": '"',
+            "》": '"',
+            "´": "'",
+            "∶": ":",
+            "：": ":",
+            "？": "?",
+            "！": "!",
+            "（": "(",
+            "）": ")",
+            "；": ";",
+            "–": "-",
+            "—": " - ",
+            "．": ". ",
+            "～": "~",
+            "’": "'",
+            "…": "...",
+            "━": "-",
+            "〈": "<",
+            "〉": ">",
+            "【": "[",
+            "】": "]",
+            "％": "%",
+            "►": "-",
         }
 
     def process_batched(self, samples):
         samples[self.text_key] = [
-            ''.join([self.punctuation_unicode.get(c, c) for c in text])
-            for text in samples[self.text_key]
+            "".join([self.punctuation_unicode.get(c, c) for c in text]) for text in samples[self.text_key]
         ]
         return samples

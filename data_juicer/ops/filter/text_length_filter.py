@@ -5,7 +5,7 @@ from data_juicer.utils.constant import Fields, StatsKeys
 from ..base_op import OPERATORS, Filter
 
 
-@OPERATORS.register_module('text_length_filter')
+@OPERATORS.register_module("text_length_filter")
 class TextLengthFilter(Filter):
     """Filter to keep samples with total text length within a specific
     range."""

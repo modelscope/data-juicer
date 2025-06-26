@@ -2,14 +2,18 @@ import numpy as np
 from PIL import ImageOps
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
-                                        load_image, remove_special_tokens)
+from data_juicer.utils.mm_utils import (
+    SpecialTokens,
+    load_data_with_context,
+    load_image,
+    remove_special_tokens,
+)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
-OP_NAME = 'image_text_similarity_filter'
+OP_NAME = "image_text_similarity_filter"
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -18,20 +22,22 @@ class ImageTextSimilarityFilter(Filter):
     """Filter to keep samples those similarities between image and text
     within a specific range."""
 
-    _accelerator = 'cuda'
+    _accelerator = "cuda"
     _batched_op = True
 
-    def __init__(self,
-                 hf_clip: str = 'openai/clip-vit-base-patch32',
-                 trust_remote_code: bool = False,
-                 min_score: float = 0.1,
-                 max_score: float = 1.0,
-                 horizontal_flip: bool = False,
-                 vertical_flip: bool = False,
-                 any_or_all: str = 'any',
-                 reduce_mode: str = 'avg',
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        hf_clip: str = "openai/clip-vit-base-patch32",
+        trust_remote_code: bool = False,
+        min_score: float = 0.1,
+        max_score: float = 1.0,
+        horizontal_flip: bool = False,
+        vertical_flip: bool = False,
+        any_or_all: str = "any",
+        reduce_mode: str = "avg",
+        *args,
+        **kwargs,
+    ):
         """
         Initialization method.
 
@@ -53,20 +59,20 @@ class ImageTextSimilarityFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault('mem_required', '1500MB')
+        kwargs.setdefault("mem_required", "1500MB")
         super().__init__(*args, **kwargs)
         self.min_score = min_score
         self.max_score = max_score
-        if reduce_mode not in ['avg', 'max', 'min']:
-            raise ValueError(f'Reduce mode [{reduce_mode}] is not supported. '
-                             f'Can only be one of ["avg", "max", "min"].')
-        if any_or_all not in ['any', 'all']:
-            raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
-                             f'Can only be one of ["any", "all"].')
-        self.any = (any_or_all == 'any')
-        self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_clip,
-                                       trust_remote_code=trust_remote_code)
+        if reduce_mode not in ["avg", "max", "min"]:
+            raise ValueError(
+                f"Reduce mode [{reduce_mode}] is not supported. " f'Can only be one of ["avg", "max", "min"].'
+            )
+        if any_or_all not in ["any", "all"]:
+            raise ValueError(f"Keep strategy [{any_or_all}] is not supported. " f'Can only be one of ["any", "all"].')
+        self.any = any_or_all == "any"
+        self.model_key = prepare_model(
+            model_type="huggingface", pretrained_model_name_or_path=hf_clip, trust_remote_code=trust_remote_code
+        )
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
@@ -78,14 +84,12 @@ class ImageTextSimilarityFilter(Filter):
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][StatsKeys.image_text_similarity] = np.array(
-                [], dtype=np.float64)
+            sample[Fields.stats][StatsKeys.image_text_similarity] = np.array([], dtype=np.float64)
             return sample
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context,
-                                                loaded_image_keys, load_image)
+        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
 
         text = sample[self.text_key]
         offset = 0
@@ -101,7 +105,7 @@ class ImageTextSimilarityFilter(Filter):
             else:
                 text_chunk = remove_special_tokens(chunk)
                 image_chunk = []
-                for image_key in loaded_image_keys[offset:offset + count]:
+                for image_key in loaded_image_keys[offset : offset + count]:
                     image = images[image_key]
                     if self.horizontal_flip:
                         image = ImageOps.mirror(image)
@@ -109,20 +113,21 @@ class ImageTextSimilarityFilter(Filter):
                         image = ImageOps.flip(image)
                     image_chunk.append(image)
 
-                inputs = processor(text=text_chunk,
-                                   images=image_chunk,
-                                   return_tensors='pt',
-                                   truncation=True,
-                                   max_length=model.config.text_config.
-                                   max_position_embeddings,
-                                   padding=True).to(model.device)
+                inputs = processor(
+                    text=text_chunk,
+                    images=image_chunk,
+                    return_tensors="pt",
+                    truncation=True,
+                    max_length=model.config.text_config.max_position_embeddings,
+                    padding=True,
+                ).to(model.device)
 
                 outputs = model(**inputs)
                 chunk_logits = outputs.logits_per_text / 100.0
 
-                if self.reduce_mode == 'avg':
+                if self.reduce_mode == "avg":
                     chunk_similarity = chunk_logits.mean()
-                elif self.reduce_mode == 'max':
+                elif self.reduce_mode == "max":
                     chunk_similarity = chunk_logits.max()
                 else:
                     chunk_similarity = chunk_logits.min()
@@ -138,10 +143,7 @@ class ImageTextSimilarityFilter(Filter):
         if len(similarity) <= 0:
             return True
 
-        keep_bools = np.array([
-            self.min_score <= sim_value <= self.max_score
-            for sim_value in similarity
-        ])
+        keep_bools = np.array([self.min_score <= sim_value <= self.max_score for sim_value in similarity])
 
         # different strategies
         if self.any:
