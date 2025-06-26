@@ -61,20 +61,20 @@ class RayExporter:
             )
         return export_format
 
-    def _export_impl(self, dataset, export_path):
+    def _export_impl(self, dataset, export_path, columns=None):
         """
         Export a dataset to specific path.
 
         :param dataset: the dataset to export.
         :param export_path: the path to export the dataset.
+        :param columns: the columns to export.
         :return:
         """
-        # fetch the corresponding export method according to the suffix
+        feature_fields = dataset.columns() if not columns else columns
+        removed_fields = []
         if not self.keep_stats_in_res_ds:
             extra_fields = {Fields.stats, Fields.meta}
-            feature_fields = set(dataset.columns())
-            removed_fields = extra_fields.intersection(feature_fields)
-            dataset = dataset.drop_columns(removed_fields)
+            removed_fields = list(extra_fields.intersection(feature_fields))
         if not self.keep_hashes_in_res_ds:
             extra_fields = {
                 HashKeys.hash,
@@ -83,8 +83,9 @@ class RayExporter:
                 HashKeys.imagehash,
                 HashKeys.videohash,
             }
-            feature_fields = set(dataset.columns())
             removed_fields = extra_fields.intersection(feature_fields)
+
+        if len(removed_fields):
             dataset = dataset.drop_columns(removed_fields)
 
         if self.export_format in {"json", "jsonl"}:
@@ -92,11 +93,12 @@ class RayExporter:
         else:
             return getattr(dataset, f"write_{self.export_format}")(export_path)
 
-    def export(self, dataset):
+    def export(self, dataset, columns=None):
         """
         Export method for a dataset.
 
         :param dataset: the dataset to export.
+        :param columns: the columns to export.
         :return:
         """
-        self._export_impl(dataset, self.export_path)
+        self._export_impl(dataset, self.export_path, columns)
