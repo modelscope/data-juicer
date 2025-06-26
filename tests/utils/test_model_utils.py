@@ -346,6 +346,9 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
         model_func = prepare_model('huggingface', pretrained_model_name_or_path='test_model')
         self.assertIsNotNone(model_func)
 
+        model_func = prepare_model('embedding', model_path='test_embedding_model', device='cuda:0')
+        self.assertIsNotNone(model_func)
+
         # Test invalid model type
         with self.assertRaises(AssertionError):
             prepare_model('invalid_type')
