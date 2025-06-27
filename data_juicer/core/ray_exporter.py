@@ -74,7 +74,7 @@ class RayExporter:
         removed_fields = []
         if not self.keep_stats_in_res_ds:
             extra_fields = {Fields.stats, Fields.meta}
-            removed_fields = list(extra_fields.intersection(feature_fields))
+            removed_fields.extend(list(extra_fields.intersection(feature_fields)))
         if not self.keep_hashes_in_res_ds:
             extra_fields = {
                 HashKeys.hash,
@@ -83,7 +83,7 @@ class RayExporter:
                 HashKeys.imagehash,
                 HashKeys.videohash,
             }
-            removed_fields = extra_fields.intersection(feature_fields)
+            removed_fields.extend(list(extra_fields.intersection(feature_fields)))
 
         if len(removed_fields):
             dataset = dataset.drop_columns(removed_fields)

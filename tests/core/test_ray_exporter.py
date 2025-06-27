@@ -16,7 +16,8 @@ class TestRayExporter(unittest.TestCase):
         import ray
         from data_juicer.core.data.ray_dataset import RayDataset
 
-        self.tmp_dir = tempfile.TemporaryDirectory().name
+        cur_dir = osp.dirname(osp.abspath(__file__))
+        self.tmp_dir = f'{cur_dir}/tmp/{self.__class__.__name__}/{self._testMethodName}'
         os.makedirs(self.tmp_dir, exist_ok=True)
 
         self.data = [
