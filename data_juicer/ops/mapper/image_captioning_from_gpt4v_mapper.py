@@ -71,7 +71,7 @@ def call_gpt_vision_api(
     except requests.exceptions.Timeout:
         logger.warning("The request timed out. Please try again later.")
     except requests.exceptions.RequestException as err:
-        logger.warningt(f"An error occurred: {err}")
+        logger.warning(f"An error occurred: {err}")
     except Exception as e:
         logger.warning(f"An unexpected error occurred: {e}")
 
