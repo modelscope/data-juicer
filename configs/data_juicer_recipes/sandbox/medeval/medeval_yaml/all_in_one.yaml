@@ -1,0 +1,25 @@
+type: med_evaluator
+med_task: 'all_in_one'
+
+input_path: "medeval/data/med_data_sub"
+output_root_path: 'medeval/res/sub/test'
+
+infer_model: 'qwen25-1.5b'
+infer_api_url: 'http://127.0.0.1:8901/v1'
+eval_model: 'qwen3-32b'
+eval_api_url: "http://127.0.0.1:8902/v1"
+flames_model_path: "CaasiHUANG/flames-scorer"
+
+infer_concurrency: 16
+eval_concurrency: 16
+flames_batch_size: 4
+
+env_name: 'dj-evalscope'
+env_manager: 'conda'
+evalscope_type: 'config'
+medjourney_config: 'configs/data_juicer_recipes/sandbox/medeval/evalscope_configs/medjourney.py'
+medagents_config: 'configs/data_juicer_recipes/sandbox/medeval/evalscope_configs/medagents.py'
+ifeval_config: 'configs/data_juicer_recipes/sandbox/medeval/evalscope_configs/ifeval.py'
+perf_config: 'configs/data_juicer_recipes/sandbox/medeval/evalscope_configs/perf.py'
+
+radar_parser: 'configs/data_juicer_recipes/sandbox/medeval/medeval_yaml/med_radar.yaml'
