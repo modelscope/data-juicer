@@ -45,6 +45,14 @@ data\_juicer.core.monitor module
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.core.ray\_exporter module
+--------------------------------------
+
+.. automodule:: data_juicer.core.ray_exporter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.core.tracer module
 -------------------------------
 

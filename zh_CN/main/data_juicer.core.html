@@ -1108,6 +1108,51 @@ result for each OP.</p>
 </dd></dl>
 
 </section>
+<section id="module-data_juicer.core.ray_exporter">
+<span id="data-juicer-core-ray-exporter-module"></span><h2>data_juicer.core.ray_exporter module<a class="headerlink" href="#module-data_juicer.core.ray_exporter" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.core.ray_exporter.RayExporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.ray_exporter.</span></span><span class="sig-name descname"><span class="pre">RayExporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.ray_exporter.RayExporter" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The Exporter class is used to export a ray dataset to files of specific
+format.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.ray_exporter.RayExporter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.ray_exporter.RayExporter.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>export_path</strong> -- the path to export datasets.</p></li>
+<li><p><strong>keep_stats_in_res_ds</strong> -- whether to keep stats in the result
+dataset.</p></li>
+<li><p><strong>keep_hashes_in_res_ds</strong> -- whether to keep hashes in the result
+dataset.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.ray_exporter.RayExporter.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter.export"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.ray_exporter.RayExporter.export" title="Link to this definition">¶</a></dt>
+<dd><p>Export method for a dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> -- the dataset to export.</p></li>
+<li><p><strong>columns</strong> -- the columns to export.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-data_juicer.core.tracer">
 <span id="data-juicer-core-tracer-module"></span><h2>data_juicer.core.tracer module<a class="headerlink" href="#module-data_juicer.core.tracer" title="Link to this heading">¶</a></h2>
 <dl class="py class">
@@ -1775,6 +1820,48 @@ dataset.</p></li>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.core.RayExporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.</span></span><span class="sig-name descname"><span class="pre">RayExporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.RayExporter" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The Exporter class is used to export a ray dataset to files of specific
+format.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.RayExporter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.RayExporter.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>export_path</strong> -- the path to export datasets.</p></li>
+<li><p><strong>keep_stats_in_res_ds</strong> -- whether to keep stats in the result
+dataset.</p></li>
+<li><p><strong>keep_hashes_in_res_ds</strong> -- whether to keep hashes in the result
+dataset.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.RayExporter.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter.export"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.RayExporter.export" title="Link to this definition">¶</a></dt>
+<dd><p>Export method for a dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> -- the dataset to export.</p></li>
+<li><p><strong>columns</strong> -- the columns to export.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.core.Monitor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.</span></span><span class="sig-name descname"><span class="pre">Monitor</span></span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.Monitor" title="Link to this definition">¶</a></dt>
 <dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -2113,6 +2200,14 @@ deduplicator</p></li>
 </li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-data_juicer.core.ray_exporter">data_juicer.core.ray_exporter module</a><ul>
+<li><a class="reference internal" href="#data_juicer.core.ray_exporter.RayExporter"><code class="docutils literal notranslate"><span class="pre">RayExporter</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.core.ray_exporter.RayExporter.__init__"><code class="docutils literal notranslate"><span class="pre">RayExporter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.ray_exporter.RayExporter.export"><code class="docutils literal notranslate"><span class="pre">RayExporter.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-data_juicer.core.tracer">data_juicer.core.tracer module</a><ul>
 <li><a class="reference internal" href="#data_juicer.core.tracer.Tracer"><code class="docutils literal notranslate"><span class="pre">Tracer</span></code></a><ul>
 <li><a class="reference internal" href="#data_juicer.core.tracer.Tracer.__init__"><code class="docutils literal notranslate"><span class="pre">Tracer.__init__()</span></code></a></li>
@@ -2187,6 +2282,11 @@ deduplicator</p></li>
 <li><a class="reference internal" href="#data_juicer.core.Exporter.to_jsonl"><code class="docutils literal notranslate"><span class="pre">Exporter.to_jsonl()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.Exporter.to_json"><code class="docutils literal notranslate"><span class="pre">Exporter.to_json()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.Exporter.to_parquet"><code class="docutils literal notranslate"><span class="pre">Exporter.to_parquet()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.core.RayExporter"><code class="docutils literal notranslate"><span class="pre">RayExporter</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.core.RayExporter.__init__"><code class="docutils literal notranslate"><span class="pre">RayExporter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.RayExporter.export"><code class="docutils literal notranslate"><span class="pre">RayExporter.export()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#data_juicer.core.Monitor"><code class="docutils literal notranslate"><span class="pre">Monitor</span></code></a><ul>
