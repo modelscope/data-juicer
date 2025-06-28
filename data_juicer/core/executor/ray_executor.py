@@ -10,6 +10,7 @@ from pydantic import PositiveInt
 from data_juicer.core.adapter import Adapter
 from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.executor import ExecutorBase
+from data_juicer.core.ray_exporter import RayExporter
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -64,6 +65,13 @@ class RayExecutor(ExecutorBase):
         # init dataset builder
         self.datasetbuilder = DatasetBuilder(self.cfg, executor_type="ray")
 
+        logger.info("Preparing exporter...")
+        self.exporter = RayExporter(
+            self.cfg.export_path,
+            keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
+            keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
+        )
+
     def run(self, load_data_np: Optional[PositiveInt] = None, skip_return=False):
         """
         Running the dataset process pipeline
@@ -75,6 +83,7 @@ class RayExecutor(ExecutorBase):
         # 1. load data
         logger.info("Loading dataset with Ray...")
         dataset = self.datasetbuilder.load_dataset(num_proc=load_data_np)
+        columns = dataset.schema().columns
 
         # 2. extract processes
         logger.info("Preparing process operators...")
@@ -97,7 +106,7 @@ class RayExecutor(ExecutorBase):
 
             # 4. data export
             logger.info("Exporting dataset to disk...")
-            dataset.data.write_json(self.cfg.export_path, force_ascii=False)
+            self.exporter.export(dataset.data, columns=columns)
             tend = time.time()
             logger.info(f"All Ops are done in {tend - tstart:.3f}s.")
 
