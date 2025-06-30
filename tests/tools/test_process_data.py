@@ -144,6 +144,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
             'ray_address': 'auto',
             'text_keys': text_keys,
             'image_key': 'images',
+            'keep_stats_in_res_ds': True,
             'export_path': tmp_out_path,
             'process': [
                 {

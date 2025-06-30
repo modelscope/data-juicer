@@ -61,7 +61,7 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
             path_keys.append(key)
     if len(path_keys) > 0:
         dataset_dir = os.path.dirname(dataset_path)
-        logger.error(f"dataset_dir: {dataset_dir}")
+        logger.info(f"dataset_dir: {dataset_dir}")
         dataset = dataset.map_batches(
             partial(convert_to_absolute_paths, dataset_dir=dataset_dir, path_keys=path_keys),
             batch_format="pyarrow",
