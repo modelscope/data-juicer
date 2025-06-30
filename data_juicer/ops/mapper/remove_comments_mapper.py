@@ -9,7 +9,7 @@ import regex as re
 from ..base_op import OPERATORS, Mapper
 
 
-@OPERATORS.register_module('remove_comments_mapper')
+@OPERATORS.register_module("remove_comments_mapper")
 class RemoveCommentsMapper(Mapper):
     """
     Mapper to remove comments in different kinds of documents.
@@ -19,12 +19,9 @@ class RemoveCommentsMapper(Mapper):
 
     _batched_op = True
 
-    def __init__(self,
-                 doc_type: Union[str, List[str]] = 'tex',
-                 inline: bool = True,
-                 multiline: bool = True,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self, doc_type: Union[str, List[str]] = "tex", inline: bool = True, multiline: bool = True, *args, **kwargs
+    ):
         """
         Initialization method.
 
@@ -45,16 +42,10 @@ class RemoveCommentsMapper(Mapper):
         for idx, text in enumerate(samples[self.text_key]):
             if self.inline:
                 # remove all in comments within a line
-                text = re.sub(pattern=r'[^\\]%.+$',
-                              repl=r'',
-                              string=text,
-                              flags=re.MULTILINE)
+                text = re.sub(pattern=r"[^\\]%.+$", repl=r"", string=text, flags=re.MULTILINE)
 
             if self.multiline:
-                text = re.sub(pattern=r'(?m)^%.*\n?',
-                              repl=r'',
-                              string=text,
-                              flags=re.MULTILINE)
+                text = re.sub(pattern=r"(?m)^%.*\n?", repl=r"", string=text, flags=re.MULTILINE)
 
             samples[self.text_key][idx] = text
 

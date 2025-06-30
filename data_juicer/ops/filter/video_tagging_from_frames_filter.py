@@ -5,13 +5,11 @@ from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, MetaKeys
 
-from ..base_op import (NON_STATS_FILTERS, OPERATORS, TAGGING_OPS, UNFORKABLE,
-                       Filter)
-from ..mapper.video_tagging_from_frames_mapper import \
-    VideoTaggingFromFramesMapper
+from ..base_op import NON_STATS_FILTERS, OPERATORS, TAGGING_OPS, UNFORKABLE, Filter
+from ..mapper.video_tagging_from_frames_mapper import VideoTaggingFromFramesMapper
 from ..op_fusion import LOADED_VIDEOS
 
-OP_NAME = 'video_tagging_from_frames_filter'
+OP_NAME = "video_tagging_from_frames_filter"
 
 
 @NON_STATS_FILTERS.register_module(OP_NAME)
@@ -20,20 +18,21 @@ OP_NAME = 'video_tagging_from_frames_filter'
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoTaggingFromFramesFilter(Filter):
-    """Filter to keep samples whose videos contain the given tags.
-    """
+    """Filter to keep samples whose videos contain the given tags."""
 
-    _accelerator = 'cuda'
+    _accelerator = "cuda"
 
-    def __init__(self,
-                 tags: List[str] = ['people'],
-                 contain: str = 'any',
-                 frame_sampling_method: str = 'all_keyframes',
-                 frame_num: PositiveInt = 3,
-                 tag_field_name: str = MetaKeys.video_frame_tags,
-                 any_or_all: str = 'any',
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        tags: List[str] = ["people"],
+        contain: str = "any",
+        frame_sampling_method: str = "all_keyframes",
+        frame_num: PositiveInt = 3,
+        tag_field_name: str = MetaKeys.video_frame_tags,
+        any_or_all: str = "any",
+        *args,
+        **kwargs,
+    ):
         """
         Initialization method.
 
@@ -64,21 +63,22 @@ class VideoTaggingFromFramesFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault('mem_required', '9GB')
+        kwargs.setdefault("mem_required", "9GB")
         super().__init__(*args, **kwargs)
-        if contain not in ['any', 'all']:
-            raise ValueError(f'the containing type [{contain}] is not '
-                             f'supported. Can only be one of ["any", "all"].')
-        if frame_sampling_method not in ['all_keyframes', 'uniform']:
+        if contain not in ["any", "all"]:
             raise ValueError(
-                f'Frame sampling method [{frame_sampling_method}] is not '
-                f'supported. Can only be one of ["all_keyframes", "uniform"].')
-        if any_or_all not in ['any', 'all']:
-            raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
-                             f'Can only be one of ["any", "all"].')
+                f"the containing type [{contain}] is not " f'supported. Can only be one of ["any", "all"].'
+            )
+        if frame_sampling_method not in ["all_keyframes", "uniform"]:
+            raise ValueError(
+                f"Frame sampling method [{frame_sampling_method}] is not "
+                f'supported. Can only be one of ["all_keyframes", "uniform"].'
+            )
+        if any_or_all not in ["any", "all"]:
+            raise ValueError(f"Keep strategy [{any_or_all}] is not supported. " f'Can only be one of ["any", "all"].')
         self.tags = set([tag.lower() for tag in tags])
-        self.contain_any = (contain == 'any')
-        self.any = (any_or_all == 'any')
+        self.contain_any = contain == "any"
+        self.any = any_or_all == "any"
         self.tag_field_name = tag_field_name
         self.tagging_producer = VideoTaggingFromFramesMapper(
             frame_sampling_method=frame_sampling_method,
@@ -88,7 +88,6 @@ class VideoTaggingFromFramesFilter(Filter):
         )
 
     def compute_stats_single(self, sample, rank=None, context=False):
-
         sample = self.tagging_producer.process(sample, rank, context)
 
         return sample

@@ -19,6 +19,9 @@ eval_name: mini_test
 # If true, load the required model for VBench from the cache path of environment parameter VBENCH_CACHE_DIR
 load_ckpt_from_local: false
 
+# number of gpus for evaluation
+num_gpus: 1
+
 # The dimensions considered in this eval.
 # All dimensions include: ['subject_consistency', 'background_consistency', 'temporal_flickering',
 # 'motion_smoothness', 'dynamic_degree', 'aesthetic_quality', 'imaging_quality', 'object_class',

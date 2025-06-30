@@ -3,10 +3,10 @@ from data_juicer.ops.filter import LLMAnalysisFilter
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 
-torch = LazyLoader('torch')
-vllm = LazyLoader('vllm')
+torch = LazyLoader("torch")
+vllm = LazyLoader("vllm")
 
-OP_NAME = 'llm_difficulty_score_filter'
+OP_NAME = "llm_difficulty_score_filter"
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -64,11 +64,11 @@ json
 }
 """  # noqa: E501
     DEFAULT_DIM_REQUIRED_KEYS = [
-        'linguistic_complexity',
-        'conceptual_depth',
-        'prior_knowledge',
-        'step_complexity',
-        'ambiguity',
+        "linguistic_complexity",
+        "conceptual_depth",
+        "prior_knowledge",
+        "step_complexity",
+        "ambiguity",
     ]
 
     def compute_stats_single(self, sample, rank=None, context=False):
