@@ -12,8 +12,7 @@ from data_juicer.ops import OPERATORS
 class OPRecord:
     """A record class for storing operator metadata"""
 
-    def __init__(self, op_type: str, name: str, desc: str, tags: List[str],
-                 sig: inspect.Signature, param_desc: str):
+    def __init__(self, op_type: str, name: str, desc: str, tags: List[str], sig: inspect.Signature, param_desc: str):
         self.type = op_type
         self.name = name
         self.desc = desc
@@ -23,12 +22,12 @@ class OPRecord:
 
     def to_dict(self):
         return {
-            'type': self.type,
-            'name': self.name,
-            'description': self.desc,
-            'tags': self.tags,
-            'signature': self.sig,
-            'param_desc': self.param_desc
+            "type": self.type,
+            "name": self.name,
+            "description": self.desc,
+            "tags": self.tags,
+            "signature": self.sig,
+            "param_desc": self.param_desc,
         }
 
 
@@ -42,16 +41,16 @@ def analyze_modality_tag(code, op_prefix):
     will be returned instead.
     """
     tags = []
-    if 'self.text_key' in code or op_prefix == 'text':
-        tags.append('text')
-    if 'self.image_key' in code or op_prefix == 'image':
-        tags.append('image')
-    if 'self.audio_key' in code or op_prefix == 'audio':
-        tags.append('audio')
-    if 'self.video_key' in code or op_prefix == 'video':
-        tags.append('video')
+    if "self.text_key" in code or op_prefix == "text":
+        tags.append("text")
+    if "self.image_key" in code or op_prefix == "image":
+        tags.append("image")
+    if "self.audio_key" in code or op_prefix == "audio":
+        tags.append("audio")
+    if "self.video_key" in code or op_prefix == "video":
+        tags.append("video")
     if len(tags) > 1:
-        tags = ['multimodal']
+        tags = ["multimodal"]
     return tags
 
 
@@ -61,11 +60,11 @@ def analyze_resource_tag(code):
     of the "Resource Tags" in `tagging_mappings.json`. It makes the choice
     according to their assigning statement to attribute `_accelerator`.
     """
-    if '_accelerator = ' in code:
-        if '_accelerator = \'cuda\'' in code:
-            return ['gpu']
+    if "_accelerator = " in code:
+        if "_accelerator = 'cuda'" in code:
+            return ["gpu"]
         else:
-            return ['cpu']
+            return ["cpu"]
     else:
         return []
 
@@ -76,18 +75,16 @@ def analyze_model_tags(code):
     the "Model Tags" in `tagging_mappings.json`. It makes the choice by finding
     the `model_type` arg in `prepare_model` method invocation.
     """
-    pattern = r'model_type=[\'|\"](.*?)[\'|\"]'
+    pattern = r"model_type=[\'|\"](.*?)[\'|\"]"
     groups = re.findall(pattern, code)
     tags = []
     for group in groups:
-        if group == 'api':
-            tags.append('api')
-        elif group == 'vllm':
-            tags.append('vllm')
-        elif group in {
-                'huggingface', 'diffusion', 'simple_aesthetics', 'video_blip'
-        }:
-            tags.append('hf')
+        if group == "api":
+            tags.append("api")
+        elif group == "vllm":
+            tags.append("vllm")
+        elif group in {"huggingface", "diffusion", "simple_aesthetics", "video_blip"}:
+            tags.append("hf")
     return tags
 
 
@@ -104,10 +101,7 @@ def analyze_model_tags(code):
 #     return tags
 
 
-def analyze_tag_with_inheritance(op_cls,
-                                 analyze_func,
-                                 default_tags=[],
-                                 other_parm=dict()):
+def analyze_tag_with_inheritance(op_cls, analyze_func, default_tags=[], other_parm=dict()):
     """
     Universal inheritance chain label analysis function
     """
@@ -130,14 +124,12 @@ def analyze_tag_from_cls(op_cls, op_name):
     Analyze the tags for the OP from the given cls.
     """
     tags = []
-    op_prefix = op_name.split('_')[0]
+    op_prefix = op_name.split("_")[0]
 
     content = inspect.getsource(op_cls)
 
     # Try to find from the inheritance chain
-    resource_tags = analyze_tag_with_inheritance(op_cls,
-                                                 analyze_resource_tag,
-                                                 default_tags=['cpu'])
+    resource_tags = analyze_tag_with_inheritance(op_cls, analyze_resource_tag, default_tags=["cpu"])
     model_tags = analyze_tag_with_inheritance(op_cls, analyze_model_tags)
 
     tags.extend(resource_tags)
@@ -150,13 +142,13 @@ def extract_param_docstring(docstring):
     """
     Extract parameter descriptions from __init__ method docstring.
     """
-    param_docstring = ''
+    param_docstring = ""
     if not docstring:
         return param_docstring
-    param_pattern = re.compile(r'(:param\s+(?!args|kwargs)\w+:\s+([^:]*))')
+    param_pattern = re.compile(r"(:param\s+(?!args|kwargs)\w+:\s+([^:]*))")
     matches = param_pattern.findall(docstring)
     for match in matches:
-        param_docstring += f'    {match[0]}\n'
+        param_docstring += f"    {match[0]}\n"
     return param_docstring
 
 
@@ -169,25 +161,19 @@ class OPSearcher:
         else:
             self.op_records = self._scan_all_ops()
 
-    def _scan_specified_ops(self,
-                            specified_op_list: List[str]) -> List[OPRecord]:
+    def _scan_specified_ops(self, specified_op_list: List[str]) -> List[OPRecord]:
         """Scan specified operators"""
         records = []
         for op_name in specified_op_list:
-            op_type = op_name.split('_')[-1]
+            op_type = op_name.split("_")[-1]
             op_cls = OPERATORS.modules[op_name]
-            desc = op_cls.__doc__ or ''
+            desc = op_cls.__doc__ or ""
             tags = analyze_tag_from_cls(op_cls, op_name)
             sig = inspect.signature(op_cls.__init__)
-            init_param_desc = extract_param_docstring(op_cls.__init__.__doc__
-                                                      or '')
+            init_param_desc = extract_param_docstring(op_cls.__init__.__doc__ or "")
             records.append(
-                OPRecord(op_type=op_type,
-                         name=op_name,
-                         desc=desc,
-                         tags=tags,
-                         sig=sig,
-                         param_desc=init_param_desc))
+                OPRecord(op_type=op_type, name=op_name, desc=desc, tags=tags, sig=sig, param_desc=init_param_desc)
+            )
         return records
 
     def _scan_all_ops(self) -> List[OPRecord]:
@@ -195,10 +181,9 @@ class OPSearcher:
         all_ops_list = list(OPERATORS.modules.keys())
         return self._scan_specified_ops(all_ops_list)
 
-    def search(self,
-               tags: Optional[List[str]] = None,
-               op_type: Optional[str] = None,
-               match_all: bool = True) -> List[Dict]:
+    def search(
+        self, tags: Optional[List[str]] = None, op_type: Optional[str] = None, match_all: bool = True
+    ) -> List[Dict]:
         """
         Search operators by criteria
         :param tags: List of tags to match
@@ -231,13 +216,13 @@ def main(tags, op_type):
 
     results = searcher.search(tags=tags, op_type=op_type)
 
-    print(f'\nFound {len(results)} operators:')
+    print(f"\nFound {len(results)} operators:")
     for op in results:
         print(f"\n[{op['type'].upper()}] {op['name']}")
         print(f"Tags: {', '.join(op['tags'])}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     tags = []
-    op_type = 'filter'
+    op_type = "filter"
     main(tags, op_type=op_type)

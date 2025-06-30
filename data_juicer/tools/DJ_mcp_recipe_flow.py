@@ -7,19 +7,19 @@ from mcp.server.fastmcp import FastMCP
 from data_juicer.tools.mcp_tool import execute_op
 from data_juicer.tools.op_search import OPSearcher
 
-parser = argparse.ArgumentParser(description='Data-Juicer MCP Server')
+parser = argparse.ArgumentParser(description="Data-Juicer MCP Server")
 parser.add_argument(
-    '--port', type=str, default='8000',
-    help='Port number for the MCP server')  # changed to str for consistency
+    "--port", type=str, default="8000", help="Port number for the MCP server"
+)  # changed to str for consistency
 args = parser.parse_args()
 
 # Server configuration
-mcp = FastMCP('Data-Juicer Server', port=args.port)
+mcp = FastMCP("Data-Juicer Server", port=args.port)
 
 # Operator Management
-ops_list_path = os.getenv('DJ_OPS_LIST_PATH', None)
+ops_list_path = os.getenv("DJ_OPS_LIST_PATH", None)
 if ops_list_path:
-    with open(ops_list_path, 'r', encoding='utf-8') as file:
+    with open(ops_list_path, "r", encoding="utf-8") as file:
         ops_list = [line.strip() for line in file if line.strip()]
 else:
     ops_list = None
@@ -80,16 +80,11 @@ def get_data_processing_ops(
                       If False, operators matching any of the specified tags are returned. Defaults to True.
     :returns: A dict containing detailed information about the available operators
     """
-    op_results = searcher.search(tags=tags,
-                                 op_type=op_type,
-                                 match_all=match_all)
+    op_results = searcher.search(tags=tags, op_type=op_type, match_all=match_all)
 
     ops_dict = dict()
     for op in op_results:
-        ops_dict[op['name']] = '\n'.join([
-            op['description'], op['param_desc'], 'Parameters: ',
-            str(op['signature'])
-        ])
+        ops_dict[op["name"]] = "\n".join([op["description"], op["param_desc"], "Parameters: ", str(op["signature"])])
 
     return ops_dict
 
@@ -147,5 +142,5 @@ def run_data_recipe(
     return execute_op(dj_cfg)
 
 
-if __name__ == '__main__':
-    mcp.run(transport=os.getenv('SERVER_TRANSPORT', 'sse'))
+if __name__ == "__main__":
+    mcp.run(transport=os.getenv("SERVER_TRANSPORT", "sse"))
