@@ -7,15 +7,20 @@ from pydantic import PositiveInt
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.file_utils import dict_to_hash
 from data_juicer.utils.mm_utils import (
-    SpecialTokens, close_video, extract_key_frames,
-    extract_key_frames_by_seconds, extract_video_frames_uniformly,
-    extract_video_frames_uniformly_by_seconds, load_data_with_context,
-    load_video)
+    SpecialTokens,
+    close_video,
+    extract_key_frames,
+    extract_key_frames_by_seconds,
+    extract_video_frames_uniformly,
+    extract_video_frames_uniformly_by_seconds,
+    load_data_with_context,
+    load_video,
+)
 
 from ..base_op import OPERATORS, TAGGING_OPS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
-OP_NAME = 'video_extract_frames_mapper'
+OP_NAME = "video_extract_frames_mapper"
 
 
 @TAGGING_OPS.register_module(OP_NAME)
@@ -38,7 +43,7 @@ class VideoExtractFramesMapper(Mapper):
 
     def __init__(
         self,
-        frame_sampling_method: str = 'all_keyframes',
+        frame_sampling_method: str = "all_keyframes",
         frame_num: PositiveInt = 3,
         duration: float = 0,
         frame_dir: str = None,
@@ -76,31 +81,30 @@ class VideoExtractFramesMapper(Mapper):
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
 
-        if frame_sampling_method not in ['all_keyframes', 'uniform']:
+        if frame_sampling_method not in ["all_keyframes", "uniform"]:
             raise ValueError(
-                f'Frame sampling method '
-                f'[{frame_sampling_method}] is not supported. '
-                f'Can only be one of ["all_keyframes", "uniform"].')
+                f"Frame sampling method "
+                f"[{frame_sampling_method}] is not supported. "
+                f'Can only be one of ["all_keyframes", "uniform"].'
+            )
 
         self.frame_dir = frame_dir
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num
         self.duration = duration
         self.frame_key = frame_key
-        self.frame_fname_template = 'frame_{}.jpg'
+        self.frame_fname_template = "frame_{}.jpg"
 
     def _get_default_frame_dir(self, original_filepath):
         original_dir = os.path.dirname(original_filepath)
-        dir_token = f'/{Fields.multimodal_data_output_dir}/'
+        dir_token = f"/{Fields.multimodal_data_output_dir}/"
         if dir_token in original_dir:
             original_dir = original_dir.split(dir_token)[0]
-        saved_dir = os.path.join(
-            original_dir, f'{Fields.multimodal_data_output_dir}/{OP_NAME}')
+        saved_dir = os.path.join(original_dir, f"{Fields.multimodal_data_output_dir}/{OP_NAME}")
         original_filename = osp.splitext(osp.basename(original_filepath))[0]
         hash_val = dict_to_hash(self._init_parameters)
 
-        return osp.join(saved_dir,
-                        f'{original_filename}__dj_hash_#{hash_val}#')
+        return osp.join(saved_dir, f"{original_filename}__dj_hash_#{hash_val}#")
 
     def process_single(self, sample, context=False):
         # check if it's generated already
@@ -113,8 +117,7 @@ class VideoExtractFramesMapper(Mapper):
 
         # load videos
         loaded_video_keys = sample[self.video_key]
-        sample, videos = load_data_with_context(sample, context,
-                                                loaded_video_keys, load_video)
+        sample, videos = load_data_with_context(sample, context, loaded_video_keys, load_video)
         video_to_frame_dir = {}
         text = sample[self.text_key]
         offset = 0
@@ -125,32 +128,30 @@ class VideoExtractFramesMapper(Mapper):
             if video_count == 0 or len(chunk) == 0:
                 continue
             else:
-                for video_key in loaded_video_keys[offset:offset +
-                                                   video_count]:
+                for video_key in loaded_video_keys[offset : offset + video_count]:
                     video = videos[video_key]
                     # extract frame videos
-                    if self.frame_sampling_method == 'all_keyframes':
+                    if self.frame_sampling_method == "all_keyframes":
                         if self.duration:
-                            frames = extract_key_frames_by_seconds(
-                                video, self.duration)
+                            frames = extract_key_frames_by_seconds(video, self.duration)
                         else:
                             frames = extract_key_frames(video)
-                    elif self.frame_sampling_method == 'uniform':
+                    elif self.frame_sampling_method == "uniform":
                         if self.duration:
                             frames = extract_video_frames_uniformly_by_seconds(
-                                video, self.frame_num, duration=self.duration)
+                                video, self.frame_num, duration=self.duration
+                            )
                         else:
-                            frames = extract_video_frames_uniformly(
-                                video, self.frame_num)
+                            frames = extract_video_frames_uniformly(video, self.frame_num)
                     else:
-                        raise ValueError(f'Not support sampling method \
-                            `{self.frame_sampling_method}`.')
+                        raise ValueError(
+                            f"Not support sampling method \
+                            `{self.frame_sampling_method}`."
+                        )
                     frames = [frame.to_image() for frame in frames]
 
                     if self.frame_dir:
-                        frame_dir = osp.join(
-                            self.frame_dir,
-                            osp.splitext(osp.basename(video_key))[0])
+                        frame_dir = osp.join(self.frame_dir, osp.splitext(osp.basename(video_key))[0])
                     else:
                         # video path as frames directory
                         frame_dir = self._get_default_frame_dir(video_key)
@@ -158,8 +159,7 @@ class VideoExtractFramesMapper(Mapper):
                     video_to_frame_dir[video_key] = frame_dir
 
                     for i, frame in enumerate(frames):
-                        frame_path = osp.join(
-                            frame_dir, self.frame_fname_template.format(i))
+                        frame_path = osp.join(frame_dir, self.frame_fname_template.format(i))
                         if not os.path.exists(frame_path):
                             frame.save(frame_path)
 

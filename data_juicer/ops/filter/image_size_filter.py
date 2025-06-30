@@ -6,7 +6,7 @@ from data_juicer.utils.mm_utils import get_file_size, size_to_bytes
 from ..base_op import OPERATORS, Filter
 
 
-@OPERATORS.register_module('image_size_filter')
+@OPERATORS.register_module("image_size_filter")
 class ImageSizeFilter(Filter):
     """Keep data samples whose image size (in Bytes/KB/MB/...) within a
     specific range.
@@ -14,12 +14,7 @@ class ImageSizeFilter(Filter):
 
     _batched_op = True
 
-    def __init__(self,
-                 min_size: str = '0',
-                 max_size: str = '1TB',
-                 any_or_all: str = 'any',
-                 *args,
-                 **kwargs):
+    def __init__(self, min_size: str = "0", max_size: str = "1TB", any_or_all: str = "any", *args, **kwargs):
         """
         Initialization method.
 
@@ -37,10 +32,9 @@ class ImageSizeFilter(Filter):
         super().__init__(*args, **kwargs)
         self.min_size = size_to_bytes(min_size)
         self.max_size = size_to_bytes(max_size)
-        if any_or_all not in ['any', 'all']:
-            raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
-                             f'Can only be one of ["any", "all"].')
-        self.any = (any_or_all == 'any')
+        if any_or_all not in ["any", "all"]:
+            raise ValueError(f"Keep strategy [{any_or_all}] is not supported. " f'Can only be one of ["any", "all"].')
+        self.any = any_or_all == "any"
 
     def compute_stats_single(self, sample, context=False):
         # check if it's computed already
@@ -49,23 +43,17 @@ class ImageSizeFilter(Filter):
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][StatsKeys.image_sizes] = np.array(
-                [], dtype=np.float64)
+            sample[Fields.stats][StatsKeys.image_sizes] = np.array([], dtype=np.float64)
             return sample
 
         # for size calculation, no need to load images into memory
-        sample[Fields.stats][StatsKeys.image_sizes] = [
-            get_file_size(img_path) for img_path in sample[self.image_key]
-        ]
+        sample[Fields.stats][StatsKeys.image_sizes] = [get_file_size(img_path) for img_path in sample[self.image_key]]
 
         return sample
 
     def process_single(self, sample):
         image_sizes = sample[Fields.stats][StatsKeys.image_sizes]
-        keep_bools = np.array([
-            self.min_size <= image_size <= self.max_size
-            for image_size in image_sizes
-        ])
+        keep_bools = np.array([self.min_size <= image_size <= self.max_size for image_size in image_sizes])
         if len(keep_bools) <= 0:
             return True
 

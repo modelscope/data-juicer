@@ -37,8 +37,7 @@ from .token_num_filter import TokenNumFilter
 from .video_aesthetics_filter import VideoAestheticsFilter
 from .video_aspect_ratio_filter import VideoAspectRatioFilter
 from .video_duration_filter import VideoDurationFilter
-from .video_frames_text_similarity_filter import \
-    VideoFramesTextSimilarityFilter
+from .video_frames_text_similarity_filter import VideoFramesTextSimilarityFilter
 from .video_motion_score_filter import VideoMotionScoreFilter
 from .video_motion_score_raft_filter import VideoMotionScoreRaftFilter
 from .video_nsfw_filter import VideoNSFWFilter
@@ -50,30 +49,60 @@ from .word_repetition_filter import WordRepetitionFilter
 from .words_num_filter import WordsNumFilter
 
 __all__ = [
-    'AlphanumericFilter', 'AudioDurationFilter', 'AudioNMFSNRFilter',
-    'AudioSizeFilter', 'AverageLineLengthFilter', 'CharacterRepetitionFilter',
-    'FlaggedWordFilter', 'ImageAestheticsFilter', 'ImageAspectRatioFilter',
-    'ImageFaceCountFilter', 'ImageFaceRatioFilter', 'ImageNSFWFilter',
-    'ImagePairSimilarityFilter', 'ImageShapeFilter', 'ImageSizeFilter',
-    'ImageTextMatchingFilter', 'ImageTextSimilarityFilter',
-    'ImageWatermarkFilter', 'LanguageIDScoreFilter', 'LLMAnalysisFilter',
-    'LLMQualityScoreFilter', 'LLMDifficultyScoreFilter',
-    'MaximumLineLengthFilter', 'PerplexityFilter',
-    'PhraseGroundingRecallFilter', 'SpecialCharactersFilter',
-    'SpecifiedFieldFilter', 'SpecifiedNumericFieldFilter', 'StopWordsFilter',
-    'SuffixFilter', 'TextActionFilter', 'TextEntityDependencyFilter',
-    'TextLengthFilter', 'TextPairSimilarityFilter', 'TokenNumFilter',
-    'VideoAestheticsFilter', 'VideoAspectRatioFilter', 'VideoDurationFilter',
-    'VideoFramesTextSimilarityFilter', 'VideoMotionScoreFilter',
-    'VideoMotionScoreRaftFilter', 'VideoNSFWFilter', 'VideoOcrAreaRatioFilter',
-    'VideoResolutionFilter', 'VideoTaggingFromFramesFilter',
-    'VideoWatermarkFilter', 'WordRepetitionFilter', 'WordsNumFilter',
-    'GeneralFieldFilter'
+    "AlphanumericFilter",
+    "AudioDurationFilter",
+    "AudioNMFSNRFilter",
+    "AudioSizeFilter",
+    "AverageLineLengthFilter",
+    "CharacterRepetitionFilter",
+    "FlaggedWordFilter",
+    "ImageAestheticsFilter",
+    "ImageAspectRatioFilter",
+    "ImageFaceCountFilter",
+    "ImageFaceRatioFilter",
+    "ImageNSFWFilter",
+    "ImagePairSimilarityFilter",
+    "ImageShapeFilter",
+    "ImageSizeFilter",
+    "ImageTextMatchingFilter",
+    "ImageTextSimilarityFilter",
+    "ImageWatermarkFilter",
+    "LanguageIDScoreFilter",
+    "LLMAnalysisFilter",
+    "LLMQualityScoreFilter",
+    "LLMDifficultyScoreFilter",
+    "MaximumLineLengthFilter",
+    "PerplexityFilter",
+    "PhraseGroundingRecallFilter",
+    "SpecialCharactersFilter",
+    "SpecifiedFieldFilter",
+    "SpecifiedNumericFieldFilter",
+    "StopWordsFilter",
+    "SuffixFilter",
+    "TextActionFilter",
+    "TextEntityDependencyFilter",
+    "TextLengthFilter",
+    "TextPairSimilarityFilter",
+    "TokenNumFilter",
+    "VideoAestheticsFilter",
+    "VideoAspectRatioFilter",
+    "VideoDurationFilter",
+    "VideoFramesTextSimilarityFilter",
+    "VideoMotionScoreFilter",
+    "VideoMotionScoreRaftFilter",
+    "VideoNSFWFilter",
+    "VideoOcrAreaRatioFilter",
+    "VideoResolutionFilter",
+    "VideoTaggingFromFramesFilter",
+    "VideoWatermarkFilter",
+    "WordRepetitionFilter",
+    "WordsNumFilter",
+    "GeneralFieldFilter",
 ]
 
 NON_STATS_FILTERS = [
-    'specified_field_filter',
-    'specified_numeric_field_filter',
-    'suffix_filter',
-    'video_tagging_from_frames_filter',
+    "specified_field_filter",
+    "specified_numeric_field_filter",
+    "suffix_filter",
+    "video_tagging_from_frames_filter",
 ]

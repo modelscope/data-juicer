@@ -111,7 +111,7 @@ class ChineseConvertMapperTest(DataJuicerTestCaseBase):
 
         samples = [{
             'text': '网络连接异常，请检查信息安全',
-            'target': '網路連線異常，請檢查資訊保安'
+            'target': '網路連線異常，請檢查資訊安全'
         }, {
             'text': '今年想去新西兰和马尔代夫旅游',
             'target': '今年想去紐西蘭和馬爾地夫旅遊'
@@ -126,7 +126,7 @@ class ChineseConvertMapperTest(DataJuicerTestCaseBase):
 
         samples = [{
             'text': '網路連線異常，請檢查資訊保安',
-            'target': '网络连接异常，请检查信息安全'
+            'target': '网络连接异常，请检查信息保安'
         }, {
             'text': '今年想去紐西蘭和馬爾地夫旅遊',
             'target': '今年想去新西兰和马尔代夫旅游'

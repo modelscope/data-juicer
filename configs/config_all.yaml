@@ -274,6 +274,11 @@ process:
       tables_field_name: 'html_tables'                        # Field name to store the extracted tables.
       retain_html_tags: false,                                # If True, retains HTML tags in the tables; otherwise, removes them.
       include_header: true,                                   # If True, includes the table header; otherwise, excludes it. This parameter is effective only when `retain_html_tags` is False and applies solely to the extracted table content.
+  - download_file_mapper:                                   # download url files to local files
+      save_dir: null                                          # The directory to save downloaded files.
+      download_field: null                                    # The filed name to get the url to download.
+      timeout: 30                                             # The timeout in seconds for each HTTP request.
+      max_concurrent: 10                                      # Maximum concurrent downloads.
   - fix_unicode_mapper:                                     # fix unicode errors in text.
   - generate_qa_from_examples_mapper:                       # mapper to generate question and answer pairs from examples.
       hf_model: 'Qwen/Qwen2.5-7B-Instruct'                    # Model name on huggingface to generate question and answer pairs.

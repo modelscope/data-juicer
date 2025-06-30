@@ -50,7 +50,14 @@ And prepare third-party libraries used in sandbox (e.g., EasyAnimate, VBench, In
 
 **NOTICE**: some sandbox-related dependencies require extra domain dependencies. 
 
-1. To use [EasyAnimate](https://github.com/aigc-apps/EasyAnimate), you need to execute the following installation script:
+1. To use [ModelScope](https://github.com/modelscope/modelscope), you need to install the related dependencies from its independent host:
+```shell
+pip install "modelscope[framework,nlp]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
+```
+Please refer the the [ModelScope documentation](https://www.modelscope.cn/docs/Beginner-s-Guide/Environment-Setup) for more information.
+
+
+2. To use [EasyAnimate](https://github.com/aigc-apps/EasyAnimate), you need to execute the following installation script:
 ```shell
 cd thirdparty/models/
 bash setup_easyanimate.sh
