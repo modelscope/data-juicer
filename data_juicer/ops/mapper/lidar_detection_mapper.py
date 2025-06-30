@@ -87,7 +87,7 @@ class LiDARDetectionMapper(Mapper):
         lidars = samples[self.lidar_key]
 
         results = [model(lidar) for lidar in lidars]
-        results = [self.pred2dict(result) for result in results]
+        results = [self.pred2dict(result[0]) for result in results]
         samples["lidar_detections"] = results
 
         return samples

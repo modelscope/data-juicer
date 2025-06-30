@@ -949,17 +949,17 @@ class MMLabModel(object):
     It is used to load a mmdeploy model and run inference on given images.
     """
 
-    def __init__(self, model_cfg, deploy_cfg, backend_files, device):
-        self.model_cfg = model_cfg
-        self.deploy_cfg = deploy_cfg
+    def __init__(self, model_cfg_path, deploy_cfg_path, backend_files, device):
+        self.model_cfg_path = model_cfg_path
+        self.deploy_cfg_path = deploy_cfg_path
         self.backend_files = backend_files
         self.device = device
 
         from mmdeploy.apis.utils import build_task_processor
         from mmdeploy.utils import get_input_shape, load_config
 
-        deploy_cfg, model_cfg = load_config(self.deploy_cfg, self.model_cfg)
-        self.task_processor = build_task_processor(self.model_cfg, self.deploy_cfg, self.device)
+        deploy_cfg, model_cfg = load_config(self.deploy_cfg_path, self.model_cfg_path)
+        self.task_processor = build_task_processor(model_cfg, deploy_cfg, self.device)
 
         self.model = self.task_processor.build_backend_model(
             self.backend_files, data_preprocessor_updater=self.task_processor.update_data_preprocessor
