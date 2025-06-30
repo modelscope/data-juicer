@@ -1,10 +1,10 @@
 import sys
 
+import wandb
 import yaml
 from jsonargparse import namespace_to_dict
 from objects import get_hpo_objective
 
-import wandb
 from data_juicer.config import init_configs, merge_config
 
 # 1: load the defined search space

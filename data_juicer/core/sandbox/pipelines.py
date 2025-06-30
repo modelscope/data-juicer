@@ -3,12 +3,12 @@ import os
 from copy import deepcopy
 from typing import List
 
+import wandb
 import yaml
 from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import dict_to_namespace, namespace_to_dict
 from loguru import logger
 
-import wandb
 from data_juicer.config import merge_config, prepare_side_configs
 from data_juicer.core.sandbox.hooks import register_hook
 from data_juicer.utils.constant import JobRequiredKeys
