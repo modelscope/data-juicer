@@ -13,7 +13,7 @@ train:
     # https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/dj-competition/modelscope_sora/models/easyanimate_mm_16x256x256_pretrain.safetensors
     transformer_path: "/PATH/TO/EASYANIMATE_MODEL"
     # Note that the root path is in "thirdparty/easy_animate"
-    lora_path: "../../../outputs/demo-bench/models/checkpoint-2.safetensors"
+    lora_path: "../../../outputs/demo-bench/models/checkpoint-1.safetensors"
 
   infer_config:
     # must match the pretrained easyanimate checkpoint.

@@ -11,7 +11,7 @@ from data_juicer.core.data import DJDataset, NestedDataset
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import free_models
 
-transformers = LazyLoader('transformers')
+transformers = LazyLoader("transformers")
 
 CLEAR_MODEL = False
 
@@ -22,12 +22,12 @@ def TEST_TAG(*tags):
     """
 
     def decorator(func):
-        setattr(func, '__test_tags__', tags)
+        setattr(func, "__test_tags__", tags)
 
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             # Save the original current_tag if it exists
-            original_tag = getattr(self, 'current_tag', 'standalone')
+            original_tag = getattr(self, "current_tag", "standalone")
 
             # Set the current_tag to the first tag
             if tags:
@@ -49,27 +49,31 @@ def set_clear_model_flag(flag):
     global CLEAR_MODEL
     CLEAR_MODEL = flag
     if CLEAR_MODEL:
-        print('CLEAR DOWNLOADED MODELS AFTER UNITTESTS.')
+        print("CLEAR DOWNLOADED MODELS AFTER UNITTESTS.")
     else:
-        print('KEEP DOWNLOADED MODELS AFTER UNITTESTS.')
+        print("KEEP DOWNLOADED MODELS AFTER UNITTESTS.")
 
 
 class DataJuicerTestCaseBase(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         # Set maxDiff for all test cases based on an environment variable
-        max_diff = os.getenv('TEST_MAX_DIFF', 'None')
-        cls.maxDiff = None if max_diff == 'None' else int(max_diff)
+        max_diff = os.getenv("TEST_MAX_DIFF", "None")
+        cls.maxDiff = None if max_diff == "None" else int(max_diff)
 
         import multiprocess
+
         cls.original_mp_method = multiprocess.get_start_method()
         if is_cuda_available():
-            multiprocess.set_start_method('spawn', force=True)
+            multiprocess.set_start_method("spawn", force=True)
+
+        # clear models in memory
+        free_models()
 
     @classmethod
     def tearDownClass(cls, hf_model_name=None) -> None:
         import multiprocess
+
         multiprocess.set_start_method(cls.original_mp_method, force=True)
 
         # clean the huggingface model cache files
@@ -77,20 +81,18 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             pass
         elif hf_model_name:
             # given the hf model name, remove this model only
-            model_dir = os.path.join(
-                transformers.TRANSFORMERS_CACHE,
-                f'models--{hf_model_name.replace("/", "--")}')
+            model_dir = os.path.join(transformers.TRANSFORMERS_CACHE, f'models--{hf_model_name.replace("/", "--")}')
             if os.path.exists(model_dir):
-                print(f'CLEAN model cache files for {hf_model_name}')
+                print(f"CLEAN model cache files for {hf_model_name}")
                 shutil.rmtree(model_dir)
         else:
             # not given the hf model name, remove the whole TRANSFORMERS_CACHE
             if os.path.exists(transformers.TRANSFORMERS_CACHE):
-                print('CLEAN all TRANSFORMERS_CACHE')
+                print("CLEAN all TRANSFORMERS_CACHE")
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
 
-    @classmethod
-    def tearDown(cls) -> None:
+    def tearDown(self) -> None:
+        # clear models in memory
         free_models()
 
     def generate_dataset(self, data) -> DJDataset:
@@ -100,40 +102,39 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             type (str, optional): "standalone" or "ray".
             Defaults to "standalone".
         """
-        current_tag = getattr(self, 'current_tag', 'standalone')
-        if current_tag.startswith('standalone'):
+        current_tag = getattr(self, "current_tag", "standalone")
+        if current_tag.startswith("standalone"):
             return NestedDataset.from_list(data)
-        elif current_tag.startswith('ray'):
+        elif current_tag.startswith("ray"):
             # Only import Ray when needed
-            ray = LazyLoader('ray')
+            ray = LazyLoader("ray")
             from data_juicer.core.data.ray_dataset import RayDataset
+
             dataset = ray.data.from_items(data)
             return RayDataset(dataset)
         else:
-            raise ValueError('Unsupported type')
+            raise ValueError("Unsupported type")
 
     def run_single_op(self, dataset: DJDataset, op, column_names):
         """Run operator in the specific executor."""
-        current_tag = getattr(self, 'current_tag', 'standalone')
+        current_tag = getattr(self, "current_tag", "standalone")
         dataset = dataset.process(op)
-        if current_tag.startswith('standalone'):
+        if current_tag.startswith("standalone"):
             dataset = dataset.select_columns(column_names=column_names)
             return dataset.to_list()
-        elif current_tag.startswith('ray'):
+        elif current_tag.startswith("ray"):
             dataset = dataset.data.to_pandas().get(column_names)
             if dataset is None:
                 return []
-            return dataset.to_dict(orient='records')
+            return dataset.to_dict(orient="records")
         else:
-            raise ValueError('Unsupported type')
+            raise ValueError("Unsupported type")
 
     def assertDatasetEqual(self, first, second):
-
         def convert_record(rec):
             for key in rec.keys():
                 # Convert incomparable `list` to comparable `tuple`
-                if isinstance(rec[key], numpy.ndarray) or isinstance(
-                        rec[key], list):
+                if isinstance(rec[key], numpy.ndarray) or isinstance(rec[key], list):
                     rec[key] = tuple(rec[key])
             return rec
 
@@ -145,25 +146,31 @@ class DataJuicerTestCaseBase(unittest.TestCase):
 
 
 # for partial unittest
-def get_diff_files(prefix_filter=['data_juicer/', 'tests/']):
+def get_diff_files(prefix_filter=["data_juicer/", "tests/"]):
     """Get git diff files in target dirs except the __init__.py files"""
-    changed_files = subprocess.check_output(
-        ['git', 'diff', '--name-only', '--diff-filter=ACMRT', 'origin/main'],
-        universal_newlines=True,
-    ).strip().split('\n')
+    changed_files = (
+        subprocess.check_output(
+            ["git", "diff", "--name-only", "--diff-filter=ACMRT", "origin/main"],
+            universal_newlines=True,
+        )
+        .strip()
+        .split("\n")
+    )
     return [
-        f for f in changed_files
+        f
+        for f in changed_files
         if any([f.startswith(prefix) for prefix in prefix_filter])
-        and f.endswith('.py') and not f.endswith('__init__.py')
+        and f.endswith(".py")
+        and not f.endswith("__init__.py")
     ]
 
 
 def find_corresponding_test_file(file_path):
-    test_file = file_path.replace('data_juicer', 'tests')
+    test_file = file_path.replace("data_juicer", "tests")
     basename = os.path.basename(test_file)
     dir = os.path.dirname(test_file)
-    if not basename.startswith('test_') and basename != 'run.py':
-        basename = 'test_' + basename
+    if not basename.startswith("test_") and basename != "run.py":
+        basename = "test_" + basename
     test_file = os.path.join(dir, basename)
     if os.path.exists(test_file):
         return test_file
@@ -173,9 +180,7 @@ def find_corresponding_test_file(file_path):
 
 def get_partial_test_cases():
     diff_files = get_diff_files()
-    test_files = [
-        find_corresponding_test_file(file_path) for file_path in diff_files
-    ]
+    test_files = [find_corresponding_test_file(file_path) for file_path in diff_files]
     if None in test_files:
         # can't find corresponding test files for some changed files: run all
         return None

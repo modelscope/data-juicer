@@ -6,7 +6,7 @@ from ..base_op import OPERATORS, Mapper
 from ..common.special_characters import VARIOUS_WHITESPACES
 
 
-@OPERATORS.register_module('whitespace_normalization_mapper')
+@OPERATORS.register_module("whitespace_normalization_mapper")
 class WhitespaceNormalizationMapper(Mapper):
     """
     Mapper to normalize different kinds of whitespaces to whitespace ' ' (0x20)
@@ -33,9 +33,6 @@ class WhitespaceNormalizationMapper(Mapper):
             text = text.strip()
 
             # replace all kinds of whitespaces with ' '
-            samples[self.text_key][idx] = ''.join([
-                char if char not in VARIOUS_WHITESPACES else ' '
-                for char in text
-            ])
+            samples[self.text_key][idx] = "".join([char if char not in VARIOUS_WHITESPACES else " " for char in text])
 
         return samples
