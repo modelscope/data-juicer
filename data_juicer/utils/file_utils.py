@@ -183,6 +183,9 @@ def transfer_filename(original_filepath: Union[str, Path], op_name, **op_kwargs)
             abc__dj_hash_#{hash_val2}#.jpg
 
     """
+    # check if it's valid local path, if it's not, regard it as a remote path/url and return None
+    if not os.path.exists(original_filepath):
+        return original_filepath
     # produce the directory
     original_dir = os.path.dirname(original_filepath)
     dir_token = f"/{Fields.multimodal_data_output_dir}/"

@@ -145,10 +145,8 @@ def load_images_byte(paths):
 
 def load_image(path_or_bytes):
     if isinstance(path_or_bytes, bytes):
-        logger.info("Load from bytes...")
         img = PIL.Image.open(io.BytesIO(path_or_bytes))
     else:
-        logger.info("Load from path...")
         img_feature = Image()
         img = img_feature.decode_example(img_feature.encode_example(path_or_bytes))
     img = img.convert("RGB")

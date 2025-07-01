@@ -59,7 +59,9 @@ class ImageBlurMapper(Mapper):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
         processed = {}
         for image_key in loaded_image_keys:
             if image_key in processed:

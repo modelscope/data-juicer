@@ -150,7 +150,9 @@ class ImageDiffusionMapper(Mapper):
 
         # load images
         loaded_image_keys = ori_sample[self.image_key]
-        ori_sample, images = load_data_with_context(ori_sample, context, loaded_image_keys, load_image)
+        ori_sample, images = load_data_with_context(
+            ori_sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         # load captions
         if self.caption_key:
