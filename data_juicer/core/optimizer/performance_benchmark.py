@@ -24,7 +24,9 @@ MODES:
     optimizer - Test the new PipelineOptimizer architecture vs legacy fusion
 """
 
+import os
 import random
+import shutil
 import string
 import time
 from dataclasses import dataclass
@@ -159,6 +161,13 @@ class PerformanceBenchmark:
         # Create a temporary config for the Analyzer
         from jsonargparse import Namespace
 
+        # Include basic filters to compute meaningful statistics
+        process_config = [
+            {"WordsNumFilter": {"min_num": 1, "max_num": 10000}},
+            {"TextLengthFilter": {"min_len": 1, "max_len": 10000}},
+            {"CharacterRepetitionFilter": {"repetition_ratio": 1.0}},
+        ]
+
         cfg = Namespace(
             work_dir="./tmp_benchmark_analyzer",
             export_path="./tmp_benchmark_analyzer/export.jsonl",
@@ -169,7 +178,7 @@ class PerformanceBenchmark:
             use_cache=False,
             cache_compress=None,
             open_monitor=False,
-            process=[],  # No extra ops, just stats
+            process=process_config,  # Include filters to compute stats
             auto=False,
             auto_num=1000,
             op_fusion=False,
@@ -201,15 +210,40 @@ class PerformanceBenchmark:
 
             # Run the Analyzer
             analyzer = Analyzer(cfg)
-            analyzer.run(dataset=dataset, skip_export=True, skip_return=True)
+            analyzer.run(dataset=dataset, skip_return=True)
 
             # Extract insights from analyzer.overall_result (a DataFrame)
             overall = analyzer.overall_result
             insights = {"dataset_size": len(dataset), "text_length": {}, "content_ratios": {}}
 
+            # Log detailed statistics before cleanup
+            logger.info("📊 DETAILED ANALYZER STATISTICS:")
+            logger.info("=" * 50)
+
+            if overall is not None:
+                logger.info(f"Dataset size: {len(dataset):,} samples")
+                logger.info(f"Available statistics: {list(overall.index)}")
+
+                # Log all available statistics
+                for stat_name in overall.index:
+                    stat_data = overall.loc[stat_name]
+                    logger.info(f"\n{stat_name.upper()}:")
+                    for col in stat_data.index:
+                        value = stat_data[col]
+                        if isinstance(value, (int, float)):
+                            logger.info(f"  {col}: {value:,.2f}")
+                        else:
+                            logger.info(f"  {col}: {value}")
+            else:
+                logger.warning("No overall statistics available from Analyzer")
+
+            # Extract specific insights for optimization
             if overall is not None and "text_length" in overall.index:
                 stats = overall.loc["text_length"]
                 insights["text_length"] = {"mean": float(stats.get("mean", 0)), "std": float(stats.get("std", 0))}
+                logger.info("📏 TEXT LENGTH INSIGHTS:")
+                logger.info(f"  Mean length: {insights['text_length']['mean']:.1f} characters")
+                logger.info(f"  Std deviation: {insights['text_length']['std']:.1f} characters")
             else:
                 # Fallback: compute basic stats manually
                 if hasattr(dataset, "column_names") and "text" in dataset.column_names:
@@ -219,21 +253,70 @@ class PerformanceBenchmark:
                 if texts:
                     lengths = [len(t) for t in texts]
                     insights["text_length"] = {"mean": float(np.mean(lengths)), "std": float(np.std(lengths))}
+                    logger.info("📏 MANUAL TEXT LENGTH COMPUTATION:")
+                    logger.info(f"  Mean length: {insights['text_length']['mean']:.1f} characters")
+                    logger.info(f"  Std deviation: {insights['text_length']['std']:.1f} characters")
                 else:
                     insights["text_length"] = {"mean": 0, "std": 0}
+                    logger.warning("No text data available for length analysis")
 
             # Extract content ratios
+            logger.info("🎭 CONTENT RATIOS:")
             for col in ["image_ratio", "audio_ratio", "video_ratio"]:
                 if overall is not None and col in overall.index:
-                    insights["content_ratios"][col] = float(overall.loc[col].get("mean", 0))
+                    ratio = float(overall.loc[col].get("mean", 0))
+                    insights["content_ratios"][col] = ratio
+                    logger.info(f"  {col}: {ratio:.3f} ({ratio*100:.1f}%)")
                 else:
                     insights["content_ratios"][col] = 0.0
+                    logger.info(f"  {col}: 0.000 (0.0%)")
 
+            # Log optimization recommendations based on insights
+            logger.info("🎯 OPTIMIZATION RECOMMENDATIONS:")
+            dataset_size = len(dataset)
+            if dataset_size > 100000:
+                logger.info("  📈 Large dataset detected - Fusion will provide significant benefits")
+            elif dataset_size > 10000:
+                logger.info("  📊 Medium dataset detected - Fusion will provide moderate benefits")
+            else:
+                logger.info("  📉 Small dataset detected - Fusion benefits may be minimal")
+
+            text_mean = insights["text_length"]["mean"]
+            if text_mean > 1000:
+                logger.info("  📝 Long text detected - Consider text-specific optimizations")
+            elif text_mean < 100:
+                logger.info("  📝 Short text detected - Simple filters may be sufficient")
+
+            logger.info("=" * 50)
             logger.info(f"Successfully extracted analyzer insights: {insights}")
+
+            # Show how insights will be used for optimization
+            logger.info("🔧 INSIGHTS FOR OPTIMIZATION:")
+            logger.info(f"  Dataset size: {insights['dataset_size']:,} samples")
+            logger.info(f"  Text length mean: {insights['text_length']['mean']:.1f} chars")
+            logger.info(f"  Text length std: {insights['text_length']['std']:.1f} chars")
+            logger.info(f"  Content ratios: {insights['content_ratios']}")
+            logger.info("  These insights will be used to:")
+            logger.info("    - Choose optimal fusion strategy (parallel vs sequential)")
+            logger.info("    - Determine batch sizes for processing")
+            logger.info("    - Select filter execution order")
+            logger.info("    - Estimate memory requirements")
+
+            # Clean up temporary directory
+            if os.path.exists("./tmp_benchmark_analyzer"):
+                shutil.rmtree("./tmp_benchmark_analyzer")
+                logger.debug("Cleaned up temporary analyzer directory")
+
             return insights
 
         except Exception as e:
             logger.warning(f"Failed to run Analyzer: {e}. Falling back to simulated insights.")
+
+            # Clean up temporary directory even if Analyzer failed
+            if os.path.exists("./tmp_benchmark_analyzer"):
+                shutil.rmtree("./tmp_benchmark_analyzer")
+                logger.debug("Cleaned up temporary analyzer directory after failure")
+
             return self.simulate_analyzer_insights(test_data)
 
     def simulate_analyzer_insights(self, test_data: Dict[str, Any]) -> dict:
@@ -242,31 +325,66 @@ class PerformanceBenchmark:
         Fallback method when Analyzer fails.
         """
         logger.info("Using simulated analyzer insights...")
+        logger.info("📊 SIMULATED ANALYZER STATISTICS:")
+        logger.info("=" * 50)
 
         # Handle different data formats
         if hasattr(test_data, "data") and hasattr(test_data.data, "to_pandas"):
             # Ray dataset
             df = test_data.data.to_pandas()
             texts = df["text"].tolist() if "text" in df.columns else []
+            logger.info("Data format: Ray dataset")
         elif isinstance(test_data, dict) and "text" in test_data:
             # Dict format
             texts = test_data["text"]
+            logger.info("Data format: Dictionary")
         else:
             # Assume it's a HuggingFace Dataset
             if hasattr(test_data, "column_names") and "text" in test_data.column_names:
                 texts = test_data["text"]
+                logger.info("Data format: HuggingFace Dataset")
             else:
                 texts = []
+                logger.warning("Data format: Unknown")
+
+        logger.info(f"Dataset size: {len(texts):,} samples")
 
         if texts:
             lengths = [len(t) for t in texts]
             mean_length = float(np.mean(lengths))
             std_length = float(np.std(lengths))
+
+            logger.info("📏 TEXT LENGTH STATISTICS:")
+            logger.info(f"  Mean length: {mean_length:.1f} characters")
+            logger.info(f"  Std deviation: {std_length:.1f} characters")
+            logger.info(f"  Min length: {min(lengths):.0f} characters")
+            logger.info(f"  Max length: {max(lengths):.0f} characters")
         else:
             mean_length = std_length = 0.0
+            logger.warning("No text data available for analysis")
 
         # Simulate multimodal ratios (none in synthetic data, but could randomize)
         content_ratios = {"image_ratio": 0.0, "audio_ratio": 0.0, "video_ratio": 0.0}
+
+        logger.info("🎭 CONTENT RATIOS (Simulated):")
+        for col, ratio in content_ratios.items():
+            logger.info(f"  {col}: {ratio:.3f} ({ratio*100:.1f}%)")
+
+        logger.info("🎯 SIMULATED OPTIMIZATION RECOMMENDATIONS:")
+        dataset_size = len(texts) if texts else 0
+        if dataset_size > 100000:
+            logger.info("  📈 Large dataset detected - Fusion will provide significant benefits")
+        elif dataset_size > 10000:
+            logger.info("  📊 Medium dataset detected - Fusion will provide moderate benefits")
+        else:
+            logger.info("  📉 Small dataset detected - Fusion benefits may be minimal")
+
+        if mean_length > 1000:
+            logger.info("  📝 Long text detected - Consider text-specific optimizations")
+        elif mean_length < 100:
+            logger.info("  📝 Short text detected - Simple filters may be sufficient")
+
+        logger.info("=" * 50)
 
         return {
             "dataset_size": len(texts) if texts else 0,
@@ -547,9 +665,13 @@ class PerformanceBenchmark:
 
         # Calculate improvements
         total_speedup = individual_stats["mean_total_time"] / fused_stats["mean_total_time"]
+        time_saved = individual_stats["mean_total_time"] - fused_stats["mean_total_time"]
         stats_speedup = individual_stats["mean_stats_time"] / fused_stats["mean_stats_time"]
-        filter_speedup = individual_stats["mean_filter_time"] / fused_stats["mean_filter_time"]
-        throughput_improvement = fused_stats["mean_throughput"] / individual_stats["mean_throughput"]
+        filter_speedup = (
+            individual_stats["mean_filter_time"] / fused_stats["mean_filter_time"]
+            if fused_stats["mean_filter_time"] > 0
+            else float("inf")
+        )
 
         # Compile results
         results = {
@@ -564,8 +686,9 @@ class PerformanceBenchmark:
                 "total_speedup": total_speedup,
                 "stats_speedup": stats_speedup,
                 "filter_speedup": filter_speedup,
-                "throughput_improvement": throughput_improvement,
-                "time_saved_percent": (1 - fused_stats["mean_total_time"] / individual_stats["mean_total_time"]) * 100,
+                "throughput_improvement": (fused_stats["mean_throughput"] / individual_stats["mean_throughput"] - 1)
+                * 100,
+                "time_saved_percent": time_saved / individual_stats["mean_total_time"] * 100,
                 "memory_efficiency": individual_stats["mean_memory_usage"] / fused_stats["mean_memory_usage"],
             },
             "raw_results": {"individual": individual_results, "fused": fused_results},
@@ -848,13 +971,25 @@ def run_simple_demo(num_samples: int = 1000):
         f"  Results: {individual_stats['passed_samples']:,}/{individual_stats['total_samples']:,} passed ({individual_stats['pass_rate']:.1f}%)"
     )
 
-    logger.info("\nFused Execution (with Analyzer Insights):")
+    logger.info("Fused Execution (with Analyzer Insights):")
     logger.info(f"  Total Time: {fused_stats['total_time']:.3f}s")
     logger.info(f"  Stats Time: {fused_stats['stats_time']:.3f}s")
     logger.info(f"  Filter Time: {fused_stats['filter_time']:.3f}s")
     logger.info(
         f"  Results: {fused_stats['passed_samples']:,}/{fused_stats['total_samples']:,} passed ({fused_stats['pass_rate']:.1f}%)"
     )
+
+    # Check if results are consistent
+    result_difference = abs(individual_stats["passed_samples"] - fused_stats["passed_samples"])
+    if result_difference > 0:
+        logger.info(f"  ⚠️  Result Difference: {result_difference} samples")
+        logger.info("     This indicates a bug in fusion implementation - results should be identical")
+        logger.info("     Individual: Each filter processes original data, then logical AND")
+        logger.info("     Fused: All filters process original data, then logical AND")
+    else:
+        logger.info("  ✅ Individual and fused results are identical")
+        logger.info("     Both use parallel execution: all filters see original data")
+        logger.info("     Fusion provides performance benefits without changing results")
 
     # Calculate improvements
     total_speedup = individual_stats["total_time"] / fused_stats["total_time"]
@@ -864,19 +999,11 @@ def run_simple_demo(num_samples: int = 1000):
         individual_stats["filter_time"] / fused_stats["filter_time"] if fused_stats["filter_time"] > 0 else float("inf")
     )
 
-    logger.info("\n🎯 IMPROVEMENTS:")
+    logger.info("🎯 IMPROVEMENTS:")
     logger.info(f"  Total Speedup: {total_speedup:.2f}x")
     logger.info(f"  Time Saved: {time_saved:.3f}s " f'({time_saved/individual_stats["total_time"]*100:.1f}%)')
     logger.info(f"  Stats Speedup: {stats_speedup:.2f}x")
     logger.info(f"  Filter Speedup: {filter_speedup:.2f}x")
-
-    # Check if results are consistent
-    result_difference = abs(individual_stats["passed_samples"] - fused_stats["passed_samples"])
-    if result_difference > 0:
-        logger.info(f"  ⚠️  Result Difference: {result_difference} samples")
-        logger.info("     This may indicate different execution order or optimization effects")
-    else:
-        logger.info("  ✅ Individual and fused results are identical")
 
     # Calculate throughput
     individual_throughput = num_samples / individual_stats["total_time"]
@@ -933,12 +1060,12 @@ def run_simple_demo(num_samples: int = 1000):
     logger.info(f"  Stats Time: {individual_stats_complex['stats_time']:.3f}s")
     logger.info(f"  Filter Time: {individual_stats_complex['filter_time']:.3f}s")
 
-    logger.info("\nFused Execution (with Analyzer Insights):")
+    logger.info("Fused Execution (with Analyzer Insights):")
     logger.info(f"  Total Time: {fused_stats_complex['total_time']:.3f}s")
     logger.info(f"  Stats Time: {fused_stats_complex['stats_time']:.3f}s")
     logger.info(f"  Filter Time: {fused_stats_complex['filter_time']:.3f}s")
 
-    logger.info("\n🎯 IMPROVEMENTS:")
+    logger.info("🎯 IMPROVEMENTS:")
     logger.info(f"  Total Speedup: {total_speedup_complex:.2f}x")
     logger.info(
         f"  Time Saved: {time_saved_complex:.3f}s "
@@ -1109,7 +1236,10 @@ def benchmark_individual_simple(filters: List[Filter], test_data: Dict[str, Any]
     total_filter_time = 0.0
     total_time = 0.0
     total_samples = len(test_data["text"])
-    cumulative_passed = total_samples
+
+    # Measure each filter independently (each processes original data)
+    # This simulates running filters one by one, not in a pipeline
+    individual_results = []
 
     for i, filter_op in enumerate(filters):
         op_name = getattr(filter_op, "_name", type(filter_op).__name__)
@@ -1134,7 +1264,15 @@ def benchmark_individual_simple(filters: List[Filter], test_data: Dict[str, Any]
         logger.info(f"  Stats: {stats_time:.3f}s, Filter: {filter_time:.3f}s")
         logger.info(f"  Results: {passed_samples:,}/{total_samples:,} passed ({pass_rate:.1f}%)")
 
-        cumulative_passed = passed_samples  # Each filter processes the output of the previous
+        individual_results.append(filter_results)
+
+    # Calculate final result: sample must pass ALL filters (logical AND)
+    final_results = individual_results[0]
+    for result in individual_results[1:]:
+        final_results = [r1 and r2 for r1, r2 in zip(final_results, result)]
+
+    final_passed = sum(final_results)
+    final_pass_rate = (final_passed / total_samples) * 100
 
     total_time = total_stats_time + total_filter_time
 
@@ -1142,9 +1280,9 @@ def benchmark_individual_simple(filters: List[Filter], test_data: Dict[str, Any]
         "total_time": total_time,
         "stats_time": total_stats_time,
         "filter_time": total_filter_time,
-        "passed_samples": cumulative_passed,
+        "passed_samples": final_passed,
         "total_samples": total_samples,
-        "pass_rate": (cumulative_passed / total_samples) * 100,
+        "pass_rate": final_pass_rate,
     }
 
 
