@@ -59,7 +59,7 @@ class DataLoadStrategy(ABC, ConfigValidator):
 
     @abstractmethod
     def load_data(self, **kwargs) -> DJDataset:
-        pass
+        """Need to be implemented in the"""
 
 
 class DataLoadStrategyRegistry:
@@ -165,7 +165,7 @@ class RayDataLoadStrategy(DataLoadStrategy):
 
     @abstractmethod
     def load_data(self, **kwargs) -> DJDataset:
-        pass
+        """Need to be implemented in the"""
 
 
 class DefaultDataLoadStrategy(DataLoadStrategy):
@@ -175,7 +175,7 @@ class DefaultDataLoadStrategy(DataLoadStrategy):
 
     @abstractmethod
     def load_data(self, **kwargs) -> DJDataset:
-        pass
+        """Need to be implemented in the"""
 
 
 # TODO dask support
