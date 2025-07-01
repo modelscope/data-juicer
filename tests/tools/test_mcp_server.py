@@ -1,6 +1,6 @@
 import ast
 import unittest
-import asyncio
+from unittest import IsolatedAsyncioTestCase
 from mcp.shared.memory import (
     create_connected_server_and_client_session as client_session,
 )
@@ -9,11 +9,11 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 from loguru import logger
 
 
-class MCPServerTest(DataJuicerTestCaseBase):
+class MCPServerTest(IsolatedAsyncioTestCase, DataJuicerTestCaseBase):
 
     test_dataset_path = "./demos/data/demo-dataset.jsonl"
 
-    async def test_get_data_processing_ops(self):
+    async def get_data_processing_ops(self):
         """Test the get_data_processing_ops method"""
         from data_juicer.tools.DJ_mcp_recipe_flow import mcp
 
@@ -45,7 +45,7 @@ class MCPServerTest(DataJuicerTestCaseBase):
             except (ValueError, SyntaxError):
                 self.fail("content.text is not a valid dictionary string")
 
-    async def test_run_data_recipe(self):
+    async def run_data_recipe(self):
         """Test the run_data_recipe method"""
         from data_juicer.tools.DJ_mcp_recipe_flow import mcp
 
@@ -102,14 +102,9 @@ class MCPServerTest(DataJuicerTestCaseBase):
             result = await client.list_tools()
             self.assertGreater(len(result.tools), 1)
 
-        await self.test_run_data_recipe()
-        await self.test_get_data_processing_ops()
-
-    def test_run_async(self):
-        """Helper method to run async tests"""
-        asyncio.run(self.test_recipe_flow())
-        asyncio.run(self.test_granular_ops())
-
+        await self.get_data_processing_ops()
+        await self.run_data_recipe()
 
 if __name__ == "__main__":
+    # nest_asyncio.apply()
     unittest.main()
