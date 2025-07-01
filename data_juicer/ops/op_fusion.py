@@ -204,12 +204,19 @@ class GeneralFusedOP(OP):
         self.num_proc = min([op.runtime_np() for op in self.fused_ops]) if self.fused_ops else 1
 
     def process_batched(self, samples, rank=None):
+        import av
+
+        # context for the intermediate vars
+        sample_key = list(samples.keys())[0]
+        num_samples = len(samples[sample_key])
+        samples[Fields.context] = [{} for _ in range(num_samples)]
+
         for op in self.fused_ops:
             process_args = {"rank": rank} if op.accelerator == "cuda" else {}
             if isinstance(op, Mapper):
-                samples = op.process_batched(samples, **process_args)
+                samples = op.process_batched(samples, context=True, **process_args)
             elif isinstance(op, Filter):
-                samples = op.compute_stats_batched(samples, **process_args)
+                samples = op.compute_stats_batched(samples, context=True, **process_args)
                 indicators = list(op.process_batched(samples))
                 new_samples = {}
                 for key in samples:
@@ -220,6 +227,14 @@ class GeneralFusedOP(OP):
                     f"FusedOP does not support OP {op._name} of type "
                     f"{type(op)} and only supports Mapper and Filter now."
                 )
+        # clean up the contexts after processing
+        # check if there are containers that need to be closed
+        for ctx in samples[Fields.context]:
+            for context_key in ctx:
+                if isinstance(ctx[context_key], av.container.InputContainer):
+                    ctx[context_key].streams.video[0].close()
+                    ctx[context_key].close()
+        _ = samples.pop(Fields.context)
         return samples
 
     def run(self, dataset, *, exporter=None, tracer=None):
