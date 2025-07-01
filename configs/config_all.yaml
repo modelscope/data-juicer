@@ -52,6 +52,7 @@ adaptive_batch_size: false                                  # whether to use ada
 
 # for multimodal data processing
 image_key: 'images'                                         # key name of field to store the list of sample image paths.
+image_bytes_key: 'image_bytes'                              # key name of field to store the list of sample image bytes.
 image_special_token: '<__dj__image>'                        # the special token that represents an image in the text. In default, it's "<__dj__image>". You can specify your own special token according to your input dataset.
 audio_key: 'audios'                                         # key name of field to store the list of sample audio paths.
 audio_special_token: '<__dj__audio>'                        # the special token that represents an audio in the text. In default, it's "<__dj__audio>". You can specify your own special token according to your input dataset.
