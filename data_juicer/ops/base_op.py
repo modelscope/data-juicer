@@ -436,12 +436,22 @@ class Filter(OP):
     def compute_stats_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
         num_samples = len(samples[Fields.stats])
+        context = False
+        context_content = {}
+        if "context" in kwargs and kwargs["context"]:
+            context = True
+            context_content = samples[Fields.context]
         for i in range(num_samples):
             this_sample = {key: samples[key][i] for key in keys}
+            if context:
+                this_sample[Fields.context] = context_content
             res_sample = self.compute_stats_single(this_sample, *args, **kwargs)
             samples[Fields.stats][i] = res_sample[Fields.stats]
-            if "context" in kwargs and kwargs["context"]:
-                samples[Fields.context][i] = res_sample[Fields.context]
+            if context:
+                context_content.update(res_sample[Fields.context])
+
+        if context:
+            samples[Fields.context] = context_content
 
         return samples
 
