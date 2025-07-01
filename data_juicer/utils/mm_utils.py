@@ -110,12 +110,22 @@ def load_mm_bytes_from_sample(sample, mm_idx, mm_bytes_key=None, sample_idx=None
 def load_data_with_context(sample, context, loaded_data_keys, load_func, mm_bytes_key=None, sample_idx=None):
     """
     The unified loading function with contexts for multimodal data.
+
+    :param sample: can be a single sample or a batch of samples.
+    :param context: whether the context fields is activated.
+    :param loaded_data_keys: the data keys (paths) to load.
+    :param load_func: the function used to load the data.
+    :param mm_bytes_key: the key to store the data bytes if it exists. It's None by default.
+    :param sample_idx: the index of the current sample. Used for batched samples.
     """
     data = {}
+    context_content = sample[Fields.context]
+    if sample_idx is not None and isinstance(context_content, list) and sample_idx < len(context_content):
+        context_content = context_content[sample_idx]
     for idx, loaded_data_key in enumerate(loaded_data_keys):
-        if context and loaded_data_key in sample[Fields.context]:
+        if context and loaded_data_key in context_content:
             # load from context
-            data[loaded_data_key] = sample[Fields.context][loaded_data_key]
+            data[loaded_data_key] = context_content[loaded_data_key]
         else:
             if loaded_data_key not in data:
                 # check if it's already in bytes key
@@ -130,7 +140,12 @@ def load_data_with_context(sample, context, loaded_data_keys, load_func, mm_byte
                 data[loaded_data_key] = data_item
                 if context:
                     # store the data into context
-                    sample[Fields.context][loaded_data_key] = data_item
+                    if sample_idx is not None and isinstance(sample[Fields.context], list):
+                        if sample_idx < len(sample[Fields.context]):
+                            sample[Fields.context][sample_idx][loaded_data_key] = data_item
+                    else:
+                        sample[Fields.context][loaded_data_key] = data_item
+
     return sample, data
 
 
