@@ -1,14 +1,16 @@
 import unittest
 import os
+import os.path as osp
 import shutil
 import tempfile
 import threading
 import numpy as np
 from functools import partial
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from data_juicer.core.data import NestedDataset as Dataset
 
-from data_juicer.utils.mm_utils import load_image
+from data_juicer.core.data import NestedDataset as Dataset
+from data_juicer.utils.constant import Fields
+from data_juicer.utils.mm_utils import load_image, load_image_byte
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 from data_juicer.ops.mapper.download_file_mapper import DownloadFileMapper
 
@@ -17,11 +19,10 @@ class DownloadFileMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
-        self.data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
-                             'data')
-        self.img1_path = os.path.join(self.data_path, 'img1.png')
-        self.img2_path = os.path.join(self.data_path, 'img2.jpg')
-        self.img3_path = os.path.join(self.data_path, 'img3.jpg')
+        self.data_path = osp.abspath(osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data'))
+        self.img1_path = osp.join(self.data_path, 'img1.png')
+        self.img2_path = osp.join(self.data_path, 'img2.jpg')
+        self.img3_path = osp.join(self.data_path, 'img3.jpg')
 
         # start HTTP server
         self.server_address = ('localhost', 0)  # 0 means random port
@@ -44,13 +45,13 @@ class DownloadFileMapperTest(DataJuicerTestCaseBase):
         self.httpd.server_close()
         shutil.rmtree(self.temp_dir)
 
-    def _test_image_download(self, ds_list):
+    def _test_image_download(self, ds_list, context=False):
         op = DownloadFileMapper(
                 save_dir=self.temp_dir,
                 download_field='images')
 
         dataset = Dataset.from_list(ds_list)
-        dataset = dataset.map(op.process, batch_size=2)
+        dataset = dataset.map(op.process, batch_size=3, fn_kwargs={'context': context})
         
         res_list = dataset.to_list()
         res_list = sorted(res_list, key=lambda x: x['id'])
@@ -71,6 +72,12 @@ class DownloadFileMapperTest(DataJuicerTestCaseBase):
                 r_img = np.array(load_image(r_path))
 
                 np.testing.assert_array_equal(t_img, r_img)
+
+                if context:
+                    self.assertEqual(
+                        res[Fields.context][r_path],
+                        load_image_byte(os.path.join(self.data_path, fname))
+                    )
 
     def test_image_download(self):
         ds_list = [{
@@ -172,6 +179,58 @@ class DownloadFileMapperTest(DataJuicerTestCaseBase):
             r_img = np.array(load_image(r_path))
 
             np.testing.assert_array_equal(t_img, r_img)
+
+    def test_image_with_only_context(self):
+        ds_list = [{
+            'images': [self.img1_url],
+            'id': 1
+        }, {
+            'images': [self.img2_url, self.img3_url],
+            'id': 2
+        }, {
+            'images': [self.img1_url, self.img2_url, self.img3_url],
+            'id': 3
+        }, {
+            'images': [self.img2_url],
+            'id': 4
+        },
+        ]
+        op = DownloadFileMapper(
+                save_dir=None,
+                download_field='images')
+
+        dataset = Dataset.from_list(ds_list)
+        dataset = dataset.map(op.process, batch_size=2, fn_kwargs={'context': True})
+        
+        res_list = dataset.to_list()
+        res_list = sorted(res_list, key=lambda x: x['id'])
+
+        self.assertEqual(len(ds_list), len(res_list))
+
+        for i in range(len(ds_list)):
+            source, res = ds_list[i], res_list[i]
+            for s_path, r_path in zip(source[op.image_key], res[op.image_key]):
+                self.assertEqual(s_path, r_path)
+                fname = os.path.basename(s_path)
+                self.assertEqual(
+                    res[Fields.context][s_path],
+                    load_image_byte(os.path.join(self.data_path, fname))
+                )
+
+    def test_image_with_context_and_savedir(self):
+        ds_list = [{
+            'images': [self.img1_url],
+            'id': 1
+        }, {
+            'images': [self.img2_path, self.img3_url],
+            'id': 2
+        }, {
+            'images': [self.img1_url, self.img2_path, self.img3_url],
+            'id': 3
+        }
+        ]
+        
+        self._test_image_download(ds_list, context=True)
 
 
 if __name__ == '__main__':
