@@ -6,7 +6,7 @@ from data_juicer.ops.mapper.generate_qa_from_examples_mapper import \
     GenerateQAFromExamplesMapper
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-@unittest.skip('unknown vllm connection error')
+# @unittest.skip('unknown vllm connection error')
 class GenerateQAFromExamplesMapperTest(DataJuicerTestCaseBase):
     text_key = 'text'
 
@@ -36,9 +36,9 @@ class GenerateQAFromExamplesMapperTest(DataJuicerTestCaseBase):
         sampling_params = {'max_new_tokens': 200}
         self._run_op(sampling_params=sampling_params, num_proc=2)
 
-    def test_vllm(self):
-        sampling_params = {'max_tokens': 200}
-        self._run_op(enable_vllm=True, sampling_params=sampling_params)
+    # def test_vllm(self):
+    #     sampling_params = {'max_tokens': 200}
+    #     self._run_op(enable_vllm=True, sampling_params=sampling_params)
 
 
 if __name__ == '__main__':
