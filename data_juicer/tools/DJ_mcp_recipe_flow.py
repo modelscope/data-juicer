@@ -7,15 +7,6 @@ from mcp.server.fastmcp import FastMCP
 from data_juicer.tools.mcp_tool import execute_op
 from data_juicer.tools.op_search import OPSearcher
 
-parser = argparse.ArgumentParser(description="Data-Juicer MCP Server")
-parser.add_argument(
-    "--port", type=str, default="8000", help="Port number for the MCP server"
-)  # changed to str for consistency
-args = parser.parse_args()
-
-# Server configuration
-mcp = FastMCP("Data-Juicer Server", port=args.port)
-
 # Operator Management
 ops_list_path = os.getenv("DJ_OPS_LIST_PATH", None)
 if ops_list_path:
@@ -27,7 +18,6 @@ searcher = OPSearcher(ops_list)
 
 
 # Operator Management
-@mcp.tool()
 def get_data_processing_ops(
     op_type: Optional[str] = None,
     tags: Optional[List[str]] = None,
@@ -89,7 +79,6 @@ def get_data_processing_ops(
     return ops_dict
 
 
-@mcp.tool()
 def run_data_recipe(
     dataset_path: str,
     process: list[Dict],
@@ -142,5 +131,28 @@ def run_data_recipe(
     return execute_op(dj_cfg)
 
 
+def create_mcp_server(port: str = "8000"):
+    """
+    Creates the FastMCP server and registers the tools.
+
+    Args:
+        port (str, optional): Port number. Defaults to "8000".
+    """
+    mcp = FastMCP("Data-Juicer Server", port=port)
+
+    mcp.tool()(get_data_processing_ops)
+    mcp.tool()(run_data_recipe)
+
+    return mcp
+
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Data-Juicer MCP Server")
+    parser.add_argument(
+        "--port", type=str, default="8000", help="Port number for the MCP server"
+    )  # changed to str for consistency
+    args = parser.parse_args()
+
+    # Server configuration
+    mcp = create_mcp_server(port=args.port)
     mcp.run(transport=os.getenv("SERVER_TRANSPORT", "sse"))

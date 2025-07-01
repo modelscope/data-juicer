@@ -10,25 +10,6 @@ from pydantic import Field
 from data_juicer.tools.mcp_tool import execute_op
 from data_juicer.tools.op_search import OPSearcher
 
-parser = argparse.ArgumentParser(description="Data-Juicer MCP Server")
-parser.add_argument(
-    "--port", type=str, default="8000", help="Port number for the MCP server"
-)  # changed to str for consistency
-args = parser.parse_args()
-
-# Server configuration
-mcp = FastMCP("Data-Juicer Server", port=args.port)
-
-# Operator Management
-ops_list_path = os.getenv("DJ_OPS_LIST_PATH", None)
-if ops_list_path:
-    with open(ops_list_path, "r", encoding="utf-8") as file:
-        ops_list = [line.strip() for line in file if line.strip()]
-else:
-    ops_list = None
-searcher = OPSearcher(ops_list)
-op_results = searcher.search()
-
 
 # Dynamic MCP Tool Creation
 def process_parameter(name: str, param: inspect.Parameter) -> inspect.Parameter:
@@ -42,7 +23,7 @@ def process_parameter(name: str, param: inspect.Parameter) -> inspect.Parameter:
     return param
 
 
-def create_operator_function(op):
+def create_operator_function(op, mcp):
     """Creates a callable function for a Data-Juicer operator class.
 
     This function dynamically creates a function that can be registered as an MCP tool,
@@ -102,9 +83,40 @@ def create_operator_function(op):
     return decorated_func
 
 
-# Register all operators as MCP tools
-for op in op_results:
-    operator_function = create_operator_function(op)
+def create_mcp_server(port: str = "8000"):
+    """
+    Creates the FastMCP server and registers the tools.
+
+    Args:
+        port (str, optional): Port number. Defaults to "8000".
+    """
+    mcp = FastMCP("Data-Juicer Server", port=port)
+
+    # Operator Management
+    ops_list_path = os.getenv("DJ_OPS_LIST_PATH", None)
+    if ops_list_path:
+        with open(ops_list_path, "r", encoding="utf-8") as file:
+            ops_list = [line.strip() for line in file if line.strip()]
+    else:
+        ops_list = None
+    searcher = OPSearcher(ops_list)
+    op_results = searcher.search()
+
+    # Register all operators as MCP tools
+    for op in op_results:
+        _ = create_operator_function(op, mcp)
+
+    return mcp
+
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Data-Juicer MCP Server")
+    parser.add_argument(
+        "--port", type=str, default="8000", help="Port number for the MCP server"
+    )  # changed to str for consistency
+    args = parser.parse_args()
+
+    # Server configuration
+    mcp = create_mcp_server(port=args.port)
+
     mcp.run(transport=os.getenv("SERVER_TRANSPORT", "sse"))

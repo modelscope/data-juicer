@@ -15,7 +15,9 @@ class MCPServerTest(IsolatedAsyncioTestCase, DataJuicerTestCaseBase):
 
     async def get_data_processing_ops(self):
         """Test the get_data_processing_ops method"""
-        from data_juicer.tools.DJ_mcp_recipe_flow import mcp
+        from data_juicer.tools.DJ_mcp_recipe_flow import create_mcp_server
+
+        mcp = create_mcp_server()
 
         async with client_session(mcp._mcp_server) as client:
             # Test with op_type and tags
@@ -47,7 +49,9 @@ class MCPServerTest(IsolatedAsyncioTestCase, DataJuicerTestCaseBase):
 
     async def run_data_recipe(self):
         """Test the run_data_recipe method"""
-        from data_juicer.tools.DJ_mcp_recipe_flow import mcp
+        from data_juicer.tools.DJ_mcp_recipe_flow import create_mcp_server
+
+        mcp = create_mcp_server()
 
         async with client_session(mcp._mcp_server) as client:
             # Test with valid parameters
@@ -73,7 +77,9 @@ class MCPServerTest(IsolatedAsyncioTestCase, DataJuicerTestCaseBase):
     # Test for granular_ops
     async def test_granular_ops(self):
         """Test the text_length_filter operator"""
-        from data_juicer.tools.DJ_mcp_granular_ops import mcp
+        from data_juicer.tools.DJ_mcp_granular_ops import create_mcp_server
+
+        mcp = create_mcp_server()
 
         async with client_session(mcp._mcp_server) as client:
             # Test with valid parameters
@@ -95,7 +101,9 @@ class MCPServerTest(IsolatedAsyncioTestCase, DataJuicerTestCaseBase):
 
     async def test_recipe_flow(self):
         """Test the recipe_flow method"""
-        from data_juicer.tools.DJ_mcp_recipe_flow import mcp
+        from data_juicer.tools.DJ_mcp_recipe_flow import create_mcp_server
+
+        mcp = create_mcp_server()
 
         async with client_session(mcp._mcp_server) as client:
             # Test with valid parameters
@@ -104,6 +112,7 @@ class MCPServerTest(IsolatedAsyncioTestCase, DataJuicerTestCaseBase):
 
         await self.get_data_processing_ops()
         await self.run_data_recipe()
+
 
 if __name__ == "__main__":
     # nest_asyncio.apply()
