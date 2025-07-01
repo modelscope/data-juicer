@@ -21,14 +21,18 @@ ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_AUDIOS, LOADED_IMAGES, LOADED
 class FilterFusionStrategy(OptimizationStrategy):
     """Strategy for fusing filter operations in the pipeline."""
 
-    def __init__(self, probe_results: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self, probe_results: Optional[Dict[str, Any]] = None, analyzer_insights: Optional[Dict[str, Any]] = None
+    ):
         """Initialize the filter fusion strategy.
 
         Args:
             probe_results: Optional dictionary containing operation speeds
+            analyzer_insights: Optional dictionary containing dataset analysis insights
         """
-        super().__init__(name='filter_fusion')
+        super().__init__(name="filter_fusion")
         self.probe_results = probe_results or {}
+        self.analyzer_insights = analyzer_insights or {}
 
     def optimize(self, ast: PipelineAST) -> PipelineAST:
         """Apply filter fusion to the pipeline AST.
@@ -44,7 +48,7 @@ class FilterFusionStrategy(OptimizationStrategy):
 
         # Create a new AST
         new_ast = PipelineAST()
-        new_ast.root = OpNode(name='root', op_type=OpType.ROOT, config={})
+        new_ast.root = OpNode(name="root", op_type=OpType.ROOT, config={})
 
         # Get all unique operation chains
         op_chains = self._get_unique_op_chains(ast.root)
@@ -52,15 +56,15 @@ class FilterFusionStrategy(OptimizationStrategy):
         # Process each chain
         current = new_ast.root
         for chain in op_chains:
-            # Group filter operations
-            filter_groups = self._group_filters(chain)
+            # Group filter operations with analyzer insights
+            filter_groups = self._group_filters_with_insights(chain)
 
             for group in filter_groups:
                 if len(group) > 1:
                     # Create fused operation with clean naming
-                    fused_name = 'fused_filter'
+                    fused_name = "fused_filter"
                     detailed_ops = [n.name for n in group]
-                    logger.info(f'Fusing filter operations into {fused_name}: {detailed_ops}')
+                    logger.info(f"Fusing filter operations into {fused_name}: {detailed_ops}")
 
                     # Create operation configs
                     op_configs = []
@@ -73,11 +77,12 @@ class FilterFusionStrategy(OptimizationStrategy):
                         name=fused_name,
                         op_type=OpType.FILTER,
                         config={
-                            'general_fused_op': {
-                                'fused_op_list': op_configs,
-                                'detailed_ops': detailed_ops,  # For display purposes
+                            "general_fused_op": {
+                                "fused_op_list": op_configs,
+                                "detailed_ops": detailed_ops,  # For display purposes
                             }
-                        })
+                        },
+                    )
                     current.add_child(fused_node)
                     current = fused_node
                 else:
@@ -117,8 +122,8 @@ class FilterFusionStrategy(OptimizationStrategy):
         traverse(node, [])
         return chains
 
-    def _group_filters(self, chain: List[OpNode]) -> List[List[OpNode]]:
-        """Group filter operations that can be fused together.
+    def _group_filters_with_insights(self, chain: List[OpNode]) -> List[List[OpNode]]:
+        """Group filter operations using analyzer insights for better decisions.
 
         Args:
             chain: List of operations in the pipeline
@@ -143,8 +148,8 @@ class FilterFusionStrategy(OptimizationStrategy):
                     # Start a new group
                     current_group = [node]
                 else:
-                    # Check if current filter can be fused with the group
-                    if self._can_fuse_with_group(node, current_group):
+                    # Check if current filter can be fused with the group using insights
+                    if self._can_fuse_with_group_insights(node, current_group):
                         current_group.append(node)
                     else:
                         # Finalize current group and start a new one
@@ -157,8 +162,8 @@ class FilterFusionStrategy(OptimizationStrategy):
 
         return groups
 
-    def _can_fuse_with_group(self, node: OpNode, group: List[OpNode]) -> bool:
-        """Check if a filter can be fused with a group.
+    def _can_fuse_with_group_insights(self, node: OpNode, group: List[OpNode]) -> bool:
+        """Check if a filter can be fused with a group using analyzer insights.
 
         Args:
             node: Operation to check
@@ -167,12 +172,102 @@ class FilterFusionStrategy(OptimizationStrategy):
         Returns:
             True if the operation can be fused with the group
         """
-        # Check dependencies
+        # Basic dependency check
         for op in group:
             if self._has_dependency(node, op) or self._has_dependency(op, node):
                 return False
 
+        # Use analyzer insights for advanced decisions
+        if self.analyzer_insights:
+            return self._analyzer_based_fusion_decision(node, group)
+
         return True
+
+    def _analyzer_based_fusion_decision(self, node: OpNode, group: List[OpNode]) -> bool:
+        """Make fusion decisions based on analyzer insights.
+
+        Args:
+            node: Operation to check
+            group: Group of operations
+
+        Returns:
+            True if fusion is recommended based on data characteristics
+        """
+        # Get dataset characteristics from analyzer
+        dataset_size = self.analyzer_insights.get("dataset_size", 0)
+        text_length_stats = self.analyzer_insights.get("text_length", {})
+        content_ratios = self.analyzer_insights.get("content_ratios", {})
+
+        # Decision 1: Large datasets benefit more from fusion
+        if dataset_size > 100000:
+            logger.debug(f"Large dataset ({dataset_size:,} samples) - favoring fusion")
+            return True
+
+        # Decision 2: High variance in text length suggests complex processing
+        if text_length_stats:
+            mean_length = text_length_stats.get("mean", 0)
+            std_length = text_length_stats.get("std", 0)
+            if mean_length > 0 and std_length / mean_length > 1.5:
+                logger.debug("High text length variance - favoring fusion for complex data")
+                return True
+
+        # Decision 3: Mixed content types suggest complex processing
+        multimodal_indicators = ["image_ratio", "audio_ratio", "video_ratio"]
+        multimodal_count = sum(1 for indicator in multimodal_indicators if content_ratios.get(indicator, 0) > 0.1)
+
+        if multimodal_count > 1:
+            logger.debug(f"Multimodal content detected ({multimodal_count} types) - favoring fusion")
+            return True
+
+        # Decision 4: Check if operations are computationally similar
+        return self._check_computational_similarity(node, group)
+
+    def _check_computational_similarity(self, node: OpNode, group: List[OpNode]) -> bool:
+        """Check if operations have similar computational characteristics.
+
+        Args:
+            node: Operation to check
+            group: Group of operations
+
+        Returns:
+            True if operations are computationally similar
+        """
+        node_complexity = self._get_operation_complexity(node.name)
+        group_complexities = [self._get_operation_complexity(op.name) for op in group]
+
+        # Prefer grouping operations of similar complexity
+        if node_complexity in group_complexities:
+            return True
+
+        # Allow mixing simple and medium operations
+        if node_complexity == "simple" and all(c in ["simple", "medium"] for c in group_complexities):
+            return True
+        if node_complexity == "medium" and all(c in ["simple", "medium"] for c in group_complexities):
+            return True
+
+        return False
+
+    def _get_operation_complexity(self, op_name: str) -> str:
+        """Get the computational complexity of an operation.
+
+        Args:
+            op_name: Name of the operation
+
+        Returns:
+            Complexity level: 'simple', 'medium', or 'complex'
+        """
+        simple_ops = {"text_length_filter", "words_num_filter", "character_repetition_filter"}
+        medium_ops = {"word_repetition_filter", "special_characters_filter", "alphanumeric_filter"}
+        complex_ops = {"perplexity_filter", "stopwords_filter", "flagged_words_filter"}
+
+        if op_name in simple_ops:
+            return "simple"
+        elif op_name in medium_ops:
+            return "medium"
+        elif op_name in complex_ops:
+            return "complex"
+        else:
+            return "medium"  # Default assumption
 
     def _has_dependency(self, op1: OpNode, op2: OpNode) -> bool:
         """Check if op1 depends on op2.
@@ -189,8 +284,8 @@ class FilterFusionStrategy(OptimizationStrategy):
         config2 = op2.config or {}
 
         # 1. Check intermediate variables
-        op1_vars = set(config1.get('inter_vars', []))
-        op2_vars = set(config2.get('inter_vars', []))
+        op1_vars = set(config1.get("inter_vars", []))
+        op2_vars = set(config2.get("inter_vars", []))
         if op1_vars & op2_vars:
             return True
 
@@ -225,19 +320,19 @@ class FilterFusionStrategy(OptimizationStrategy):
         """Get stats keys that an operation produces or consumes."""
         # Map operation names to their stats keys
         stats_mapping = {
-            'words_num_filter': {StatsKeys.num_words},
-            'text_length_filter': {StatsKeys.text_len},
-            'character_repetition_filter': {StatsKeys.char_rep_ratio},
-            'word_repetition_filter': {StatsKeys.word_rep_ratio},
-            'average_line_length_filter': {StatsKeys.avg_line_length},
-            'maximum_line_length_filter': {StatsKeys.max_line_length},
-            'alphanumeric_filter': {StatsKeys.alnum_ratio, StatsKeys.alpha_token_ratio},
-            'special_characters_filter': {StatsKeys.special_char_ratio},
-            'perplexity_filter': {StatsKeys.perplexity},
-            'stopwords_filter': {StatsKeys.stopwords_ratio},
-            'flagged_words_filter': {StatsKeys.flagged_words_ratio},
-            'text_entity_dependency_filter': {StatsKeys.num_dependency_edges},
-            'general_field_filter': {StatsKeys.general_field_filter_condition},
+            "words_num_filter": {StatsKeys.num_words},
+            "text_length_filter": {StatsKeys.text_len},
+            "character_repetition_filter": {StatsKeys.char_rep_ratio},
+            "word_repetition_filter": {StatsKeys.word_rep_ratio},
+            "average_line_length_filter": {StatsKeys.avg_line_length},
+            "maximum_line_length_filter": {StatsKeys.max_line_length},
+            "alphanumeric_filter": {StatsKeys.alnum_ratio, StatsKeys.alpha_token_ratio},
+            "special_characters_filter": {StatsKeys.special_char_ratio},
+            "perplexity_filter": {StatsKeys.perplexity},
+            "stopwords_filter": {StatsKeys.stopwords_ratio},
+            "flagged_words_filter": {StatsKeys.flagged_words_ratio},
+            "text_entity_dependency_filter": {StatsKeys.num_dependency_edges},
+            "general_field_filter": {StatsKeys.general_field_filter_condition},
         }
 
         return stats_mapping.get(op.name, set())
@@ -252,7 +347,7 @@ class FilterFusionStrategy(OptimizationStrategy):
         op2_models = set()
 
         # Check for model keys in config
-        for key in ['model_key', 'sp_model_key', 'kl_model_key']:
+        for key in ["model_key", "sp_model_key", "kl_model_key"]:
             if key in config1:
                 op1_models.add(config1[key])
             if key in config2:
@@ -271,7 +366,7 @@ class FilterFusionStrategy(OptimizationStrategy):
         op2_fields = set()
 
         # Check for field keys in config
-        for key in ['text_key', 'image_key', 'audio_key', 'video_key']:
+        for key in ["text_key", "image_key", "audio_key", "video_key"]:
             if key in config1:
                 op1_fields.add(config1[key])
             if key in config2:
@@ -283,7 +378,7 @@ class FilterFusionStrategy(OptimizationStrategy):
 
         # Only consider it a dependency if both operations are text processors
         # and they share text_key (indicating they process the same text)
-        if shared_fields and 'text_key' in shared_fields:
+        if shared_fields and "text_key" in shared_fields:
             return True
 
         return False
