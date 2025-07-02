@@ -4,7 +4,7 @@ from data_juicer.core.executor.ray_executor import RayExecutor
 from data_juicer.config import init_configs
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 
-class DefaultExecutorTest(DataJuicerTestCaseBase):
+class RayExecutorTest(DataJuicerTestCaseBase):
 
     def setUp(self) -> None:
         super().setUp()

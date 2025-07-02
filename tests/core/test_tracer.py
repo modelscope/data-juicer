@@ -5,7 +5,7 @@ from datasets import Dataset
 from data_juicer.core import Tracer
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-class AdapterTest(DataJuicerTestCaseBase):
+class TracerTest(DataJuicerTestCaseBase):
 
     def setUp(self) -> None:
         super().setUp()
