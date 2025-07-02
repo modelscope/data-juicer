@@ -57,7 +57,8 @@ dependencies = [
     "tomli",
     "tomli-w",
     "gitpython",
-    "pylance"
+    "mcp[cli]>=1.7.0",
+    "pylance",
 ]
 
 [project.optional-dependencies]
