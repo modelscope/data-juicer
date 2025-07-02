@@ -15,6 +15,7 @@ class LiDARDetectionMapper(Mapper):
     """Mapper to detect ground truth from LiDAR data."""
 
     _batched_op = True
+    _accelerator = "cuda"
 
     def __init__(self, model_name="centerpoint", *args, **kwargs):
         """
@@ -27,7 +28,6 @@ class LiDARDetectionMapper(Mapper):
         super().__init__(*args, **kwargs)
 
         self.model_name = model_name
-        self.device = "cpu"
 
         if self.model_name == "centerpoint":
             self.deploy_cfg_path = "voxel-detection_onnxruntime_dynamic.py"
@@ -43,7 +43,6 @@ class LiDARDetectionMapper(Mapper):
             model_cfg=self.model_cfg_path,
             deploy_cfg=self.deploy_cfg_path,
             backend_files=self.backend_files,
-            device=self.device,
         )
 
     #  Maybe should include model name, timestamp, filename, image info etc.
@@ -82,8 +81,8 @@ class LiDARDetectionMapper(Mapper):
 
         return result
 
-    def process_batched(self, samples):
-        model = get_model(self.model_key)
+    def process_batched(self, samples, rank=None):
+        model = get_model(self.model_key, rank, self.use_cuda())
         lidars = samples[self.lidar_key]
 
         results = [model(lidar) for lidar in lidars]
