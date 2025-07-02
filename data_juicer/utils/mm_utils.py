@@ -119,9 +119,10 @@ def load_data_with_context(sample, context, loaded_data_keys, load_func, mm_byte
     :param sample_idx: the index of the current sample. Used for batched samples.
     """
     data = {}
-    context_content = sample[Fields.context]
-    if sample_idx is not None and isinstance(context_content, list) and sample_idx < len(context_content):
-        context_content = context_content[sample_idx]
+    if context:
+        context_content = sample[Fields.context]
+        if sample_idx is not None and isinstance(context_content, list) and sample_idx < len(context_content):
+            context_content = context_content[sample_idx]
     for idx, loaded_data_key in enumerate(loaded_data_keys):
         if context and loaded_data_key in context_content:
             # load from context
