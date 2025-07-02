@@ -19,6 +19,7 @@ wandb/
 __pycache__
 .vscode/
 .ipynb_checkpoints/
+performance_test_results*.json
 
 # label studio related
 label_studio_data/

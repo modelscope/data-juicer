@@ -58,6 +58,48 @@ from data_juicer.ops.filter import (
 )
 from data_juicer.utils.constant import Fields
 
+# Global model cache to prevent repeated loading
+_MODEL_CACHE = {}
+
+
+def get_cached_model(model_type: str, lang: str = "en"):
+    """Get a cached model or load it if not cached."""
+    cache_key = f"{model_type}_{lang}"
+    if cache_key not in _MODEL_CACHE:
+        from data_juicer.utils.model_utils import prepare_model
+
+        logger.info(f"Loading {model_type} model for {lang} (first time)...")
+        _MODEL_CACHE[cache_key] = prepare_model(model_type=model_type, lang=lang)
+        logger.info(f"Model {model_type}_{lang} loaded and cached")
+    else:
+        logger.debug(f"Using cached {model_type} model for {lang}")
+    return _MODEL_CACHE[cache_key]
+
+
+def create_filter_with_cached_model(filter_class, **kwargs):
+    """Create a filter instance with cached model loading."""
+    # For spaCy-based filters, we need to patch the model loading
+    if filter_class in [TextEntityDependencyFilter, TextActionFilter]:
+        # Temporarily patch the prepare_model function
+        import data_juicer.utils.model_utils as model_utils
+
+        original_prepare_spacy = model_utils.prepare_spacy_model
+
+        def cached_prepare_spacy(lang, **kwargs):
+            return get_cached_model("spacy", lang)
+
+        model_utils.prepare_spacy_model = cached_prepare_spacy
+
+        try:
+            filter_instance = filter_class(**kwargs)
+        finally:
+            # Restore original function
+            model_utils.prepare_spacy_model = original_prepare_spacy
+    else:
+        filter_instance = filter_class(**kwargs)
+
+    return filter_instance
+
 
 @dataclass
 class PerformanceMetrics:
@@ -128,10 +170,10 @@ class PerformanceBenchmark:
             StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.5),
             FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1),
             LanguageIDScoreFilter(lang="en", min_score=0.5, max_score=1.0),
-            # Advanced text analysis filters (high complexity)
+            # Advanced text analysis filters (high complexity) - with cached models
             # Note: These use local models and are computationally intensive
-            TextEntityDependencyFilter(lang="en", min_dependency_num=1, any_or_all="all"),
-            TextActionFilter(lang="en", min_action_num=1),
+            # create_filter_with_cached_model(TextEntityDependencyFilter, lang="en", min_dependency_num=1, any_or_all="all"),
+            # create_filter_with_cached_model(TextActionFilter, lang="en", min_action_num=1),
         ]
 
         return filters
@@ -397,6 +439,7 @@ class PerformanceBenchmark:
 
         total_stats_time = 0.0
         total_filter_time = 0.0
+        filter_details = []
 
         for i, filter_op in enumerate(filters):
             op_name = getattr(filter_op, "_name", type(filter_op).__name__)
@@ -414,13 +457,37 @@ class PerformanceBenchmark:
             filter_time = time.time() - filter_start
             total_filter_time += filter_time
 
-            logger.info(f"    Stats: {stats_time:.3f}s, Filter: {filter_time:.3f}s")
+            filter_details.append(
+                {
+                    "name": op_name,
+                    "stats_time": stats_time,
+                    "filter_time": filter_time,
+                    "total_time": stats_time + filter_time,
+                }
+            )
+
+            logger.info(
+                f"    Stats: {stats_time:.3f}s, Filter: {filter_time:.3f}s, Total: {stats_time + filter_time:.3f}s"
+            )
 
         total_time = time.time() - total_start_time
         end_memory = self.measure_memory_usage()
         memory_usage = end_memory - start_memory
-
         throughput = len(test_data["text"]) / total_time
+
+        # Detailed breakdown
+        logger.info("  📊 INDIVIDUAL EXECUTION BREAKDOWN:")
+        logger.info(f"    Total stats time: {total_stats_time:.3f}s ({total_stats_time/total_time*100:.1f}%)")
+        logger.info(f"    Total filter time: {total_filter_time:.3f}s ({total_filter_time/total_time*100:.1f}%)")
+        logger.info(f"    Total time: {total_time:.3f}s")
+        logger.info(f"    Throughput: {throughput:.1f} samples/sec")
+        logger.info(f"    Memory usage: {memory_usage:.1f} MB")
+
+        # Show slowest filters
+        filter_details.sort(key=lambda x: x["total_time"], reverse=True)
+        logger.info("  🐌 SLOWEST FILTERS:")
+        for i, detail in enumerate(filter_details[:5]):
+            logger.info(f"    {i+1}. {detail['name']}: {detail['total_time']:.3f}s")
 
         return PerformanceMetrics(
             total_time=total_time,
@@ -439,30 +506,49 @@ class PerformanceBenchmark:
         start_memory = self.measure_memory_usage()
         total_start_time = time.time()
 
-        # Ensure analyzer_insights is a dict
+        # Step 1: FusedFilter initialization
+        init_start = time.time()
         if analyzer_insights is None:
             analyzer_insights = {}
         fused_filter = FusedFilter("performance_test_fused", filters, analyzer_insights=analyzer_insights)
+        init_time = time.time() - init_start
+        logger.info(f"  Step 1 - FusedFilter initialization: {init_time:.3f}s")
 
-        # Phase 1: Stats computation
+        # Step 2: Data copy
+        copy_start = time.time()
+        test_data_copy = test_data.copy()
+        copy_time = time.time() - copy_start
+        logger.info(f"  Step 2 - Data copy: {copy_time:.3f}s")
+
+        # Step 3: Stats computation
         stats_start = time.time()
-        samples_with_stats = fused_filter.compute_stats_batched(test_data.copy())
+        logger.info("  Step 3 - Starting stats computation...")
+        samples_with_stats = fused_filter.compute_stats_batched(test_data_copy)
         stats_time = time.time() - stats_start
+        logger.info(f"  Step 3 - Stats computation completed: {stats_time:.3f}s")
 
-        # Phase 2: Filtering
+        # Step 4: Filtering
         filter_start = time.time()
-        _ = fused_filter.process_batched(samples_with_stats)
+        logger.info("  Step 4 - Starting filtering...")
+        _ = list(fused_filter.process_batched(samples_with_stats))
         filter_time = time.time() - filter_start
+        logger.info(f"  Step 4 - Filtering completed: {filter_time:.3f}s")
 
+        # Calculate totals
         total_time = time.time() - total_start_time
         end_memory = self.measure_memory_usage()
         memory_usage = end_memory - start_memory
-
         throughput = len(test_data["text"]) / total_time
 
-        logger.info(
-            f"  Fused execution - Stats: {stats_time:.3f}s, Filter: {filter_time:.3f}s, Total: {total_time:.3f}s"
-        )
+        # Detailed breakdown
+        logger.info("  📊 FUSED EXECUTION BREAKDOWN:")
+        logger.info(f"    Initialization: {init_time:.3f}s ({init_time/total_time*100:.1f}%)")
+        logger.info(f"    Data copy: {copy_time:.3f}s ({copy_time/total_time*100:.1f}%)")
+        logger.info(f"    Stats computation: {stats_time:.3f}s ({stats_time/total_time*100:.1f}%)")
+        logger.info(f"    Filtering: {filter_time:.3f}s ({filter_time/total_time*100:.1f}%)")
+        logger.info(f"    Total time: {total_time:.3f}s")
+        logger.info(f"    Throughput: {throughput:.1f} samples/sec")
+        logger.info(f"    Memory usage: {memory_usage:.1f} MB")
 
         return PerformanceMetrics(
             total_time=total_time,
@@ -620,8 +706,18 @@ class PerformanceBenchmark:
         logger.info("=" * 60)
 
     def save_results(self, results: Dict[str, Any], filename: str = "performance_test_results.json"):
-        """Save test results to file."""
+        """Save test results to file with timestamp and metadata."""
+        import datetime
         import json
+        import os
+
+        # Add timestamp and metadata to results
+        results["metadata"] = {
+            "timestamp": datetime.datetime.now().isoformat(),
+            "filename": filename,
+            "version": "1.0",
+            "data_juicer_version": "latest",
+        }
 
         # Convert dataclasses to dict for JSON serialization
         def convert_metrics(metrics_list):
@@ -637,6 +733,7 @@ class PerformanceBenchmark:
             ]
 
         saveable_results = {
+            "metadata": results.get("metadata", {}),
             "test_config": results["test_config"],
             "individual": results["individual"],
             "fused": results["fused"],
@@ -647,10 +744,41 @@ class PerformanceBenchmark:
             },
         }
 
+        # Add additional metadata if available (with JSON serialization handling)
+        def convert_numpy_types(obj):
+            """Convert numpy types to JSON serializable types."""
+            import numpy as np
+
+            if isinstance(obj, np.integer):
+                return int(obj)
+            elif isinstance(obj, np.floating):
+                return float(obj)
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, dict):
+                return {k: convert_numpy_types(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_numpy_types(item) for item in obj]
+            else:
+                return obj
+
+        if "filtering_stats" in results:
+            saveable_results["filtering_stats"] = convert_numpy_types(results["filtering_stats"])
+        if "analyzer_insights" in results:
+            saveable_results["analyzer_insights"] = convert_numpy_types(results["analyzer_insights"])
+
+        # Create directory if it doesn't exist
+        os.makedirs(os.path.dirname(filename) if os.path.dirname(filename) else ".", exist_ok=True)
+
+        # Save to file
         with open(filename, "w") as f:
             json.dump(saveable_results, f, indent=2)
 
-        logger.info(f"Results saved to {filename}")
+        # Log file info
+        file_size_kb = os.path.getsize(filename) / 1024
+        logger.info(f"📁 Results saved to {filename}")
+        logger.info(f"   File size: {file_size_kb:.1f} KB")
+        logger.info(f"   Timestamp: {saveable_results['metadata']['timestamp']}")
 
     def calculate_statistics(self, individual_results, fused_results, num_samples):
         """Calculate comprehensive statistics from multiple runs."""
@@ -1612,7 +1740,20 @@ def main():
                 logger.warning("   Consider using --samples 10000 for faster testing")
 
             benchmark = PerformanceBenchmark()
-            return benchmark.run_comprehensive_test(args.samples, args.runs)
+            results = benchmark.run_comprehensive_test(args.samples, args.runs)
+
+            # Print the final performance summary
+            benchmark.print_results(results)
+
+            # Save results to file with timestamp
+            import datetime
+
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"performance_test_results_{timestamp}.json"
+            benchmark.save_results(results, filename)
+            logger.info(f"📁 Results saved to: {filename}")
+
+            return results
 
         elif args.mode == "fusion-analysis":
             logger.info("🔬 Running FUSION ANALYSIS (analyze fusion decisions)")
