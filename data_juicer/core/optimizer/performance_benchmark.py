@@ -44,8 +44,14 @@ from data_juicer.ops.filter import (
     AlphanumericFilter,
     AverageLineLengthFilter,
     CharacterRepetitionFilter,
+    FlaggedWordFilter,
+    LanguageIDScoreFilter,
     MaximumLineLengthFilter,
+    PerplexityFilter,
     SpecialCharactersFilter,
+    StopWordsFilter,
+    TextActionFilter,
+    TextEntityDependencyFilter,
     TextLengthFilter,
     WordRepetitionFilter,
     WordsNumFilter,
@@ -103,25 +109,12 @@ class PerformanceBenchmark:
         logger.info(f"Created test data with {len(texts)} text samples")
         return test_data
 
-    def create_basic_test_filters(self) -> List[Filter]:
-        """Create only the most basic filters for reliable testing."""
-        logger.info("Creating basic test filters...")
-
-        filters = [
-            # Only the most basic, reliable filters
-            WordsNumFilter(min_num=5, max_num=1000),
-            TextLengthFilter(min_len=20, max_len=1000),
-            CharacterRepetitionFilter(repetition_ratio=0.8),
-        ]
-
-        return filters
-
     def create_test_filters(self) -> List[Filter]:
-        """Create a safe set of test filters that won't hang."""
-        logger.info("Creating safe test filters...")
+        """Create a comprehensive set of test filters covering different categories."""
+        logger.info("Creating comprehensive test filters...")
 
         filters = [
-            # Only simple, reliable filters
+            # Basic text filters (simple, fast)
             WordsNumFilter(min_num=5, max_num=1000),
             TextLengthFilter(min_len=20, max_len=1000),
             CharacterRepetitionFilter(repetition_ratio=0.8),
@@ -130,6 +123,15 @@ class PerformanceBenchmark:
             AlphanumericFilter(min_ratio=0.3),
             AverageLineLengthFilter(min_len=10, max_len=100),
             MaximumLineLengthFilter(min_len=10, max_len=200),
+            # Content quality filters (moderate complexity)
+            PerplexityFilter(lang="en", model_key="gpt2", min_score=0.0, max_score=100.0),
+            StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.5),
+            FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1),
+            LanguageIDScoreFilter(lang="en", min_score=0.5, max_score=1.0),
+            # Advanced text analysis filters (high complexity)
+            # Note: These use local models and are computationally intensive
+            TextEntityDependencyFilter(lang="en", min_dependency_num=1, any_or_all="all"),
+            TextActionFilter(lang="en", min_action_num=1),
         ]
 
         return filters
@@ -883,8 +885,8 @@ class PerformanceBenchmark:
 
 
 def create_simple_test_data(num_samples: int = 1000) -> Dict[str, Any]:
-    """Create simple test data for demonstration."""
-    logger.info(f"Creating {num_samples:,} test samples...")
+    """Create comprehensive test data covering different text characteristics."""
+    logger.info(f"Creating {num_samples:,} comprehensive test samples...")
 
     # For large datasets, create in batches to avoid memory issues
     batch_size = 10000
@@ -895,10 +897,52 @@ def create_simple_test_data(num_samples: int = 1000) -> Dict[str, Any]:
         batch_size_actual = batch_end - batch_start
 
         batch_texts = []
-        for _ in range(batch_size_actual):
-            # Create text with varying characteristics
-            length = random.randint(50, 200)
-            text = "".join(random.choices(string.ascii_letters + string.digits + " .,!?", k=length))
+        for i in range(batch_size_actual):
+            # Create diverse text samples with different characteristics
+            sample_type = i % 8  # 8 different types of text
+
+            if sample_type == 0:
+                # Normal text
+                length = random.randint(50, 200)
+                text = "".join(random.choices(string.ascii_letters + string.digits + " .,!?", k=length))
+            elif sample_type == 1:
+                # Short text
+                length = random.randint(10, 30)
+                text = "".join(random.choices(string.ascii_lowercase + " ", k=length))
+            elif sample_type == 2:
+                # Long text with repetition
+                length = random.randint(300, 800)
+                text = "".join(random.choices("hello world test data sample " * 20, k=length))
+            elif sample_type == 3:
+                # Text with special characters
+                length = random.randint(100, 300)
+                text = "".join(
+                    random.choices(string.ascii_letters + string.digits + "!@#$%^&*()_+-=[]{}|;:,.<>?", k=length)
+                )
+            elif sample_type == 4:
+                # Text with numbers
+                length = random.randint(80, 250)
+                text = "".join(random.choices(string.ascii_letters + string.digits + " .,", k=length))
+            elif sample_type == 5:
+                # Text with high repetition
+                length = random.randint(150, 400)
+                text = "".join(random.choices("aaaaa bbbbb ccccc ddddd " * 10, k=length))
+            elif sample_type == 6:
+                # Multi-line text
+                lines = random.randint(3, 8)
+                text_lines = []
+                for _ in range(lines):
+                    line_length = random.randint(20, 80)
+                    line = "".join(random.choices(string.ascii_letters + " ", k=line_length))
+                    text_lines.append(line)
+                text = "\n".join(text_lines)
+            else:
+                # Mixed content
+                length = random.randint(100, 350)
+                text = "".join(
+                    random.choices(string.ascii_letters + string.digits + "!@#$%^&*()_+-=[]{}|;:,.<>? \n\t", k=length)
+                )
+
             batch_texts.append(text)
 
         texts.extend(batch_texts)
@@ -906,37 +950,71 @@ def create_simple_test_data(num_samples: int = 1000) -> Dict[str, Any]:
         if batch_end % (batch_size * 5) == 0:
             logger.info(f"  Created {batch_end:,}/{num_samples:,} samples...")
 
-    logger.info(f"Successfully created {len(texts):,} test samples")
+    logger.info(f"Successfully created {len(texts):,} comprehensive test samples")
+    logger.info(f"Text characteristics: lengths {min(len(t) for t in texts)}-{max(len(t) for t in texts)} chars")
     return {"text": texts, Fields.stats: [{} for _ in range(num_samples)]}
 
 
-def create_realistic_funnel_filters() -> List[Filter]:
-    """Create filters with realistic thresholds that create a funnel effect."""
+def create_simple_filters() -> List[Filter]:
+    """Create a comprehensive set of simple filters for testing."""
 
     filters = [
-        # Filter 1: Remove very short texts (should pass ~80-90%)
-        TextLengthFilter(min_len=10, max_len=2000),
-        # Filter 2: Remove texts with too few words (should pass ~70-80%)
-        WordsNumFilter(min_num=3, max_num=500),
-        # Filter 3: Remove texts with high character repetition (should pass ~60-70%)
-        CharacterRepetitionFilter(repetition_ratio=0.9),
-        # Filter 4: Remove texts with high word repetition (should pass ~50-60%)
-        WordRepetitionFilter(repetition_ratio=0.8),
-        # Filter 5: Remove texts with too many special characters (should pass ~40-50%)
+        # Basic text metrics (very fast)
+        WordsNumFilter(min_num=5, max_num=1000),
+        TextLengthFilter(min_len=20, max_len=1000),
+        CharacterRepetitionFilter(repetition_ratio=0.8),
+        # Text structure filters (fast)
+        WordRepetitionFilter(min_ratio=0.0, max_ratio=0.5),
         SpecialCharactersFilter(min_ratio=0.0, max_ratio=0.3),
+        AlphanumericFilter(min_ratio=0.3),
+        AverageLineLengthFilter(min_len=10, max_len=100),
+        MaximumLineLengthFilter(min_len=10, max_len=200),
     ]
 
     return filters
 
 
-def create_simple_filters() -> List[Filter]:
-    """Create a few simple filters for testing."""
+def create_complex_filters():
+    """Create complex filters that should trigger sequential execution."""
+    from data_juicer.ops.filter import (
+        FlaggedWordFilter,
+        LanguageIDScoreFilter,
+        PerplexityFilter,
+        StopWordsFilter,
+        TextActionFilter,
+        TextEntityDependencyFilter,
+        WordRepetitionFilter,
+    )
 
-    filters = [
-        WordsNumFilter(min_num=5, max_num=1000),
-        TextLengthFilter(min_len=20, max_len=1000),
-        CharacterRepetitionFilter(repetition_ratio=0.8),
-    ]
+    filters = []
+
+    # Perplexity filter (complex - requires language model)
+    perplexity_filter = PerplexityFilter(lang="en", model_key="gpt2", min_score=0.0, max_score=100.0)
+    filters.append(perplexity_filter)
+
+    # Stopwords filter (complex - requires language processing)
+    stopwords_filter = StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.5)
+    filters.append(stopwords_filter)
+
+    # Flagged words filter (complex - requires word list processing)
+    flagged_words_filter = FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1)
+    filters.append(flagged_words_filter)
+
+    # Language ID score filter (complex - requires language detection)
+    lang_id_filter = LanguageIDScoreFilter(lang="en", min_score=0.5, max_score=1.0)
+    filters.append(lang_id_filter)
+
+    # Word repetition filter (complex - requires pattern analysis)
+    word_rep_filter = WordRepetitionFilter(lang="en", min_ratio=0.0, max_ratio=0.3)
+    filters.append(word_rep_filter)
+
+    # Text entity dependency filter (complex - requires spaCy NLP)
+    entity_dep_filter = TextEntityDependencyFilter(lang="en", min_dependency_num=1, any_or_all="all")
+    filters.append(entity_dep_filter)
+
+    # Text action filter (complex - requires spaCy POS tagging)
+    action_filter = TextActionFilter(lang="en", min_action_num=1)
+    filters.append(action_filter)
 
     return filters
 
@@ -1389,41 +1467,6 @@ def print_filtering_comparison(stats: Dict[str, Any]):
         "difference": difference,
         "efficiency_ratio": efficiency_ratio,
     }
-
-
-def create_complex_filters():
-    """Create complex filters that should trigger sequential execution."""
-    from data_juicer.ops.filter import (
-        FlaggedWordFilter,
-        LanguageIDScoreFilter,
-        PerplexityFilter,
-        StopWordsFilter,
-        WordRepetitionFilter,
-    )
-
-    filters = []
-
-    # Perplexity filter (complex - requires language model)
-    perplexity_filter = PerplexityFilter(lang="en", model_key="gpt2", min_score=0.0, max_score=100.0)
-    filters.append(perplexity_filter)
-
-    # Stopwords filter (complex - requires language processing)
-    stopwords_filter = StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.5)
-    filters.append(stopwords_filter)
-
-    # Flagged words filter (complex - requires word list processing)
-    flagged_words_filter = FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1)
-    filters.append(flagged_words_filter)
-
-    # Language ID score filter (complex - requires language detection)
-    lang_id_filter = LanguageIDScoreFilter(lang="en", min_score=0.5, max_score=1.0)
-    filters.append(lang_id_filter)
-
-    # Word repetition filter (complex - requires pattern analysis)
-    word_rep_filter = WordRepetitionFilter(lang="en", min_ratio=0.0, max_ratio=0.3)
-    filters.append(word_rep_filter)
-
-    return filters
 
 
 def analyze_fusion_decisions():
