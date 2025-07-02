@@ -363,6 +363,263 @@
         <article role="main" id="furo-main-content">
           <section id="data-juicer-tools-package">
 <h1>data_juicer.tools package<a class="headerlink" href="#data-juicer-tools-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-data_juicer.tools.DJ_mcp_granular_ops">
+<span id="data-juicer-tools-dj-mcp-granular-ops-module"></span><h2>data_juicer.tools.DJ_mcp_granular_ops module<a class="headerlink" href="#module-data_juicer.tools.DJ_mcp_granular_ops" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.DJ_mcp_granular_ops.process_parameter">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.DJ_mcp_granular_ops.</span></span><span class="sig-name descname"><span class="pre">process_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Parameter</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Parameter</span></span></span><a class="reference internal" href="_modules/data_juicer/tools/DJ_mcp_granular_ops.html#process_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.DJ_mcp_granular_ops.process_parameter" title="Link to this definition">¶</a></dt>
+<dd><p>Processes a function parameter:
+- Converts jsonargparse.typing.ClosedUnitInterval to a local equivalent annotation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.DJ_mcp_granular_ops.create_operator_function">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.DJ_mcp_granular_ops.</span></span><span class="sig-name descname"><span class="pre">create_operator_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/DJ_mcp_granular_ops.html#create_operator_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.DJ_mcp_granular_ops.create_operator_function" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a callable function for a Data-Juicer operator class.</p>
+<p>This function dynamically creates a function that can be registered as an MCP tool,
+with proper signature and documentation based on the operator’s __init__ method.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.DJ_mcp_granular_ops.create_mcp_server">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.DJ_mcp_granular_ops.</span></span><span class="sig-name descname"><span class="pre">create_mcp_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'8000'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/DJ_mcp_granular_ops.html#create_mcp_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.DJ_mcp_granular_ops.create_mcp_server" title="Link to this definition">¶</a></dt>
+<dd><p>Creates the FastMCP server and registers the tools.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>port</strong> (<em>str</em><em>, </em><em>optional</em>) – Port number. Defaults to “8000”.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-data_juicer.tools.DJ_mcp_recipe_flow">
+<span id="data-juicer-tools-dj-mcp-recipe-flow-module"></span><h2>data_juicer.tools.DJ_mcp_recipe_flow module<a class="headerlink" href="#module-data_juicer.tools.DJ_mcp_recipe_flow" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.DJ_mcp_recipe_flow.get_data_processing_ops">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.DJ_mcp_recipe_flow.</span></span><span class="sig-name descname"><span class="pre">get_data_processing_ops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/data_juicer/tools/DJ_mcp_recipe_flow.html#get_data_processing_ops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.DJ_mcp_recipe_flow.get_data_processing_ops" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieves a list of available data processing operators based on the specified type and tags.
+Operators are a collection of basic processes that assist in data modification,
+cleaning, filtering, deduplication, etc.</p>
+<p>Should be used with <cite>run_data_recipe</cite>.</p>
+<p>If both tags and ops_type are None, return a list of all operators.</p>
+<p>The following <cite>op_type</cite> values are supported:
+- aggregator: Aggregate for batched samples, such as summary or conclusion.
+- deduplicator: Detects and removes duplicate samples.
+- filter: Filters out low-quality samples.
+- grouper: Group samples to batched samples.
+- mapper: Edits and transforms samples.
+- selector: Selects top samples based on ranking.</p>
+<p>The <cite>tags</cite> parameter specifies the characteristics of the data or the required resources.
+Available tags are:</p>
+<dl class="simple">
+<dt>Modality Tags:</dt><dd><ul class="simple">
+<li><p>text: process text data specifically.</p></li>
+<li><p>image: process image data specifically.</p></li>
+<li><p>audio: process audio data specifically.</p></li>
+<li><p>video: process video data specifically.</p></li>
+<li><p>multimodal: process multimodal data.</p></li>
+</ul>
+</dd>
+<dt>Resource Tags:</dt><dd><ul class="simple">
+<li><p>cpu: only requires CPU resource.</p></li>
+<li><p>gpu: requires GPU/CUDA resource as well.</p></li>
+</ul>
+</dd>
+<dt>Model Tags:</dt><dd><ul class="simple">
+<li><p>api: equipped with API-based models (e.g. ChatGPT, GPT-4o).</p></li>
+<li><p>vllm: equipped with models supported by vLLM.</p></li>
+<li><p>hf: equipped with models from HuggingFace Hub.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Tags are used to refine the search for suitable operators based on specific data processing needs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>op_type</strong> – The type of data processing operator to retrieve.
+If None, no ops_type-based filtering is applied.
+If specified, must be one of the values listed. Defaults to None.</p></li>
+<li><p><strong>tags</strong> – An optional list of tags to filter operators.  See the tag list above for options.
+If None, no tag-based filtering is applied. Defaults to None.</p></li>
+<li><p><strong>match_all</strong> – If True, only operators matching all specified tags are returned.
+If False, operators matching any of the specified tags are returned. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dict containing detailed information about the available operators</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.DJ_mcp_recipe_flow.run_data_recipe">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.DJ_mcp_recipe_flow.</span></span><span class="sig-name descname"><span class="pre">run_data_recipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">np</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/data_juicer/tools/DJ_mcp_recipe_flow.html#run_data_recipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.DJ_mcp_recipe_flow.run_data_recipe" title="Link to this definition">¶</a></dt>
+<dd><p>Run data recipe.
+If you want to run one or more DataJuicer data processing operators, you can
+use this tool. Supported operators and their arguments should be obtained
+through the <cite>get_data_processing_ops</cite> tool.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_path</strong> – Path to the dataset to be processed.</p></li>
+<li><p><strong>process</strong> – List of processing operations to be executed sequentially.
+Each element is a dictionary with operator name as key and
+its configuration as value. Multiple operators can be chained.</p></li>
+<li><p><strong>export_path</strong> – Path to export the processed dataset. Defaults to None,
+which exports to ‘./outputs’ directory.</p></li>
+<li><p><strong>np</strong> – Number of processes to use. Defaults to 1.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p># First get available filter operators for text data
+&gt;&gt;&gt; available_ops = get_data_processing_ops(
+…     op_type=”filter”,
+…     tags=[“text”]
+… )</p>
+<p># Then run a data recipe with selected filters:
+# 1. First filter samples with text length 10-50
+# 2. Then filter English samples with language confidence score &gt;= 0.8
+&gt;&gt;&gt; run_data_recipe(
+…     “/path/to/dataset.jsonl”,
+…     [
+…         {
+…             “text_length_filter”: {
+…                 “min_len”: 10,
+…                 “max_len”: 50
+…             }
+…         },
+…         {
+…             “language_id_score_filter”: {
+…                 “lang”: “en”,
+…                 “min_score”: 0.8
+…             }
+…         }
+…     ]
+… )</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.DJ_mcp_recipe_flow.create_mcp_server">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.DJ_mcp_recipe_flow.</span></span><span class="sig-name descname"><span class="pre">create_mcp_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'8000'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/DJ_mcp_recipe_flow.html#create_mcp_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.DJ_mcp_recipe_flow.create_mcp_server" title="Link to this definition">¶</a></dt>
+<dd><p>Creates the FastMCP server and registers the tools.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>port</strong> (<em>str</em><em>, </em><em>optional</em>) – Port number. Defaults to “8000”.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-data_juicer.tools.mcp_tool">
+<span id="data-juicer-tools-mcp-tool-module"></span><h2>data_juicer.tools.mcp_tool module<a class="headerlink" href="#module-data_juicer.tools.mcp_tool" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.mcp_tool.add_extra_cfg">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.mcp_tool.</span></span><span class="sig-name descname"><span class="pre">add_extra_cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dj_cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="reference internal" href="_modules/data_juicer/tools/mcp_tool.html#add_extra_cfg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.mcp_tool.add_extra_cfg" title="Link to this definition">¶</a></dt>
+<dd><p>Add extra dj config.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.mcp_tool.execute_op">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.mcp_tool.</span></span><span class="sig-name descname"><span class="pre">execute_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dj_cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/mcp_tool.html#execute_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.mcp_tool.execute_op" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-data_juicer.tools.op_search">
+<span id="data-juicer-tools-op-search-module"></span><h2>data_juicer.tools.op_search module<a class="headerlink" href="#module-data_juicer.tools.op_search" title="Link to this heading">¶</a></h2>
+<p>Operator Searcher - A tool for filtering Data-Juicer operators by tags</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.OPRecord">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.tools.op_search.</span></span><span class="sig-name descname"><span class="pre">OPRecord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Signature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#OPRecord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.OPRecord" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A record class for storing operator metadata</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.OPRecord.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Signature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#OPRecord.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.OPRecord.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.OPRecord.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#OPRecord.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.OPRecord.to_dict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.analyze_modality_tag">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.op_search.</span></span><span class="sig-name descname"><span class="pre">analyze_modality_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_prefix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#analyze_modality_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.analyze_modality_tag" title="Link to this definition">¶</a></dt>
+<dd><p>Analyze the modality tag for the given code content string. Should be one
+of the “Modality Tags” in <cite>tagging_mappings.json</cite>. It makes the choice by
+finding the usages of attributes <cite>{modality}_key</cite> and the prefix of the OP
+name. If there are multiple modality keys are used, the ‘multimodal’ tag
+will be returned instead.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.analyze_resource_tag">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.op_search.</span></span><span class="sig-name descname"><span class="pre">analyze_resource_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#analyze_resource_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.analyze_resource_tag" title="Link to this definition">¶</a></dt>
+<dd><p>Analyze the resource tag for the given code content string. Should be one
+of the “Resource Tags” in <cite>tagging_mappings.json</cite>. It makes the choice
+according to their assigning statement to attribute <cite>_accelerator</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.analyze_model_tags">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.op_search.</span></span><span class="sig-name descname"><span class="pre">analyze_model_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#analyze_model_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.analyze_model_tags" title="Link to this definition">¶</a></dt>
+<dd><p>Analyze the model tag for the given code content string. SHOULD be one of
+the “Model Tags” in <cite>tagging_mappings.json</cite>. It makes the choice by finding
+the <cite>model_type</cite> arg in <cite>prepare_model</cite> method invocation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.analyze_tag_with_inheritance">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.op_search.</span></span><span class="sig-name descname"><span class="pre">analyze_tag_with_inheritance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyze_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_parm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#analyze_tag_with_inheritance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.analyze_tag_with_inheritance" title="Link to this definition">¶</a></dt>
+<dd><p>Universal inheritance chain label analysis function</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.analyze_tag_from_cls">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.op_search.</span></span><span class="sig-name descname"><span class="pre">analyze_tag_from_cls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#analyze_tag_from_cls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.analyze_tag_from_cls" title="Link to this definition">¶</a></dt>
+<dd><p>Analyze the tags for the OP from the given cls.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.extract_param_docstring">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.op_search.</span></span><span class="sig-name descname"><span class="pre">extract_param_docstring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">docstring</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#extract_param_docstring"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.extract_param_docstring" title="Link to this definition">¶</a></dt>
+<dd><p>Extract parameter descriptions from __init__ method docstring.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.OPSearcher">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.tools.op_search.</span></span><span class="sig-name descname"><span class="pre">OPSearcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specified_op_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#OPSearcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.OPSearcher" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Operator search engine</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.OPSearcher.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specified_op_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#OPSearcher.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.OPSearcher.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.OPSearcher.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#OPSearcher.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.OPSearcher.search" title="Link to this definition">¶</a></dt>
+<dd><p>Search operators by criteria
+:param tags: List of tags to match
+:param op_type: Operator type (mapper/filter/etc)
+:param match_all: True requires matching all tags, False matches any tag
+:return: List of matched operator records</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.tools.op_search.main">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.tools.op_search.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/tools/op_search.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.tools.op_search.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="module-data_juicer.tools">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-data_juicer.tools" title="Link to this heading">¶</a></h2>
 </section>
@@ -406,6 +663,44 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">data_juicer.tools package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-data_juicer.tools.DJ_mcp_granular_ops">data_juicer.tools.DJ_mcp_granular_ops module</a><ul>
+<li><a class="reference internal" href="#data_juicer.tools.DJ_mcp_granular_ops.process_parameter"><code class="docutils literal notranslate"><span class="pre">process_parameter()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.DJ_mcp_granular_ops.create_operator_function"><code class="docutils literal notranslate"><span class="pre">create_operator_function()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.DJ_mcp_granular_ops.create_mcp_server"><code class="docutils literal notranslate"><span class="pre">create_mcp_server()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-data_juicer.tools.DJ_mcp_recipe_flow">data_juicer.tools.DJ_mcp_recipe_flow module</a><ul>
+<li><a class="reference internal" href="#data_juicer.tools.DJ_mcp_recipe_flow.get_data_processing_ops"><code class="docutils literal notranslate"><span class="pre">get_data_processing_ops()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.DJ_mcp_recipe_flow.run_data_recipe"><code class="docutils literal notranslate"><span class="pre">run_data_recipe()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.DJ_mcp_recipe_flow.create_mcp_server"><code class="docutils literal notranslate"><span class="pre">create_mcp_server()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-data_juicer.tools.mcp_tool">data_juicer.tools.mcp_tool module</a><ul>
+<li><a class="reference internal" href="#data_juicer.tools.mcp_tool.add_extra_cfg"><code class="docutils literal notranslate"><span class="pre">add_extra_cfg()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.mcp_tool.execute_op"><code class="docutils literal notranslate"><span class="pre">execute_op()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-data_juicer.tools.op_search">data_juicer.tools.op_search module</a><ul>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.OPRecord"><code class="docutils literal notranslate"><span class="pre">OPRecord</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.OPRecord.__init__"><code class="docutils literal notranslate"><span class="pre">OPRecord.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.OPRecord.to_dict"><code class="docutils literal notranslate"><span class="pre">OPRecord.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.analyze_modality_tag"><code class="docutils literal notranslate"><span class="pre">analyze_modality_tag()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.analyze_resource_tag"><code class="docutils literal notranslate"><span class="pre">analyze_resource_tag()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.analyze_model_tags"><code class="docutils literal notranslate"><span class="pre">analyze_model_tags()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.analyze_tag_with_inheritance"><code class="docutils literal notranslate"><span class="pre">analyze_tag_with_inheritance()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.analyze_tag_from_cls"><code class="docutils literal notranslate"><span class="pre">analyze_tag_from_cls()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.extract_param_docstring"><code class="docutils literal notranslate"><span class="pre">extract_param_docstring()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.OPSearcher"><code class="docutils literal notranslate"><span class="pre">OPSearcher</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.OPSearcher.__init__"><code class="docutils literal notranslate"><span class="pre">OPSearcher.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.OPSearcher.search"><code class="docutils literal notranslate"><span class="pre">OPSearcher.search()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.tools.op_search.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-data_juicer.tools">Module contents</a></li>
 </ul>
 </li>

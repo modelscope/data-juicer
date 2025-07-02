@@ -222,7 +222,7 @@
 <li class="toctree-l1"><a class="reference internal" href="docs/DatasetCfg_ZH.html">数据集配置指南</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/BadDataExhibition_ZH.html">“坏”数据展览</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/DJ_SORA_ZH.html">DJ-SORA</a></li>
-<li class="toctree-l1"><a class="reference internal" href="docs/DJ_service_ZH.html">API服务化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/DJ_service_ZH.html">DJ_服务化</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/DeveloperGuide_ZH.html">开发者指南</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/Sandbox_ZH.html">沙盒实验室</a></li>
@@ -772,10 +772,10 @@
 </li>
         <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.VideoAestheticsFilter.__init__">__init__() （data_juicer.ops.filter.VideoAestheticsFilter 方法）</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.VideoAspectRatioFilter.__init__">__init__() （data_juicer.ops.filter.VideoAspectRatioFilter 方法）</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.VideoDurationFilter.__init__">__init__() （data_juicer.ops.filter.VideoDurationFilter 方法）</a>
 </li>
         <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.VideoFramesTextSimilarityFilter.__init__">__init__() （data_juicer.ops.filter.VideoFramesTextSimilarityFilter 方法）</a>
@@ -1164,6 +1164,10 @@
 </li>
         <li><a href="data_juicer.ops.selector.html#data_juicer.ops.selector.TopkSpecifiedFieldSelector.__init__">__init__() （data_juicer.ops.selector.TopkSpecifiedFieldSelector 方法）</a>
 </li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.OPRecord.__init__">__init__() （data_juicer.tools.op_search.OPRecord 方法）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.OPSearcher.__init__">__init__() （data_juicer.tools.op_search.OPSearcher 方法）</a>
+</li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.cache_utils.DatasetCacheControl.__init__">__init__() （data_juicer.utils.cache_utils.DatasetCacheControl 方法）</a>
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.ckpt_utils.CheckpointManager.__init__">__init__() （data_juicer.utils.ckpt_utils.CheckpointManager 方法）</a>
@@ -1207,6 +1211,8 @@
         <li><a href="data_juicer.core.data.html#data_juicer.core.data.NestedDataset.add_column">add_column() （data_juicer.core.data.NestedDataset 方法）</a>
 </li>
         <li><a href="data_juicer.core.html#data_juicer.core.NestedDataset.add_column">add_column() （data_juicer.core.NestedDataset 方法）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.mcp_tool.add_extra_cfg">add_extra_cfg()（在 data_juicer.tools.mcp_tool 模块中）</a>
 </li>
         <li><a href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.BTSUnionFind.add_key_value_pairs">add_key_value_pairs() （data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.BTSUnionFind 方法）</a>
 </li>
@@ -1252,6 +1258,12 @@
 </li>
         <li><a href="data_juicer.analysis.html#data_juicer.analysis.OverallAnalysis.analyze">analyze() （data_juicer.analysis.OverallAnalysis 方法）</a>
 </li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.analyze_modality_tag">analyze_modality_tag()（在 data_juicer.tools.op_search 模块中）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.analyze_model_tags">analyze_model_tags()（在 data_juicer.tools.op_search 模块中）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.analyze_resource_tag">analyze_resource_tag()（在 data_juicer.tools.op_search 模块中）</a>
+</li>
         <li><a href="data_juicer.core.html#data_juicer.core.Monitor.analyze_resource_util_list">analyze_resource_util_list()（data_juicer.core.Monitor 静态方法）</a>
 </li>
         <li><a href="data_juicer.core.html#data_juicer.core.monitor.Monitor.analyze_resource_util_list">analyze_resource_util_list()（data_juicer.core.monitor.Monitor 静态方法）</a>
@@ -1262,10 +1274,14 @@
 </li>
         <li><a href="data_juicer.core.html#data_juicer.core.Adapter.analyze_small_batch">analyze_small_batch() （data_juicer.core.Adapter 方法）</a>
 </li>
-        <li><a href="data_juicer.core.html#data_juicer.core.adapter.Adapter.analyze_small_batch">analyze_small_batch() （data_juicer.core.adapter.Adapter 方法）</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="data_juicer.core.html#data_juicer.core.adapter.Adapter.analyze_small_batch">analyze_small_batch() （data_juicer.core.adapter.Adapter 方法）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.analyze_tag_from_cls">analyze_tag_from_cls()（在 data_juicer.tools.op_search 模块中）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.analyze_tag_with_inheritance">analyze_tag_with_inheritance()（在 data_juicer.tools.op_search 模块中）</a>
+</li>
         <li><a href="data_juicer.core.html#data_juicer.core.Analyzer">Analyzer（data_juicer.core 中的类）</a>
 </li>
         <li><a href="data_juicer.core.html#data_juicer.core.analyzer.Analyzer">Analyzer（data_juicer.core.analyzer 中的类）</a>
@@ -1656,10 +1672,10 @@
 </li>
         <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.WordRepetitionFilter.compute_stats_batched">compute_stats_batched() （data_juicer.ops.filter.WordRepetitionFilter 方法）</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.words_num_filter.WordsNumFilter.compute_stats_batched">compute_stats_batched() （data_juicer.ops.filter.words_num_filter.WordsNumFilter 方法）</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.WordsNumFilter.compute_stats_batched">compute_stats_batched() （data_juicer.ops.filter.WordsNumFilter 方法）</a>
 </li>
         <li><a href="data_juicer.ops.html#data_juicer.ops.op_fusion.FusedFilter.compute_stats_batched">compute_stats_batched() （data_juicer.ops.op_fusion.FusedFilter 方法）</a>
@@ -1871,6 +1887,12 @@
         <li><a href="data_juicer.core.executor.html#data_juicer.core.executor.factory.ExecutorFactory.create_executor">create_executor()（data_juicer.core.executor.factory.ExecutorFactory 静态方法）</a>
 </li>
         <li><a href="data_juicer.core.html#data_juicer.core.ExecutorFactory.create_executor">create_executor()（data_juicer.core.ExecutorFactory 静态方法）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.DJ_mcp_granular_ops.create_mcp_server">create_mcp_server()（在 data_juicer.tools.DJ_mcp_granular_ops 模块中）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.DJ_mcp_recipe_flow.create_mcp_server">create_mcp_server()（在 data_juicer.tools.DJ_mcp_recipe_flow 模块中）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.DJ_mcp_granular_ops.create_operator_function">create_operator_function()（在 data_juicer.tools.DJ_mcp_granular_ops 模块中）</a>
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.nltk_utils.create_physical_resource_alias">create_physical_resource_alias()（在 data_juicer.utils.nltk_utils 模块中）</a>
 </li>
@@ -3233,8 +3255,6 @@
           <li><a href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_captioning_from_frames_mapper">module</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     data_juicer.ops.mapper.video_captioning_from_summarizer_mapper
 
@@ -3249,6 +3269,8 @@
           <li><a href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_captioning_from_video_mapper">module</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     data_juicer.ops.mapper.video_extract_frames_mapper
 
@@ -3394,6 +3416,34 @@
 
         <ul>
           <li><a href="data_juicer.tools.html#module-data_juicer.tools">module</a>
+</li>
+        </ul></li>
+        <li>
+    data_juicer.tools.DJ_mcp_granular_ops
+
+        <ul>
+          <li><a href="data_juicer.tools.html#module-data_juicer.tools.DJ_mcp_granular_ops">module</a>
+</li>
+        </ul></li>
+        <li>
+    data_juicer.tools.DJ_mcp_recipe_flow
+
+        <ul>
+          <li><a href="data_juicer.tools.html#module-data_juicer.tools.DJ_mcp_recipe_flow">module</a>
+</li>
+        </ul></li>
+        <li>
+    data_juicer.tools.mcp_tool
+
+        <ul>
+          <li><a href="data_juicer.tools.html#module-data_juicer.tools.mcp_tool">module</a>
+</li>
+        </ul></li>
+        <li>
+    data_juicer.tools.op_search
+
+        <ul>
+          <li><a href="data_juicer.tools.html#module-data_juicer.tools.op_search">module</a>
 </li>
         </ul></li>
         <li>
@@ -4186,6 +4236,8 @@
 </li>
         <li><a href="data_juicer.core.html#data_juicer.core.adapter.Adapter.execute_and_probe">execute_and_probe()（data_juicer.core.adapter.Adapter 静态方法）</a>
 </li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.mcp_tool.execute_op">execute_op()（在 data_juicer.tools.mcp_tool 模块中）</a>
+</li>
         <li><a href="data_juicer.core.data.html#data_juicer.core.data.load_strategy.StrategyKey.executor_type">executor_type（data_juicer.core.data.load_strategy.StrategyKey 属性）</a>
 </li>
         <li><a href="data_juicer.core.html#data_juicer.core.ExecutorBase">ExecutorBase（data_juicer.core 中的类）</a>
@@ -4243,6 +4295,8 @@
         <li><a href="data_juicer.utils.html#data_juicer.utils.mm_utils.extract_key_frames">extract_key_frames()（在 data_juicer.utils.mm_utils 模块中）</a>
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.mm_utils.extract_key_frames_by_seconds">extract_key_frames_by_seconds()（在 data_juicer.utils.mm_utils 模块中）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.extract_param_docstring">extract_param_docstring()（在 data_juicer.tools.op_search 模块中）</a>
 </li>
         <li><a href="data_juicer.format.html#data_juicer.format.text_formatter.extract_txt_from_docx">extract_txt_from_docx()（在 data_juicer.format.text_formatter 模块中）</a>
 </li>
@@ -4467,6 +4521,8 @@
         <li><a href="data_juicer.utils.html#data_juicer.utils.resource_utils.get_cpu_count">get_cpu_count()（在 data_juicer.utils.resource_utils 模块中）</a>
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.resource_utils.get_cpu_utilization">get_cpu_utilization()（在 data_juicer.utils.resource_utils 模块中）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.DJ_mcp_recipe_flow.get_data_processing_ops">get_data_processing_ops()（在 data_juicer.tools.DJ_mcp_recipe_flow 模块中）</a>
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.mm_utils.get_decoded_frames_from_video">get_decoded_frames_from_video()（在 data_juicer.utils.mm_utils 模块中）</a>
 </li>
@@ -5004,6 +5060,8 @@
   <h2>M</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.main">main()（在 data_juicer.tools.op_search 模块中）</a>
+</li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.constant.MetaKeys.main_entities">main_entities（data_juicer.utils.constant.MetaKeys 属性）</a>
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.logger_utils.make_log_summarization">make_log_summarization()（在 data_juicer.utils.logger_utils 模块中）</a>
@@ -5524,6 +5582,14 @@
 </li>
           <li><a href="data_juicer.tools.html#module-data_juicer.tools">data_juicer.tools</a>
 </li>
+          <li><a href="data_juicer.tools.html#module-data_juicer.tools.DJ_mcp_granular_ops">data_juicer.tools.DJ_mcp_granular_ops</a>
+</li>
+          <li><a href="data_juicer.tools.html#module-data_juicer.tools.DJ_mcp_recipe_flow">data_juicer.tools.DJ_mcp_recipe_flow</a>
+</li>
+          <li><a href="data_juicer.tools.html#module-data_juicer.tools.mcp_tool">data_juicer.tools.mcp_tool</a>
+</li>
+          <li><a href="data_juicer.tools.html#module-data_juicer.tools.op_search">data_juicer.tools.op_search</a>
+</li>
           <li><a href="data_juicer.utils.html#module-data_juicer.utils">data_juicer.utils</a>
 </li>
           <li><a href="data_juicer.utils.html#module-data_juicer.utils.asset_utils">data_juicer.utils.asset_utils</a>
@@ -5685,6 +5751,10 @@
   <h2>O</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.OPRecord">OPRecord（data_juicer.tools.op_search 中的类）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.OPSearcher">OPSearcher（data_juicer.tools.op_search 中的类）</a>
+</li>
         <li><a href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_minhash_deduplicator.optimal_param">optimal_param()（在 data_juicer.ops.deduplicator.document_minhash_deduplicator 模块中）</a>
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQAMapper">OptimizeQAMapper（data_juicer.ops.mapper 中的类）</a>
@@ -5693,10 +5763,10 @@
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQueryMapper">OptimizeQueryMapper（data_juicer.ops.mapper 中的类）</a>
 </li>
-        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.optimize_query_mapper.OptimizeQueryMapper">OptimizeQueryMapper（data_juicer.ops.mapper.optimize_query_mapper 中的类）</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.optimize_query_mapper.OptimizeQueryMapper">OptimizeQueryMapper（data_juicer.ops.mapper.optimize_query_mapper 中的类）</a>
+</li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeResponseMapper">OptimizeResponseMapper（data_juicer.ops.mapper 中的类）</a>
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.optimize_response_mapper.OptimizeResponseMapper">OptimizeResponseMapper（data_juicer.ops.mapper.optimize_response_mapper 中的类）</a>
@@ -6200,6 +6270,8 @@
         <li><a href="data_juicer.ops.html#data_juicer.ops.op_fusion.GeneralFusedOP.process_batched">process_batched() （data_juicer.ops.op_fusion.GeneralFusedOP 方法）</a>
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.mm_utils.process_each_frame">process_each_frame()（在 data_juicer.utils.mm_utils 模块中）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.DJ_mcp_granular_ops.process_parameter">process_parameter()（在 data_juicer.tools.DJ_mcp_granular_ops 模块中）</a>
 </li>
         <li><a href="data_juicer.ops.html#data_juicer.ops.Aggregator.process_single">process_single() （data_juicer.ops.Aggregator 方法）</a>
 </li>
@@ -6721,10 +6793,10 @@
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.mm_utils.remove_special_tokens">remove_special_tokens()（在 data_juicer.utils.mm_utils 模块中）</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveBibliographyMapper">RemoveBibliographyMapper（data_juicer.ops.mapper 中的类）</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper">RemoveBibliographyMapper（data_juicer.ops.mapper.remove_bibliography_mapper 中的类）</a>
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveCommentsMapper">RemoveCommentsMapper（data_juicer.ops.mapper 中的类）</a>
@@ -6843,6 +6915,8 @@
 </li>
         <li><a href="data_juicer.ops.html#data_juicer.ops.Selector.run">run() （data_juicer.ops.Selector 方法）</a>
 </li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.DJ_mcp_recipe_flow.run_data_recipe">run_data_recipe()（在 data_juicer.tools.DJ_mcp_recipe_flow 模块中）</a>
+</li>
         <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.phrase_grounding_recall_filter.run_ner">run_ner()（在 data_juicer.ops.filter.phrase_grounding_recall_filter 模块中）</a>
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.run_single_op">run_single_op() （data_juicer.utils.unittest_utils.DataJuicerTestCaseBase 方法）</a>
@@ -6886,6 +6960,8 @@
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.SDXLPrompt2PromptMapper">SDXLPrompt2PromptMapper（data_juicer.ops.mapper 中的类）</a>
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.sdxl_prompt2prompt_mapper.SDXLPrompt2PromptMapper">SDXLPrompt2PromptMapper（data_juicer.ops.mapper.sdxl_prompt2prompt_mapper 中的类）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.OPSearcher.search">search() （data_juicer.tools.op_search.OPSearcher 方法）</a>
 </li>
         <li><a href="data_juicer.core.data.html#data_juicer.core.data.dj_dataset.NestedDataset.select">select() （data_juicer.core.data.dj_dataset.NestedDataset 方法）</a>
 </li>
@@ -6965,10 +7041,10 @@
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.special_char_ratio">special_char_ratio（data_juicer.utils.constant.StatsKeysConstant 属性）</a>
 </li>
-        <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.SpecialCharactersFilter">SpecialCharactersFilter（data_juicer.ops.filter 中的类）</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.SpecialCharactersFilter">SpecialCharactersFilter（data_juicer.ops.filter 中的类）</a>
+</li>
         <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.special_characters_filter.SpecialCharactersFilter">SpecialCharactersFilter（data_juicer.ops.filter.special_characters_filter 中的类）</a>
 </li>
         <li><a href="data_juicer.utils.html#data_juicer.utils.mm_utils.SpecialTokens">SpecialTokens（data_juicer.utils.mm_utils 中的类）</a>
@@ -7142,6 +7218,8 @@
         <li><a href="data_juicer.utils.html#data_juicer.utils.mm_utils.timecode_string_to_seconds">timecode_string_to_seconds()（在 data_juicer.utils.mm_utils 模块中）</a>
 </li>
         <li><a href="data_juicer.config.html#data_juicer.config.config.timing_context">timing_context()（在 data_juicer.config.config 模块中）</a>
+</li>
+        <li><a href="data_juicer.tools.html#data_juicer.tools.op_search.OPRecord.to_dict">to_dict() （data_juicer.tools.op_search.OPRecord 方法）</a>
 </li>
         <li><a href="data_juicer.core.html#data_juicer.core.Exporter.to_json">to_json()（data_juicer.core.Exporter 静态方法）</a>
 </li>

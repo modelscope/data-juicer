@@ -223,7 +223,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/DatasetCfg_ZH.html">数据集配置指南</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/BadDataExhibition_ZH.html">“坏”数据展览</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_SORA_ZH.html">DJ-SORA</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_service_ZH.html">API服务化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_service_ZH.html">DJ_服务化</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/DeveloperGuide_ZH.html">开发者指南</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/Sandbox_ZH.html">沙盒实验室</a></li>
@@ -1419,7 +1419,7 @@
 
 <div class="viewcode-block" id="get_init_configs">
 <a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.get_init_configs">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_init_configs</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_init_configs</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">Dict</span><span class="p">],</span> <span class="n">load_configs_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    set init configs of data-juicer for cfg</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1430,7 +1430,7 @@
     <span class="c1"># create a temp config file</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">prepare_cfgs_for_export</span><span class="p">(</span><span class="n">cfg</span><span class="p">),</span> <span class="n">f</span><span class="p">)</span>
-    <span class="n">inited_dj_cfg</span> <span class="o">=</span> <span class="n">init_configs</span><span class="p">([</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">temp_file</span><span class="p">],</span> <span class="n">load_configs_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">inited_dj_cfg</span> <span class="o">=</span> <span class="n">init_configs</span><span class="p">([</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">temp_file</span><span class="p">],</span> <span class="n">load_configs_only</span><span class="o">=</span><span class="n">load_configs_only</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">inited_dj_cfg</span></div>
 
 

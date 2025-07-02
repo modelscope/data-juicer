@@ -224,7 +224,7 @@
 <li class="toctree-l1"><a class="reference internal" href="docs/DatasetCfg_ZH.html">数据集配置指南</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/BadDataExhibition_ZH.html">“坏”数据展览</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/DJ_SORA_ZH.html">DJ-SORA</a></li>
-<li class="toctree-l1"><a class="reference internal" href="docs/DJ_service_ZH.html">API服务化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/DJ_service_ZH.html">DJ_服务化</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/DeveloperGuide_ZH.html">开发者指南</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/Sandbox_ZH.html">沙盒实验室</a></li>
@@ -1246,6 +1246,44 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_juicer.tools.html">data_juicer.tools package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.tools.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.tools.html#module-data_juicer.tools.DJ_mcp_granular_ops">data_juicer.tools.DJ_mcp_granular_ops module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.DJ_mcp_granular_ops.process_parameter"><code class="docutils literal notranslate"><span class="pre">process_parameter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.DJ_mcp_granular_ops.create_operator_function"><code class="docutils literal notranslate"><span class="pre">create_operator_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.DJ_mcp_granular_ops.create_mcp_server"><code class="docutils literal notranslate"><span class="pre">create_mcp_server()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.tools.html#module-data_juicer.tools.DJ_mcp_recipe_flow">data_juicer.tools.DJ_mcp_recipe_flow module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.DJ_mcp_recipe_flow.get_data_processing_ops"><code class="docutils literal notranslate"><span class="pre">get_data_processing_ops()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.DJ_mcp_recipe_flow.run_data_recipe"><code class="docutils literal notranslate"><span class="pre">run_data_recipe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.DJ_mcp_recipe_flow.create_mcp_server"><code class="docutils literal notranslate"><span class="pre">create_mcp_server()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.tools.html#module-data_juicer.tools.mcp_tool">data_juicer.tools.mcp_tool module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.mcp_tool.add_extra_cfg"><code class="docutils literal notranslate"><span class="pre">add_extra_cfg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.mcp_tool.execute_op"><code class="docutils literal notranslate"><span class="pre">execute_op()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.tools.html#module-data_juicer.tools.op_search">data_juicer.tools.op_search module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.OPRecord"><code class="docutils literal notranslate"><span class="pre">OPRecord</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.OPRecord.__init__"><code class="docutils literal notranslate"><span class="pre">OPRecord.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.OPRecord.to_dict"><code class="docutils literal notranslate"><span class="pre">OPRecord.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.analyze_modality_tag"><code class="docutils literal notranslate"><span class="pre">analyze_modality_tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.analyze_resource_tag"><code class="docutils literal notranslate"><span class="pre">analyze_resource_tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.analyze_model_tags"><code class="docutils literal notranslate"><span class="pre">analyze_model_tags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.analyze_tag_with_inheritance"><code class="docutils literal notranslate"><span class="pre">analyze_tag_with_inheritance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.analyze_tag_from_cls"><code class="docutils literal notranslate"><span class="pre">analyze_tag_from_cls()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.extract_param_docstring"><code class="docutils literal notranslate"><span class="pre">extract_param_docstring()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.OPSearcher"><code class="docutils literal notranslate"><span class="pre">OPSearcher</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.OPSearcher.__init__"><code class="docutils literal notranslate"><span class="pre">OPSearcher.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.OPSearcher.search"><code class="docutils literal notranslate"><span class="pre">OPSearcher.search()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.tools.html#data_juicer.tools.op_search.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.tools.html#module-data_juicer.tools">Module contents</a></li>
 </ul>
 </li>
