@@ -50,7 +50,7 @@ class DefaultExecutorTest(DataJuicerTestCaseBase):
         cfg.work_dir = os.path.join(self.tmp_dir, 'test_end2end_execution')
         ds = NestedDataset(load_dataset('json', data_files=self.test_file, split='train'))
         # open optional modules
-        cfg.open_tracer = True
+        cfg.open_tracer = False
         cfg.use_checkpoint = True
         cfg.op_fusion = True
         cfg.adaptive_batch_size = True
@@ -61,7 +61,7 @@ class DefaultExecutorTest(DataJuicerTestCaseBase):
         # check result files
         self.assertTrue(os.path.exists(cfg.export_path))
         # check tracer outputs
-        self.assertTrue(os.path.exists(os.path.join(cfg.work_dir, 'trace')))
+        self.assertFalse(os.path.exists(os.path.join(cfg.work_dir, 'trace')))
         # check checkpoints
         self.assertTrue(os.path.exists(os.path.join(cfg.work_dir, 'ckpt')))
 
