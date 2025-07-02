@@ -1016,7 +1016,7 @@ def prepare_side_configs(ori_config: Union[str, Namespace, Dict]):
     return config
 
 
-def get_init_configs(cfg: Union[Namespace, Dict]):
+def get_init_configs(cfg: Union[Namespace, Dict], load_configs_only: bool = True):
     """
     set init configs of data-juicer for cfg
     """
@@ -1027,7 +1027,7 @@ def get_init_configs(cfg: Union[Namespace, Dict]):
     # create a temp config file
     with open(temp_file, "w") as f:
         json.dump(prepare_cfgs_for_export(cfg), f)
-    inited_dj_cfg = init_configs(["--config", temp_file], load_configs_only=True)
+    inited_dj_cfg = init_configs(["--config", temp_file], load_configs_only=load_configs_only)
     return inited_dj_cfg
 
 
