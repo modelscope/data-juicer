@@ -1315,7 +1315,7 @@ def benchmark_individual_simple(filters: List[Filter], test_data: Dict[str, Any]
     final_pass_rate = (final_passed / total_samples) * 100
 
     # Log the funnel effect
-    logger.info("📊 FUNNEL EFFECT (Individual + Combined):")
+    logger.info("📊 FUNNEL EFFECT (Individual Filters):")
     for i, result in enumerate(individual_results):
         passed = sum(result)
         pass_rate = (passed / total_samples) * 100
@@ -1357,7 +1357,7 @@ def print_filtering_comparison(stats: Dict[str, Any]):
         filtered = filter_stats["filtered"]
 
         logger.info(f"  {filter_name:25s}: {passed:8,} passed ({pass_rate:5.1f}%) | {filtered:8,} filtered")
-        cumulative_passed = passed  # Each filter processes the output of the previous
+        cumulative_passed = passed  # Track the last filter's result for comparison
 
     logger.info("Fused Filter Results:")
     fused_passed = fused_stats["passed"]
@@ -1553,9 +1553,9 @@ def main():
     parser = argparse.ArgumentParser(description="Data-Juicer Performance Benchmark")
     parser.add_argument(
         "--mode",
-        choices=["quick", "full", "optimizer"],
+        choices=["quick", "full", "optimizer", "fusion-analysis"],
         default="quick",
-        help="Benchmark mode: quick (basic demo), full (comprehensive test), optimizer (new optimizer architecture)",
+        help="Benchmark mode: quick (basic demo), full (comprehensive test), optimizer (new optimizer architecture), fusion-analysis (analyze fusion decisions)",
     )
     parser.add_argument("--samples", type=int, default=1000, help="Number of samples for testing")
     parser.add_argument("--runs", type=int, default=3, help="Number of runs for comprehensive testing")
@@ -1589,6 +1589,11 @@ def main():
             test_data = benchmark.create_realistic_test_data(args.samples)
             analyzer_insights = benchmark.get_analyzer_insights(test_data)
             return benchmark.run_pipeline_optimizer_benchmark(filters, test_data, analyzer_insights)
+
+        elif args.mode == "fusion-analysis":
+            logger.info("🔬 Running FUSION ANALYSIS (analyze fusion decisions)")
+            logger.info(f"Testing with {args.samples:,} samples...")
+            return analyze_fusion_decisions()
 
     except Exception as e:
         logger.error(f"❌ Benchmark failed with exception: {e}")
