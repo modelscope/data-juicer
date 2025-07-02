@@ -910,25 +910,6 @@ def create_simple_test_data(num_samples: int = 1000) -> Dict[str, Any]:
     return {"text": texts, Fields.stats: [{} for _ in range(num_samples)]}
 
 
-def create_lenient_funnel_filters() -> List[Filter]:
-    """Create filters with very lenient thresholds to ensure funnel effect with non-zero results."""
-
-    filters = [
-        # Filter 1: Very lenient text length (should pass ~95%)
-        TextLengthFilter(min_len=5, max_len=5000),
-        # Filter 2: Very lenient word count (should pass ~90%)
-        WordsNumFilter(min_num=2, max_num=1000),
-        # Filter 3: Very lenient character repetition (should pass ~85%)
-        CharacterRepetitionFilter(repetition_ratio=0.95),
-        # Filter 4: Very lenient word repetition (should pass ~80%)
-        WordRepetitionFilter(min_ratio=0.0, max_ratio=0.9),
-        # Filter 5: Very lenient special characters (should pass ~75%)
-        SpecialCharactersFilter(min_ratio=0.0, max_ratio=0.5),
-    ]
-
-    return filters
-
-
 def create_realistic_funnel_filters() -> List[Filter]:
     """Create filters with realistic thresholds that create a funnel effect."""
 
@@ -981,14 +962,14 @@ def run_simple_demo(num_samples: int = 1000):
     logger.info(f"Analyzer insights: {analyzer_insights}")
 
     # Create test filters
-    logger.info("Creating lenient funnel filters...")
-    filters = create_lenient_funnel_filters()
+    logger.info("Creating simple filters...")
+    filters = create_simple_filters()
     op_names = [getattr(f, "_name", type(f).__name__) for f in filters]
-    logger.info(f"Created {len(filters)} lenient filters: {op_names}")
+    logger.info(f"Created {len(filters)} simple filters: {op_names}")
 
-    # Test 1: Lenient Funnel Filters (should use parallel strategy)
+    # Test 1: Simple Filters (should use parallel strategy)
     logger.info("\n" + "=" * 60)
-    logger.info("TEST 1: Lenient Funnel Filters (Parallel Strategy)")
+    logger.info("TEST 1: Simple Filters (Parallel Strategy)")
     logger.info("=" * 60)
 
     # Collect filtering statistics with analyzer insights
