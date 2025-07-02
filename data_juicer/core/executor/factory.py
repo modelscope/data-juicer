@@ -1,15 +1,16 @@
-from typing import Union
-
-from .default_executor import DefaultExecutor
-from .ray_executor import RayExecutor
+from .base import ExecutorBase
 
 
 class ExecutorFactory:
     @staticmethod
-    def create_executor(executor_type: str) -> Union[DefaultExecutor, RayExecutor]:
+    def create_executor(executor_type: str) -> ExecutorBase:
         if executor_type in ("local", "default"):
+            from .default_executor import DefaultExecutor
+
             return DefaultExecutor()
         elif executor_type == "ray":
+            from .ray_executor import RayExecutor
+
             return RayExecutor()
         # TODO: add nemo support
         #  elif executor_type == "nemo":
