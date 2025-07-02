@@ -198,7 +198,7 @@ class Visualize:
     @staticmethod
     def setup():
         st.set_page_config(
-            page_title='InteRecipe',
+            page_title='Data-Juicer Agent',
             page_icon=':smile',
             layout='wide',
             # initial_sidebar_state="expanded",
@@ -206,7 +206,7 @@ class Visualize:
 
         readme_link = 'https://github.com/alibaba/data-juicer'
         st.markdown(
-            '<div align = "center"> <font size = "70"> InteRecipe\
+            '<div align = "center"> <font size = "70"> Data-Juicer Agent\
             </font> </div>',
             unsafe_allow_html=True,
         )
