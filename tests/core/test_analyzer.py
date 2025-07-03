@@ -7,8 +7,7 @@ from data_juicer.utils.file_utils import add_suffix_to_filename
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 root_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..')
-test_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                              '..',
+test_yaml_path = os.path.join(root_path,
                               'config',
                               'demo_4_test.yaml')
 
