@@ -126,7 +126,6 @@ jobs:
   combine-coverage:
     needs: [unittest-single, unittest-dist]
     runs-on: [GPU, unittest]
-    environment: Testing
     steps:
     - uses: actions/checkout@v3
       with:

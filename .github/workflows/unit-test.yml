@@ -123,7 +123,6 @@ jobs:
   combine-coverage:
     needs: [unittest-single, unittest-dist]
     runs-on: [GPU, unittest]
-    environment: Testing
     outputs:
       total: ${{ steps.total.outputs.total }}
     steps:
@@ -146,11 +145,13 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: coverage_report_standalone
+        path: dj-${{ github.run_id }}
 
     - name: Download Coverage Report Ray
       uses: actions/download-artifact@v4
       with:
         name: coverage_report_ray
+        path: dj-${{ github.run_id }}
 
     - name: Combine Coverage Reports
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
