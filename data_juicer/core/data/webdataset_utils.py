@@ -65,7 +65,8 @@ def _custom_default_decoder(sample: Dict[str, Any], format: Optional[Union[bool,
 
 
 def _custom_default_encoder(sample: Dict[str, Any], format: Optional[Union[str, bool]] = True):
-    """A custom encoder for webdataset, supporting images list encoding.
+    """A custom encoder for webdataset.
+    In addition to the original encoding, it also supports encode image lists and byte type images.
 
     This handles common file extensions: .txt, .cls, .cls2, .jpg,
         .png, .json, .npy, .mp, .pt, .pth, .pickle, .pkl, .jpgs (images list),
