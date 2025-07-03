@@ -6,7 +6,6 @@ from loguru import logger
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import find_files_with_suffix, is_absolute_path
-from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.registry import Registry
 
 FORMATTERS = Registry("Formatters")
@@ -212,9 +211,9 @@ def unify_format(
                 ds_dir = os.path.dirname(global_cfg.dataset_path)
         else:
             ds_dir = ""
-        image_key = global_cfg.get("image_key", SpecialTokens.image)
-        audio_key = global_cfg.get("audio_key", SpecialTokens.audio)
-        video_key = global_cfg.get("video_key", SpecialTokens.video)
+        image_key = global_cfg.get("image_key", "images")
+        audio_key = global_cfg.get("audio_key", "audios")
+        video_key = global_cfg.get("video_key", "videos")
 
         data_path_keys = []
         if image_key in dataset.features:

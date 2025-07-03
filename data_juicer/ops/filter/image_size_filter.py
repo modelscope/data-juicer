@@ -47,7 +47,12 @@ class ImageSizeFilter(Filter):
             return sample
 
         # for size calculation, no need to load images into memory
-        sample[Fields.stats][StatsKeys.image_sizes] = [get_file_size(img_path) for img_path in sample[self.image_key]]
+        if self.image_bytes_key in sample and len(sample[self.image_bytes_key]) == len(sample[self.image_key]):
+            sample[Fields.stats][StatsKeys.image_sizes] = [len(img_bytes) for img_bytes in sample[self.image_bytes_key]]
+        else:
+            sample[Fields.stats][StatsKeys.image_sizes] = [
+                get_file_size(img_path) for img_path in sample[self.image_key]
+            ]
 
         return sample
 

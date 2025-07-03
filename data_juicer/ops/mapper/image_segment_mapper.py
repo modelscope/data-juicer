@@ -54,7 +54,9 @@ class ImageSegmentMapper(Mapper):
             return sample
 
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         model = get_model(self.model_key, rank=rank, use_cuda=self.use_cuda())
         sample[Fields.meta][MetaKeys.bbox_tag] = []

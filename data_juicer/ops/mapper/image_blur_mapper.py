@@ -59,7 +59,9 @@ class ImageBlurMapper(Mapper):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
         processed = {}
         for image_key in loaded_image_keys:
             if image_key in processed:
@@ -69,19 +71,31 @@ class ImageBlurMapper(Mapper):
                 processed[image_key] = image_key
             else:
                 blured_image_key = transfer_filename(image_key, OP_NAME, **self._init_parameters)
-                if not os.path.exists(blured_image_key) or blured_image_key not in images:
+                if blured_image_key != image_key:
+                    # the image_key is a valid local path, we can update it
+                    if not os.path.exists(blured_image_key) or blured_image_key not in images:
+                        blured_image = images[image_key].convert("RGB").filter(self.blur)
+                        images[blured_image_key] = blured_image
+                        blured_image.save(blured_image_key)
+                        if context:
+                            # update context
+                            sample[Fields.context][blured_image_key] = blured_image
+                    processed[image_key] = blured_image_key
+                else:
                     blured_image = images[image_key].convert("RGB").filter(self.blur)
-                    images[blured_image_key] = blured_image
-                    blured_image.save(blured_image_key)
+                    images[image_key] = blured_image
+                    processed[image_key] = image_key
                     if context:
-                        sample[Fields.context][blured_image_key] = blured_image
-                processed[image_key] = blured_image_key
+                        # update context
+                        sample[Fields.context][image_key] = blured_image
 
         # when the file is modified, its source file needs to be updated.
         for i, value in enumerate(loaded_image_keys):
             if sample[Fields.source_file][i] != value:
                 if processed[value] != value:
                     sample[Fields.source_file][i] = value
+            if self.image_bytes_key in sample and i < len(sample[self.image_bytes_key]):
+                sample[self.image_bytes_key][i] = images[processed[value]].tobytes()
 
         sample[self.image_key] = [processed[key] for key in loaded_image_keys]
         return sample

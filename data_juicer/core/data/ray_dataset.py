@@ -16,7 +16,6 @@ from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import is_remote_path
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.process_utils import calculate_np
 
 ray = LazyLoader("ray")
@@ -53,9 +52,9 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     path_keys = []
     columns = dataset.columns()
     for key in [
-        cfg.get("video_key", SpecialTokens.video),
-        cfg.get("image_key", SpecialTokens.image),
-        cfg.get("audio_key", SpecialTokens.audio),
+        cfg.get("video_key", "videos"),
+        cfg.get("image_key", "images"),
+        cfg.get("audio_key", "audios"),
     ]:
         if key in columns:
             path_keys.append(key)

@@ -225,6 +225,12 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 help="Key name of field to store the list of sample image paths.",  # noqa: E251
             )
             parser.add_argument(
+                "--image_bytes_key",
+                type=str,
+                default="image_bytes",
+                help="Key name of field to store the list of sample image bytes.",  # noqa: E251
+            )
+            parser.add_argument(
                 "--image_special_token",
                 type=str,
                 default=SpecialTokens.image,
@@ -663,6 +669,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         "image_key": cfg.image_key,
         "audio_key": cfg.audio_key,
         "video_key": cfg.video_key,
+        "image_bytes_key": cfg.image_bytes_key,
         "num_proc": cfg.np,
         "turbo": cfg.turbo,
         "skip_op_error": cfg.skip_op_error,

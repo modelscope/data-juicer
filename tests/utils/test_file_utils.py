@@ -56,10 +56,18 @@ class FileUtilsTest(DataJuicerTestCaseBase):
         self.assertTrue(os.path.exists(self.temp_output_path))
 
     def test_transfer_filename(self):
+        # test existing file
+        with open(os.path.join(self.temp_output_path, 'abc.jpg'), 'w') as f:
+            f.write('test')
         self.assertTrue(
             re.match(
                 os.path.join(self.temp_output_path, Fields.multimodal_data_output_dir, 'op1', 'abc__dj_hash_#(.*?)#.jpg'),
                 transfer_filename(os.path.join(self.temp_output_path, 'abc.jpg'), 'op1')))
+        # test non-existing file
+        self.assertTrue(
+            re.match(
+                os.path.join(self.temp_output_path, 'non-existing.jpg'),
+                transfer_filename(os.path.join(self.temp_output_path, 'non-existing.jpg'), 'op1')))
 
     def test_copy_data(self):
         tgt_fn = 'test.txt'

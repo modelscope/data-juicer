@@ -147,6 +147,8 @@ class OP:
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
+            to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
@@ -160,6 +162,9 @@ class OP:
         self.image_key = kwargs.get("image_key", "images")
         self.audio_key = kwargs.get("audio_key", "audios")
         self.video_key = kwargs.get("video_key", "videos")
+
+        # extra mm bytes keys
+        self.image_bytes_key = kwargs.get("image_bytes_key", "image_bytes")
 
         self.query_key = kwargs.get("query_key", "query")
         self.response_key = kwargs.get("response_key", "response")
@@ -293,6 +298,8 @@ class Mapper(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
+            to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
@@ -384,6 +391,8 @@ class Filter(OP):
         :param audio_key: the key name of field that stores sample audio list
             to be processed
         :param video_key: the key name of field that stores sample video list
+            to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
             to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
@@ -494,6 +503,8 @@ class Deduplicator(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
+            to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
@@ -558,6 +569,8 @@ class Selector(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
+            to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
@@ -595,6 +608,8 @@ class Grouper(OP):
         :param audio_key: the key name of field that stores sample audio list
             to be processed
         :param video_key: the key name of field that stores sample video list
+            to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
             to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
@@ -636,6 +651,8 @@ class Aggregator(OP):
         :param audio_key: the key name of field that stores sample audio list
             to be processed
         :param video_key: the key name of field that stores sample video list
+            to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
             to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
