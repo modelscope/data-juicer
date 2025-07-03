@@ -53,13 +53,14 @@ jobs:
           docker compose exec -e OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ray-head bash -c 'python tests/run.py --tag standalone --mode partial'
         fi
         docker compose exec ray-head bash -c 'coverage combine'
+        docker compose exec ray-head bash -c 'mv .coverage .coverage.standalone'
 
     - name: Upload coverage report of standalone
       uses: actions/upload-artifact@v4
       with:
         name: coverage_report_standalone
         include-hidden-files: true
-        path: dj-${{ github.run_id }}/.coverage
+        path: dj-${{ github.run_id }}/.coverage.standalone
 
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
@@ -102,13 +103,14 @@ jobs:
       run: |
         docker compose exec ray-head bash -c 'python tests/run.py --tag ray --mode partial'
         docker compose exec ray-head bash -c 'coverage combine'
+        docker compose exec ray-head bash -c 'mv .coverage .coverage.ray'
 
     - name: Upload coverage report of ray
       uses: actions/upload-artifact@v4
       with:
         name: coverage_report_ray
         include-hidden-files: true
-        path: dj-${{ github.run_id }}/.coverage
+        path: dj-${{ github.run_id }}/.coverage.ray
 
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
@@ -145,15 +147,11 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: coverage_report_standalone
-        include-hidden-files: true
-        path: dj-${{ github.run_id }}/.coverage.standalone
 
     - name: Download Coverage Report Ray
       uses: actions/download-artifact@v4
       with:
         name: coverage_report_ray
-        include-hidden-files: true
-        path: dj-${{ github.run_id }}/.coverage.ray
 
     - name: Combine Coverage Reports
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
