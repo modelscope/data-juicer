@@ -712,6 +712,7 @@ process:
   - llm_difficulty_score_filter:                            # filter to keep sample with high difficulty score estimated by LLM.
       api_or_hf_model: 'gpt-4o'                               # API or huggingface model name.
       min_score: 0.5                                          # The lowest difficulty score threshold to keep the sample.
+      is_hf_model: false                                      # Indicates if the model is from Hugging Face.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       input_keys: ['text']                                    # Sub set of keys in the sample. Support data with multi fields such as 'query', 'analysis' and 'answer' in RFT data.
@@ -726,6 +727,7 @@ process:
   - llm_quality_score_filter:                               # filter to keep sample with high quality score estimated by LLM.
       api_or_hf_model: 'gpt-4o'                               # API or huggingface model name.
       min_score: 0.5                                          # The lowest quality score threshold to keep the sample.
+      is_hf_model: false                                      # Indicates if the model is from Hugging Face.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       input_keys: ['text']                                    # Sub set of keys in the sample. Support data with multi fields such as 'query', 'analysis' and 'answer' in RFT data.
