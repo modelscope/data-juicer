@@ -5,6 +5,12 @@ from data_juicer.core import DefaultExecutor, NestedDataset
 from data_juicer.config import init_configs
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
+root_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..')
+test_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                              '..',
+                              'config',
+                              'demo_4_test.yaml')
+
 class DefaultExecutorTest(DataJuicerTestCaseBase):
     test_file = 'text_only_2.3k.jsonl'
 
@@ -35,7 +41,7 @@ class DefaultExecutorTest(DataJuicerTestCaseBase):
             os.system(f'rm -rf {self.tmp_dir}')
 
     def test_end2end_execution(self):
-        cfg = init_configs(['--config', 'tests/config/demo_4_test.yaml'])
+        cfg = init_configs(['--config', test_yaml_path])
         cfg.export_path = os.path.join(self.tmp_dir, 'test_end2end_execution', 'res.jsonl')
         cfg.work_dir = os.path.join(self.tmp_dir, 'test_end2end_execution')
         executor = DefaultExecutor(cfg)
@@ -45,7 +51,7 @@ class DefaultExecutorTest(DataJuicerTestCaseBase):
         self.assertTrue(os.path.exists(cfg.export_path))
 
     def test_end2end_execution_with_existing_dataset(self):
-        cfg = init_configs(['--config', 'tests/config/demo_4_test.yaml'])
+        cfg = init_configs(['--config', test_yaml_path])
         cfg.export_path = os.path.join(self.tmp_dir, 'test_end2end_execution_with_existing_dataset', 'res.jsonl')
         cfg.work_dir = os.path.join(self.tmp_dir, 'test_end2end_execution')
         ds = NestedDataset(load_dataset('json', data_files=self.test_file, split='train'))
@@ -67,27 +73,27 @@ class DefaultExecutorTest(DataJuicerTestCaseBase):
 
     def test_sample_data(self):
         ds_length = 6
-        cfg = init_configs(['--config', 'tests/config/demo_4_test.yaml'])
+        cfg = init_configs(['--config', test_yaml_path])
         executor = DefaultExecutor(cfg)
         res_ds = executor.sample_data(sample_ratio=0.5)
         self.assertEqual(len(res_ds) * 2, ds_length)
 
     def test_sample_data_with_existing_dataset(self):
-        cfg = init_configs(['--config', 'tests/config/demo_4_test.yaml'])
+        cfg = init_configs(['--config', test_yaml_path])
         ds = NestedDataset(load_dataset('json', data_files=self.test_file, split='train'))
         executor = DefaultExecutor(cfg)
         res_ds = executor.sample_data(ds, sample_algo='frequency_specified_field_selector', field_key='id', top_ratio=0.5)
         self.assertEqual(len(res_ds) * 2, len(ds))
 
     def test_sample_data_with_existing_dataset_topk(self):
-        cfg = init_configs(['--config', 'tests/config/demo_4_test.yaml'])
+        cfg = init_configs(['--config', test_yaml_path])
         ds = NestedDataset(load_dataset('json', data_files=self.test_file, split='train'))
         executor = DefaultExecutor(cfg)
         res_ds = executor.sample_data(ds, sample_algo='topk_specified_field_selector', field_key='id', topk=100)
         self.assertEqual(len(res_ds), 100)
 
     def test_sample_data_unknow_algo(self):
-        cfg = init_configs(['--config', 'tests/config/demo_4_test.yaml'])
+        cfg = init_configs(['--config', test_yaml_path])
         executor = DefaultExecutor(cfg)
         with self.assertRaises(ValueError):
             executor.sample_data(sample_algo='unknown_algo')
