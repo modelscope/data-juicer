@@ -118,7 +118,6 @@ def _custom_default_encoder(sample: Dict[str, Any], format: Optional[Union[str, 
                 value.save(stream, format=extension_to_format.get(extension.lower(), extension))
                 return stream.getvalue()
 
-            assert isinstance(value, list)
             import pickle
 
             sample[key] = pickle.dumps([_encode_image(v) for v in value])
