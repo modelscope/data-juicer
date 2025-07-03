@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from loguru import logger
@@ -9,10 +10,11 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 # @unittest.skip('unknown vllm connection error')
 class GenerateQAFromExamplesMapperTest(DataJuicerTestCaseBase):
     text_key = 'text'
+    root_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', '..')
 
     def _run_op(self, enable_vllm=False, sampling_params=None, num_proc=1):
         op = GenerateQAFromExamplesMapper(
-            seed_file='demos/data/demo-dataset-chatml.jsonl',
+            seed_file=os.path.join(self.root_path, 'demos/data/demo-dataset-chatml.jsonl'),
             example_num=3,
             enable_vllm=enable_vllm,
             sampling_params=sampling_params,
