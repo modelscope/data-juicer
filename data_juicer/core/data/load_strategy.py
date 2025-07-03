@@ -1,11 +1,11 @@
 import fnmatch
 import os
 from abc import ABC, abstractmethod
-from argparse import Namespace
 from dataclasses import dataclass
 from typing import Dict, Optional, Type
 
 import datasets
+from jsonargparse import Namespace
 from loguru import logger
 
 from data_juicer.core.data import DJDataset

@@ -1,10 +1,10 @@
 import os
 import shlex
-from argparse import Namespace
 from typing import List, Tuple
 
 import numpy as np
 from datasets import concatenate_datasets
+from jsonargparse import Namespace
 from loguru import logger
 
 from data_juicer.core.data import DJDataset, NestedDataset

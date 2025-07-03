@@ -1,10 +1,10 @@
 import json
 import os
-from argparse import Namespace
 from copy import deepcopy
 
 from datasets import Dataset, concatenate_datasets
 from datasets.config import DEFAULT_MAX_BATCH_SIZE
+from jsonargparse import Namespace
 
 from data_juicer.analysis.measure import RelatedTTestMeasure
 from data_juicer.core.monitor import Monitor

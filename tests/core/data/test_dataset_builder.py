@@ -1,7 +1,7 @@
 import os
 import unittest
 from unittest.mock import patch
-from argparse import Namespace
+from jsonargparse import Namespace
 from contextlib import redirect_stdout
 from io import StringIO
 from data_juicer.config import init_configs
