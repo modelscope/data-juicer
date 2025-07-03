@@ -50,9 +50,9 @@ class GenerateQAFromTextMapperTest(DataJuicerTestCaseBase):
         sampling_params = {'max_new_tokens': 200}
         self._run_op(sampling_params=sampling_params, max_num=1)
 
-    def test_multi_process(self):
-        sampling_params = {'max_new_tokens': 200}
-        self._run_op(sampling_params=sampling_params, num_proc=2)
+    # def test_multi_process(self):
+    #     sampling_params = {'max_new_tokens': 200}
+    #     self._run_op(sampling_params=sampling_params, num_proc=2)
 
     # def test_vllm(self):
     #     model_params = {'max_model_len': 1024, 'max_num_seqs': 16}

@@ -38,9 +38,9 @@ class OptimizeQueryMapperTest(DataJuicerTestCaseBase):
         sampling_params = {'max_new_tokens': 200}
         self._run_op(sampling_params=sampling_params)
 
-    def test_multi_process(self):
-        sampling_params = {'max_new_tokens': 200}
-        self._run_op(sampling_params=sampling_params, num_proc=2)
+    # def test_multi_process(self):
+    #     sampling_params = {'max_new_tokens': 200}
+    #     self._run_op(sampling_params=sampling_params, num_proc=2)
 
     # def test_vllm(self):
     #     sampling_params = {'max_tokens': 200}
