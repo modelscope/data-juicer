@@ -108,6 +108,7 @@ def main():
 
     cov.stop()
     cov.save()
+    cov.combine()
 
     if not res.wasSuccessful():
         exit(1)
