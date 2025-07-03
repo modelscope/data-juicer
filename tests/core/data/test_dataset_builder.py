@@ -21,14 +21,20 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         """Setup basic configuration for tests"""
+        super().setUp()
         self.base_cfg = Namespace()
         self.base_cfg.dataset_path = None
         self.executor_type = 'default'
+
+        self._original_cwd = os.getcwd()
 
         # Get the directory where this test file is located
         test_file_dir = os.path.dirname(os.path.abspath(__file__))
         os.chdir(test_file_dir)
 
+    def tearDown(self):
+        super().tearDown()
+        os.chdir(self._original_cwd)
 
     def test_rewrite_cli_datapath_local_single_file(self):
         dataset_path = os.path.join(WORK_DIR, "test_data/sample.txt")

@@ -21,6 +21,8 @@ class DefaultExecutorTest(DataJuicerTestCaseBase):
         download_link = f'http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/unittest_data/{cls.test_file}'
         os.system(f'wget {download_link}')
 
+        print(f"CURRENT DIR: {os.getcwd()}")
+
     @classmethod
     def tearDownClass(cls, hf_model_name=None) -> None:
         # remove test dataset
