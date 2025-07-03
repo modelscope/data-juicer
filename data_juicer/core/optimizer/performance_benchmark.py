@@ -1158,6 +1158,133 @@ class PerformanceBenchmark:
 
             logger.info(f"🏆 Best strategy:      {best_strategy}")
 
+        # --- Validation: Compare results between individual and fused ---
+        logger.info("\n🔎 VALIDATING FUSED RESULTS AGAINST INDIVIDUAL EXECUTION")
+        individual_mask = self.get_final_mask_from_filters(filters, test_data)
+        fused_mask = self.get_final_mask_from_fused(filters, test_data, analyzer_insights)
+        if individual_mask == fused_mask:
+            logger.info("✅ Fused results match individual execution!")
+            mismatches = []
+        else:
+            mismatches = [i for i, (a, b) in enumerate(zip(individual_mask, fused_mask)) if a != b]
+            logger.warning(
+                f"❌ Fused results do NOT match individual execution! {len(mismatches)} mismatches out of {len(individual_mask)} samples."
+            )
+            logger.warning(f"First 5 mismatches: {mismatches[:5]}")
+            # Print debug info for first 3 mismatches
+            for idx in mismatches[:3]:
+                logger.warning(f"--- Mismatch at index {idx} ---")
+                logger.warning(f"Input text: {test_data['text'][idx]}")
+
+                # Detailed individual execution debugging
+                logger.warning("🔍 INDIVIDUAL EXECUTION (step-by-step):")
+                data = test_data.copy()
+                ind_masks = []
+                logger.warning(f"  Starting with {len(filters)} filters")
+
+                for i, filter_op in enumerate(filters):
+
+                    if hasattr(filter_op, "compute_stats_batched"):
+                        data_before = data.copy()
+                        data = filter_op.compute_stats_batched(data)
+                        logger.warning(f"    Stats computed: data keys={list(data.keys())}")
+                        # Check if data was modified
+                        if data_before != data:
+                            logger.warning(f"    Data was modified during stats computation: {data_before} -> {data}")
+                        else:
+                            logger.warning("    Data was not modified during stats computation")
+
+                    if hasattr(filter_op, "process_batched"):
+                        result = list(filter_op.process_batched(data))
+                        # Handle both boolean masks and text content
+                        if result and isinstance(result[0], bool):
+                            mask = result
+                        else:
+                            # If it returns text content, create a mask based on non-empty results
+                            mask = [bool(item) for item in result]
+
+                        ind_masks.append(mask[idx])
+                        logger.warning(f"    Result for sample {idx}: {mask[idx]} (passed={mask[idx]})")
+                        logger.warning(f"    Overall: {sum(mask)}/{len(mask)} samples passed")
+                        logger.warning(f"    Current masks so far: {ind_masks}")
+                    else:
+                        logger.warning("    No process_batched method found")
+                        ind_masks.append(True)  # Assume pass if no process method
+
+                logger.warning(f"  Individual final result: {all(ind_masks)} (all masks: {ind_masks})")
+
+                # Detailed fused execution debugging
+                logger.warning("🔗 FUSED EXECUTION (step-by-step):")
+                pipeline_config = self._build_pipeline_config_from_filters(filters)
+                from data_juicer.core.pipeline_ast import PipelineAST
+
+                ast = PipelineAST()
+                ast.build_from_config(pipeline_config)
+                from data_juicer.core.optimizer.filter_fusion_strategy import (
+                    FilterFusionStrategy,
+                )
+                from data_juicer.core.optimizer.mapper_fusion_strategy import (
+                    MapperFusionStrategy,
+                )
+
+                strategies = [FilterFusionStrategy(analyzer_insights=analyzer_insights), MapperFusionStrategy()]
+                optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
+                optimized_ast = optimizer.optimize(ast)
+                optimized_ops = self._convert_ast_to_operations(optimized_ast)
+
+                logger.warning(f"  Original filters: {len(filters)}")
+                logger.warning(f"  Optimized ops: {len(optimized_ops)}")
+                logger.warning(f"  Optimization ratio: {len(optimized_ops)/len(filters):.2f}x")
+
+                data_fused = test_data.copy()
+                mask_fused = [True] * len(data_fused["text"])
+                fused_masks = []
+                from data_juicer.ops import load_ops
+
+                for j, op_config in enumerate(optimized_ops):
+                    logger.warning(f"  Optimized Op {j+1}/{len(optimized_ops)}: {op_config}")
+                    loaded_ops = load_ops([op_config])
+                    if loaded_ops:
+                        op = loaded_ops[0]
+                        logger.warning(f"    Loaded op: {type(op).__name__}")
+
+                        if hasattr(op, "compute_stats_batched"):
+                            data_fused_before = data_fused.copy()
+                            data_fused = op.compute_stats_batched(data_fused)
+                            logger.warning(f"    Stats computed: data keys={list(data_fused.keys())}")
+                            # Check if data was modified
+                            if data_fused_before != data_fused:
+                                logger.warning("    Data was modified during stats computation")
+
+                        if hasattr(op, "process_batched"):
+                            result = list(op.process_batched(data_fused))
+                            # Handle both boolean masks and text content
+                            if result and isinstance(result[0], bool):
+                                op_mask = result
+                            else:
+                                # If it returns text content, create a mask based on non-empty results
+                                op_mask = [bool(item) for item in result]
+
+                            fused_masks.append(op_mask[idx])
+                            mask_fused = [m and o for m, o in zip(mask_fused, op_mask)]
+                            logger.warning(f"    Result for sample {idx}: {op_mask[idx]} (passed={op_mask[idx]})")
+                            logger.warning(f"    Overall: {sum(op_mask)}/{len(op_mask)} samples passed")
+                            logger.warning(f"    Current masks so far: {fused_masks}")
+                        else:
+                            logger.warning("    No process_batched method found")
+                            fused_masks.append(True)
+                    else:
+                        logger.warning("    Failed to load op from config")
+                        fused_masks.append(True)
+
+                logger.warning(f"  Fused final result: {mask_fused[idx]} (all masks: {fused_masks})")
+                logger.warning(f"  Comparison: Individual={all(ind_masks)} vs Fused={mask_fused[idx]}")
+                logger.warning("--- End of mismatch analysis ---")
+        results["validation"] = {
+            "match": individual_mask == fused_mask,
+            "mismatches": mismatches if "mismatches" in locals() else [],
+        }
+
         return results
 
     def get_quick_test_filters(self) -> List[Filter]:
@@ -1208,6 +1335,76 @@ class PerformanceBenchmark:
         except Exception as e:
             logger.warning(f"⚠️  Analyzer failed: {e}")
             return None
+
+    def get_final_mask_from_filters(self, filters: List[Filter], test_data: Dict[str, Any]) -> list:
+        """Compute the final boolean mask for each sample using individual filter execution (AND)."""
+        data = test_data.copy()
+        masks = []
+        for filter_op in filters:
+            if hasattr(filter_op, "compute_stats_batched"):
+                data = filter_op.compute_stats_batched(data)
+            if hasattr(filter_op, "process_batched"):
+                result = list(filter_op.process_batched(data))
+                # Handle both boolean masks and text content
+                if result and isinstance(result[0], bool):
+                    mask = result
+                else:
+                    # If it returns text content, create a mask based on non-empty results
+                    mask = [bool(item) for item in result]
+                masks.append(mask)
+        # AND across all filters
+        if masks:
+            final_mask = [all(vals) for vals in zip(*masks)]
+        else:
+            final_mask = [True] * len(data["text"])
+        return final_mask
+
+    def get_final_mask_from_fused(
+        self, filters: List[Filter], test_data: Dict[str, Any], analyzer_insights=None
+    ) -> list:
+        """Compute the final boolean mask for each sample using fused execution (with fusion strategies)."""
+        # Use the same logic as run_fused_filters_benchmark, but return the mask
+        pipeline_config = self._build_pipeline_config_from_filters(filters)
+        from data_juicer.core.pipeline_ast import PipelineAST
+
+        ast = PipelineAST()
+        ast.build_from_config(pipeline_config)
+        from data_juicer.core.optimizer.filter_fusion_strategy import (
+            FilterFusionStrategy,
+        )
+        from data_juicer.core.optimizer.mapper_fusion_strategy import (
+            MapperFusionStrategy,
+        )
+        from data_juicer.core.optimizer.optimizer import PipelineOptimizer
+
+        strategies = [FilterFusionStrategy(analyzer_insights=analyzer_insights), MapperFusionStrategy()]
+        optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
+        optimized_ast = optimizer.optimize(ast)
+        optimized_ops = self._convert_ast_to_operations(optimized_ast)
+        data = test_data.copy()
+        from data_juicer.ops import load_ops
+
+        for op_config in optimized_ops:
+            loaded_ops = load_ops([op_config])
+            if loaded_ops:
+                op = loaded_ops[0]
+                if hasattr(op, "compute_stats_batched"):
+                    data = op.compute_stats_batched(data)
+                if hasattr(op, "process_batched_for_validation"):
+                    # Use the new validation method that returns boolean masks
+                    mask = op.process_batched_for_validation(data)
+                    return mask
+                elif hasattr(op, "process_batched"):
+                    result = list(op.process_batched(data))
+                    # Handle both boolean masks and text content
+                    if result and isinstance(result[0], bool):
+                        return result
+                    else:
+                        # If it returns text content, create a mask based on non-empty results
+                        return [bool(item) for item in result]
+
+        # If no ops were processed, return all True
+        return [True] * len(data["text"])
 
 
 def create_simple_test_data(num_samples: int = 1000) -> Dict[str, Any]:
