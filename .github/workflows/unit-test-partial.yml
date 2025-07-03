@@ -120,3 +120,60 @@ jobs:
       if: always()
       run: |
         rm -rf  dj-${{ github.run_id }}
+
+  combine-coverage:
+    needs: [unittest-single, unittest-dist]
+    runs-on: [GPU, unittest]
+    environment: Testing
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        path: dj-${{ github.run_id }}
+        fetch-depth: 0
+
+    - name: Setup docker compose
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose up -d
+
+    - name: Install coverage
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose exec ray-head bash -c '/root/.local/bin/uv pip install --system coverage'
+
+    - name: Download Coverage Report Standalone
+      uses: actions/download-artifact@v4
+      with:
+        name: coverage_report_standalone
+        include-hidden-files: true
+        path: dj-${{ github.run_id }}/.coverage.standalone
+
+    - name: Download Coverage Report Ray
+      uses: actions/download-artifact@v4
+      with:
+        name: coverage_report_ray
+        include-hidden-files: true
+        path: dj-${{ github.run_id }}/.coverage.ray
+
+    - name: Combine Coverage Reports
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose exec ray-head bash -c 'coverage combine'
+
+    - name: Upload Overall Coverage Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage_report_all
+        include-hidden-files: true
+        path: dj-${{ github.run_id }}/.coverage
+
+    - name: Remove docker compose
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      if: always()
+      run: |
+        docker compose down --remove-orphans
+
+    - name: Cleanup workspace
+      if: always()
+      run: |
+        rm -rf  dj-${{ github.run_id }}
