@@ -98,6 +98,11 @@ dj-analyze --auto --dataset_path xx.jsonl [--auto_num 1000]
 * **注意**：Analyzer 只用于能在 stats 字段里产出统计信息的 Filter 算子和能在 meta 字段里产出 tags 或类别标签的其他算子。除此之外的其他的算子会在分析过程中被忽略。我们使用以下两种注册器来装饰相关的算子：
   * `NON_STATS_FILTERS`：装饰那些**不能**产出任何统计信息的 Filter 算子。
   * `TAGGING_OPS`：装饰那些能在 meta 字段中产出 tags 或类别标签的算子。
+* 有时会产生 "Glyph missing" 的警告，并且在分析结果图表中会出现一些非法字符。用户可以使用环境变量 `ANALYZER_FONT` 来指定合适的字体。例如：
+```shell
+export ANALYZER_FONT="Heiti TC"  # 使用黑体来支持中文字符，这也是 Analyzer 的默认字体
+python tools/analyze_data.py --config configs/demo/analyzer.yaml
+```
 
 ## 数据可视化
 

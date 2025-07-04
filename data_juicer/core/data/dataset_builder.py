@@ -1,10 +1,10 @@
 import os
 import shlex
-from argparse import Namespace
 from typing import List, Tuple
 
 import numpy as np
 from datasets import concatenate_datasets
+from jsonargparse import Namespace
 from loguru import logger
 
 from data_juicer.core.data import DJDataset, NestedDataset
@@ -25,6 +25,19 @@ class DatasetBuilder(object):
         self.cfg = cfg
         self.executor_type = executor_type
         self.require_dataset_arg = False
+
+        # initialize data validators
+        self.validators = []
+        if hasattr(cfg, "validators"):
+            for validator_config in cfg.validators:
+                if "type" not in validator_config:
+                    raise ValueError('Validator config must have a "type" key')
+                validator_type = validator_config["type"]
+                validator_cls = DataValidatorRegistry.get_validator(validator_type)
+                if validator_cls:
+                    self.validators.append(validator_cls(validator_config))
+                else:
+                    raise ValueError(f"No data validator found for {validator_type}")
 
         # priority: generated_dataset_config > dataset_path > dataset
         if hasattr(cfg, "generated_dataset_config") and cfg.generated_dataset_config:
@@ -71,11 +84,10 @@ class DatasetBuilder(object):
             # initialize data loading strategy
             data_type = ds_config.get("type", None)
             data_source = ds_config.get("source", None)
-            stra = DataLoadStrategyRegistry.get_strategy_class(self.executor_type, data_type, data_source)(
-                ds_config, cfg=self.cfg
-            )
+            stra = DataLoadStrategyRegistry.get_strategy_class(self.executor_type, data_type, data_source)
             if stra is None:
                 raise ValueError(f"No data load strategy found for" f" {data_type} {data_source}")
+            stra = stra(ds_config, cfg=self.cfg)
             self.load_strategies.append(stra)
 
         # failed to initialize any load strategy
@@ -92,19 +104,6 @@ class DatasetBuilder(object):
         else:
             self.weights = [1.0 for stra in self.load_strategies]
             self.sample_numbers = [None for stra in self.load_strategies]
-
-        # initialize data validators
-        self.validators = []
-        if hasattr(cfg, "validators"):
-            for validator_config in cfg.validators:
-                if "type" not in validator_config:
-                    raise ValueError('Validator config must have a "type" key')
-                validator_type = validator_config["type"]
-                validator_cls = DataValidatorRegistry.get_validator(validator_type)
-                if validator_cls:
-                    self.validators.append(validator_cls(validator_config))
-                else:
-                    raise ValueError(f"No data validator found for {validator_type}")
 
     def load_dataset(self, **kwargs) -> DJDataset:
         if self.require_dataset_arg:

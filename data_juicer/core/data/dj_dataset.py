@@ -35,7 +35,6 @@ class DJDataset(ABC):
     @abstractmethod
     def process(self, operators, *, exporter=None, checkpointer=None, tracer=None) -> DJDataset:  # TODO: add type hint
         """process a list of operators on the dataset."""
-        pass
 
     @abstractmethod
     def schema(self) -> Schema:
@@ -44,7 +43,6 @@ class DJDataset(ABC):
         Returns:
             Schema: Dataset schema containing column names and types
         """
-        pass
 
     @abstractmethod
     def get(self, k: int) -> List[Dict[str, Any]]:
@@ -56,7 +54,6 @@ class DJDataset(ABC):
         Returns:
             List[Any]: A list of rows from the dataset.
         """
-        pass
 
     @abstractmethod
     def get_column(self, column: str, k: Optional[int] = None) -> List[Any]:
@@ -73,12 +70,10 @@ class DJDataset(ABC):
             KeyError: If column doesn't exist in dataset
             ValueError: If k is negative
         """
-        pass
 
     @abstractmethod
     def to_list(self) -> list:
         """Convert the current dataset to a Python list."""
-        pass
 
     def contain_column(self, column: str) -> bool:
         """Check whether the dataset contains a specific column/field.

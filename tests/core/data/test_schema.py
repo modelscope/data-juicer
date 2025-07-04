@@ -1,7 +1,7 @@
 import unittest
 from data_juicer.utils.unittest_utils import TEST_TAG
 from datasets import Dataset
-from typing import List
+from typing import List, Any
 from data_juicer.core.data.schema import Schema
 from data_juicer.core.data import NestedDataset
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
@@ -263,6 +263,49 @@ class TestSchema(DataJuicerTestCaseBase):
             isinstance(row['flag'], schema.column_types['flag'])
             for row in rows
         ))
+
+    def test_type_mapping(self):
+        # hf type
+        from datasets import Value, Sequence, Array2D, ClassLabel
+        test_mapping = [
+            (Value('string'), str),
+            (Sequence(Value('int32')), List[int]),
+            (Array2D((2, 3), dtype='float32'), List[float]),
+            ({'a': Value('bool')}, Schema(column_types={'a': bool}, columns=['a'])),
+            (ClassLabel(num_classes=2), int),
+            (None, Any)
+        ]
+        for ori, tgt in test_mapping:
+            self.assertEqual(Schema.map_hf_type_to_python(ori), tgt)
+
+        # ray/arrow type
+        import pyarrow as pa
+        test_mapping = [
+            (pa.string(), str),
+            (pa.list_(pa.int32()), List[int]),
+            (pa.struct({'a': pa.bool_()}), Schema(column_types={'a': bool}, columns=['a'])),
+            (pa.binary(10), bytes),
+            (pa.float64(), float),
+            (pa.list_(pa.float64()), List[float]),
+            (pa.map_(pa.string(), pa.int32()), dict),
+            (pa.date32(), Any)
+        ]
+        for ori, tgt in test_mapping:
+            self.assertEqual(Schema.map_ray_type_to_python(ori), tgt)
+
+    def test_missing_column(self):
+        with self.assertRaises(ValueError):
+            Schema(column_types={'a': int}, columns=['a', 'b'])
+
+    def test_convert_to_str(self):
+        s = Schema(column_types={'a': int}, columns=['a'])
+        ss = str(s)
+        self.assertIsInstance(ss, str)
+        self.assertIn("-" * 40, ss)
+        self.assertIn("Dataset Schema", ss)
+        for col in s.columns:
+            self.assertIn(col, ss)
+
 
 if __name__ == '__main__':
     unittest.main()

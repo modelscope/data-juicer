@@ -68,7 +68,6 @@ class BaseConversationValidator(DataValidator):
     @abstractmethod
     def validate_conversation(self, data: Dict) -> None:
         """Validate specific conversation format"""
-        pass
 
 
 @DataValidatorRegistry.register("swift_messages")

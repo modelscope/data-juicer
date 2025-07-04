@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import os
-from argparse import Namespace
 from functools import partial
 from typing import Any, Dict, List, Literal, Optional, Union
 
 import pyarrow
+from jsonargparse import Namespace
 from loguru import logger
 
 from data_juicer import cuda_device_count

@@ -1,10 +1,9 @@
 import copy
 import json
 import sys
-from argparse import Namespace
 
 import yaml
-from jsonargparse import namespace_to_dict
+from jsonargparse import Namespace, namespace_to_dict
 from loguru import logger
 
 from data_juicer.config import init_configs, prepare_cfgs_for_export
