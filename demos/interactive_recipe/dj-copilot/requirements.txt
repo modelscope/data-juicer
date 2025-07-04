@@ -14,4 +14,3 @@ oss2==2.18.5
 numpy==1.26.4
 regex==2024.9.11
 modelscope_studio==0.5.0
-py-data-juicer[dev]==1.4.0

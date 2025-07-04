@@ -16,8 +16,18 @@ Before running, set below environment variables:
 export DASHSCOPE_API_KEY=your_dashscope_key
 ````
 
+Start the copilot server (replace the `PATH_TO_DJ_REPO` variable in `setup_server.sh` with the absolute path to your data-juicer repository):
+
+```bash
+cd dj-copilot
+as_scripts/setup_server.sh
+```
+
+Note: It is strongly recommended to create a clean data-juicer repository to avoid potential issues. When you change the repository path, make sure to update the `input_dir` field in each knowledge base entry in `dj-copilot/configs/as_config/as_knowledge_configs/knowledge_config.json` accordingly.
+
 Launch the demo with streamlit:
 ```bash
+cd ..
 streamlit run app.py
 ```
 
