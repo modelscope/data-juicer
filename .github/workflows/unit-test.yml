@@ -157,6 +157,7 @@ jobs:
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
         docker compose exec ray-head bash -c 'coverage combine'
+        docker compose exec ray-head bash -c 'coverage report -m'
 
     - name: Upload Overall Coverage Report
       uses: actions/upload-artifact@v4
