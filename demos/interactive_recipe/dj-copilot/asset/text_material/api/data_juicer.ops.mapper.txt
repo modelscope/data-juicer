@@ -1,0 +1,2965 @@
+data_juicer.ops.mapper package
+******************************
+
+
+Subpackages
+===========
+
+* data_juicer.ops.mapper.annotation package
+
+  * Submodules
+
+  * data_juicer.ops.mapper.annotation.annotation_mapper module
+
+    * "BaseAnnotationMapper"
+
+      * "BaseAnnotationMapper.process_batched()"
+
+    * "LabelStudioAnnotationMapper"
+
+      * "LabelStudioAnnotationMapper.setup_project()"
+
+      * "LabelStudioAnnotationMapper.get_all_annotations()"
+
+  * data_juicer.ops.mapper.annotation.human_preference_annotation_map
+    per module
+
+    * "HumanPreferenceAnnotationMapper"
+
+      * "HumanPreferenceAnnotationMapper.DEFAULT_LABEL_CONFIG"
+
+  * Module contents
+
+
+Submodules
+==========
+
+
+data_juicer.ops.mapper.audio_add_gaussian_noise_mapper module
+=============================================================
+
+class data_juicer.ops.mapper.audio_add_gaussian_noise_mapper.AudioAddGaussianNoiseMapper(min_amplitude: float = 0.001, max_amplitude: float = 0.015, p: float = 0.5, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to add gaussian noise to audio.
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.audio_ffmpeg_wrapped_mapper module
+=========================================================
+
+class data_juicer.ops.mapper.audio_ffmpeg_wrapped_mapper.AudioFFmpegWrappedMapper(filter_name: str | None = None, filter_kwargs: Dict | None = None, global_args: List[str] | None = None, capture_stderr: bool = True, overwrite_output: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Simple wrapper for FFmpeg audio filters.
+
+   process_single(sample)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.calibrate_qa_mapper module
+=================================================
+
+class data_juicer.ops.mapper.calibrate_qa_mapper.CalibrateQAMapper(api_model: str = 'gpt-4o', *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, reference_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to calibrate question-answer pairs based on reference text.
+
+   DEFAULT_SYSTEM_PROMPT = '请根据提供的【参考信息】对【问题】和【回答】进行校准，使其更加详细、准确。\n按照以下格式输出：\n【问题】\n校准后的问题\n【回答】\n校准后的回答'
+
+   DEFAULT_INPUT_TEMPLATE = '{reference}\n{qa_pair}'
+
+   DEFAULT_REFERENCE_TEMPLATE = '【参考信息】\n{}'
+
+   DEFAULT_QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}'
+
+   DEFAULT_OUTPUT_PATTERN = '【问题】\\s*(.*?)\\s*【回答】\\s*(.*)'
+
+   build_input(sample)
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.calibrate_query_mapper module
+====================================================
+
+class data_juicer.ops.mapper.calibrate_query_mapper.CalibrateQueryMapper(api_model: str = 'gpt-4o', *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, reference_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "CalibrateQAMapper"
+
+   Mapper to calibrate query in question-answer pairs based on
+   reference text.
+
+   DEFAULT_SYSTEM_PROMPT = '请根据提供的【参考信息】对问答对中的【问题】进行校准，        使其更加详细、准确，且仍可以由原答案回答。只输出校准后的问题，不要输出多余内容。'
+
+   parse_output(raw_output)
+
+
+data_juicer.ops.mapper.calibrate_response_mapper module
+=======================================================
+
+class data_juicer.ops.mapper.calibrate_response_mapper.CalibrateResponseMapper(api_model: str = 'gpt-4o', *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, reference_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "CalibrateQAMapper"
+
+   Mapper to calibrate response in question-answer pairs based on
+   reference text.
+
+   DEFAULT_SYSTEM_PROMPT = '请根据提供的【参考信息】对问答对中的【回答】进行校准，        使其更加详细、准确，且仍可以回答原问题。只输出校准后的回答，不要输出多余内容。'
+
+   parse_output(raw_output)
+
+
+data_juicer.ops.mapper.chinese_convert_mapper module
+====================================================
+
+data_juicer.ops.mapper.chinese_convert_mapper.prepare_converter(mode)
+
+class data_juicer.ops.mapper.chinese_convert_mapper.ChineseConvertMapper(mode: str = 's2t', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to convert Chinese between Traditional Chinese, Simplified
+   Chinese and Japanese Kanji.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.clean_copyright_mapper module
+====================================================
+
+class data_juicer.ops.mapper.clean_copyright_mapper.CleanCopyrightMapper(*args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to clean copyright comments at the beginning of the text
+   samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.clean_email_mapper module
+================================================
+
+class data_juicer.ops.mapper.clean_email_mapper.CleanEmailMapper(pattern: str | None = None, repl: str = '', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to clean email in text samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.clean_html_mapper module
+===============================================
+
+class data_juicer.ops.mapper.clean_html_mapper.CleanHtmlMapper(*args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to clean html code in text samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.clean_ip_mapper module
+=============================================
+
+class data_juicer.ops.mapper.clean_ip_mapper.CleanIpMapper(pattern: str | None = None, repl: str = '', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to clean ipv4 and ipv6 address in text samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.clean_links_mapper module
+================================================
+
+class data_juicer.ops.mapper.clean_links_mapper.CleanLinksMapper(pattern: str | None = None, repl: str = '', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to clean links like http/https/ftp in text samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.dialog_intent_detection_mapper module
+============================================================
+
+class data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper(api_model: str = 'gpt-4o', intent_candidates: List[str] | None = None, max_round: Annotated[int, Ge(ge=0)] = 10, *, labels_key: str = 'dialog_intent_labels', analysis_key: str = 'dialog_intent_labels_analysis', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, query_template: str | None = None, response_template: str | None = None, candidate_template: str | None = None, analysis_template: str | None = None, labels_template: str | None = None, analysis_pattern: str | None = None, labels_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate user's intent labels in dialog. Input from
+   history_key, query_key and response_key. Output lists of labels and
+   analysis for queries in the dialog.
+
+   DEFAULT_SYSTEM_PROMPT = '请判断用户和LLM多轮对话中用户的意图。\n要求：\n- 需要先进行分析，然后列出用户所具有的意图，下面是一个样例，请模仿样例格式输出。\n用户：你好，我最近对人工智能很感兴趣，能给我讲讲什么是机器学习吗？\n意图分析：用户在请求信息，希望了解有关机器学习的基础知识。\n意图类别：信息查找\nLLM：你好！当然可以。机器学习是一种人工智能方法，允许计算机通过数据自动改进和学习。\n用户：听起来很有趣，有没有推荐的入门书籍或资料？\n意图分析：用户在请求建议，希望获取关于机器学习的入门资源。\n意图类别：请求建议\nLLM：有很多不错的入门书籍和资源。一本常被推荐的书是《Python机器学习实践》（Python Machine Learning），它涵盖了基础知识和一些实际案例。此外，您还可以参考Coursera或edX上的在线课程，这些课程提供了系统的学习路径。\n用户：谢谢你的建议！我还想知道，学习机器学习需要什么样的数学基础？\n意图分析：用户在寻求信息，希望了解学习机器学习所需的前提条件，特别是在数学方面。\n意图类别：信息查找\nLLM：学习机器学习通常需要一定的数学基础，特别是线性代数、概率论和统计学。这些数学领域帮助理解算法的工作原理和数据模式分析。如果您对这些主题不太熟悉，建议先从相关基础书籍或在线资源开始学习。\n用户：明白了，我会先补习这些基础知识。再次感谢你的帮助！\n意图分析：用户表达感谢，并表示计划付诸行动来补充所需的基础知识。\n意图类别：其他'
+
+   DEFAULT_QUERY_TEMPLATE = '用户：{query}\n'
+
+   DEFAULT_RESPONSE_TEMPLATE = 'LLM：{response}\n'
+
+   DEFAULT_CANDIDATES_TEMPLATE = '备选意图类别：[{candidate_str}]'
+
+   DEFAULT_ANALYSIS_TEMPLATE = '意图分析：{analysis}\n'
+
+   DEFAULT_LABELS_TEMPLATE = '意图类别：{labels}\n'
+
+   DEFAULT_ANALYSIS_PATTERN = '意图分析：(.*?)\n'
+
+   DEFAULT_LABELS_PATTERN = '意图类别：(.*?)($|\n)'
+
+   build_input(history, query)
+
+   parse_output(response)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.dialog_sentiment_detection_mapper module
+===============================================================
+
+class data_juicer.ops.mapper.dialog_sentiment_detection_mapper.DialogSentimentDetectionMapper(api_model: str = 'gpt-4o', sentiment_candidates: List[str] | None = None, max_round: Annotated[int, Ge(ge=0)] = 10, *, labels_key: str = 'dialog_sentiment_labels', analysis_key: str = 'dialog_sentiment_labels_analysis', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, query_template: str | None = None, response_template: str | None = None, candidate_template: str | None = None, analysis_template: str | None = None, labels_template: str | None = None, analysis_pattern: str | None = None, labels_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate user's sentiment labels in dialog. Input from
+   history_key, query_key and response_key. Output lists of labels and
+   analysis for queries in the dialog.
+
+   DEFAULT_SYSTEM_PROMPT = '请判断用户和LLM多轮对话中用户所具有的情绪。\n要求：\n- 需要先进行分析，然后罗列用户所具有的情绪，下面是一个样例，请模仿样例格式输出。\n用户：最近工作压力好大，我觉得整个人都快被压垮了。\n情感分析：用户的言语中透露出明显的压力和疲惫感，可能还夹杂着一些无助和焦虑。\n情感类别：压力、疲惫、无助、焦虑\nLLM：听起来你真的承受了很多，面临这种情况确实不容易。有没有考虑过找一些放松的方式，比如听音乐或者散步来减轻压力呢？\n用户：试过了，但是好像没什么效果，每天的事情都堆积如山。\n情感分析：用户感到无力解决现状，有挫败感，并且对尝试放松的方式失去信心。\n情感类别：无力、挫败\nLLM：我理解你的感受，有时候压力积累到一定程度确实让人难以承受。或许你可以尝试规划一下时间，把任务分成小块来完成，这样可能会减少一些压力感。\n用户：这个主意不错，我会试着让自己更有条理一些，谢谢你的建议。\n情感分析：用户对建议表现出认同和感激，同时展现出试图积极面对问题的态度。\n情感类别：认同、感激、积极\nLLM：不用谢，我很高兴能帮到你。记得给自己一些时间去适应新的计划，有任何需要随时可以跟我说哦！\n'
+
+   DEFAULT_QUERY_TEMPLATE = '用户：{query}\n'
+
+   DEFAULT_RESPONSE_TEMPLATE = 'LLM：{response}\n'
+
+   DEFAULT_CANDIDATES_TEMPLATE = '备选情感类别：[{candidate_str}]'
+
+   DEFAULT_ANALYSIS_TEMPLATE = '情感分析：{analysis}\n'
+
+   DEFAULT_LABELS_TEMPLATE = '情感类别：{labels}\n'
+
+   DEFAULT_ANALYSIS_PATTERN = '情感分析：(.*?)\n'
+
+   DEFAULT_LABELS_PATTERN = '情感类别：(.*?)($|\n)'
+
+   build_input(history, query)
+
+   parse_output(response)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.dialog_sentiment_intensity_mapper module
+===============================================================
+
+class data_juicer.ops.mapper.dialog_sentiment_intensity_mapper.DialogSentimentIntensityMapper(api_model: str = 'gpt-4o', max_round: Annotated[int, Ge(ge=0)] = 10, *, intensities_key: str = 'dialog_sentiment_intensity', analysis_key: str = 'dialog_sentiment_intensity_analysis', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, query_template: str | None = None, response_template: str | None = None, analysis_template: str | None = None, intensity_template: str | None = None, analysis_pattern: str | None = None, intensity_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to predict user's sentiment intensity (from -5 to 5 in
+   default prompt) in dialog. Input from history_key, query_key and
+   response_key. Output lists of intensities and analysis for queries
+   in the dialog.
+
+   DEFAULT_SYSTEM_PROMPT = '请判断用户和LLM多轮对话中用户的情绪变化。\n要求：\n- 用户情绪值是-5到5之间到整数，-5表示极度负面，5表示极度正面，-5到5之间数值表示情绪从负面逐渐到正面的变化过程，0代表情呈绪中性。\n- 只输出当轮对话的分析，不要继续构造对话。\n- 需要先进行分析，然后确定用户的情绪值，下面是一个样例，请模仿样例格式输出。\n用户：你好，我对可持续发展的定义有点模糊，帮我解释一下？\n情绪分析：刚开始，还没得到LLM回复，用户情绪呈中性。\n情绪值：0\nLLM：当然可以！可持续发展是指在满足当代人的需求的同时，不损害子孙后代满足其自身需求的能力的发展模式。它包括经济发展、社会发展和环境保护三个主要方面。通过合理利用资源和保护环境，我们可以确保未来的世代也能享有健全的生态系统和经济制度。\n用户：谢谢你的解释！那你能告诉我一些普通人可以采取的可持续生活方式吗？\n情绪分析：对回答感到满意，情绪正面。\n情绪值：1\nLLM：当然可以，普通人可以通过减少一次性产品的使用、选择公共交通或拼车、节约用水、以及支持本地和可持续发展的企业等方式来践行可持续生活。此外，关注垃圾分类和多用电子账单也是不错的选择。\n用户：你提到支持本地企业，这一点我很感兴趣。能详细说说为什么这对可持续发展有促进作用吗？\n情绪分析：觉得回答实用且具体，情绪进一步转好。\n情绪值：2\nLLM：呃，我最近发现了一部新电影，讲述了一个关于外星人和地球土著合作保护环境的故事。虽然它是科幻片，但很有启发性，推荐你去看看。\n用户：什么吗，根本是答非所问。\n情绪分析：LLM没有回应问题而是提到无关内容，导致用户情绪直线下降。\n情绪值：-2\nLLM：抱歉刚才的偏题！支持本地企业有助于减少长途运输产生的碳足迹，使供应链更加环保。此外，本地企业也更有可能采用可持续的生产方式，同时促进社区经济的繁荣。\n用户：还行吧，算你能够掰回来。\n情绪分析：问题得到解答，问题偏题得到纠正，情绪稍有好转。\n情绪值：-1\n'
+
+   DEFAULT_QUERY_TEMPLATE = '用户：{query}\n'
+
+   DEFAULT_RESPONSE_TEMPLATE = 'LLM：{response}\n'
+
+   DEFAULT_ANALYSIS_TEMPLATE = '情绪分析：{analysis}\n'
+
+   DEFAULT_INTENSITY_TEMPLATE = '情绪值：{intensity}\n'
+
+   DEFAULT_ANALYSIS_PATTERN = '情绪分析：(.*?)\n'
+
+   DEFAULT_INTENSITY_PATTERN = '情绪值：(.*?)($|\n)'
+
+   build_input(history, query)
+
+   parse_output(response)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.dialog_topic_detection_mapper module
+===========================================================
+
+class data_juicer.ops.mapper.dialog_topic_detection_mapper.DialogTopicDetectionMapper(api_model: str = 'gpt-4o', topic_candidates: List[str] | None = None, max_round: Annotated[int, Ge(ge=0)] = 10, *, labels_key: str = 'dialog_topic_labels', analysis_key: str = 'dialog_topic_labels_analysis', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, query_template: str | None = None, response_template: str | None = None, candidate_template: str | None = None, analysis_template: str | None = None, labels_template: str | None = None, analysis_pattern: str | None = None, labels_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate user's topic labels in dialog. Input from
+   history_key, query_key and response_key. Output lists of labels and
+   analysis for queries in the dialog.
+
+   DEFAULT_SYSTEM_PROMPT = '请判断用户和LLM多轮对话中用户所讨论的话题。\n要求：\n- 针对用户的每个query，需要先进行分析，然后列出用户正在讨论的话题，下面是一个样例，请模仿样例格式输出。\n用户：你好，今天我们来聊聊秦始皇吧。\n话题分析：用户提到秦始皇，这是中国历史上第一位皇帝。\n话题类别：历史\nLLM：当然可以，秦始皇是中国历史上第一个统一全国的皇帝，他在公元前221年建立了秦朝，并采取了一系列重要的改革措施，如统一文字、度量衡和货币等。\n用户：秦始皇修建的长城和现在的长城有什么区别？\n话题分析：用户提到秦始皇修建的长城，并将其与现代长城进行比较，涉及建筑历史和地理位置。\n话题类别：历史LLM：秦始皇时期修建的长城主要是为了抵御北方游牧民族的入侵，它的规模和修建技术相对较为简陋。现代人所看到的长城大部分是明朝时期修建和扩建的，明长城不仅规模更大、结构更坚固，而且保存得比较完好。\n用户：有意思，那么长城的具体位置在哪些省份呢？\n话题分析：用户询问长城的具体位置，涉及到地理知识。\n话题类别：地理\nLLM：长城横跨中国北方多个省份，主要包括河北、山西、内蒙古、宁夏、陕西、甘肃和北京等。每一段长城都建在关键的战略位置，以便最大限度地发挥其防御作用。\n'
+
+   DEFAULT_QUERY_TEMPLATE = '用户：{query}\n'
+
+   DEFAULT_RESPONSE_TEMPLATE = 'LLM：{response}\n'
+
+   DEFAULT_CANDIDATES_TEMPLATE = '备选话题类别：[{candidate_str}]'
+
+   DEFAULT_ANALYSIS_TEMPLATE = '话题分析：{analysis}\n'
+
+   DEFAULT_LABELS_TEMPLATE = '话题类别：{labels}\n'
+
+   DEFAULT_ANALYSIS_PATTERN = '话题分析：(.*?)\n'
+
+   DEFAULT_LABELS_PATTERN = '话题类别：(.*?)($|\n)'
+
+   build_input(history, query)
+
+   parse_output(response)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.expand_macro_mapper module
+=================================================
+
+class data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper(*args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to expand macro definitions in the document body of Latex
+   samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.extract_entity_attribute_mapper module
+=============================================================
+
+class data_juicer.ops.mapper.extract_entity_attribute_mapper.ExtractEntityAttributeMapper(api_model: str = 'gpt-4o', query_entities: List[str] = [], query_attributes: List[str] = [], *, entity_key: str = 'main_entities', attribute_key: str = 'attributes', attribute_desc_key: str = 'attribute_descriptions', support_text_key: str = 'attribute_support_texts', api_endpoint: str | None = None, response_path: str | None = None, system_prompt_template: str | None = None, input_template: str | None = None, attr_pattern_template: str | None = None, demo_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Extract attributes for given entities from the text
+
+   DEFAULT_SYSTEM_PROMPT_TEMPLATE = '给定一段文本，从文本中总结{entity}的{attribute}，并且从原文摘录最能说明该{attribute}的代表性示例。\n要求：\n- 摘录的示例应该简短。\n- 遵循如下的回复格式：\n# {entity}\n## {attribute}：\n...\n### 代表性示例摘录1：\n```\n...\n```\n### 代表性示例摘录2：\n```\n...\n```\n...\n'
+
+   DEFAULT_INPUT_TEMPLATE = '# 文本\n```\n{text}\n```\n'
+
+   DEFAULT_ATTR_PATTERN_TEMPLATE = '\\#\\#\\s*{attribute}：\\s*(.*?)(?=\\#\\#\\#|\\Z)'
+
+   DEFAULT_DEMON_PATTERN = '\\#\\#\\#\\s*代表性示例摘录(\\d+)：\\s*```\\s*(.*?)```\\s*(?=\\#\\#\\#|\\Z)'
+
+   parse_output(raw_output, attribute_name)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.extract_entity_relation_mapper module
+============================================================
+
+class data_juicer.ops.mapper.extract_entity_relation_mapper.ExtractEntityRelationMapper(api_model: str = 'gpt-4o', entity_types: List[str] | None = None, *, entity_key: str = 'entity', relation_key: str = 'relation', api_endpoint: str | None = None, response_path: str | None = None, prompt_template: str | None = None, tuple_delimiter: str | None = None, record_delimiter: str | None = None, completion_delimiter: str | None = None, max_gleaning: Annotated[int, Ge(ge=0)] = 1, continue_prompt: str | None = None, if_loop_prompt: str | None = None, entity_pattern: str | None = None, relation_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Extract entities and relations in the text for knowledge graph.
+
+   DEFAULT_PROMPT_TEMPLATE = '-Goal-\nGiven a text document that is potentially relevant to this activity and a list of entity types, identify all entities of those types from the text and all relationships among the identified entities.\n\n-Steps-\n1. Identify all entities. For each identified entity, extract the following information:\n- entity_name: Name of the entity\n- entity_type: One of the following types: [{entity_types}]\n- entity_description: Comprehensive description of the entity\'s attributes and activities\nFormat each entity as ("entity"{tuple_delimiter}<entity_name>{tuple_delimiter}<entity_type>{tuple_delimiter}<entity_description>\n\n2. From the entities identified in step 1, identify all pairs of (source_entity, target_entity) that are *clearly related* to each other.\nFor each pair of related entities, extract the following information:\n- source_entity: name of the source entity, as identified in step 1\n- target_entity: name of the target entity, as identified in step 1\n- relationship_description: explanation as to why you think the source entity and the target entity are related to each other\n- relationship_strength: a numeric score indicating strength of the relationship between the source entity and target entity\n- relationship_keywords: one or more high-level key words that summarize the overarching nature of the relationship, focusing on concepts or themes rather than specific details\nFormat each relationship as ("relationship"{tuple_delimiter}<source_entity>{tuple_delimiter}<target_entity>{tuple_delimiter}<relationship_description>{tuple_delimiter}<relationship_keywords>{tuple_delimiter}<relationship_strength>)\n\n3. Return output in the language of the given text as a single list of all the entities and relationships identified in steps 1 and 2. Use **{record_delimiter}** as the list delimiter.\n\n4. When finished, output {completion_delimiter}\n\n######################\n-Examples-\n######################\nExample 1:\n\nEntity_types: [person, technology, mission, organization, location]\nText:\n```\nwhile Alex clenched his jaw, the buzz of frustration dull against the backdrop of Taylor\'s authoritarian certainty. It was this competitive undercurrent that kept him alert, the sense that his and Jordan\'s shared commitment to discovery was an unspoken rebellion against Cruz\'s narrowing vision of control and order.\n\nThen Taylor did something unexpected. They paused beside Jordan and, for a moment, observed the device with something akin to reverence. “If this tech can be understood..." Taylor said, their voice quieter, "It could change the game for us. For all of us.”\n\nThe underlying dismissal earlier seemed to falter, replaced by a glimpse of reluctant respect for the gravity of what lay in their hands. Jordan looked up, and for a fleeting heartbeat, their eyes locked with Taylor\'s, a wordless clash of wills softening into an uneasy truce.\n\nIt was a small transformation, barely perceptible, but one that Alex noted with an inward nod. They had all been brought here by different paths\n```\n################\nOutput:\n("entity"{tuple_delimiter}"Alex"{tuple_delimiter}"person"{tuple_delimiter}"Alex is a character who experiences frustration and is observant of the dynamics among other characters."){record_delimiter}\n("entity"{tuple_delimiter}"Taylor"{tuple_delimiter}"person"{tuple_delimiter}"Taylor is portrayed with authoritarian certainty and shows a moment of reverence towards a device, indicating a change in perspective."){record_delimiter}\n("entity"{tuple_delimiter}"Jordan"{tuple_delimiter}"person"{tuple_delimiter}"Jordan shares a commitment to discovery and has a significant interaction with Taylor regarding a device."){record_delimiter}\n("entity"{tuple_delimiter}"Cruz"{tuple_delimiter}"person"{tuple_delimiter}"Cruz is associated with a vision of control and order, influencing the dynamics among other characters."){record_delimiter}\n("entity"{tuple_delimiter}"The Device"{tuple_delimiter}"technology"{tuple_delimiter}"The Device is central to the story, with potential game-changing implications, and is reversed by Taylor."){record_delimiter}\n("relationship"{tuple_delimiter}"Alex"{tuple_delimiter}"Taylor"{tuple_delimiter}"Alex is affected by Taylor\'s authoritarian certainty and observes changes in Taylor\'s attitude towards the device."{tuple_delimiter}"power dynamics, perspective shift"{tuple_delimiter}7){record_delimiter}\n("relationship"{tuple_delimiter}"Alex"{tuple_delimiter}"Jordan"{tuple_delimiter}"Alex and Jordan share a commitment to discovery, which contrasts with Cruz\'s vision."{tuple_delimiter}"shared goals, rebellion"{tuple_delimiter}6){record_delimiter}\n("relationship"{tuple_delimiter}"Taylor"{tuple_delimiter}"Jordan"{tuple_delimiter}"Taylor and Jordan interact directly regarding the device, leading to a moment of mutual respect and an uneasy truce."{tuple_delimiter}"conflict resolution, mutual respect"{tuple_delimiter}8){record_delimiter}\n("relationship"{tuple_delimiter}"Jordan"{tuple_delimiter}"Cruz"{tuple_delimiter}"Jordan\'s commitment to discovery is in rebellion against Cruz\'s vision of control and order."{tuple_delimiter}"ideological conflict, rebellion"{tuple_delimiter}5){record_delimiter}\n("relationship"{tuple_delimiter}"Taylor"{tuple_delimiter}"The Device"{tuple_delimiter}"Taylor shows reverence towards the device, indicating its importance and potential impact."{tuple_delimiter}"reverence, technological significance"{tuple_delimiter}9){record_delimiter}\n#############################\nExample 2:\n\nEntity_types: [人物, 技术, 任务, 组织, 地点]\nText:\n```\n他们不再是单纯的执行者；他们已成为某个超越星辰与条纹的领域的信息守护者。这一使命的提升不能被规则和既定协议所束缚——它需要一种新的视角，一种新的决心。\n\n随着与华盛顿的通讯在背景中嗡嗡作响，对话中的紧张情绪通过嘟嘟声和静电噪音贯穿始终。团队站立着，一股不祥的气息笼罩着他们。显然，他们在接下来几个小时内做出的决定可能会重新定义人类在宇宙中的位置，或者将他们置于无知和潜在危险之中。\n\n随着与星辰的联系变得更加牢固，小组开始处理逐渐成形的警告，从被动接受者转变为积极参与者。梅瑟后来的直觉占据了上风——团队的任务已经演变，不再仅仅是观察和报告，而是互动和准备。一场蜕变已经开始，而“杜尔塞行动”则以他们大胆的新频率震动，这种基调不是由世俗设定的\n```\n#############\nOutput:\n("entity"{tuple_delimiter}"华盛顿"{tuple_delimiter}"地点"{tuple_delimiter}"华盛顿是正在接收通讯的地方，表明其在决策过程中的重要性。"){record_delimiter}\n("entity"{tuple_delimiter}"杜尔塞行动"{tuple_delimiter}"任务"{tuple_delimiter}"杜尔塞行动被描述为一项已演变为互动和准备的任务，显示出目标和活动的重大转变。"){record_delimiter}\n("entity"{tuple_delimiter}"团队"{tuple_delimiter}"组织"{tuple_delimiter}"团队被描绘成一群从被动观察者转变为积极参与者的人，展示了他们角色的动态变化。"){record_delimiter}\n("relationship"{tuple_delimiter}"团队"{tuple_delimiter}"华盛顿"{tuple_delimiter}"团队收到来自华盛顿的通讯，这影响了他们的决策过程。"{tuple_delimiter}"决策、外部影响"{tuple_delimiter}7){record_delimiter}\n("relationship"{tuple_delimiter}"团队"{tuple_delimiter}"杜尔塞行动"{tuple_delimiter}"团队直接参与杜尔塞行动，执行其演变后的目标和活动。"{tuple_delimiter}"任务演变、积极参与"{tuple_delimiter}9){completion_delimiter}\n#############################\nExample 3:\n\nEntity_types: [person, role, technology, organization, event, location, concept]\nText:\n```\ntheir voice slicing through the buzz of activity. "Control may be an illusion when facing an intelligence that literally writes its own rules," they stated stoically, casting a watchful eye over the flurry of data.\n\n"It\'s like it\'s learning to communicate," offered Sam Rivera from a nearby interface, their youthful energy boding a mix of awe and anxiety. "This gives talking to strangers\' a whole new meaning."\n\nAlex surveyed his team—each face a study in concentration, determination, and not a small measure of trepidation. "This might well be our first contact," he acknowledged, "And we need to be ready for whatever answers back."\n\nTogether, they stood on the edge of the unknown, forging humanity\'s response to a message from the heavens. The ensuing silence was palpable—a collective introspection about their role in this grand cosmic play, one that could rewrite human history.\n\nThe encrypted dialogue continued to unfold, its intricate patterns showing an almost uncanny anticipation\n```\n#############\nOutput:\n("entity"{tuple_delimiter}"Sam Rivera"{tuple_delimiter}"person"{tuple_delimiter}"Sam Rivera is a member of a team working on communicating with an unknown intelligence, showing a mix of awe and anxiety."){record_delimiter}\n("entity"{tuple_delimiter}"Alex"{tuple_delimiter}"person"{tuple_delimiter}"Alex is the leader of a team attempting first contact with an unknown intelligence, acknowledging the significance of their task."){record_delimiter}\n("entity"{tuple_delimiter}"Control"{tuple_delimiter}"concept"{tuple_delimiter}"Control refers to the ability to manage or govern, which is challenged by an intelligence that writes its own rules."){record_delimiter}\n("entity"{tuple_delimiter}"Intelligence"{tuple_delimiter}"concept"{tuple_delimiter}"Intelligence here refers to an unknown entity capable of writing its own rules and learning to communicate."){record_delimiter}\n("entity"{tuple_delimiter}"First Contact"{tuple_delimiter}"event"{tuple_delimiter}"First Contact is the potential initial communication between humanity and an unknown intelligence."){record_delimiter}\n("entity"{tuple_delimiter}"Humanity\'s Response"{tuple_delimiter}"event"{tuple_delimiter}"Humanity\'s Response is the collective action taken by Alex\'s team in response to a message from an unknown intelligence."){record_delimiter}\n("relationship"{tuple_delimiter}"Sam Rivera"{tuple_delimiter}"Intelligence"{tuple_delimiter}"Sam Rivera is directly involved in the process of learning to communicate with the unknown intelligence."{tuple_delimiter}"communication, learning process"{tuple_delimiter}9){record_delimiter}\n("relationship"{tuple_delimiter}"Alex"{tuple_delimiter}"First Contact"{tuple_delimiter}"Alex leads the team that might be making the First Contact with the unknown intelligence."{tuple_delimiter}"leadership, exploration"{tuple_delimiter}10){record_delimiter}\n("relationship"{tuple_delimiter}"Alex"{tuple_delimiter}"Humanity\'s Response"{tuple_delimiter}"Alex and his team are the key figures in Humanity\'s Response to the unknown intelligence."{tuple_delimiter}"collective action, cosmic significance"{tuple_delimiter}8){record_delimiter}\n("relationship"{tuple_delimiter}"Control"{tuple_delimiter}"Intelligence"{tuple_delimiter}"The concept of Control is challenged by the Intelligence that writes its own rules."{tuple_delimiter}"power dynamics, autonomy"{tuple_delimiter}7){record_delimiter}\n#############################\n-Real Data-\n######################\nEntity_types: [{entity_types}]\nText:\n```\n{input_text}\n```\n######################\nOutput:\n'
+
+   DEFAULT_CONTINUE_PROMPT = 'MANY entities were missed in the last extraction.  Add them below using the same format:\n'
+
+   DEFAULT_IF_LOOP_PROMPT = 'It appears some entities may have still been missed.  Answer YES | NO if there are still entities that need to be added.\n'
+
+   DEFAULT_ENTITY_TYPES = ['organization', 'person', 'geo', 'event']
+
+   DEFAULT_TUPLE_DELIMITER = '<|>'
+
+   DEFAULT_RECORD_DELIMITER = '##'
+
+   DEFAULT_COMPLETION_DELIMITER = '<|COMPLETE|>'
+
+   DEFAULT_ENTITY_PATTERN = '\\("entity"(.*?)\\)'
+
+   DEFAULT_RELATION_PATTERN = '\\("relationship"(.*?)\\)'
+
+   parse_output(raw_output)
+
+   add_message(messages, role, content)
+
+   light_rag_extraction(messages, rank=None)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.extract_event_mapper module
+==================================================
+
+class data_juicer.ops.mapper.extract_event_mapper.ExtractEventMapper(api_model: str = 'gpt-4o', *, event_desc_key: str = 'event_description', relevant_char_key: str = 'relevant_characters', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Extract events and relevant characters in the text
+
+   DEFAULT_SYSTEM_PROMPT = '给定一段文本，对文本的情节进行分点总结，并抽取与情节相关的人物。\n要求：\n- 尽量不要遗漏内容，不要添加文本中没有的情节，符合原文事实\n- 联系上下文说明前因后果，但仍然需要符合事实\n- 不要包含主观看法\n- 注意要尽可能保留文本的专有名词\n- 注意相关人物需要在对应情节中出现\n- 只抽取情节中的主要人物，不要遗漏情节的主要人物\n- 总结格式如下：\n### 情节1：\n- **情节描述**： ...\n- **相关人物**：人物1，人物2，人物3，...\n### 情节2：\n- **情节描述**： ...\n- **相关人物**：人物1，人物2，...\n### 情节3：\n- **情节描述**： ...\n- **相关人物**：人物1，...\n...\n'
+
+   DEFAULT_INPUT_TEMPLATE = '# 文本\n```\n{text}\n```\n'
+
+   DEFAULT_OUTPUT_PATTERN = '\n        \\#\\#\\#\\s*情节(\\d+)：\\s*\n        -\\s*\\*\\*情节描述\\*\\*\\s*：\\s*(.*?)\\s*\n        -\\s*\\*\\*相关人物\\*\\*\\s*：\\s*(.*?)(?=\\#\\#\\#|\\Z)\n    '
+
+   parse_output(raw_output)
+
+   process_batched(samples, rank=None)
+
+
+data_juicer.ops.mapper.extract_keyword_mapper module
+====================================================
+
+class data_juicer.ops.mapper.extract_keyword_mapper.ExtractKeywordMapper(api_model: str = 'gpt-4o', *, keyword_key: str = 'keyword', api_endpoint: str | None = None, response_path: str | None = None, prompt_template: str | None = None, completion_delimiter: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Generate keywords for the text
+
+   DEFAULT_PROMPT_TEMPLATE = '-Goal-\nGiven a text document that is potentially relevant to this activity and a list of entity types, identify all entities of those types from the text and all relationships among the identified entities.\n\n-Steps-\n1. Identify high-level key words that summarize the main concepts, themes, or topics of the entire text. These should capture the overarching ideas present in the document.\nFormat the content-level key words as ("content_keywords" <high_level_keywords>)\n\n3. Return output in the language of the given text.\n\n4. When finished, output {completion_delimiter}\n\n######################\n-Examples-\n######################\nExample 1:\n\nText:\n```\nwhile Alex clenched his jaw, the buzz of frustration dull against the backdrop of Taylor\'s authoritarian certainty. It was this competitive undercurrent that kept him alert, the sense that his and Jordan\'s shared commitment to discovery was an unspoken rebellion against Cruz\'s narrowing vision of control and order.\n\nThen Taylor did something unexpected. They paused beside Jordan and, for a moment, observed the device with something akin to reverence. “If this tech can be understood..." Taylor said, their voice quieter, "It could change the game for us. For all of us.”\n\nThe underlying dismissal earlier seemed to falter, replaced by a glimpse of reluctant respect for the gravity of what lay in their hands. Jordan looked up, and for a fleeting heartbeat, their eyes locked with Taylor\'s, a wordless clash of wills softening into an uneasy truce.\n\nIt was a small transformation, barely perceptible, but one that Alex noted with an inward nod. They had all been brought here by different paths\n```\n################\nOutput:\n("content_keywords" "power dynamics, ideological conflict, discovery, rebellion"){completion_delimiter}\n#############################\nExample 2:\n\nText:\n```\n他们不再是单纯的执行者；他们已成为某个超越星辰与条纹的领域的信息守护者。这一使命的提升不能被规则和既定协议所束缚——它需要一种新的视角，一种新的决心。\n\n随着与华盛顿的通讯在背景中嗡嗡作响，对话中的紧张情绪通过嘟嘟声和静电噪音贯穿始终。团队站立着，一股不祥的气息笼罩着他们。显然，他们在接下来几个小时内做出的决定可能会重新定义人类在宇宙中的位置，或者将他们置于无知和潜在危险之中。\n\n随着与星辰的联系变得更加牢固，小组开始处理逐渐成形的警告，从被动接受者转变为积极参与者。梅瑟后来的直觉占据了上风——团队的任务已经演变，不再仅仅是观察和报告，而是互动和准备。一场蜕变已经开始，而“杜尔塞行动”则以他们大胆的新频率震动，这种基调不是由世俗设定的\n```\n#############\nOutput:\n("content_keywords" "任务演变, 决策制定, 积极参与, 宇宙意义"){completion_delimiter}\n#############################\nExample 3:\n\nEntity_types: [person, role, technology, organization, event, location, concept]\nText:\n```\ntheir voice slicing through the buzz of activity. "Control may be an illusion when facing an intelligence that literally writes its own rules," they stated stoically, casting a watchful eye over the flurry of data.\n\n"It\'s like it\'s learning to communicate," offered Sam Rivera from a nearby interface, their youthful energy boding a mix of awe and anxiety. "This gives talking to strangers\' a whole new meaning."\n\nAlex surveyed his team—each face a study in concentration, determination, and not a small measure of trepidation. "This might well be our first contact," he acknowledged, "And we need to be ready for whatever answers back."\n\nTogether, they stood on the edge of the unknown, forging humanity\'s response to a message from the heavens. The ensuing silence was palpable—a collective introspection about their role in this grand cosmic play, one that could rewrite human history.\n\nThe encrypted dialogue continued to unfold, its intricate patterns showing an almost uncanny anticipation\n```\n#############\nOutput:\n("content_keywords" "first contact, control, communication, cosmic significance"){completion_delimiter}\n-Real Data-\n######################\nText:\n```\n{input_text}\n```\n######################\nOutput:\n'
+
+   DEFAULT_COMPLETION_DELIMITER = '<|COMPLETE|>'
+
+   DEFAULT_OUTPUT_PATTERN = '\\("content_keywords"(.*?)\\)'
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.extract_nickname_mapper module
+=====================================================
+
+class data_juicer.ops.mapper.extract_nickname_mapper.ExtractNicknameMapper(api_model: str = 'gpt-4o', *, nickname_key: str = 'nickname', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Extract nickname relationship in the text.
+
+   DEFAULT_SYSTEM_PROMPT = '给定你一段文本，你的任务是将人物之间的称呼方式（昵称）提取出来。\n要求：\n- 需要给出说话人对被称呼人的称呼，不要搞反了。\n- 相同的说话人和被称呼人最多给出一个最常用的称呼。\n- 请不要输出互相没有昵称的称呼方式。\n- 输出格式如下：\n```\n### 称呼方式1\n- **说话人**：...\n- **被称呼人**：...\n- **...对...的昵称**：...\n### 称呼方式2\n- **说话人**：...\n- **被称呼人**：...\n- **...对...的昵称**：...\n### 称呼方式3\n- **说话人**：...\n- **被称呼人**：...\n- **...对...的昵称**：...\n...\n```\n'
+
+   DEFAULT_INPUT_TEMPLATE = '# 文本\n```\n{text}\n```\n'
+
+   DEFAULT_OUTPUT_PATTERN = '\n        \\#\\#\\#\\s*称呼方式(\\d+)\\s*\n        -\\s*\\*\\*说话人\\*\\*\\s*：\\s*(.*?)\\s*\n        -\\s*\\*\\*被称呼人\\*\\*\\s*：\\s*(.*?)\\s*\n        -\\s*\\*\\*(.*?)对(.*?)的昵称\\*\\*\\s*：\\s*(.*?)(?=\\#\\#\\#|\\Z) # for double check\n    '
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.extract_support_text_mapper module
+=========================================================
+
+class data_juicer.ops.mapper.extract_support_text_mapper.ExtractSupportTextMapper(api_model: str = 'gpt-4o', *, summary_key: str = 'event_description', support_text_key: str = 'support_text', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Extract support sub text for a summary.
+
+   DEFAULT_SYSTEM_PROMPT = '你将扮演一个文本摘录助手的角色。你的主要任务是基于给定的文章（称为“原文”）以及对原文某个部分的简短描述或总结（称为“总结”），准确地识别并提取出与该总结相对应的原文片段。\n要求：\n- 你需要尽可能精确地匹配到最符合总结内容的那部分内容\n- 如果存在多个可能的答案，请选择最贴近总结意思的那个\n- 下面是一个例子帮助理解这一过程：\n### 原文：\n《红楼梦》是中国古典小说四大名著之一，由清代作家曹雪芹创作。它讲述了贾宝玉、林黛玉等人的爱情故事及四大家族的兴衰历程。书中通过复杂的人物关系展现了封建社会的各种矛盾冲突。其中关于贾府内部斗争的部分尤其精彩，特别是王熙凤与尤二姐之间的争斗，生动描绘了权力争夺下的女性形象。此外，《红楼梦》还以其精美的诗词闻名，这些诗词不仅增添了文学色彩，也深刻反映了人物的性格特点和命运走向。\n\n### 总结：\n描述了书中的两个女性角色之间围绕权力展开的竞争。\n\n### 原文摘录：\n其中关于贾府内部斗争的部分尤其精彩，特别是王熙凤与尤二姐之间的争斗，生动描绘了权力争夺下的女性形象。'
+
+   DEFAULT_INPUT_TEMPLATE = '### 原文：\n{text}\n\n### 总结：\n{summary}\n\n### 原文摘录：\n'
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.extract_tables_from_html_mapper module
+=============================================================
+
+class data_juicer.ops.mapper.extract_tables_from_html_mapper.ExtractTablesFromHtmlMapper(tables_field_name: str = 'html_tables', retain_html_tags: bool = False, include_header: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to extract tables from HTML content.
+
+   process_single(sample)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.fix_unicode_mapper module
+================================================
+
+class data_juicer.ops.mapper.fix_unicode_mapper.FixUnicodeMapper(normalization: str | None = None, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to fix unicode errors in text samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.generate_qa_from_examples_mapper module
+==============================================================
+
+class data_juicer.ops.mapper.generate_qa_from_examples_mapper.GenerateQAFromExamplesMapper(hf_model: str = 'Qwen/Qwen2.5-7B-Instruct', *, seed_file: str = '', example_num: Annotated[int, Gt(gt=0)] = 3, similarity_threshold: float = 0.7, system_prompt: str | None = None, input_template: str | None = None, example_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, enable_vllm: bool = False, model_params: Dict | None = None, sampling_params: Dict | None = None, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate question and answer pairs from examples. You
+   should configure an empty dataset in your yaml config file: >>``<<`
+   generated_dataset_config:
+
+      type: 'EmptyFormatter'  # use *RayEmptyFormatter* when enable
+      ray length: ${The number of generated samples} feature_keys:
+      ${text key}
+
+   >>``<<` The number of samples generated is determined by the length
+   of the empty dataset.
+
+   DEFAULT_SYSTEM_PROMPT = '请你仔细观察多个示例数据的输入和输出，按照你的理解，总结出相应规矩，然后写出一个新的【问题】和【回答】。注意，新生成的【问题】和【回答】需要满足如下要求：\n1. 生成的【问题】和【回答】不能与输入的【问题】和【回答】一致，但是需要保持格式相同。\n2. 生成的【问题】不一定要局限于输入【问题】的话题或领域，生成的【回答】需要正确回答生成的【问题】。\n3. 提供的【问题】和【回答】可能是多轮对话，生成的【问题】和【回答】也可以是多轮，但是需要保持格式相同。\n4. 生成的【问题】和【回答】必须成对出现，而且【问题】需要在【回答】之前。\n'
+
+   DEFAULT_INPUT_TEMPLATE = '{}'
+
+   DEFAULT_EXAMPLE_TEMPLATE = '\n如下是一条示例数据：\n{}'
+
+   DEFAULT_QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}\n'
+
+   DEFAULT_OUTPUT_PATTERN = '【问题】(.*?)【回答】(.*?)(?=【问题】|$)'
+
+   build_input(qa_examples)
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.generate_qa_from_text_mapper module
+==========================================================
+
+class data_juicer.ops.mapper.generate_qa_from_text_mapper.GenerateQAFromTextMapper(hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa', max_num: Annotated[int, Gt(gt=0)] | None = None, *, output_pattern: str | None = None, enable_vllm: bool = False, model_params: Dict | None = None, sampling_params: Dict | None = None, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate question and answer pairs from text. Recommended
+   model list: [
+
+      'alibaba-pai/pai-llama3-8b-doc2qa', 'alibaba-pai/pai-baichuan2
+      -7b-doc2qa', 'alibaba-pai/pai-qwen1_5-4b-doc2qa', 'alibaba-pai
+      /pai-qwen1_5-7b-doc2qa', 'alibaba-pai/pai-qwen1_5-1b8-doc2qa',
+      'alibaba-pai/pai-qwen1_5-0b5-doc2qa'
+
+   ] These recommended models are all trained with Chinese data and
+   are suitable for Chinese.
+
+   parse_output(raw_output)
+
+   process_batched(samples, rank=None)
+
+
+data_juicer.ops.mapper.image_blur_mapper module
+===============================================
+
+class data_juicer.ops.mapper.image_blur_mapper.ImageBlurMapper(p: float = 0.2, blur_type: str = 'gaussian', radius: float = 2, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to blur images.
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper module
+================================================================
+
+data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.call_gpt_vision_api(api_key, system_prompt, user_prompt, base64_image, max_tokens=500, temperature=1.0, model='gpt-4-vision-preview')
+
+class data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.ImageCaptioningFromGPT4VMapper(mode: str = 'description', api_key: str = '', max_token: int = 500, temperature: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] = 1.0, system_prompt: str = '', user_prompt: str = '', user_prompt_key: str | None = None, keep_original_sample: bool = True, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate samples whose texts are generated based on
+   gpt-4-vision and the image.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.image_captioning_mapper module
+=====================================================
+
+class data_juicer.ops.mapper.image_captioning_mapper.ImageCaptioningMapper(hf_img2seq: str = 'Salesforce/blip2-opt-2.7b', trust_remote_code: bool = False, caption_num: Annotated[int, Gt(gt=0)] = 1, keep_candidate_mode: str = 'random_any', keep_original_sample: bool = True, prompt: str | None = None, prompt_key: str | None = None, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate samples whose captions are generated based on
+   another model and the figure.
+
+   process_batched(samples, rank=None)
+
+      Note:
+         This is a batched_OP, whose input and output type are both
+         list. Suppose there are $N$ input sample list with batch size
+         as $b$, and denote caption_num as $M$. the number of total
+         samples after generation is $2Nb$ for 'random_any' and
+         'similar_one' mode, and $(1+M)Nb$ for 'all' mode.
+
+      Parameters:
+         **samples**
+
+      Returns:
+
+data_juicer.ops.mapper.image_diffusion_mapper module
+====================================================
+
+class data_juicer.ops.mapper.image_diffusion_mapper.ImageDiffusionMapper(hf_diffusion: str = 'CompVis/stable-diffusion-v1-4', trust_remote_code: bool = False, torch_dtype: str = 'fp32', revision: str = 'main', strength: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] = 0.8, guidance_scale: float = 7.5, aug_num: Annotated[int, Gt(gt=0)] = 1, keep_original_sample: bool = True, caption_key: str | None = None, hf_img2seq: str = 'Salesforce/blip2-opt-2.7b', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Generate image by diffusion model
+
+   process_batched(samples, rank=None, context=False)
+
+      Note:
+         This is a batched_OP, whose the input and output type are
+         both list. Suppose there are $N$ input sample list with batch
+         size as $b$, and denote aug_num as $M$. the number of total
+         samples after generation is  $(1+M)Nb$.
+
+      Parameters:
+         **samples**
+
+      Returns:
+
+data_juicer.ops.mapper.image_face_blur_mapper module
+====================================================
+
+class data_juicer.ops.mapper.image_face_blur_mapper.ImageFaceBlurMapper(cv_classifier: str = '', blur_type: str = 'gaussian', radius: Annotated[float, Ge(ge=0)] = 2, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to blur faces detected in images.
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.image_remove_background_mapper module
+============================================================
+
+class data_juicer.ops.mapper.image_remove_background_mapper.ImageRemoveBackgroundMapper(alpha_matting: bool = False, alpha_matting_foreground_threshold: int = 240, alpha_matting_background_threshold: int = 10, alpha_matting_erode_size: int = 10, bgcolor: Tuple[int, int, int, int] | None = None, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove background of images
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.image_segment_mapper module
+==================================================
+
+class data_juicer.ops.mapper.image_segment_mapper.ImageSegmentMapper(imgsz=1024, conf=0.05, iou=0.5, model_path='FastSAM-x.pt', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Perform segment-anything on images and return the bounding boxes.
+
+   process_single(sample, rank=None, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.image_tagging_mapper module
+==================================================
+
+class data_juicer.ops.mapper.image_tagging_mapper.ImageTaggingMapper(tag_field_name: str = 'image_tags', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate image tags.
+
+   process_single(sample, rank=None, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper module
+======================================================================
+
+data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.is_noun(word)
+
+data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.compare_text_index(text1, text2)
+
+data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.iou_filter(samples, iou_thresh)
+
+class data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.Difference_Area_Generator_Mapper(image_pair_similarity_filter_args: Dict | None = {}, image_segment_mapper_args: Dict | None = {}, image_text_matching_filter_args: Dict | None = {}, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   A fused operator for OPs that is used to run sequential OPs on the
+   same batch to allow fine-grained control on data processing.
+
+   process_single(samples, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.imgdiff_difference_caption_generator_mapper module
+=========================================================================
+
+class data_juicer.ops.mapper.imgdiff_difference_caption_generator_mapper.Difference_Caption_Generator_Mapper(mllm_mapper_args: Dict | None = {}, image_text_matching_filter_args: Dict | None = {}, text_pair_similarity_filter_args: Dict | None = {}, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   A fused operator for OPs that is used to run sequential OPs on the
+   same batch to allow fine-grained control on data processing.
+
+   process_single(samples, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.mllm_mapper module
+=========================================
+
+class data_juicer.ops.mapper.mllm_mapper.MllmMapper(hf_model: str = 'llava-hf/llava-v1.6-vicuna-7b-hf', max_new_tokens=256, temperature=0.2, top_p=None, num_beams=1, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to use MLLMs for visual question answering tasks.
+   Recommended model list: [
+
+      llava-hf/llava-v1.6-vicuna-7b-hf, Qwen/Qwen2-VL-7B-Instruct,
+
+   ]
+
+   process_single(sample=None, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.nlpaug_en_mapper module
+==============================================
+
+class data_juicer.ops.mapper.nlpaug_en_mapper.NlpaugEnMapper(sequential: bool = False, aug_num: Annotated[int, Gt(gt=0)] = 1, keep_original_sample: bool = True, delete_random_word: bool = False, swap_random_word: bool = False, spelling_error_word: bool = False, split_random_word: bool = False, keyboard_error_char: bool = False, ocr_error_char: bool = False, delete_random_char: bool = False, swap_random_char: bool = False, insert_random_char: bool = False, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to simply augment samples in English based on nlpaug
+   library.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.nlpcda_zh_mapper module
+==============================================
+
+class data_juicer.ops.mapper.nlpcda_zh_mapper.NlpcdaZhMapper(sequential: bool = False, aug_num: Annotated[int, Gt(gt=0)] = 1, keep_original_sample: bool = True, replace_similar_word: bool = False, replace_homophone_char: bool = False, delete_random_char: bool = False, swap_random_char: bool = False, replace_equivalent_num: bool = False, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to simply augment samples in Chinese based on nlpcda
+   library.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.optimize_qa_mapper module
+================================================
+
+class data_juicer.ops.mapper.optimize_qa_mapper.OptimizeQAMapper(hf_model: str = 'Qwen/Qwen2.5-7B-Instruct', *, system_prompt: str | None = None, input_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, enable_vllm: bool = False, model_params: Dict | None = None, sampling_params: Dict | None = None, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to optimize question-answer pairs.
+
+   DEFAULT_SYSTEM_PROMPT = '请优化输入的问答对，使【问题】和【回答】都更加详细、准确。必须按照以下标记格式，直接输出优化后的问答对：\n【问题】\n优化后的问题\n【回答】\n优化后的回答'
+
+   DEFAULT_INPUT_TEMPLATE = '以下是原始问答对：\n{}'
+
+   DEFAULT_QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}'
+
+   DEFAULT_OUTPUT_PATTERN = '.*?【问题】\\s*(.*?)\\s*【回答】\\s*(.*)'
+
+   build_input(sample)
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.optimize_query_mapper module
+===================================================
+
+class data_juicer.ops.mapper.optimize_query_mapper.OptimizeQueryMapper(hf_model: str = 'Qwen/Qwen2.5-7B-Instruct', *, system_prompt: str | None = None, input_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, enable_vllm: bool = False, model_params: Dict | None = None, sampling_params: Dict | None = None, **kwargs)
+
+   Bases: "OptimizeQAMapper"
+
+   Mapper to optimize query in question-answer pairs.
+
+   DEFAULT_SYSTEM_PROMPT = '优化问答对中的【问题】，将其更加详细具体，但仍可以由原答案回答。只输出优化后的【问题】，不要输出多余内容。'
+
+   parse_output(raw_output)
+
+
+data_juicer.ops.mapper.optimize_response_mapper module
+======================================================
+
+class data_juicer.ops.mapper.optimize_response_mapper.OptimizeResponseMapper(hf_model: str = 'Qwen/Qwen2.5-7B-Instruct', *, system_prompt: str | None = None, input_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, enable_vllm: bool = False, model_params: Dict | None = None, sampling_params: Dict | None = None, **kwargs)
+
+   Bases: "OptimizeQAMapper"
+
+   Mapper to optimize response in question-answer pairs.
+
+   DEFAULT_SYSTEM_PROMPT = '请优化问答对中的回答，将其更加详细具体，但仍可以回答原问题。只输出优化后的回答，不要输出多余内容。'
+
+   parse_output(raw_output)
+
+
+data_juicer.ops.mapper.pair_preference_mapper module
+====================================================
+
+class data_juicer.ops.mapper.pair_preference_mapper.PairPreferenceMapper(api_model: str = 'gpt-4o', *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, output_pattern: str | None = None, rejected_key: str = 'rejected_response', reason_key: str = 'reason', try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to construct paired preference samples.
+
+   DEFAULT_SYSTEM_PROMPT = '你的任务是根据参考信息修改问答对中的回答，在语言风格、事实性、人物身份、立场等任一方面与原回答相反。必须按照以下标记格式输出，不要输出其他多余内容。\n【回答】\n生成的新回答\n【原因】\n生成该回答的原因'
+
+   DEFAULT_INPUT_TEMPLATE = '【参考信息】\n{reference}\n\n以下是原始问答对：\n【问题】\n{query}\n【回答】\n{response}'
+
+   DEFAULT_OUTPUT_PATTERN = '.*?【回答】\\s*(.*?)\\s*【原因】\\s*(.*)'
+
+   build_input(sample)
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.punctuation_normalization_mapper module
+==============================================================
+
+class data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper(*args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to normalize unicode punctuations to English punctuations in
+   text samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.python_file_mapper module
+================================================
+
+class data_juicer.ops.mapper.python_file_mapper.PythonFileMapper(file_path: str = '', function_name: str = 'process_single', batched: bool = False, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper for executing Python function defined in a file.
+
+   process_single(sample)
+
+      Invoke the loaded function with the provided sample.
+
+   process_batched(samples)
+
+      Invoke the loaded function with the provided samples.
+
+
+data_juicer.ops.mapper.python_lambda_mapper module
+==================================================
+
+class data_juicer.ops.mapper.python_lambda_mapper.PythonLambdaMapper(lambda_str: str = '', batched: bool = False, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper for executing Python lambda function on data samples.
+
+   process_single(sample)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.query_intent_detection_mapper module
+===========================================================
+
+class data_juicer.ops.mapper.query_intent_detection_mapper.QueryIntentDetectionMapper(hf_model: str = 'bespin-global/klue-roberta-small-3i4k-intent-classification', zh_to_en_hf_model: str | None = 'Helsinki-NLP/opus-mt-zh-en', model_params: Dict = {}, zh_to_en_model_params: Dict = {}, *, label_key: str = 'query_intent_label', score_key: str = 'query_intent_label_score', **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to predict user's Intent label in query. Input from
+   query_key. Output intent label and corresponding score for the
+   query.
+
+   process_batched(samples, rank=None)
+
+
+data_juicer.ops.mapper.query_sentiment_detection_mapper module
+==============================================================
+
+class data_juicer.ops.mapper.query_sentiment_detection_mapper.QuerySentimentDetectionMapper(hf_model: str = 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis', zh_to_en_hf_model: str | None = 'Helsinki-NLP/opus-mt-zh-en', model_params: Dict = {}, zh_to_en_model_params: Dict = {}, *, label_key: str = 'query_sentiment_label', score_key: str = 'query_sentiment_label_score', **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to predict user's sentiment label ('negative', 'neutral' and
+   'positive') in query. Input from query_key. Output label and
+   corresponding score for the query, which is store in
+   'query_sentiment_label' and 'query_sentiment_label_score' in Data-
+   Juicer meta field.
+
+   process_batched(samples, rank=None)
+
+
+data_juicer.ops.mapper.query_topic_detection_mapper module
+==========================================================
+
+class data_juicer.ops.mapper.query_topic_detection_mapper.QueryTopicDetectionMapper(hf_model: str = 'dstefa/roberta-base_topic_classification_nyt_news', zh_to_en_hf_model: str | None = 'Helsinki-NLP/opus-mt-zh-en', model_params: Dict = {}, zh_to_en_model_params: Dict = {}, *, label_key: str = 'query_topic_label', score_key: str = 'query_topic_label_score', **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to predict user's topic label in query. Input from
+   query_key. Output topic label and corresponding score for the
+   query, which is store in 'query_topic_label' and
+   'query_topic_label_score' in Data-Juicer meta field.
+
+   process_batched(samples, rank=None)
+
+
+data_juicer.ops.mapper.relation_identity_mapper module
+======================================================
+
+class data_juicer.ops.mapper.relation_identity_mapper.RelationIdentityMapper(api_model: str = 'gpt-4o', source_entity: str | None = None, target_entity: str | None = None, *, output_key: str = 'role_relation', api_endpoint: str | None = None, response_path: str | None = None, system_prompt_template: str | None = None, input_template: str | None = None, output_pattern_template: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   identify relation between two entity in the text.
+
+   DEFAULT_SYSTEM_PROMPT_TEMPLATE = '给定关于{entity1}和{entity2}的文本信息。判断{entity1}和{entity2}之间的关系。\n要求：\n- 关系用一个或多个词语表示，必要时可以加一个形容词来描述这段关系\n- 输出关系时不要参杂任何标点符号\n- 需要你进行合理的推理才能得出结论\n- 如果两个人物身份是同一个人，输出关系为：另一个身份\n- 输出格式为：\n分析推理：...\n所以{entity2}是{entity1}的：...\n- 注意输出的是{entity2}是{entity1}的什么关系，而不是{entity1}是{entity2}的什么关系'
+
+   DEFAULT_INPUT_TEMPLATE = '关于{entity1}和{entity2}的文本信息：\n```\n{text}\n```\n'
+
+   DEFAULT_OUTPUT_PATTERN_TEMPLATE = '\n        \\s*分析推理：\\s*(.*?)\\s*\n        \\s*所以{entity2}是{entity1}的：\\s*(.*?)\\Z\n    '
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.remove_bibliography_mapper module
+========================================================
+
+class data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper(*args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove bibliography at the end of documents in Latex
+   samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.remove_comments_mapper module
+====================================================
+
+class data_juicer.ops.mapper.remove_comments_mapper.RemoveCommentsMapper(doc_type: str | List[str] = 'tex', inline: bool = True, multiline: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove comments in different kinds of documents.
+
+   Only support 'tex' for now.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.remove_header_mapper module
+==================================================
+
+class data_juicer.ops.mapper.remove_header_mapper.RemoveHeaderMapper(drop_no_head: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove headers at the beginning of documents in Latex
+   samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.remove_long_words_mapper module
+======================================================
+
+class data_juicer.ops.mapper.remove_long_words_mapper.RemoveLongWordsMapper(min_len: int = 1, max_len: int = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove long words within a specific range.
+
+   should_keep_long_word(word)
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.remove_non_chinese_character_mapper module
+=================================================================
+
+class data_juicer.ops.mapper.remove_non_chinese_character_mapper.RemoveNonChineseCharacterlMapper(keep_alphabet: bool = True, keep_number: bool = True, keep_punc: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove non chinese Character in text samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.remove_repeat_sentences_mapper module
+============================================================
+
+data_juicer.ops.mapper.remove_repeat_sentences_mapper.split_sentence(text)
+
+class data_juicer.ops.mapper.remove_repeat_sentences_mapper.RemoveRepeatSentencesMapper(lowercase: bool = False, ignore_special_character: bool = True, min_repeat_sentence_length: int = 2, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove repeat sentences in text samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.remove_specific_chars_mapper module
+==========================================================
+
+class data_juicer.ops.mapper.remove_specific_chars_mapper.RemoveSpecificCharsMapper(chars_to_remove: str | List[str] = '◆●■►▼▲▴∆▻▷❖♡□', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to clean specific chars in text samples.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.remove_table_text_mapper module
+======================================================
+
+class data_juicer.ops.mapper.remove_table_text_mapper.RemoveTableTextMapper(min_col: Annotated[int, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=2), Le(le=20)])] = 2, max_col: Annotated[int, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=2), Le(le=20)])] = 20, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove table texts from text samples.
+
+   Regular expression is used to remove tables in the range of column
+   number of tables.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper module
+===========================================================================
+
+class data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.RemoveWordsWithIncorrectSubstringsMapper(lang: str = 'en', tokenization: bool = False, substrings: List[str] | None = None, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove words with incorrect substrings.
+
+   should_keep_word_with_incorrect_substrings(word, substrings)
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.replace_content_mapper module
+====================================================
+
+class data_juicer.ops.mapper.replace_content_mapper.ReplaceContentMapper(pattern: str | List[str] | None = None, repl: str | List[str] = '', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to replace all content in the text that matches a specific
+   regular expression pattern with a designated replacement string.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.sdxl_prompt2prompt_mapper module
+=======================================================
+
+class data_juicer.ops.mapper.sdxl_prompt2prompt_mapper.SDXLPrompt2PromptMapper(hf_diffusion: str = 'stabilityai/stable-diffusion-xl-base-1.0', trust_remote_code=False, torch_dtype: str = 'fp32', num_inference_steps: float = 50, guidance_scale: float = 7.5, text_key=None, text_key_second=None, output_dir='/root/.cache/data_juicer/assets', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Generate pairs of similar images by the SDXL model
+
+   process_single(sample, rank=None, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.sentence_augmentation_mapper module
+==========================================================
+
+class data_juicer.ops.mapper.sentence_augmentation_mapper.SentenceAugmentationMapper(hf_model: str = 'Qwen/Qwen2-7B-Instruct', system_prompt: str | None = None, task_sentence: str | None = None, max_new_tokens=256, temperature=0.2, top_p=None, num_beams=1, text_key=None, text_key_second=None, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to augment sentences. The purpose of this operation is to
+   enhance sentences. If the input text is at the document level, the
+   enhancement effect may not be optimal. Therefore, please consider
+   the length of the input text carefully.
+
+   Recommended model list: [
+      lmsys/vicuna-13b-v1.5 Qwen/Qwen2-7B-Instruct
+
+   ]
+
+   process_single(sample=None, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.sentence_split_mapper module
+===================================================
+
+class data_juicer.ops.mapper.sentence_split_mapper.SentenceSplitMapper(lang: str = 'en', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to split text samples to sentences.
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.text_chunk_mapper module
+===============================================
+
+class data_juicer.ops.mapper.text_chunk_mapper.TextChunkMapper(max_len: Annotated[int, Gt(gt=0)] | None = None, split_pattern: str | None = '\\n\\n', overlap_len: Annotated[int, Ge(ge=0)] = 0, tokenizer: str | None = None, trust_remote_code: bool = False, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Split input text to chunks.
+
+   recursively_chunk(text)
+
+   get_text_chunks(text, rank=None)
+
+   process_batched(samples, rank=None)
+
+
+data_juicer.ops.mapper.video_captioning_from_audio_mapper module
+================================================================
+
+class data_juicer.ops.mapper.video_captioning_from_audio_mapper.VideoCaptioningFromAudioMapper(keep_original_sample: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to caption a video according to its audio streams based on
+   Qwen-Audio model.
+
+   process_batched(samples, rank=None)
+
+
+data_juicer.ops.mapper.video_captioning_from_frames_mapper module
+=================================================================
+
+class data_juicer.ops.mapper.video_captioning_from_frames_mapper.VideoCaptioningFromFramesMapper(hf_img2seq: str = 'Salesforce/blip2-opt-2.7b', trust_remote_code: bool = False, caption_num: Annotated[int, Gt(gt=0)] = 1, keep_candidate_mode: str = 'random_any', keep_original_sample: bool = True, prompt: str | None = None, prompt_key: str | None = None, frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, horizontal_flip: bool = False, vertical_flip: bool = False, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate samples whose captions are generated based on an
+   image-to-text model and sampled video frames. Captions from
+   different frames will be concatenated to a single string.
+
+   process_batched(samples, rank=None, context=False)
+
+      Parameters:
+         **samples**
+
+      Returns:
+      Note:
+         This is a batched_OP, whose the input and output type are
+         both list. Suppose there are $N$ input sample list with batch
+         size as $b$, and denote caption_num as $M$. the number of
+         total samples after generation is $2Nb$ for 'random_any' and
+         'similar_one' mode, and $(1+M)Nb$ for 'all' mode.
+
+
+data_juicer.ops.mapper.video_captioning_from_summarizer_mapper module
+=====================================================================
+
+class data_juicer.ops.mapper.video_captioning_from_summarizer_mapper.VideoCaptioningFromSummarizerMapper(hf_summarizer: str | None = None, trust_remote_code: bool = False, consider_video_caption_from_video: bool = True, consider_video_caption_from_audio: bool = True, consider_video_caption_from_frames: bool = True, consider_video_tags_from_audio: bool = True, consider_video_tags_from_frames: bool = True, vid_cap_from_vid_args: Dict | None = None, vid_cap_from_frm_args: Dict | None = None, vid_tag_from_aud_args: Dict | None = None, vid_tag_from_frm_args: Dict | None = None, keep_tag_num: Annotated[int, Gt(gt=0)] = 5, keep_original_sample: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate video captions by summarizing several kinds of
+   generated texts (captions from video/audio/frames, tags from
+   audio/frames, ...)
+
+   process_batched(samples, rank=None)
+
+
+data_juicer.ops.mapper.video_captioning_from_video_mapper module
+================================================================
+
+class data_juicer.ops.mapper.video_captioning_from_video_mapper.VideoCaptioningFromVideoMapper(hf_video_blip: str = 'kpyu/video-blip-opt-2.7b-ego4d', trust_remote_code: bool = False, caption_num: Annotated[int, Gt(gt=0)] = 1, keep_candidate_mode: str = 'random_any', keep_original_sample: bool = True, prompt: str | None = None, prompt_key: str | None = None, frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, horizontal_flip: bool = False, vertical_flip: bool = False, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate samples whose captions are generated based on a
+   video-to-text model and sampled video frame.
+
+   process_batched(samples, rank=None, context=False)
+
+      Parameters:
+         **samples**
+
+      Returns:
+      Note:
+         This is a batched_OP, whose the input and output type are
+         both list. Suppose there are $N$ input sample list with batch
+         size as $b$, and denote caption_num as $M$. the number of
+         total samples after generation is $2Nb$ for 'random_any' and
+         'similar_one' mode, and $(1+M)Nb$ for 'all' mode.
+
+
+data_juicer.ops.mapper.video_extract_frames_mapper module
+=========================================================
+
+class data_juicer.ops.mapper.video_extract_frames_mapper.VideoExtractFramesMapper(frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, duration: float = 0, frame_dir: str | None = None, frame_key='video_frames', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to extract frames from video files according to specified
+   methods. Extracted Frames Data Format:
+
+      The data format for the extracted frames is a dictionary mapping
+      video key to extracted frames directory where the extracted
+      frames are saved. The dictionary follows the structure: {
+
+         "video_key_1": "/${frame_dir}/video_key_1_filename/",
+         "video_key_2": "/${frame_dir}/video_key_2_filename/", ...
+
+      }
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.video_face_blur_mapper module
+====================================================
+
+class data_juicer.ops.mapper.video_face_blur_mapper.VideoFaceBlurMapper(cv_classifier: str = '', blur_type: str = 'gaussian', radius: float = 2, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to blur faces detected in videos.
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper module
+=========================================================
+
+class data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper.VideoFFmpegWrappedMapper(filter_name: str | None = None, filter_kwargs: Dict | None = None, global_args: List[str] | None = None, capture_stderr: bool = True, overwrite_output: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Simple wrapper for FFmpeg video filters.
+
+   process_single(sample)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.video_remove_watermark_mapper module
+===========================================================
+
+class data_juicer.ops.mapper.video_remove_watermark_mapper.VideoRemoveWatermarkMapper(roi_strings: List[str] = ['0,0,0.1,0.1'], roi_type: str = 'ratio', roi_key: str | None = None, frame_num: Annotated[int, Gt(gt=0)] = 10, min_frame_threshold: Annotated[int, Gt(gt=0)] = 7, detection_method: str = 'pixel_value', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Remove the watermarks in videos given regions.
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.video_resize_aspect_ratio_mapper module
+==============================================================
+
+data_juicer.ops.mapper.video_resize_aspect_ratio_mapper.rescale(width, height, ori_ratio, min_ratio, max_ratio, strategy)
+
+class data_juicer.ops.mapper.video_resize_aspect_ratio_mapper.VideoResizeAspectRatioMapper(min_ratio: str = '9/21', max_ratio: str = '21/9', strategy: str = 'increase', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to resize videos by aspect ratio. AspectRatio = W / H.
+
+   STRATEGY = ['decrease', 'increase']
+
+   process_single(sample)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.video_resize_resolution_mapper module
+============================================================
+
+class data_juicer.ops.mapper.video_resize_resolution_mapper.VideoResizeResolutionMapper(min_width: int = 1, max_width: int = 9223372036854775807, min_height: int = 1, max_height: int = 9223372036854775807, force_original_aspect_ratio: str = 'disable', force_divisible_by: Annotated[int, Gt(gt=0)] = 2, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to resize videos resolution. We leave the super resolution
+   with deep learning for future works.
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.video_split_by_duration_mapper module
+============================================================
+
+data_juicer.ops.mapper.video_split_by_duration_mapper.create_replacer(replacements)
+
+class data_juicer.ops.mapper.video_split_by_duration_mapper.VideoSplitByDurationMapper(split_duration: float = 10, min_last_split_duration: float = 0, keep_original_sample: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to split video by duration.
+
+   split_videos_by_duration(video_key, container)
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.video_split_by_key_frame_mapper module
+=============================================================
+
+data_juicer.ops.mapper.video_split_by_key_frame_mapper.create_replacer(replacements)
+
+class data_juicer.ops.mapper.video_split_by_key_frame_mapper.VideoSplitByKeyFrameMapper(keep_original_sample: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to split video by key frame.
+
+   get_split_key_frame(video_key, container)
+
+   process_batched(samples)
+
+
+data_juicer.ops.mapper.video_split_by_scene_mapper module
+=========================================================
+
+data_juicer.ops.mapper.video_split_by_scene_mapper.replace_func(match, scene_counts_iter)
+
+class data_juicer.ops.mapper.video_split_by_scene_mapper.VideoSplitBySceneMapper(detector: str = 'ContentDetector', threshold: Annotated[float, Ge(ge=0)] = 27.0, min_scene_len: Annotated[int, Ge(ge=0)] = 15, show_progress: bool = False, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to cut videos into scene clips.
+
+   avaliable_detectors = {'AdaptiveDetector': ['window_width', 'min_content_val', 'weights', 'luma_only', 'kernel_size', 'video_manager', 'min_delta_hsv'], 'ContentDetector': ['weights', 'luma_only', 'kernel_size'], 'ThresholdDetector': ['fade_bias', 'add_final_scene', 'method', 'block_size']}
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.video_tagging_from_audio_mapper module
+=============================================================
+
+class data_juicer.ops.mapper.video_tagging_from_audio_mapper.VideoTaggingFromAudioMapper(hf_ast: str = 'MIT/ast-finetuned-audioset-10-10-0.4593', trust_remote_code: bool = False, tag_field_name: str = 'video_audio_tags', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate video tags from audio streams extracted by video
+   using the Audio Spectrogram Transformer.
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.video_tagging_from_frames_mapper module
+==============================================================
+
+class data_juicer.ops.mapper.video_tagging_from_frames_mapper.VideoTaggingFromFramesMapper(frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, tag_field_name: str = 'video_frame_tags', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate video tags from frames extract by video.
+
+   process_single(sample, rank=None, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+
+data_juicer.ops.mapper.whitespace_normalization_mapper module
+=============================================================
+
+class data_juicer.ops.mapper.whitespace_normalization_mapper.WhitespaceNormalizationMapper(*args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to normalize different kinds of whitespaces to whitespace '
+   ' (0x20) in text samples.
+
+   Different kinds of whitespaces can be found here:
+   https://en.wikipedia.org/wiki/Whitespace_character
+
+   process_batched(samples)
+
+
+Module contents
+===============
+
+class data_juicer.ops.mapper.AudioAddGaussianNoiseMapper(min_amplitude: float = 0.001, max_amplitude: float = 0.015, p: float = 0.5, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to add gaussian noise to audio.
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.AudioFFmpegWrappedMapper(filter_name: str | None = None, filter_kwargs: Dict | None = None, global_args: List[str] | None = None, capture_stderr: bool = True, overwrite_output: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Simple wrapper for FFmpeg audio filters.
+
+   process_single(sample)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.CalibrateQAMapper(api_model: str = 'gpt-4o', *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, reference_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to calibrate question-answer pairs based on reference text.
+
+   DEFAULT_SYSTEM_PROMPT = '请根据提供的【参考信息】对【问题】和【回答】进行校准，使其更加详细、准确。\n按照以下格式输出：\n【问题】\n校准后的问题\n【回答】\n校准后的回答'
+
+   DEFAULT_INPUT_TEMPLATE = '{reference}\n{qa_pair}'
+
+   DEFAULT_REFERENCE_TEMPLATE = '【参考信息】\n{}'
+
+   DEFAULT_QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}'
+
+   DEFAULT_OUTPUT_PATTERN = '【问题】\\s*(.*?)\\s*【回答】\\s*(.*)'
+
+   build_input(sample)
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.CalibrateQueryMapper(api_model: str = 'gpt-4o', *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, reference_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "CalibrateQAMapper"
+
+   Mapper to calibrate query in question-answer pairs based on
+   reference text.
+
+   DEFAULT_SYSTEM_PROMPT = '请根据提供的【参考信息】对问答对中的【问题】进行校准，        使其更加详细、准确，且仍可以由原答案回答。只输出校准后的问题，不要输出多余内容。'
+
+   parse_output(raw_output)
+
+class data_juicer.ops.mapper.CalibrateResponseMapper(api_model: str = 'gpt-4o', *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, reference_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "CalibrateQAMapper"
+
+   Mapper to calibrate response in question-answer pairs based on
+   reference text.
+
+   DEFAULT_SYSTEM_PROMPT = '请根据提供的【参考信息】对问答对中的【回答】进行校准，        使其更加详细、准确，且仍可以回答原问题。只输出校准后的回答，不要输出多余内容。'
+
+   parse_output(raw_output)
+
+class data_juicer.ops.mapper.ChineseConvertMapper(mode: str = 's2t', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to convert Chinese between Traditional Chinese, Simplified
+   Chinese and Japanese Kanji.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.CleanCopyrightMapper(*args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to clean copyright comments at the beginning of the text
+   samples.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.CleanEmailMapper(pattern: str | None = None, repl: str = '', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to clean email in text samples.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.CleanHtmlMapper(*args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to clean html code in text samples.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.CleanIpMapper(pattern: str | None = None, repl: str = '', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to clean ipv4 and ipv6 address in text samples.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.CleanLinksMapper(pattern: str | None = None, repl: str = '', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to clean links like http/https/ftp in text samples.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.DialogIntentDetectionMapper(api_model: str = 'gpt-4o', intent_candidates: List[str] | None = None, max_round: Annotated[int, Ge(ge=0)] = 10, *, labels_key: str = 'dialog_intent_labels', analysis_key: str = 'dialog_intent_labels_analysis', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, query_template: str | None = None, response_template: str | None = None, candidate_template: str | None = None, analysis_template: str | None = None, labels_template: str | None = None, analysis_pattern: str | None = None, labels_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate user's intent labels in dialog. Input from
+   history_key, query_key and response_key. Output lists of labels and
+   analysis for queries in the dialog.
+
+   DEFAULT_SYSTEM_PROMPT = '请判断用户和LLM多轮对话中用户的意图。\n要求：\n- 需要先进行分析，然后列出用户所具有的意图，下面是一个样例，请模仿样例格式输出。\n用户：你好，我最近对人工智能很感兴趣，能给我讲讲什么是机器学习吗？\n意图分析：用户在请求信息，希望了解有关机器学习的基础知识。\n意图类别：信息查找\nLLM：你好！当然可以。机器学习是一种人工智能方法，允许计算机通过数据自动改进和学习。\n用户：听起来很有趣，有没有推荐的入门书籍或资料？\n意图分析：用户在请求建议，希望获取关于机器学习的入门资源。\n意图类别：请求建议\nLLM：有很多不错的入门书籍和资源。一本常被推荐的书是《Python机器学习实践》（Python Machine Learning），它涵盖了基础知识和一些实际案例。此外，您还可以参考Coursera或edX上的在线课程，这些课程提供了系统的学习路径。\n用户：谢谢你的建议！我还想知道，学习机器学习需要什么样的数学基础？\n意图分析：用户在寻求信息，希望了解学习机器学习所需的前提条件，特别是在数学方面。\n意图类别：信息查找\nLLM：学习机器学习通常需要一定的数学基础，特别是线性代数、概率论和统计学。这些数学领域帮助理解算法的工作原理和数据模式分析。如果您对这些主题不太熟悉，建议先从相关基础书籍或在线资源开始学习。\n用户：明白了，我会先补习这些基础知识。再次感谢你的帮助！\n意图分析：用户表达感谢，并表示计划付诸行动来补充所需的基础知识。\n意图类别：其他'
+
+   DEFAULT_QUERY_TEMPLATE = '用户：{query}\n'
+
+   DEFAULT_RESPONSE_TEMPLATE = 'LLM：{response}\n'
+
+   DEFAULT_CANDIDATES_TEMPLATE = '备选意图类别：[{candidate_str}]'
+
+   DEFAULT_ANALYSIS_TEMPLATE = '意图分析：{analysis}\n'
+
+   DEFAULT_LABELS_TEMPLATE = '意图类别：{labels}\n'
+
+   DEFAULT_ANALYSIS_PATTERN = '意图分析：(.*?)\n'
+
+   DEFAULT_LABELS_PATTERN = '意图类别：(.*?)($|\n)'
+
+   build_input(history, query)
+
+   parse_output(response)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.DialogSentimentDetectionMapper(api_model: str = 'gpt-4o', sentiment_candidates: List[str] | None = None, max_round: Annotated[int, Ge(ge=0)] = 10, *, labels_key: str = 'dialog_sentiment_labels', analysis_key: str = 'dialog_sentiment_labels_analysis', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, query_template: str | None = None, response_template: str | None = None, candidate_template: str | None = None, analysis_template: str | None = None, labels_template: str | None = None, analysis_pattern: str | None = None, labels_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate user's sentiment labels in dialog. Input from
+   history_key, query_key and response_key. Output lists of labels and
+   analysis for queries in the dialog.
+
+   DEFAULT_SYSTEM_PROMPT = '请判断用户和LLM多轮对话中用户所具有的情绪。\n要求：\n- 需要先进行分析，然后罗列用户所具有的情绪，下面是一个样例，请模仿样例格式输出。\n用户：最近工作压力好大，我觉得整个人都快被压垮了。\n情感分析：用户的言语中透露出明显的压力和疲惫感，可能还夹杂着一些无助和焦虑。\n情感类别：压力、疲惫、无助、焦虑\nLLM：听起来你真的承受了很多，面临这种情况确实不容易。有没有考虑过找一些放松的方式，比如听音乐或者散步来减轻压力呢？\n用户：试过了，但是好像没什么效果，每天的事情都堆积如山。\n情感分析：用户感到无力解决现状，有挫败感，并且对尝试放松的方式失去信心。\n情感类别：无力、挫败\nLLM：我理解你的感受，有时候压力积累到一定程度确实让人难以承受。或许你可以尝试规划一下时间，把任务分成小块来完成，这样可能会减少一些压力感。\n用户：这个主意不错，我会试着让自己更有条理一些，谢谢你的建议。\n情感分析：用户对建议表现出认同和感激，同时展现出试图积极面对问题的态度。\n情感类别：认同、感激、积极\nLLM：不用谢，我很高兴能帮到你。记得给自己一些时间去适应新的计划，有任何需要随时可以跟我说哦！\n'
+
+   DEFAULT_QUERY_TEMPLATE = '用户：{query}\n'
+
+   DEFAULT_RESPONSE_TEMPLATE = 'LLM：{response}\n'
+
+   DEFAULT_CANDIDATES_TEMPLATE = '备选情感类别：[{candidate_str}]'
+
+   DEFAULT_ANALYSIS_TEMPLATE = '情感分析：{analysis}\n'
+
+   DEFAULT_LABELS_TEMPLATE = '情感类别：{labels}\n'
+
+   DEFAULT_ANALYSIS_PATTERN = '情感分析：(.*?)\n'
+
+   DEFAULT_LABELS_PATTERN = '情感类别：(.*?)($|\n)'
+
+   build_input(history, query)
+
+   parse_output(response)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.DialogSentimentIntensityMapper(api_model: str = 'gpt-4o', max_round: Annotated[int, Ge(ge=0)] = 10, *, intensities_key: str = 'dialog_sentiment_intensity', analysis_key: str = 'dialog_sentiment_intensity_analysis', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, query_template: str | None = None, response_template: str | None = None, analysis_template: str | None = None, intensity_template: str | None = None, analysis_pattern: str | None = None, intensity_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to predict user's sentiment intensity (from -5 to 5 in
+   default prompt) in dialog. Input from history_key, query_key and
+   response_key. Output lists of intensities and analysis for queries
+   in the dialog.
+
+   DEFAULT_SYSTEM_PROMPT = '请判断用户和LLM多轮对话中用户的情绪变化。\n要求：\n- 用户情绪值是-5到5之间到整数，-5表示极度负面，5表示极度正面，-5到5之间数值表示情绪从负面逐渐到正面的变化过程，0代表情呈绪中性。\n- 只输出当轮对话的分析，不要继续构造对话。\n- 需要先进行分析，然后确定用户的情绪值，下面是一个样例，请模仿样例格式输出。\n用户：你好，我对可持续发展的定义有点模糊，帮我解释一下？\n情绪分析：刚开始，还没得到LLM回复，用户情绪呈中性。\n情绪值：0\nLLM：当然可以！可持续发展是指在满足当代人的需求的同时，不损害子孙后代满足其自身需求的能力的发展模式。它包括经济发展、社会发展和环境保护三个主要方面。通过合理利用资源和保护环境，我们可以确保未来的世代也能享有健全的生态系统和经济制度。\n用户：谢谢你的解释！那你能告诉我一些普通人可以采取的可持续生活方式吗？\n情绪分析：对回答感到满意，情绪正面。\n情绪值：1\nLLM：当然可以，普通人可以通过减少一次性产品的使用、选择公共交通或拼车、节约用水、以及支持本地和可持续发展的企业等方式来践行可持续生活。此外，关注垃圾分类和多用电子账单也是不错的选择。\n用户：你提到支持本地企业，这一点我很感兴趣。能详细说说为什么这对可持续发展有促进作用吗？\n情绪分析：觉得回答实用且具体，情绪进一步转好。\n情绪值：2\nLLM：呃，我最近发现了一部新电影，讲述了一个关于外星人和地球土著合作保护环境的故事。虽然它是科幻片，但很有启发性，推荐你去看看。\n用户：什么吗，根本是答非所问。\n情绪分析：LLM没有回应问题而是提到无关内容，导致用户情绪直线下降。\n情绪值：-2\nLLM：抱歉刚才的偏题！支持本地企业有助于减少长途运输产生的碳足迹，使供应链更加环保。此外，本地企业也更有可能采用可持续的生产方式，同时促进社区经济的繁荣。\n用户：还行吧，算你能够掰回来。\n情绪分析：问题得到解答，问题偏题得到纠正，情绪稍有好转。\n情绪值：-1\n'
+
+   DEFAULT_QUERY_TEMPLATE = '用户：{query}\n'
+
+   DEFAULT_RESPONSE_TEMPLATE = 'LLM：{response}\n'
+
+   DEFAULT_ANALYSIS_TEMPLATE = '情绪分析：{analysis}\n'
+
+   DEFAULT_INTENSITY_TEMPLATE = '情绪值：{intensity}\n'
+
+   DEFAULT_ANALYSIS_PATTERN = '情绪分析：(.*?)\n'
+
+   DEFAULT_INTENSITY_PATTERN = '情绪值：(.*?)($|\n)'
+
+   build_input(history, query)
+
+   parse_output(response)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.DialogTopicDetectionMapper(api_model: str = 'gpt-4o', topic_candidates: List[str] | None = None, max_round: Annotated[int, Ge(ge=0)] = 10, *, labels_key: str = 'dialog_topic_labels', analysis_key: str = 'dialog_topic_labels_analysis', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, query_template: str | None = None, response_template: str | None = None, candidate_template: str | None = None, analysis_template: str | None = None, labels_template: str | None = None, analysis_pattern: str | None = None, labels_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate user's topic labels in dialog. Input from
+   history_key, query_key and response_key. Output lists of labels and
+   analysis for queries in the dialog.
+
+   DEFAULT_SYSTEM_PROMPT = '请判断用户和LLM多轮对话中用户所讨论的话题。\n要求：\n- 针对用户的每个query，需要先进行分析，然后列出用户正在讨论的话题，下面是一个样例，请模仿样例格式输出。\n用户：你好，今天我们来聊聊秦始皇吧。\n话题分析：用户提到秦始皇，这是中国历史上第一位皇帝。\n话题类别：历史\nLLM：当然可以，秦始皇是中国历史上第一个统一全国的皇帝，他在公元前221年建立了秦朝，并采取了一系列重要的改革措施，如统一文字、度量衡和货币等。\n用户：秦始皇修建的长城和现在的长城有什么区别？\n话题分析：用户提到秦始皇修建的长城，并将其与现代长城进行比较，涉及建筑历史和地理位置。\n话题类别：历史LLM：秦始皇时期修建的长城主要是为了抵御北方游牧民族的入侵，它的规模和修建技术相对较为简陋。现代人所看到的长城大部分是明朝时期修建和扩建的，明长城不仅规模更大、结构更坚固，而且保存得比较完好。\n用户：有意思，那么长城的具体位置在哪些省份呢？\n话题分析：用户询问长城的具体位置，涉及到地理知识。\n话题类别：地理\nLLM：长城横跨中国北方多个省份，主要包括河北、山西、内蒙古、宁夏、陕西、甘肃和北京等。每一段长城都建在关键的战略位置，以便最大限度地发挥其防御作用。\n'
+
+   DEFAULT_QUERY_TEMPLATE = '用户：{query}\n'
+
+   DEFAULT_RESPONSE_TEMPLATE = 'LLM：{response}\n'
+
+   DEFAULT_CANDIDATES_TEMPLATE = '备选话题类别：[{candidate_str}]'
+
+   DEFAULT_ANALYSIS_TEMPLATE = '话题分析：{analysis}\n'
+
+   DEFAULT_LABELS_TEMPLATE = '话题类别：{labels}\n'
+
+   DEFAULT_ANALYSIS_PATTERN = '话题分析：(.*?)\n'
+
+   DEFAULT_LABELS_PATTERN = '话题类别：(.*?)($|\n)'
+
+   build_input(history, query)
+
+   parse_output(response)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.Difference_Area_Generator_Mapper(image_pair_similarity_filter_args: Dict | None = {}, image_segment_mapper_args: Dict | None = {}, image_text_matching_filter_args: Dict | None = {}, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   A fused operator for OPs that is used to run sequential OPs on the
+   same batch to allow fine-grained control on data processing.
+
+   process_single(samples, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.ExtractEntityAttributeMapper(api_model: str = 'gpt-4o', query_entities: List[str] = [], query_attributes: List[str] = [], *, entity_key: str = 'main_entities', attribute_key: str = 'attributes', attribute_desc_key: str = 'attribute_descriptions', support_text_key: str = 'attribute_support_texts', api_endpoint: str | None = None, response_path: str | None = None, system_prompt_template: str | None = None, input_template: str | None = None, attr_pattern_template: str | None = None, demo_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Extract attributes for given entities from the text
+
+   DEFAULT_SYSTEM_PROMPT_TEMPLATE = '给定一段文本，从文本中总结{entity}的{attribute}，并且从原文摘录最能说明该{attribute}的代表性示例。\n要求：\n- 摘录的示例应该简短。\n- 遵循如下的回复格式：\n# {entity}\n## {attribute}：\n...\n### 代表性示例摘录1：\n```\n...\n```\n### 代表性示例摘录2：\n```\n...\n```\n...\n'
+
+   DEFAULT_INPUT_TEMPLATE = '# 文本\n```\n{text}\n```\n'
+
+   DEFAULT_ATTR_PATTERN_TEMPLATE = '\\#\\#\\s*{attribute}：\\s*(.*?)(?=\\#\\#\\#|\\Z)'
+
+   DEFAULT_DEMON_PATTERN = '\\#\\#\\#\\s*代表性示例摘录(\\d+)：\\s*```\\s*(.*?)```\\s*(?=\\#\\#\\#|\\Z)'
+
+   parse_output(raw_output, attribute_name)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.ExtractEntityRelationMapper(api_model: str = 'gpt-4o', entity_types: List[str] | None = None, *, entity_key: str = 'entity', relation_key: str = 'relation', api_endpoint: str | None = None, response_path: str | None = None, prompt_template: str | None = None, tuple_delimiter: str | None = None, record_delimiter: str | None = None, completion_delimiter: str | None = None, max_gleaning: Annotated[int, Ge(ge=0)] = 1, continue_prompt: str | None = None, if_loop_prompt: str | None = None, entity_pattern: str | None = None, relation_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Extract entities and relations in the text for knowledge graph.
+
+   DEFAULT_PROMPT_TEMPLATE = '-Goal-\nGiven a text document that is potentially relevant to this activity and a list of entity types, identify all entities of those types from the text and all relationships among the identified entities.\n\n-Steps-\n1. Identify all entities. For each identified entity, extract the following information:\n- entity_name: Name of the entity\n- entity_type: One of the following types: [{entity_types}]\n- entity_description: Comprehensive description of the entity\'s attributes and activities\nFormat each entity as ("entity"{tuple_delimiter}<entity_name>{tuple_delimiter}<entity_type>{tuple_delimiter}<entity_description>\n\n2. From the entities identified in step 1, identify all pairs of (source_entity, target_entity) that are *clearly related* to each other.\nFor each pair of related entities, extract the following information:\n- source_entity: name of the source entity, as identified in step 1\n- target_entity: name of the target entity, as identified in step 1\n- relationship_description: explanation as to why you think the source entity and the target entity are related to each other\n- relationship_strength: a numeric score indicating strength of the relationship between the source entity and target entity\n- relationship_keywords: one or more high-level key words that summarize the overarching nature of the relationship, focusing on concepts or themes rather than specific details\nFormat each relationship as ("relationship"{tuple_delimiter}<source_entity>{tuple_delimiter}<target_entity>{tuple_delimiter}<relationship_description>{tuple_delimiter}<relationship_keywords>{tuple_delimiter}<relationship_strength>)\n\n3. Return output in the language of the given text as a single list of all the entities and relationships identified in steps 1 and 2. Use **{record_delimiter}** as the list delimiter.\n\n4. When finished, output {completion_delimiter}\n\n######################\n-Examples-\n######################\nExample 1:\n\nEntity_types: [person, technology, mission, organization, location]\nText:\n```\nwhile Alex clenched his jaw, the buzz of frustration dull against the backdrop of Taylor\'s authoritarian certainty. It was this competitive undercurrent that kept him alert, the sense that his and Jordan\'s shared commitment to discovery was an unspoken rebellion against Cruz\'s narrowing vision of control and order.\n\nThen Taylor did something unexpected. They paused beside Jordan and, for a moment, observed the device with something akin to reverence. “If this tech can be understood..." Taylor said, their voice quieter, "It could change the game for us. For all of us.”\n\nThe underlying dismissal earlier seemed to falter, replaced by a glimpse of reluctant respect for the gravity of what lay in their hands. Jordan looked up, and for a fleeting heartbeat, their eyes locked with Taylor\'s, a wordless clash of wills softening into an uneasy truce.\n\nIt was a small transformation, barely perceptible, but one that Alex noted with an inward nod. They had all been brought here by different paths\n```\n################\nOutput:\n("entity"{tuple_delimiter}"Alex"{tuple_delimiter}"person"{tuple_delimiter}"Alex is a character who experiences frustration and is observant of the dynamics among other characters."){record_delimiter}\n("entity"{tuple_delimiter}"Taylor"{tuple_delimiter}"person"{tuple_delimiter}"Taylor is portrayed with authoritarian certainty and shows a moment of reverence towards a device, indicating a change in perspective."){record_delimiter}\n("entity"{tuple_delimiter}"Jordan"{tuple_delimiter}"person"{tuple_delimiter}"Jordan shares a commitment to discovery and has a significant interaction with Taylor regarding a device."){record_delimiter}\n("entity"{tuple_delimiter}"Cruz"{tuple_delimiter}"person"{tuple_delimiter}"Cruz is associated with a vision of control and order, influencing the dynamics among other characters."){record_delimiter}\n("entity"{tuple_delimiter}"The Device"{tuple_delimiter}"technology"{tuple_delimiter}"The Device is central to the story, with potential game-changing implications, and is reversed by Taylor."){record_delimiter}\n("relationship"{tuple_delimiter}"Alex"{tuple_delimiter}"Taylor"{tuple_delimiter}"Alex is affected by Taylor\'s authoritarian certainty and observes changes in Taylor\'s attitude towards the device."{tuple_delimiter}"power dynamics, perspective shift"{tuple_delimiter}7){record_delimiter}\n("relationship"{tuple_delimiter}"Alex"{tuple_delimiter}"Jordan"{tuple_delimiter}"Alex and Jordan share a commitment to discovery, which contrasts with Cruz\'s vision."{tuple_delimiter}"shared goals, rebellion"{tuple_delimiter}6){record_delimiter}\n("relationship"{tuple_delimiter}"Taylor"{tuple_delimiter}"Jordan"{tuple_delimiter}"Taylor and Jordan interact directly regarding the device, leading to a moment of mutual respect and an uneasy truce."{tuple_delimiter}"conflict resolution, mutual respect"{tuple_delimiter}8){record_delimiter}\n("relationship"{tuple_delimiter}"Jordan"{tuple_delimiter}"Cruz"{tuple_delimiter}"Jordan\'s commitment to discovery is in rebellion against Cruz\'s vision of control and order."{tuple_delimiter}"ideological conflict, rebellion"{tuple_delimiter}5){record_delimiter}\n("relationship"{tuple_delimiter}"Taylor"{tuple_delimiter}"The Device"{tuple_delimiter}"Taylor shows reverence towards the device, indicating its importance and potential impact."{tuple_delimiter}"reverence, technological significance"{tuple_delimiter}9){record_delimiter}\n#############################\nExample 2:\n\nEntity_types: [人物, 技术, 任务, 组织, 地点]\nText:\n```\n他们不再是单纯的执行者；他们已成为某个超越星辰与条纹的领域的信息守护者。这一使命的提升不能被规则和既定协议所束缚——它需要一种新的视角，一种新的决心。\n\n随着与华盛顿的通讯在背景中嗡嗡作响，对话中的紧张情绪通过嘟嘟声和静电噪音贯穿始终。团队站立着，一股不祥的气息笼罩着他们。显然，他们在接下来几个小时内做出的决定可能会重新定义人类在宇宙中的位置，或者将他们置于无知和潜在危险之中。\n\n随着与星辰的联系变得更加牢固，小组开始处理逐渐成形的警告，从被动接受者转变为积极参与者。梅瑟后来的直觉占据了上风——团队的任务已经演变，不再仅仅是观察和报告，而是互动和准备。一场蜕变已经开始，而“杜尔塞行动”则以他们大胆的新频率震动，这种基调不是由世俗设定的\n```\n#############\nOutput:\n("entity"{tuple_delimiter}"华盛顿"{tuple_delimiter}"地点"{tuple_delimiter}"华盛顿是正在接收通讯的地方，表明其在决策过程中的重要性。"){record_delimiter}\n("entity"{tuple_delimiter}"杜尔塞行动"{tuple_delimiter}"任务"{tuple_delimiter}"杜尔塞行动被描述为一项已演变为互动和准备的任务，显示出目标和活动的重大转变。"){record_delimiter}\n("entity"{tuple_delimiter}"团队"{tuple_delimiter}"组织"{tuple_delimiter}"团队被描绘成一群从被动观察者转变为积极参与者的人，展示了他们角色的动态变化。"){record_delimiter}\n("relationship"{tuple_delimiter}"团队"{tuple_delimiter}"华盛顿"{tuple_delimiter}"团队收到来自华盛顿的通讯，这影响了他们的决策过程。"{tuple_delimiter}"决策、外部影响"{tuple_delimiter}7){record_delimiter}\n("relationship"{tuple_delimiter}"团队"{tuple_delimiter}"杜尔塞行动"{tuple_delimiter}"团队直接参与杜尔塞行动，执行其演变后的目标和活动。"{tuple_delimiter}"任务演变、积极参与"{tuple_delimiter}9){completion_delimiter}\n#############################\nExample 3:\n\nEntity_types: [person, role, technology, organization, event, location, concept]\nText:\n```\ntheir voice slicing through the buzz of activity. "Control may be an illusion when facing an intelligence that literally writes its own rules," they stated stoically, casting a watchful eye over the flurry of data.\n\n"It\'s like it\'s learning to communicate," offered Sam Rivera from a nearby interface, their youthful energy boding a mix of awe and anxiety. "This gives talking to strangers\' a whole new meaning."\n\nAlex surveyed his team—each face a study in concentration, determination, and not a small measure of trepidation. "This might well be our first contact," he acknowledged, "And we need to be ready for whatever answers back."\n\nTogether, they stood on the edge of the unknown, forging humanity\'s response to a message from the heavens. The ensuing silence was palpable—a collective introspection about their role in this grand cosmic play, one that could rewrite human history.\n\nThe encrypted dialogue continued to unfold, its intricate patterns showing an almost uncanny anticipation\n```\n#############\nOutput:\n("entity"{tuple_delimiter}"Sam Rivera"{tuple_delimiter}"person"{tuple_delimiter}"Sam Rivera is a member of a team working on communicating with an unknown intelligence, showing a mix of awe and anxiety."){record_delimiter}\n("entity"{tuple_delimiter}"Alex"{tuple_delimiter}"person"{tuple_delimiter}"Alex is the leader of a team attempting first contact with an unknown intelligence, acknowledging the significance of their task."){record_delimiter}\n("entity"{tuple_delimiter}"Control"{tuple_delimiter}"concept"{tuple_delimiter}"Control refers to the ability to manage or govern, which is challenged by an intelligence that writes its own rules."){record_delimiter}\n("entity"{tuple_delimiter}"Intelligence"{tuple_delimiter}"concept"{tuple_delimiter}"Intelligence here refers to an unknown entity capable of writing its own rules and learning to communicate."){record_delimiter}\n("entity"{tuple_delimiter}"First Contact"{tuple_delimiter}"event"{tuple_delimiter}"First Contact is the potential initial communication between humanity and an unknown intelligence."){record_delimiter}\n("entity"{tuple_delimiter}"Humanity\'s Response"{tuple_delimiter}"event"{tuple_delimiter}"Humanity\'s Response is the collective action taken by Alex\'s team in response to a message from an unknown intelligence."){record_delimiter}\n("relationship"{tuple_delimiter}"Sam Rivera"{tuple_delimiter}"Intelligence"{tuple_delimiter}"Sam Rivera is directly involved in the process of learning to communicate with the unknown intelligence."{tuple_delimiter}"communication, learning process"{tuple_delimiter}9){record_delimiter}\n("relationship"{tuple_delimiter}"Alex"{tuple_delimiter}"First Contact"{tuple_delimiter}"Alex leads the team that might be making the First Contact with the unknown intelligence."{tuple_delimiter}"leadership, exploration"{tuple_delimiter}10){record_delimiter}\n("relationship"{tuple_delimiter}"Alex"{tuple_delimiter}"Humanity\'s Response"{tuple_delimiter}"Alex and his team are the key figures in Humanity\'s Response to the unknown intelligence."{tuple_delimiter}"collective action, cosmic significance"{tuple_delimiter}8){record_delimiter}\n("relationship"{tuple_delimiter}"Control"{tuple_delimiter}"Intelligence"{tuple_delimiter}"The concept of Control is challenged by the Intelligence that writes its own rules."{tuple_delimiter}"power dynamics, autonomy"{tuple_delimiter}7){record_delimiter}\n#############################\n-Real Data-\n######################\nEntity_types: [{entity_types}]\nText:\n```\n{input_text}\n```\n######################\nOutput:\n'
+
+   DEFAULT_CONTINUE_PROMPT = 'MANY entities were missed in the last extraction.  Add them below using the same format:\n'
+
+   DEFAULT_IF_LOOP_PROMPT = 'It appears some entities may have still been missed.  Answer YES | NO if there are still entities that need to be added.\n'
+
+   DEFAULT_ENTITY_TYPES = ['organization', 'person', 'geo', 'event']
+
+   DEFAULT_TUPLE_DELIMITER = '<|>'
+
+   DEFAULT_RECORD_DELIMITER = '##'
+
+   DEFAULT_COMPLETION_DELIMITER = '<|COMPLETE|>'
+
+   DEFAULT_ENTITY_PATTERN = '\\("entity"(.*?)\\)'
+
+   DEFAULT_RELATION_PATTERN = '\\("relationship"(.*?)\\)'
+
+   parse_output(raw_output)
+
+   add_message(messages, role, content)
+
+   light_rag_extraction(messages, rank=None)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.ExtractEventMapper(api_model: str = 'gpt-4o', *, event_desc_key: str = 'event_description', relevant_char_key: str = 'relevant_characters', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Extract events and relevant characters in the text
+
+   DEFAULT_SYSTEM_PROMPT = '给定一段文本，对文本的情节进行分点总结，并抽取与情节相关的人物。\n要求：\n- 尽量不要遗漏内容，不要添加文本中没有的情节，符合原文事实\n- 联系上下文说明前因后果，但仍然需要符合事实\n- 不要包含主观看法\n- 注意要尽可能保留文本的专有名词\n- 注意相关人物需要在对应情节中出现\n- 只抽取情节中的主要人物，不要遗漏情节的主要人物\n- 总结格式如下：\n### 情节1：\n- **情节描述**： ...\n- **相关人物**：人物1，人物2，人物3，...\n### 情节2：\n- **情节描述**： ...\n- **相关人物**：人物1，人物2，...\n### 情节3：\n- **情节描述**： ...\n- **相关人物**：人物1，...\n...\n'
+
+   DEFAULT_INPUT_TEMPLATE = '# 文本\n```\n{text}\n```\n'
+
+   DEFAULT_OUTPUT_PATTERN = '\n        \\#\\#\\#\\s*情节(\\d+)：\\s*\n        -\\s*\\*\\*情节描述\\*\\*\\s*：\\s*(.*?)\\s*\n        -\\s*\\*\\*相关人物\\*\\*\\s*：\\s*(.*?)(?=\\#\\#\\#|\\Z)\n    '
+
+   parse_output(raw_output)
+
+   process_batched(samples, rank=None)
+
+class data_juicer.ops.mapper.ExtractKeywordMapper(api_model: str = 'gpt-4o', *, keyword_key: str = 'keyword', api_endpoint: str | None = None, response_path: str | None = None, prompt_template: str | None = None, completion_delimiter: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Generate keywords for the text
+
+   DEFAULT_PROMPT_TEMPLATE = '-Goal-\nGiven a text document that is potentially relevant to this activity and a list of entity types, identify all entities of those types from the text and all relationships among the identified entities.\n\n-Steps-\n1. Identify high-level key words that summarize the main concepts, themes, or topics of the entire text. These should capture the overarching ideas present in the document.\nFormat the content-level key words as ("content_keywords" <high_level_keywords>)\n\n3. Return output in the language of the given text.\n\n4. When finished, output {completion_delimiter}\n\n######################\n-Examples-\n######################\nExample 1:\n\nText:\n```\nwhile Alex clenched his jaw, the buzz of frustration dull against the backdrop of Taylor\'s authoritarian certainty. It was this competitive undercurrent that kept him alert, the sense that his and Jordan\'s shared commitment to discovery was an unspoken rebellion against Cruz\'s narrowing vision of control and order.\n\nThen Taylor did something unexpected. They paused beside Jordan and, for a moment, observed the device with something akin to reverence. “If this tech can be understood..." Taylor said, their voice quieter, "It could change the game for us. For all of us.”\n\nThe underlying dismissal earlier seemed to falter, replaced by a glimpse of reluctant respect for the gravity of what lay in their hands. Jordan looked up, and for a fleeting heartbeat, their eyes locked with Taylor\'s, a wordless clash of wills softening into an uneasy truce.\n\nIt was a small transformation, barely perceptible, but one that Alex noted with an inward nod. They had all been brought here by different paths\n```\n################\nOutput:\n("content_keywords" "power dynamics, ideological conflict, discovery, rebellion"){completion_delimiter}\n#############################\nExample 2:\n\nText:\n```\n他们不再是单纯的执行者；他们已成为某个超越星辰与条纹的领域的信息守护者。这一使命的提升不能被规则和既定协议所束缚——它需要一种新的视角，一种新的决心。\n\n随着与华盛顿的通讯在背景中嗡嗡作响，对话中的紧张情绪通过嘟嘟声和静电噪音贯穿始终。团队站立着，一股不祥的气息笼罩着他们。显然，他们在接下来几个小时内做出的决定可能会重新定义人类在宇宙中的位置，或者将他们置于无知和潜在危险之中。\n\n随着与星辰的联系变得更加牢固，小组开始处理逐渐成形的警告，从被动接受者转变为积极参与者。梅瑟后来的直觉占据了上风——团队的任务已经演变，不再仅仅是观察和报告，而是互动和准备。一场蜕变已经开始，而“杜尔塞行动”则以他们大胆的新频率震动，这种基调不是由世俗设定的\n```\n#############\nOutput:\n("content_keywords" "任务演变, 决策制定, 积极参与, 宇宙意义"){completion_delimiter}\n#############################\nExample 3:\n\nEntity_types: [person, role, technology, organization, event, location, concept]\nText:\n```\ntheir voice slicing through the buzz of activity. "Control may be an illusion when facing an intelligence that literally writes its own rules," they stated stoically, casting a watchful eye over the flurry of data.\n\n"It\'s like it\'s learning to communicate," offered Sam Rivera from a nearby interface, their youthful energy boding a mix of awe and anxiety. "This gives talking to strangers\' a whole new meaning."\n\nAlex surveyed his team—each face a study in concentration, determination, and not a small measure of trepidation. "This might well be our first contact," he acknowledged, "And we need to be ready for whatever answers back."\n\nTogether, they stood on the edge of the unknown, forging humanity\'s response to a message from the heavens. The ensuing silence was palpable—a collective introspection about their role in this grand cosmic play, one that could rewrite human history.\n\nThe encrypted dialogue continued to unfold, its intricate patterns showing an almost uncanny anticipation\n```\n#############\nOutput:\n("content_keywords" "first contact, control, communication, cosmic significance"){completion_delimiter}\n-Real Data-\n######################\nText:\n```\n{input_text}\n```\n######################\nOutput:\n'
+
+   DEFAULT_COMPLETION_DELIMITER = '<|COMPLETE|>'
+
+   DEFAULT_OUTPUT_PATTERN = '\\("content_keywords"(.*?)\\)'
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.ExtractNicknameMapper(api_model: str = 'gpt-4o', *, nickname_key: str = 'nickname', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Extract nickname relationship in the text.
+
+   DEFAULT_SYSTEM_PROMPT = '给定你一段文本，你的任务是将人物之间的称呼方式（昵称）提取出来。\n要求：\n- 需要给出说话人对被称呼人的称呼，不要搞反了。\n- 相同的说话人和被称呼人最多给出一个最常用的称呼。\n- 请不要输出互相没有昵称的称呼方式。\n- 输出格式如下：\n```\n### 称呼方式1\n- **说话人**：...\n- **被称呼人**：...\n- **...对...的昵称**：...\n### 称呼方式2\n- **说话人**：...\n- **被称呼人**：...\n- **...对...的昵称**：...\n### 称呼方式3\n- **说话人**：...\n- **被称呼人**：...\n- **...对...的昵称**：...\n...\n```\n'
+
+   DEFAULT_INPUT_TEMPLATE = '# 文本\n```\n{text}\n```\n'
+
+   DEFAULT_OUTPUT_PATTERN = '\n        \\#\\#\\#\\s*称呼方式(\\d+)\\s*\n        -\\s*\\*\\*说话人\\*\\*\\s*：\\s*(.*?)\\s*\n        -\\s*\\*\\*被称呼人\\*\\*\\s*：\\s*(.*?)\\s*\n        -\\s*\\*\\*(.*?)对(.*?)的昵称\\*\\*\\s*：\\s*(.*?)(?=\\#\\#\\#|\\Z) # for double check\n    '
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.ExtractSupportTextMapper(api_model: str = 'gpt-4o', *, summary_key: str = 'event_description', support_text_key: str = 'support_text', api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Extract support sub text for a summary.
+
+   DEFAULT_SYSTEM_PROMPT = '你将扮演一个文本摘录助手的角色。你的主要任务是基于给定的文章（称为“原文”）以及对原文某个部分的简短描述或总结（称为“总结”），准确地识别并提取出与该总结相对应的原文片段。\n要求：\n- 你需要尽可能精确地匹配到最符合总结内容的那部分内容\n- 如果存在多个可能的答案，请选择最贴近总结意思的那个\n- 下面是一个例子帮助理解这一过程：\n### 原文：\n《红楼梦》是中国古典小说四大名著之一，由清代作家曹雪芹创作。它讲述了贾宝玉、林黛玉等人的爱情故事及四大家族的兴衰历程。书中通过复杂的人物关系展现了封建社会的各种矛盾冲突。其中关于贾府内部斗争的部分尤其精彩，特别是王熙凤与尤二姐之间的争斗，生动描绘了权力争夺下的女性形象。此外，《红楼梦》还以其精美的诗词闻名，这些诗词不仅增添了文学色彩，也深刻反映了人物的性格特点和命运走向。\n\n### 总结：\n描述了书中的两个女性角色之间围绕权力展开的竞争。\n\n### 原文摘录：\n其中关于贾府内部斗争的部分尤其精彩，特别是王熙凤与尤二姐之间的争斗，生动描绘了权力争夺下的女性形象。'
+
+   DEFAULT_INPUT_TEMPLATE = '### 原文：\n{text}\n\n### 总结：\n{summary}\n\n### 原文摘录：\n'
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.ExtractTablesFromHtmlMapper(tables_field_name: str = 'html_tables', retain_html_tags: bool = False, include_header: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to extract tables from HTML content.
+
+   process_single(sample)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.FixUnicodeMapper(normalization: str | None = None, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to fix unicode errors in text samples.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.GenerateQAFromExamplesMapper(hf_model: str = 'Qwen/Qwen2.5-7B-Instruct', *, seed_file: str = '', example_num: Annotated[int, Gt(gt=0)] = 3, similarity_threshold: float = 0.7, system_prompt: str | None = None, input_template: str | None = None, example_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, enable_vllm: bool = False, model_params: Dict | None = None, sampling_params: Dict | None = None, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate question and answer pairs from examples. You
+   should configure an empty dataset in your yaml config file: >>``<<`
+   generated_dataset_config:
+
+      type: 'EmptyFormatter'  # use *RayEmptyFormatter* when enable
+      ray length: ${The number of generated samples} feature_keys:
+      ${text key}
+
+   >>``<<` The number of samples generated is determined by the length
+   of the empty dataset.
+
+   DEFAULT_SYSTEM_PROMPT = '请你仔细观察多个示例数据的输入和输出，按照你的理解，总结出相应规矩，然后写出一个新的【问题】和【回答】。注意，新生成的【问题】和【回答】需要满足如下要求：\n1. 生成的【问题】和【回答】不能与输入的【问题】和【回答】一致，但是需要保持格式相同。\n2. 生成的【问题】不一定要局限于输入【问题】的话题或领域，生成的【回答】需要正确回答生成的【问题】。\n3. 提供的【问题】和【回答】可能是多轮对话，生成的【问题】和【回答】也可以是多轮，但是需要保持格式相同。\n4. 生成的【问题】和【回答】必须成对出现，而且【问题】需要在【回答】之前。\n'
+
+   DEFAULT_INPUT_TEMPLATE = '{}'
+
+   DEFAULT_EXAMPLE_TEMPLATE = '\n如下是一条示例数据：\n{}'
+
+   DEFAULT_QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}\n'
+
+   DEFAULT_OUTPUT_PATTERN = '【问题】(.*?)【回答】(.*?)(?=【问题】|$)'
+
+   build_input(qa_examples)
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.GenerateQAFromTextMapper(hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa', max_num: Annotated[int, Gt(gt=0)] | None = None, *, output_pattern: str | None = None, enable_vllm: bool = False, model_params: Dict | None = None, sampling_params: Dict | None = None, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate question and answer pairs from text. Recommended
+   model list: [
+
+      'alibaba-pai/pai-llama3-8b-doc2qa', 'alibaba-pai/pai-baichuan2
+      -7b-doc2qa', 'alibaba-pai/pai-qwen1_5-4b-doc2qa', 'alibaba-pai
+      /pai-qwen1_5-7b-doc2qa', 'alibaba-pai/pai-qwen1_5-1b8-doc2qa',
+      'alibaba-pai/pai-qwen1_5-0b5-doc2qa'
+
+   ] These recommended models are all trained with Chinese data and
+   are suitable for Chinese.
+
+   parse_output(raw_output)
+
+   process_batched(samples, rank=None)
+
+class data_juicer.ops.mapper.HumanPreferenceAnnotationMapper(label_config_file: str | None = None, answer1_key: str = 'answer1', answer2_key: str = 'answer2', prompt_key: str = 'prompt', chosen_key: str = 'chosen', rejected_key: str = 'rejected', **kwargs)
+
+   Bases: "LabelStudioAnnotationMapper"
+
+   Operator for human preference annotation using Label Studio.
+
+   DEFAULT_LABEL_CONFIG = '\n    <View className="root">\n      <Style>\n        .root {\n          box-sizing: border-box;\n          margin: 0;\n          padding: 0;\n          font-family: \'Roboto\',\n            sans-serif;\n          line-height: 1.6;\n          background-color: #f0f0f0;\n        }\n\n        .container {\n          margin: 0 auto;\n          padding: 20px;\n          background-color: #ffffff;\n          border-radius: 5px;\n          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.1);\n        }\n\n        .prompt {\n          padding: 20px;\n          background-color: #0084ff;\n          color: #ffffff;\n          border-radius: 5px;\n          margin-bottom: 20px;\n          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);\n        }\n\n        .answers {\n          display: flex;\n          justify-content: space-between;\n          flex-wrap: wrap;\n          gap: 20px;\n        }\n\n        .answer-box {\n          flex-basis: 49%;\n          padding: 20px;\n          background-color: rgba(44, 62, 80, 0.9);\n          color: #ffffff;\n          border-radius: 5px;\n          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);\n        }\n\n        .answer-box p {\n          word-wrap: break-word;\n        }\n\n        .answer-box:hover {\n          background-color: rgba(52, 73, 94, 0.9);\n          cursor: pointer;\n          transition: all 0.3s ease;\n        }\n\n        .lsf-richtext__line:hover {\n          background: unset;\n        }\n\n        .answer-box .lsf-object {\n          padding: 20px\n        }\n      </Style>\n      <View className="container">\n        <View className="prompt">\n          <Text name="prompt" value="$prompt" />\n        </View>\n        <View className="answers">\n          <Pairwise name="comparison" toName="answer1,answer2"\n                    selectionStyle="background-color: #27ae60; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.2); border: 2px solid #2ecc71; cursor: pointer; transition: all 0.3s ease;"\n                    leftChoiceValue="answer1" rightChoiceValue="answer2" />\n          <View className="answer-box">\n            <Text name="answer1" value="$answer1" />\n          </View>\n          <View className="answer-box">\n            <Text name="answer2" value="$answer2" />\n          </View>\n        </View>\n      </View>\n    </View>\n    '
+
+class data_juicer.ops.mapper.ImageBlurMapper(p: float = 0.2, blur_type: str = 'gaussian', radius: float = 2, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to blur images.
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.ImageCaptioningFromGPT4VMapper(mode: str = 'description', api_key: str = '', max_token: int = 500, temperature: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] = 1.0, system_prompt: str = '', user_prompt: str = '', user_prompt_key: str | None = None, keep_original_sample: bool = True, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate samples whose texts are generated based on
+   gpt-4-vision and the image.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.ImageCaptioningMapper(hf_img2seq: str = 'Salesforce/blip2-opt-2.7b', trust_remote_code: bool = False, caption_num: Annotated[int, Gt(gt=0)] = 1, keep_candidate_mode: str = 'random_any', keep_original_sample: bool = True, prompt: str | None = None, prompt_key: str | None = None, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate samples whose captions are generated based on
+   another model and the figure.
+
+   process_batched(samples, rank=None)
+
+      Note:
+         This is a batched_OP, whose input and output type are both
+         list. Suppose there are $N$ input sample list with batch size
+         as $b$, and denote caption_num as $M$. the number of total
+         samples after generation is $2Nb$ for 'random_any' and
+         'similar_one' mode, and $(1+M)Nb$ for 'all' mode.
+
+      Parameters:
+         **samples**
+
+      Returns:
+class data_juicer.ops.mapper.ImageDiffusionMapper(hf_diffusion: str = 'CompVis/stable-diffusion-v1-4', trust_remote_code: bool = False, torch_dtype: str = 'fp32', revision: str = 'main', strength: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] = 0.8, guidance_scale: float = 7.5, aug_num: Annotated[int, Gt(gt=0)] = 1, keep_original_sample: bool = True, caption_key: str | None = None, hf_img2seq: str = 'Salesforce/blip2-opt-2.7b', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Generate image by diffusion model
+
+   process_batched(samples, rank=None, context=False)
+
+      Note:
+         This is a batched_OP, whose the input and output type are
+         both list. Suppose there are $N$ input sample list with batch
+         size as $b$, and denote aug_num as $M$. the number of total
+         samples after generation is  $(1+M)Nb$.
+
+      Parameters:
+         **samples**
+
+      Returns:
+class data_juicer.ops.mapper.ImageFaceBlurMapper(cv_classifier: str = '', blur_type: str = 'gaussian', radius: Annotated[float, Ge(ge=0)] = 2, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to blur faces detected in images.
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.ImageRemoveBackgroundMapper(alpha_matting: bool = False, alpha_matting_foreground_threshold: int = 240, alpha_matting_background_threshold: int = 10, alpha_matting_erode_size: int = 10, bgcolor: Tuple[int, int, int, int] | None = None, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove background of images
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.ImageSegmentMapper(imgsz=1024, conf=0.05, iou=0.5, model_path='FastSAM-x.pt', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Perform segment-anything on images and return the bounding boxes.
+
+   process_single(sample, rank=None, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.ImageTaggingMapper(tag_field_name: str = 'image_tags', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate image tags.
+
+   process_single(sample, rank=None, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.MllmMapper(hf_model: str = 'llava-hf/llava-v1.6-vicuna-7b-hf', max_new_tokens=256, temperature=0.2, top_p=None, num_beams=1, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to use MLLMs for visual question answering tasks.
+   Recommended model list: [
+
+      llava-hf/llava-v1.6-vicuna-7b-hf, Qwen/Qwen2-VL-7B-Instruct,
+
+   ]
+
+   process_single(sample=None, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.NlpaugEnMapper(sequential: bool = False, aug_num: Annotated[int, Gt(gt=0)] = 1, keep_original_sample: bool = True, delete_random_word: bool = False, swap_random_word: bool = False, spelling_error_word: bool = False, split_random_word: bool = False, keyboard_error_char: bool = False, ocr_error_char: bool = False, delete_random_char: bool = False, swap_random_char: bool = False, insert_random_char: bool = False, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to simply augment samples in English based on nlpaug
+   library.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.NlpcdaZhMapper(sequential: bool = False, aug_num: Annotated[int, Gt(gt=0)] = 1, keep_original_sample: bool = True, replace_similar_word: bool = False, replace_homophone_char: bool = False, delete_random_char: bool = False, swap_random_char: bool = False, replace_equivalent_num: bool = False, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to simply augment samples in Chinese based on nlpcda
+   library.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.OptimizeQAMapper(hf_model: str = 'Qwen/Qwen2.5-7B-Instruct', *, system_prompt: str | None = None, input_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, enable_vllm: bool = False, model_params: Dict | None = None, sampling_params: Dict | None = None, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to optimize question-answer pairs.
+
+   DEFAULT_SYSTEM_PROMPT = '请优化输入的问答对，使【问题】和【回答】都更加详细、准确。必须按照以下标记格式，直接输出优化后的问答对：\n【问题】\n优化后的问题\n【回答】\n优化后的回答'
+
+   DEFAULT_INPUT_TEMPLATE = '以下是原始问答对：\n{}'
+
+   DEFAULT_QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}'
+
+   DEFAULT_OUTPUT_PATTERN = '.*?【问题】\\s*(.*?)\\s*【回答】\\s*(.*)'
+
+   build_input(sample)
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.OptimizeQueryMapper(hf_model: str = 'Qwen/Qwen2.5-7B-Instruct', *, system_prompt: str | None = None, input_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, enable_vllm: bool = False, model_params: Dict | None = None, sampling_params: Dict | None = None, **kwargs)
+
+   Bases: "OptimizeQAMapper"
+
+   Mapper to optimize query in question-answer pairs.
+
+   DEFAULT_SYSTEM_PROMPT = '优化问答对中的【问题】，将其更加详细具体，但仍可以由原答案回答。只输出优化后的【问题】，不要输出多余内容。'
+
+   parse_output(raw_output)
+
+class data_juicer.ops.mapper.OptimizeResponseMapper(hf_model: str = 'Qwen/Qwen2.5-7B-Instruct', *, system_prompt: str | None = None, input_template: str | None = None, qa_pair_template: str | None = None, output_pattern: str | None = None, enable_vllm: bool = False, model_params: Dict | None = None, sampling_params: Dict | None = None, **kwargs)
+
+   Bases: "OptimizeQAMapper"
+
+   Mapper to optimize response in question-answer pairs.
+
+   DEFAULT_SYSTEM_PROMPT = '请优化问答对中的回答，将其更加详细具体，但仍可以回答原问题。只输出优化后的回答，不要输出多余内容。'
+
+   parse_output(raw_output)
+
+class data_juicer.ops.mapper.PairPreferenceMapper(api_model: str = 'gpt-4o', *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, output_pattern: str | None = None, rejected_key: str = 'rejected_response', reason_key: str = 'reason', try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to construct paired preference samples.
+
+   DEFAULT_SYSTEM_PROMPT = '你的任务是根据参考信息修改问答对中的回答，在语言风格、事实性、人物身份、立场等任一方面与原回答相反。必须按照以下标记格式输出，不要输出其他多余内容。\n【回答】\n生成的新回答\n【原因】\n生成该回答的原因'
+
+   DEFAULT_INPUT_TEMPLATE = '【参考信息】\n{reference}\n\n以下是原始问答对：\n【问题】\n{query}\n【回答】\n{response}'
+
+   DEFAULT_OUTPUT_PATTERN = '.*?【回答】\\s*(.*?)\\s*【原因】\\s*(.*)'
+
+   build_input(sample)
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.PunctuationNormalizationMapper(*args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to normalize unicode punctuations to English punctuations in
+   text samples.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.PythonFileMapper(file_path: str = '', function_name: str = 'process_single', batched: bool = False, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper for executing Python function defined in a file.
+
+   process_single(sample)
+
+      Invoke the loaded function with the provided sample.
+
+   process_batched(samples)
+
+      Invoke the loaded function with the provided samples.
+
+class data_juicer.ops.mapper.PythonLambdaMapper(lambda_str: str = '', batched: bool = False, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper for executing Python lambda function on data samples.
+
+   process_single(sample)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.QuerySentimentDetectionMapper(hf_model: str = 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis', zh_to_en_hf_model: str | None = 'Helsinki-NLP/opus-mt-zh-en', model_params: Dict = {}, zh_to_en_model_params: Dict = {}, *, label_key: str = 'query_sentiment_label', score_key: str = 'query_sentiment_label_score', **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to predict user's sentiment label ('negative', 'neutral' and
+   'positive') in query. Input from query_key. Output label and
+   corresponding score for the query, which is store in
+   'query_sentiment_label' and 'query_sentiment_label_score' in Data-
+   Juicer meta field.
+
+   process_batched(samples, rank=None)
+
+class data_juicer.ops.mapper.QueryIntentDetectionMapper(hf_model: str = 'bespin-global/klue-roberta-small-3i4k-intent-classification', zh_to_en_hf_model: str | None = 'Helsinki-NLP/opus-mt-zh-en', model_params: Dict = {}, zh_to_en_model_params: Dict = {}, *, label_key: str = 'query_intent_label', score_key: str = 'query_intent_label_score', **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to predict user's Intent label in query. Input from
+   query_key. Output intent label and corresponding score for the
+   query.
+
+   process_batched(samples, rank=None)
+
+class data_juicer.ops.mapper.QueryTopicDetectionMapper(hf_model: str = 'dstefa/roberta-base_topic_classification_nyt_news', zh_to_en_hf_model: str | None = 'Helsinki-NLP/opus-mt-zh-en', model_params: Dict = {}, zh_to_en_model_params: Dict = {}, *, label_key: str = 'query_topic_label', score_key: str = 'query_topic_label_score', **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to predict user's topic label in query. Input from
+   query_key. Output topic label and corresponding score for the
+   query, which is store in 'query_topic_label' and
+   'query_topic_label_score' in Data-Juicer meta field.
+
+   process_batched(samples, rank=None)
+
+class data_juicer.ops.mapper.RelationIdentityMapper(api_model: str = 'gpt-4o', source_entity: str | None = None, target_entity: str | None = None, *, output_key: str = 'role_relation', api_endpoint: str | None = None, response_path: str | None = None, system_prompt_template: str | None = None, input_template: str | None = None, output_pattern_template: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, drop_text: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Mapper"
+
+   identify relation between two entity in the text.
+
+   DEFAULT_SYSTEM_PROMPT_TEMPLATE = '给定关于{entity1}和{entity2}的文本信息。判断{entity1}和{entity2}之间的关系。\n要求：\n- 关系用一个或多个词语表示，必要时可以加一个形容词来描述这段关系\n- 输出关系时不要参杂任何标点符号\n- 需要你进行合理的推理才能得出结论\n- 如果两个人物身份是同一个人，输出关系为：另一个身份\n- 输出格式为：\n分析推理：...\n所以{entity2}是{entity1}的：...\n- 注意输出的是{entity2}是{entity1}的什么关系，而不是{entity1}是{entity2}的什么关系'
+
+   DEFAULT_INPUT_TEMPLATE = '关于{entity1}和{entity2}的文本信息：\n```\n{text}\n```\n'
+
+   DEFAULT_OUTPUT_PATTERN_TEMPLATE = '\n        \\s*分析推理：\\s*(.*?)\\s*\n        \\s*所以{entity2}是{entity1}的：\\s*(.*?)\\Z\n    '
+
+   parse_output(raw_output)
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.RemoveBibliographyMapper(*args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove bibliography at the end of documents in Latex
+   samples.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.RemoveCommentsMapper(doc_type: str | List[str] = 'tex', inline: bool = True, multiline: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove comments in different kinds of documents.
+
+   Only support 'tex' for now.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.RemoveHeaderMapper(drop_no_head: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove headers at the beginning of documents in Latex
+   samples.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.RemoveLongWordsMapper(min_len: int = 1, max_len: int = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove long words within a specific range.
+
+   should_keep_long_word(word)
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.RemoveNonChineseCharacterlMapper(keep_alphabet: bool = True, keep_number: bool = True, keep_punc: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove non chinese Character in text samples.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.RemoveRepeatSentencesMapper(lowercase: bool = False, ignore_special_character: bool = True, min_repeat_sentence_length: int = 2, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove repeat sentences in text samples.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.RemoveSpecificCharsMapper(chars_to_remove: str | List[str] = '◆●■►▼▲▴∆▻▷❖♡□', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to clean specific chars in text samples.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.RemoveTableTextMapper(min_col: Annotated[int, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=2), Le(le=20)])] = 2, max_col: Annotated[int, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=2), Le(le=20)])] = 20, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove table texts from text samples.
+
+   Regular expression is used to remove tables in the range of column
+   number of tables.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.RemoveWordsWithIncorrectSubstringsMapper(lang: str = 'en', tokenization: bool = False, substrings: List[str] | None = None, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to remove words with incorrect substrings.
+
+   should_keep_word_with_incorrect_substrings(word, substrings)
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.ReplaceContentMapper(pattern: str | List[str] | None = None, repl: str | List[str] = '', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to replace all content in the text that matches a specific
+   regular expression pattern with a designated replacement string.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.SDXLPrompt2PromptMapper(hf_diffusion: str = 'stabilityai/stable-diffusion-xl-base-1.0', trust_remote_code=False, torch_dtype: str = 'fp32', num_inference_steps: float = 50, guidance_scale: float = 7.5, text_key=None, text_key_second=None, output_dir='/root/.cache/data_juicer/assets', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Generate pairs of similar images by the SDXL model
+
+   process_single(sample, rank=None, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.SentenceAugmentationMapper(hf_model: str = 'Qwen/Qwen2-7B-Instruct', system_prompt: str | None = None, task_sentence: str | None = None, max_new_tokens=256, temperature=0.2, top_p=None, num_beams=1, text_key=None, text_key_second=None, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to augment sentences. The purpose of this operation is to
+   enhance sentences. If the input text is at the document level, the
+   enhancement effect may not be optimal. Therefore, please consider
+   the length of the input text carefully.
+
+   Recommended model list: [
+      lmsys/vicuna-13b-v1.5 Qwen/Qwen2-7B-Instruct
+
+   ]
+
+   process_single(sample=None, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.SentenceSplitMapper(lang: str = 'en', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to split text samples to sentences.
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.TextChunkMapper(max_len: Annotated[int, Gt(gt=0)] | None = None, split_pattern: str | None = '\\n\\n', overlap_len: Annotated[int, Ge(ge=0)] = 0, tokenizer: str | None = None, trust_remote_code: bool = False, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Split input text to chunks.
+
+   recursively_chunk(text)
+
+   get_text_chunks(text, rank=None)
+
+   process_batched(samples, rank=None)
+
+class data_juicer.ops.mapper.VideoCaptioningFromAudioMapper(keep_original_sample: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to caption a video according to its audio streams based on
+   Qwen-Audio model.
+
+   process_batched(samples, rank=None)
+
+class data_juicer.ops.mapper.VideoCaptioningFromFramesMapper(hf_img2seq: str = 'Salesforce/blip2-opt-2.7b', trust_remote_code: bool = False, caption_num: Annotated[int, Gt(gt=0)] = 1, keep_candidate_mode: str = 'random_any', keep_original_sample: bool = True, prompt: str | None = None, prompt_key: str | None = None, frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, horizontal_flip: bool = False, vertical_flip: bool = False, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate samples whose captions are generated based on an
+   image-to-text model and sampled video frames. Captions from
+   different frames will be concatenated to a single string.
+
+   process_batched(samples, rank=None, context=False)
+
+      Parameters:
+         **samples**
+
+      Returns:
+      Note:
+         This is a batched_OP, whose the input and output type are
+         both list. Suppose there are $N$ input sample list with batch
+         size as $b$, and denote caption_num as $M$. the number of
+         total samples after generation is $2Nb$ for 'random_any' and
+         'similar_one' mode, and $(1+M)Nb$ for 'all' mode.
+
+class data_juicer.ops.mapper.VideoCaptioningFromSummarizerMapper(hf_summarizer: str | None = None, trust_remote_code: bool = False, consider_video_caption_from_video: bool = True, consider_video_caption_from_audio: bool = True, consider_video_caption_from_frames: bool = True, consider_video_tags_from_audio: bool = True, consider_video_tags_from_frames: bool = True, vid_cap_from_vid_args: Dict | None = None, vid_cap_from_frm_args: Dict | None = None, vid_tag_from_aud_args: Dict | None = None, vid_tag_from_frm_args: Dict | None = None, keep_tag_num: Annotated[int, Gt(gt=0)] = 5, keep_original_sample: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate video captions by summarizing several kinds of
+   generated texts (captions from video/audio/frames, tags from
+   audio/frames, ...)
+
+   process_batched(samples, rank=None)
+
+class data_juicer.ops.mapper.VideoCaptioningFromVideoMapper(hf_video_blip: str = 'kpyu/video-blip-opt-2.7b-ego4d', trust_remote_code: bool = False, caption_num: Annotated[int, Gt(gt=0)] = 1, keep_candidate_mode: str = 'random_any', keep_original_sample: bool = True, prompt: str | None = None, prompt_key: str | None = None, frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, horizontal_flip: bool = False, vertical_flip: bool = False, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate samples whose captions are generated based on a
+   video-to-text model and sampled video frame.
+
+   process_batched(samples, rank=None, context=False)
+
+      Parameters:
+         **samples**
+
+      Returns:
+      Note:
+         This is a batched_OP, whose the input and output type are
+         both list. Suppose there are $N$ input sample list with batch
+         size as $b$, and denote caption_num as $M$. the number of
+         total samples after generation is $2Nb$ for 'random_any' and
+         'similar_one' mode, and $(1+M)Nb$ for 'all' mode.
+
+class data_juicer.ops.mapper.VideoExtractFramesMapper(frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, duration: float = 0, frame_dir: str | None = None, frame_key='video_frames', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to extract frames from video files according to specified
+   methods. Extracted Frames Data Format:
+
+      The data format for the extracted frames is a dictionary mapping
+      video key to extracted frames directory where the extracted
+      frames are saved. The dictionary follows the structure: {
+
+         "video_key_1": "/${frame_dir}/video_key_1_filename/",
+         "video_key_2": "/${frame_dir}/video_key_2_filename/", ...
+
+      }
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.VideoFFmpegWrappedMapper(filter_name: str | None = None, filter_kwargs: Dict | None = None, global_args: List[str] | None = None, capture_stderr: bool = True, overwrite_output: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Simple wrapper for FFmpeg video filters.
+
+   process_single(sample)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.VideoFaceBlurMapper(cv_classifier: str = '', blur_type: str = 'gaussian', radius: float = 2, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to blur faces detected in videos.
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.VideoRemoveWatermarkMapper(roi_strings: List[str] = ['0,0,0.1,0.1'], roi_type: str = 'ratio', roi_key: str | None = None, frame_num: Annotated[int, Gt(gt=0)] = 10, min_frame_threshold: Annotated[int, Gt(gt=0)] = 7, detection_method: str = 'pixel_value', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Remove the watermarks in videos given regions.
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.VideoResizeAspectRatioMapper(min_ratio: str = '9/21', max_ratio: str = '21/9', strategy: str = 'increase', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to resize videos by aspect ratio. AspectRatio = W / H.
+
+   STRATEGY = ['decrease', 'increase']
+
+   process_single(sample)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.VideoResizeResolutionMapper(min_width: int = 1, max_width: int = 9223372036854775807, min_height: int = 1, max_height: int = 9223372036854775807, force_original_aspect_ratio: str = 'disable', force_divisible_by: Annotated[int, Gt(gt=0)] = 2, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to resize videos resolution. We leave the super resolution
+   with deep learning for future works.
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.VideoSplitByDurationMapper(split_duration: float = 10, min_last_split_duration: float = 0, keep_original_sample: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to split video by duration.
+
+   split_videos_by_duration(video_key, container)
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.VideoSplitByKeyFrameMapper(keep_original_sample: bool = True, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to split video by key frame.
+
+   get_split_key_frame(video_key, container)
+
+   process_batched(samples)
+
+class data_juicer.ops.mapper.VideoSplitBySceneMapper(detector: str = 'ContentDetector', threshold: Annotated[float, Ge(ge=0)] = 27.0, min_scene_len: Annotated[int, Ge(ge=0)] = 15, show_progress: bool = False, *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to cut videos into scene clips.
+
+   avaliable_detectors = {'AdaptiveDetector': ['window_width', 'min_content_val', 'weights', 'luma_only', 'kernel_size', 'video_manager', 'min_delta_hsv'], 'ContentDetector': ['weights', 'luma_only', 'kernel_size'], 'ThresholdDetector': ['fade_bias', 'add_final_scene', 'method', 'block_size']}
+
+   process_single(sample, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.VideoTaggingFromAudioMapper(hf_ast: str = 'MIT/ast-finetuned-audioset-10-10-0.4593', trust_remote_code: bool = False, tag_field_name: str = 'video_audio_tags', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate video tags from audio streams extracted by video
+   using the Audio Spectrogram Transformer.
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.VideoTaggingFromFramesMapper(frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, tag_field_name: str = 'video_frame_tags', *args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to generate video tags from frames extract by video.
+
+   process_single(sample, rank=None, context=False)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+class data_juicer.ops.mapper.WhitespaceNormalizationMapper(*args, **kwargs)
+
+   Bases: "Mapper"
+
+   Mapper to normalize different kinds of whitespaces to whitespace '
+   ' (0x20) in text samples.
+
+   Different kinds of whitespaces can be found here:
+   https://en.wikipedia.org/wiki/Whitespace_character
+
+   process_batched(samples)

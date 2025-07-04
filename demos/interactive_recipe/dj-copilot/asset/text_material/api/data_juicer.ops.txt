@@ -1,0 +1,3287 @@
+data_juicer.ops package
+***********************
+
+
+Subpackages
+===========
+
+* data_juicer.ops.aggregator package
+
+  * Submodules
+
+  * data_juicer.ops.aggregator.entity_attribute_aggregator module
+
+    * "EntityAttributeAggregator"
+
+      * "EntityAttributeAggregator.DEFAULT_SYSTEM_TEMPLATE"
+
+      * "EntityAttributeAggregator.DEFAULT_EXAMPLE_PROMPT"
+
+      * "EntityAttributeAggregator.DEFAULT_INPUT_TEMPLATE"
+
+      * "EntityAttributeAggregator.DEFAULT_OUTPUT_PATTERN_TEMPLATE"
+
+      * "EntityAttributeAggregator.parse_output()"
+
+      * "EntityAttributeAggregator.attribute_summary()"
+
+      * "EntityAttributeAggregator.process_single()"
+
+  * data_juicer.ops.aggregator.meta_tags_aggregator module
+
+    * "MetaTagsAggregator"
+
+      * "MetaTagsAggregator.DEFAULT_SYSTEM_PROMPT"
+
+      * "MetaTagsAggregator.DEFAULT_INPUT_TEMPLATE"
+
+      * "MetaTagsAggregator.DEFAULT_TARGET_TAG_TEMPLATE"
+
+      * "MetaTagsAggregator.DEFAULT_TAG_TEMPLATE"
+
+      * "MetaTagsAggregator.DEFAULT_OUTPUT_PATTERN"
+
+      * "MetaTagsAggregator.parse_output()"
+
+      * "MetaTagsAggregator.meta_map()"
+
+      * "MetaTagsAggregator.process_single()"
+
+  * data_juicer.ops.aggregator.most_relevant_entities_aggregator
+    module
+
+    * "MostRelevantEntitiesAggregator"
+
+      * "MostRelevantEntitiesAggregator.DEFAULT_SYSTEM_TEMPLATE"
+
+      * "MostRelevantEntitiesAggregator.DEFAULT_INPUT_TEMPLATE"
+
+      * "MostRelevantEntitiesAggregator.DEFAULT_OUTPUT_PATTERN"
+
+      * "MostRelevantEntitiesAggregator.parse_output()"
+
+      * "MostRelevantEntitiesAggregator.query_most_relevant_entities(
+        )"
+
+      * "MostRelevantEntitiesAggregator.process_single()"
+
+  * data_juicer.ops.aggregator.nested_aggregator module
+
+    * "NestedAggregator"
+
+      * "NestedAggregator.DEFAULT_SYSTEM_PROMPT"
+
+      * "NestedAggregator.DEFAULT_INPUT_TEMPLATE"
+
+      * "NestedAggregator.DEFAULT_SUB_DOC_TEMPLATE"
+
+      * "NestedAggregator.parse_output()"
+
+      * "NestedAggregator.recursive_summary()"
+
+      * "NestedAggregator.process_single()"
+
+  * Module contents
+
+    * "NestedAggregator"
+
+      * "NestedAggregator.DEFAULT_SYSTEM_PROMPT"
+
+      * "NestedAggregator.DEFAULT_INPUT_TEMPLATE"
+
+      * "NestedAggregator.DEFAULT_SUB_DOC_TEMPLATE"
+
+      * "NestedAggregator.parse_output()"
+
+      * "NestedAggregator.recursive_summary()"
+
+      * "NestedAggregator.process_single()"
+
+    * "MetaTagsAggregator"
+
+      * "MetaTagsAggregator.DEFAULT_SYSTEM_PROMPT"
+
+      * "MetaTagsAggregator.DEFAULT_INPUT_TEMPLATE"
+
+      * "MetaTagsAggregator.DEFAULT_TARGET_TAG_TEMPLATE"
+
+      * "MetaTagsAggregator.DEFAULT_TAG_TEMPLATE"
+
+      * "MetaTagsAggregator.DEFAULT_OUTPUT_PATTERN"
+
+      * "MetaTagsAggregator.parse_output()"
+
+      * "MetaTagsAggregator.meta_map()"
+
+      * "MetaTagsAggregator.process_single()"
+
+    * "EntityAttributeAggregator"
+
+      * "EntityAttributeAggregator.DEFAULT_SYSTEM_TEMPLATE"
+
+      * "EntityAttributeAggregator.DEFAULT_EXAMPLE_PROMPT"
+
+      * "EntityAttributeAggregator.DEFAULT_INPUT_TEMPLATE"
+
+      * "EntityAttributeAggregator.DEFAULT_OUTPUT_PATTERN_TEMPLATE"
+
+      * "EntityAttributeAggregator.parse_output()"
+
+      * "EntityAttributeAggregator.attribute_summary()"
+
+      * "EntityAttributeAggregator.process_single()"
+
+    * "MostRelevantEntitiesAggregator"
+
+      * "MostRelevantEntitiesAggregator.DEFAULT_SYSTEM_TEMPLATE"
+
+      * "MostRelevantEntitiesAggregator.DEFAULT_INPUT_TEMPLATE"
+
+      * "MostRelevantEntitiesAggregator.DEFAULT_OUTPUT_PATTERN"
+
+      * "MostRelevantEntitiesAggregator.parse_output()"
+
+      * "MostRelevantEntitiesAggregator.query_most_relevant_entities(
+        )"
+
+      * "MostRelevantEntitiesAggregator.process_single()"
+
+* data_juicer.ops.common package
+
+  * Submodules
+
+  * data_juicer.ops.common.helper_func module
+
+    * "UnionFind"
+
+      * "UnionFind.find()"
+
+      * "UnionFind.union()"
+
+    * "strip()"
+
+    * "split_on_whitespace()"
+
+    * "split_on_newline_tab_whitespace()"
+
+    * "merge_on_whitespace_tab_newline()"
+
+    * "words_augmentation()"
+
+    * "get_words_from_document()"
+
+    * "words_refinement()"
+
+    * "get_sentences_from_document()"
+
+    * "split_text_by_punctuation()"
+
+  * data_juicer.ops.common.prompt2prompt_pipeline module
+
+    * "rescale_noise_cfg()"
+
+    * "Prompt2PromptPipeline"
+
+      * "Prompt2PromptPipeline.check_inputs()"
+
+      * "Prompt2PromptPipeline.register_attention_control()"
+
+    * "P2PCrossAttnProcessor"
+
+    * "AttentionControl"
+
+      * "AttentionControl.step_callback()"
+
+      * "AttentionControl.between_steps()"
+
+      * "AttentionControl.num_uncond_att_layers"
+
+      * "AttentionControl.forward()"
+
+      * "AttentionControl.reset()"
+
+    * "create_controller()"
+
+    * "EmptyControl"
+
+      * "EmptyControl.forward()"
+
+    * "AttentionStore"
+
+      * "AttentionStore.get_empty_store()"
+
+      * "AttentionStore.forward()"
+
+      * "AttentionStore.between_steps()"
+
+      * "AttentionStore.get_average_attention()"
+
+      * "AttentionStore.reset()"
+
+    * "LocalBlend"
+
+    * "AttentionControlEdit"
+
+      * "AttentionControlEdit.step_callback()"
+
+      * "AttentionControlEdit.replace_self_attention()"
+
+      * "AttentionControlEdit.replace_cross_attention()"
+
+      * "AttentionControlEdit.forward()"
+
+    * "AttentionReplace"
+
+      * "AttentionReplace.replace_cross_attention()"
+
+    * "AttentionRefine"
+
+      * "AttentionRefine.replace_cross_attention()"
+
+    * "AttentionReweight"
+
+      * "AttentionReweight.replace_cross_attention()"
+
+    * "update_alpha_time_word()"
+
+    * "get_time_words_attention_alpha()"
+
+    * "get_word_inds()"
+
+    * "get_replacement_mapper_()"
+
+    * "get_replacement_mapper()"
+
+    * "get_equalizer()"
+
+    * "ScoreParams"
+
+      * "ScoreParams.mis_match_char()"
+
+    * "get_matrix()"
+
+    * "get_traceback_matrix()"
+
+    * "global_align()"
+
+    * "get_aligned_sequences()"
+
+    * "get_mapper()"
+
+    * "get_refinement_mapper()"
+
+  * data_juicer.ops.common.special_characters module
+
+  * Module contents
+
+    * "get_sentences_from_document()"
+
+    * "get_words_from_document()"
+
+    * "merge_on_whitespace_tab_newline()"
+
+    * "split_on_newline_tab_whitespace()"
+
+    * "split_on_whitespace()"
+
+    * "strip()"
+
+    * "words_augmentation()"
+
+    * "words_refinement()"
+
+    * "split_text_by_punctuation()"
+
+* data_juicer.ops.deduplicator package
+
+  * Submodules
+
+  * data_juicer.ops.deduplicator.document_deduplicator module
+
+    * "DocumentDeduplicator"
+
+      * "DocumentDeduplicator.compute_hash()"
+
+      * "DocumentDeduplicator.process()"
+
+  * data_juicer.ops.deduplicator.document_minhash_deduplicator module
+
+    * "sha1_hash32()"
+
+    * "optimal_param()"
+
+    * "DocumentMinhashDeduplicator"
+
+      * "DocumentMinhashDeduplicator.compute_hash()"
+
+      * "DocumentMinhashDeduplicator.process()"
+
+  * data_juicer.ops.deduplicator.document_simhash_deduplicator module
+
+    * "DocumentSimhashDeduplicator"
+
+      * "DocumentSimhashDeduplicator.compute_hash()"
+
+      * "DocumentSimhashDeduplicator.process()"
+
+  * data_juicer.ops.deduplicator.image_deduplicator module
+
+    * "get_hash_method()"
+
+    * "ImageDeduplicator"
+
+      * "ImageDeduplicator.compute_hash()"
+
+      * "ImageDeduplicator.process()"
+
+  * data_juicer.ops.deduplicator.ray_basic_deduplicator module
+
+    * "DedupSet"
+
+      * "DedupSet.is_unique()"
+
+    * "get_remote_dedup_set()"
+
+    * "Backend"
+
+      * "Backend.is_unique()"
+
+    * "ActorBackend"
+
+      * "ActorBackend.is_unique()"
+
+    * "RedisBackend"
+
+      * "RedisBackend.is_unique()"
+
+    * "RayBasicDeduplicator"
+
+      * "RayBasicDeduplicator.EMPTY_HASH_VALUE"
+
+      * "RayBasicDeduplicator.calculate_hash()"
+
+      * "RayBasicDeduplicator.compute_stats_single()"
+
+      * "RayBasicDeduplicator.process_single()"
+
+  * data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator module
+
+    * "IdGenerator"
+
+      * "IdGenerator.get_next_id()"
+
+    * "EdgeBuffer"
+
+      * "EdgeBuffer.clear()"
+
+      * "EdgeBuffer.set_edges()"
+
+      * "EdgeBuffer.get_edges()"
+
+    * "BTSUnionFind"
+
+      * "BTSUnionFind.add_key_value_pairs()"
+
+      * "BTSUnionFind.flush_key_value_pairs()"
+
+      * "BTSUnionFind.balanced_union_find()"
+
+      * "BTSUnionFind.distribute_edge()"
+
+      * "BTSUnionFind.set_edge_buffer()"
+
+      * "BTSUnionFind.edge_redistribution()"
+
+      * "BTSUnionFind.communication()"
+
+      * "BTSUnionFind.find()"
+
+      * "BTSUnionFind.union()"
+
+      * "BTSUnionFind.union_list()"
+
+      * "BTSUnionFind.rebalancing()"
+
+      * "BTSUnionFind.squeeze()"
+
+      * "BTSUnionFind.dup_idx()"
+
+    * "get_remote_classes()"
+
+    * "RayBTSMinhashDeduplicator"
+
+      * "RayBTSMinhashDeduplicator.EMPTY_HASH_VALUE"
+
+      * "RayBTSMinhashDeduplicator.calc_minhash()"
+
+      * "RayBTSMinhashDeduplicator.merge_op_batch()"
+
+      * "RayBTSMinhashDeduplicator.merge()"
+
+      * "RayBTSMinhashDeduplicator.filter_with_union_find()"
+
+      * "RayBTSMinhashDeduplicator.run()"
+
+  * data_juicer.ops.deduplicator.ray_document_deduplicator module
+
+    * "RayDocumentDeduplicator"
+
+      * "RayDocumentDeduplicator.calculate_hash()"
+
+  * data_juicer.ops.deduplicator.ray_image_deduplicator module
+
+    * "get_hash_method()"
+
+    * "RayImageDeduplicator"
+
+      * "RayImageDeduplicator.calculate_hash()"
+
+  * data_juicer.ops.deduplicator.ray_video_deduplicator module
+
+    * "RayVideoDeduplicator"
+
+      * "RayVideoDeduplicator.calculate_hash()"
+
+  * data_juicer.ops.deduplicator.video_deduplicator module
+
+    * "VideoDeduplicator"
+
+      * "VideoDeduplicator.compute_hash()"
+
+      * "VideoDeduplicator.process()"
+
+  * Module contents
+
+    * "DocumentDeduplicator"
+
+      * "DocumentDeduplicator.compute_hash()"
+
+      * "DocumentDeduplicator.process()"
+
+    * "DocumentMinhashDeduplicator"
+
+      * "DocumentMinhashDeduplicator.compute_hash()"
+
+      * "DocumentMinhashDeduplicator.process()"
+
+    * "DocumentSimhashDeduplicator"
+
+      * "DocumentSimhashDeduplicator.compute_hash()"
+
+      * "DocumentSimhashDeduplicator.process()"
+
+    * "ImageDeduplicator"
+
+      * "ImageDeduplicator.compute_hash()"
+
+      * "ImageDeduplicator.process()"
+
+    * "RayBasicDeduplicator"
+
+      * "RayBasicDeduplicator.EMPTY_HASH_VALUE"
+
+      * "RayBasicDeduplicator.calculate_hash()"
+
+      * "RayBasicDeduplicator.compute_stats_single()"
+
+      * "RayBasicDeduplicator.process_single()"
+
+    * "RayDocumentDeduplicator"
+
+      * "RayDocumentDeduplicator.calculate_hash()"
+
+    * "RayImageDeduplicator"
+
+      * "RayImageDeduplicator.calculate_hash()"
+
+    * "RayVideoDeduplicator"
+
+      * "RayVideoDeduplicator.calculate_hash()"
+
+    * "RayBTSMinhashDeduplicator"
+
+      * "RayBTSMinhashDeduplicator.EMPTY_HASH_VALUE"
+
+      * "RayBTSMinhashDeduplicator.calc_minhash()"
+
+      * "RayBTSMinhashDeduplicator.merge_op_batch()"
+
+      * "RayBTSMinhashDeduplicator.merge()"
+
+      * "RayBTSMinhashDeduplicator.filter_with_union_find()"
+
+      * "RayBTSMinhashDeduplicator.run()"
+
+    * "VideoDeduplicator"
+
+      * "VideoDeduplicator.compute_hash()"
+
+      * "VideoDeduplicator.process()"
+
+* data_juicer.ops.filter package
+
+  * Submodules
+
+  * data_juicer.ops.filter.alphanumeric_filter module
+
+    * "AlphanumericFilter"
+
+      * "AlphanumericFilter.compute_stats_batched()"
+
+      * "AlphanumericFilter.process_batched()"
+
+  * data_juicer.ops.filter.audio_duration_filter module
+
+    * "AudioDurationFilter"
+
+      * "AudioDurationFilter.compute_stats_single()"
+
+      * "AudioDurationFilter.process_single()"
+
+  * data_juicer.ops.filter.audio_nmf_snr_filter module
+
+    * "separate_signal_noise()"
+
+    * "compute_nmf_snr()"
+
+    * "AudioNMFSNRFilter"
+
+      * "AudioNMFSNRFilter.compute_stats_single()"
+
+      * "AudioNMFSNRFilter.process_single()"
+
+  * data_juicer.ops.filter.audio_size_filter module
+
+    * "AudioSizeFilter"
+
+      * "AudioSizeFilter.compute_stats_single()"
+
+      * "AudioSizeFilter.process_single()"
+
+  * data_juicer.ops.filter.average_line_length_filter module
+
+    * "AverageLineLengthFilter"
+
+      * "AverageLineLengthFilter.compute_stats_batched()"
+
+      * "AverageLineLengthFilter.process_batched()"
+
+  * data_juicer.ops.filter.character_repetition_filter module
+
+    * "CharacterRepetitionFilter"
+
+      * "CharacterRepetitionFilter.compute_stats_batched()"
+
+      * "CharacterRepetitionFilter.process_batched()"
+
+  * data_juicer.ops.filter.flagged_words_filter module
+
+    * "FlaggedWordFilter"
+
+      * "FlaggedWordFilter.compute_stats_batched()"
+
+      * "FlaggedWordFilter.process_batched()"
+
+  * data_juicer.ops.filter.general_field_filter module
+
+    * "GeneralFieldFilter"
+
+      * "GeneralFieldFilter.compute_stats_single()"
+
+      * "GeneralFieldFilter.process_single()"
+
+    * "ExpressionTransformer"
+
+      * "ExpressionTransformer.visit_BoolOp()"
+
+      * "ExpressionTransformer.visit_Compare()"
+
+      * "ExpressionTransformer.visit_Name()"
+
+      * "ExpressionTransformer.visit_Attribute()"
+
+      * "ExpressionTransformer.visit_Constant()"
+
+      * "ExpressionTransformer.generic_visit()"
+
+      * "ExpressionTransformer.transform()"
+
+  * data_juicer.ops.filter.image_aesthetics_filter module
+
+    * "ImageAestheticsFilter"
+
+      * "ImageAestheticsFilter.compute_stats_single()"
+
+      * "ImageAestheticsFilter.process_single()"
+
+  * data_juicer.ops.filter.image_aspect_ratio_filter module
+
+    * "ImageAspectRatioFilter"
+
+      * "ImageAspectRatioFilter.compute_stats_batched()"
+
+      * "ImageAspectRatioFilter.process_batched()"
+
+  * data_juicer.ops.filter.image_face_count_filter module
+
+    * "ImageFaceCountFilter"
+
+      * "ImageFaceCountFilter.compute_stats_single()"
+
+      * "ImageFaceCountFilter.process_single()"
+
+  * data_juicer.ops.filter.image_face_ratio_filter module
+
+    * "ImageFaceRatioFilter"
+
+      * "ImageFaceRatioFilter.compute_stats_single()"
+
+      * "ImageFaceRatioFilter.process_single()"
+
+  * data_juicer.ops.filter.image_nsfw_filter module
+
+    * "ImageNSFWFilter"
+
+      * "ImageNSFWFilter.compute_stats_single()"
+
+      * "ImageNSFWFilter.process_single()"
+
+  * data_juicer.ops.filter.image_pair_similarity_filter module
+
+    * "ImagePairSimilarityFilter"
+
+      * "ImagePairSimilarityFilter.compute_stats_single()"
+
+      * "ImagePairSimilarityFilter.process_single()"
+
+  * data_juicer.ops.filter.image_shape_filter module
+
+    * "ImageShapeFilter"
+
+      * "ImageShapeFilter.compute_stats_single()"
+
+      * "ImageShapeFilter.process_single()"
+
+  * data_juicer.ops.filter.image_size_filter module
+
+    * "ImageSizeFilter"
+
+      * "ImageSizeFilter.compute_stats_single()"
+
+      * "ImageSizeFilter.process_single()"
+
+  * data_juicer.ops.filter.image_text_matching_filter module
+
+    * "ImageTextMatchingFilter"
+
+      * "ImageTextMatchingFilter.compute_stats_single()"
+
+      * "ImageTextMatchingFilter.process_single()"
+
+  * data_juicer.ops.filter.image_text_similarity_filter module
+
+    * "ImageTextSimilarityFilter"
+
+      * "ImageTextSimilarityFilter.compute_stats_single()"
+
+      * "ImageTextSimilarityFilter.process_single()"
+
+  * data_juicer.ops.filter.image_watermark_filter module
+
+    * "ImageWatermarkFilter"
+
+      * "ImageWatermarkFilter.compute_stats_single()"
+
+      * "ImageWatermarkFilter.process_single()"
+
+  * data_juicer.ops.filter.language_id_score_filter module
+
+    * "LanguageIDScoreFilter"
+
+      * "LanguageIDScoreFilter.compute_stats_single()"
+
+      * "LanguageIDScoreFilter.process_single()"
+
+  * data_juicer.ops.filter.llm_difficulty_score_filter module
+
+    * "LLMDifficultyScoreFilter"
+
+      * "LLMDifficultyScoreFilter.DEFAULT_SYSTEM_PROMPT"
+
+      * "LLMDifficultyScoreFilter.DEFAULT_INPUT_TEMPLATE"
+
+      * "LLMDifficultyScoreFilter.DEFAULT_FIELD_TEMPLATE"
+
+      * "LLMDifficultyScoreFilter.build_input()"
+
+      * "LLMDifficultyScoreFilter.parse_output()"
+
+      * "LLMDifficultyScoreFilter.compute_stats_single()"
+
+      * "LLMDifficultyScoreFilter.process_single()"
+
+  * data_juicer.ops.filter.llm_quality_score_filter module
+
+    * "LLMQualityScoreFilter"
+
+      * "LLMQualityScoreFilter.DEFAULT_SYSTEM_PROMPT"
+
+      * "LLMQualityScoreFilter.DEFAULT_INPUT_TEMPLATE"
+
+      * "LLMQualityScoreFilter.DEFAULT_FIELD_TEMPLATE"
+
+      * "LLMQualityScoreFilter.build_input()"
+
+      * "LLMQualityScoreFilter.parse_output()"
+
+      * "LLMQualityScoreFilter.compute_stats_single()"
+
+      * "LLMQualityScoreFilter.process_single()"
+
+  * data_juicer.ops.filter.maximum_line_length_filter module
+
+    * "MaximumLineLengthFilter"
+
+      * "MaximumLineLengthFilter.compute_stats_batched()"
+
+      * "MaximumLineLengthFilter.process_batched()"
+
+  * data_juicer.ops.filter.perplexity_filter module
+
+    * "PerplexityFilter"
+
+      * "PerplexityFilter.compute_stats_batched()"
+
+      * "PerplexityFilter.process_batched()"
+
+  * data_juicer.ops.filter.phrase_grounding_recall_filter module
+
+    * "find_noun_phrases()"
+
+    * "remove_punctuation()"
+
+    * "run_ner()"
+
+    * "PhraseGroundingRecallFilter"
+
+      * "PhraseGroundingRecallFilter.compute_stats_single()"
+
+      * "PhraseGroundingRecallFilter.process_single()"
+
+  * data_juicer.ops.filter.special_characters_filter module
+
+    * "SpecialCharactersFilter"
+
+      * "SpecialCharactersFilter.compute_stats_batched()"
+
+      * "SpecialCharactersFilter.process_batched()"
+
+  * data_juicer.ops.filter.specified_field_filter module
+
+    * "SpecifiedFieldFilter"
+
+      * "SpecifiedFieldFilter.compute_stats_single()"
+
+      * "SpecifiedFieldFilter.process_single()"
+
+  * data_juicer.ops.filter.specified_numeric_field_filter module
+
+    * "is_number()"
+
+    * "SpecifiedNumericFieldFilter"
+
+      * "SpecifiedNumericFieldFilter.compute_stats_single()"
+
+      * "SpecifiedNumericFieldFilter.process_single()"
+
+  * data_juicer.ops.filter.stopwords_filter module
+
+    * "StopWordsFilter"
+
+      * "StopWordsFilter.compute_stats_single()"
+
+      * "StopWordsFilter.process_single()"
+
+  * data_juicer.ops.filter.suffix_filter module
+
+    * "SuffixFilter"
+
+      * "SuffixFilter.compute_stats_single()"
+
+      * "SuffixFilter.process_single()"
+
+  * data_juicer.ops.filter.text_action_filter module
+
+    * "TextActionFilter"
+
+      * "TextActionFilter.compute_stats_single()"
+
+      * "TextActionFilter.process_single()"
+
+  * data_juicer.ops.filter.text_entity_dependency_filter module
+
+    * "TextEntityDependencyFilter"
+
+      * "TextEntityDependencyFilter.compute_stats_single()"
+
+      * "TextEntityDependencyFilter.process_single()"
+
+  * data_juicer.ops.filter.text_length_filter module
+
+    * "TextLengthFilter"
+
+      * "TextLengthFilter.compute_stats_batched()"
+
+      * "TextLengthFilter.process_batched()"
+
+  * data_juicer.ops.filter.text_pair_similarity_filter module
+
+    * "TextPairSimilarityFilter"
+
+      * "TextPairSimilarityFilter.compute_stats_single()"
+
+      * "TextPairSimilarityFilter.process_single()"
+
+  * data_juicer.ops.filter.token_num_filter module
+
+    * "TokenNumFilter"
+
+      * "TokenNumFilter.compute_stats_single()"
+
+      * "TokenNumFilter.process_single()"
+
+  * data_juicer.ops.filter.video_aesthetics_filter module
+
+    * "VideoAestheticsFilter"
+
+      * "VideoAestheticsFilter.compute_stats_single()"
+
+      * "VideoAestheticsFilter.process_single()"
+
+  * data_juicer.ops.filter.video_aspect_ratio_filter module
+
+    * "VideoAspectRatioFilter"
+
+      * "VideoAspectRatioFilter.compute_stats_single()"
+
+      * "VideoAspectRatioFilter.process_single()"
+
+  * data_juicer.ops.filter.video_duration_filter module
+
+    * "VideoDurationFilter"
+
+      * "VideoDurationFilter.compute_stats_single()"
+
+      * "VideoDurationFilter.process_single()"
+
+  * data_juicer.ops.filter.video_frames_text_similarity_filter module
+
+    * "VideoFramesTextSimilarityFilter"
+
+      * "VideoFramesTextSimilarityFilter.compute_stats_single()"
+
+      * "VideoFramesTextSimilarityFilter.process_single()"
+
+  * data_juicer.ops.filter.video_motion_score_filter module
+
+    * "VideoCapture()"
+
+    * "VideoMotionScoreFilter"
+
+      * "VideoMotionScoreFilter.setup_model()"
+
+      * "VideoMotionScoreFilter.compute_flow()"
+
+      * "VideoMotionScoreFilter.compute_stats_single()"
+
+      * "VideoMotionScoreFilter.process_single()"
+
+  * data_juicer.ops.filter.video_motion_score_raft_filter module
+
+    * "VideoMotionScoreRaftFilter"
+
+      * "VideoMotionScoreRaftFilter.setup_model()"
+
+      * "VideoMotionScoreRaftFilter.compute_flow()"
+
+  * data_juicer.ops.filter.video_nsfw_filter module
+
+    * "VideoNSFWFilter"
+
+      * "VideoNSFWFilter.compute_stats_single()"
+
+      * "VideoNSFWFilter.process_single()"
+
+  * data_juicer.ops.filter.video_ocr_area_ratio_filter module
+
+    * "triangle_area()"
+
+    * "VideoOcrAreaRatioFilter"
+
+      * "VideoOcrAreaRatioFilter.get_reader()"
+
+      * "VideoOcrAreaRatioFilter.compute_stats_single()"
+
+      * "VideoOcrAreaRatioFilter.process_single()"
+
+  * data_juicer.ops.filter.video_resolution_filter module
+
+    * "VideoResolutionFilter"
+
+      * "VideoResolutionFilter.compute_stats_single()"
+
+      * "VideoResolutionFilter.process_single()"
+
+  * data_juicer.ops.filter.video_tagging_from_frames_filter module
+
+    * "VideoTaggingFromFramesFilter"
+
+      * "VideoTaggingFromFramesFilter.compute_stats_single()"
+
+      * "VideoTaggingFromFramesFilter.process_single()"
+
+  * data_juicer.ops.filter.video_watermark_filter module
+
+    * "VideoWatermarkFilter"
+
+      * "VideoWatermarkFilter.compute_stats_single()"
+
+      * "VideoWatermarkFilter.process_single()"
+
+  * data_juicer.ops.filter.word_repetition_filter module
+
+    * "WordRepetitionFilter"
+
+      * "WordRepetitionFilter.compute_stats_batched()"
+
+      * "WordRepetitionFilter.process_batched()"
+
+  * data_juicer.ops.filter.words_num_filter module
+
+    * "WordsNumFilter"
+
+      * "WordsNumFilter.compute_stats_batched()"
+
+      * "WordsNumFilter.process_batched()"
+
+  * Module contents
+
+    * "AlphanumericFilter"
+
+      * "AlphanumericFilter.compute_stats_batched()"
+
+      * "AlphanumericFilter.process_batched()"
+
+    * "AudioDurationFilter"
+
+      * "AudioDurationFilter.compute_stats_single()"
+
+      * "AudioDurationFilter.process_single()"
+
+    * "AudioNMFSNRFilter"
+
+      * "AudioNMFSNRFilter.compute_stats_single()"
+
+      * "AudioNMFSNRFilter.process_single()"
+
+    * "AudioSizeFilter"
+
+      * "AudioSizeFilter.compute_stats_single()"
+
+      * "AudioSizeFilter.process_single()"
+
+    * "AverageLineLengthFilter"
+
+      * "AverageLineLengthFilter.compute_stats_batched()"
+
+      * "AverageLineLengthFilter.process_batched()"
+
+    * "CharacterRepetitionFilter"
+
+      * "CharacterRepetitionFilter.compute_stats_batched()"
+
+      * "CharacterRepetitionFilter.process_batched()"
+
+    * "FlaggedWordFilter"
+
+      * "FlaggedWordFilter.compute_stats_batched()"
+
+      * "FlaggedWordFilter.process_batched()"
+
+    * "ImageAestheticsFilter"
+
+      * "ImageAestheticsFilter.compute_stats_single()"
+
+      * "ImageAestheticsFilter.process_single()"
+
+    * "ImageAspectRatioFilter"
+
+      * "ImageAspectRatioFilter.compute_stats_batched()"
+
+      * "ImageAspectRatioFilter.process_batched()"
+
+    * "ImageFaceCountFilter"
+
+      * "ImageFaceCountFilter.compute_stats_single()"
+
+      * "ImageFaceCountFilter.process_single()"
+
+    * "ImageFaceRatioFilter"
+
+      * "ImageFaceRatioFilter.compute_stats_single()"
+
+      * "ImageFaceRatioFilter.process_single()"
+
+    * "ImageNSFWFilter"
+
+      * "ImageNSFWFilter.compute_stats_single()"
+
+      * "ImageNSFWFilter.process_single()"
+
+    * "ImagePairSimilarityFilter"
+
+      * "ImagePairSimilarityFilter.compute_stats_single()"
+
+      * "ImagePairSimilarityFilter.process_single()"
+
+    * "ImageShapeFilter"
+
+      * "ImageShapeFilter.compute_stats_single()"
+
+      * "ImageShapeFilter.process_single()"
+
+    * "ImageSizeFilter"
+
+      * "ImageSizeFilter.compute_stats_single()"
+
+      * "ImageSizeFilter.process_single()"
+
+    * "ImageTextMatchingFilter"
+
+      * "ImageTextMatchingFilter.compute_stats_single()"
+
+      * "ImageTextMatchingFilter.process_single()"
+
+    * "ImageTextSimilarityFilter"
+
+      * "ImageTextSimilarityFilter.compute_stats_single()"
+
+      * "ImageTextSimilarityFilter.process_single()"
+
+    * "ImageWatermarkFilter"
+
+      * "ImageWatermarkFilter.compute_stats_single()"
+
+      * "ImageWatermarkFilter.process_single()"
+
+    * "LanguageIDScoreFilter"
+
+      * "LanguageIDScoreFilter.compute_stats_single()"
+
+      * "LanguageIDScoreFilter.process_single()"
+
+    * "LLMQualityScoreFilter"
+
+      * "LLMQualityScoreFilter.DEFAULT_SYSTEM_PROMPT"
+
+      * "LLMQualityScoreFilter.DEFAULT_INPUT_TEMPLATE"
+
+      * "LLMQualityScoreFilter.DEFAULT_FIELD_TEMPLATE"
+
+      * "LLMQualityScoreFilter.build_input()"
+
+      * "LLMQualityScoreFilter.parse_output()"
+
+      * "LLMQualityScoreFilter.compute_stats_single()"
+
+      * "LLMQualityScoreFilter.process_single()"
+
+    * "LLMDifficultyScoreFilter"
+
+      * "LLMDifficultyScoreFilter.DEFAULT_SYSTEM_PROMPT"
+
+      * "LLMDifficultyScoreFilter.DEFAULT_INPUT_TEMPLATE"
+
+      * "LLMDifficultyScoreFilter.DEFAULT_FIELD_TEMPLATE"
+
+      * "LLMDifficultyScoreFilter.build_input()"
+
+      * "LLMDifficultyScoreFilter.parse_output()"
+
+      * "LLMDifficultyScoreFilter.compute_stats_single()"
+
+      * "LLMDifficultyScoreFilter.process_single()"
+
+    * "MaximumLineLengthFilter"
+
+      * "MaximumLineLengthFilter.compute_stats_batched()"
+
+      * "MaximumLineLengthFilter.process_batched()"
+
+    * "PerplexityFilter"
+
+      * "PerplexityFilter.compute_stats_batched()"
+
+      * "PerplexityFilter.process_batched()"
+
+    * "PhraseGroundingRecallFilter"
+
+      * "PhraseGroundingRecallFilter.compute_stats_single()"
+
+      * "PhraseGroundingRecallFilter.process_single()"
+
+    * "SpecialCharactersFilter"
+
+      * "SpecialCharactersFilter.compute_stats_batched()"
+
+      * "SpecialCharactersFilter.process_batched()"
+
+    * "SpecifiedFieldFilter"
+
+      * "SpecifiedFieldFilter.compute_stats_single()"
+
+      * "SpecifiedFieldFilter.process_single()"
+
+    * "SpecifiedNumericFieldFilter"
+
+      * "SpecifiedNumericFieldFilter.compute_stats_single()"
+
+      * "SpecifiedNumericFieldFilter.process_single()"
+
+    * "StopWordsFilter"
+
+      * "StopWordsFilter.compute_stats_single()"
+
+      * "StopWordsFilter.process_single()"
+
+    * "SuffixFilter"
+
+      * "SuffixFilter.compute_stats_single()"
+
+      * "SuffixFilter.process_single()"
+
+    * "TextActionFilter"
+
+      * "TextActionFilter.compute_stats_single()"
+
+      * "TextActionFilter.process_single()"
+
+    * "TextEntityDependencyFilter"
+
+      * "TextEntityDependencyFilter.compute_stats_single()"
+
+      * "TextEntityDependencyFilter.process_single()"
+
+    * "TextLengthFilter"
+
+      * "TextLengthFilter.compute_stats_batched()"
+
+      * "TextLengthFilter.process_batched()"
+
+    * "TextPairSimilarityFilter"
+
+      * "TextPairSimilarityFilter.compute_stats_single()"
+
+      * "TextPairSimilarityFilter.process_single()"
+
+    * "TokenNumFilter"
+
+      * "TokenNumFilter.compute_stats_single()"
+
+      * "TokenNumFilter.process_single()"
+
+    * "VideoAestheticsFilter"
+
+      * "VideoAestheticsFilter.compute_stats_single()"
+
+      * "VideoAestheticsFilter.process_single()"
+
+    * "VideoAspectRatioFilter"
+
+      * "VideoAspectRatioFilter.compute_stats_single()"
+
+      * "VideoAspectRatioFilter.process_single()"
+
+    * "VideoDurationFilter"
+
+      * "VideoDurationFilter.compute_stats_single()"
+
+      * "VideoDurationFilter.process_single()"
+
+    * "VideoFramesTextSimilarityFilter"
+
+      * "VideoFramesTextSimilarityFilter.compute_stats_single()"
+
+      * "VideoFramesTextSimilarityFilter.process_single()"
+
+    * "VideoMotionScoreFilter"
+
+      * "VideoMotionScoreFilter.setup_model()"
+
+      * "VideoMotionScoreFilter.compute_flow()"
+
+      * "VideoMotionScoreFilter.compute_stats_single()"
+
+      * "VideoMotionScoreFilter.process_single()"
+
+    * "VideoMotionScoreRaftFilter"
+
+      * "VideoMotionScoreRaftFilter.setup_model()"
+
+      * "VideoMotionScoreRaftFilter.compute_flow()"
+
+    * "VideoNSFWFilter"
+
+      * "VideoNSFWFilter.compute_stats_single()"
+
+      * "VideoNSFWFilter.process_single()"
+
+    * "VideoOcrAreaRatioFilter"
+
+      * "VideoOcrAreaRatioFilter.get_reader()"
+
+      * "VideoOcrAreaRatioFilter.compute_stats_single()"
+
+      * "VideoOcrAreaRatioFilter.process_single()"
+
+    * "VideoResolutionFilter"
+
+      * "VideoResolutionFilter.compute_stats_single()"
+
+      * "VideoResolutionFilter.process_single()"
+
+    * "VideoTaggingFromFramesFilter"
+
+      * "VideoTaggingFromFramesFilter.compute_stats_single()"
+
+      * "VideoTaggingFromFramesFilter.process_single()"
+
+    * "VideoWatermarkFilter"
+
+      * "VideoWatermarkFilter.compute_stats_single()"
+
+      * "VideoWatermarkFilter.process_single()"
+
+    * "WordRepetitionFilter"
+
+      * "WordRepetitionFilter.compute_stats_batched()"
+
+      * "WordRepetitionFilter.process_batched()"
+
+    * "WordsNumFilter"
+
+      * "WordsNumFilter.compute_stats_batched()"
+
+      * "WordsNumFilter.process_batched()"
+
+    * "GeneralFieldFilter"
+
+      * "GeneralFieldFilter.compute_stats_single()"
+
+      * "GeneralFieldFilter.process_single()"
+
+* data_juicer.ops.grouper package
+
+  * Submodules
+
+  * data_juicer.ops.grouper.key_value_grouper module
+
+    * "KeyValueGrouper"
+
+      * "KeyValueGrouper.process()"
+
+  * data_juicer.ops.grouper.naive_grouper module
+
+    * "NaiveGrouper"
+
+      * "NaiveGrouper.process()"
+
+  * data_juicer.ops.grouper.naive_reverse_grouper module
+
+    * "NaiveReverseGrouper"
+
+      * "NaiveReverseGrouper.process()"
+
+  * Module contents
+
+    * "KeyValueGrouper"
+
+      * "KeyValueGrouper.process()"
+
+    * "NaiveGrouper"
+
+      * "NaiveGrouper.process()"
+
+    * "NaiveReverseGrouper"
+
+      * "NaiveReverseGrouper.process()"
+
+* data_juicer.ops.mapper package
+
+  * Subpackages
+
+    * data_juicer.ops.mapper.annotation package
+
+      * Submodules
+
+      * data_juicer.ops.mapper.annotation.annotation_mapper module
+
+      * data_juicer.ops.mapper.annotation.human_preference_annotation
+        _mapper module
+
+      * Module contents
+
+  * Submodules
+
+  * data_juicer.ops.mapper.audio_add_gaussian_noise_mapper module
+
+    * "AudioAddGaussianNoiseMapper"
+
+      * "AudioAddGaussianNoiseMapper.process_single()"
+
+  * data_juicer.ops.mapper.audio_ffmpeg_wrapped_mapper module
+
+    * "AudioFFmpegWrappedMapper"
+
+      * "AudioFFmpegWrappedMapper.process_single()"
+
+  * data_juicer.ops.mapper.calibrate_qa_mapper module
+
+    * "CalibrateQAMapper"
+
+      * "CalibrateQAMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "CalibrateQAMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "CalibrateQAMapper.DEFAULT_REFERENCE_TEMPLATE"
+
+      * "CalibrateQAMapper.DEFAULT_QA_PAIR_TEMPLATE"
+
+      * "CalibrateQAMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "CalibrateQAMapper.build_input()"
+
+      * "CalibrateQAMapper.parse_output()"
+
+      * "CalibrateQAMapper.process_single()"
+
+  * data_juicer.ops.mapper.calibrate_query_mapper module
+
+    * "CalibrateQueryMapper"
+
+      * "CalibrateQueryMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "CalibrateQueryMapper.parse_output()"
+
+  * data_juicer.ops.mapper.calibrate_response_mapper module
+
+    * "CalibrateResponseMapper"
+
+      * "CalibrateResponseMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "CalibrateResponseMapper.parse_output()"
+
+  * data_juicer.ops.mapper.chinese_convert_mapper module
+
+    * "prepare_converter()"
+
+    * "ChineseConvertMapper"
+
+      * "ChineseConvertMapper.process_batched()"
+
+  * data_juicer.ops.mapper.clean_copyright_mapper module
+
+    * "CleanCopyrightMapper"
+
+      * "CleanCopyrightMapper.process_batched()"
+
+  * data_juicer.ops.mapper.clean_email_mapper module
+
+    * "CleanEmailMapper"
+
+      * "CleanEmailMapper.process_batched()"
+
+  * data_juicer.ops.mapper.clean_html_mapper module
+
+    * "CleanHtmlMapper"
+
+      * "CleanHtmlMapper.process_batched()"
+
+  * data_juicer.ops.mapper.clean_ip_mapper module
+
+    * "CleanIpMapper"
+
+      * "CleanIpMapper.process_batched()"
+
+  * data_juicer.ops.mapper.clean_links_mapper module
+
+    * "CleanLinksMapper"
+
+      * "CleanLinksMapper.process_batched()"
+
+  * data_juicer.ops.mapper.dialog_intent_detection_mapper module
+
+    * "DialogIntentDetectionMapper"
+
+      * "DialogIntentDetectionMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "DialogIntentDetectionMapper.DEFAULT_QUERY_TEMPLATE"
+
+      * "DialogIntentDetectionMapper.DEFAULT_RESPONSE_TEMPLATE"
+
+      * "DialogIntentDetectionMapper.DEFAULT_CANDIDATES_TEMPLATE"
+
+      * "DialogIntentDetectionMapper.DEFAULT_ANALYSIS_TEMPLATE"
+
+      * "DialogIntentDetectionMapper.DEFAULT_LABELS_TEMPLATE"
+
+      * "DialogIntentDetectionMapper.DEFAULT_ANALYSIS_PATTERN"
+
+      * "DialogIntentDetectionMapper.DEFAULT_LABELS_PATTERN"
+
+      * "DialogIntentDetectionMapper.build_input()"
+
+      * "DialogIntentDetectionMapper.parse_output()"
+
+      * "DialogIntentDetectionMapper.process_single()"
+
+  * data_juicer.ops.mapper.dialog_sentiment_detection_mapper module
+
+    * "DialogSentimentDetectionMapper"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_QUERY_TEMPLATE"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_RESPONSE_TEMPLATE"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_CANDIDATES_TEMPLATE"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_ANALYSIS_TEMPLATE"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_LABELS_TEMPLATE"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_ANALYSIS_PATTERN"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_LABELS_PATTERN"
+
+      * "DialogSentimentDetectionMapper.build_input()"
+
+      * "DialogSentimentDetectionMapper.parse_output()"
+
+      * "DialogSentimentDetectionMapper.process_single()"
+
+  * data_juicer.ops.mapper.dialog_sentiment_intensity_mapper module
+
+    * "DialogSentimentIntensityMapper"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_QUERY_TEMPLATE"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_RESPONSE_TEMPLATE"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_ANALYSIS_TEMPLATE"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_INTENSITY_TEMPLATE"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_ANALYSIS_PATTERN"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_INTENSITY_PATTERN"
+
+      * "DialogSentimentIntensityMapper.build_input()"
+
+      * "DialogSentimentIntensityMapper.parse_output()"
+
+      * "DialogSentimentIntensityMapper.process_single()"
+
+  * data_juicer.ops.mapper.dialog_topic_detection_mapper module
+
+    * "DialogTopicDetectionMapper"
+
+      * "DialogTopicDetectionMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "DialogTopicDetectionMapper.DEFAULT_QUERY_TEMPLATE"
+
+      * "DialogTopicDetectionMapper.DEFAULT_RESPONSE_TEMPLATE"
+
+      * "DialogTopicDetectionMapper.DEFAULT_CANDIDATES_TEMPLATE"
+
+      * "DialogTopicDetectionMapper.DEFAULT_ANALYSIS_TEMPLATE"
+
+      * "DialogTopicDetectionMapper.DEFAULT_LABELS_TEMPLATE"
+
+      * "DialogTopicDetectionMapper.DEFAULT_ANALYSIS_PATTERN"
+
+      * "DialogTopicDetectionMapper.DEFAULT_LABELS_PATTERN"
+
+      * "DialogTopicDetectionMapper.build_input()"
+
+      * "DialogTopicDetectionMapper.parse_output()"
+
+      * "DialogTopicDetectionMapper.process_single()"
+
+  * data_juicer.ops.mapper.expand_macro_mapper module
+
+    * "ExpandMacroMapper"
+
+      * "ExpandMacroMapper.process_batched()"
+
+  * data_juicer.ops.mapper.extract_entity_attribute_mapper module
+
+    * "ExtractEntityAttributeMapper"
+
+      * "ExtractEntityAttributeMapper.DEFAULT_SYSTEM_PROMPT_TEMPLATE"
+
+      * "ExtractEntityAttributeMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "ExtractEntityAttributeMapper.DEFAULT_ATTR_PATTERN_TEMPLATE"
+
+      * "ExtractEntityAttributeMapper.DEFAULT_DEMON_PATTERN"
+
+      * "ExtractEntityAttributeMapper.parse_output()"
+
+      * "ExtractEntityAttributeMapper.process_single()"
+
+  * data_juicer.ops.mapper.extract_entity_relation_mapper module
+
+    * "ExtractEntityRelationMapper"
+
+      * "ExtractEntityRelationMapper.DEFAULT_PROMPT_TEMPLATE"
+
+      * "ExtractEntityRelationMapper.DEFAULT_CONTINUE_PROMPT"
+
+      * "ExtractEntityRelationMapper.DEFAULT_IF_LOOP_PROMPT"
+
+      * "ExtractEntityRelationMapper.DEFAULT_ENTITY_TYPES"
+
+      * "ExtractEntityRelationMapper.DEFAULT_TUPLE_DELIMITER"
+
+      * "ExtractEntityRelationMapper.DEFAULT_RECORD_DELIMITER"
+
+      * "ExtractEntityRelationMapper.DEFAULT_COMPLETION_DELIMITER"
+
+      * "ExtractEntityRelationMapper.DEFAULT_ENTITY_PATTERN"
+
+      * "ExtractEntityRelationMapper.DEFAULT_RELATION_PATTERN"
+
+      * "ExtractEntityRelationMapper.parse_output()"
+
+      * "ExtractEntityRelationMapper.add_message()"
+
+      * "ExtractEntityRelationMapper.light_rag_extraction()"
+
+      * "ExtractEntityRelationMapper.process_single()"
+
+  * data_juicer.ops.mapper.extract_event_mapper module
+
+    * "ExtractEventMapper"
+
+      * "ExtractEventMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "ExtractEventMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "ExtractEventMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "ExtractEventMapper.parse_output()"
+
+      * "ExtractEventMapper.process_batched()"
+
+  * data_juicer.ops.mapper.extract_keyword_mapper module
+
+    * "ExtractKeywordMapper"
+
+      * "ExtractKeywordMapper.DEFAULT_PROMPT_TEMPLATE"
+
+      * "ExtractKeywordMapper.DEFAULT_COMPLETION_DELIMITER"
+
+      * "ExtractKeywordMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "ExtractKeywordMapper.parse_output()"
+
+      * "ExtractKeywordMapper.process_single()"
+
+  * data_juicer.ops.mapper.extract_nickname_mapper module
+
+    * "ExtractNicknameMapper"
+
+      * "ExtractNicknameMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "ExtractNicknameMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "ExtractNicknameMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "ExtractNicknameMapper.parse_output()"
+
+      * "ExtractNicknameMapper.process_single()"
+
+  * data_juicer.ops.mapper.extract_support_text_mapper module
+
+    * "ExtractSupportTextMapper"
+
+      * "ExtractSupportTextMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "ExtractSupportTextMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "ExtractSupportTextMapper.process_single()"
+
+  * data_juicer.ops.mapper.extract_tables_from_html_mapper module
+
+    * "ExtractTablesFromHtmlMapper"
+
+      * "ExtractTablesFromHtmlMapper.process_single()"
+
+  * data_juicer.ops.mapper.fix_unicode_mapper module
+
+    * "FixUnicodeMapper"
+
+      * "FixUnicodeMapper.process_batched()"
+
+  * data_juicer.ops.mapper.generate_qa_from_examples_mapper module
+
+    * "GenerateQAFromExamplesMapper"
+
+      * "GenerateQAFromExamplesMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "GenerateQAFromExamplesMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "GenerateQAFromExamplesMapper.DEFAULT_EXAMPLE_TEMPLATE"
+
+      * "GenerateQAFromExamplesMapper.DEFAULT_QA_PAIR_TEMPLATE"
+
+      * "GenerateQAFromExamplesMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "GenerateQAFromExamplesMapper.build_input()"
+
+      * "GenerateQAFromExamplesMapper.parse_output()"
+
+      * "GenerateQAFromExamplesMapper.process_single()"
+
+  * data_juicer.ops.mapper.generate_qa_from_text_mapper module
+
+    * "GenerateQAFromTextMapper"
+
+      * "GenerateQAFromTextMapper.parse_output()"
+
+      * "GenerateQAFromTextMapper.process_batched()"
+
+  * data_juicer.ops.mapper.image_blur_mapper module
+
+    * "ImageBlurMapper"
+
+      * "ImageBlurMapper.process_single()"
+
+  * data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper module
+
+    * "call_gpt_vision_api()"
+
+    * "ImageCaptioningFromGPT4VMapper"
+
+      * "ImageCaptioningFromGPT4VMapper.process_batched()"
+
+  * data_juicer.ops.mapper.image_captioning_mapper module
+
+    * "ImageCaptioningMapper"
+
+      * "ImageCaptioningMapper.process_batched()"
+
+  * data_juicer.ops.mapper.image_diffusion_mapper module
+
+    * "ImageDiffusionMapper"
+
+      * "ImageDiffusionMapper.process_batched()"
+
+  * data_juicer.ops.mapper.image_face_blur_mapper module
+
+    * "ImageFaceBlurMapper"
+
+      * "ImageFaceBlurMapper.process_single()"
+
+  * data_juicer.ops.mapper.image_remove_background_mapper module
+
+    * "ImageRemoveBackgroundMapper"
+
+      * "ImageRemoveBackgroundMapper.process_single()"
+
+  * data_juicer.ops.mapper.image_segment_mapper module
+
+    * "ImageSegmentMapper"
+
+      * "ImageSegmentMapper.process_single()"
+
+  * data_juicer.ops.mapper.image_tagging_mapper module
+
+    * "ImageTaggingMapper"
+
+      * "ImageTaggingMapper.process_single()"
+
+  * data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper
+    module
+
+    * "is_noun()"
+
+    * "compare_text_index()"
+
+    * "iou_filter()"
+
+    * "Difference_Area_Generator_Mapper"
+
+      * "Difference_Area_Generator_Mapper.process_single()"
+
+  * data_juicer.ops.mapper.imgdiff_difference_caption_generator_mapper
+    module
+
+    * "Difference_Caption_Generator_Mapper"
+
+      * "Difference_Caption_Generator_Mapper.process_single()"
+
+  * data_juicer.ops.mapper.mllm_mapper module
+
+    * "MllmMapper"
+
+      * "MllmMapper.process_single()"
+
+  * data_juicer.ops.mapper.nlpaug_en_mapper module
+
+    * "NlpaugEnMapper"
+
+      * "NlpaugEnMapper.process_batched()"
+
+  * data_juicer.ops.mapper.nlpcda_zh_mapper module
+
+    * "NlpcdaZhMapper"
+
+      * "NlpcdaZhMapper.process_batched()"
+
+  * data_juicer.ops.mapper.optimize_qa_mapper module
+
+    * "OptimizeQAMapper"
+
+      * "OptimizeQAMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "OptimizeQAMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "OptimizeQAMapper.DEFAULT_QA_PAIR_TEMPLATE"
+
+      * "OptimizeQAMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "OptimizeQAMapper.build_input()"
+
+      * "OptimizeQAMapper.parse_output()"
+
+      * "OptimizeQAMapper.process_single()"
+
+  * data_juicer.ops.mapper.optimize_query_mapper module
+
+    * "OptimizeQueryMapper"
+
+      * "OptimizeQueryMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "OptimizeQueryMapper.parse_output()"
+
+  * data_juicer.ops.mapper.optimize_response_mapper module
+
+    * "OptimizeResponseMapper"
+
+      * "OptimizeResponseMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "OptimizeResponseMapper.parse_output()"
+
+  * data_juicer.ops.mapper.pair_preference_mapper module
+
+    * "PairPreferenceMapper"
+
+      * "PairPreferenceMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "PairPreferenceMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "PairPreferenceMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "PairPreferenceMapper.build_input()"
+
+      * "PairPreferenceMapper.parse_output()"
+
+      * "PairPreferenceMapper.process_single()"
+
+  * data_juicer.ops.mapper.punctuation_normalization_mapper module
+
+    * "PunctuationNormalizationMapper"
+
+      * "PunctuationNormalizationMapper.process_batched()"
+
+  * data_juicer.ops.mapper.python_file_mapper module
+
+    * "PythonFileMapper"
+
+      * "PythonFileMapper.process_single()"
+
+      * "PythonFileMapper.process_batched()"
+
+  * data_juicer.ops.mapper.python_lambda_mapper module
+
+    * "PythonLambdaMapper"
+
+      * "PythonLambdaMapper.process_single()"
+
+      * "PythonLambdaMapper.process_batched()"
+
+  * data_juicer.ops.mapper.query_intent_detection_mapper module
+
+    * "QueryIntentDetectionMapper"
+
+      * "QueryIntentDetectionMapper.process_batched()"
+
+  * data_juicer.ops.mapper.query_sentiment_detection_mapper module
+
+    * "QuerySentimentDetectionMapper"
+
+      * "QuerySentimentDetectionMapper.process_batched()"
+
+  * data_juicer.ops.mapper.query_topic_detection_mapper module
+
+    * "QueryTopicDetectionMapper"
+
+      * "QueryTopicDetectionMapper.process_batched()"
+
+  * data_juicer.ops.mapper.relation_identity_mapper module
+
+    * "RelationIdentityMapper"
+
+      * "RelationIdentityMapper.DEFAULT_SYSTEM_PROMPT_TEMPLATE"
+
+      * "RelationIdentityMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "RelationIdentityMapper.DEFAULT_OUTPUT_PATTERN_TEMPLATE"
+
+      * "RelationIdentityMapper.parse_output()"
+
+      * "RelationIdentityMapper.process_single()"
+
+  * data_juicer.ops.mapper.remove_bibliography_mapper module
+
+    * "RemoveBibliographyMapper"
+
+      * "RemoveBibliographyMapper.process_batched()"
+
+  * data_juicer.ops.mapper.remove_comments_mapper module
+
+    * "RemoveCommentsMapper"
+
+      * "RemoveCommentsMapper.process_batched()"
+
+  * data_juicer.ops.mapper.remove_header_mapper module
+
+    * "RemoveHeaderMapper"
+
+      * "RemoveHeaderMapper.process_batched()"
+
+  * data_juicer.ops.mapper.remove_long_words_mapper module
+
+    * "RemoveLongWordsMapper"
+
+      * "RemoveLongWordsMapper.should_keep_long_word()"
+
+      * "RemoveLongWordsMapper.process_batched()"
+
+  * data_juicer.ops.mapper.remove_non_chinese_character_mapper module
+
+    * "RemoveNonChineseCharacterlMapper"
+
+      * "RemoveNonChineseCharacterlMapper.process_batched()"
+
+  * data_juicer.ops.mapper.remove_repeat_sentences_mapper module
+
+    * "split_sentence()"
+
+    * "RemoveRepeatSentencesMapper"
+
+      * "RemoveRepeatSentencesMapper.process_batched()"
+
+  * data_juicer.ops.mapper.remove_specific_chars_mapper module
+
+    * "RemoveSpecificCharsMapper"
+
+      * "RemoveSpecificCharsMapper.process_batched()"
+
+  * data_juicer.ops.mapper.remove_table_text_mapper module
+
+    * "RemoveTableTextMapper"
+
+      * "RemoveTableTextMapper.process_batched()"
+
+  * data_juicer.ops.mapper.remove_words_with_incorrect_substrings_map
+    per module
+
+    * "RemoveWordsWithIncorrectSubstringsMapper"
+
+      * "RemoveWordsWithIncorrectSubstringsMapper.should_keep_word_wi
+        th_incorrect_substrings()"
+
+      * "RemoveWordsWithIncorrectSubstringsMapper.process_batched()"
+
+  * data_juicer.ops.mapper.replace_content_mapper module
+
+    * "ReplaceContentMapper"
+
+      * "ReplaceContentMapper.process_batched()"
+
+  * data_juicer.ops.mapper.sdxl_prompt2prompt_mapper module
+
+    * "SDXLPrompt2PromptMapper"
+
+      * "SDXLPrompt2PromptMapper.process_single()"
+
+  * data_juicer.ops.mapper.sentence_augmentation_mapper module
+
+    * "SentenceAugmentationMapper"
+
+      * "SentenceAugmentationMapper.process_single()"
+
+  * data_juicer.ops.mapper.sentence_split_mapper module
+
+    * "SentenceSplitMapper"
+
+      * "SentenceSplitMapper.process_batched()"
+
+  * data_juicer.ops.mapper.text_chunk_mapper module
+
+    * "TextChunkMapper"
+
+      * "TextChunkMapper.recursively_chunk()"
+
+      * "TextChunkMapper.get_text_chunks()"
+
+      * "TextChunkMapper.process_batched()"
+
+  * data_juicer.ops.mapper.video_captioning_from_audio_mapper module
+
+    * "VideoCaptioningFromAudioMapper"
+
+      * "VideoCaptioningFromAudioMapper.process_batched()"
+
+  * data_juicer.ops.mapper.video_captioning_from_frames_mapper module
+
+    * "VideoCaptioningFromFramesMapper"
+
+      * "VideoCaptioningFromFramesMapper.process_batched()"
+
+  * data_juicer.ops.mapper.video_captioning_from_summarizer_mapper
+    module
+
+    * "VideoCaptioningFromSummarizerMapper"
+
+      * "VideoCaptioningFromSummarizerMapper.process_batched()"
+
+  * data_juicer.ops.mapper.video_captioning_from_video_mapper module
+
+    * "VideoCaptioningFromVideoMapper"
+
+      * "VideoCaptioningFromVideoMapper.process_batched()"
+
+  * data_juicer.ops.mapper.video_extract_frames_mapper module
+
+    * "VideoExtractFramesMapper"
+
+      * "VideoExtractFramesMapper.process_single()"
+
+  * data_juicer.ops.mapper.video_face_blur_mapper module
+
+    * "VideoFaceBlurMapper"
+
+      * "VideoFaceBlurMapper.process_single()"
+
+  * data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper module
+
+    * "VideoFFmpegWrappedMapper"
+
+      * "VideoFFmpegWrappedMapper.process_single()"
+
+  * data_juicer.ops.mapper.video_remove_watermark_mapper module
+
+    * "VideoRemoveWatermarkMapper"
+
+      * "VideoRemoveWatermarkMapper.process_single()"
+
+  * data_juicer.ops.mapper.video_resize_aspect_ratio_mapper module
+
+    * "rescale()"
+
+    * "VideoResizeAspectRatioMapper"
+
+      * "VideoResizeAspectRatioMapper.STRATEGY"
+
+      * "VideoResizeAspectRatioMapper.process_single()"
+
+  * data_juicer.ops.mapper.video_resize_resolution_mapper module
+
+    * "VideoResizeResolutionMapper"
+
+      * "VideoResizeResolutionMapper.process_single()"
+
+  * data_juicer.ops.mapper.video_split_by_duration_mapper module
+
+    * "create_replacer()"
+
+    * "VideoSplitByDurationMapper"
+
+      * "VideoSplitByDurationMapper.split_videos_by_duration()"
+
+      * "VideoSplitByDurationMapper.process_batched()"
+
+  * data_juicer.ops.mapper.video_split_by_key_frame_mapper module
+
+    * "create_replacer()"
+
+    * "VideoSplitByKeyFrameMapper"
+
+      * "VideoSplitByKeyFrameMapper.get_split_key_frame()"
+
+      * "VideoSplitByKeyFrameMapper.process_batched()"
+
+  * data_juicer.ops.mapper.video_split_by_scene_mapper module
+
+    * "replace_func()"
+
+    * "VideoSplitBySceneMapper"
+
+      * "VideoSplitBySceneMapper.avaliable_detectors"
+
+      * "VideoSplitBySceneMapper.process_single()"
+
+  * data_juicer.ops.mapper.video_tagging_from_audio_mapper module
+
+    * "VideoTaggingFromAudioMapper"
+
+      * "VideoTaggingFromAudioMapper.process_single()"
+
+  * data_juicer.ops.mapper.video_tagging_from_frames_mapper module
+
+    * "VideoTaggingFromFramesMapper"
+
+      * "VideoTaggingFromFramesMapper.process_single()"
+
+  * data_juicer.ops.mapper.whitespace_normalization_mapper module
+
+    * "WhitespaceNormalizationMapper"
+
+      * "WhitespaceNormalizationMapper.process_batched()"
+
+  * Module contents
+
+    * "AudioAddGaussianNoiseMapper"
+
+      * "AudioAddGaussianNoiseMapper.process_single()"
+
+    * "AudioFFmpegWrappedMapper"
+
+      * "AudioFFmpegWrappedMapper.process_single()"
+
+    * "CalibrateQAMapper"
+
+      * "CalibrateQAMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "CalibrateQAMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "CalibrateQAMapper.DEFAULT_REFERENCE_TEMPLATE"
+
+      * "CalibrateQAMapper.DEFAULT_QA_PAIR_TEMPLATE"
+
+      * "CalibrateQAMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "CalibrateQAMapper.build_input()"
+
+      * "CalibrateQAMapper.parse_output()"
+
+      * "CalibrateQAMapper.process_single()"
+
+    * "CalibrateQueryMapper"
+
+      * "CalibrateQueryMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "CalibrateQueryMapper.parse_output()"
+
+    * "CalibrateResponseMapper"
+
+      * "CalibrateResponseMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "CalibrateResponseMapper.parse_output()"
+
+    * "ChineseConvertMapper"
+
+      * "ChineseConvertMapper.process_batched()"
+
+    * "CleanCopyrightMapper"
+
+      * "CleanCopyrightMapper.process_batched()"
+
+    * "CleanEmailMapper"
+
+      * "CleanEmailMapper.process_batched()"
+
+    * "CleanHtmlMapper"
+
+      * "CleanHtmlMapper.process_batched()"
+
+    * "CleanIpMapper"
+
+      * "CleanIpMapper.process_batched()"
+
+    * "CleanLinksMapper"
+
+      * "CleanLinksMapper.process_batched()"
+
+    * "DialogIntentDetectionMapper"
+
+      * "DialogIntentDetectionMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "DialogIntentDetectionMapper.DEFAULT_QUERY_TEMPLATE"
+
+      * "DialogIntentDetectionMapper.DEFAULT_RESPONSE_TEMPLATE"
+
+      * "DialogIntentDetectionMapper.DEFAULT_CANDIDATES_TEMPLATE"
+
+      * "DialogIntentDetectionMapper.DEFAULT_ANALYSIS_TEMPLATE"
+
+      * "DialogIntentDetectionMapper.DEFAULT_LABELS_TEMPLATE"
+
+      * "DialogIntentDetectionMapper.DEFAULT_ANALYSIS_PATTERN"
+
+      * "DialogIntentDetectionMapper.DEFAULT_LABELS_PATTERN"
+
+      * "DialogIntentDetectionMapper.build_input()"
+
+      * "DialogIntentDetectionMapper.parse_output()"
+
+      * "DialogIntentDetectionMapper.process_single()"
+
+    * "DialogSentimentDetectionMapper"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_QUERY_TEMPLATE"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_RESPONSE_TEMPLATE"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_CANDIDATES_TEMPLATE"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_ANALYSIS_TEMPLATE"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_LABELS_TEMPLATE"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_ANALYSIS_PATTERN"
+
+      * "DialogSentimentDetectionMapper.DEFAULT_LABELS_PATTERN"
+
+      * "DialogSentimentDetectionMapper.build_input()"
+
+      * "DialogSentimentDetectionMapper.parse_output()"
+
+      * "DialogSentimentDetectionMapper.process_single()"
+
+    * "DialogSentimentIntensityMapper"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_QUERY_TEMPLATE"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_RESPONSE_TEMPLATE"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_ANALYSIS_TEMPLATE"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_INTENSITY_TEMPLATE"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_ANALYSIS_PATTERN"
+
+      * "DialogSentimentIntensityMapper.DEFAULT_INTENSITY_PATTERN"
+
+      * "DialogSentimentIntensityMapper.build_input()"
+
+      * "DialogSentimentIntensityMapper.parse_output()"
+
+      * "DialogSentimentIntensityMapper.process_single()"
+
+    * "DialogTopicDetectionMapper"
+
+      * "DialogTopicDetectionMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "DialogTopicDetectionMapper.DEFAULT_QUERY_TEMPLATE"
+
+      * "DialogTopicDetectionMapper.DEFAULT_RESPONSE_TEMPLATE"
+
+      * "DialogTopicDetectionMapper.DEFAULT_CANDIDATES_TEMPLATE"
+
+      * "DialogTopicDetectionMapper.DEFAULT_ANALYSIS_TEMPLATE"
+
+      * "DialogTopicDetectionMapper.DEFAULT_LABELS_TEMPLATE"
+
+      * "DialogTopicDetectionMapper.DEFAULT_ANALYSIS_PATTERN"
+
+      * "DialogTopicDetectionMapper.DEFAULT_LABELS_PATTERN"
+
+      * "DialogTopicDetectionMapper.build_input()"
+
+      * "DialogTopicDetectionMapper.parse_output()"
+
+      * "DialogTopicDetectionMapper.process_single()"
+
+    * "Difference_Area_Generator_Mapper"
+
+      * "Difference_Area_Generator_Mapper.process_single()"
+
+    * "ExtractEntityAttributeMapper"
+
+      * "ExtractEntityAttributeMapper.DEFAULT_SYSTEM_PROMPT_TEMPLATE"
+
+      * "ExtractEntityAttributeMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "ExtractEntityAttributeMapper.DEFAULT_ATTR_PATTERN_TEMPLATE"
+
+      * "ExtractEntityAttributeMapper.DEFAULT_DEMON_PATTERN"
+
+      * "ExtractEntityAttributeMapper.parse_output()"
+
+      * "ExtractEntityAttributeMapper.process_single()"
+
+    * "ExtractEntityRelationMapper"
+
+      * "ExtractEntityRelationMapper.DEFAULT_PROMPT_TEMPLATE"
+
+      * "ExtractEntityRelationMapper.DEFAULT_CONTINUE_PROMPT"
+
+      * "ExtractEntityRelationMapper.DEFAULT_IF_LOOP_PROMPT"
+
+      * "ExtractEntityRelationMapper.DEFAULT_ENTITY_TYPES"
+
+      * "ExtractEntityRelationMapper.DEFAULT_TUPLE_DELIMITER"
+
+      * "ExtractEntityRelationMapper.DEFAULT_RECORD_DELIMITER"
+
+      * "ExtractEntityRelationMapper.DEFAULT_COMPLETION_DELIMITER"
+
+      * "ExtractEntityRelationMapper.DEFAULT_ENTITY_PATTERN"
+
+      * "ExtractEntityRelationMapper.DEFAULT_RELATION_PATTERN"
+
+      * "ExtractEntityRelationMapper.parse_output()"
+
+      * "ExtractEntityRelationMapper.add_message()"
+
+      * "ExtractEntityRelationMapper.light_rag_extraction()"
+
+      * "ExtractEntityRelationMapper.process_single()"
+
+    * "ExtractEventMapper"
+
+      * "ExtractEventMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "ExtractEventMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "ExtractEventMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "ExtractEventMapper.parse_output()"
+
+      * "ExtractEventMapper.process_batched()"
+
+    * "ExtractKeywordMapper"
+
+      * "ExtractKeywordMapper.DEFAULT_PROMPT_TEMPLATE"
+
+      * "ExtractKeywordMapper.DEFAULT_COMPLETION_DELIMITER"
+
+      * "ExtractKeywordMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "ExtractKeywordMapper.parse_output()"
+
+      * "ExtractKeywordMapper.process_single()"
+
+    * "ExtractNicknameMapper"
+
+      * "ExtractNicknameMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "ExtractNicknameMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "ExtractNicknameMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "ExtractNicknameMapper.parse_output()"
+
+      * "ExtractNicknameMapper.process_single()"
+
+    * "ExtractSupportTextMapper"
+
+      * "ExtractSupportTextMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "ExtractSupportTextMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "ExtractSupportTextMapper.process_single()"
+
+    * "ExtractTablesFromHtmlMapper"
+
+      * "ExtractTablesFromHtmlMapper.process_single()"
+
+    * "FixUnicodeMapper"
+
+      * "FixUnicodeMapper.process_batched()"
+
+    * "GenerateQAFromExamplesMapper"
+
+      * "GenerateQAFromExamplesMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "GenerateQAFromExamplesMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "GenerateQAFromExamplesMapper.DEFAULT_EXAMPLE_TEMPLATE"
+
+      * "GenerateQAFromExamplesMapper.DEFAULT_QA_PAIR_TEMPLATE"
+
+      * "GenerateQAFromExamplesMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "GenerateQAFromExamplesMapper.build_input()"
+
+      * "GenerateQAFromExamplesMapper.parse_output()"
+
+      * "GenerateQAFromExamplesMapper.process_single()"
+
+    * "GenerateQAFromTextMapper"
+
+      * "GenerateQAFromTextMapper.parse_output()"
+
+      * "GenerateQAFromTextMapper.process_batched()"
+
+    * "HumanPreferenceAnnotationMapper"
+
+      * "HumanPreferenceAnnotationMapper.DEFAULT_LABEL_CONFIG"
+
+    * "ImageBlurMapper"
+
+      * "ImageBlurMapper.process_single()"
+
+    * "ImageCaptioningFromGPT4VMapper"
+
+      * "ImageCaptioningFromGPT4VMapper.process_batched()"
+
+    * "ImageCaptioningMapper"
+
+      * "ImageCaptioningMapper.process_batched()"
+
+    * "ImageDiffusionMapper"
+
+      * "ImageDiffusionMapper.process_batched()"
+
+    * "ImageFaceBlurMapper"
+
+      * "ImageFaceBlurMapper.process_single()"
+
+    * "ImageRemoveBackgroundMapper"
+
+      * "ImageRemoveBackgroundMapper.process_single()"
+
+    * "ImageSegmentMapper"
+
+      * "ImageSegmentMapper.process_single()"
+
+    * "ImageTaggingMapper"
+
+      * "ImageTaggingMapper.process_single()"
+
+    * "MllmMapper"
+
+      * "MllmMapper.process_single()"
+
+    * "NlpaugEnMapper"
+
+      * "NlpaugEnMapper.process_batched()"
+
+    * "NlpcdaZhMapper"
+
+      * "NlpcdaZhMapper.process_batched()"
+
+    * "OptimizeQAMapper"
+
+      * "OptimizeQAMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "OptimizeQAMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "OptimizeQAMapper.DEFAULT_QA_PAIR_TEMPLATE"
+
+      * "OptimizeQAMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "OptimizeQAMapper.build_input()"
+
+      * "OptimizeQAMapper.parse_output()"
+
+      * "OptimizeQAMapper.process_single()"
+
+    * "OptimizeQueryMapper"
+
+      * "OptimizeQueryMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "OptimizeQueryMapper.parse_output()"
+
+    * "OptimizeResponseMapper"
+
+      * "OptimizeResponseMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "OptimizeResponseMapper.parse_output()"
+
+    * "PairPreferenceMapper"
+
+      * "PairPreferenceMapper.DEFAULT_SYSTEM_PROMPT"
+
+      * "PairPreferenceMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "PairPreferenceMapper.DEFAULT_OUTPUT_PATTERN"
+
+      * "PairPreferenceMapper.build_input()"
+
+      * "PairPreferenceMapper.parse_output()"
+
+      * "PairPreferenceMapper.process_single()"
+
+    * "PunctuationNormalizationMapper"
+
+      * "PunctuationNormalizationMapper.process_batched()"
+
+    * "PythonFileMapper"
+
+      * "PythonFileMapper.process_single()"
+
+      * "PythonFileMapper.process_batched()"
+
+    * "PythonLambdaMapper"
+
+      * "PythonLambdaMapper.process_single()"
+
+      * "PythonLambdaMapper.process_batched()"
+
+    * "QuerySentimentDetectionMapper"
+
+      * "QuerySentimentDetectionMapper.process_batched()"
+
+    * "QueryIntentDetectionMapper"
+
+      * "QueryIntentDetectionMapper.process_batched()"
+
+    * "QueryTopicDetectionMapper"
+
+      * "QueryTopicDetectionMapper.process_batched()"
+
+    * "RelationIdentityMapper"
+
+      * "RelationIdentityMapper.DEFAULT_SYSTEM_PROMPT_TEMPLATE"
+
+      * "RelationIdentityMapper.DEFAULT_INPUT_TEMPLATE"
+
+      * "RelationIdentityMapper.DEFAULT_OUTPUT_PATTERN_TEMPLATE"
+
+      * "RelationIdentityMapper.parse_output()"
+
+      * "RelationIdentityMapper.process_single()"
+
+    * "RemoveBibliographyMapper"
+
+      * "RemoveBibliographyMapper.process_batched()"
+
+    * "RemoveCommentsMapper"
+
+      * "RemoveCommentsMapper.process_batched()"
+
+    * "RemoveHeaderMapper"
+
+      * "RemoveHeaderMapper.process_batched()"
+
+    * "RemoveLongWordsMapper"
+
+      * "RemoveLongWordsMapper.should_keep_long_word()"
+
+      * "RemoveLongWordsMapper.process_batched()"
+
+    * "RemoveNonChineseCharacterlMapper"
+
+      * "RemoveNonChineseCharacterlMapper.process_batched()"
+
+    * "RemoveRepeatSentencesMapper"
+
+      * "RemoveRepeatSentencesMapper.process_batched()"
+
+    * "RemoveSpecificCharsMapper"
+
+      * "RemoveSpecificCharsMapper.process_batched()"
+
+    * "RemoveTableTextMapper"
+
+      * "RemoveTableTextMapper.process_batched()"
+
+    * "RemoveWordsWithIncorrectSubstringsMapper"
+
+      * "RemoveWordsWithIncorrectSubstringsMapper.should_keep_word_wi
+        th_incorrect_substrings()"
+
+      * "RemoveWordsWithIncorrectSubstringsMapper.process_batched()"
+
+    * "ReplaceContentMapper"
+
+      * "ReplaceContentMapper.process_batched()"
+
+    * "SDXLPrompt2PromptMapper"
+
+      * "SDXLPrompt2PromptMapper.process_single()"
+
+    * "SentenceAugmentationMapper"
+
+      * "SentenceAugmentationMapper.process_single()"
+
+    * "SentenceSplitMapper"
+
+      * "SentenceSplitMapper.process_batched()"
+
+    * "TextChunkMapper"
+
+      * "TextChunkMapper.recursively_chunk()"
+
+      * "TextChunkMapper.get_text_chunks()"
+
+      * "TextChunkMapper.process_batched()"
+
+    * "VideoCaptioningFromAudioMapper"
+
+      * "VideoCaptioningFromAudioMapper.process_batched()"
+
+    * "VideoCaptioningFromFramesMapper"
+
+      * "VideoCaptioningFromFramesMapper.process_batched()"
+
+    * "VideoCaptioningFromSummarizerMapper"
+
+      * "VideoCaptioningFromSummarizerMapper.process_batched()"
+
+    * "VideoCaptioningFromVideoMapper"
+
+      * "VideoCaptioningFromVideoMapper.process_batched()"
+
+    * "VideoExtractFramesMapper"
+
+      * "VideoExtractFramesMapper.process_single()"
+
+    * "VideoFFmpegWrappedMapper"
+
+      * "VideoFFmpegWrappedMapper.process_single()"
+
+    * "VideoFaceBlurMapper"
+
+      * "VideoFaceBlurMapper.process_single()"
+
+    * "VideoRemoveWatermarkMapper"
+
+      * "VideoRemoveWatermarkMapper.process_single()"
+
+    * "VideoResizeAspectRatioMapper"
+
+      * "VideoResizeAspectRatioMapper.STRATEGY"
+
+      * "VideoResizeAspectRatioMapper.process_single()"
+
+    * "VideoResizeResolutionMapper"
+
+      * "VideoResizeResolutionMapper.process_single()"
+
+    * "VideoSplitByDurationMapper"
+
+      * "VideoSplitByDurationMapper.split_videos_by_duration()"
+
+      * "VideoSplitByDurationMapper.process_batched()"
+
+    * "VideoSplitByKeyFrameMapper"
+
+      * "VideoSplitByKeyFrameMapper.get_split_key_frame()"
+
+      * "VideoSplitByKeyFrameMapper.process_batched()"
+
+    * "VideoSplitBySceneMapper"
+
+      * "VideoSplitBySceneMapper.avaliable_detectors"
+
+      * "VideoSplitBySceneMapper.process_single()"
+
+    * "VideoTaggingFromAudioMapper"
+
+      * "VideoTaggingFromAudioMapper.process_single()"
+
+    * "VideoTaggingFromFramesMapper"
+
+      * "VideoTaggingFromFramesMapper.process_single()"
+
+    * "WhitespaceNormalizationMapper"
+
+      * "WhitespaceNormalizationMapper.process_batched()"
+
+* data_juicer.ops.selector package
+
+  * Submodules
+
+  * data_juicer.ops.selector.frequency_specified_field_selector module
+
+    * "FrequencySpecifiedFieldSelector"
+
+      * "FrequencySpecifiedFieldSelector.process()"
+
+  * data_juicer.ops.selector.random_selector module
+
+    * "RandomSelector"
+
+      * "RandomSelector.process()"
+
+  * data_juicer.ops.selector.range_specified_field_selector module
+
+    * "RangeSpecifiedFieldSelector"
+
+      * "RangeSpecifiedFieldSelector.process()"
+
+  * data_juicer.ops.selector.tags_specified_field_selector module
+
+    * "TagsSpecifiedFieldSelector"
+
+      * "TagsSpecifiedFieldSelector.process()"
+
+  * data_juicer.ops.selector.topk_specified_field_selector module
+
+    * "TopkSpecifiedFieldSelector"
+
+      * "TopkSpecifiedFieldSelector.process()"
+
+  * Module contents
+
+    * "FrequencySpecifiedFieldSelector"
+
+      * "FrequencySpecifiedFieldSelector.process()"
+
+    * "RandomSelector"
+
+      * "RandomSelector.process()"
+
+    * "RangeSpecifiedFieldSelector"
+
+      * "RangeSpecifiedFieldSelector.process()"
+
+    * "TagsSpecifiedFieldSelector"
+
+      * "TagsSpecifiedFieldSelector.process()"
+
+    * "TopkSpecifiedFieldSelector"
+
+      * "TopkSpecifiedFieldSelector.process()"
+
+
+Submodules
+==========
+
+
+data_juicer.ops.base_op module
+==============================
+
+data_juicer.ops.base_op.convert_list_dict_to_dict_list(samples)
+
+data_juicer.ops.base_op.convert_dict_list_to_list_dict(samples)
+
+data_juicer.ops.base_op.convert_arrow_to_python(method)
+
+data_juicer.ops.base_op.catch_map_batches_exception(method, skip_op_error=False, op_name=None)
+
+   For batched-map sample-level fault tolerance.
+
+data_juicer.ops.base_op.catch_map_single_exception(method, return_sample=True, skip_op_error=False, op_name=None)
+
+   For single-map sample-level fault tolerance. The input sample is
+   expected batch_size = 1.
+
+class data_juicer.ops.base_op.OP(*args, **kwargs)
+
+   Bases: "object"
+
+   is_batched_op()
+
+   process(*args, **kwargs)
+
+   use_cuda()
+
+   runtime_np()
+
+   remove_extra_parameters(param_dict, keys=None)
+
+      at the beginning of the init of the mapper op, call
+      self.remove_extra_parameters(locals()) to get the init parameter
+      dict of the op for convenience
+
+   add_parameters(init_parameter_dict, **extra_param_dict)
+
+      add parameters for each sample, need to keep extra_param_dict
+      and init_parameter_dict unchanged.
+
+   run(dataset)
+
+   empty_history()
+
+class data_juicer.ops.base_op.Mapper(*args, **kwargs)
+
+   Bases: "OP"
+
+   process_batched(samples, *args, **kwargs)
+
+   process_single(sample)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+   run(dataset, *, exporter=None, tracer=None)
+
+class data_juicer.ops.base_op.Filter(*args, **kwargs)
+
+   Bases: "OP"
+
+   compute_stats_batched(samples, *args, **kwargs)
+
+   process_batched(samples)
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+   run(dataset, *, exporter=None, tracer=None, reduce=True)
+
+class data_juicer.ops.base_op.Deduplicator(*args, **kwargs)
+
+   Bases: "OP"
+
+   compute_hash(sample)
+
+      Compute hash values for the sample.
+
+      Parameters:
+         **sample** -- input sample
+
+      Returns:
+         sample with computed hash value.
+
+   process(dataset, show_num=0)
+
+      For doc-level, dataset --> dataset.
+
+      Parameters:
+         * **dataset** -- input dataset
+
+         * **show_num** -- number of traced samples used when tracer
+           is open.
+
+      Returns:
+         deduplicated dataset and the sampled duplicate pairs.
+
+   run(dataset, *, exporter=None, tracer=None, reduce=True)
+
+class data_juicer.ops.base_op.Selector(*args, **kwargs)
+
+   Bases: "OP"
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         selected dataset.
+
+   run(dataset, *, exporter=None, tracer=None)
+
+class data_juicer.ops.base_op.Grouper(*args, **kwargs)
+
+   Bases: "OP"
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         dataset of batched samples.
+
+   run(dataset, *, exporter=None, tracer=None)
+
+class data_juicer.ops.base_op.Aggregator(*args, **kwargs)
+
+   Bases: "OP"
+
+   process_single(sample)
+
+      For sample level, batched sample --> sample, the input must be
+      the output of some Grouper OP.
+
+      Parameters:
+         **sample** -- batched sample to aggregate
+
+      Returns:
+         aggregated sample
+
+   run(dataset, *, exporter=None, tracer=None)
+
+
+data_juicer.ops.load module
+===========================
+
+data_juicer.ops.load.load_ops(process_list)
+
+   Load op list according to the process list from config file.
+
+   Parameters:
+      **process_list** -- A process list. Each item is an op name and
+      its arguments.
+
+   Returns:
+      The op instance list.
+
+
+data_juicer.ops.mixins module
+=============================
+
+class data_juicer.ops.mixins.EventDrivenMixin(*args, **kwargs)
+
+   Bases: "object"
+
+   Mixin for event-driven capabilities in operations.
+
+   This mixin provides functionality for registering event handlers,
+   triggering events, and managing event polling.
+
+   register_event_handler(event_type: str, handler: Callable)
+
+      Register a handler for a specific event type.
+
+      Args:
+         event_type: Type of event to handle handler: Callback
+         function to handle the event
+
+   trigger_event(event_type: str, data: Dict)
+
+      Trigger an event and call all registered handlers.
+
+      Args:
+         event_type: Type of event to trigger data: Event data to pass
+         to handlers
+
+   start_polling(event_type: str, poll_func: Callable, interval: int = 60)
+
+      Start polling for a specific event type.
+
+      Args:
+         event_type: Type of event to poll for poll_func: Function to
+         call for polling interval: Polling interval in seconds
+
+   stop_polling(event_type: str)
+
+      Stop polling for a specific event type.
+
+      Args:
+         event_type: Type of event to stop polling for
+
+   stop_all_polling()
+
+      Stop all polling threads.
+
+   wait_for_completion(condition_func: Callable[[], bool], timeout: int = 3600, poll_interval: int = 10, error_message: str = 'Operation timed out')
+
+      Wait for a condition to be met.
+
+      Args:
+         condition_func: Function that returns True when condition is
+         met timeout: Maximum time to wait in seconds poll_interval:
+         Polling interval in seconds error_message: Error message to
+         raise on timeout
+
+      Raises:
+         TimeoutError: If the condition is not met within the timeout
+
+class data_juicer.ops.mixins.NotificationMixin(*args, **kwargs)
+
+   Bases: "object"
+
+   Mixin for sending notifications through various channels.
+
+   This mixin provides functionality for sending notifications via
+   email, Slack, DingTalk, and other platforms.
+
+   Notification configuration can be specified as a
+   "notification_config" parameter within an operator (for backward
+   compatibility): >>``<<>>`<<yaml process:
+
+      * some_mapper:
+           notification_config:
+              enabled: true email:
+
+                 # ... email settings ...
+
+   >>``<<>>`<<
+
+   For security best practices, sensitive information like passwords
+   and tokens should be provided via environment variables:
+
+   * Email: set 'DATA_JUICER_EMAIL_PASSWORD' environment variable or
+     service-specific 'DATA_JUICER_SMTP_SERVER_NAME_PASSWORD'
+
+   * Slack: set 'DATA_JUICER_SLACK_WEBHOOK' environment variable
+
+   * DingTalk: set 'DATA_JUICER_DINGTALK_TOKEN' and
+     'DATA_JUICER_DINGTALK_SECRET' environment variables
+
+   For even more secure email authentication, you can use TLS client
+   certificates instead of passwords:
+
+   1. Generate a client certificate and key (example using OpenSSL):
+      >>``<<>>`<<bash # Generate a private key openssl genrsa -out
+      client.key 2048
+
+      # Generate a certificate signing request (CSR) openssl req -new
+      -key client.key -out client.csr
+
+      # Generate a self-signed certificate openssl x509 -req -days 365
+      -in client.csr -signkey client.key
+
+         -out client.crt
+
+      >>``<<>>`<<
+
+   2. Configure your SMTP server to accept this client certificate for
+         authentication
+
+   3. Configure Data Juicer to use certificate authentication:
+      >>``<<>>`<<yaml notification:
+
+         enabled: true email:
+
+            use_cert_auth: true client_cert_file:
+            "/path/to/client.crt" client_key_file:
+            "/path/to/client.key" smtp_server: "smtp.example.com"
+            smtp_port: 587 sender_email: "notifications@example.com"
+            recipients: ["recipient@example.com"]
+
+      >>``<<>>`<<
+
+   4. Or use environment variables: "`bash export
+      DATA_JUICER_EMAIL_CERT="/path/to/client.crt" export
+      DATA_JUICER_EMAIL_KEY="/path/to/client.key" `"
+
+   For maximum connection security, you can use a direct SSL
+   connection instead of STARTTLS by enabling the 'use_ssl' option:
+
+   >>``<<>>`<<yaml notification:
+
+      enabled: true email:
+
+         use_ssl: true smtp_port: 465  # Common port for SMTP over SSL
+         # ... other email configuration ...
+
+   >>``<<>>`<<
+
+   This establishes an encrypted connection from the beginning, rather
+   than
+      starting with an unencrypted connection and upgrading to TLS as
+      with STARTTLS. Note that this option can be combined with
+      certificate authentication for maximum security.
+
+   The email notification system supports various email server
+   configurations
+      through a flexible configuration system. Here are some examples
+      for different servers:
+
+   Standard SMTP with STARTTLS: >>``<<>>`<<yaml notification:
+
+      enabled: true email:
+
+         smtp_server: "smtp.example.com" smtp_port: 587 username:
+         "your.username@example.com" sender_email:
+         "your.username@example.com" sender_name: "Your Name"  #
+         Optional recipients: ["recipient1@example.com",
+         "recipient2@example.com"]
+
+   >>``<<>>`<<
+
+   Direct SSL Connection (e.g., Gmail): >>``<<>>`<<yaml notification:
+
+      enabled: true email:
+
+         smtp_server: "smtp.gmail.com" smtp_port: 465 use_ssl: true
+         username: "your.username@gmail.com" sender_email:
+         "your.username@gmail.com" sender_name: "Your Name"
+         recipients: ["recipient1@example.com",
+         "recipient2@example.com"]
+
+   >>``<<>>`<<
+
+   Alibaba Email Server: >>``<<>>`<<yaml notification:
+
+      enabled: true email:
+
+         smtp_server: "smtp.alibaba-inc.com" smtp_port: 465 username:
+         "your.username@alibaba-inc.com" sender_email: "your.username
+         @alibaba-inc.com" sender_name: "Your Name"
+         recipient_separator: ";"       # Use semicolons to separate
+         recipients recipients: ["recipient1@example.com",
+         "recipient2@example.com"]
+
+   >>``<<>>`<<
+
+   Environment variable usage examples: >>``<<>>`<<bash # General
+   email password export
+   DATA_JUICER_EMAIL_PASSWORD="your_email_password"
+
+   # Server-specific passwords (preferred for clarity) export
+   DATA_JUICER_SMTP_GMAIL_COM_PASSWORD="your_gmail_password" export
+   DATA_JUICER_SMTP_ALIBABA_INC_COM_PASSWORD="your_alibaba_password"
+
+   # Slack webhook export
+   DATA_JUICER_SLACK_WEBHOOK="your_slack_webhook_url"
+
+   # DingTalk credentials export
+   DATA_JUICER_DINGTALK_TOKEN="your_dingtalk_token" export
+   DATA_JUICER_DINGTALK_SECRET="your_dingtalk_secret" >>``<<>>`<<
+
+   If environment variables are not set, the system will fall back to
+   using values from the configuration file, but this is less secure
+   and not recommended for production environments.
+
+   send_notification(message: str, notification_type: str | None = None, **kwargs)
+
+      Send a notification message.
+
+      Args:
+         message: The message to send notification_type: The type of
+         notification to send.
+
+            Email, Slack, DingTalk. If None, send nothing
+
+         >>**<<kwargs: Additional arguments to pass to the
+         notification handler
+            These can override any configuration settings for this
+            specific notification
+
+      Returns:
+         bool: True if the notification was sent successfully, else
+         False
+
+
+data_juicer.ops.op_fusion module
+================================
+
+data_juicer.ops.op_fusion.fuse_operators(ops, probe_res=None)
+
+   Fuse the input ops list and return the fused ops list.
+
+   Parameters:
+      * **ops** -- the corresponding list of op objects.
+
+      * **probe_res** -- the probed speed for each OP from Monitor.
+
+   Returns:
+      a list of fused op objects.
+
+data_juicer.ops.op_fusion.fuse_filter_group(original_filter_group)
+
+   Fuse single filter group and return the fused filter group.
+
+   Parameters:
+      **original_filter_group** -- the original filter group,
+      including op definitions and objects.
+
+   Returns:
+      the fused definitions and objects of the input filter group.
+
+class data_juicer.ops.op_fusion.FusedFilter(name: str, fused_filters: List)
+
+   Bases: "Filter"
+
+   A fused operator for filters.
+
+   compute_stats_batched(samples, rank=None)
+
+   process_batched(samples)
+
+class data_juicer.ops.op_fusion.GeneralFusedOP(batch_size: int = 1, fused_op_list: List | None = None, *args, **kwargs)
+
+   Bases: "OP"
+
+   An explicitly fused operator designed to execute multiple
+   sequential operations (OPs) on the same batch, enabling fine-
+   grained control over data processing.
+
+   process_batched(samples, rank=None)
+
+   run(dataset, *, exporter=None, tracer=None)
+
+
+Module contents
+===============
+
+data_juicer.ops.load_ops(process_list)
+
+   Load op list according to the process list from config file.
+
+   Parameters:
+      **process_list** -- A process list. Each item is an op name and
+      its arguments.
+
+   Returns:
+      The op instance list.
+
+class data_juicer.ops.Filter(*args, **kwargs)
+
+   Bases: "OP"
+
+   compute_stats_batched(samples, *args, **kwargs)
+
+   process_batched(samples)
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+   run(dataset, *, exporter=None, tracer=None, reduce=True)
+
+class data_juicer.ops.Mapper(*args, **kwargs)
+
+   Bases: "OP"
+
+   process_batched(samples, *args, **kwargs)
+
+   process_single(sample)
+
+      For sample level, sample --> sample
+
+      Parameters:
+         **sample** -- sample to process
+
+      Returns:
+         processed sample
+
+   run(dataset, *, exporter=None, tracer=None)
+
+class data_juicer.ops.Deduplicator(*args, **kwargs)
+
+   Bases: "OP"
+
+   compute_hash(sample)
+
+      Compute hash values for the sample.
+
+      Parameters:
+         **sample** -- input sample
+
+      Returns:
+         sample with computed hash value.
+
+   process(dataset, show_num=0)
+
+      For doc-level, dataset --> dataset.
+
+      Parameters:
+         * **dataset** -- input dataset
+
+         * **show_num** -- number of traced samples used when tracer
+           is open.
+
+      Returns:
+         deduplicated dataset and the sampled duplicate pairs.
+
+   run(dataset, *, exporter=None, tracer=None, reduce=True)
+
+class data_juicer.ops.Selector(*args, **kwargs)
+
+   Bases: "OP"
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         selected dataset.
+
+   run(dataset, *, exporter=None, tracer=None)
+
+class data_juicer.ops.Grouper(*args, **kwargs)
+
+   Bases: "OP"
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         dataset of batched samples.
+
+   run(dataset, *, exporter=None, tracer=None)
+
+class data_juicer.ops.Aggregator(*args, **kwargs)
+
+   Bases: "OP"
+
+   process_single(sample)
+
+      For sample level, batched sample --> sample, the input must be
+      the output of some Grouper OP.
+
+      Parameters:
+         **sample** -- batched sample to aggregate
+
+      Returns:
+         aggregated sample
+
+   run(dataset, *, exporter=None, tracer=None)

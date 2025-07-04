@@ -1,0 +1,177 @@
+data_juicer.core.executor package
+*********************************
+
+
+Submodules
+==========
+
+
+data_juicer.core.executor.base module
+=====================================
+
+class data_juicer.core.executor.base.ExecutorBase(cfg: Namespace | None = None)
+
+   Bases: "ABC"
+
+   abstract run(load_data_np: Annotated[int, Gt(gt=0)] | None = None, skip_return=False)
+
+
+data_juicer.core.executor.default_executor module
+=================================================
+
+class data_juicer.core.executor.default_executor.DefaultExecutor(cfg: Namespace | None = None)
+
+   Bases: "ExecutorBase"
+
+   This Executor class is used to process a specific dataset.
+
+   It will load the dataset and unify the format, then apply all the
+   ops in the config file in order and generate a processed dataset.
+
+   run(dataset: Dataset | NestedDataset | None = None, load_data_np: Annotated[int, Gt(gt=0)] | None = None, skip_return=False)
+
+      Running the dataset process pipeline.
+
+      Parameters:
+         * **dataset** -- a Dataset object to be executed.
+
+         * **load_data_np** -- number of workers when loading the
+           dataset.
+
+         * **skip_return** -- skip return for API called.
+
+      Returns:
+         processed dataset.
+
+   sample_data(dataset_to_sample: Dataset | None = None, load_data_np=None, sample_ratio: float = 1.0, sample_algo: str = 'uniform', **kwargs)
+
+      Sample a subset from the given dataset. TODO add support other
+      than LocalExecutor
+
+      Parameters:
+         * **dataset_to_sample** -- Dataset to sample from. If None,
+           will use the formatter linked by the executor. Default is
+           None.
+
+         * **load_data_np** -- number of workers when loading the
+           dataset.
+
+         * **sample_ratio** -- The ratio of the sample size to the
+           original dataset size. Default is 1.0 (no sampling).
+
+         * **sample_algo** -- Sampling algorithm to use. Options are
+           "uniform", "frequency_specified_field_selector", or
+           "topk_specified_field_selector". Default is "uniform".
+
+      Returns:
+         A sampled Dataset.
+
+
+data_juicer.core.executor.factory module
+========================================
+
+class data_juicer.core.executor.factory.ExecutorFactory
+
+   Bases: "object"
+
+   static create_executor(executor_type: str) -> DefaultExecutor | RayExecutor
+
+
+data_juicer.core.executor.ray_executor module
+=============================================
+
+class data_juicer.core.executor.ray_executor.TempDirManager(tmp_dir)
+
+   Bases: "object"
+
+class data_juicer.core.executor.ray_executor.RayExecutor(cfg: Namespace | None = None)
+
+   Bases: "ExecutorBase"
+
+   Executor based on Ray.
+
+   Run Data-Juicer data processing in a distributed cluster.
+
+      1. Support Filter, Mapper and Exact Deduplicator operators for
+         now.
+
+      2. Only support loading *.json* files.
+
+      3. Advanced functions such as checkpoint, tracer are not
+         supported.
+
+   run(load_data_np: Annotated[int, Gt(gt=0)] | None = None, skip_return=False)
+
+      Running the dataset process pipeline
+
+      Parameters:
+         * **load_data_np** -- number of workers when loading the
+           dataset.
+
+         * **skip_return** -- skip return for API called.
+
+      Returns:
+         processed dataset.
+
+
+Module contents
+===============
+
+class data_juicer.core.executor.ExecutorBase(cfg: Namespace | None = None)
+
+   Bases: "ABC"
+
+   abstract run(load_data_np: Annotated[int, Gt(gt=0)] | None = None, skip_return=False)
+
+class data_juicer.core.executor.ExecutorFactory
+
+   Bases: "object"
+
+   static create_executor(executor_type: str) -> DefaultExecutor | RayExecutor
+
+class data_juicer.core.executor.DefaultExecutor(cfg: Namespace | None = None)
+
+   Bases: "ExecutorBase"
+
+   This Executor class is used to process a specific dataset.
+
+   It will load the dataset and unify the format, then apply all the
+   ops in the config file in order and generate a processed dataset.
+
+   run(dataset: Dataset | NestedDataset | None = None, load_data_np: Annotated[int, Gt(gt=0)] | None = None, skip_return=False)
+
+      Running the dataset process pipeline.
+
+      Parameters:
+         * **dataset** -- a Dataset object to be executed.
+
+         * **load_data_np** -- number of workers when loading the
+           dataset.
+
+         * **skip_return** -- skip return for API called.
+
+      Returns:
+         processed dataset.
+
+   sample_data(dataset_to_sample: Dataset | None = None, load_data_np=None, sample_ratio: float = 1.0, sample_algo: str = 'uniform', **kwargs)
+
+      Sample a subset from the given dataset. TODO add support other
+      than LocalExecutor
+
+      Parameters:
+         * **dataset_to_sample** -- Dataset to sample from. If None,
+           will use the formatter linked by the executor. Default is
+           None.
+
+         * **load_data_np** -- number of workers when loading the
+           dataset.
+
+         * **sample_ratio** -- The ratio of the sample size to the
+           original dataset size. Default is 1.0 (no sampling).
+
+         * **sample_algo** -- Sampling algorithm to use. Options are
+           "uniform", "frequency_specified_field_selector", or
+           "topk_specified_field_selector". Default is "uniform".
+
+      Returns:
+         A sampled Dataset.

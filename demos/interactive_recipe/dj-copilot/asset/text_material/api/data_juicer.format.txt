@@ -1,0 +1,381 @@
+data_juicer.format package
+**************************
+
+
+Submodules
+==========
+
+
+data_juicer.format.csv_formatter module
+=======================================
+
+class data_juicer.format.csv_formatter.CsvFormatter(dataset_path, suffixes=None, **kwargs)
+
+   Bases: "LocalFormatter"
+
+   The class is used to load and format csv-type files.
+
+   Default suffixes is *['.csv']*
+
+   SUFFIXES = ['.csv']
+
+
+data_juicer.format.empty_formatter module
+=========================================
+
+class data_juicer.format.empty_formatter.EmptyFormatter(length, feature_keys: List[str] = [], *args, **kwargs)
+
+   Bases: "BaseFormatter"
+
+   The class is used to create empty data.
+
+   SUFFIXES = []
+
+   property null_value
+
+   load_dataset(*args, **kwargs)
+
+class data_juicer.format.empty_formatter.RayEmptyFormatter(length, feature_keys: List[str] = [], *args, **kwargs)
+
+   Bases: "BaseFormatter"
+
+   The class is used to create empty data for ray.
+
+   SUFFIXES = []
+
+   property null_value
+
+   load_dataset(*args, **kwargs)
+
+
+data_juicer.format.formatter module
+===================================
+
+class data_juicer.format.formatter.BaseFormatter
+
+   Bases: "object"
+
+   Base class to load dataset.
+
+   load_dataset(*args) -> Dataset
+
+class data_juicer.format.formatter.LocalFormatter(dataset_path: str, type: str, suffixes: str | List[str] | None = None, text_keys: List[str] | None = None, add_suffix=False, **kwargs)
+
+   Bases: "BaseFormatter"
+
+   The class is used to load a dataset from local files or local
+   directory.
+
+   load_dataset(num_proc: int = 1, global_cfg=None) -> Dataset
+
+      Load a dataset from dataset file or dataset directory, and unify
+      its format.
+
+      Parameters:
+         * **num_proc** -- number of processes when loading the
+           dataset
+
+         * **global_cfg** -- global cfg used in consequent processes,
+
+      Returns:
+         formatted dataset
+
+class data_juicer.format.formatter.RemoteFormatter(dataset_path: str, text_keys: List[str] | None = None, **kwargs)
+
+   Bases: "BaseFormatter"
+
+   The class is used to load a dataset from repository of huggingface
+   hub.
+
+   load_dataset(num_proc: int = 1, global_cfg=None) -> Dataset
+
+      Load a dataset from HuggingFace, and unify its format.
+
+      Parameters:
+         * **num_proc** -- number of processes when loading the
+           dataset
+
+         * **global_cfg** -- the global cfg used in consequent
+           processes,
+
+      Returns:
+         formatted dataset
+
+data_juicer.format.formatter.add_suffixes(datasets: DatasetDict, num_proc: int = 1) -> Dataset
+
+   Add suffix filed to datasets.
+
+   Parameters:
+      * **datasets** -- a DatasetDict object
+
+      * **num_proc** -- number of processes to add suffixes
+
+   Returns:
+      datasets with suffix features.
+
+data_juicer.format.formatter.unify_format(dataset: Dataset, text_keys: List[str] | str = 'text', num_proc: int = 1, global_cfg=None) -> Dataset
+
+   Get an unified internal format, conduct the following
+   modifications.
+
+   1. check keys of dataset
+
+   2. filter out those samples with empty or None text
+
+   Parameters:
+      * **dataset** -- input dataset
+
+      * **text_keys** -- original text key(s) of dataset.
+
+      * **num_proc** -- number of processes for mapping
+
+      * **global_cfg** -- the global cfg used in consequent processes,
+        since cfg.text_key may be modified after unifying
+
+   Returns:
+      unified_format_dataset
+
+
+data_juicer.format.json_formatter module
+========================================
+
+class data_juicer.format.json_formatter.JsonFormatter(dataset_path, suffixes=None, **kwargs)
+
+   Bases: "LocalFormatter"
+
+   The class is used to load and format json-type files.
+
+   Default suffixes is *['.json', '.jsonl', '.jsonl.zst']*
+
+   SUFFIXES = ['.json', '.jsonl', '.jsonl.zst']
+
+
+data_juicer.format.load module
+==============================
+
+data_juicer.format.load.load_formatter(dataset_path, text_keys=None, suffixes=None, add_suffix=False, **kwargs) -> BaseFormatter
+
+   Load the appropriate formatter for different types of data formats.
+
+   Parameters:
+      * **dataset_path** -- Path to dataset file or dataset directory
+
+      * **text_keys** -- key names of field that stores sample text.
+        Default: None
+
+      * **suffixes** -- the suffix of files that will be read.
+        Default: None
+
+      * **add_suffix** -- whether to add the file suffix to dataset
+        meta. Default: False
+
+   Returns:
+      a dataset formatter.
+
+
+data_juicer.format.parquet_formatter module
+===========================================
+
+class data_juicer.format.parquet_formatter.ParquetFormatter(dataset_path, suffixes=None, **kwargs)
+
+   Bases: "LocalFormatter"
+
+   The class is used to load and format parquet-type files.
+
+   Default suffixes is *['.parquet']*
+
+   SUFFIXES = ['.parquet']
+
+
+data_juicer.format.text_formatter module
+========================================
+
+data_juicer.format.text_formatter.extract_txt_from_docx(fn, tgt_path)
+
+   Extract text from a docx file and save to target path.
+
+   Parameters:
+      * **fn** -- path to input pdf file
+
+      * **tgt_path** -- path to save text file.
+
+data_juicer.format.text_formatter.extract_txt_from_pdf(fn, tgt_path)
+
+   Extract text from a pdf file and save to target path.
+
+   Parameters:
+      * **fn** -- path to input pdf file
+
+      * **tgt_path** -- path to save text file.
+
+class data_juicer.format.text_formatter.TextFormatter(dataset_path, suffixes=None, add_suffix=False, **kwargs)
+
+   Bases: "LocalFormatter"
+
+   The class is used to load and format text-type files.
+
+   e.g. *['.txt', '.pdf', '.cpp', '.docx']*
+
+   SUFFIXES = ['.docx', '.pdf', '.txt', '.md', '.tex', '.asm', '.bat', '.cmd', '.c', '.h', '.cs', '.cpp', '.hpp', '.c++', '.h++', '.cc', '.hh', '.C', '.H', '.cmake', '.css', '.dockerfile', '.f90', '.f', '.f03', '.f08', '.f77', '.f95', '.for', '.fpp', '.go', '.hs', '.html', '.java', '.js', '.jl', '.lua', '.markdown', '.php', '.php3', '.php4', '.php5', '.phps', '.phpt', '.pl', '.pm', '.pod', '.perl', '.ps1', '.psd1', '.psm1', '.py', '.rb', '.rs', '.sql', '.scala', '.sh', '.bash', '.command', '.zsh', '.ts', '.tsx', '.vb', 'Dockerfile', 'Makefile', '.xml', '.rst', '.m', '.smali']
+
+   load_dataset(num_proc: int = 1, global_cfg=None) -> Dataset
+
+      Load a dataset from local text-type files.
+
+      Parameters:
+         * **num_proc** -- number of processes when loading the
+           dataset
+
+         * **global_cfg** -- the global cfg used in consequent
+           processes,
+
+      Returns:
+         unified_format_dataset.
+
+
+data_juicer.format.tsv_formatter module
+=======================================
+
+class data_juicer.format.tsv_formatter.TsvFormatter(dataset_path, suffixes=None, **kwargs)
+
+   Bases: "LocalFormatter"
+
+   The class is used to load and format tsv-type files.
+
+   Default suffixes is *['.tsv']*
+
+   SUFFIXES = ['.tsv']
+
+
+Module contents
+===============
+
+class data_juicer.format.JsonFormatter(dataset_path, suffixes=None, **kwargs)
+
+   Bases: "LocalFormatter"
+
+   The class is used to load and format json-type files.
+
+   Default suffixes is *['.json', '.jsonl', '.jsonl.zst']*
+
+   SUFFIXES = ['.json', '.jsonl', '.jsonl.zst']
+
+class data_juicer.format.LocalFormatter(dataset_path: str, type: str, suffixes: str | List[str] | None = None, text_keys: List[str] | None = None, add_suffix=False, **kwargs)
+
+   Bases: "BaseFormatter"
+
+   The class is used to load a dataset from local files or local
+   directory.
+
+   load_dataset(num_proc: int = 1, global_cfg=None) -> Dataset
+
+      Load a dataset from dataset file or dataset directory, and unify
+      its format.
+
+      Parameters:
+         * **num_proc** -- number of processes when loading the
+           dataset
+
+         * **global_cfg** -- global cfg used in consequent processes,
+
+      Returns:
+         formatted dataset
+
+class data_juicer.format.RemoteFormatter(dataset_path: str, text_keys: List[str] | None = None, **kwargs)
+
+   Bases: "BaseFormatter"
+
+   The class is used to load a dataset from repository of huggingface
+   hub.
+
+   load_dataset(num_proc: int = 1, global_cfg=None) -> Dataset
+
+      Load a dataset from HuggingFace, and unify its format.
+
+      Parameters:
+         * **num_proc** -- number of processes when loading the
+           dataset
+
+         * **global_cfg** -- the global cfg used in consequent
+           processes,
+
+      Returns:
+         formatted dataset
+
+class data_juicer.format.TextFormatter(dataset_path, suffixes=None, add_suffix=False, **kwargs)
+
+   Bases: "LocalFormatter"
+
+   The class is used to load and format text-type files.
+
+   e.g. *['.txt', '.pdf', '.cpp', '.docx']*
+
+   SUFFIXES = ['.docx', '.pdf', '.txt', '.md', '.tex', '.asm', '.bat', '.cmd', '.c', '.h', '.cs', '.cpp', '.hpp', '.c++', '.h++', '.cc', '.hh', '.C', '.H', '.cmake', '.css', '.dockerfile', '.f90', '.f', '.f03', '.f08', '.f77', '.f95', '.for', '.fpp', '.go', '.hs', '.html', '.java', '.js', '.jl', '.lua', '.markdown', '.php', '.php3', '.php4', '.php5', '.phps', '.phpt', '.pl', '.pm', '.pod', '.perl', '.ps1', '.psd1', '.psm1', '.py', '.rb', '.rs', '.sql', '.scala', '.sh', '.bash', '.command', '.zsh', '.ts', '.tsx', '.vb', 'Dockerfile', 'Makefile', '.xml', '.rst', '.m', '.smali']
+
+   load_dataset(num_proc: int = 1, global_cfg=None) -> Dataset
+
+      Load a dataset from local text-type files.
+
+      Parameters:
+         * **num_proc** -- number of processes when loading the
+           dataset
+
+         * **global_cfg** -- the global cfg used in consequent
+           processes,
+
+      Returns:
+         unified_format_dataset.
+
+class data_juicer.format.ParquetFormatter(dataset_path, suffixes=None, **kwargs)
+
+   Bases: "LocalFormatter"
+
+   The class is used to load and format parquet-type files.
+
+   Default suffixes is *['.parquet']*
+
+   SUFFIXES = ['.parquet']
+
+class data_juicer.format.CsvFormatter(dataset_path, suffixes=None, **kwargs)
+
+   Bases: "LocalFormatter"
+
+   The class is used to load and format csv-type files.
+
+   Default suffixes is *['.csv']*
+
+   SUFFIXES = ['.csv']
+
+class data_juicer.format.TsvFormatter(dataset_path, suffixes=None, **kwargs)
+
+   Bases: "LocalFormatter"
+
+   The class is used to load and format tsv-type files.
+
+   Default suffixes is *['.tsv']*
+
+   SUFFIXES = ['.tsv']
+
+class data_juicer.format.EmptyFormatter(length, feature_keys: List[str] = [], *args, **kwargs)
+
+   Bases: "BaseFormatter"
+
+   The class is used to create empty data.
+
+   SUFFIXES = []
+
+   property null_value
+
+   load_dataset(*args, **kwargs)
+
+class data_juicer.format.RayEmptyFormatter(length, feature_keys: List[str] = [], *args, **kwargs)
+
+   Bases: "BaseFormatter"
+
+   The class is used to create empty data for ray.
+
+   SUFFIXES = []
+
+   property null_value
+
+   load_dataset(*args, **kwargs)

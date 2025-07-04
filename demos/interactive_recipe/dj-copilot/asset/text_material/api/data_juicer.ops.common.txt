@@ -1,0 +1,460 @@
+data_juicer.ops.common package
+******************************
+
+
+Submodules
+==========
+
+
+data_juicer.ops.common.helper_func module
+=========================================
+
+class data_juicer.ops.common.helper_func.UnionFind
+
+   Bases: "object"
+
+   find(x)
+
+   union(x, y)
+
+data_juicer.ops.common.helper_func.strip(document, strip_characters)
+
+   Way faster than document.strip(strip_characters) since
+   strip_characters is now a set instead of a str, and it contains a
+   lot of elements (all the emojis).
+
+   Parameters:
+      * **document** -- document to be processed
+
+      * **strip_characters** -- characters used for stripping document
+
+   Returns:
+      stripped document
+
+data_juicer.ops.common.helper_func.split_on_whitespace(document, new_line=False, tab=False)
+
+   This method also removes concatenated spaces.
+
+   Parameters:
+      * **document** -- document to be split
+
+      * **new_line** -- whether to split document with '\n'
+
+      * **tag** -- whether to split document with '\t'
+
+   Returns:
+      word list obtained after splitting document
+
+data_juicer.ops.common.helper_func.split_on_newline_tab_whitespace(document)
+
+   This method is used to split the document into different levels of
+   sub- sentences.
+
+   First split on "\n", then on "\t", then on " ". :param document:
+   document to be split :return: sentence list obtained after
+   splitting document
+
+data_juicer.ops.common.helper_func.merge_on_whitespace_tab_newline(sentences)
+
+   This method is used to merge different levels of sub-sentences into
+   one document. Invert the method split_on_newline_tab_whitespace.
+   Removes concatenated separators.
+
+   Parameters:
+      **sentences** -- sentence list to be merged
+
+   Returns:
+      document obtained after merging sub-sentences
+
+data_juicer.ops.common.helper_func.words_augmentation(words, group_size, join_char)
+
+   Augment words, especially for Chinese (without a space between
+   words) and Vietnamese (with a space between syllables).
+
+   Parameters:
+      * **word** -- word list to be augmented
+
+      * **group_size** -- the size of word groups that need to be
+        merged
+
+      * **join_char** -- characters to be added between word group
+
+   Returns:
+      word list after augment
+
+data_juicer.ops.common.helper_func.get_words_from_document(document, token_func=None, new_line=True, tab=True)
+
+   Get words from a document. Useful to compute ratios, like the
+   stopwords ratio.
+
+   Parameters:
+      * **document** -- document that need to split words.
+
+      * **token_func** -- function of tokenizer, if specified, the
+        function will be used for split document into different
+        tokens.
+
+      * **new_line** -- whether to use '\n' to split words.
+
+      * **tab** -- whether to use '\t' to split words.
+
+   Returns:
+      word list obtained from document
+
+data_juicer.ops.common.helper_func.words_refinement(words, lower_case=False, strip_chars=None, use_words_aug=False, words_aug_group_sizes=[2], words_aug_join_char='')
+
+   Refine split words. Non reversible since the document is split on
+   multiple characters, words are stripped of special characters and
+   characters are converted to lower case.
+
+   Parameters:
+      * **words** -- the word list to be augmented
+
+      * **lower_case** -- whether to convert word to lowercase
+
+      * **strip_chars** -- chars that need to be stripped in words
+
+      * **use_words_aug** -- whether to use word augmentation
+
+      * **words_aug_group_sizes** -- the size of word groups that need
+        to be merged
+
+      * **words_aug_join_char** -- characters to be added between word
+        group
+
+   Returns:
+      refined words or word list
+
+data_juicer.ops.common.helper_func.get_sentences_from_document(document, model_func=None)
+
+   Get sentences from a document.
+
+   Parameters:
+      * **document** -- document that need to split sentences
+
+      * **model_func** -- function of sentence model, if specified,
+        the function will be used for splitting document into
+        different sentences.
+
+   Returns:
+      document with the sentences separated by '\n'
+
+data_juicer.ops.common.helper_func.split_text_by_punctuation(text)
+
+   Split text by any zh and en punctuation
+
+   Parameters:
+      **text** -- text to be split.
+
+   Returns:
+      sub texts split by any zh and en punctuation
+
+
+data_juicer.ops.common.prompt2prompt_pipeline module
+====================================================
+
+data_juicer.ops.common.prompt2prompt_pipeline.rescale_noise_cfg(noise_cfg, noise_pred_text, guidance_rescale=0.0)
+
+   Rescale *noise_cfg* according to *guidance_rescale*. Based on
+   findings of [Common Diffusion Noise Schedules and Sample Steps are
+   Flawed](https://arxiv.org/pdf/2305.08891.pdf).
+
+      See Section 3.4
+
+class data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline(vae: AutoencoderKL, text_encoder: CLIPTextModel, text_encoder_2: CLIPTextModelWithProjection, tokenizer: CLIPTokenizer, tokenizer_2: CLIPTokenizer, unet: UNet2DConditionModel, scheduler: KarrasDiffusionSchedulers, image_encoder: CLIPVisionModelWithProjection | None = None, feature_extractor: CLIPImageProcessor | None = None, force_zeros_for_empty_prompt: bool = True, add_watermarker: bool | None = None)
+
+   Bases: "StableDiffusionXLPipeline"
+
+   Args: Prompt-to-Prompt-Pipeline for text-to-image generation using
+   Stable Diffusion. This model inherits from
+   [*StableDiffusionPipeline*]. Check the superclass documentation
+
+      for the generic methods the library implements for
+
+   all the pipelines (such as downloading or saving, running on a
+   particular device, etc.)
+
+      vae ([*AutoencoderKL*]):
+         Variational Auto-Encoder (VAE) Model to encode and decode
+         images to and from latent representations.
+
+      text_encoder ([*CLIPTextModel*]):
+         Frozen text-encoder. Stable Diffusion uses the text portion
+         of [CLIP](https://huggingface.co/docs/transformers/model_doc/
+         clip#transformers.CLIPTextModel), specifically the [clip-vit-
+         large-patch14](https://huggingface.co/openai/ clip-vit-large-
+         patch14) variant.
+
+      tokenizer (*CLIPTokenizer*):
+         Tokenizer of class
+         [CLIPTokenizer](https://huggingface.co/docs/transformers/
+         v4.21.0/en/model_doc/clip#transformers.CLIPTokenizer).
+
+      unet ([*UNet2DConditionModel*]): Conditional U-Net architecture
+         to denoise the encoded image latents. scheduler
+
+      ([*SchedulerMixin*]):
+         A scheduler to be used in combination with *unet* to denoise
+            the encoded image latents. Can be one of
+
+         [*DDIMScheduler*], [*LMSDiscreteScheduler*], or
+         [*PNDMScheduler*].
+
+      safety_checker ([*StableDiffusionSafetyChecker*]):
+         Classification module that estimates whether generated
+            images could be considered offensive or harmful.
+
+         Please, refer to the [model card](https://huggingface.co/
+         runwayml/stable-diffusion-v1-5) for details.
+
+      feature_extractor ([*CLIPFeatureExtractor*]):
+         Model that extracts features from generated images to be
+            used as inputs for the *safety_checker*.
+
+   check_inputs(prompt, prompt_2, height, width, callback_steps, negative_prompt=None, negative_prompt_2=None, prompt_embeds=None, negative_prompt_embeds=None, pooled_prompt_embeds=None, negative_pooled_prompt_embeds=None)
+
+   register_attention_control(controller)
+
+class data_juicer.ops.common.prompt2prompt_pipeline.P2PCrossAttnProcessor(controller, place_in_unet)
+
+   Bases: "object"
+
+class data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl(attn_res=None)
+
+   Bases: "ABC"
+
+   step_callback(x_t)
+
+   between_steps()
+
+   property num_uncond_att_layers
+
+   abstract forward(attn, is_cross: bool, place_in_unet: str)
+
+   reset()
+
+data_juicer.ops.common.prompt2prompt_pipeline.create_controller(prompts: List[str], cross_attention_kwargs: Dict, num_inference_steps: int, tokenizer, device, attn_res) -> AttentionControl
+
+class data_juicer.ops.common.prompt2prompt_pipeline.EmptyControl(attn_res=None)
+
+   Bases: "AttentionControl"
+
+   forward(attn, is_cross: bool, place_in_unet: str)
+
+class data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore(attn_res=None)
+
+   Bases: "AttentionControl"
+
+   static get_empty_store()
+
+   forward(attn, is_cross: bool, place_in_unet: str)
+
+   between_steps()
+
+   get_average_attention()
+
+   reset()
+
+class data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend(prompts: List[str], words: [List[List[str]]], tokenizer, device, threshold=0.3, attn_res=None)
+
+   Bases: "object"
+
+class data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit(prompts, num_steps: int, cross_replace_steps: float | Tuple[float, float] | Dict[str, Tuple[float, float]], self_replace_steps: float | Tuple[float, float], local_blend: LocalBlend | None, tokenizer, device, attn_res=None)
+
+   Bases: "AttentionStore", "ABC"
+
+   step_callback(x_t)
+
+   replace_self_attention(attn_base, att_replace)
+
+   abstract replace_cross_attention(attn_base, att_replace)
+
+   forward(attn, is_cross: bool, place_in_unet: str)
+
+class data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace(prompts, num_steps: int, cross_replace_steps: float, self_replace_steps: float, local_blend: LocalBlend | None = None, tokenizer=None, device=None, attn_res=None)
+
+   Bases: "AttentionControlEdit"
+
+   replace_cross_attention(attn_base, att_replace)
+
+class data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine(prompts, num_steps: int, cross_replace_steps: float, self_replace_steps: float, local_blend: LocalBlend | None = None, tokenizer=None, device=None, attn_res=None)
+
+   Bases: "AttentionControlEdit"
+
+   replace_cross_attention(attn_base, att_replace)
+
+class data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight(prompts, num_steps: int, cross_replace_steps: float, self_replace_steps: float, equalizer, local_blend: LocalBlend | None = None, controller: AttentionControlEdit | None = None, tokenizer=None, device=None, attn_res=None)
+
+   Bases: "AttentionControlEdit"
+
+   replace_cross_attention(attn_base, att_replace)
+
+data_juicer.ops.common.prompt2prompt_pipeline.update_alpha_time_word(alpha, bounds: float | Tuple[float, float], prompt_ind: int, word_inds: Tensor | None = None)
+
+data_juicer.ops.common.prompt2prompt_pipeline.get_time_words_attention_alpha(prompts, num_steps, cross_replace_steps: float | Dict[str, Tuple[float, float]], tokenizer, max_num_words=77)
+
+data_juicer.ops.common.prompt2prompt_pipeline.get_word_inds(text: str, word_place: int, tokenizer)
+
+data_juicer.ops.common.prompt2prompt_pipeline.get_replacement_mapper_(x: str, y: str, tokenizer, max_len=77)
+
+data_juicer.ops.common.prompt2prompt_pipeline.get_replacement_mapper(prompts, tokenizer, max_len=77)
+
+data_juicer.ops.common.prompt2prompt_pipeline.get_equalizer(text: str, word_select: int | Tuple[int, ...], values: List[float] | Tuple[float, ...], tokenizer)
+
+class data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams(gap, match, mismatch)
+
+   Bases: "object"
+
+   mis_match_char(x, y)
+
+data_juicer.ops.common.prompt2prompt_pipeline.get_matrix(size_x, size_y, gap)
+
+data_juicer.ops.common.prompt2prompt_pipeline.get_traceback_matrix(size_x, size_y)
+
+data_juicer.ops.common.prompt2prompt_pipeline.global_align(x, y, score)
+
+data_juicer.ops.common.prompt2prompt_pipeline.get_aligned_sequences(x, y, trace_back)
+
+data_juicer.ops.common.prompt2prompt_pipeline.get_mapper(x: str, y: str, tokenizer, max_len=77)
+
+data_juicer.ops.common.prompt2prompt_pipeline.get_refinement_mapper(prompts, tokenizer, max_len=77)
+
+
+data_juicer.ops.common.special_characters module
+================================================
+
+
+Module contents
+===============
+
+data_juicer.ops.common.get_sentences_from_document(document, model_func=None)
+
+   Get sentences from a document.
+
+   Parameters:
+      * **document** -- document that need to split sentences
+
+      * **model_func** -- function of sentence model, if specified,
+        the function will be used for splitting document into
+        different sentences.
+
+   Returns:
+      document with the sentences separated by '\n'
+
+data_juicer.ops.common.get_words_from_document(document, token_func=None, new_line=True, tab=True)
+
+   Get words from a document. Useful to compute ratios, like the
+   stopwords ratio.
+
+   Parameters:
+      * **document** -- document that need to split words.
+
+      * **token_func** -- function of tokenizer, if specified, the
+        function will be used for split document into different
+        tokens.
+
+      * **new_line** -- whether to use '\n' to split words.
+
+      * **tab** -- whether to use '\t' to split words.
+
+   Returns:
+      word list obtained from document
+
+data_juicer.ops.common.merge_on_whitespace_tab_newline(sentences)
+
+   This method is used to merge different levels of sub-sentences into
+   one document. Invert the method split_on_newline_tab_whitespace.
+   Removes concatenated separators.
+
+   Parameters:
+      **sentences** -- sentence list to be merged
+
+   Returns:
+      document obtained after merging sub-sentences
+
+data_juicer.ops.common.split_on_newline_tab_whitespace(document)
+
+   This method is used to split the document into different levels of
+   sub- sentences.
+
+   First split on "\n", then on "\t", then on " ". :param document:
+   document to be split :return: sentence list obtained after
+   splitting document
+
+data_juicer.ops.common.split_on_whitespace(document, new_line=False, tab=False)
+
+   This method also removes concatenated spaces.
+
+   Parameters:
+      * **document** -- document to be split
+
+      * **new_line** -- whether to split document with '\n'
+
+      * **tag** -- whether to split document with '\t'
+
+   Returns:
+      word list obtained after splitting document
+
+data_juicer.ops.common.strip(document, strip_characters)
+
+   Way faster than document.strip(strip_characters) since
+   strip_characters is now a set instead of a str, and it contains a
+   lot of elements (all the emojis).
+
+   Parameters:
+      * **document** -- document to be processed
+
+      * **strip_characters** -- characters used for stripping document
+
+   Returns:
+      stripped document
+
+data_juicer.ops.common.words_augmentation(words, group_size, join_char)
+
+   Augment words, especially for Chinese (without a space between
+   words) and Vietnamese (with a space between syllables).
+
+   Parameters:
+      * **word** -- word list to be augmented
+
+      * **group_size** -- the size of word groups that need to be
+        merged
+
+      * **join_char** -- characters to be added between word group
+
+   Returns:
+      word list after augment
+
+data_juicer.ops.common.words_refinement(words, lower_case=False, strip_chars=None, use_words_aug=False, words_aug_group_sizes=[2], words_aug_join_char='')
+
+   Refine split words. Non reversible since the document is split on
+   multiple characters, words are stripped of special characters and
+   characters are converted to lower case.
+
+   Parameters:
+      * **words** -- the word list to be augmented
+
+      * **lower_case** -- whether to convert word to lowercase
+
+      * **strip_chars** -- chars that need to be stripped in words
+
+      * **use_words_aug** -- whether to use word augmentation
+
+      * **words_aug_group_sizes** -- the size of word groups that need
+        to be merged
+
+      * **words_aug_join_char** -- characters to be added between word
+        group
+
+   Returns:
+      refined words or word list
+
+data_juicer.ops.common.split_text_by_punctuation(text)
+
+   Split text by any zh and en punctuation
+
+   Parameters:
+      **text** -- text to be split.
+
+   Returns:
+      sub texts split by any zh and en punctuation

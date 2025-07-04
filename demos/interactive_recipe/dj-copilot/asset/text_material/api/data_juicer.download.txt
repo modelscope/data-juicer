@@ -1,0 +1,158 @@
+data_juicer.download package
+****************************
+
+
+Submodules
+==========
+
+
+data_juicer.download.arxiv module
+=================================
+
+
+data_juicer.download.commoncrawl module
+=======================================
+
+
+data_juicer.download.downloader module
+======================================
+
+class data_juicer.download.downloader.DocumentDownloader
+
+   Bases: "ABC"
+
+   Abstract class for downloading remote data to disk
+
+   abstract download(url)
+
+class data_juicer.download.downloader.DocumentIterator
+
+   Bases: "ABC"
+
+   Abstract iterator class for reading in raw records that have been
+   downloaded to disk
+
+   abstract iterate(file_path)
+
+class data_juicer.download.downloader.DocumentExtractor
+
+   Bases: "ABC"
+
+   Abstract class for extracting text from records read from disk
+
+   abstract extract(content)
+
+data_juicer.download.downloader.download_and_extract(urls: List[str], output_paths: List[str], downloader: DocumentDownloader, iterator: DocumentIterator, extractor: DocumentExtractor, output_format: dict, output_type: str = 'jsonl', keep_raw_download=False, force_download=False, input_meta: str | dict | None = None, item_limit=None) -> Dataset
+
+   Downloads and extracts a dataset
+
+   Args:
+      urls: A list of urls to download the dataset from output_paths:
+      A list of paths to save the final extracted output to.
+
+         The raw output of the downloader will be saved using the path
+         given by downloader.download(url).
+
+      downloader: A DocumentDownloader that handles retrieving each
+      file from its url and saving it to storage iterator: A
+      DocumentIterator that handles iterating through the downloaded
+      file's format extractor: A DocumentExtractor that handles
+      extracting the data from its raw format into text output_format:
+      A dictionary mappings columns to datatypes for the fields of
+      each datapoint after extraction. output_type: The file type to
+      save the dataset as. keep_raw_download: Whether to keep the pre-
+      extracted download file. force_download: If False, will skip
+      processing all files in output_paths that already exist and
+
+         directly read from them instead.
+
+      input_meta: A dictionary or a string formatted as a dictionary,
+      which outlines
+         the field names and their respective data types within the
+         JSONL input file.
+
+      item_limit: limit on number of items downloaded; for sampling
+      and testing purposes
+
+   Returns:
+      A HuggingFace DataSet of the downloaded data
+
+data_juicer.download.downloader.get_wikipedia_urls(language='en', wikidumps_index_prefix='https://dumps.wikimedia.org', dump_date: str | None = None) -> List[str]
+
+   Retrieves all urls pointing to the latest Wikipedia dumps
+
+   Args:
+      language: Desired language of the Wikipedia dump.
+      wikidumps_index_prefix: The base url for all wikipedia dumps
+      dump_date: A string formatted as "YYYYMMDD" for the wikipedia
+      dump to use.
+
+         If None, latest dump is used.
+
+data_juicer.download.downloader.get_arxiv_urls()
+
+data_juicer.download.downloader.validate_snapshot_format(snapshot: str | None) -> None
+
+   Validate snapshot format 'YYYY-WW'.
+
+   Args:
+      snapshot: Snapshot string in format 'YYYY-WW' or None
+
+   Raises:
+      ValueError: If format is invalid
+
+
+data_juicer.download.wikipedia module
+=====================================
+
+class data_juicer.download.wikipedia.WikipediaDownloader(download_dir, verbose=False)
+
+   Bases: "DocumentDownloader"
+
+   download(url)
+
+class data_juicer.download.wikipedia.WikipediaIterator(language='en', log_frequency=1000)
+
+   Bases: "DocumentIterator"
+
+   iterate(file_path)
+
+class data_juicer.download.wikipedia.WikipediaExtractor(language='en', parser=<module 'mwparserfromhell' from '/mnt/d/work/data-juicer/.venv/lib/python3.10/site-packages/mwparserfromhell/__init__.py'>)
+
+   Bases: "DocumentExtractor"
+
+   extract(content)
+
+data_juicer.download.wikipedia.download_wikipedia(output_path: str, language: str = 'en', dump_date=None, output_type: str = 'jsonl', raw_download_dir=None, keep_raw_download=False, force_download=False, url_limit=None, item_limit=None) -> Dataset
+
+   Downloads the latest Wikipedia dumps and extracts them using
+   mwparserfromhell
+
+   Args:
+      output_path: The path to the root directory of the files
+      language: The language of the Wikipedia articles to download
+      dump_date: A string formatted as "YYYYMMDD" for the wikipedia
+      dump to use.
+
+         If None, latest dump is used.
+
+      output_type: The file type to save the data as.
+      raw_download_dir: Path to store the raw download files for
+      intermediate processing.
+
+         If None, they are stored in a folder named "downloads" under
+         output_path.
+
+      keep_raw_download: If True, keeps the bz2 files that have not
+      been extracted. force_download: If False, will skip processing
+      all files in output_paths that already exist and
+
+         directly read from them instead.
+
+      url_limit: The maximum number of raw files to download from the
+      snapshot. If None, all
+         files from the range of snapshots are downloaded.
+
+
+Module contents
+===============

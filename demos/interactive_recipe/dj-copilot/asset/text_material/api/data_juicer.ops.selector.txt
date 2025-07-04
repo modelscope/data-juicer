@@ -1,0 +1,196 @@
+data_juicer.ops.selector package
+********************************
+
+
+Submodules
+==========
+
+
+data_juicer.ops.selector.frequency_specified_field_selector module
+==================================================================
+
+class data_juicer.ops.selector.frequency_specified_field_selector.FrequencySpecifiedFieldSelector(field_key: str = '', top_ratio: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | None = None, topk: Annotated[int, Gt(gt=0)] | None = None, reverse: bool = True, *args, **kwargs)
+
+   Bases: "Selector"
+
+   Selector to select samples based on the sorted frequency of
+   specified field.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         selected dataset.
+
+
+data_juicer.ops.selector.random_selector module
+===============================================
+
+class data_juicer.ops.selector.random_selector.RandomSelector(select_ratio: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | None = None, select_num: Annotated[int, Gt(gt=0)] | None = None, *args, **kwargs)
+
+   Bases: "Selector"
+
+   Selector to random select samples.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         selected dataset.
+
+
+data_juicer.ops.selector.range_specified_field_selector module
+==============================================================
+
+class data_juicer.ops.selector.range_specified_field_selector.RangeSpecifiedFieldSelector(field_key: str = '', lower_percentile: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | None = None, upper_percentile: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | None = None, lower_rank: Annotated[int, Gt(gt=0)] | None = None, upper_rank: Annotated[int, Gt(gt=0)] | None = None, *args, **kwargs)
+
+   Bases: "Selector"
+
+   Selector to select a range of samples based on the sorted specified
+   field value from smallest to largest.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         selected dataset.
+
+
+data_juicer.ops.selector.tags_specified_field_selector module
+=============================================================
+
+class data_juicer.ops.selector.tags_specified_field_selector.TagsSpecifiedFieldSelector(field_key: str = '', target_tags: List[str] | None = None, *args, **kwargs)
+
+   Bases: "Selector"
+
+   Selector to select samples based on the tags of specified field.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         selected dataset.
+
+
+data_juicer.ops.selector.topk_specified_field_selector module
+=============================================================
+
+class data_juicer.ops.selector.topk_specified_field_selector.TopkSpecifiedFieldSelector(field_key: str = '', top_ratio: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | None = None, topk: Annotated[int, Gt(gt=0)] | None = None, reverse: bool = True, *args, **kwargs)
+
+   Bases: "Selector"
+
+   Selector to select top samples based on the sorted specified field
+   value.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         selected dataset.
+
+
+Module contents
+===============
+
+class data_juicer.ops.selector.FrequencySpecifiedFieldSelector(field_key: str = '', top_ratio: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | None = None, topk: Annotated[int, Gt(gt=0)] | None = None, reverse: bool = True, *args, **kwargs)
+
+   Bases: "Selector"
+
+   Selector to select samples based on the sorted frequency of
+   specified field.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         selected dataset.
+
+class data_juicer.ops.selector.RandomSelector(select_ratio: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | None = None, select_num: Annotated[int, Gt(gt=0)] | None = None, *args, **kwargs)
+
+   Bases: "Selector"
+
+   Selector to random select samples.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         selected dataset.
+
+class data_juicer.ops.selector.RangeSpecifiedFieldSelector(field_key: str = '', lower_percentile: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | None = None, upper_percentile: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | None = None, lower_rank: Annotated[int, Gt(gt=0)] | None = None, upper_rank: Annotated[int, Gt(gt=0)] | None = None, *args, **kwargs)
+
+   Bases: "Selector"
+
+   Selector to select a range of samples based on the sorted specified
+   field value from smallest to largest.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         selected dataset.
+
+class data_juicer.ops.selector.TagsSpecifiedFieldSelector(field_key: str = '', target_tags: List[str] | None = None, *args, **kwargs)
+
+   Bases: "Selector"
+
+   Selector to select samples based on the tags of specified field.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         selected dataset.
+
+class data_juicer.ops.selector.TopkSpecifiedFieldSelector(field_key: str = '', top_ratio: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | None = None, topk: Annotated[int, Gt(gt=0)] | None = None, reverse: bool = True, *args, **kwargs)
+
+   Bases: "Selector"
+
+   Selector to select top samples based on the sorted specified field
+   value.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         selected dataset.

@@ -1,0 +1,2804 @@
+data_juicer.ops.filter package
+******************************
+
+
+Submodules
+==========
+
+
+data_juicer.ops.filter.alphanumeric_filter module
+=================================================
+
+class data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter(tokenization: bool = False, min_ratio: float = 0.25, max_ratio: float = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with alphabet/numeric ratio within a
+   specific range.
+
+   compute_stats_batched(samples)
+
+   process_batched(samples)
+
+
+data_juicer.ops.filter.audio_duration_filter module
+===================================================
+
+class data_juicer.ops.filter.audio_duration_filter.AudioDurationFilter(min_duration: int = 0, max_duration: int = 9223372036854775807, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose audios' durations are within a specified
+   range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.audio_nmf_snr_filter module
+==================================================
+
+data_juicer.ops.filter.audio_nmf_snr_filter.separate_signal_noise(audio, n_components=2, nmf_iter=500)
+
+data_juicer.ops.filter.audio_nmf_snr_filter.compute_nmf_snr(audio_data, nmf_iter=500)
+
+class data_juicer.ops.filter.audio_nmf_snr_filter.AudioNMFSNRFilter(min_snr: float = 0, max_snr: float = 9223372036854775807, nmf_iter_num: Annotated[int, Gt(gt=0)] = 500, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose audios' SNRs (computed based on NMF) are
+   within a specified range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.audio_size_filter module
+===============================================
+
+class data_juicer.ops.filter.audio_size_filter.AudioSizeFilter(min_size: str = '0', max_size: str = '1TB', any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose audio size (in bytes/kb/MB/...) within a
+   specific range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.average_line_length_filter module
+========================================================
+
+class data_juicer.ops.filter.average_line_length_filter.AverageLineLengthFilter(min_len: int = 10, max_len: int = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with average line length within a specific
+   range.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+
+data_juicer.ops.filter.character_repetition_filter module
+=========================================================
+
+class data_juicer.ops.filter.character_repetition_filter.CharacterRepetitionFilter(rep_len: Annotated[int, Gt(gt=0)] = 10, min_ratio: float = 0.0, max_ratio: float = 0.5, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with char-level n-gram repetition ratio
+   within a specific range.
+
+   compute_stats_batched(samples)
+
+   process_batched(samples)
+
+
+data_juicer.ops.filter.flagged_words_filter module
+==================================================
+
+class data_juicer.ops.filter.flagged_words_filter.FlaggedWordFilter(lang: str = 'en', tokenization: bool = False, max_ratio: float = 0.045, flagged_words_dir: str = '/root/.cache/data_juicer/assets', use_words_aug: bool = False, words_aug_group_sizes: List[Annotated[int, Gt(gt=0)]] = [2], words_aug_join_char: str = '', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with flagged-word ratio less than a specific
+   max value.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+
+data_juicer.ops.filter.general_field_filter module
+==================================================
+
+class data_juicer.ops.filter.general_field_filter.GeneralFieldFilter(filter_condition: str = '', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples based on a general field filter condition.
+   The filter condition is a string that can include logical operators
+   and chain comparisons.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample: Dict) -> bool
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.general_field_filter.ExpressionTransformer(sample: Dict)
+
+   Bases: "NodeVisitor"
+
+   visit_BoolOp(node: BoolOp) -> bool
+
+   visit_Compare(node: Compare) -> bool
+
+   visit_Name(node: Name) -> Any
+
+   visit_Attribute(node: Attribute) -> Any
+
+   visit_Constant(node: Constant) -> Any
+
+   generic_visit(node: AST) -> None
+
+      Called if no explicit visitor function exists for a node.
+
+   transform(ast_tree: Expression) -> bool
+
+
+data_juicer.ops.filter.image_aesthetics_filter module
+=====================================================
+
+class data_juicer.ops.filter.image_aesthetics_filter.ImageAestheticsFilter(hf_scorer_model: str = '', trust_remote_code: bool = False, min_score: float = 0.5, max_score: float = 1.0, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with aesthetics scores within a specific
+   range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.image_aspect_ratio_filter module
+=======================================================
+
+class data_juicer.ops.filter.image_aspect_ratio_filter.ImageAspectRatioFilter(min_ratio: float = 0.333, max_ratio: float = 3.0, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with image aspect ratio within a specific
+   range. AspectRatio = W / H.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+
+data_juicer.ops.filter.image_face_count_filter module
+=====================================================
+
+class data_juicer.ops.filter.image_face_count_filter.ImageFaceCountFilter(cv_classifier: str = '', min_face_count: int = 1, max_face_count: int = 1, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with the number of faces within a specific
+   range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.image_face_ratio_filter module
+=====================================================
+
+class data_juicer.ops.filter.image_face_ratio_filter.ImageFaceRatioFilter(cv_classifier: str = '', min_ratio: float = 0.0, max_ratio: float = 0.4, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with face area ratios within a specific
+   range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.image_nsfw_filter module
+===============================================
+
+class data_juicer.ops.filter.image_nsfw_filter.ImageNSFWFilter(hf_nsfw_model: str = 'Falconsai/nsfw_image_detection', trust_remote_code: bool = False, max_score: float = 0.5, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples whose images have low nsfw scores.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.image_pair_similarity_filter module
+==========================================================
+
+class data_juicer.ops.filter.image_pair_similarity_filter.ImagePairSimilarityFilter(hf_clip='openai/clip-vit-base-patch32', trust_remote_code=False, min_score: ClosedUnitInterval = 0.1, max_score: ClosedUnitInterval = 1.0, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep image pairs with similarities between images within
+   a specific range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.image_shape_filter module
+================================================
+
+class data_juicer.ops.filter.image_shape_filter.ImageShapeFilter(min_width: int = 1, max_width: int = 9223372036854775807, min_height: int = 1, max_height: int = 9223372036854775807, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with image shape (w, h) within specific
+   ranges.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.image_size_filter module
+===============================================
+
+class data_juicer.ops.filter.image_size_filter.ImageSizeFilter(min_size: str = '0', max_size: str = '1TB', any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose image size (in Bytes/KB/MB/...) within a
+   specific range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.image_text_matching_filter module
+========================================================
+
+class data_juicer.ops.filter.image_text_matching_filter.ImageTextMatchingFilter(hf_blip: str = 'Salesforce/blip-itm-base-coco', trust_remote_code: bool = False, min_score: float = 0.003, max_score: float = 1.0, horizontal_flip: bool = False, vertical_flip: bool = False, any_or_all: str = 'any', reduce_mode: str = 'avg', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples those matching score between image and text
+   within a specific range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.image_text_similarity_filter module
+==========================================================
+
+class data_juicer.ops.filter.image_text_similarity_filter.ImageTextSimilarityFilter(hf_clip: str = 'openai/clip-vit-base-patch32', trust_remote_code: bool = False, min_score: float = 0.1, max_score: float = 1.0, horizontal_flip: bool = False, vertical_flip: bool = False, any_or_all: str = 'any', reduce_mode: str = 'avg', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples those similarities between image and text
+   within a specific range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.image_watermark_filter module
+====================================================
+
+class data_juicer.ops.filter.image_watermark_filter.ImageWatermarkFilter(hf_watermark_model: str = 'amrul-hzz/watermark_detector', trust_remote_code: bool = False, prob_threshold: float = 0.8, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples whose images have no watermark with high
+   probability.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.language_id_score_filter module
+======================================================
+
+class data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter(lang: str | List[str] = '', min_score: float = 0.8, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples in a specific language with confidence score
+   larger than a specific min value.
+
+   compute_stats_single(sample)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.llm_difficulty_score_filter module
+=========================================================
+
+class data_juicer.ops.filter.llm_difficulty_score_filter.LLMDifficultyScoreFilter(api_or_hf_model: str = 'gpt-4o', min_score: float = 0.5, is_hf_model: bool = False, *, api_endpoint: str | None = None, response_path: str | None = None, input_keys: List[str] = ['text'], field_names: List[str] = ['Text'], system_prompt: str | None = None, input_template: str | None = None, field_template: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, enable_vllm: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep sample with high difficulty score estimated by LLM.
+
+   DEFAULT_SYSTEM_PROMPT = '\nYou are an expert pedagogical evaluator for LLM training data. Analyze each data sample through multiple difficulty lenses and provide calibrated scores with detailed reasoning. Follow these guidelines:\n\n1. Evaluation Dimensions\nRate each dimension (1-5 scale: 1=Novice-friendly, 3=Intermediate, 5=Expert-level):\n- Linguistic Complexity: Vocabulary sophistication & syntactic structures\n- Conceptual Depth: Abstraction level & theoretical requirements\n- Prior Knowledge: Required domain-specific understanding\n- Step Complexity: Problem-solving steps needed\n- Ambiguity: Multiple valid interpretations\n\n2. Output Format\njson\n{\n  "dimension_scores": {\n    "linguistic_complexity": ,\n    "conceptual_depth": ,\n    "prior_knowledge": ,\n    "step_complexity": ,\n    "ambiguity":\n  },\n  "flags": ["multistep_reasoning", "cultural_context", ...],\n  "rationale": "Technical analysis of challenge sources"\n}\n3. Special Instructions\n- Differentiate intrinsic vs. extrinsic difficulty factors\n- Account for varying cultural/educational backgrounds\n- Mark samples requiring cross-domain knowledge synthesis\n- Consider temporal aspects for time-sensitive subjects\n- Flag ambiguous samples needing difficulty bracketing\n- Response a json dict\n\nExample Response:\n\njson\n{\n  "dimension_scores": {\n    "linguistic_complexity": 3,\n    "conceptual_depth": 5,\n    "prior_knowledge": 4,\n    "step_complexity": 4,\n    "ambiguity": 5\n  },\n  "flags": ["nonlinear_reasoning", "semantic_ambiguity"],\n  "rationale": "High conceptual difficulty due to multi-layered metaphor interpretation requiring philosophy background. Moderate linguistic complexity offset by implicit cultural references."\n}\n'
+
+   DEFAULT_INPUT_TEMPLATE = "# Data\n'''\n{data}\n'''\n\n# Response\njson\n"
+
+   DEFAULT_FIELD_TEMPLATE = '**{field_name}**\n{field_data}'
+
+   build_input(sample)
+
+   parse_output(raw_output)
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.llm_quality_score_filter module
+======================================================
+
+class data_juicer.ops.filter.llm_quality_score_filter.LLMQualityScoreFilter(api_or_hf_model: str = 'gpt-4o', min_score: float = 0.5, is_hf_model: bool = False, *, api_endpoint: str | None = None, response_path: str | None = None, input_keys: List[str] = ['text'], field_names: List[str] = ['Text'], system_prompt: str | None = None, input_template: str | None = None, field_template: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, enable_vllm: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep sample with high quality score estimated by LLM.
+
+   DEFAULT_SYSTEM_PROMPT = '\nYou are a meticulous data quality assessor for LLM training. Analyze each data sample across multiple quality dimensions and provide numerical scores with reasoning. Follow these guidelines:\n\n1. Evaluation Dimensions\nScore each dimension (1-5 scale: 1=lowest, 5=highest):\n- Accuracy: Factual correctness & verifiability\n- Grammar: Linguistic correctness & fluency\n- Informativeness: Depth/utility of content\n- Coherence: Logical structure & consistency\n\n2. Scoring Protocol\n- Base scores on concrete evidence from text\n- Flag samples needing human review (confidence <90%)\n- Compare with similar data points for consistency\n- Penalize hallucination/misinformation severely\n\n3. Output Format\njson\n{\n  "dimension_scores": {\n    "accuracy": ,\n    "grammar": ,\n    "informativeness": ,\n    "coherence":\n  },\n  "flags": ["syntax_error", "insufficient_information", ...],\n  "rationale": "Concise technical analysis",\n  "recommendation": ["keep", "review", "discard"]\n}\n4. Special Instructions\n- Prioritize factual integrity over stylistic qualities\n- Treat unverified medical/legal claims as high-risk\n- Contextualize cultural references appropriately\n- Response a json dict\n\nExample Response:\n\njson\n{\n  "dimension_scores": {\n    "accuracy": 2,\n    "grammar": 4,\n    "informativeness": 4,\n    "coherence": 2\n  },\n  "flags": ["accuracy_concern", "logical_confusion"],\n  "rationale": "The text provides rich information but suffers from logical confusion and lacks contextual coherence. Excellent grammatical structure offset by factual inaccuracies.",\n  "recommendation": "review"\n}\n'
+
+   DEFAULT_INPUT_TEMPLATE = "# Data\n'''\n{data}\n'''\n\n# Response\njson\n"
+
+   DEFAULT_FIELD_TEMPLATE = '**{field_name}**\n{field_data}'
+
+   build_input(sample)
+
+   parse_output(raw_output)
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.maximum_line_length_filter module
+========================================================
+
+class data_juicer.ops.filter.maximum_line_length_filter.MaximumLineLengthFilter(min_len: int = 10, max_len: int = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with maximum line length within a specific
+   range.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+
+data_juicer.ops.filter.perplexity_filter module
+===============================================
+
+class data_juicer.ops.filter.perplexity_filter.PerplexityFilter(lang: str = 'en', max_ppl: float = 1500, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with perplexity score less than a specific
+   max value.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+
+data_juicer.ops.filter.phrase_grounding_recall_filter module
+============================================================
+
+data_juicer.ops.filter.phrase_grounding_recall_filter.find_noun_phrases(caption: str, pos_tagger=None) -> List[str]
+
+data_juicer.ops.filter.phrase_grounding_recall_filter.remove_punctuation(text: str) -> str
+
+data_juicer.ops.filter.phrase_grounding_recall_filter.run_ner(caption, pos_tagger=None)
+
+class data_juicer.ops.filter.phrase_grounding_recall_filter.PhraseGroundingRecallFilter(hf_owlvit: str = 'google/owlvit-base-patch32', trust_remote_code: bool = False, min_recall: float = 0.1, max_recall: float = 1.0, horizontal_flip: bool = False, vertical_flip: bool = False, any_or_all: str = 'any', reduce_mode: str = 'avg', iou_thr: float = 0.5, large_area_ratio_thr: float = 0.95, conf_thr: float = 0.0, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples whose locating recalls of phrases extracted
+   from text in the images are within a specified range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.special_characters_filter module
+=======================================================
+
+class data_juicer.ops.filter.special_characters_filter.SpecialCharactersFilter(min_ratio: float = 0.0, max_ratio: float = 0.25, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with special-char ratio within a specific
+   range.
+
+   compute_stats_batched(samples)
+
+   process_batched(samples)
+
+
+data_juicer.ops.filter.specified_field_filter module
+====================================================
+
+class data_juicer.ops.filter.specified_field_filter.SpecifiedFieldFilter(field_key: str = '', target_value: List = [], *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter based on specified field information.
+
+   If the specified field information in the sample is not within the
+   specified target value, the sample will be filtered.
+
+   compute_stats_single(sample)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.specified_numeric_field_filter module
+============================================================
+
+data_juicer.ops.filter.specified_numeric_field_filter.is_number(s)
+
+class data_juicer.ops.filter.specified_numeric_field_filter.SpecifiedNumericFieldFilter(field_key: str = '', min_value: float = -9223372036854775807, max_value: float = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter based on specified numeric field information.
+
+   If the specified numeric information in the sample is not within
+   the specified range, the sample will be filtered.
+
+   compute_stats_single(sample)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.stopwords_filter module
+==============================================
+
+class data_juicer.ops.filter.stopwords_filter.StopWordsFilter(lang: str = 'en', tokenization: bool = False, min_ratio: float = 0.3, stopwords_dir: str = '/root/.cache/data_juicer/assets', use_words_aug: bool = False, words_aug_group_sizes: List[Annotated[int, Gt(gt=0)]] = [2], words_aug_join_char: str = '', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with stopword ratio larger than a specific
+   min value.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.suffix_filter module
+===========================================
+
+class data_juicer.ops.filter.suffix_filter.SuffixFilter(suffixes: str | List[str] = [], *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with specified suffix.
+
+   compute_stats_single(sample)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.text_action_filter module
+================================================
+
+class data_juicer.ops.filter.text_action_filter.TextActionFilter(lang: str = 'en', min_action_num: int = 1, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep texts those contain actions in the text.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.text_entity_dependency_filter module
+===========================================================
+
+class data_juicer.ops.filter.text_entity_dependency_filter.TextEntityDependencyFilter(lang: str = 'en', min_dependency_num: int = 1, any_or_all: str = 'all', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Identify the entities in the text which are independent with other
+   token, and filter them. The text containing no entities will be
+   omitted.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.text_length_filter module
+================================================
+
+class data_juicer.ops.filter.text_length_filter.TextLengthFilter(min_len: int = 10, max_len: int = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with total text length within a specific
+   range.
+
+   compute_stats_batched(samples)
+
+   process_batched(samples)
+
+
+data_juicer.ops.filter.text_pair_similarity_filter module
+=========================================================
+
+class data_juicer.ops.filter.text_pair_similarity_filter.TextPairSimilarityFilter(hf_clip='openai/clip-vit-base-patch32', trust_remote_code=False, min_score: ClosedUnitInterval = 0.1, max_score: ClosedUnitInterval = 1.0, text_key_second=None, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep text pairs with similarities between texts within a
+   specific range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.token_num_filter module
+==============================================
+
+class data_juicer.ops.filter.token_num_filter.TokenNumFilter(hf_tokenizer: str = 'EleutherAI/pythia-6.9b-deduped', min_num: int = 10, max_num: int = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with total token number within a specific
+   range.
+
+   compute_stats_single(sample)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.video_aesthetics_filter module
+=====================================================
+
+class data_juicer.ops.filter.video_aesthetics_filter.VideoAestheticsFilter(hf_scorer_model: str = '', trust_remote_code: bool = False, min_score: float = 0.4, max_score: float = 1.0, frame_sampling_method: str = 'uniform', frame_num: Annotated[int, Gt(gt=0)] = 3, any_or_all: str = 'any', reduce_mode: str = 'avg', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep data samples with aesthetics scores for specified
+   frames in the videos within a specific range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.video_aspect_ratio_filter module
+=======================================================
+
+class data_juicer.ops.filter.video_aspect_ratio_filter.VideoAspectRatioFilter(min_ratio: str = '9/21', max_ratio: str = '21/9', any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with video aspect ratio within a specific
+   range. AspectRatio = W / H.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.video_duration_filter module
+===================================================
+
+class data_juicer.ops.filter.video_duration_filter.VideoDurationFilter(min_duration: float = 0, max_duration: float = 9223372036854775807, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose videos' durations are within a specified
+   range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.video_frames_text_similarity_filter module
+=================================================================
+
+class data_juicer.ops.filter.video_frames_text_similarity_filter.VideoFramesTextSimilarityFilter(hf_clip='openai/clip-vit-base-patch32', trust_remote_code=False, min_score: float = 0.1, max_score: float = 1.0, frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, horizontal_flip: bool = False, vertical_flip: bool = False, any_or_all: str = 'any', reduce_mode: str = 'avg', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples those similarities between sampled video
+   frame images and text within a specific range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.video_motion_score_filter module
+=======================================================
+
+data_juicer.ops.filter.video_motion_score_filter.VideoCapture(*args, **kwargs)
+
+class data_juicer.ops.filter.video_motion_score_filter.VideoMotionScoreFilter(min_score: float = 0.25, max_score: float = 1.7976931348623157e+308, sampling_fps: Annotated[float, Gt(gt=0)] = 2, size: Annotated[int, Gt(gt=0)] | Tuple[Annotated[int, Gt(gt=0)]] | Tuple[Annotated[int, Gt(gt=0)], Annotated[int, Gt(gt=0)]] | None = None, max_size: Annotated[int, Gt(gt=0)] | None = None, divisible: Annotated[int, Gt(gt=0)] = 1, relative: bool = False, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with video motion scores within a specific
+   range. The Farneback's algorithm from OpenCV is used to compute
+   dense optical flow.
+
+   setup_model(rank=None)
+
+   compute_flow(prev_frame, curr_frame)
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.video_motion_score_raft_filter module
+============================================================
+
+class data_juicer.ops.filter.video_motion_score_raft_filter.VideoMotionScoreRaftFilter(min_score: float = 1.0, max_score: float = 1.7976931348623157e+308, sampling_fps: Annotated[float, Gt(gt=0)] = 2, size: Annotated[int, Gt(gt=0)] | Tuple[Annotated[int, Gt(gt=0)]] | Tuple[Annotated[int, Gt(gt=0)], Annotated[int, Gt(gt=0)]] | None = None, max_size: Annotated[int, Gt(gt=0)] | None = None, divisible: Annotated[int, Gt(gt=0)] = 8, relative: bool = False, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "VideoMotionScoreFilter"
+
+   Filter to keep samples with video motion scores within a specified
+   range. This operator utilizes the RAFT (Recurrent All-Pairs Field
+   Transforms) model from torchvision to predict optical flow between
+   video frames.
+
+   For further details, refer to the official torchvision
+   documentation: https://pytorch.org/vision/main/models/raft.html
+
+   The original paper on RAFT is available here:
+   https://arxiv.org/abs/2003.12039
+
+   setup_model(rank=None)
+
+   compute_flow(prev_frame, curr_frame)
+
+
+data_juicer.ops.filter.video_nsfw_filter module
+===============================================
+
+class data_juicer.ops.filter.video_nsfw_filter.VideoNSFWFilter(hf_nsfw_model: str = 'Falconsai/nsfw_image_detection', trust_remote_code: bool = False, max_score: float = 0.5, frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, reduce_mode: str = 'avg', any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples whose videos have low nsfw scores.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.video_ocr_area_ratio_filter module
+=========================================================
+
+data_juicer.ops.filter.video_ocr_area_ratio_filter.triangle_area(p1, p2, p3)
+
+   Compute the triangle area according to its coordinates.
+
+class data_juicer.ops.filter.video_ocr_area_ratio_filter.VideoOcrAreaRatioFilter(min_area_ratio: float = 0, max_area_ratio: float = 1.0, frame_sample_num: Annotated[int, Gt(gt=0)] = 3, languages_to_detect: str | List[str] = ['ch_sim', 'en'], any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose detected text area ratios for specified
+   frames in the video are within a specified range.
+
+   get_reader(rank)
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.video_resolution_filter module
+=====================================================
+
+class data_juicer.ops.filter.video_resolution_filter.VideoResolutionFilter(min_width: int = 1, max_width: int = 9223372036854775807, min_height: int = 1, max_height: int = 9223372036854775807, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose videos' resolutions are within a specified
+   range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.video_tagging_from_frames_filter module
+==============================================================
+
+class data_juicer.ops.filter.video_tagging_from_frames_filter.VideoTaggingFromFramesFilter(tags: List[str] = ['people'], contain: str = 'any', frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, tag_field_name: str = 'video_frame_tags', any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples whose videos contain the given tags.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.video_watermark_filter module
+====================================================
+
+class data_juicer.ops.filter.video_watermark_filter.VideoWatermarkFilter(hf_watermark_model: str = 'amrul-hzz/watermark_detector', trust_remote_code: bool = False, prob_threshold: float = 0.8, frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, reduce_mode: str = 'avg', any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples whose videos have no watermark with high
+   probability.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.filter.word_repetition_filter module
+====================================================
+
+class data_juicer.ops.filter.word_repetition_filter.WordRepetitionFilter(lang: str = 'en', tokenization: bool = False, rep_len: Annotated[int, Gt(gt=0)] = 10, min_ratio: float = 0.0, max_ratio: float = 0.5, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with word-level n-gram repetition ratio
+   within a specific range.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+
+data_juicer.ops.filter.words_num_filter module
+==============================================
+
+class data_juicer.ops.filter.words_num_filter.WordsNumFilter(lang: str = 'en', tokenization: bool = False, min_num: int = 10, max_num: int = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with total words number within a specific
+   range.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+
+Module contents
+===============
+
+class data_juicer.ops.filter.AlphanumericFilter(tokenization: bool = False, min_ratio: float = 0.25, max_ratio: float = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with alphabet/numeric ratio within a
+   specific range.
+
+   compute_stats_batched(samples)
+
+   process_batched(samples)
+
+class data_juicer.ops.filter.AudioDurationFilter(min_duration: int = 0, max_duration: int = 9223372036854775807, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose audios' durations are within a specified
+   range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.AudioNMFSNRFilter(min_snr: float = 0, max_snr: float = 9223372036854775807, nmf_iter_num: Annotated[int, Gt(gt=0)] = 500, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose audios' SNRs (computed based on NMF) are
+   within a specified range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.AudioSizeFilter(min_size: str = '0', max_size: str = '1TB', any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose audio size (in bytes/kb/MB/...) within a
+   specific range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.AverageLineLengthFilter(min_len: int = 10, max_len: int = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with average line length within a specific
+   range.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+class data_juicer.ops.filter.CharacterRepetitionFilter(rep_len: Annotated[int, Gt(gt=0)] = 10, min_ratio: float = 0.0, max_ratio: float = 0.5, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with char-level n-gram repetition ratio
+   within a specific range.
+
+   compute_stats_batched(samples)
+
+   process_batched(samples)
+
+class data_juicer.ops.filter.FlaggedWordFilter(lang: str = 'en', tokenization: bool = False, max_ratio: float = 0.045, flagged_words_dir: str = '/root/.cache/data_juicer/assets', use_words_aug: bool = False, words_aug_group_sizes: List[Annotated[int, Gt(gt=0)]] = [2], words_aug_join_char: str = '', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with flagged-word ratio less than a specific
+   max value.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+class data_juicer.ops.filter.ImageAestheticsFilter(hf_scorer_model: str = '', trust_remote_code: bool = False, min_score: float = 0.5, max_score: float = 1.0, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with aesthetics scores within a specific
+   range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.ImageAspectRatioFilter(min_ratio: float = 0.333, max_ratio: float = 3.0, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with image aspect ratio within a specific
+   range. AspectRatio = W / H.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+class data_juicer.ops.filter.ImageFaceCountFilter(cv_classifier: str = '', min_face_count: int = 1, max_face_count: int = 1, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with the number of faces within a specific
+   range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.ImageFaceRatioFilter(cv_classifier: str = '', min_ratio: float = 0.0, max_ratio: float = 0.4, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with face area ratios within a specific
+   range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.ImageNSFWFilter(hf_nsfw_model: str = 'Falconsai/nsfw_image_detection', trust_remote_code: bool = False, max_score: float = 0.5, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples whose images have low nsfw scores.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.ImagePairSimilarityFilter(hf_clip='openai/clip-vit-base-patch32', trust_remote_code=False, min_score: ClosedUnitInterval = 0.1, max_score: ClosedUnitInterval = 1.0, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep image pairs with similarities between images within
+   a specific range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.ImageShapeFilter(min_width: int = 1, max_width: int = 9223372036854775807, min_height: int = 1, max_height: int = 9223372036854775807, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with image shape (w, h) within specific
+   ranges.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.ImageSizeFilter(min_size: str = '0', max_size: str = '1TB', any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose image size (in Bytes/KB/MB/...) within a
+   specific range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.ImageTextMatchingFilter(hf_blip: str = 'Salesforce/blip-itm-base-coco', trust_remote_code: bool = False, min_score: float = 0.003, max_score: float = 1.0, horizontal_flip: bool = False, vertical_flip: bool = False, any_or_all: str = 'any', reduce_mode: str = 'avg', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples those matching score between image and text
+   within a specific range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.ImageTextSimilarityFilter(hf_clip: str = 'openai/clip-vit-base-patch32', trust_remote_code: bool = False, min_score: float = 0.1, max_score: float = 1.0, horizontal_flip: bool = False, vertical_flip: bool = False, any_or_all: str = 'any', reduce_mode: str = 'avg', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples those similarities between image and text
+   within a specific range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.ImageWatermarkFilter(hf_watermark_model: str = 'amrul-hzz/watermark_detector', trust_remote_code: bool = False, prob_threshold: float = 0.8, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples whose images have no watermark with high
+   probability.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.LanguageIDScoreFilter(lang: str | List[str] = '', min_score: float = 0.8, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples in a specific language with confidence score
+   larger than a specific min value.
+
+   compute_stats_single(sample)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.LLMQualityScoreFilter(api_or_hf_model: str = 'gpt-4o', min_score: float = 0.5, is_hf_model: bool = False, *, api_endpoint: str | None = None, response_path: str | None = None, input_keys: List[str] = ['text'], field_names: List[str] = ['Text'], system_prompt: str | None = None, input_template: str | None = None, field_template: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, enable_vllm: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep sample with high quality score estimated by LLM.
+
+   DEFAULT_SYSTEM_PROMPT = '\nYou are a meticulous data quality assessor for LLM training. Analyze each data sample across multiple quality dimensions and provide numerical scores with reasoning. Follow these guidelines:\n\n1. Evaluation Dimensions\nScore each dimension (1-5 scale: 1=lowest, 5=highest):\n- Accuracy: Factual correctness & verifiability\n- Grammar: Linguistic correctness & fluency\n- Informativeness: Depth/utility of content\n- Coherence: Logical structure & consistency\n\n2. Scoring Protocol\n- Base scores on concrete evidence from text\n- Flag samples needing human review (confidence <90%)\n- Compare with similar data points for consistency\n- Penalize hallucination/misinformation severely\n\n3. Output Format\njson\n{\n  "dimension_scores": {\n    "accuracy": ,\n    "grammar": ,\n    "informativeness": ,\n    "coherence":\n  },\n  "flags": ["syntax_error", "insufficient_information", ...],\n  "rationale": "Concise technical analysis",\n  "recommendation": ["keep", "review", "discard"]\n}\n4. Special Instructions\n- Prioritize factual integrity over stylistic qualities\n- Treat unverified medical/legal claims as high-risk\n- Contextualize cultural references appropriately\n- Response a json dict\n\nExample Response:\n\njson\n{\n  "dimension_scores": {\n    "accuracy": 2,\n    "grammar": 4,\n    "informativeness": 4,\n    "coherence": 2\n  },\n  "flags": ["accuracy_concern", "logical_confusion"],\n  "rationale": "The text provides rich information but suffers from logical confusion and lacks contextual coherence. Excellent grammatical structure offset by factual inaccuracies.",\n  "recommendation": "review"\n}\n'
+
+   DEFAULT_INPUT_TEMPLATE = "# Data\n'''\n{data}\n'''\n\n# Response\njson\n"
+
+   DEFAULT_FIELD_TEMPLATE = '**{field_name}**\n{field_data}'
+
+   build_input(sample)
+
+   parse_output(raw_output)
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.LLMDifficultyScoreFilter(api_or_hf_model: str = 'gpt-4o', min_score: float = 0.5, is_hf_model: bool = False, *, api_endpoint: str | None = None, response_path: str | None = None, input_keys: List[str] = ['text'], field_names: List[str] = ['Text'], system_prompt: str | None = None, input_template: str | None = None, field_template: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, enable_vllm: bool = False, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep sample with high difficulty score estimated by LLM.
+
+   DEFAULT_SYSTEM_PROMPT = '\nYou are an expert pedagogical evaluator for LLM training data. Analyze each data sample through multiple difficulty lenses and provide calibrated scores with detailed reasoning. Follow these guidelines:\n\n1. Evaluation Dimensions\nRate each dimension (1-5 scale: 1=Novice-friendly, 3=Intermediate, 5=Expert-level):\n- Linguistic Complexity: Vocabulary sophistication & syntactic structures\n- Conceptual Depth: Abstraction level & theoretical requirements\n- Prior Knowledge: Required domain-specific understanding\n- Step Complexity: Problem-solving steps needed\n- Ambiguity: Multiple valid interpretations\n\n2. Output Format\njson\n{\n  "dimension_scores": {\n    "linguistic_complexity": ,\n    "conceptual_depth": ,\n    "prior_knowledge": ,\n    "step_complexity": ,\n    "ambiguity":\n  },\n  "flags": ["multistep_reasoning", "cultural_context", ...],\n  "rationale": "Technical analysis of challenge sources"\n}\n3. Special Instructions\n- Differentiate intrinsic vs. extrinsic difficulty factors\n- Account for varying cultural/educational backgrounds\n- Mark samples requiring cross-domain knowledge synthesis\n- Consider temporal aspects for time-sensitive subjects\n- Flag ambiguous samples needing difficulty bracketing\n- Response a json dict\n\nExample Response:\n\njson\n{\n  "dimension_scores": {\n    "linguistic_complexity": 3,\n    "conceptual_depth": 5,\n    "prior_knowledge": 4,\n    "step_complexity": 4,\n    "ambiguity": 5\n  },\n  "flags": ["nonlinear_reasoning", "semantic_ambiguity"],\n  "rationale": "High conceptual difficulty due to multi-layered metaphor interpretation requiring philosophy background. Moderate linguistic complexity offset by implicit cultural references."\n}\n'
+
+   DEFAULT_INPUT_TEMPLATE = "# Data\n'''\n{data}\n'''\n\n# Response\njson\n"
+
+   DEFAULT_FIELD_TEMPLATE = '**{field_name}**\n{field_data}'
+
+   build_input(sample)
+
+   parse_output(raw_output)
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.MaximumLineLengthFilter(min_len: int = 10, max_len: int = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with maximum line length within a specific
+   range.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+class data_juicer.ops.filter.PerplexityFilter(lang: str = 'en', max_ppl: float = 1500, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with perplexity score less than a specific
+   max value.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+class data_juicer.ops.filter.PhraseGroundingRecallFilter(hf_owlvit: str = 'google/owlvit-base-patch32', trust_remote_code: bool = False, min_recall: float = 0.1, max_recall: float = 1.0, horizontal_flip: bool = False, vertical_flip: bool = False, any_or_all: str = 'any', reduce_mode: str = 'avg', iou_thr: float = 0.5, large_area_ratio_thr: float = 0.95, conf_thr: float = 0.0, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples whose locating recalls of phrases extracted
+   from text in the images are within a specified range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.SpecialCharactersFilter(min_ratio: float = 0.0, max_ratio: float = 0.25, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with special-char ratio within a specific
+   range.
+
+   compute_stats_batched(samples)
+
+   process_batched(samples)
+
+class data_juicer.ops.filter.SpecifiedFieldFilter(field_key: str = '', target_value: List = [], *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter based on specified field information.
+
+   If the specified field information in the sample is not within the
+   specified target value, the sample will be filtered.
+
+   compute_stats_single(sample)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.SpecifiedNumericFieldFilter(field_key: str = '', min_value: float = -9223372036854775807, max_value: float = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter based on specified numeric field information.
+
+   If the specified numeric information in the sample is not within
+   the specified range, the sample will be filtered.
+
+   compute_stats_single(sample)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.StopWordsFilter(lang: str = 'en', tokenization: bool = False, min_ratio: float = 0.3, stopwords_dir: str = '/root/.cache/data_juicer/assets', use_words_aug: bool = False, words_aug_group_sizes: List[Annotated[int, Gt(gt=0)]] = [2], words_aug_join_char: str = '', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with stopword ratio larger than a specific
+   min value.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.SuffixFilter(suffixes: str | List[str] = [], *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with specified suffix.
+
+   compute_stats_single(sample)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.TextActionFilter(lang: str = 'en', min_action_num: int = 1, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep texts those contain actions in the text.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.TextEntityDependencyFilter(lang: str = 'en', min_dependency_num: int = 1, any_or_all: str = 'all', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Identify the entities in the text which are independent with other
+   token, and filter them. The text containing no entities will be
+   omitted.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.TextLengthFilter(min_len: int = 10, max_len: int = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with total text length within a specific
+   range.
+
+   compute_stats_batched(samples)
+
+   process_batched(samples)
+
+class data_juicer.ops.filter.TextPairSimilarityFilter(hf_clip='openai/clip-vit-base-patch32', trust_remote_code=False, min_score: ClosedUnitInterval = 0.1, max_score: ClosedUnitInterval = 1.0, text_key_second=None, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep text pairs with similarities between texts within a
+   specific range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.TokenNumFilter(hf_tokenizer: str = 'EleutherAI/pythia-6.9b-deduped', min_num: int = 10, max_num: int = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with total token number within a specific
+   range.
+
+   compute_stats_single(sample)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.VideoAestheticsFilter(hf_scorer_model: str = '', trust_remote_code: bool = False, min_score: float = 0.4, max_score: float = 1.0, frame_sampling_method: str = 'uniform', frame_num: Annotated[int, Gt(gt=0)] = 3, any_or_all: str = 'any', reduce_mode: str = 'avg', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep data samples with aesthetics scores for specified
+   frames in the videos within a specific range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.VideoAspectRatioFilter(min_ratio: str = '9/21', max_ratio: str = '21/9', any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with video aspect ratio within a specific
+   range. AspectRatio = W / H.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.VideoDurationFilter(min_duration: float = 0, max_duration: float = 9223372036854775807, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose videos' durations are within a specified
+   range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.VideoFramesTextSimilarityFilter(hf_clip='openai/clip-vit-base-patch32', trust_remote_code=False, min_score: float = 0.1, max_score: float = 1.0, frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, horizontal_flip: bool = False, vertical_flip: bool = False, any_or_all: str = 'any', reduce_mode: str = 'avg', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples those similarities between sampled video
+   frame images and text within a specific range.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.VideoMotionScoreFilter(min_score: float = 0.25, max_score: float = 1.7976931348623157e+308, sampling_fps: Annotated[float, Gt(gt=0)] = 2, size: Annotated[int, Gt(gt=0)] | Tuple[Annotated[int, Gt(gt=0)]] | Tuple[Annotated[int, Gt(gt=0)], Annotated[int, Gt(gt=0)]] | None = None, max_size: Annotated[int, Gt(gt=0)] | None = None, divisible: Annotated[int, Gt(gt=0)] = 1, relative: bool = False, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with video motion scores within a specific
+   range. The Farneback's algorithm from OpenCV is used to compute
+   dense optical flow.
+
+   setup_model(rank=None)
+
+   compute_flow(prev_frame, curr_frame)
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.VideoMotionScoreRaftFilter(min_score: float = 1.0, max_score: float = 1.7976931348623157e+308, sampling_fps: Annotated[float, Gt(gt=0)] = 2, size: Annotated[int, Gt(gt=0)] | Tuple[Annotated[int, Gt(gt=0)]] | Tuple[Annotated[int, Gt(gt=0)], Annotated[int, Gt(gt=0)]] | None = None, max_size: Annotated[int, Gt(gt=0)] | None = None, divisible: Annotated[int, Gt(gt=0)] = 8, relative: bool = False, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "VideoMotionScoreFilter"
+
+   Filter to keep samples with video motion scores within a specified
+   range. This operator utilizes the RAFT (Recurrent All-Pairs Field
+   Transforms) model from torchvision to predict optical flow between
+   video frames.
+
+   For further details, refer to the official torchvision
+   documentation: https://pytorch.org/vision/main/models/raft.html
+
+   The original paper on RAFT is available here:
+   https://arxiv.org/abs/2003.12039
+
+   setup_model(rank=None)
+
+   compute_flow(prev_frame, curr_frame)
+
+class data_juicer.ops.filter.VideoNSFWFilter(hf_nsfw_model: str = 'Falconsai/nsfw_image_detection', trust_remote_code: bool = False, max_score: float = 0.5, frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, reduce_mode: str = 'avg', any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples whose videos have low nsfw scores.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.VideoOcrAreaRatioFilter(min_area_ratio: float = 0, max_area_ratio: float = 1.0, frame_sample_num: Annotated[int, Gt(gt=0)] = 3, languages_to_detect: str | List[str] = ['ch_sim', 'en'], any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose detected text area ratios for specified
+   frames in the video are within a specified range.
+
+   get_reader(rank)
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.VideoResolutionFilter(min_width: int = 1, max_width: int = 9223372036854775807, min_height: int = 1, max_height: int = 9223372036854775807, any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Keep data samples whose videos' resolutions are within a specified
+   range.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.VideoTaggingFromFramesFilter(tags: List[str] = ['people'], contain: str = 'any', frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, tag_field_name: str = 'video_frame_tags', any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples whose videos contain the given tags.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.VideoWatermarkFilter(hf_watermark_model: str = 'amrul-hzz/watermark_detector', trust_remote_code: bool = False, prob_threshold: float = 0.8, frame_sampling_method: str = 'all_keyframes', frame_num: Annotated[int, Gt(gt=0)] = 3, reduce_mode: str = 'avg', any_or_all: str = 'any', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples whose videos have no watermark with high
+   probability.
+
+   compute_stats_single(sample, rank=None, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample, rank=None)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.filter.WordRepetitionFilter(lang: str = 'en', tokenization: bool = False, rep_len: Annotated[int, Gt(gt=0)] = 10, min_ratio: float = 0.0, max_ratio: float = 0.5, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with word-level n-gram repetition ratio
+   within a specific range.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+class data_juicer.ops.filter.WordsNumFilter(lang: str = 'en', tokenization: bool = False, min_num: int = 10, max_num: int = 9223372036854775807, *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples with total words number within a specific
+   range.
+
+   compute_stats_batched(samples, context=False)
+
+   process_batched(samples)
+
+class data_juicer.ops.filter.GeneralFieldFilter(filter_condition: str = '', *args, **kwargs)
+
+   Bases: "Filter"
+
+   Filter to keep samples based on a general field filter condition.
+   The filter condition is a string that can include logical operators
+   and chain comparisons.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample: Dict) -> bool
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering

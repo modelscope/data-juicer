@@ -1,0 +1,1797 @@
+data_juicer package
+*******************
+
+
+Subpackages
+===========
+
+* data_juicer.analysis package
+
+  * Submodules
+
+  * data_juicer.analysis.collector module
+
+    * "TextTokenDistCollector"
+
+      * "TextTokenDistCollector.collect()"
+
+  * data_juicer.analysis.column_wise_analysis module
+
+    * "get_row_col()"
+
+    * "ColumnWiseAnalysis"
+
+      * "ColumnWiseAnalysis.analyze()"
+
+      * "ColumnWiseAnalysis.draw_hist()"
+
+      * "ColumnWiseAnalysis.draw_box()"
+
+      * "ColumnWiseAnalysis.draw_wordcloud()"
+
+  * data_juicer.analysis.diversity_analysis module
+
+    * "find_root_verb_and_its_dobj()"
+
+    * "find_root_verb_and_its_dobj_in_string()"
+
+    * "get_diversity()"
+
+    * "DiversityAnalysis"
+
+      * "DiversityAnalysis.compute()"
+
+      * "DiversityAnalysis.analyze()"
+
+  * data_juicer.analysis.draw module
+
+    * "draw_heatmap()"
+
+  * data_juicer.analysis.measure module
+
+    * "Measure"
+
+      * "Measure.name"
+
+      * "Measure.measure()"
+
+    * "KLDivMeasure"
+
+      * "KLDivMeasure.name"
+
+      * "KLDivMeasure.measure()"
+
+    * "JSDivMeasure"
+
+      * "JSDivMeasure.name"
+
+      * "JSDivMeasure.measure()"
+
+    * "CrossEntropyMeasure"
+
+      * "CrossEntropyMeasure.name"
+
+      * "CrossEntropyMeasure.measure()"
+
+    * "EntropyMeasure"
+
+      * "EntropyMeasure.name"
+
+      * "EntropyMeasure.measure()"
+
+    * "RelatedTTestMeasure"
+
+      * "RelatedTTestMeasure.name"
+
+      * "RelatedTTestMeasure.stats_to_hist()"
+
+      * "RelatedTTestMeasure.category_to_hist()"
+
+      * "RelatedTTestMeasure.measure()"
+
+  * data_juicer.analysis.overall_analysis module
+
+    * "OverallAnalysis"
+
+      * "OverallAnalysis.refine_single_column()"
+
+      * "OverallAnalysis.analyze()"
+
+  * Module contents
+
+    * "ColumnWiseAnalysis"
+
+      * "ColumnWiseAnalysis.analyze()"
+
+      * "ColumnWiseAnalysis.draw_hist()"
+
+      * "ColumnWiseAnalysis.draw_box()"
+
+      * "ColumnWiseAnalysis.draw_wordcloud()"
+
+    * "DiversityAnalysis"
+
+      * "DiversityAnalysis.compute()"
+
+      * "DiversityAnalysis.analyze()"
+
+    * "OverallAnalysis"
+
+      * "OverallAnalysis.refine_single_column()"
+
+      * "OverallAnalysis.analyze()"
+
+* data_juicer.config package
+
+  * Submodules
+
+  * data_juicer.config.config module
+
+    * "timing_context()"
+
+    * "init_configs()"
+
+    * "update_ds_cache_dir_and_related_vars()"
+
+    * "init_setup_from_cfg()"
+
+    * "load_ops_with_stats_meta()"
+
+    * "update_op_attr()"
+
+    * "sort_op_by_types_and_names()"
+
+    * "update_op_process()"
+
+    * "namespace_to_arg_list()"
+
+    * "config_backup()"
+
+    * "display_config()"
+
+    * "export_config()"
+
+    * "merge_config()"
+
+    * "prepare_side_configs()"
+
+    * "get_init_configs()"
+
+    * "get_default_cfg()"
+
+  * Module contents
+
+    * "init_configs()"
+
+    * "get_init_configs()"
+
+    * "export_config()"
+
+    * "merge_config()"
+
+    * "prepare_side_configs()"
+
+    * "get_default_cfg()"
+
+* data_juicer.core package
+
+  * Subpackages
+
+    * data_juicer.core.data package
+
+      * Submodules
+
+      * data_juicer.core.data.config_validator module
+
+      * data_juicer.core.data.data_validator module
+
+      * data_juicer.core.data.dataset_builder module
+
+      * data_juicer.core.data.dj_dataset module
+
+      * data_juicer.core.data.load_strategy module
+
+      * data_juicer.core.data.ray_dataset module
+
+      * data_juicer.core.data.schema module
+
+      * Module contents
+
+    * data_juicer.core.executor package
+
+      * Submodules
+
+      * data_juicer.core.executor.base module
+
+      * data_juicer.core.executor.default_executor module
+
+      * data_juicer.core.executor.factory module
+
+      * data_juicer.core.executor.ray_executor module
+
+      * Module contents
+
+  * Submodules
+
+  * data_juicer.core.adapter module
+
+    * "Adapter"
+
+      * "Adapter.MAX_BATCH_SIZE"
+
+      * "Adapter.execute_and_probe()"
+
+      * "Adapter.take_batch()"
+
+      * "Adapter.adapt_workloads()"
+
+      * "Adapter.probe_small_batch()"
+
+      * "Adapter.batch_size_strategy()"
+
+      * "Adapter.analyze_small_batch()"
+
+      * "Adapter.insight_mining()"
+
+  * data_juicer.core.analyzer module
+
+    * "Analyzer"
+
+      * "Analyzer.run()"
+
+  * data_juicer.core.exporter module
+
+    * "Exporter"
+
+      * "Exporter.KiB"
+
+      * "Exporter.MiB"
+
+      * "Exporter.GiB"
+
+      * "Exporter.TiB"
+
+      * "Exporter.export()"
+
+      * "Exporter.export_compute_stats()"
+
+      * "Exporter.to_jsonl()"
+
+      * "Exporter.to_json()"
+
+      * "Exporter.to_parquet()"
+
+  * data_juicer.core.monitor module
+
+    * "resource_monitor()"
+
+    * "Monitor"
+
+      * "Monitor.DYNAMIC_FIELDS"
+
+      * "Monitor.monitor_all_resources()"
+
+      * "Monitor.monitor_current_resources()"
+
+      * "Monitor.draw_resource_util_graph()"
+
+      * "Monitor.analyze_resource_util_list()"
+
+      * "Monitor.analyze_single_resource_util()"
+
+      * "Monitor.monitor_func()"
+
+  * data_juicer.core.tracer module
+
+    * "Tracer"
+
+      * "Tracer.trace_mapper()"
+
+      * "Tracer.trace_batch_mapper()"
+
+      * "Tracer.trace_filter()"
+
+      * "Tracer.trace_deduplicator()"
+
+  * Module contents
+
+    * "Adapter"
+
+      * "Adapter.MAX_BATCH_SIZE"
+
+      * "Adapter.execute_and_probe()"
+
+      * "Adapter.take_batch()"
+
+      * "Adapter.adapt_workloads()"
+
+      * "Adapter.probe_small_batch()"
+
+      * "Adapter.batch_size_strategy()"
+
+      * "Adapter.analyze_small_batch()"
+
+      * "Adapter.insight_mining()"
+
+    * "Analyzer"
+
+      * "Analyzer.run()"
+
+    * "NestedDataset"
+
+      * "NestedDataset.schema()"
+
+      * "NestedDataset.get()"
+
+      * "NestedDataset.get_column()"
+
+      * "NestedDataset.process()"
+
+      * "NestedDataset.update_args()"
+
+      * "NestedDataset.map()"
+
+      * "NestedDataset.filter()"
+
+      * "NestedDataset.select()"
+
+      * "NestedDataset.from_dict()"
+
+      * "NestedDataset.add_column()"
+
+      * "NestedDataset.select_columns()"
+
+      * "NestedDataset.remove_columns()"
+
+      * "NestedDataset.cleanup_cache_files()"
+
+      * "NestedDataset.load_from_disk()"
+
+    * "ExecutorBase"
+
+      * "ExecutorBase.run()"
+
+    * "ExecutorFactory"
+
+      * "ExecutorFactory.create_executor()"
+
+    * "DefaultExecutor"
+
+      * "DefaultExecutor.run()"
+
+      * "DefaultExecutor.sample_data()"
+
+    * "Exporter"
+
+      * "Exporter.KiB"
+
+      * "Exporter.MiB"
+
+      * "Exporter.GiB"
+
+      * "Exporter.TiB"
+
+      * "Exporter.export()"
+
+      * "Exporter.export_compute_stats()"
+
+      * "Exporter.to_jsonl()"
+
+      * "Exporter.to_json()"
+
+      * "Exporter.to_parquet()"
+
+    * "Monitor"
+
+      * "Monitor.DYNAMIC_FIELDS"
+
+      * "Monitor.monitor_all_resources()"
+
+      * "Monitor.monitor_current_resources()"
+
+      * "Monitor.draw_resource_util_graph()"
+
+      * "Monitor.analyze_resource_util_list()"
+
+      * "Monitor.analyze_single_resource_util()"
+
+      * "Monitor.monitor_func()"
+
+    * "Tracer"
+
+      * "Tracer.trace_mapper()"
+
+      * "Tracer.trace_batch_mapper()"
+
+      * "Tracer.trace_filter()"
+
+      * "Tracer.trace_deduplicator()"
+
+* data_juicer.download package
+
+  * Submodules
+
+  * data_juicer.download.arxiv module
+
+  * data_juicer.download.commoncrawl module
+
+  * data_juicer.download.downloader module
+
+    * "DocumentDownloader"
+
+      * "DocumentDownloader.download()"
+
+    * "DocumentIterator"
+
+      * "DocumentIterator.iterate()"
+
+    * "DocumentExtractor"
+
+      * "DocumentExtractor.extract()"
+
+    * "download_and_extract()"
+
+    * "get_wikipedia_urls()"
+
+    * "get_arxiv_urls()"
+
+    * "validate_snapshot_format()"
+
+  * data_juicer.download.wikipedia module
+
+    * "WikipediaDownloader"
+
+      * "WikipediaDownloader.download()"
+
+    * "WikipediaIterator"
+
+      * "WikipediaIterator.iterate()"
+
+    * "WikipediaExtractor"
+
+      * "WikipediaExtractor.extract()"
+
+    * "download_wikipedia()"
+
+  * Module contents
+
+* data_juicer.format package
+
+  * Submodules
+
+  * data_juicer.format.csv_formatter module
+
+    * "CsvFormatter"
+
+      * "CsvFormatter.SUFFIXES"
+
+  * data_juicer.format.empty_formatter module
+
+    * "EmptyFormatter"
+
+      * "EmptyFormatter.SUFFIXES"
+
+      * "EmptyFormatter.null_value"
+
+      * "EmptyFormatter.load_dataset()"
+
+    * "RayEmptyFormatter"
+
+      * "RayEmptyFormatter.SUFFIXES"
+
+      * "RayEmptyFormatter.null_value"
+
+      * "RayEmptyFormatter.load_dataset()"
+
+  * data_juicer.format.formatter module
+
+    * "BaseFormatter"
+
+      * "BaseFormatter.load_dataset()"
+
+    * "LocalFormatter"
+
+      * "LocalFormatter.load_dataset()"
+
+    * "RemoteFormatter"
+
+      * "RemoteFormatter.load_dataset()"
+
+    * "add_suffixes()"
+
+    * "unify_format()"
+
+  * data_juicer.format.json_formatter module
+
+    * "JsonFormatter"
+
+      * "JsonFormatter.SUFFIXES"
+
+  * data_juicer.format.load module
+
+    * "load_formatter()"
+
+  * data_juicer.format.parquet_formatter module
+
+    * "ParquetFormatter"
+
+      * "ParquetFormatter.SUFFIXES"
+
+  * data_juicer.format.text_formatter module
+
+    * "extract_txt_from_docx()"
+
+    * "extract_txt_from_pdf()"
+
+    * "TextFormatter"
+
+      * "TextFormatter.SUFFIXES"
+
+      * "TextFormatter.load_dataset()"
+
+  * data_juicer.format.tsv_formatter module
+
+    * "TsvFormatter"
+
+      * "TsvFormatter.SUFFIXES"
+
+  * Module contents
+
+    * "JsonFormatter"
+
+      * "JsonFormatter.SUFFIXES"
+
+    * "LocalFormatter"
+
+      * "LocalFormatter.load_dataset()"
+
+    * "RemoteFormatter"
+
+      * "RemoteFormatter.load_dataset()"
+
+    * "TextFormatter"
+
+      * "TextFormatter.SUFFIXES"
+
+      * "TextFormatter.load_dataset()"
+
+    * "ParquetFormatter"
+
+      * "ParquetFormatter.SUFFIXES"
+
+    * "CsvFormatter"
+
+      * "CsvFormatter.SUFFIXES"
+
+    * "TsvFormatter"
+
+      * "TsvFormatter.SUFFIXES"
+
+    * "EmptyFormatter"
+
+      * "EmptyFormatter.SUFFIXES"
+
+      * "EmptyFormatter.null_value"
+
+      * "EmptyFormatter.load_dataset()"
+
+    * "RayEmptyFormatter"
+
+      * "RayEmptyFormatter.SUFFIXES"
+
+      * "RayEmptyFormatter.null_value"
+
+      * "RayEmptyFormatter.load_dataset()"
+
+* data_juicer.ops package
+
+  * Subpackages
+
+    * data_juicer.ops.aggregator package
+
+      * Submodules
+
+      * data_juicer.ops.aggregator.entity_attribute_aggregator module
+
+      * data_juicer.ops.aggregator.meta_tags_aggregator module
+
+      * data_juicer.ops.aggregator.most_relevant_entities_aggregator
+        module
+
+      * data_juicer.ops.aggregator.nested_aggregator module
+
+      * Module contents
+
+    * data_juicer.ops.common package
+
+      * Submodules
+
+      * data_juicer.ops.common.helper_func module
+
+      * data_juicer.ops.common.prompt2prompt_pipeline module
+
+      * data_juicer.ops.common.special_characters module
+
+      * Module contents
+
+    * data_juicer.ops.deduplicator package
+
+      * Submodules
+
+      * data_juicer.ops.deduplicator.document_deduplicator module
+
+      * data_juicer.ops.deduplicator.document_minhash_deduplicator
+        module
+
+      * data_juicer.ops.deduplicator.document_simhash_deduplicator
+        module
+
+      * data_juicer.ops.deduplicator.image_deduplicator module
+
+      * data_juicer.ops.deduplicator.ray_basic_deduplicator module
+
+      * data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator
+        module
+
+      * data_juicer.ops.deduplicator.ray_document_deduplicator module
+
+      * data_juicer.ops.deduplicator.ray_image_deduplicator module
+
+      * data_juicer.ops.deduplicator.ray_video_deduplicator module
+
+      * data_juicer.ops.deduplicator.video_deduplicator module
+
+      * Module contents
+
+    * data_juicer.ops.filter package
+
+      * Submodules
+
+      * data_juicer.ops.filter.alphanumeric_filter module
+
+      * data_juicer.ops.filter.audio_duration_filter module
+
+      * data_juicer.ops.filter.audio_nmf_snr_filter module
+
+      * data_juicer.ops.filter.audio_size_filter module
+
+      * data_juicer.ops.filter.average_line_length_filter module
+
+      * data_juicer.ops.filter.character_repetition_filter module
+
+      * data_juicer.ops.filter.flagged_words_filter module
+
+      * data_juicer.ops.filter.general_field_filter module
+
+      * data_juicer.ops.filter.image_aesthetics_filter module
+
+      * data_juicer.ops.filter.image_aspect_ratio_filter module
+
+      * data_juicer.ops.filter.image_face_count_filter module
+
+      * data_juicer.ops.filter.image_face_ratio_filter module
+
+      * data_juicer.ops.filter.image_nsfw_filter module
+
+      * data_juicer.ops.filter.image_pair_similarity_filter module
+
+      * data_juicer.ops.filter.image_shape_filter module
+
+      * data_juicer.ops.filter.image_size_filter module
+
+      * data_juicer.ops.filter.image_text_matching_filter module
+
+      * data_juicer.ops.filter.image_text_similarity_filter module
+
+      * data_juicer.ops.filter.image_watermark_filter module
+
+      * data_juicer.ops.filter.language_id_score_filter module
+
+      * data_juicer.ops.filter.llm_difficulty_score_filter module
+
+      * data_juicer.ops.filter.llm_quality_score_filter module
+
+      * data_juicer.ops.filter.maximum_line_length_filter module
+
+      * data_juicer.ops.filter.perplexity_filter module
+
+      * data_juicer.ops.filter.phrase_grounding_recall_filter module
+
+      * data_juicer.ops.filter.special_characters_filter module
+
+      * data_juicer.ops.filter.specified_field_filter module
+
+      * data_juicer.ops.filter.specified_numeric_field_filter module
+
+      * data_juicer.ops.filter.stopwords_filter module
+
+      * data_juicer.ops.filter.suffix_filter module
+
+      * data_juicer.ops.filter.text_action_filter module
+
+      * data_juicer.ops.filter.text_entity_dependency_filter module
+
+      * data_juicer.ops.filter.text_length_filter module
+
+      * data_juicer.ops.filter.text_pair_similarity_filter module
+
+      * data_juicer.ops.filter.token_num_filter module
+
+      * data_juicer.ops.filter.video_aesthetics_filter module
+
+      * data_juicer.ops.filter.video_aspect_ratio_filter module
+
+      * data_juicer.ops.filter.video_duration_filter module
+
+      * data_juicer.ops.filter.video_frames_text_similarity_filter
+        module
+
+      * data_juicer.ops.filter.video_motion_score_filter module
+
+      * data_juicer.ops.filter.video_motion_score_raft_filter module
+
+      * data_juicer.ops.filter.video_nsfw_filter module
+
+      * data_juicer.ops.filter.video_ocr_area_ratio_filter module
+
+      * data_juicer.ops.filter.video_resolution_filter module
+
+      * data_juicer.ops.filter.video_tagging_from_frames_filter module
+
+      * data_juicer.ops.filter.video_watermark_filter module
+
+      * data_juicer.ops.filter.word_repetition_filter module
+
+      * data_juicer.ops.filter.words_num_filter module
+
+      * Module contents
+
+    * data_juicer.ops.grouper package
+
+      * Submodules
+
+      * data_juicer.ops.grouper.key_value_grouper module
+
+      * data_juicer.ops.grouper.naive_grouper module
+
+      * data_juicer.ops.grouper.naive_reverse_grouper module
+
+      * Module contents
+
+    * data_juicer.ops.mapper package
+
+      * Subpackages
+
+      * Submodules
+
+      * data_juicer.ops.mapper.audio_add_gaussian_noise_mapper module
+
+      * data_juicer.ops.mapper.audio_ffmpeg_wrapped_mapper module
+
+      * data_juicer.ops.mapper.calibrate_qa_mapper module
+
+      * data_juicer.ops.mapper.calibrate_query_mapper module
+
+      * data_juicer.ops.mapper.calibrate_response_mapper module
+
+      * data_juicer.ops.mapper.chinese_convert_mapper module
+
+      * data_juicer.ops.mapper.clean_copyright_mapper module
+
+      * data_juicer.ops.mapper.clean_email_mapper module
+
+      * data_juicer.ops.mapper.clean_html_mapper module
+
+      * data_juicer.ops.mapper.clean_ip_mapper module
+
+      * data_juicer.ops.mapper.clean_links_mapper module
+
+      * data_juicer.ops.mapper.dialog_intent_detection_mapper module
+
+      * data_juicer.ops.mapper.dialog_sentiment_detection_mapper
+        module
+
+      * data_juicer.ops.mapper.dialog_sentiment_intensity_mapper
+        module
+
+      * data_juicer.ops.mapper.dialog_topic_detection_mapper module
+
+      * data_juicer.ops.mapper.expand_macro_mapper module
+
+      * data_juicer.ops.mapper.extract_entity_attribute_mapper module
+
+      * data_juicer.ops.mapper.extract_entity_relation_mapper module
+
+      * data_juicer.ops.mapper.extract_event_mapper module
+
+      * data_juicer.ops.mapper.extract_keyword_mapper module
+
+      * data_juicer.ops.mapper.extract_nickname_mapper module
+
+      * data_juicer.ops.mapper.extract_support_text_mapper module
+
+      * data_juicer.ops.mapper.extract_tables_from_html_mapper module
+
+      * data_juicer.ops.mapper.fix_unicode_mapper module
+
+      * data_juicer.ops.mapper.generate_qa_from_examples_mapper module
+
+      * data_juicer.ops.mapper.generate_qa_from_text_mapper module
+
+      * data_juicer.ops.mapper.image_blur_mapper module
+
+      * data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper
+        module
+
+      * data_juicer.ops.mapper.image_captioning_mapper module
+
+      * data_juicer.ops.mapper.image_diffusion_mapper module
+
+      * data_juicer.ops.mapper.image_face_blur_mapper module
+
+      * data_juicer.ops.mapper.image_remove_background_mapper module
+
+      * data_juicer.ops.mapper.image_segment_mapper module
+
+      * data_juicer.ops.mapper.image_tagging_mapper module
+
+      * data_juicer.ops.mapper.imgdiff_difference_area_generator_mapp
+        er module
+
+      * data_juicer.ops.mapper.imgdiff_difference_caption_generator_m
+        apper module
+
+      * data_juicer.ops.mapper.mllm_mapper module
+
+      * data_juicer.ops.mapper.nlpaug_en_mapper module
+
+      * data_juicer.ops.mapper.nlpcda_zh_mapper module
+
+      * data_juicer.ops.mapper.optimize_qa_mapper module
+
+      * data_juicer.ops.mapper.optimize_query_mapper module
+
+      * data_juicer.ops.mapper.optimize_response_mapper module
+
+      * data_juicer.ops.mapper.pair_preference_mapper module
+
+      * data_juicer.ops.mapper.punctuation_normalization_mapper module
+
+      * data_juicer.ops.mapper.python_file_mapper module
+
+      * data_juicer.ops.mapper.python_lambda_mapper module
+
+      * data_juicer.ops.mapper.query_intent_detection_mapper module
+
+      * data_juicer.ops.mapper.query_sentiment_detection_mapper module
+
+      * data_juicer.ops.mapper.query_topic_detection_mapper module
+
+      * data_juicer.ops.mapper.relation_identity_mapper module
+
+      * data_juicer.ops.mapper.remove_bibliography_mapper module
+
+      * data_juicer.ops.mapper.remove_comments_mapper module
+
+      * data_juicer.ops.mapper.remove_header_mapper module
+
+      * data_juicer.ops.mapper.remove_long_words_mapper module
+
+      * data_juicer.ops.mapper.remove_non_chinese_character_mapper
+        module
+
+      * data_juicer.ops.mapper.remove_repeat_sentences_mapper module
+
+      * data_juicer.ops.mapper.remove_specific_chars_mapper module
+
+      * data_juicer.ops.mapper.remove_table_text_mapper module
+
+      * data_juicer.ops.mapper.remove_words_with_incorrect_substrings
+        _mapper module
+
+      * data_juicer.ops.mapper.replace_content_mapper module
+
+      * data_juicer.ops.mapper.sdxl_prompt2prompt_mapper module
+
+      * data_juicer.ops.mapper.sentence_augmentation_mapper module
+
+      * data_juicer.ops.mapper.sentence_split_mapper module
+
+      * data_juicer.ops.mapper.text_chunk_mapper module
+
+      * data_juicer.ops.mapper.video_captioning_from_audio_mapper
+        module
+
+      * data_juicer.ops.mapper.video_captioning_from_frames_mapper
+        module
+
+      * data_juicer.ops.mapper.video_captioning_from_summarizer_mapper
+        module
+
+      * data_juicer.ops.mapper.video_captioning_from_video_mapper
+        module
+
+      * data_juicer.ops.mapper.video_extract_frames_mapper module
+
+      * data_juicer.ops.mapper.video_face_blur_mapper module
+
+      * data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper module
+
+      * data_juicer.ops.mapper.video_remove_watermark_mapper module
+
+      * data_juicer.ops.mapper.video_resize_aspect_ratio_mapper module
+
+      * data_juicer.ops.mapper.video_resize_resolution_mapper module
+
+      * data_juicer.ops.mapper.video_split_by_duration_mapper module
+
+      * data_juicer.ops.mapper.video_split_by_key_frame_mapper module
+
+      * data_juicer.ops.mapper.video_split_by_scene_mapper module
+
+      * data_juicer.ops.mapper.video_tagging_from_audio_mapper module
+
+      * data_juicer.ops.mapper.video_tagging_from_frames_mapper module
+
+      * data_juicer.ops.mapper.whitespace_normalization_mapper module
+
+      * Module contents
+
+    * data_juicer.ops.selector package
+
+      * Submodules
+
+      * data_juicer.ops.selector.frequency_specified_field_selector
+        module
+
+      * data_juicer.ops.selector.random_selector module
+
+      * data_juicer.ops.selector.range_specified_field_selector module
+
+      * data_juicer.ops.selector.tags_specified_field_selector module
+
+      * data_juicer.ops.selector.topk_specified_field_selector module
+
+      * Module contents
+
+  * Submodules
+
+  * data_juicer.ops.base_op module
+
+    * "convert_list_dict_to_dict_list()"
+
+    * "convert_dict_list_to_list_dict()"
+
+    * "convert_arrow_to_python()"
+
+    * "catch_map_batches_exception()"
+
+    * "catch_map_single_exception()"
+
+    * "OP"
+
+      * "OP.is_batched_op()"
+
+      * "OP.process()"
+
+      * "OP.use_cuda()"
+
+      * "OP.runtime_np()"
+
+      * "OP.remove_extra_parameters()"
+
+      * "OP.add_parameters()"
+
+      * "OP.run()"
+
+      * "OP.empty_history()"
+
+    * "Mapper"
+
+      * "Mapper.process_batched()"
+
+      * "Mapper.process_single()"
+
+      * "Mapper.run()"
+
+    * "Filter"
+
+      * "Filter.compute_stats_batched()"
+
+      * "Filter.process_batched()"
+
+      * "Filter.compute_stats_single()"
+
+      * "Filter.process_single()"
+
+      * "Filter.run()"
+
+    * "Deduplicator"
+
+      * "Deduplicator.compute_hash()"
+
+      * "Deduplicator.process()"
+
+      * "Deduplicator.run()"
+
+    * "Selector"
+
+      * "Selector.process()"
+
+      * "Selector.run()"
+
+    * "Grouper"
+
+      * "Grouper.process()"
+
+      * "Grouper.run()"
+
+    * "Aggregator"
+
+      * "Aggregator.process_single()"
+
+      * "Aggregator.run()"
+
+  * data_juicer.ops.load module
+
+    * "load_ops()"
+
+  * data_juicer.ops.mixins module
+
+    * "EventDrivenMixin"
+
+      * "EventDrivenMixin.register_event_handler()"
+
+      * "EventDrivenMixin.trigger_event()"
+
+      * "EventDrivenMixin.start_polling()"
+
+      * "EventDrivenMixin.stop_polling()"
+
+      * "EventDrivenMixin.stop_all_polling()"
+
+      * "EventDrivenMixin.wait_for_completion()"
+
+    * "NotificationMixin"
+
+      * "NotificationMixin.send_notification()"
+
+  * data_juicer.ops.op_fusion module
+
+    * "fuse_operators()"
+
+    * "fuse_filter_group()"
+
+    * "FusedFilter"
+
+      * "FusedFilter.compute_stats_batched()"
+
+      * "FusedFilter.process_batched()"
+
+    * "GeneralFusedOP"
+
+      * "GeneralFusedOP.process_batched()"
+
+      * "GeneralFusedOP.run()"
+
+  * Module contents
+
+    * "load_ops()"
+
+    * "Filter"
+
+      * "Filter.compute_stats_batched()"
+
+      * "Filter.process_batched()"
+
+      * "Filter.compute_stats_single()"
+
+      * "Filter.process_single()"
+
+      * "Filter.run()"
+
+    * "Mapper"
+
+      * "Mapper.process_batched()"
+
+      * "Mapper.process_single()"
+
+      * "Mapper.run()"
+
+    * "Deduplicator"
+
+      * "Deduplicator.compute_hash()"
+
+      * "Deduplicator.process()"
+
+      * "Deduplicator.run()"
+
+    * "Selector"
+
+      * "Selector.process()"
+
+      * "Selector.run()"
+
+    * "Grouper"
+
+      * "Grouper.process()"
+
+      * "Grouper.run()"
+
+    * "Aggregator"
+
+      * "Aggregator.process_single()"
+
+      * "Aggregator.run()"
+
+* data_juicer.tools package
+
+  * Module contents
+
+* data_juicer.utils package
+
+  * Submodules
+
+  * data_juicer.utils.asset_utils module
+
+    * "load_words_asset()"
+
+  * data_juicer.utils.availability_utils module
+
+  * data_juicer.utils.cache_utils module
+
+    * "DatasetCacheControl"
+
+    * "dataset_cache_control()"
+
+  * data_juicer.utils.ckpt_utils module
+
+    * "CheckpointManager"
+
+      * "CheckpointManager.get_left_process_list()"
+
+      * "CheckpointManager.check_ckpt()"
+
+      * "CheckpointManager.record()"
+
+      * "CheckpointManager.check_ops_to_skip()"
+
+      * "CheckpointManager.save_ckpt()"
+
+      * "CheckpointManager.load_ckpt()"
+
+  * data_juicer.utils.common_utils module
+
+    * "stats_to_number()"
+
+    * "dict_to_hash()"
+
+    * "nested_access()"
+
+    * "is_string_list()"
+
+    * "avg_split_string_list_under_limit()"
+
+    * "is_float()"
+
+  * data_juicer.utils.compress module
+
+    * "FileLock"
+
+    * "Extractor"
+
+      * "Extractor.extract()"
+
+    * "BaseCompressor"
+
+      * "BaseCompressor.compress()"
+
+    * "ZstdCompressor"
+
+      * "ZstdCompressor.compress()"
+
+    * "Lz4Compressor"
+
+      * "Lz4Compressor.compress()"
+
+    * "GzipCompressor"
+
+      * "GzipCompressor.compress()"
+
+    * "Compressor"
+
+      * "Compressor.compressors"
+
+      * "Compressor.compress()"
+
+    * "CompressManager"
+
+      * "CompressManager.compress()"
+
+      * "CompressManager.decompress()"
+
+    * "CacheCompressManager"
+
+      * "CacheCompressManager.compress()"
+
+      * "CacheCompressManager.decompress()"
+
+      * "CacheCompressManager.format_cache_file_name()"
+
+      * "CacheCompressManager.cleanup_cache_files()"
+
+    * "CompressionOff"
+
+    * "compress()"
+
+    * "decompress()"
+
+    * "cleanup_compressed_cache_files()"
+
+  * data_juicer.utils.constant module
+
+    * "Fields"
+
+      * "Fields.stats"
+
+      * "Fields.meta"
+
+      * "Fields.batch_meta"
+
+      * "Fields.context"
+
+      * "Fields.suffix"
+
+      * "Fields.source_file"
+
+      * "Fields.multimodal_data_output_dir"
+
+    * "BatchMetaKeys"
+
+      * "BatchMetaKeys.entity_attribute"
+
+      * "BatchMetaKeys.most_relevant_entities"
+
+    * "MetaKeys"
+
+      * "MetaKeys.dialog_sentiment_intensity"
+
+      * "MetaKeys.dialog_sentiment_intensity_analysis"
+
+      * "MetaKeys.query_sentiment_label"
+
+      * "MetaKeys.query_sentiment_score"
+
+      * "MetaKeys.dialog_sentiment_labels"
+
+      * "MetaKeys.dialog_sentiment_labels_analysis"
+
+      * "MetaKeys.dialog_intent_labels"
+
+      * "MetaKeys.dialog_intent_labels_analysis"
+
+      * "MetaKeys.query_intent_label"
+
+      * "MetaKeys.query_intent_score"
+
+      * "MetaKeys.dialog_topic_labels"
+
+      * "MetaKeys.dialog_topic_labels_analysis"
+
+      * "MetaKeys.query_topic_label"
+
+      * "MetaKeys.query_topic_score"
+
+      * "MetaKeys.video_frame_tags"
+
+      * "MetaKeys.video_audio_tags"
+
+      * "MetaKeys.video_frames"
+
+      * "MetaKeys.image_tags"
+
+      * "MetaKeys.bbox_tag"
+
+      * "MetaKeys.event_description"
+
+      * "MetaKeys.relevant_characters"
+
+      * "MetaKeys.main_entities"
+
+      * "MetaKeys.attributes"
+
+      * "MetaKeys.attribute_descriptions"
+
+      * "MetaKeys.attribute_support_texts"
+
+      * "MetaKeys.nickname"
+
+      * "MetaKeys.entity"
+
+      * "MetaKeys.entity_name"
+
+      * "MetaKeys.entity_type"
+
+      * "MetaKeys.entity_description"
+
+      * "MetaKeys.relation"
+
+      * "MetaKeys.source_entity"
+
+      * "MetaKeys.target_entity"
+
+      * "MetaKeys.relation_description"
+
+      * "MetaKeys.relation_keywords"
+
+      * "MetaKeys.relation_strength"
+
+      * "MetaKeys.keyword"
+
+      * "MetaKeys.support_text"
+
+      * "MetaKeys.role_relation"
+
+      * "MetaKeys.html_tables"
+
+    * "StatsKeysMeta"
+
+      * "StatsKeysMeta.get_access_log()"
+
+    * "StatsKeysConstant"
+
+      * "StatsKeysConstant.alpha_token_ratio"
+
+      * "StatsKeysConstant.alnum_ratio"
+
+      * "StatsKeysConstant.avg_line_length"
+
+      * "StatsKeysConstant.char_rep_ratio"
+
+      * "StatsKeysConstant.flagged_words_ratio"
+
+      * "StatsKeysConstant.lang"
+
+      * "StatsKeysConstant.lang_score"
+
+      * "StatsKeysConstant.max_line_length"
+
+      * "StatsKeysConstant.perplexity"
+
+      * "StatsKeysConstant.special_char_ratio"
+
+      * "StatsKeysConstant.stopwords_ratio"
+
+      * "StatsKeysConstant.text_len"
+
+      * "StatsKeysConstant.text_pair_similarity"
+
+      * "StatsKeysConstant.num_action"
+
+      * "StatsKeysConstant.num_dependency_edges"
+
+      * "StatsKeysConstant.num_token"
+
+      * "StatsKeysConstant.num_words"
+
+      * "StatsKeysConstant.word_rep_ratio"
+
+      * "StatsKeysConstant.llm_quality_score"
+
+      * "StatsKeysConstant.llm_quality_record"
+
+      * "StatsKeysConstant.llm_difficulty_score"
+
+      * "StatsKeysConstant.llm_difficulty_record"
+
+      * "StatsKeysConstant.aspect_ratios"
+
+      * "StatsKeysConstant.image_width"
+
+      * "StatsKeysConstant.image_height"
+
+      * "StatsKeysConstant.image_sizes"
+
+      * "StatsKeysConstant.face_ratios"
+
+      * "StatsKeysConstant.face_detections"
+
+      * "StatsKeysConstant.face_counts"
+
+      * "StatsKeysConstant.image_aesthetics_scores"
+
+      * "StatsKeysConstant.image_nsfw_score"
+
+      * "StatsKeysConstant.image_watermark_prob"
+
+      * "StatsKeysConstant.image_pair_similarity"
+
+      * "StatsKeysConstant.audio_duration"
+
+      * "StatsKeysConstant.audio_nmf_snr"
+
+      * "StatsKeysConstant.audio_sizes"
+
+      * "StatsKeysConstant.video_duration"
+
+      * "StatsKeysConstant.video_aspect_ratios"
+
+      * "StatsKeysConstant.video_width"
+
+      * "StatsKeysConstant.video_height"
+
+      * "StatsKeysConstant.video_ocr_area_ratio"
+
+      * "StatsKeysConstant.video_aesthetic_score"
+
+      * "StatsKeysConstant.video_frames_aesthetics_score"
+
+      * "StatsKeysConstant.video_motion_score"
+
+      * "StatsKeysConstant.video_nsfw_score"
+
+      * "StatsKeysConstant.video_watermark_prob"
+
+      * "StatsKeysConstant.image_text_similarity"
+
+      * "StatsKeysConstant.image_text_matching_score"
+
+      * "StatsKeysConstant.phrase_grounding_recall"
+
+      * "StatsKeysConstant.video_frames_text_similarity"
+
+      * "StatsKeysConstant.general_field_filter_condition"
+
+    * "StatsKeys"
+
+    * "HashKeys"
+
+      * "HashKeys.uid"
+
+      * "HashKeys.hash"
+
+      * "HashKeys.minhash"
+
+      * "HashKeys.simhash"
+
+      * "HashKeys.imagehash"
+
+      * "HashKeys.videohash"
+
+      * "HashKeys.is_unique"
+
+    * "InterVars"
+
+      * "InterVars.lines"
+
+      * "InterVars.words"
+
+      * "InterVars.refined_words"
+
+      * "InterVars.loaded_images"
+
+      * "InterVars.loaded_audios"
+
+      * "InterVars.loaded_videos"
+
+      * "InterVars.sampled_frames"
+
+    * "JobRequiredKeys"
+
+      * "JobRequiredKeys.hook"
+
+      * "JobRequiredKeys.dj_configs"
+
+      * "JobRequiredKeys.meta_name"
+
+      * "JobRequiredKeys.extra_configs"
+
+  * data_juicer.utils.file_utils module
+
+    * "follow_read()"
+
+    * "find_files_with_suffix()"
+
+    * "is_absolute_path()"
+
+    * "add_suffix_to_filename()"
+
+    * "create_directory_if_not_exists()"
+
+    * "transfer_data_dir()"
+
+    * "transfer_filename()"
+
+    * "copy_data()"
+
+    * "expand_outdir_and_mkdir()"
+
+    * "single_partition_write_with_filename()"
+
+    * "read_single_partition()"
+
+    * "get_all_files_paths_under()"
+
+  * data_juicer.utils.fingerprint_utils module
+
+    * "Hasher"
+
+      * "Hasher.dispatch"
+
+      * "Hasher.hash_bytes()"
+
+      * "Hasher.hash_default()"
+
+      * "Hasher.hash()"
+
+      * "Hasher.update()"
+
+      * "Hasher.hexdigest()"
+
+    * "update_fingerprint()"
+
+    * "generate_fingerprint()"
+
+  * data_juicer.utils.lazy_loader module
+
+    * "get_toml_file_path()"
+
+    * "get_uv_lock_path()"
+
+    * "LazyLoader"
+
+      * "LazyLoader.get_package_name()"
+
+      * "LazyLoader.reset_dependencies_cache()"
+
+      * "LazyLoader.get_all_dependencies()"
+
+      * "LazyLoader.check_packages()"
+
+  * data_juicer.utils.logger_utils module
+
+    * "get_caller_name()"
+
+    * "StreamToLoguru"
+
+      * "StreamToLoguru.fileno()"
+
+      * "StreamToLoguru.write()"
+
+      * "StreamToLoguru.getvalue()"
+
+      * "StreamToLoguru.flush()"
+
+      * "StreamToLoguru.isatty()"
+
+    * "redirect_sys_output()"
+
+    * "get_log_file_path()"
+
+    * "setup_logger()"
+
+    * "make_log_summarization()"
+
+    * "HiddenPrints"
+
+  * data_juicer.utils.mm_utils module
+
+    * "SpecialTokens"
+
+      * "SpecialTokens.image"
+
+      * "SpecialTokens.audio"
+
+      * "SpecialTokens.video"
+
+      * "SpecialTokens.eoc"
+
+    * "AV_STREAM_THREAD_TYPE"
+
+    * "get_special_tokens()"
+
+    * "remove_special_tokens()"
+
+    * "remove_non_special_tokens()"
+
+    * "load_data_with_context()"
+
+    * "load_images()"
+
+    * "load_images_byte()"
+
+    * "load_image()"
+
+    * "load_image_byte()"
+
+    * "image_path_to_base64()"
+
+    * "image_byte_to_base64()"
+
+    * "pil_to_opencv()"
+
+    * "detect_faces()"
+
+    * "get_file_size()"
+
+    * "iou()"
+
+    * "calculate_resized_dimensions()"
+
+    * "load_audios()"
+
+    * "load_audio()"
+
+    * "load_videos()"
+
+    * "load_video()"
+
+    * "get_video_duration()"
+
+    * "get_decoded_frames_from_video()"
+
+    * "cut_video_by_seconds()"
+
+    * "process_each_frame()"
+
+    * "extract_key_frames_by_seconds()"
+
+    * "extract_key_frames()"
+
+    * "get_key_frame_seconds()"
+
+    * "extract_video_frames_uniformly_by_seconds()"
+
+    * "extract_video_frames_uniformly()"
+
+    * "extract_audio_from_video()"
+
+    * "size_to_bytes()"
+
+    * "insert_texts_after_placeholders()"
+
+    * "timecode_string_to_seconds()"
+
+    * "parse_string_to_roi()"
+
+    * "close_video()"
+
+  * data_juicer.utils.model_utils module
+
+    * "get_backup_model_link()"
+
+    * "check_model()"
+
+    * "filter_arguments()"
+
+    * "ChatAPIModel"
+
+    * "EmbeddingAPIModel"
+
+    * "prepare_api_model()"
+
+    * "prepare_diffusion_model()"
+
+    * "prepare_fastsam_model()"
+
+    * "prepare_fasttext_model()"
+
+    * "prepare_huggingface_model()"
+
+    * "prepare_kenlm_model()"
+
+    * "prepare_nltk_model()"
+
+    * "prepare_nltk_pos_tagger()"
+
+    * "prepare_opencv_classifier()"
+
+    * "prepare_recognizeAnything_model()"
+
+    * "prepare_sdxl_prompt2prompt()"
+
+    * "prepare_sentencepiece_model()"
+
+    * "prepare_sentencepiece_for_lang()"
+
+    * "prepare_simple_aesthetics_model()"
+
+    * "prepare_spacy_model()"
+
+    * "prepare_video_blip_model()"
+
+    * "prepare_vllm_model()"
+
+    * "prepare_embedding_model()"
+
+    * "update_sampling_params()"
+
+    * "prepare_model()"
+
+    * "get_model()"
+
+    * "free_models()"
+
+  * data_juicer.utils.nltk_utils module
+
+    * "ensure_nltk_resource()"
+
+    * "clean_nltk_cache()"
+
+    * "patch_nltk_pickle_security()"
+
+    * "create_physical_resource_alias()"
+
+    * "setup_resource_aliases()"
+
+  * data_juicer.utils.process_utils module
+
+    * "setup_mp()"
+
+    * "get_min_cuda_memory()"
+
+    * "calculate_np()"
+
+  * data_juicer.utils.registry module
+
+    * "Registry"
+
+      * "Registry.name"
+
+      * "Registry.modules"
+
+      * "Registry.list()"
+
+      * "Registry.get()"
+
+      * "Registry.register_module()"
+
+  * data_juicer.utils.resource_utils module
+
+    * "query_cuda_info()"
+
+    * "get_cpu_count()"
+
+    * "get_cpu_utilization()"
+
+    * "query_mem_info()"
+
+  * data_juicer.utils.sample module
+
+    * "random_sample()"
+
+  * data_juicer.utils.unittest_utils module
+
+    * "TEST_TAG()"
+
+    * "set_clear_model_flag()"
+
+    * "DataJuicerTestCaseBase"
+
+      * "DataJuicerTestCaseBase.setUpClass()"
+
+      * "DataJuicerTestCaseBase.tearDownClass()"
+
+      * "DataJuicerTestCaseBase.tearDown()"
+
+      * "DataJuicerTestCaseBase.generate_dataset()"
+
+      * "DataJuicerTestCaseBase.run_single_op()"
+
+      * "DataJuicerTestCaseBase.assertDatasetEqual()"
+
+    * "get_diff_files()"
+
+    * "find_corresponding_test_file()"
+
+    * "get_partial_test_cases()"
+
+  * Module contents
+
+
+Module contents
+===============
+
+data_juicer.cuda_device_count()
+
+data_juicer.is_cuda_available()

@@ -1,0 +1,670 @@
+data_juicer.ops.deduplicator package
+************************************
+
+
+Submodules
+==========
+
+
+data_juicer.ops.deduplicator.document_deduplicator module
+=========================================================
+
+class data_juicer.ops.deduplicator.document_deduplicator.DocumentDeduplicator(lowercase: bool = False, ignore_non_character: bool = False, *args, **kwargs)
+
+   Bases: "Deduplicator"
+
+   Deduplicator to deduplicate samples at document-level using exact
+   matching.
+
+   Using md5 hash to deduplicate samples.
+
+   compute_hash(sample)
+
+      Compute md5 hash values for the sample.
+
+      Parameters:
+         **sample** -- input sample
+
+      Returns:
+         sample with md5 hash value.
+
+   process(dataset, show_num=0)
+
+      For doc-level, dataset --> dataset.
+
+      Parameters:
+         * **dataset** -- input dataset
+
+         * **show_num** -- number of traced samples used when tracer
+           is open.
+
+      Returns:
+         deduplicated dataset and the sampled duplicate pairs.
+
+
+data_juicer.ops.deduplicator.document_minhash_deduplicator module
+=================================================================
+
+data_juicer.ops.deduplicator.document_minhash_deduplicator.sha1_hash32(data)
+
+   Directly taken from datasketch package to avoid dependency.
+
+
+   Parameters
+   ----------
+
+   data : bytes
+
+
+   Returns
+   -------
+
+   int
+
+data_juicer.ops.deduplicator.document_minhash_deduplicator.optimal_param(threshold: float, num_perm: int, false_positive_weight: float = 0.5, false_negative_weight: float = 0.5)
+
+   Compute the optimal *MinHashLSH* parameter that minimizes the
+   weighted sum of probabilities of false positive and false negative,
+   taken from datasketch.
+
+   Parameters:
+      * **threshold** -- float. The threshold for similarity
+
+      * **num_perm** -- int. The number of permutations
+
+      * **false_positive_weight** -- float. The weight of false
+        positive
+
+      * **false_negative_weight** -- float. The weight of false
+        negative
+
+   Returns:
+      Tuple[int, int]. The optimal *b* and *r* parameters. The number
+      of bands, and the number of rows per band respectively
+
+class data_juicer.ops.deduplicator.document_minhash_deduplicator.DocumentMinhashDeduplicator(tokenization: str = 'space', window_size: Annotated[int, Gt(gt=0)] = 5, lowercase: bool = True, ignore_pattern: str | None = None, num_permutations: Annotated[int, Gt(gt=0)] = 256, jaccard_threshold: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] = 0.7, num_bands: Annotated[int, Gt(gt=0)] | None = None, num_rows_per_band: Annotated[int, Gt(gt=0)] | None = None, tokenizer_model: str | None = None, *args, **kwargs)
+
+   Bases: "Deduplicator"
+
+   Deduplicator to deduplicate samples at document-level using
+   MinHashLSH.
+
+   Different from simhash, minhash is stored as bytes, so they won't
+   be kept in the final dataset.
+
+   compute_hash(sample)
+
+      Compute minhash values for the sample.
+
+      Parameters:
+         **sample** -- input sample
+
+      Returns:
+         sample with minhash value.
+
+   process(dataset, show_num=0)
+
+      For doc-level, dataset --> dataset.
+
+      Parameters:
+         * **dataset** -- input dataset
+
+         * **show_num** -- number of traced samples used when tracer
+           is open.
+
+      Returns:
+         deduplicated dataset and the sampled duplicate pairs.
+
+
+data_juicer.ops.deduplicator.document_simhash_deduplicator module
+=================================================================
+
+class data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator(tokenization: str = 'space', window_size: Annotated[int, Gt(gt=0)] = 6, lowercase: bool = True, ignore_pattern: str | None = None, num_blocks: Annotated[int, Gt(gt=0)] = 6, hamming_distance: Annotated[int, Gt(gt=0)] = 4, *args, **kwargs)
+
+   Bases: "Deduplicator"
+
+   Deduplicator to deduplicate samples at document-level using
+   SimHash.
+
+   compute_hash(sample)
+
+      Compute simhash values for the sample.
+
+      Parameters:
+         **sample** -- input sample
+
+      Returns:
+         sample with simhash value.
+
+   process(dataset, show_num=0)
+
+      For doc-level, dataset --> dataset.
+
+      Parameters:
+         * **dataset** -- input dataset
+
+         * **show_num** -- number of traced samples used when tracer
+           is open.
+
+      Returns:
+         deduplicated dataset and the sampled duplicate pairs.
+
+
+data_juicer.ops.deduplicator.image_deduplicator module
+======================================================
+
+data_juicer.ops.deduplicator.image_deduplicator.get_hash_method(method_name)
+
+class data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator(method: str = 'phash', consider_text: bool = False, *args, **kwargs)
+
+   Bases: "Deduplicator"
+
+   Deduplicator to deduplicate samples at document-level using exact
+   matching of images between documents.
+
+   compute_hash(sample, context=False)
+
+      Compute hash values for the sample.
+
+      Parameters:
+         **sample** -- input sample
+
+      Returns:
+         sample with computed hash value.
+
+   process(dataset, show_num=0)
+
+      For doc-level, dataset --> dataset.
+
+      Parameters:
+         * **dataset** -- input dataset
+
+         * **show_num** -- number of traced samples used when tracer
+           is open.
+
+      Returns:
+         deduplicated dataset and the sampled duplicate pairs.
+
+
+data_juicer.ops.deduplicator.ray_basic_deduplicator module
+==========================================================
+
+class data_juicer.ops.deduplicator.ray_basic_deduplicator.DedupSet
+
+   Bases: "object"
+
+   is_unique(key)
+
+data_juicer.ops.deduplicator.ray_basic_deduplicator.get_remote_dedup_set()
+
+   Get the remote version of DedupSet with Ray decorator applied at
+   runtime.
+
+class data_juicer.ops.deduplicator.ray_basic_deduplicator.Backend(*args, **kwargs)
+
+   Bases: "ABC"
+
+   Backend for deduplicator.
+
+   abstract is_unique(md5_value: str)
+
+class data_juicer.ops.deduplicator.ray_basic_deduplicator.ActorBackend(dedup_set_num: int, RemoteDedupSet=None)
+
+   Bases: "Backend"
+
+   Ray actor backend for deduplicator.
+
+   is_unique(md5_value: str)
+
+class data_juicer.ops.deduplicator.ray_basic_deduplicator.RedisBackend(redis_address: str)
+
+   Bases: "Backend"
+
+   Redis backend for deduplicator.
+
+   is_unique(md5_value: str)
+
+class data_juicer.ops.deduplicator.ray_basic_deduplicator.RayBasicDeduplicator(backend: str = 'ray_actor', redis_address: str = 'redis://localhost:6379', *args, **kwargs)
+
+   Bases: "Filter"
+
+   A basic exact matching deduplicator for RAY. Although its
+   functionality is deduplication, it is implemented as Filter sub-
+   class.
+
+   EMPTY_HASH_VALUE = 'EMPTY'
+
+   calculate_hash(sample, context=False)
+
+      Calculate hash value for the sample.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+
+data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator module
+================================================================
+
+class data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.IdGenerator(start_id=0)
+
+   Bases: "object"
+
+   get_next_id(count)
+
+class data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.EdgeBuffer
+
+   Bases: "object"
+
+   clear()
+
+   set_edges(edge_dict)
+
+   get_edges(key)
+
+class data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.BTSUnionFind(union_threshold, parallel_num, parallel_id, remote_edge_buffers, max_pending_edge_buffer_task, num_edge_buffer_task_returns)
+
+   Bases: "object"
+
+   A distributed implementation of Union-Find with load balancing.
+
+   The original paper on BTS Union-Find is available at:
+   https://ieeexplore.ieee.org/document/10598116
+
+   add_key_value_pairs(pairs)
+
+   flush_key_value_pairs()
+
+   balanced_union_find()
+
+   distribute_edge(u, v)
+
+   set_edge_buffer()
+
+   edge_redistribution()
+
+   communication()
+
+   find(x)
+
+   union(x, y)
+
+   union_list(x_list)
+
+   rebalancing()
+
+   squeeze()
+
+   dup_idx(queries)
+
+data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.get_remote_classes()
+
+   Get remote versions of classes with Ray decorators applied at
+   runtime.
+
+class data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.RayBTSMinhashDeduplicator(tokenization: str = 'space', window_size: Annotated[int, Gt(gt=0)] = 5, lowercase: bool = True, ignore_pattern: str | None = None, num_permutations: Annotated[int, Gt(gt=0)] = 256, jaccard_threshold: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] = 0.7, num_bands: Annotated[int, Gt(gt=0)] | None = None, num_rows_per_band: Annotated[int, Gt(gt=0)] | None = None, tokenizer_model: str | None = None, union_find_parallel_num: int | str = 'auto', union_threshold: int | None = 256, max_pending_edge_buffer_task: int | None = 20, num_edge_buffer_task_returns: int | None = 10, max_pending_filter_tasks: int | None = 20, num_filter_task_returns: int | None = 10, merge_batch_size: int | None = 1000, *args, **kwargs)
+
+   Bases: "Deduplicator"
+
+   A MinhashLSH deduplicator based on RAY.
+
+   EMPTY_HASH_VALUE = 'EMPTY'
+
+   calc_minhash(text_list: Array, uid_list: List) -> Table
+
+   merge_op_batch(object_refs)
+
+   merge()
+
+   filter_with_union_find(samples: Table) -> Table
+
+   run(dataset, **kwargs)
+
+
+data_juicer.ops.deduplicator.ray_document_deduplicator module
+=============================================================
+
+class data_juicer.ops.deduplicator.ray_document_deduplicator.RayDocumentDeduplicator(backend: str = 'ray_actor', redis_address: str = 'redis://localhost:6379', lowercase: bool = False, ignore_non_character: bool = False, *args, **kwargs)
+
+   Bases: "RayBasicDeduplicator"
+
+   Deduplicator to deduplicate samples at document-level using exact
+   matching.
+
+   calculate_hash(sample, context=False)
+
+      Calculate hash value for the sample.
+
+
+data_juicer.ops.deduplicator.ray_image_deduplicator module
+==========================================================
+
+data_juicer.ops.deduplicator.ray_image_deduplicator.get_hash_method(method_name)
+
+class data_juicer.ops.deduplicator.ray_image_deduplicator.RayImageDeduplicator(backend: str = 'ray_actor', redis_address: str = 'redis://localhost:6379', method: str = 'phash', *args, **kwargs)
+
+   Bases: "RayBasicDeduplicator"
+
+   Deduplicator to deduplicate samples at document-level using exact
+   matching of images between documents.
+
+   calculate_hash(sample, context=False)
+
+      Calculate hash value for the sample.
+
+
+data_juicer.ops.deduplicator.ray_video_deduplicator module
+==========================================================
+
+class data_juicer.ops.deduplicator.ray_video_deduplicator.RayVideoDeduplicator(backend: str = 'ray_actor', redis_address: str = 'redis://localhost:6379', *args, **kwargs)
+
+   Bases: "RayBasicDeduplicator"
+
+   Deduplicator to deduplicate samples at document-level using exact
+   matching of videos between documents.
+
+   calculate_hash(sample, context=False)
+
+      Calculate hash value for the sample.
+
+
+data_juicer.ops.deduplicator.video_deduplicator module
+======================================================
+
+class data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator(consider_text: bool = False, *args, **kwargs)
+
+   Bases: "Deduplicator"
+
+   Deduplicator to deduplicate samples at document-level using exact
+   matching of videos between documents.
+
+   compute_hash(sample, context=False)
+
+      Compute hash values for the sample.
+
+      Parameters:
+         **sample** -- input sample
+
+      Returns:
+         sample with computed hash value.
+
+   process(dataset, show_num=0)
+
+      For doc-level, dataset --> dataset.
+
+      Parameters:
+         * **dataset** -- input dataset
+
+         * **show_num** -- number of traced samples used when tracer
+           is open.
+
+      Returns:
+         deduplicated dataset and the sampled duplicate pairs.
+
+
+Module contents
+===============
+
+class data_juicer.ops.deduplicator.DocumentDeduplicator(lowercase: bool = False, ignore_non_character: bool = False, *args, **kwargs)
+
+   Bases: "Deduplicator"
+
+   Deduplicator to deduplicate samples at document-level using exact
+   matching.
+
+   Using md5 hash to deduplicate samples.
+
+   compute_hash(sample)
+
+      Compute md5 hash values for the sample.
+
+      Parameters:
+         **sample** -- input sample
+
+      Returns:
+         sample with md5 hash value.
+
+   process(dataset, show_num=0)
+
+      For doc-level, dataset --> dataset.
+
+      Parameters:
+         * **dataset** -- input dataset
+
+         * **show_num** -- number of traced samples used when tracer
+           is open.
+
+      Returns:
+         deduplicated dataset and the sampled duplicate pairs.
+
+class data_juicer.ops.deduplicator.DocumentMinhashDeduplicator(tokenization: str = 'space', window_size: Annotated[int, Gt(gt=0)] = 5, lowercase: bool = True, ignore_pattern: str | None = None, num_permutations: Annotated[int, Gt(gt=0)] = 256, jaccard_threshold: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] = 0.7, num_bands: Annotated[int, Gt(gt=0)] | None = None, num_rows_per_band: Annotated[int, Gt(gt=0)] | None = None, tokenizer_model: str | None = None, *args, **kwargs)
+
+   Bases: "Deduplicator"
+
+   Deduplicator to deduplicate samples at document-level using
+   MinHashLSH.
+
+   Different from simhash, minhash is stored as bytes, so they won't
+   be kept in the final dataset.
+
+   compute_hash(sample)
+
+      Compute minhash values for the sample.
+
+      Parameters:
+         **sample** -- input sample
+
+      Returns:
+         sample with minhash value.
+
+   process(dataset, show_num=0)
+
+      For doc-level, dataset --> dataset.
+
+      Parameters:
+         * **dataset** -- input dataset
+
+         * **show_num** -- number of traced samples used when tracer
+           is open.
+
+      Returns:
+         deduplicated dataset and the sampled duplicate pairs.
+
+class data_juicer.ops.deduplicator.DocumentSimhashDeduplicator(tokenization: str = 'space', window_size: Annotated[int, Gt(gt=0)] = 6, lowercase: bool = True, ignore_pattern: str | None = None, num_blocks: Annotated[int, Gt(gt=0)] = 6, hamming_distance: Annotated[int, Gt(gt=0)] = 4, *args, **kwargs)
+
+   Bases: "Deduplicator"
+
+   Deduplicator to deduplicate samples at document-level using
+   SimHash.
+
+   compute_hash(sample)
+
+      Compute simhash values for the sample.
+
+      Parameters:
+         **sample** -- input sample
+
+      Returns:
+         sample with simhash value.
+
+   process(dataset, show_num=0)
+
+      For doc-level, dataset --> dataset.
+
+      Parameters:
+         * **dataset** -- input dataset
+
+         * **show_num** -- number of traced samples used when tracer
+           is open.
+
+      Returns:
+         deduplicated dataset and the sampled duplicate pairs.
+
+class data_juicer.ops.deduplicator.ImageDeduplicator(method: str = 'phash', consider_text: bool = False, *args, **kwargs)
+
+   Bases: "Deduplicator"
+
+   Deduplicator to deduplicate samples at document-level using exact
+   matching of images between documents.
+
+   compute_hash(sample, context=False)
+
+      Compute hash values for the sample.
+
+      Parameters:
+         **sample** -- input sample
+
+      Returns:
+         sample with computed hash value.
+
+   process(dataset, show_num=0)
+
+      For doc-level, dataset --> dataset.
+
+      Parameters:
+         * **dataset** -- input dataset
+
+         * **show_num** -- number of traced samples used when tracer
+           is open.
+
+      Returns:
+         deduplicated dataset and the sampled duplicate pairs.
+
+class data_juicer.ops.deduplicator.RayBasicDeduplicator(backend: str = 'ray_actor', redis_address: str = 'redis://localhost:6379', *args, **kwargs)
+
+   Bases: "Filter"
+
+   A basic exact matching deduplicator for RAY. Although its
+   functionality is deduplication, it is implemented as Filter sub-
+   class.
+
+   EMPTY_HASH_VALUE = 'EMPTY'
+
+   calculate_hash(sample, context=False)
+
+      Calculate hash value for the sample.
+
+   compute_stats_single(sample, context=False)
+
+      Compute stats for the sample which is used as a metric to decide
+      whether to filter this sample.
+
+      Parameters:
+         * **sample** -- input sample.
+
+         * **context** -- whether to store context information of
+           intermediate vars in the sample temporarily.
+
+      Returns:
+         sample with computed stats
+
+   process_single(sample)
+
+      For sample level, sample --> Boolean.
+
+      Parameters:
+         **sample** -- sample to decide whether to filter
+
+      Returns:
+         true for keeping and false for filtering
+
+class data_juicer.ops.deduplicator.RayDocumentDeduplicator(backend: str = 'ray_actor', redis_address: str = 'redis://localhost:6379', lowercase: bool = False, ignore_non_character: bool = False, *args, **kwargs)
+
+   Bases: "RayBasicDeduplicator"
+
+   Deduplicator to deduplicate samples at document-level using exact
+   matching.
+
+   calculate_hash(sample, context=False)
+
+      Calculate hash value for the sample.
+
+class data_juicer.ops.deduplicator.RayImageDeduplicator(backend: str = 'ray_actor', redis_address: str = 'redis://localhost:6379', method: str = 'phash', *args, **kwargs)
+
+   Bases: "RayBasicDeduplicator"
+
+   Deduplicator to deduplicate samples at document-level using exact
+   matching of images between documents.
+
+   calculate_hash(sample, context=False)
+
+      Calculate hash value for the sample.
+
+class data_juicer.ops.deduplicator.RayVideoDeduplicator(backend: str = 'ray_actor', redis_address: str = 'redis://localhost:6379', *args, **kwargs)
+
+   Bases: "RayBasicDeduplicator"
+
+   Deduplicator to deduplicate samples at document-level using exact
+   matching of videos between documents.
+
+   calculate_hash(sample, context=False)
+
+      Calculate hash value for the sample.
+
+class data_juicer.ops.deduplicator.RayBTSMinhashDeduplicator(tokenization: str = 'space', window_size: Annotated[int, Gt(gt=0)] = 5, lowercase: bool = True, ignore_pattern: str | None = None, num_permutations: Annotated[int, Gt(gt=0)] = 256, jaccard_threshold: Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] = 0.7, num_bands: Annotated[int, Gt(gt=0)] | None = None, num_rows_per_band: Annotated[int, Gt(gt=0)] | None = None, tokenizer_model: str | None = None, union_find_parallel_num: int | str = 'auto', union_threshold: int | None = 256, max_pending_edge_buffer_task: int | None = 20, num_edge_buffer_task_returns: int | None = 10, max_pending_filter_tasks: int | None = 20, num_filter_task_returns: int | None = 10, merge_batch_size: int | None = 1000, *args, **kwargs)
+
+   Bases: "Deduplicator"
+
+   A MinhashLSH deduplicator based on RAY.
+
+   EMPTY_HASH_VALUE = 'EMPTY'
+
+   calc_minhash(text_list: Array, uid_list: List) -> Table
+
+   merge_op_batch(object_refs)
+
+   merge()
+
+   filter_with_union_find(samples: Table) -> Table
+
+   run(dataset, **kwargs)
+
+class data_juicer.ops.deduplicator.VideoDeduplicator(consider_text: bool = False, *args, **kwargs)
+
+   Bases: "Deduplicator"
+
+   Deduplicator to deduplicate samples at document-level using exact
+   matching of videos between documents.
+
+   compute_hash(sample, context=False)
+
+      Compute hash values for the sample.
+
+      Parameters:
+         **sample** -- input sample
+
+      Returns:
+         sample with computed hash value.
+
+   process(dataset, show_num=0)
+
+      For doc-level, dataset --> dataset.
+
+      Parameters:
+         * **dataset** -- input dataset
+
+         * **show_num** -- number of traced samples used when tracer
+           is open.
+
+      Returns:
+         deduplicated dataset and the sampled duplicate pairs.

@@ -1,0 +1,118 @@
+data_juicer.ops.grouper package
+*******************************
+
+
+Submodules
+==========
+
+
+data_juicer.ops.grouper.key_value_grouper module
+================================================
+
+class data_juicer.ops.grouper.key_value_grouper.KeyValueGrouper(group_by_keys: List[str] | None = None, *args, **kwargs)
+
+   Bases: "Grouper"
+
+   Group samples to batched samples according values in given keys.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         dataset of batched samples.
+
+
+data_juicer.ops.grouper.naive_grouper module
+============================================
+
+class data_juicer.ops.grouper.naive_grouper.NaiveGrouper(*args, **kwargs)
+
+   Bases: "Grouper"
+
+   Group all samples to one batched sample.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         dataset of batched samples.
+
+
+data_juicer.ops.grouper.naive_reverse_grouper module
+====================================================
+
+class data_juicer.ops.grouper.naive_reverse_grouper.NaiveReverseGrouper(batch_meta_export_path=None, *args, **kwargs)
+
+   Bases: "Grouper"
+
+   Split batched samples to samples.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         dataset of batched samples.
+
+
+Module contents
+===============
+
+class data_juicer.ops.grouper.KeyValueGrouper(group_by_keys: List[str] | None = None, *args, **kwargs)
+
+   Bases: "Grouper"
+
+   Group samples to batched samples according values in given keys.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         dataset of batched samples.
+
+class data_juicer.ops.grouper.NaiveGrouper(*args, **kwargs)
+
+   Bases: "Grouper"
+
+   Group all samples to one batched sample.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         dataset of batched samples.
+
+class data_juicer.ops.grouper.NaiveReverseGrouper(batch_meta_export_path=None, *args, **kwargs)
+
+   Bases: "Grouper"
+
+   Split batched samples to samples.
+
+   process(dataset)
+
+      Dataset --> dataset.
+
+      Parameters:
+         **dataset** -- input dataset
+
+      Returns:
+         dataset of batched samples.

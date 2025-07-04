@@ -1,0 +1,258 @@
+data_juicer.ops.aggregator package
+**********************************
+
+
+Submodules
+==========
+
+
+data_juicer.ops.aggregator.entity_attribute_aggregator module
+=============================================================
+
+class data_juicer.ops.aggregator.entity_attribute_aggregator.EntityAttributeAggregator(api_model: str = 'gpt-4o', entity: str | None = None, attribute: str | None = None, input_key: str = 'event_description', output_key: str = 'entity_attribute', word_limit: Annotated[int, Gt(gt=0)] = 100, max_token_num: Annotated[int, Gt(gt=0)] | None = None, *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt_template: str | None = None, example_prompt: str | None = None, input_template: str | None = None, output_pattern_template: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Aggregator"
+
+   Return conclusion of the given entity's attribute from some docs.
+
+   DEFAULT_SYSTEM_TEMPLATE = '给定与`{entity}`相关的一些文档，总结`{entity}`的`{attribute}`。\n要求：\n- 尽量使用原文专有名词\n- 联系上下文，自动忽略上下文不一致的细节错误\n- 只对文档中与`{entity}`的`{attribute}`有关的内容进行总结\n- 字数限制在**{word_limit}字以内**\n- 要求输出格式如下：\n# {entity}\n## {attribute}\n...\n{example}'
+
+   DEFAULT_EXAMPLE_PROMPT = '- 例如，根据相关文档总结`孙悟空`的`出身背景`，**100字**以内的样例如下：\n`孙悟空`的`出身背景`总结：\n# 孙悟空\n## 出身背景\n号称齐天大圣，花果山水帘洞的美猴王、西行取经队伍中的大师兄。师父是唐僧玄奘，曾拜菩提祖师学艺。亲生父母未知，自石头中孕育而生。自认斗战胜佛，最怕观世音菩萨和紧箍咒。\n'
+
+   DEFAULT_INPUT_TEMPLATE = '`{entity}`的相关文档：\n{sub_docs}\n\n`{entity}`的`{attribute}`总结：\n'
+
+   DEFAULT_OUTPUT_PATTERN_TEMPLATE = '\\#\\s*{entity}\\s*\\#\\#\\s*{attribute}\\s*(.*?)\\Z'
+
+   parse_output(response)
+
+   attribute_summary(sub_docs, rank=None)
+
+   process_single(sample=None, rank=None)
+
+      For sample level, batched sample --> sample, the input must be
+      the output of some Grouper OP.
+
+      Parameters:
+         **sample** -- batched sample to aggregate
+
+      Returns:
+         aggregated sample
+
+
+data_juicer.ops.aggregator.meta_tags_aggregator module
+======================================================
+
+class data_juicer.ops.aggregator.meta_tags_aggregator.MetaTagsAggregator(api_model: str = 'gpt-4o', meta_tag_key: str = 'dialog_sentiment_labels', target_tags: List[str] | None = None, *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, target_tag_template: str | None = None, tag_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Aggregator"
+
+   Merge similar meta tags to one tag.
+
+   DEFAULT_SYSTEM_PROMPT = '给定一些标签以及这些标签出现的频次，合并意思相近的标签。\n要求：\n- 任务分为两种情况，一种是给定合并后的标签，需要将合并前的标签映射到这些标签。如果给定的合并后的标签中有类似“其他”这种标签，将无法归类的标签合并到“其他”。以下是这种情况的一个样例：\n合并后的标签应限定在[科技, 健康, 其他]中。\n| 合并前标签 | 频次 |\n| ------ | ------ |\n| 医疗 | 20 |\n| 信息技术 | 16 |\n| 学习 | 19 |\n| 气候变化 | 22 |\n| 人工智能 | 11 |\n| 养生 | 17 |\n| 科学创新 | 10 |\n\n## 分析：“信息技术”、“人工智能”、“科学创新”都属于“科技”类别，“医疗”和“养生”跟“健康”有关联，“学习”、“气候变化”和“科技”还有“健康”关联不强，应该被归为“其他”。\n## 标签合并：\n** 医疗归类为健康 **\n** 信息技术归类为科技 **\n** 学习归类为其他 **\n** 气候变化归类为其他 **\n** 人工智能归类为科技 **\n** 养生归类为健康 **\n** 科学创新归类为科技 **\n- 另外一种情况没有事先给定合并后的标签，需要生成合理的标签类别：| 合并前标签 | 频次 |\n| ------ | ------ |\n| 医疗 | 20 |\n| 信息技术 | 16 |\n| 学习 | 2 |\n| 气候变化 | 1 |\n| 人工智能 | 11 |\n| 养生 | 17 |\n| 科学创新 | 10 |\n\n## 分析：“信息技术”、“人工智能”、“科学创新”这三个标签比较相近，归为同一类，都属于“科技”类别，“医疗”和“养生”都跟“健康”有关系，可以归类为“健康”，“学习”和“气候变化”跟其他标签关联度不强，且频次较低，统一归类为“其他”。\n## 标签合并：\n** 医疗归类为健康 **\n** 信息技术归类为科技 **\n** 学习归类为其他 **\n** 气候变化归类为其他 **\n** 人工智能归类为科技 **\n** 养生归类为健康 **\n** 科学创新归类为科技 **\n'
+
+   DEFAULT_INPUT_TEMPLATE = '{target_tag_str}| 合并前标签 | 频次 |\n| ------ | ------ |\n{tag_strs}'
+
+   DEFAULT_TARGET_TAG_TEMPLATE = '合并后的标签应限定在[{target_tags}]中。\n'
+
+   DEFAULT_TAG_TEMPLATE = '| {tag} | {cnt} |'
+
+   DEFAULT_OUTPUT_PATTERN = '\\*\\*\\s*(\\w+)归类为(\\w+)\\s*\\*\\*'
+
+   parse_output(response)
+
+   meta_map(meta_cnts, rank=None)
+
+   process_single(sample=None, rank=None)
+
+      For sample level, batched sample --> sample, the input must be
+      the output of some Grouper OP.
+
+      Parameters:
+         **sample** -- batched sample to aggregate
+
+      Returns:
+         aggregated sample
+
+
+data_juicer.ops.aggregator.most_relevant_entities_aggregator module
+===================================================================
+
+class data_juicer.ops.aggregator.most_relevant_entities_aggregator.MostRelevantEntitiesAggregator(api_model: str = 'gpt-4o', entity: str | None = None, query_entity_type: str | None = None, input_key: str = 'event_description', output_key: str = 'most_relevant_entities', max_token_num: Annotated[int, Gt(gt=0)] | None = None, *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt_template: str | None = None, input_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Aggregator"
+
+   Extract entities closely related to a given entity from some texts,
+   and sort them in descending order of importance.
+
+   DEFAULT_SYSTEM_TEMPLATE = '给定与`{entity}`相关的一些文档，总结一些与`{entity}`最为相关的`{entity_type}`。\n要求：\n- 不用包含与{entity}为同一{entity_type}的{entity_type}。\n- 请按照人物的重要性进行排序，**越重要人物在列表越前面**。\n- 你的返回格式如下：\n## 分析\n你对各个{entity_type}与{entity}关联度的分析\n## 列表\n人物1, 人物2, 人物3, ...'
+
+   DEFAULT_INPUT_TEMPLATE = '`{entity}`的相关文档：\n{sub_docs}\n\n与`{entity}`最相关的一些`{entity_type}`：\n'
+
+   DEFAULT_OUTPUT_PATTERN = '\\#\\#\\s*列表\\s*(.*?)\\Z'
+
+   parse_output(response)
+
+   query_most_relevant_entities(sub_docs, rank=None)
+
+   process_single(sample=None, rank=None)
+
+      For sample level, batched sample --> sample, the input must be
+      the output of some Grouper OP.
+
+      Parameters:
+         **sample** -- batched sample to aggregate
+
+      Returns:
+         aggregated sample
+
+
+data_juicer.ops.aggregator.nested_aggregator module
+===================================================
+
+class data_juicer.ops.aggregator.nested_aggregator.NestedAggregator(api_model: str = 'gpt-4o', input_key: str = 'event_description', output_key: str | None = None, max_token_num: Annotated[int, Gt(gt=0)] | None = None, *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, sub_doc_template: str | None = None, input_template: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Aggregator"
+
+   Considering the limitation of input length, nested aggregate
+   contents for each given number of samples.
+
+   DEFAULT_SYSTEM_PROMPT = '给定一些文档碎片，将这些文档整合成一个文档总结。\n要求：\n- 总结的长度与文档碎片的平均长度基本一致\n- 不要包含主观看法\n- 注意要尽可能保留文本的专有名词\n- 只输出文档总结不要输出其他内容\n- 参考如下样例：\n文档碎片：\n唐僧师徒四人行至白虎岭，遇上了变化多端的白骨精。\n\n文档碎片：\n白骨精首次变身少女送斋，被孙悟空识破打死，唐僧责怪悟空。\n\n文档碎片：\n妖怪再变老妇寻女，又被悟空击毙，师傅更加不满，念紧箍咒惩罚。\n\n文档碎片：\n不甘心的白骨精第三次化作老公公来诱骗，依旧逃不过金睛火眼。\n\n文档碎片：\n最终，在观音菩萨的帮助下，真相大白，唐僧明白了自己的误解。\n\n\n文档总结：\n唐僧师徒在白虎岭三遇白骨精变化诱惑，悟空屡次识破击毙妖怪却遭误解，最终观音相助真相大白。'
+
+   DEFAULT_INPUT_TEMPLATE = '{sub_docs}\n\n文档总结：\n'
+
+   DEFAULT_SUB_DOC_TEMPLATE = '文档碎片：\n{text}\n'
+
+   parse_output(response)
+
+   recursive_summary(sub_docs, rank=None)
+
+   process_single(sample=None, rank=None)
+
+      For sample level, batched sample --> sample, the input must be
+      the output of some Grouper OP.
+
+      Parameters:
+         **sample** -- batched sample to aggregate
+
+      Returns:
+         aggregated sample
+
+
+Module contents
+===============
+
+class data_juicer.ops.aggregator.NestedAggregator(api_model: str = 'gpt-4o', input_key: str = 'event_description', output_key: str | None = None, max_token_num: Annotated[int, Gt(gt=0)] | None = None, *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, sub_doc_template: str | None = None, input_template: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Aggregator"
+
+   Considering the limitation of input length, nested aggregate
+   contents for each given number of samples.
+
+   DEFAULT_SYSTEM_PROMPT = '给定一些文档碎片，将这些文档整合成一个文档总结。\n要求：\n- 总结的长度与文档碎片的平均长度基本一致\n- 不要包含主观看法\n- 注意要尽可能保留文本的专有名词\n- 只输出文档总结不要输出其他内容\n- 参考如下样例：\n文档碎片：\n唐僧师徒四人行至白虎岭，遇上了变化多端的白骨精。\n\n文档碎片：\n白骨精首次变身少女送斋，被孙悟空识破打死，唐僧责怪悟空。\n\n文档碎片：\n妖怪再变老妇寻女，又被悟空击毙，师傅更加不满，念紧箍咒惩罚。\n\n文档碎片：\n不甘心的白骨精第三次化作老公公来诱骗，依旧逃不过金睛火眼。\n\n文档碎片：\n最终，在观音菩萨的帮助下，真相大白，唐僧明白了自己的误解。\n\n\n文档总结：\n唐僧师徒在白虎岭三遇白骨精变化诱惑，悟空屡次识破击毙妖怪却遭误解，最终观音相助真相大白。'
+
+   DEFAULT_INPUT_TEMPLATE = '{sub_docs}\n\n文档总结：\n'
+
+   DEFAULT_SUB_DOC_TEMPLATE = '文档碎片：\n{text}\n'
+
+   parse_output(response)
+
+   recursive_summary(sub_docs, rank=None)
+
+   process_single(sample=None, rank=None)
+
+      For sample level, batched sample --> sample, the input must be
+      the output of some Grouper OP.
+
+      Parameters:
+         **sample** -- batched sample to aggregate
+
+      Returns:
+         aggregated sample
+
+class data_juicer.ops.aggregator.MetaTagsAggregator(api_model: str = 'gpt-4o', meta_tag_key: str = 'dialog_sentiment_labels', target_tags: List[str] | None = None, *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt: str | None = None, input_template: str | None = None, target_tag_template: str | None = None, tag_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Aggregator"
+
+   Merge similar meta tags to one tag.
+
+   DEFAULT_SYSTEM_PROMPT = '给定一些标签以及这些标签出现的频次，合并意思相近的标签。\n要求：\n- 任务分为两种情况，一种是给定合并后的标签，需要将合并前的标签映射到这些标签。如果给定的合并后的标签中有类似“其他”这种标签，将无法归类的标签合并到“其他”。以下是这种情况的一个样例：\n合并后的标签应限定在[科技, 健康, 其他]中。\n| 合并前标签 | 频次 |\n| ------ | ------ |\n| 医疗 | 20 |\n| 信息技术 | 16 |\n| 学习 | 19 |\n| 气候变化 | 22 |\n| 人工智能 | 11 |\n| 养生 | 17 |\n| 科学创新 | 10 |\n\n## 分析：“信息技术”、“人工智能”、“科学创新”都属于“科技”类别，“医疗”和“养生”跟“健康”有关联，“学习”、“气候变化”和“科技”还有“健康”关联不强，应该被归为“其他”。\n## 标签合并：\n** 医疗归类为健康 **\n** 信息技术归类为科技 **\n** 学习归类为其他 **\n** 气候变化归类为其他 **\n** 人工智能归类为科技 **\n** 养生归类为健康 **\n** 科学创新归类为科技 **\n- 另外一种情况没有事先给定合并后的标签，需要生成合理的标签类别：| 合并前标签 | 频次 |\n| ------ | ------ |\n| 医疗 | 20 |\n| 信息技术 | 16 |\n| 学习 | 2 |\n| 气候变化 | 1 |\n| 人工智能 | 11 |\n| 养生 | 17 |\n| 科学创新 | 10 |\n\n## 分析：“信息技术”、“人工智能”、“科学创新”这三个标签比较相近，归为同一类，都属于“科技”类别，“医疗”和“养生”都跟“健康”有关系，可以归类为“健康”，“学习”和“气候变化”跟其他标签关联度不强，且频次较低，统一归类为“其他”。\n## 标签合并：\n** 医疗归类为健康 **\n** 信息技术归类为科技 **\n** 学习归类为其他 **\n** 气候变化归类为其他 **\n** 人工智能归类为科技 **\n** 养生归类为健康 **\n** 科学创新归类为科技 **\n'
+
+   DEFAULT_INPUT_TEMPLATE = '{target_tag_str}| 合并前标签 | 频次 |\n| ------ | ------ |\n{tag_strs}'
+
+   DEFAULT_TARGET_TAG_TEMPLATE = '合并后的标签应限定在[{target_tags}]中。\n'
+
+   DEFAULT_TAG_TEMPLATE = '| {tag} | {cnt} |'
+
+   DEFAULT_OUTPUT_PATTERN = '\\*\\*\\s*(\\w+)归类为(\\w+)\\s*\\*\\*'
+
+   parse_output(response)
+
+   meta_map(meta_cnts, rank=None)
+
+   process_single(sample=None, rank=None)
+
+      For sample level, batched sample --> sample, the input must be
+      the output of some Grouper OP.
+
+      Parameters:
+         **sample** -- batched sample to aggregate
+
+      Returns:
+         aggregated sample
+
+class data_juicer.ops.aggregator.EntityAttributeAggregator(api_model: str = 'gpt-4o', entity: str | None = None, attribute: str | None = None, input_key: str = 'event_description', output_key: str = 'entity_attribute', word_limit: Annotated[int, Gt(gt=0)] = 100, max_token_num: Annotated[int, Gt(gt=0)] | None = None, *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt_template: str | None = None, example_prompt: str | None = None, input_template: str | None = None, output_pattern_template: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Aggregator"
+
+   Return conclusion of the given entity's attribute from some docs.
+
+   DEFAULT_SYSTEM_TEMPLATE = '给定与`{entity}`相关的一些文档，总结`{entity}`的`{attribute}`。\n要求：\n- 尽量使用原文专有名词\n- 联系上下文，自动忽略上下文不一致的细节错误\n- 只对文档中与`{entity}`的`{attribute}`有关的内容进行总结\n- 字数限制在**{word_limit}字以内**\n- 要求输出格式如下：\n# {entity}\n## {attribute}\n...\n{example}'
+
+   DEFAULT_EXAMPLE_PROMPT = '- 例如，根据相关文档总结`孙悟空`的`出身背景`，**100字**以内的样例如下：\n`孙悟空`的`出身背景`总结：\n# 孙悟空\n## 出身背景\n号称齐天大圣，花果山水帘洞的美猴王、西行取经队伍中的大师兄。师父是唐僧玄奘，曾拜菩提祖师学艺。亲生父母未知，自石头中孕育而生。自认斗战胜佛，最怕观世音菩萨和紧箍咒。\n'
+
+   DEFAULT_INPUT_TEMPLATE = '`{entity}`的相关文档：\n{sub_docs}\n\n`{entity}`的`{attribute}`总结：\n'
+
+   DEFAULT_OUTPUT_PATTERN_TEMPLATE = '\\#\\s*{entity}\\s*\\#\\#\\s*{attribute}\\s*(.*?)\\Z'
+
+   parse_output(response)
+
+   attribute_summary(sub_docs, rank=None)
+
+   process_single(sample=None, rank=None)
+
+      For sample level, batched sample --> sample, the input must be
+      the output of some Grouper OP.
+
+      Parameters:
+         **sample** -- batched sample to aggregate
+
+      Returns:
+         aggregated sample
+
+class data_juicer.ops.aggregator.MostRelevantEntitiesAggregator(api_model: str = 'gpt-4o', entity: str | None = None, query_entity_type: str | None = None, input_key: str = 'event_description', output_key: str = 'most_relevant_entities', max_token_num: Annotated[int, Gt(gt=0)] | None = None, *, api_endpoint: str | None = None, response_path: str | None = None, system_prompt_template: str | None = None, input_template: str | None = None, output_pattern: str | None = None, try_num: Annotated[int, Gt(gt=0)] = 3, model_params: Dict = {}, sampling_params: Dict = {}, **kwargs)
+
+   Bases: "Aggregator"
+
+   Extract entities closely related to a given entity from some texts,
+   and sort them in descending order of importance.
+
+   DEFAULT_SYSTEM_TEMPLATE = '给定与`{entity}`相关的一些文档，总结一些与`{entity}`最为相关的`{entity_type}`。\n要求：\n- 不用包含与{entity}为同一{entity_type}的{entity_type}。\n- 请按照人物的重要性进行排序，**越重要人物在列表越前面**。\n- 你的返回格式如下：\n## 分析\n你对各个{entity_type}与{entity}关联度的分析\n## 列表\n人物1, 人物2, 人物3, ...'
+
+   DEFAULT_INPUT_TEMPLATE = '`{entity}`的相关文档：\n{sub_docs}\n\n与`{entity}`最相关的一些`{entity_type}`：\n'
+
+   DEFAULT_OUTPUT_PATTERN = '\\#\\#\\s*列表\\s*(.*?)\\Z'
+
+   parse_output(response)
+
+   query_most_relevant_entities(sub_docs, rank=None)
+
+   process_single(sample=None, rank=None)
+
+      For sample level, batched sample --> sample, the input must be
+      the output of some Grouper OP.
+
+      Parameters:
+         **sample** -- batched sample to aggregate
+
+      Returns:
+         aggregated sample

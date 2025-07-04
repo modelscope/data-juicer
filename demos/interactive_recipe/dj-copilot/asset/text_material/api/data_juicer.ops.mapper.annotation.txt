@@ -1,0 +1,77 @@
+data_juicer.ops.mapper.annotation package
+*****************************************
+
+
+Submodules
+==========
+
+
+data_juicer.ops.mapper.annotation.annotation_mapper module
+==========================================================
+
+class data_juicer.ops.mapper.annotation.annotation_mapper.BaseAnnotationMapper(project_name_prefix: str = 'DataJuicer_Annotation', wait_for_annotations: bool = False, timeout: int = 3600, poll_interval: int = 60, samples_per_task: int = 1, max_tasks_per_batch: int = 100, project_id: int | None = None, notification_config: Dict | None = None, notification_events: Dict[str, bool] | None = None, **kwargs)
+
+   Bases: "EventDrivenMixin", "NotificationMixin", "Mapper", "ABC"
+
+   Base class for annotation operations with event-driven
+   capabilities.
+
+   This class provides functionality for creating annotation tasks,
+   waiting for annotations to be completed, and handling notification
+   events for various stages of the annotation process.
+
+   It supports sending notifications with annotation platform URLs
+   included, making it easy for annotators to directly access the
+   annotation interface when they receive a notification. This is
+   particularly useful for time-se- -nsitive annotation tasks or for
+   coordinating with remote annotation teams.
+
+   Notifications can be sent via email, Slack, or DingTalk, and can be
+   configured to trigger on various events such as task creation,
+   batch creation, annotation completion, and error conditions.
+
+   URL inclusion in notifications can be enabled or disabled using the
+   *include_urls_in_notifications* parameter.
+
+   process_batched(samples)
+
+      Process a batch of samples by creating annotation tasks
+
+      Args:
+         samples: Dictionary of samples to process (column-oriented)
+
+      Returns:
+         Dict: Processed samples (column-oriented)
+
+class data_juicer.ops.mapper.annotation.annotation_mapper.LabelStudioAnnotationMapper(api_url: str | None = None, api_key: str | None = None, label_config: str | None = None, **kwargs)
+
+   Bases: "BaseAnnotationMapper", "ABC"
+
+   Operation for annotating data using Label Studio
+
+   setup_project()
+
+      Create a new project or use existing one
+
+   get_all_annotations() -> Dict[int, Dict]
+
+      Get all annotations for tasks created by this operation
+
+      Returns:
+         Dict[int, Dict]: Dictionary mapping task IDs to annotations
+
+
+data_juicer.ops.mapper.annotation.human_preference_annotation_mapper module
+===========================================================================
+
+class data_juicer.ops.mapper.annotation.human_preference_annotation_mapper.HumanPreferenceAnnotationMapper(label_config_file: str | None = None, answer1_key: str = 'answer1', answer2_key: str = 'answer2', prompt_key: str = 'prompt', chosen_key: str = 'chosen', rejected_key: str = 'rejected', **kwargs)
+
+   Bases: "LabelStudioAnnotationMapper"
+
+   Operator for human preference annotation using Label Studio.
+
+   DEFAULT_LABEL_CONFIG = '\n    <View className="root">\n      <Style>\n        .root {\n          box-sizing: border-box;\n          margin: 0;\n          padding: 0;\n          font-family: \'Roboto\',\n            sans-serif;\n          line-height: 1.6;\n          background-color: #f0f0f0;\n        }\n\n        .container {\n          margin: 0 auto;\n          padding: 20px;\n          background-color: #ffffff;\n          border-radius: 5px;\n          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.1);\n        }\n\n        .prompt {\n          padding: 20px;\n          background-color: #0084ff;\n          color: #ffffff;\n          border-radius: 5px;\n          margin-bottom: 20px;\n          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);\n        }\n\n        .answers {\n          display: flex;\n          justify-content: space-between;\n          flex-wrap: wrap;\n          gap: 20px;\n        }\n\n        .answer-box {\n          flex-basis: 49%;\n          padding: 20px;\n          background-color: rgba(44, 62, 80, 0.9);\n          color: #ffffff;\n          border-radius: 5px;\n          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);\n        }\n\n        .answer-box p {\n          word-wrap: break-word;\n        }\n\n        .answer-box:hover {\n          background-color: rgba(52, 73, 94, 0.9);\n          cursor: pointer;\n          transition: all 0.3s ease;\n        }\n\n        .lsf-richtext__line:hover {\n          background: unset;\n        }\n\n        .answer-box .lsf-object {\n          padding: 20px\n        }\n      </Style>\n      <View className="container">\n        <View className="prompt">\n          <Text name="prompt" value="$prompt" />\n        </View>\n        <View className="answers">\n          <Pairwise name="comparison" toName="answer1,answer2"\n                    selectionStyle="background-color: #27ae60; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.2); border: 2px solid #2ecc71; cursor: pointer; transition: all 0.3s ease;"\n                    leftChoiceValue="answer1" rightChoiceValue="answer2" />\n          <View className="answer-box">\n            <Text name="answer1" value="$answer1" />\n          </View>\n          <View className="answer-box">\n            <Text name="answer2" value="$answer2" />\n          </View>\n        </View>\n      </View>\n    </View>\n    '
+
+
+Module contents
+===============

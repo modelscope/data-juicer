@@ -1,0 +1,454 @@
+data_juicer.analysis package
+****************************
+
+
+Submodules
+==========
+
+
+data_juicer.analysis.collector module
+=====================================
+
+class data_juicer.analysis.collector.TextTokenDistCollector(tokenizer)
+
+   Bases: "object"
+
+   Tokenize and collect distribution of tokens for given dataset with
+   a specified tokenizer.
+
+   collect(data_path, text_key, num_proc=1) -> Categorical
+
+      Tokenize and collect tokens distribution of input dataset :param
+      data_path: path to input dataset. :param text_key: field keys
+      that will be considered into token counts. :param num_proc:
+      number of processes to count tokens. :return: token
+      distribution.
+
+
+data_juicer.analysis.column_wise_analysis module
+================================================
+
+data_juicer.analysis.column_wise_analysis.get_row_col(total_num, factor=2)
+
+   Given the total number of stats figures, get the "best" number of
+   rows and columns. This function is needed when we need to store all
+   stats figures into one image.
+
+   Parameters:
+      * **total_num** -- Total number of stats figures
+
+      * **factor** -- Number of sub-figure types in each figure. In
+        default, it's 2, which means there are histogram and box plot
+        for each stat figure
+
+   Returns:
+      "best" number of rows and columns, and the grid list
+
+class data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis(dataset, output_path, overall_result=None, save_stats_in_one_file=True)
+
+   Bases: "object"
+
+   Apply analysis on each column of stats respectively.
+
+   analyze(show_percentiles=False, show=False, skip_export=False)
+
+      Apply analysis and draw the analysis figure for stats.
+
+      Parameters:
+         * **show_percentiles** -- whether to show the percentile line
+           in each sub-figure. If it's true, there will be several red
+           lines to indicate the quantiles of the stats distributions
+
+         * **show** -- whether to show in a single window after
+           drawing
+
+         * **skip_export** -- whether save the results into disk
+
+      Returns:
+   draw_hist(ax, data, save_path, percentiles=None, show=False)
+
+      Draw the histogram for the data.
+
+      Parameters:
+         * **ax** -- the axes to draw
+
+         * **data** -- data to draw
+
+         * **save_path** -- the path to save the histogram figure
+
+         * **percentiles** -- the overall analysis result of the data
+           including percentile information
+
+         * **show** -- whether to show in a single window after
+           drawing
+
+      Returns:
+   draw_box(ax, data, save_path, percentiles=None, show=False)
+
+      Draw the box plot for the data.
+
+      Parameters:
+         * **ax** -- the axes to draw
+
+         * **data** -- data to draw
+
+         * **save_path** -- the path to save the box figure
+
+         * **percentiles** -- the overall analysis result of the data
+           including percentile information
+
+         * **show** -- whether to show in a single window after
+           drawing
+
+      Returns:
+   draw_wordcloud(ax, data, save_path, show=False)
+
+
+data_juicer.analysis.diversity_analysis module
+==============================================
+
+data_juicer.analysis.diversity_analysis.find_root_verb_and_its_dobj(tree_root)
+
+   Find the verb and its object closest to the root.
+
+   Parameters:
+      **tree_root** -- the root of lexical tree
+
+   Returns:
+      valid verb and its object.
+
+data_juicer.analysis.diversity_analysis.find_root_verb_and_its_dobj_in_string(nlp, s, first_sent=True)
+
+   Find the verb and its object closest to the root of lexical tree of
+   input string.
+
+   Parameters:
+      * **nlp** -- the diversity model to analyze the diversity
+        strings
+
+      * **s** -- the string to be analyzed
+
+      * **first_sent** -- whether to analyze the first sentence in the
+        input string only. If it's true, return the analysis result of
+        the first sentence no matter it's valid or not. If it's false,
+        return the first valid result over all sentences
+
+   Returns:
+      valid verb and its object of this string
+
+data_juicer.analysis.diversity_analysis.get_diversity(dataset, top_k_verbs=20, top_k_nouns=4, **kwargs)
+
+   Given the lexical tree analysis result, return the diversity
+   results.
+
+   Parameters:
+      * **dataset** -- lexical tree analysis result
+
+      * **top_k_verbs** -- only keep the top_k_verbs largest verb
+        groups
+
+      * **top_k_nouns** -- only keep the top_k_nouns largest noun
+        groups for each verb group
+
+      * **kwargs** -- extra args
+
+   Returns:
+      the diversity results
+
+class data_juicer.analysis.diversity_analysis.DiversityAnalysis(dataset, output_path, lang_or_model='en')
+
+   Bases: "object"
+
+   Apply diversity analysis for each sample and get an overall
+   analysis result.
+
+   compute(lang_or_model=None, column_name='text')
+
+      Apply lexical tree analysis on each sample.
+
+      Parameters:
+         * **lang_or_model** -- the diversity model or a specific
+           language used to load the diversity model
+
+         * **column_name** -- the name of column to be analyzed
+
+      Returns:
+         the analysis result.
+
+   analyze(lang_or_model=None, column_name='text', postproc_func=<function get_diversity>, **postproc_kwarg)
+
+      Apply diversity analysis on the whole dataset.
+
+      Parameters:
+         * **lang_or_model** -- the diversity model or a specific
+           language used to load the diversity model
+
+         * **column_name** -- the name of column to be analyzed
+
+         * **postproc_func** -- function to analyze diversity. In
+           default, it's function get_diversity
+
+         * **postproc_kwarg** -- arguments of the postproc_func
+
+      Returns:
+
+data_juicer.analysis.draw module
+================================
+
+data_juicer.analysis.draw.draw_heatmap(data, xlabels, ylabels='auto', figsize=None, triangle=False, show=False)
+
+   Draw heatmap of input data with special labels.
+
+   Parameters:
+      * **data** -- input data, now support [*list*, *tuple*, *numpy
+        array*, 'torch tensor']
+
+      * **xlabels** -- x axis labels.
+
+      * **ylabels** -- y axis labels, if None, use xlabels.
+
+      * **figsize** -- figure size.
+
+      * **triangle** -- only display triangle.
+
+   Returns:
+      a plot figure.
+
+
+data_juicer.analysis.measure module
+===================================
+
+class data_juicer.analysis.measure.Measure
+
+   Bases: "object"
+
+   Base class for Measure distribution.
+
+   name = 'base'
+
+   measure(*args, **kwargs)
+
+class data_juicer.analysis.measure.KLDivMeasure
+
+   Bases: "Measure"
+
+   Measure Kullback-Leibler divergence.
+
+   name = 'kl_divergence'
+
+   measure(p, q)
+
+class data_juicer.analysis.measure.JSDivMeasure
+
+   Bases: "Measure"
+
+   Measure Jensen-Shannon divergence.
+
+   name = 'js_divergence'
+
+   measure(p, q)
+
+class data_juicer.analysis.measure.CrossEntropyMeasure
+
+   Bases: "Measure"
+
+   Measure Cross-Entropy.
+
+   name = 'cross_entropy'
+
+   measure(p, q)
+
+class data_juicer.analysis.measure.EntropyMeasure
+
+   Bases: "Measure"
+
+   Measure Entropy.
+
+   name = 'entropy'
+
+   measure(p)
+
+class data_juicer.analysis.measure.RelatedTTestMeasure
+
+   Bases: "Measure"
+
+   Measure T-Test for two related distributions on their histogram of
+   the same bins.
+
+   Ref: https://en.wikipedia.org/wiki/Student%27s_t-test
+
+   For continuous features or distributions, the input could be
+   dataset stats list. For discrete features or distributions, the
+   input could be the tags or the categories list.
+
+   name = 't-test'
+
+   static stats_to_hist(p, q)
+
+   static category_to_hist(p, q)
+
+   measure(p, q)
+
+      Parameters:
+         * **p** -- the first feature or distribution.
+           (stats/tags/categories)
+
+         * **q** -- the second feature or distribution.
+           (stats/tags/categories)
+
+      Returns:
+         the T-Test results object -- ([ref](https://docs.scipy.org/d
+         oc/scipy/reference/generated/scipy.stats._result_classes.Tte
+         stResult.html#scipy.stats._result_classes.TtestResult))  #
+         noqa: E501
+
+
+data_juicer.analysis.overall_analysis module
+============================================
+
+class data_juicer.analysis.overall_analysis.OverallAnalysis(dataset, output_path)
+
+   Bases: "object"
+
+   Apply analysis on the overall stats, including mean, std,
+   quantiles, etc.
+
+   refine_single_column(col)
+
+   analyze(percentiles=[], num_proc=1, skip_export=False)
+
+      Apply overall analysis on the whole dataset based on the
+      describe method of pandas.
+
+      Parameters:
+         * **percentiles** -- percentiles to analyze
+
+         * **num_proc** -- number of processes to analyze the dataset
+
+         * **skip_export** -- whether export the results to disk
+
+      Returns:
+         the overall analysis result.
+
+
+Module contents
+===============
+
+class data_juicer.analysis.ColumnWiseAnalysis(dataset, output_path, overall_result=None, save_stats_in_one_file=True)
+
+   Bases: "object"
+
+   Apply analysis on each column of stats respectively.
+
+   analyze(show_percentiles=False, show=False, skip_export=False)
+
+      Apply analysis and draw the analysis figure for stats.
+
+      Parameters:
+         * **show_percentiles** -- whether to show the percentile line
+           in each sub-figure. If it's true, there will be several red
+           lines to indicate the quantiles of the stats distributions
+
+         * **show** -- whether to show in a single window after
+           drawing
+
+         * **skip_export** -- whether save the results into disk
+
+      Returns:
+   draw_hist(ax, data, save_path, percentiles=None, show=False)
+
+      Draw the histogram for the data.
+
+      Parameters:
+         * **ax** -- the axes to draw
+
+         * **data** -- data to draw
+
+         * **save_path** -- the path to save the histogram figure
+
+         * **percentiles** -- the overall analysis result of the data
+           including percentile information
+
+         * **show** -- whether to show in a single window after
+           drawing
+
+      Returns:
+   draw_box(ax, data, save_path, percentiles=None, show=False)
+
+      Draw the box plot for the data.
+
+      Parameters:
+         * **ax** -- the axes to draw
+
+         * **data** -- data to draw
+
+         * **save_path** -- the path to save the box figure
+
+         * **percentiles** -- the overall analysis result of the data
+           including percentile information
+
+         * **show** -- whether to show in a single window after
+           drawing
+
+      Returns:
+   draw_wordcloud(ax, data, save_path, show=False)
+
+class data_juicer.analysis.DiversityAnalysis(dataset, output_path, lang_or_model='en')
+
+   Bases: "object"
+
+   Apply diversity analysis for each sample and get an overall
+   analysis result.
+
+   compute(lang_or_model=None, column_name='text')
+
+      Apply lexical tree analysis on each sample.
+
+      Parameters:
+         * **lang_or_model** -- the diversity model or a specific
+           language used to load the diversity model
+
+         * **column_name** -- the name of column to be analyzed
+
+      Returns:
+         the analysis result.
+
+   analyze(lang_or_model=None, column_name='text', postproc_func=<function get_diversity>, **postproc_kwarg)
+
+      Apply diversity analysis on the whole dataset.
+
+      Parameters:
+         * **lang_or_model** -- the diversity model or a specific
+           language used to load the diversity model
+
+         * **column_name** -- the name of column to be analyzed
+
+         * **postproc_func** -- function to analyze diversity. In
+           default, it's function get_diversity
+
+         * **postproc_kwarg** -- arguments of the postproc_func
+
+      Returns:
+class data_juicer.analysis.OverallAnalysis(dataset, output_path)
+
+   Bases: "object"
+
+   Apply analysis on the overall stats, including mean, std,
+   quantiles, etc.
+
+   refine_single_column(col)
+
+   analyze(percentiles=[], num_proc=1, skip_export=False)
+
+      Apply overall analysis on the whole dataset based on the
+      describe method of pandas.
+
+      Parameters:
+         * **percentiles** -- percentiles to analyze
+
+         * **num_proc** -- number of processes to analyze the dataset
+
+         * **skip_export** -- whether export the results to disk
+
+      Returns:
+         the overall analysis result.

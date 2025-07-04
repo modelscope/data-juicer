@@ -1,0 +1,1247 @@
+data_juicer.core package
+************************
+
+
+Subpackages
+===========
+
+* data_juicer.core.data package
+
+  * Submodules
+
+  * data_juicer.core.data.config_validator module
+
+    * "ConfigValidationError"
+
+    * "ConfigValidator"
+
+      * "ConfigValidator.CONFIG_VALIDATION_RULES"
+
+      * "ConfigValidator.validate_config()"
+
+  * data_juicer.core.data.data_validator module
+
+    * "DataValidator"
+
+      * "DataValidator.validate()"
+
+    * "DataValidationError"
+
+    * "DataValidatorRegistry"
+
+      * "DataValidatorRegistry.register()"
+
+      * "DataValidatorRegistry.get_validator()"
+
+    * "BaseConversationValidator"
+
+      * "BaseConversationValidator.validate()"
+
+      * "BaseConversationValidator.validate_conversation()"
+
+    * "SwiftMessagesValidator"
+
+      * "SwiftMessagesValidator.validate_conversation()"
+
+    * "DataJuicerFormatValidator"
+
+      * "DataJuicerFormatValidator.validate_conversation()"
+
+    * "CodeDataValidator"
+
+      * "CodeDataValidator.validate()"
+
+    * "RequiredFieldsValidator"
+
+      * "RequiredFieldsValidator.validate()"
+
+  * data_juicer.core.data.dataset_builder module
+
+    * "DatasetBuilder"
+
+      * "DatasetBuilder.load_dataset()"
+
+      * "DatasetBuilder.load_dataset_by_generated_config()"
+
+    * "rewrite_cli_datapath()"
+
+    * "parse_cli_datapath()"
+
+    * "get_sample_numbers()"
+
+  * data_juicer.core.data.dj_dataset module
+
+    * "DJDataset"
+
+      * "DJDataset.process()"
+
+      * "DJDataset.schema()"
+
+      * "DJDataset.get()"
+
+      * "DJDataset.get_column()"
+
+    * "wrap_func_with_nested_access()"
+
+    * "nested_obj_factory()"
+
+    * "NestedQueryDict"
+
+    * "NestedDatasetDict"
+
+      * "NestedDatasetDict.map()"
+
+    * "NestedDataset"
+
+      * "NestedDataset.schema()"
+
+      * "NestedDataset.get()"
+
+      * "NestedDataset.get_column()"
+
+      * "NestedDataset.process()"
+
+      * "NestedDataset.update_args()"
+
+      * "NestedDataset.map()"
+
+      * "NestedDataset.filter()"
+
+      * "NestedDataset.select()"
+
+      * "NestedDataset.from_dict()"
+
+      * "NestedDataset.add_column()"
+
+      * "NestedDataset.select_columns()"
+
+      * "NestedDataset.remove_columns()"
+
+      * "NestedDataset.cleanup_cache_files()"
+
+      * "NestedDataset.load_from_disk()"
+
+    * "nested_query()"
+
+    * "add_same_content_to_new_column()"
+
+  * data_juicer.core.data.load_strategy module
+
+    * "StrategyKey"
+
+      * "StrategyKey.executor_type"
+
+      * "StrategyKey.data_type"
+
+      * "StrategyKey.data_source"
+
+      * "StrategyKey.matches()"
+
+    * "DataLoadStrategy"
+
+      * "DataLoadStrategy.load_data()"
+
+    * "DataLoadStrategyRegistry"
+
+      * "DataLoadStrategyRegistry.get_strategy_class()"
+
+      * "DataLoadStrategyRegistry.register()"
+
+    * "RayDataLoadStrategy"
+
+      * "RayDataLoadStrategy.load_data()"
+
+    * "DefaultDataLoadStrategy"
+
+      * "DefaultDataLoadStrategy.load_data()"
+
+    * "RayLocalJsonDataLoadStrategy"
+
+      * "RayLocalJsonDataLoadStrategy.CONFIG_VALIDATION_RULES"
+
+      * "RayLocalJsonDataLoadStrategy.load_data()"
+
+    * "RayHuggingfaceDataLoadStrategy"
+
+      * "RayHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES"
+
+      * "RayHuggingfaceDataLoadStrategy.load_data()"
+
+    * "DefaultLocalDataLoadStrategy"
+
+      * "DefaultLocalDataLoadStrategy.CONFIG_VALIDATION_RULES"
+
+      * "DefaultLocalDataLoadStrategy.load_data()"
+
+    * "DefaultHuggingfaceDataLoadStrategy"
+
+      * "DefaultHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES"
+
+      * "DefaultHuggingfaceDataLoadStrategy.load_data()"
+
+    * "DefaultModelScopeDataLoadStrategy"
+
+      * "DefaultModelScopeDataLoadStrategy.load_data()"
+
+    * "DefaultArxivDataLoadStrategy"
+
+      * "DefaultArxivDataLoadStrategy.CONFIG_VALIDATION_RULES"
+
+      * "DefaultArxivDataLoadStrategy.load_data()"
+
+    * "DefaultWikiDataLoadStrategy"
+
+      * "DefaultWikiDataLoadStrategy.CONFIG_VALIDATION_RULES"
+
+      * "DefaultWikiDataLoadStrategy.load_data()"
+
+    * "DefaultCommonCrawlDataLoadStrategy"
+
+      * "DefaultCommonCrawlDataLoadStrategy.CONFIG_VALIDATION_RULES"
+
+      * "DefaultCommonCrawlDataLoadStrategy.load_data()"
+
+  * data_juicer.core.data.ray_dataset module
+
+    * "get_abs_path()"
+
+    * "convert_to_absolute_paths()"
+
+    * "set_dataset_to_absolute_path()"
+
+    * "preprocess_dataset()"
+
+    * "get_num_gpus()"
+
+    * "filter_batch()"
+
+    * "RayDataset"
+
+      * "RayDataset.schema()"
+
+      * "RayDataset.get()"
+
+      * "RayDataset.get_column()"
+
+      * "RayDataset.process()"
+
+      * "RayDataset.read_json()"
+
+    * "JSONStreamDatasource"
+
+    * "read_json_stream()"
+
+  * data_juicer.core.data.schema module
+
+    * "Schema"
+
+      * "Schema.column_types"
+
+      * "Schema.columns"
+
+      * "Schema.map_hf_type_to_python()"
+
+      * "Schema.map_ray_type_to_python()"
+
+  * Module contents
+
+    * "DJDataset"
+
+      * "DJDataset.process()"
+
+      * "DJDataset.schema()"
+
+      * "DJDataset.get()"
+
+      * "DJDataset.get_column()"
+
+    * "NestedDataset"
+
+      * "NestedDataset.schema()"
+
+      * "NestedDataset.get()"
+
+      * "NestedDataset.get_column()"
+
+      * "NestedDataset.process()"
+
+      * "NestedDataset.update_args()"
+
+      * "NestedDataset.map()"
+
+      * "NestedDataset.filter()"
+
+      * "NestedDataset.select()"
+
+      * "NestedDataset.from_dict()"
+
+      * "NestedDataset.add_column()"
+
+      * "NestedDataset.select_columns()"
+
+      * "NestedDataset.remove_columns()"
+
+      * "NestedDataset.cleanup_cache_files()"
+
+      * "NestedDataset.load_from_disk()"
+
+    * "wrap_func_with_nested_access()"
+
+    * "add_same_content_to_new_column()"
+
+* data_juicer.core.executor package
+
+  * Submodules
+
+  * data_juicer.core.executor.base module
+
+    * "ExecutorBase"
+
+      * "ExecutorBase.run()"
+
+  * data_juicer.core.executor.default_executor module
+
+    * "DefaultExecutor"
+
+      * "DefaultExecutor.run()"
+
+      * "DefaultExecutor.sample_data()"
+
+  * data_juicer.core.executor.factory module
+
+    * "ExecutorFactory"
+
+      * "ExecutorFactory.create_executor()"
+
+  * data_juicer.core.executor.ray_executor module
+
+    * "TempDirManager"
+
+    * "RayExecutor"
+
+      * "RayExecutor.run()"
+
+  * Module contents
+
+    * "ExecutorBase"
+
+      * "ExecutorBase.run()"
+
+    * "ExecutorFactory"
+
+      * "ExecutorFactory.create_executor()"
+
+    * "DefaultExecutor"
+
+      * "DefaultExecutor.run()"
+
+      * "DefaultExecutor.sample_data()"
+
+
+Submodules
+==========
+
+
+data_juicer.core.adapter module
+===============================
+
+class data_juicer.core.adapter.Adapter(cfg: dict)
+
+   Bases: "object"
+
+   MAX_BATCH_SIZE = 10000
+
+   static execute_and_probe(dataset, operators, sample_interval=0.5)
+
+      Process the input dataset and probe related information for each
+      OP in the specified operator list.
+
+      For now, we support the following targets to probe: "resource":
+      resource utilization for each OP. "speed": average processing
+      speed for each OP.
+
+      The probe result is a list and each item in the list is the
+      probe result for each OP.
+
+   static take_batch(dataset, config)
+
+      Split the dataset into batches based on configuration and load
+      factor.
+
+      Parameters:
+         * **dataset** -- The dataset to be split
+
+         * **config** -- Configuration settings, including batch size
+
+      Returns:
+         An iterator of batches
+
+   adapt_workloads(dataset, operators)
+
+      Manage the scheduling and load balancing for the dataset
+      processing.
+
+      Parameters:
+         * **dataset** -- The dataset that needs to be processed
+
+         * **operators** -- Operators in the data recipe
+
+   probe_small_batch(dataset, operators)
+
+      Perform small batch pre-execution to probe available resources,
+      current load and estimated OP speed, returning load factors and
+      speed ranks for each OP.
+
+      Notice: the probe should be run with cache enabled to avoid
+      removing the cache files of the input dataset.
+
+      Parameters:
+         * **dataset** -- The dataset to pre-execute small batch on
+
+         * **operators** -- The OP list to be pre-execution and probe
+
+      Returns:
+         A list of probe results for each OP and the length of data
+         batch to probe.
+
+   batch_size_strategy(load_analysis_res, base_bs=1, util_th=0.9)
+
+      Decide the batch size for each op according to their workload
+      analysis result and expected utilization threshold. We need to
+      guarantee that the resource utilization won't exceed the
+      threshold. Now we only consider the buckets effect, which means
+      the max batch size is decided by the max utilization of all
+      types of resources except GPU util (decided by num_proc).
+
+   analyze_small_batch(dataset, current_state)
+
+      Perform small batch analysis to probe the current OP-wise
+      stats/meta distributions. The analyzed results will be stored in
+      the directory *{work_dir}/insight_mining*.
+
+      Notice: the probe should be run with cache enabled to avoid
+      removing the cache files of the input dataset.
+
+      Parameters:
+         * **dataset** -- The dataset to analyze small batch on
+
+         * **current_state** -- A string to indicate the current state
+           of the input dataset. It usually consists of a number of
+           the index of the OP processed just now and the OP name,
+           e.g. "1_text_length_filter".
+
+   insight_mining(pval_th=0.05)
+
+      Mining the insights from the OP-wise analysis results. For now,
+      we use T-Test to check the significance of stats/meta changes
+      before and after each OP processing. If the p-value is less than
+      a given threshold (usually 0.05), we think the stats/meta
+      changes are significant. The insight mining results will be
+      stored in the file
+      *{work_dir}/insight_mining/insight_mining.json*.
+
+      Parameters:
+         **pval_th** -- the threshold of p-value.
+
+
+data_juicer.core.analyzer module
+================================
+
+class data_juicer.core.analyzer.Analyzer(cfg: Namespace | None = None)
+
+   Bases: "object"
+
+   This Analyzer class is used to analyze a specific dataset.
+
+   It will compute stats for all filter ops in the config file, apply
+   multiple analysis (e.g. OverallAnalysis, ColumnWiseAnalysis, etc.)
+   on these stats, and generate the analysis results (stats tables,
+   distribution figures, etc.) to help users understand the input
+   dataset better.
+
+   run(dataset: Dataset | NestedDataset | None = None, load_data_np: Annotated[int, Gt(gt=0)] | None = None, skip_export: bool = False, skip_return: bool = False)
+
+      Running the dataset analysis pipeline.
+
+      Parameters:
+         * **dataset** -- a Dataset object to be analyzed.
+
+         * **load_data_np** -- number of workers when loading the
+           dataset.
+
+         * **skip_export** -- whether export the results into disk
+
+         * **skip_return** -- skip return for API called.
+
+      Returns:
+         analyzed dataset.
+
+
+data_juicer.core.exporter module
+================================
+
+class data_juicer.core.exporter.Exporter(export_path, export_shard_size=0, export_in_parallel=True, num_proc=1, export_ds=True, keep_stats_in_res_ds=False, keep_hashes_in_res_ds=False, export_stats=True)
+
+   Bases: "object"
+
+   The Exporter class is used to export a dataset to files of specific
+   format.
+
+   KiB = 1024
+
+   MiB = 1048576
+
+   GiB = 1073741824
+
+   TiB = 1099511627776
+
+   export(dataset)
+
+      Export method for a dataset.
+
+      Parameters:
+         **dataset** -- the dataset to export.
+
+      Returns:
+   export_compute_stats(dataset, export_path)
+
+      Export method for saving compute status in filters
+
+   static to_jsonl(dataset, export_path, num_proc=1, **kwargs)
+
+      Export method for jsonl target files.
+
+      Parameters:
+         * **dataset** -- the dataset to export.
+
+         * **export_path** -- the path to store the exported dataset.
+
+         * **num_proc** -- the number of processes used to export the
+           dataset.
+
+         * **kwargs** -- extra arguments.
+
+      Returns:
+   static to_json(dataset, export_path, num_proc=1, **kwargs)
+
+      Export method for json target files.
+
+      Parameters:
+         * **dataset** -- the dataset to export.
+
+         * **export_path** -- the path to store the exported dataset.
+
+         * **num_proc** -- the number of processes used to export the
+           dataset.
+
+         * **kwargs** -- extra arguments.
+
+      Returns:
+   static to_parquet(dataset, export_path, **kwargs)
+
+      Export method for parquet target files.
+
+      Parameters:
+         * **dataset** -- the dataset to export.
+
+         * **export_path** -- the path to store the exported dataset.
+
+         * **kwargs** -- extra arguments.
+
+      Returns:
+
+data_juicer.core.monitor module
+===============================
+
+data_juicer.core.monitor.resource_monitor(mdict, interval)
+
+class data_juicer.core.monitor.Monitor
+
+   Bases: "object"
+
+   Monitor resource utilization and other information during the data
+   processing.
+
+   Resource utilization dict: (for each func) '''python {
+
+      'time': 10, 'sampling interval': 0.5, 'resource': [
+
+         {
+            'timestamp': xxx, 'CPU count': xxx, 'GPU free mem.': xxx.
+            ...
+
+         }, {
+
+            'timestamp': xxx, 'CPU count': xxx, 'GPU free mem.': xxx,
+            ...
+
+         },
+
+      ]
+
+
+   }
+   -
+
+   Based on the structure above, the resource utilization analysis
+   result will add several extra fields on the first level: '''python
+   {
+
+      'time': 10, 'sampling interval': 0.5, 'resource': [...],
+      'resource_analysis': {
+
+         'GPU free mem.': {
+            'max': xxx, 'min': xxx, 'avg': xxx,
+
+      }
+
+
+   }
+   -
+
+   Only those fields in DYNAMIC_FIELDS will be analyzed.
+
+   DYNAMIC_FIELDS = {'Available mem.', 'CPU util.', 'Free mem.', 'GPU free mem.', 'GPU used mem.', 'GPU util.', 'Mem. util.', 'Used mem.'}
+
+   monitor_all_resources()
+
+      Detect the resource utilization of all distributed nodes.
+
+   static monitor_current_resources()
+
+      Detect the resource utilization of the current
+      environment/machine. All data of "util." is ratios in the range
+      of [0.0, 1.0]. All data of "mem." is in MB.
+
+   static draw_resource_util_graph(resource_util_list, store_dir)
+
+   static analyze_resource_util_list(resource_util_list)
+
+      Analyze the resource utilization for a given resource util list.
+      Compute {'max', 'min', 'avg'} of resource metrics for each dict
+      item.
+
+   static analyze_single_resource_util(resource_util_dict)
+
+      Analyze the resource utilization for a single resource util
+      dict. Compute {'max', 'min', 'avg'} of each resource metrics.
+
+   static monitor_func(func, args=None, sample_interval=0.5)
+
+      Process the input dataset and probe related information for each
+      OP in the specified operator list.
+
+      For now, we support the following targets to probe: "resource":
+      resource utilization for each OP. "speed": average processing
+      speed for each OP.
+
+      The probe result is a list and each item in the list is the
+      probe result for each OP.
+
+
+data_juicer.core.tracer module
+==============================
+
+class data_juicer.core.tracer.Tracer(work_dir, show_num=10)
+
+   Bases: "object"
+
+   The tracer to trace the sample changes before and after an operator
+   process.
+
+   The comparison results will be stored in the work directory.
+
+   trace_mapper(op_name: str, previous_ds: Dataset, processed_ds: Dataset, text_key: str)
+
+      Compare datasets before and after a Mapper.
+
+      This will mainly show the different sample pairs due to the
+      modification by the Mapper
+
+      Parameters:
+         * **op_name** -- the op name of mapper
+
+         * **previous_ds** -- dataset before the mapper process
+
+         * **processed_ds** -- dataset processed by the mapper
+
+         * **text_key** -- which text_key to trace
+
+      Returns:
+   trace_batch_mapper(op_name: str, previous_ds: Dataset, processed_ds: Dataset, text_key: str)
+
+      Compare datasets before and after a BatchMapper.
+
+      This will mainly show the new samples augmented by the
+      BatchMapper
+
+      Parameters:
+         * **op_name** -- the op name of mapper
+
+         * **previous_ds** -- dataset before the mapper process
+
+         * **processed_ds** -- dataset processed by the mapper
+
+         * **text_key** -- which text_key to trace
+
+      Returns:
+   trace_filter(op_name: str, previous_ds: Dataset, processed_ds: Dataset)
+
+      Compare datasets before and after a Filter.
+
+      This will mainly show the filtered samples by the Filter
+
+      Parameters:
+         * **op_name** -- the op name of filter
+
+         * **previous_ds** -- dataset before the filter process
+
+         * **processed_ds** -- dataset processed by the filter
+
+      Returns:
+   trace_deduplicator(op_name: str, dup_pairs: list)
+
+      Compare datasets before and after a Deduplicator.
+
+      This will mainly show the near-duplicate sample pairs extracted
+      by the Deduplicator. Different from the other two trace methods,
+      the trace process for deduplicator is embedded into the process
+      method of deduplicator, but the other two trace methods are
+      independent of the process method of mapper and filter operators
+
+      Parameters:
+         * **op_name** -- the op name of deduplicator
+
+         * **dup_pairs** -- duplicate sample pairs obtained from
+           deduplicator
+
+      Returns:
+
+Module contents
+===============
+
+class data_juicer.core.Adapter(cfg: dict)
+
+   Bases: "object"
+
+   MAX_BATCH_SIZE = 10000
+
+   static execute_and_probe(dataset, operators, sample_interval=0.5)
+
+      Process the input dataset and probe related information for each
+      OP in the specified operator list.
+
+      For now, we support the following targets to probe: "resource":
+      resource utilization for each OP. "speed": average processing
+      speed for each OP.
+
+      The probe result is a list and each item in the list is the
+      probe result for each OP.
+
+   static take_batch(dataset, config)
+
+      Split the dataset into batches based on configuration and load
+      factor.
+
+      Parameters:
+         * **dataset** -- The dataset to be split
+
+         * **config** -- Configuration settings, including batch size
+
+      Returns:
+         An iterator of batches
+
+   adapt_workloads(dataset, operators)
+
+      Manage the scheduling and load balancing for the dataset
+      processing.
+
+      Parameters:
+         * **dataset** -- The dataset that needs to be processed
+
+         * **operators** -- Operators in the data recipe
+
+   probe_small_batch(dataset, operators)
+
+      Perform small batch pre-execution to probe available resources,
+      current load and estimated OP speed, returning load factors and
+      speed ranks for each OP.
+
+      Notice: the probe should be run with cache enabled to avoid
+      removing the cache files of the input dataset.
+
+      Parameters:
+         * **dataset** -- The dataset to pre-execute small batch on
+
+         * **operators** -- The OP list to be pre-execution and probe
+
+      Returns:
+         A list of probe results for each OP and the length of data
+         batch to probe.
+
+   batch_size_strategy(load_analysis_res, base_bs=1, util_th=0.9)
+
+      Decide the batch size for each op according to their workload
+      analysis result and expected utilization threshold. We need to
+      guarantee that the resource utilization won't exceed the
+      threshold. Now we only consider the buckets effect, which means
+      the max batch size is decided by the max utilization of all
+      types of resources except GPU util (decided by num_proc).
+
+   analyze_small_batch(dataset, current_state)
+
+      Perform small batch analysis to probe the current OP-wise
+      stats/meta distributions. The analyzed results will be stored in
+      the directory *{work_dir}/insight_mining*.
+
+      Notice: the probe should be run with cache enabled to avoid
+      removing the cache files of the input dataset.
+
+      Parameters:
+         * **dataset** -- The dataset to analyze small batch on
+
+         * **current_state** -- A string to indicate the current state
+           of the input dataset. It usually consists of a number of
+           the index of the OP processed just now and the OP name,
+           e.g. "1_text_length_filter".
+
+   insight_mining(pval_th=0.05)
+
+      Mining the insights from the OP-wise analysis results. For now,
+      we use T-Test to check the significance of stats/meta changes
+      before and after each OP processing. If the p-value is less than
+      a given threshold (usually 0.05), we think the stats/meta
+      changes are significant. The insight mining results will be
+      stored in the file
+      *{work_dir}/insight_mining/insight_mining.json*.
+
+      Parameters:
+         **pval_th** -- the threshold of p-value.
+
+class data_juicer.core.Analyzer(cfg: Namespace | None = None)
+
+   Bases: "object"
+
+   This Analyzer class is used to analyze a specific dataset.
+
+   It will compute stats for all filter ops in the config file, apply
+   multiple analysis (e.g. OverallAnalysis, ColumnWiseAnalysis, etc.)
+   on these stats, and generate the analysis results (stats tables,
+   distribution figures, etc.) to help users understand the input
+   dataset better.
+
+   run(dataset: Dataset | NestedDataset | None = None, load_data_np: Annotated[int, Gt(gt=0)] | None = None, skip_export: bool = False, skip_return: bool = False)
+
+      Running the dataset analysis pipeline.
+
+      Parameters:
+         * **dataset** -- a Dataset object to be analyzed.
+
+         * **load_data_np** -- number of workers when loading the
+           dataset.
+
+         * **skip_export** -- whether export the results into disk
+
+         * **skip_return** -- skip return for API called.
+
+      Returns:
+         analyzed dataset.
+
+class data_juicer.core.NestedDataset(*args, **kargs)
+
+   Bases: "Dataset", "DJDataset"
+
+   Enhanced HuggingFace-Dataset for better usability and efficiency.
+
+   schema() -> Schema
+
+      Get dataset schema.
+
+   get(k: int) -> List[Dict[str, Any]]
+
+      Get k rows from the dataset.
+
+   get_column(column: str, k: int | None = None) -> List[Any]
+
+      Get column values from HuggingFace dataset.
+
+      Args:
+         column: Name of the column to retrieve k: Optional number of
+         rows to return. If None, returns all rows
+
+      Returns:
+         List of values from the specified column
+
+      Raises:
+         KeyError: If column doesn't exist ValueError: If k is
+         negative
+
+   process(operators, *, work_dir=None, exporter=None, checkpointer=None, tracer=None, adapter=None, open_monitor=True)
+
+      process a list of operators on the dataset.
+
+   update_args(args, kargs, is_filter=False)
+
+   map(*args, **kargs)
+
+      Override the map func, which is called by most common
+      operations, such that the processed samples can be accessed by
+      nested manner.
+
+   filter(*args, **kargs)
+
+      Override the filter func, which is called by most common
+      operations, such that the processed samples can be accessed by
+      nested manner.
+
+   select(*args, **kargs)
+
+      Override the select func, such that selected samples can be
+      accessed by nested manner.
+
+   classmethod from_dict(*args, **kargs)
+
+      Override the from_dict func, which is called by most from_xx
+      constructors, such that the constructed dataset object is
+      NestedDataset.
+
+   add_column(*args, **kargs)
+
+      Override the add column func, such that the processed samples
+      can be accessed by nested manner.
+
+   select_columns(*args, **kargs)
+
+      Override the select columns func, such that the processed
+      samples can be accessed by nested manner.
+
+   remove_columns(*args, **kargs)
+
+      Override the remove columns func, such that the processed
+      samples can be accessed by nested manner.
+
+   cleanup_cache_files()
+
+      Override the cleanup_cache_files func, clear raw and compressed
+      cache files.
+
+   static load_from_disk(*args, **kargs)
+
+      Loads a dataset that was previously saved using [*save_to_disk*]
+      from a dataset directory, or from a filesystem using any
+      implementation of *fsspec.spec.AbstractFileSystem*.
+
+      Args:
+         dataset_path (*path-like*):
+            Path (e.g. *"dataset/train"*) or remote URI (e.g. *"s3
+            //my-bucket/dataset/train"*) of the dataset directory
+            where the dataset will be loaded from.
+
+         keep_in_memory (*bool*, defaults to *None*):
+            Whether to copy the dataset in-memory. If *None*, the
+            dataset will not be copied in-memory unless explicitly
+            enabled by setting *datasets.config.IN_MEMORY_MAX_SIZE* to
+            nonzero. See more details in the [improve
+            performance](../cache#improve-performance) section.
+
+         storage_options (*dict*, *optional*):
+            Key/value pairs to be passed on to the file-system
+            backend, if any.
+
+            <Added version="2.8.0"/>
+
+      Returns:
+         [*Dataset*] or [*DatasetDict*]: - If *dataset_path* is a path
+         of a dataset directory, the dataset requested. - If
+         *dataset_path* is a path of a dataset dict directory, a
+         *datasets.DatasetDict* with each split.
+
+      Example:
+
+      "`py >>> ds = load_from_disk("path/to/dataset/directory") `"
+
+class data_juicer.core.ExecutorBase(cfg: Namespace | None = None)
+
+   Bases: "ABC"
+
+   abstract run(load_data_np: Annotated[int, Gt(gt=0)] | None = None, skip_return=False)
+
+class data_juicer.core.ExecutorFactory
+
+   Bases: "object"
+
+   static create_executor(executor_type: str) -> DefaultExecutor | RayExecutor
+
+class data_juicer.core.DefaultExecutor(cfg: Namespace | None = None)
+
+   Bases: "ExecutorBase"
+
+   This Executor class is used to process a specific dataset.
+
+   It will load the dataset and unify the format, then apply all the
+   ops in the config file in order and generate a processed dataset.
+
+   run(dataset: Dataset | NestedDataset | None = None, load_data_np: Annotated[int, Gt(gt=0)] | None = None, skip_return=False)
+
+      Running the dataset process pipeline.
+
+      Parameters:
+         * **dataset** -- a Dataset object to be executed.
+
+         * **load_data_np** -- number of workers when loading the
+           dataset.
+
+         * **skip_return** -- skip return for API called.
+
+      Returns:
+         processed dataset.
+
+   sample_data(dataset_to_sample: Dataset | None = None, load_data_np=None, sample_ratio: float = 1.0, sample_algo: str = 'uniform', **kwargs)
+
+      Sample a subset from the given dataset. TODO add support other
+      than LocalExecutor
+
+      Parameters:
+         * **dataset_to_sample** -- Dataset to sample from. If None,
+           will use the formatter linked by the executor. Default is
+           None.
+
+         * **load_data_np** -- number of workers when loading the
+           dataset.
+
+         * **sample_ratio** -- The ratio of the sample size to the
+           original dataset size. Default is 1.0 (no sampling).
+
+         * **sample_algo** -- Sampling algorithm to use. Options are
+           "uniform", "frequency_specified_field_selector", or
+           "topk_specified_field_selector". Default is "uniform".
+
+      Returns:
+         A sampled Dataset.
+
+class data_juicer.core.Exporter(export_path, export_shard_size=0, export_in_parallel=True, num_proc=1, export_ds=True, keep_stats_in_res_ds=False, keep_hashes_in_res_ds=False, export_stats=True)
+
+   Bases: "object"
+
+   The Exporter class is used to export a dataset to files of specific
+   format.
+
+   KiB = 1024
+
+   MiB = 1048576
+
+   GiB = 1073741824
+
+   TiB = 1099511627776
+
+   export(dataset)
+
+      Export method for a dataset.
+
+      Parameters:
+         **dataset** -- the dataset to export.
+
+      Returns:
+   export_compute_stats(dataset, export_path)
+
+      Export method for saving compute status in filters
+
+   static to_jsonl(dataset, export_path, num_proc=1, **kwargs)
+
+      Export method for jsonl target files.
+
+      Parameters:
+         * **dataset** -- the dataset to export.
+
+         * **export_path** -- the path to store the exported dataset.
+
+         * **num_proc** -- the number of processes used to export the
+           dataset.
+
+         * **kwargs** -- extra arguments.
+
+      Returns:
+   static to_json(dataset, export_path, num_proc=1, **kwargs)
+
+      Export method for json target files.
+
+      Parameters:
+         * **dataset** -- the dataset to export.
+
+         * **export_path** -- the path to store the exported dataset.
+
+         * **num_proc** -- the number of processes used to export the
+           dataset.
+
+         * **kwargs** -- extra arguments.
+
+      Returns:
+   static to_parquet(dataset, export_path, **kwargs)
+
+      Export method for parquet target files.
+
+      Parameters:
+         * **dataset** -- the dataset to export.
+
+         * **export_path** -- the path to store the exported dataset.
+
+         * **kwargs** -- extra arguments.
+
+      Returns:
+class data_juicer.core.Monitor
+
+   Bases: "object"
+
+   Monitor resource utilization and other information during the data
+   processing.
+
+   Resource utilization dict: (for each func) '''python {
+
+      'time': 10, 'sampling interval': 0.5, 'resource': [
+
+         {
+            'timestamp': xxx, 'CPU count': xxx, 'GPU free mem.': xxx.
+            ...
+
+         }, {
+
+            'timestamp': xxx, 'CPU count': xxx, 'GPU free mem.': xxx,
+            ...
+
+         },
+
+      ]
+
+
+   }
+   -
+
+   Based on the structure above, the resource utilization analysis
+   result will add several extra fields on the first level: '''python
+   {
+
+      'time': 10, 'sampling interval': 0.5, 'resource': [...],
+      'resource_analysis': {
+
+         'GPU free mem.': {
+            'max': xxx, 'min': xxx, 'avg': xxx,
+
+      }
+
+
+   }
+   -
+
+   Only those fields in DYNAMIC_FIELDS will be analyzed.
+
+   DYNAMIC_FIELDS = {'Available mem.', 'CPU util.', 'Free mem.', 'GPU free mem.', 'GPU used mem.', 'GPU util.', 'Mem. util.', 'Used mem.'}
+
+   monitor_all_resources()
+
+      Detect the resource utilization of all distributed nodes.
+
+   static monitor_current_resources()
+
+      Detect the resource utilization of the current
+      environment/machine. All data of "util." is ratios in the range
+      of [0.0, 1.0]. All data of "mem." is in MB.
+
+   static draw_resource_util_graph(resource_util_list, store_dir)
+
+   static analyze_resource_util_list(resource_util_list)
+
+      Analyze the resource utilization for a given resource util list.
+      Compute {'max', 'min', 'avg'} of resource metrics for each dict
+      item.
+
+   static analyze_single_resource_util(resource_util_dict)
+
+      Analyze the resource utilization for a single resource util
+      dict. Compute {'max', 'min', 'avg'} of each resource metrics.
+
+   static monitor_func(func, args=None, sample_interval=0.5)
+
+      Process the input dataset and probe related information for each
+      OP in the specified operator list.
+
+      For now, we support the following targets to probe: "resource":
+      resource utilization for each OP. "speed": average processing
+      speed for each OP.
+
+      The probe result is a list and each item in the list is the
+      probe result for each OP.
+
+class data_juicer.core.Tracer(work_dir, show_num=10)
+
+   Bases: "object"
+
+   The tracer to trace the sample changes before and after an operator
+   process.
+
+   The comparison results will be stored in the work directory.
+
+   trace_mapper(op_name: str, previous_ds: Dataset, processed_ds: Dataset, text_key: str)
+
+      Compare datasets before and after a Mapper.
+
+      This will mainly show the different sample pairs due to the
+      modification by the Mapper
+
+      Parameters:
+         * **op_name** -- the op name of mapper
+
+         * **previous_ds** -- dataset before the mapper process
+
+         * **processed_ds** -- dataset processed by the mapper
+
+         * **text_key** -- which text_key to trace
+
+      Returns:
+   trace_batch_mapper(op_name: str, previous_ds: Dataset, processed_ds: Dataset, text_key: str)
+
+      Compare datasets before and after a BatchMapper.
+
+      This will mainly show the new samples augmented by the
+      BatchMapper
+
+      Parameters:
+         * **op_name** -- the op name of mapper
+
+         * **previous_ds** -- dataset before the mapper process
+
+         * **processed_ds** -- dataset processed by the mapper
+
+         * **text_key** -- which text_key to trace
+
+      Returns:
+   trace_filter(op_name: str, previous_ds: Dataset, processed_ds: Dataset)
+
+      Compare datasets before and after a Filter.
+
+      This will mainly show the filtered samples by the Filter
+
+      Parameters:
+         * **op_name** -- the op name of filter
+
+         * **previous_ds** -- dataset before the filter process
+
+         * **processed_ds** -- dataset processed by the filter
+
+      Returns:
+   trace_deduplicator(op_name: str, dup_pairs: list)
+
+      Compare datasets before and after a Deduplicator.
+
+      This will mainly show the near-duplicate sample pairs extracted
+      by the Deduplicator. Different from the other two trace methods,
+      the trace process for deduplicator is embedded into the process
+      method of deduplicator, but the other two trace methods are
+      independent of the process method of mapper and filter operators
+
+      Parameters:
+         * **op_name** -- the op name of deduplicator
+
+         * **dup_pairs** -- duplicate sample pairs obtained from
+           deduplicator
+
+      Returns:

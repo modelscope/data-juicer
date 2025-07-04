@@ -1,0 +1,219 @@
+data_juicer.config package
+**************************
+
+
+Submodules
+==========
+
+
+data_juicer.config.config module
+================================
+
+data_juicer.config.config.timing_context(description)
+
+data_juicer.config.config.init_configs(args: List[str] | None = None, which_entry: object | None = None)
+
+   initialize the jsonargparse parser and parse configs from one of:
+      1. POSIX-style commands line args;
+
+      2. config files in yaml (json and jsonnet supersets);
+
+      3. environment variables
+
+      4. hard-coded defaults
+
+   Parameters:
+      * **args** -- list of params, e.g., ['--config', 'cfg.yaml'],
+        default None.
+
+      * **which_entry** -- which entry to init configs
+        (executor/analyzer)
+
+   Returns:
+      a global cfg object used by the DefaultExecutor or Analyzer
+
+data_juicer.config.config.update_ds_cache_dir_and_related_vars(new_ds_cache_path)
+
+data_juicer.config.config.init_setup_from_cfg(cfg: Namespace)
+
+   Do some extra setup tasks after parsing config file or command
+   line.
+
+   1. create working directory and a log directory
+
+   2. update cache directory
+
+   3. update checkpoint and *temp_dir* of tempfile
+
+   Parameters:
+      * **cfg** -- an original cfg
+
+      * **cfg** -- an updated cfg
+
+data_juicer.config.config.load_ops_with_stats_meta()
+
+data_juicer.config.config.update_op_attr(op_list: list, attr_dict: dict | None = None)
+
+data_juicer.config.config.sort_op_by_types_and_names(op_name_classes)
+
+   Split ops items by op type and sort them to sub-ops by name, then
+   concat together.
+
+   Parameters:
+      **op_name_classes** -- a list of op modules
+
+   Returns:
+      sorted op list , each item is a pair of op_name and op_class
+
+data_juicer.config.config.update_op_process(cfg, parser, used_ops=None)
+
+   Update operator process configuration with optimized performance.
+
+   Args:
+      cfg: Configuration namespace parser: Argument parser used_ops:
+      Set of operator names that are actually used in the config
+
+data_juicer.config.config.namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None)
+
+data_juicer.config.config.config_backup(cfg: Namespace)
+
+data_juicer.config.config.display_config(cfg: Namespace)
+
+data_juicer.config.config.export_config(cfg: Namespace, path: str, format: str = 'yaml', skip_none: bool = True, skip_check: bool = True, overwrite: bool = False, multifile: bool = True)
+
+   Save the config object, some params are from jsonargparse
+
+   Parameters:
+      * **cfg** -- cfg object to save (Namespace type)
+
+      * **path** -- the save path
+
+      * **format** -- 'yaml', 'json', 'json_indented', 'parser_mode'
+
+      * **skip_none** -- Whether to exclude entries whose value is
+        None.
+
+      * **skip_check** -- Whether to skip parser checking.
+
+      * **overwrite** -- Whether to overwrite existing files.
+
+      * **multifile** -- Whether to save multiple config files by
+        using the __path__ metas.
+
+   Returns:
+data_juicer.config.config.merge_config(ori_cfg: Namespace, new_cfg: Namespace)
+
+   Merge configuration from new_cfg into ori_cfg
+
+   Parameters:
+      * **ori_cfg** -- the original configuration object, whose type
+        is expected as namespace from jsonargparse
+
+      * **new_cfg** -- the configuration object to be merged, whose
+        type is expected as dict or namespace from jsonargparse
+
+   Returns:
+      cfg_after_merge
+
+data_juicer.config.config.prepare_side_configs(ori_config: str | Namespace | Dict)
+
+   parse the config if ori_config is a string of a config file path
+   with
+      yaml, yml or json format
+
+   Parameters:
+      **ori_config** -- a config dict or a string of a config file
+      path with yaml, yml or json format
+
+   Returns:
+      a config dict
+
+data_juicer.config.config.get_init_configs(cfg: Namespace | Dict)
+
+   set init configs of data-juicer for cfg
+
+data_juicer.config.config.get_default_cfg()
+
+   Get default config values from config_all.yaml
+
+
+Module contents
+===============
+
+data_juicer.config.init_configs(args: List[str] | None = None, which_entry: object | None = None)
+
+   initialize the jsonargparse parser and parse configs from one of:
+      1. POSIX-style commands line args;
+
+      2. config files in yaml (json and jsonnet supersets);
+
+      3. environment variables
+
+      4. hard-coded defaults
+
+   Parameters:
+      * **args** -- list of params, e.g., ['--config', 'cfg.yaml'],
+        default None.
+
+      * **which_entry** -- which entry to init configs
+        (executor/analyzer)
+
+   Returns:
+      a global cfg object used by the DefaultExecutor or Analyzer
+
+data_juicer.config.get_init_configs(cfg: Namespace | Dict)
+
+   set init configs of data-juicer for cfg
+
+data_juicer.config.export_config(cfg: Namespace, path: str, format: str = 'yaml', skip_none: bool = True, skip_check: bool = True, overwrite: bool = False, multifile: bool = True)
+
+   Save the config object, some params are from jsonargparse
+
+   Parameters:
+      * **cfg** -- cfg object to save (Namespace type)
+
+      * **path** -- the save path
+
+      * **format** -- 'yaml', 'json', 'json_indented', 'parser_mode'
+
+      * **skip_none** -- Whether to exclude entries whose value is
+        None.
+
+      * **skip_check** -- Whether to skip parser checking.
+
+      * **overwrite** -- Whether to overwrite existing files.
+
+      * **multifile** -- Whether to save multiple config files by
+        using the __path__ metas.
+
+   Returns:
+data_juicer.config.merge_config(ori_cfg: Namespace, new_cfg: Namespace)
+
+   Merge configuration from new_cfg into ori_cfg
+
+   Parameters:
+      * **ori_cfg** -- the original configuration object, whose type
+        is expected as namespace from jsonargparse
+
+      * **new_cfg** -- the configuration object to be merged, whose
+        type is expected as dict or namespace from jsonargparse
+
+   Returns:
+      cfg_after_merge
+
+data_juicer.config.prepare_side_configs(ori_config: str | Namespace | Dict)
+
+   parse the config if ori_config is a string of a config file path
+   with
+      yaml, yml or json format
+
+   Parameters:
+      **ori_config** -- a config dict or a string of a config file
+      path with yaml, yml or json format
+
+   Returns:
+      a config dict
+
+data_juicer.config.get_default_cfg()
+
+   Get default config values from config_all.yaml
