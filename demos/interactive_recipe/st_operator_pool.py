@@ -5,7 +5,9 @@ from collections import OrderedDict
 import numpy as np
 import pandas as pd
 import os
+import re
 import json
+import math
 
 from matplotlib import pyplot as plt
 from wordcloud import WordCloud
@@ -175,6 +177,26 @@ class StOperatorPool(OperatorPool):
         super(StOperatorPool, self).__init__(config_path=config_path)
         for op_name in self.pool:
             self.pool[op_name] = StOperator(self, state=self.pool[op_name].state)
+        self.items_per_page = 15  # Number of operators displayed per page
+        self.current_page = 1
+        self.search_term = ""
+        self.search_example = "e.g., filter|remove"
+
+    def filter_operators(self):
+        if not self.search_term:
+            return list(self.pool.keys())
+
+        filtered_ops = []
+        try:
+            pattern = re.compile(self.search_term.lower())
+            for op_name, op in self.pool.items():
+                if pattern.search(op_name.lower()) or pattern.search(op.desc.lower()):
+                    filtered_ops.append(op_name)
+        except re.error:
+            st.warning("Invalid regular expression.")
+            return list(self.pool.keys())
+
+        return filtered_ops
 
     def render(self):
         with st.sidebar:
@@ -186,18 +208,54 @@ class StOperatorPool(OperatorPool):
                     project_name=st.session_state.project_name,
                     dataset_path=st.session_state.dataset_path,
                     nproc=1,
-                    export_path=st.session_state.get('export_path', './data/processed_dataset.jsonl'),
+                    export_path=st.session_state.get(
+                        "export_path", "./data/processed_dataset.jsonl"
+                    ),
                 )
                 config_path = os.path.join(os.path.dirname(__file__), config_path)
                 st.write(f"Successfully export config to {config_path}.")
+
+            # search box
+            self.search_term = st.text_input(
+                "Search Operators",
+                value=self.search_term,
+                placeholder=self.search_example,
+            )
             # Show enabled only option
             st.checkbox(
                 emoji.emojize("Show enabled:check_mark_button: only"),
                 value=False,
-                key='show_enabled_only'
+                key="show_enabled_only",
             )
-            for op_name in self.pool:
+
+            # filter operator
+            filtered_ops = self.filter_operators()
+
+            total_ops = len(filtered_ops)
+
+            # Computes the operator displayed on the current page
+            start_index = (self.current_page - 1) * self.items_per_page
+            end_index = min(start_index + self.items_per_page, total_ops)
+            ops_to_render = filtered_ops[start_index:end_index]
+
+            # Operator rendering the current page
+            for op_name in ops_to_render:
                 self.pool[op_name].render()
+
+            total_pages = math.ceil(total_ops / self.items_per_page)
+
+            # paging controls
+            cols = st.columns([0.3, 0.4, 0.3])
+            with cols[0]:
+                if st.button("👈", disabled=self.current_page == 1):
+                    self.current_page -= 1
+            with cols[2]:
+                if st.button(
+                    "👉", disabled=self.current_page == total_pages or total_pages == 0
+                ):
+                    self.current_page += 1
+
+            st.write(f"Page {self.current_page} of {total_pages}")
 
     def st_sync(self):
         for op_name in self.pool:
