@@ -1151,27 +1151,36 @@
         <span class="n">cfg</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="c1"># Create direct mapping of operator names to their configs</span>
-    <span class="n">op_configs</span> <span class="o">=</span> <span class="p">{</span><span class="nb">list</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">op</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]]</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">}</span>
+    <span class="n">op_configs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">:</span>
+        <span class="n">op_configs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]])</span>
 
     <span class="c1"># Process each used operator</span>
     <span class="n">temp_cfg</span> <span class="o">=</span> <span class="n">cfg</span>
+    <span class="n">op_name_count</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">op_name</span> <span class="ow">in</span> <span class="n">used_ops</span><span class="p">:</span>
         <span class="n">op_config</span> <span class="o">=</span> <span class="n">op_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">op_name</span><span class="p">)</span>
-
+        <span class="n">op_config_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">op_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">option_in_commands</span><span class="p">:</span>
             <span class="c1"># Update op params if set</span>
             <span class="k">if</span> <span class="n">op_config</span><span class="p">:</span>
-                <span class="n">temp_cfg</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">merge_config</span><span class="p">(</span><span class="n">dict_to_namespace</span><span class="p">({</span><span class="n">op_name</span><span class="p">:</span> <span class="n">op_config</span><span class="p">}),</span> <span class="n">temp_cfg</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">op_c</span> <span class="ow">in</span> <span class="n">op_config</span><span class="p">:</span>
+                    <span class="n">temp_cfg</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">merge_config</span><span class="p">(</span><span class="n">dict_to_namespace</span><span class="p">({</span><span class="n">op_name</span><span class="p">:</span> <span class="n">op_c</span><span class="p">}),</span> <span class="n">temp_cfg</span><span class="p">)</span>
+                    <span class="n">oc</span> <span class="o">=</span> <span class="n">namespace_to_dict</span><span class="p">(</span><span class="n">temp_cfg</span><span class="p">)[</span><span class="n">op_name</span><span class="p">]</span>
+                    <span class="n">op_config_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">oc</span><span class="p">)</span>
+                <span class="n">temp_cfg</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">merge_config</span><span class="p">(</span><span class="n">dict_to_namespace</span><span class="p">({</span><span class="n">op_name</span><span class="p">:</span> <span class="n">op_config_list</span><span class="p">}),</span> <span class="n">temp_cfg</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Remove args that will be overridden by command line</span>
             <span class="k">if</span> <span class="n">op_config</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">full_option</span> <span class="ow">in</span> <span class="n">full_option_in_commands</span><span class="p">:</span>
-                    <span class="n">key</span> <span class="o">=</span> <span class="n">full_option</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">op_config</span><span class="p">:</span>
-                        <span class="n">op_config</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">op_config</span><span class="p">:</span>
-                    <span class="n">temp_cfg</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">merge_config</span><span class="p">(</span><span class="n">dict_to_namespace</span><span class="p">({</span><span class="n">op_name</span><span class="p">:</span> <span class="n">op_config</span><span class="p">}),</span> <span class="n">temp_cfg</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">op_c</span> <span class="ow">in</span> <span class="n">op_config</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">full_option</span> <span class="ow">in</span> <span class="n">full_option_in_commands</span><span class="p">:</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="n">full_option</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">op_c</span><span class="p">:</span>
+                            <span class="n">op_c</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                    <span class="n">temp_cfg</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">merge_config</span><span class="p">(</span><span class="n">dict_to_namespace</span><span class="p">({</span><span class="n">op_name</span><span class="p">:</span> <span class="n">op_c</span><span class="p">}),</span> <span class="n">temp_cfg</span><span class="p">)</span>
+                    <span class="n">oc</span> <span class="o">=</span> <span class="n">namespace_to_dict</span><span class="p">(</span><span class="n">temp_cfg</span><span class="p">)[</span><span class="n">op_name</span><span class="p">]</span>
+                    <span class="n">op_config_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">oc</span><span class="p">)</span>
+                <span class="n">temp_cfg</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">merge_config</span><span class="p">(</span><span class="n">dict_to_namespace</span><span class="p">({</span><span class="n">op_name</span><span class="p">:</span> <span class="n">op_config_list</span><span class="p">}),</span> <span class="n">temp_cfg</span><span class="p">)</span>
 
         <span class="c1"># Update op params</span>
         <span class="n">internal_op_para</span> <span class="o">=</span> <span class="n">temp_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">op_name</span><span class="p">)</span>
@@ -1179,11 +1188,19 @@
         <span class="k">if</span> <span class="n">op_name</span> <span class="ow">in</span> <span class="n">op_configs</span><span class="p">:</span>
             <span class="c1"># Update existing operator</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">op_in_process</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">):</span>
-                <span class="k">if</span> <span class="nb">list</span><span class="p">(</span><span class="n">op_in_process</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">op_name</span><span class="p">:</span>
-                    <span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                        <span class="n">op_name</span><span class="p">:</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">internal_op_para</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">namespace_to_dict</span><span class="p">(</span><span class="n">internal_op_para</span><span class="p">)</span>
-                    <span class="p">}</span>
-                    <span class="k">break</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">internal_op_para</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">list</span><span class="p">(</span><span class="n">op_in_process</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">op_name</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">op_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">op_name_count</span><span class="p">:</span>
+                            <span class="n">op_name_count</span><span class="p">[</span><span class="n">op_name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">op_name_count</span><span class="p">[</span><span class="n">op_name</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="n">op_name</span><span class="p">:</span> <span class="p">(</span>
+                                <span class="kc">None</span>
+                                <span class="k">if</span> <span class="n">internal_op_para</span> <span class="ow">is</span> <span class="kc">None</span>
+                                <span class="k">else</span> <span class="n">namespace_to_dict</span><span class="p">(</span><span class="n">internal_op_para</span><span class="p">[</span><span class="n">op_name_count</span><span class="p">[</span><span class="n">op_name</span><span class="p">]])</span>
+                            <span class="p">)</span>
+                        <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Add new operator</span>
             <span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">op_name</span><span class="p">:</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">internal_op_para</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">namespace_to_dict</span><span class="p">(</span><span class="n">internal_op_para</span><span class="p">)})</span>
