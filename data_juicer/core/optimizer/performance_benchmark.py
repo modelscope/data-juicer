@@ -513,22 +513,35 @@ class PerformanceBenchmark:
         init_time = time.time() - init_start
         logger.info(f"  Step 1 - Filter initialization: {init_time:.3f}s")
 
-        # Step 2: Stats computation
-        stats_start = time.time()
+        # Step 2: Process each filter completely (stats + filtering) before moving to the next
+        processing_start = time.time()
         samples_with_stats = test_data.copy()
-        for i, filter_op in enumerate(actual_filters):
-            logger.info(f"    Processing filter {i+1}/{len(actual_filters)}: {filter_op._name}")
-            samples_with_stats = filter_op.compute_stats_batched(samples_with_stats)
-        stats_time = time.time() - stats_start
-        logger.info(f"  Step 2 - Stats computation: {stats_time:.3f}s")
+        total_stats_time = 0.0
+        total_filter_time = 0.0
 
-        # Step 3: Filtering
-        filter_start = time.time()
         for i, filter_op in enumerate(actual_filters):
             logger.info(f"    Processing filter {i+1}/{len(actual_filters)}: {filter_op._name}")
-            _ = list(filter_op.process_batched(samples_with_stats))
-        filter_time = time.time() - filter_start
-        logger.info(f"  Step 3 - Filtering: {filter_time:.3f}s")
+
+            # Compute stats for this filter
+            stats_start = time.time()
+            if hasattr(filter_op, "compute_stats_batched"):
+                samples_with_stats = filter_op.compute_stats_batched(samples_with_stats)
+            stats_time = time.time() - stats_start
+            total_stats_time += stats_time
+
+            # Immediately filter with this filter
+            filter_start = time.time()
+            if hasattr(filter_op, "process_batched"):
+                _ = list(filter_op.process_batched(samples_with_stats))
+            filter_time = time.time() - filter_start
+            total_filter_time += filter_time
+
+            logger.debug(f"      Filter {i+1} - Stats: {stats_time:.3f}s, Filter: {filter_time:.3f}s")
+
+        processing_time = time.time() - processing_start
+        logger.info(f"  Step 2 - Complete processing: {processing_time:.3f}s")
+        logger.info(f"    Total stats time: {total_stats_time:.3f}s")
+        logger.info(f"    Total filter time: {total_filter_time:.3f}s")
 
         # Calculate totals
         total_time = time.time() - total_start_time
@@ -538,15 +551,15 @@ class PerformanceBenchmark:
 
         logger.info("  📊 INDIVIDUAL FILTERS BREAKDOWN:")
         logger.info(f"    Initialization: {init_time:.3f}s ({init_time/total_time*100:.1f}%)")
-        logger.info(f"    Stats computation: {stats_time:.3f}s ({stats_time/total_time*100:.1f}%)")
-        logger.info(f"    Filtering: {filter_time:.3f}s ({filter_time/total_time*100:.1f}%)")
+        logger.info(f"    Stats computation: {total_stats_time:.3f}s ({total_stats_time/total_time*100:.1f}%)")
+        logger.info(f"    Filtering: {total_filter_time:.3f}s ({total_filter_time/total_time*100:.1f}%)")
         logger.info(f"    Total time: {total_time:.3f}s")
         logger.info(f"    Throughput: {throughput:.1f} samples/sec")
 
         return PerformanceMetrics(
             total_time=total_time,
-            stats_time=stats_time,
-            filter_time=filter_time,
+            stats_time=total_stats_time,
+            filter_time=total_filter_time,
             memory_usage=memory_usage,
             throughput=throughput,
         )
@@ -1036,26 +1049,28 @@ class PerformanceBenchmark:
                         # Handle both possible config structures
                         if "fused_op_list" in op_config:
                             fused_op_list = op_config["fused_op_list"]
+                            logger.debug(f"Found fused_op_list in op_config: {len(fused_op_list)} items")
                         elif "general_fused_op" in op_config and "fused_op_list" in op_config["general_fused_op"]:
                             fused_op_list = op_config["general_fused_op"]["fused_op_list"]
+                            logger.debug(f"Found fused_op_list in general_fused_op: {len(fused_op_list)} items")
+                        else:
+                            logger.debug(
+                                f"No fused_op_list found in op_config. Available keys: {list(op_config.keys())}"
+                            )
                         if fused_op_list is not None:
                             clean_config = {"fused_op_list": fused_op_list}
                             operations.append({op_name: clean_config})
+                            logger.debug(f"Added fused_filter with {len(fused_op_list)} operations")
                         else:
                             # Fallback if structure is different
                             operations.append({op_name: op_config})
-
-                    elif op_name in ["punctuation_normalization_mapper", "whitespace_normalization_mapper"]:
-                        # Individual mappers - pass through their config
-                        operations.append({op_name: op_config})
-
-                    elif op_name == "document_simhash_deduplicator":
-                        # Deduplicator - pass through its config
-                        operations.append({op_name: op_config})
+                            logger.debug("Added fused_filter with fallback config (no fused_op_list)")
 
                     else:
-                        # Unknown operation type - log and skip
-                        logger.warning(f"Unknown operation type: {op_name}")
+                        # Generic handling for all other operation types
+                        # This includes filters, mappers, deduplicators, etc.
+                        operations.append({op_name: op_config})
+                        logger.debug(f"Added operation: {op_name}")
 
                     # Continue traversing
                     traverse_node(child)
@@ -1246,7 +1261,6 @@ class PerformanceBenchmark:
 
         if individual_time > 0:
             pipeline_speedup = individual_time / pipeline_time
-
             logger.info(f"Individual execution: {individual_time:.3f}s ({individual_results.throughput:.1f} samples/s)")
             logger.info(f"Pipeline optimizer:   {pipeline_time:.3f}s ({pipeline_results.throughput:.1f} samples/s)")
             logger.info(f"Pipeline speedup:     {pipeline_speedup:.2f}x")
@@ -1262,8 +1276,29 @@ class PerformanceBenchmark:
 
         # --- Validation: Compare results between individual and pipeline ---
         logger.info("\n🔎 VALIDATING PIPELINE RESULTS AGAINST INDIVIDUAL EXECUTION")
+
+        # Get the optimized operations from the pipeline benchmark
+        pipeline_config = self._build_pipeline_config_from_filters(filters)
+        from data_juicer.core.pipeline_ast import PipelineAST
+
+        ast = PipelineAST()
+        ast.build_from_config(pipeline_config)
+        from data_juicer.core.optimizer.filter_fusion_strategy import (
+            FilterFusionStrategy,
+        )
+        from data_juicer.core.optimizer.mapper_fusion_strategy import (
+            MapperFusionStrategy,
+        )
+        from data_juicer.core.optimizer.optimizer import PipelineOptimizer
+
+        strategies = [FilterFusionStrategy(analyzer_insights=analyzer_insights), MapperFusionStrategy()]
+        optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
+        optimized_ast = optimizer.optimize(ast)
+        optimized_ops = self._convert_ast_to_operations(optimized_ast)
+
         individual_mask = self.get_final_mask_from_filters(filters, test_data)
-        pipeline_mask = self.get_final_mask_from_fused(filters, test_data, analyzer_insights)
+        pipeline_mask = self.get_final_mask_from_optimized_ops(optimized_ops, test_data)
+
         if individual_mask == pipeline_mask:
             logger.info("✅ Pipeline results match individual execution!")
             mismatches = []
@@ -1320,25 +1355,8 @@ class PerformanceBenchmark:
 
                 logger.warning(f"  Individual final result: {all(ind_masks)} (all masks: {ind_masks})")
 
-                # Detailed pipeline execution debugging
+                # Detailed pipeline execution debugging using the same optimized operations
                 logger.warning("🔗 PIPELINE EXECUTION (step-by-step):")
-                pipeline_config = self._build_pipeline_config_from_filters(filters)
-                from data_juicer.core.pipeline_ast import PipelineAST
-
-                ast = PipelineAST()
-                ast.build_from_config(pipeline_config)
-                from data_juicer.core.optimizer.filter_fusion_strategy import (
-                    FilterFusionStrategy,
-                )
-                from data_juicer.core.optimizer.mapper_fusion_strategy import (
-                    MapperFusionStrategy,
-                )
-
-                strategies = [FilterFusionStrategy(analyzer_insights=analyzer_insights), MapperFusionStrategy()]
-                optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
-                optimized_ast = optimizer.optimize(ast)
-                optimized_ops = self._convert_ast_to_operations(optimized_ast)
-
                 logger.warning(f"  Original filters: {len(filters)}")
                 logger.warning(f"  Optimized ops: {len(optimized_ops)}")
                 logger.warning(f"  Optimization ratio: {len(optimized_ops)/len(filters):.2f}x")
@@ -1469,7 +1487,6 @@ class PerformanceBenchmark:
             "analyzer_insights": analyzer_insights,
         }
 
-        logger.info("\n✅ Benchmark completed successfully!")
         return results
 
     def get_quick_test_filters(self) -> List[Filter]:
@@ -1566,11 +1583,14 @@ class PerformanceBenchmark:
         optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
         optimized_ast = optimizer.optimize(ast)
         optimized_ops = self._convert_ast_to_operations(optimized_ast)
-        data = test_data.copy()
-        from data_juicer.ops import load_ops
 
-        # Initialize final mask as all True
-        final_mask = [True] * len(data["text"])
+        return self.get_final_mask_from_optimized_ops(optimized_ops, test_data)
+
+    def get_final_mask_from_optimized_ops(self, optimized_ops: List, test_data: Dict[str, Any]) -> list:
+        """Compute the final boolean mask for each sample using optimized operations."""
+        data = test_data.copy()
+        mask = [True] * len(data["text"])
+        from data_juicer.ops import load_ops
 
         for op_config in optimized_ops:
             # Special handling for fused_filter - we need to create the actual filter objects
@@ -1592,23 +1612,11 @@ class PerformanceBenchmark:
                 if individual_filters:
                     from data_juicer.core.optimizer.fused_op import FusedFilter
 
-                    fused_filter = FusedFilter(name="fused_filter", fused_filters=individual_filters)
+                    op = FusedFilter(name="fused_filter", fused_filters=individual_filters)
                     # Force sequential execution to avoid parallel stats access issues
-                    fused_filter.execution_strategy = "sequential"
-
-                    # Process the fused filter
-                    if hasattr(fused_filter, "compute_stats_batched"):
-                        data = fused_filter.compute_stats_batched(data)
-                    if hasattr(fused_filter, "process_batched_for_validation"):
-                        mask = fused_filter.process_batched_for_validation(data)
-                        final_mask = [a and b for a, b in zip(final_mask, mask)]
-                    elif hasattr(fused_filter, "process_batched"):
-                        result = list(fused_filter.process_batched(data))
-                        if result and isinstance(result[0], bool):
-                            final_mask = [a and b for a, b in zip(final_mask, result)]
-                        else:
-                            mask = [bool(item) for item in result]
-                            final_mask = [a and b for a, b in zip(final_mask, mask)]
+                    op.execution_strategy = "sequential"
+                else:
+                    continue  # Skip if we can't create the fused filter
             elif op_name == "fused_mapper":
                 # Extract the fused_mappers list and create FusedMapper directly
                 mapper_config = op_config[op_name]
@@ -1616,36 +1624,34 @@ class PerformanceBenchmark:
                 fused_mappers = mapper_config.get("fused_mappers", [])
 
                 # Create the fused mapper directly
-                fused_mapper = FusedMapper(name=name, fused_mappers=fused_mappers)
+                from data_juicer.core.optimizer.fused_op import FusedMapper
 
-                # Execute the mapper
-                if hasattr(fused_mapper, "process_batched"):
-                    data = fused_mapper.process_batched(data)
+                op = FusedMapper(name=name, fused_mappers=fused_mappers)
             else:
                 # Load the operation from config for non-fused operations
                 loaded_ops = load_ops([op_config])
                 if loaded_ops:
                     op = loaded_ops[0]
-                    if hasattr(op, "compute_stats_batched"):
-                        data = op.compute_stats_batched(data)
-                    if hasattr(op, "process_batched_for_validation"):
-                        # Use the new validation method that returns boolean masks
-                        mask = op.process_batched_for_validation(data)
-                        # Apply AND logic with the current final mask
-                        final_mask = [a and b for a, b in zip(final_mask, mask)]
-                    elif hasattr(op, "process_batched"):
-                        result = list(op.process_batched(data))
-                        # Handle both boolean masks and text content
-                        if result and isinstance(result[0], bool):
-                            # Apply AND logic with the current final mask
-                            final_mask = [a and b for a, b in zip(final_mask, result)]
-                        else:
-                            # If it returns text content, create a mask based on non-empty results
-                            mask = [bool(item) for item in result]
-                            # Apply AND logic with the current final mask
-                            final_mask = [a and b for a, b in zip(final_mask, mask)]
+                else:
+                    continue  # Skip if we can't load the operation
 
-        return final_mask
+            # Execute the operation
+            if hasattr(op, "compute_stats_batched"):
+                data = op.compute_stats_batched(data)
+            if hasattr(op, "process_batched"):
+                result = list(op.process_batched(data))
+                # Handle both boolean masks and text content
+                if result and isinstance(result[0], bool):
+                    op_mask = result
+                else:
+                    # If it returns text content, create a mask based on non-empty results
+                    op_mask = [bool(item) for item in result]
+
+                # Apply the operation mask (AND operation)
+                if len(op_mask) == len(mask):
+                    mask = [m and o for m, o in zip(mask, op_mask)]
+
+        return mask
 
     def get_complex_only_test_filters(self) -> List[Filter]:
         """Get only complex filters for testing advanced fusion scenarios."""
