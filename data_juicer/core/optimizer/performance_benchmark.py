@@ -37,7 +37,7 @@ import numpy as np
 from loguru import logger
 
 from data_juicer.core.analyzer import Analyzer
-from data_juicer.core.optimizer.fused_op import FusedFilter
+from data_juicer.core.optimizer.fused_op import FusedFilter, FusedMapper
 from data_juicer.core.optimizer.optimizer import PipelineOptimizer
 from data_juicer.ops.base_op import Filter
 from data_juicer.ops.filter import (
@@ -488,68 +488,65 @@ class PerformanceBenchmark:
         }
 
     def run_individual_filters_benchmark(self, filters: List[Filter], test_data: Dict[str, Any]) -> PerformanceMetrics:
-        """Benchmark individual filter execution."""
+        """Benchmark individual filters executed sequentially."""
         logger.info("Running individual filters benchmark...")
 
         start_memory = self.measure_memory_usage()
         total_start_time = time.time()
 
-        total_stats_time = 0.0
-        total_filter_time = 0.0
-        filter_details = []
+        # Step 1: Initialize filters
+        init_start = time.time()
+        # Filter out operations that don't have compute_stats_batched (like mappers)
+        actual_filters = [f for f in filters if hasattr(f, "compute_stats_batched")]
+        logger.info(f"  Found {len(actual_filters)} actual filters out of {len(filters)} operations")
 
-        for i, filter_op in enumerate(filters):
-            op_name = getattr(filter_op, "_name", type(filter_op).__name__)
-            logger.info(f"  Processing filter {i+1}/{len(filters)}: {op_name}")
-
-            # Phase 1: Stats computation
-            stats_start = time.time()
-            samples_with_stats = filter_op.compute_stats_batched(test_data.copy())
-            stats_time = time.time() - stats_start
-            total_stats_time += stats_time
-
-            # Phase 2: Filtering
-            filter_start = time.time()
-            _ = filter_op.process_batched(samples_with_stats)
-            filter_time = time.time() - filter_start
-            total_filter_time += filter_time
-
-            filter_details.append(
-                {
-                    "name": op_name,
-                    "stats_time": stats_time,
-                    "filter_time": filter_time,
-                    "total_time": stats_time + filter_time,
-                }
+        if not actual_filters:
+            logger.warning("  No actual filters found to benchmark!")
+            return PerformanceMetrics(
+                total_time=0.0,
+                stats_time=0.0,
+                filter_time=0.0,
+                memory_usage=0.0,
+                throughput=0.0,
             )
 
-            logger.info(
-                f"    Stats: {stats_time:.3f}s, Filter: {filter_time:.3f}s, Total: {stats_time + filter_time:.3f}s"
-            )
+        init_time = time.time() - init_start
+        logger.info(f"  Step 1 - Filter initialization: {init_time:.3f}s")
 
+        # Step 2: Stats computation
+        stats_start = time.time()
+        samples_with_stats = test_data.copy()
+        for i, filter_op in enumerate(actual_filters):
+            logger.info(f"    Processing filter {i+1}/{len(actual_filters)}: {filter_op._name}")
+            samples_with_stats = filter_op.compute_stats_batched(samples_with_stats)
+        stats_time = time.time() - stats_start
+        logger.info(f"  Step 2 - Stats computation: {stats_time:.3f}s")
+
+        # Step 3: Filtering
+        filter_start = time.time()
+        for i, filter_op in enumerate(actual_filters):
+            logger.info(f"    Processing filter {i+1}/{len(actual_filters)}: {filter_op._name}")
+            _ = list(filter_op.process_batched(samples_with_stats))
+        filter_time = time.time() - filter_start
+        logger.info(f"  Step 3 - Filtering: {filter_time:.3f}s")
+
+        # Calculate totals
         total_time = time.time() - total_start_time
         end_memory = self.measure_memory_usage()
         memory_usage = end_memory - start_memory
         throughput = len(test_data["text"]) / total_time
 
-        # Detailed breakdown
-        logger.info("  📊 INDIVIDUAL EXECUTION BREAKDOWN:")
-        logger.info(f"    Total stats time: {total_stats_time:.3f}s ({total_stats_time/total_time*100:.1f}%)")
-        logger.info(f"    Total filter time: {total_filter_time:.3f}s ({total_filter_time/total_time*100:.1f}%)")
+        logger.info("  📊 INDIVIDUAL FILTERS BREAKDOWN:")
+        logger.info(f"    Initialization: {init_time:.3f}s ({init_time/total_time*100:.1f}%)")
+        logger.info(f"    Stats computation: {stats_time:.3f}s ({stats_time/total_time*100:.1f}%)")
+        logger.info(f"    Filtering: {filter_time:.3f}s ({filter_time/total_time*100:.1f}%)")
         logger.info(f"    Total time: {total_time:.3f}s")
         logger.info(f"    Throughput: {throughput:.1f} samples/sec")
-        logger.info(f"    Memory usage: {memory_usage:.1f} MB")
-
-        # Show slowest filters
-        filter_details.sort(key=lambda x: x["total_time"], reverse=True)
-        logger.info("  🐌 SLOWEST FILTERS:")
-        for i, detail in enumerate(filter_details[:5]):
-            logger.info(f"    {i+1}. {detail['name']}: {detail['total_time']:.3f}s")
 
         return PerformanceMetrics(
             total_time=total_time,
-            stats_time=total_stats_time,
-            filter_time=total_filter_time,
+            stats_time=stats_time,
+            filter_time=filter_time,
             memory_usage=memory_usage,
             throughput=throughput,
         )
@@ -1007,85 +1004,60 @@ class PerformanceBenchmark:
         def traverse_node(node):
             if hasattr(node, "children") and node.children:
                 for child in node.children:
-                    if hasattr(child, "config") and child.config:
-                        # Debug: Log the entire config structure
-                        logger.debug(f"Node config: {child.config}")
+                    # Skip root node
+                    if child.name == "root":
+                        traverse_node(child)
+                        continue
 
-                        # Check if this is a flat config structure with individual keys
-                        if isinstance(child.config, dict):
-                            # Look for actual operation names in the config
-                            operation_names = []
-                            config_params = {}
+                    # Extract operation name and config from the node
+                    op_name = child.name
+                    op_config = child.config if child.config else {}
 
-                            for key, value in child.config.items():
-                                if key == "detailed_ops":
-                                    continue  # Skip metadata
+                    # Debug: Log what we're processing
+                    logger.debug(f"Processing node: {op_name} with config: {op_config}")
 
-                                # Check if this key looks like an operation name
-                                if isinstance(value, (str, dict)) and key not in {
-                                    "batch_size",
-                                    "cpu_required",
-                                    "mem_required",
-                                    "min_score",
-                                    "skip_op_error",
-                                    "turbo",
-                                    "accelerator",
-                                    "num_proc",
-                                    "text_key",
-                                    "image_key",
-                                    "audio_key",
-                                    "video_key",
-                                    "query_key",
-                                    "response_key",
-                                    "history_key",
-                                    "index_key",
-                                    "work_dir",
-                                    "detailed_ops",
-                                }:
-                                    operation_names.append(key)
-                                else:
-                                    # This is a config parameter
-                                    config_params[key] = value
+                    # Handle different operation types
+                    if op_name == "fused_mapper":
+                        # Extract fused mapper configuration
+                        if "fused_mapper" in op_config:
+                            mapper_config = op_config["fused_mapper"]
+                            clean_config = {
+                                "name": mapper_config.get("name", "fused_mapper"),
+                                "fused_mappers": mapper_config.get("fused_mappers", []),
+                            }
+                            operations.append({op_name: clean_config})
+                        else:
+                            # Fallback if structure is different
+                            operations.append({op_name: op_config})
 
-                            # If we found operation names, create operations
-                            if operation_names:
-                                for op_name in operation_names:
-                                    op_config = child.config.get(op_name, {})
+                    elif op_name == "fused_filter":
+                        # Extract fused filter configuration
+                        fused_op_list = None
+                        # Handle both possible config structures
+                        if "fused_op_list" in op_config:
+                            fused_op_list = op_config["fused_op_list"]
+                        elif "general_fused_op" in op_config and "fused_op_list" in op_config["general_fused_op"]:
+                            fused_op_list = op_config["general_fused_op"]["fused_op_list"]
+                        if fused_op_list is not None:
+                            clean_config = {"fused_op_list": fused_op_list}
+                            operations.append({op_name: clean_config})
+                        else:
+                            # Fallback if structure is different
+                            operations.append({op_name: op_config})
 
-                                    if isinstance(op_config, dict):
-                                        # Clean config based on operation type
-                                        if op_name == "general_fused_op":
-                                            # Only keep allowed keys for GeneralFusedOP
-                                            allowed_keys = {"batch_size", "fused_op_list"}
-                                            clean_config = {k: v for k, v in op_config.items() if k in allowed_keys}
-                                            operations.append({op_name: clean_config})
-                                        elif op_name == "fused_filter":
-                                            # Only keep allowed keys for FusedFilter
-                                            allowed_keys = {"name", "fused_filters"}
-                                            clean_config = {k: v for k, v in op_config.items() if k in allowed_keys}
-                                            operations.append({op_name: clean_config})
-                                        elif op_name == "fused_mapper":
-                                            # Only keep allowed keys for FusedMapper
-                                            allowed_keys = {"name", "fused_mappers", "batch_size"}
-                                            clean_config = {k: v for k, v in op_config.items() if k in allowed_keys}
-                                            operations.append({op_name: clean_config})
-                                        else:
-                                            # For other operations, remove common problematic keys
-                                            problematic_keys = {"accelerator", "batch_size", "num_proc", "detailed_ops"}
-                                            clean_config = {
-                                                k: v for k, v in op_config.items() if k not in problematic_keys
-                                            }
-                                            operations.append({op_name: clean_config})
-                                    elif isinstance(op_config, str):
-                                        # Simple operation with no config
-                                        operations.append({op_config: {}})
-                                    else:
-                                        # Fallback
-                                        operations.append({op_name: {}})
-                            else:
-                                # No operation names found, this might be a flat config
-                                # Skip individual config parameters that aren't operations
-                                logger.debug("Skipping flat config node with no operation names")
+                    elif op_name in ["punctuation_normalization_mapper", "whitespace_normalization_mapper"]:
+                        # Individual mappers - pass through their config
+                        operations.append({op_name: op_config})
+
+                    elif op_name == "document_simhash_deduplicator":
+                        # Deduplicator - pass through its config
+                        operations.append({op_name: op_config})
+
+                    else:
+                        # Unknown operation type - log and skip
+                        logger.warning(f"Unknown operation type: {op_name}")
+
+                    # Continue traversing
                     traverse_node(child)
 
         if ast.root:
@@ -1103,16 +1075,58 @@ class PerformanceBenchmark:
         for op_config in optimized_ops:
             # Debug: Log the operation configuration
             logger.debug(f"Loading operation config: {op_config}")
-            # Load the operation from config
-            loaded_ops = load_ops([op_config])
-            if loaded_ops:
-                op = loaded_ops[0]
 
-                # Execute the operation
-                if hasattr(op, "compute_stats_batched"):
-                    test_data = op.compute_stats_batched(test_data)
-                if hasattr(op, "process_batched"):
-                    _ = list(op.process_batched(test_data))
+            # Special handling for fused_filter - we need to create the actual filter objects
+            op_name = list(op_config.keys())[0]
+            if op_name == "fused_filter":
+                # Extract the fused_op_list and create individual filter objects
+                fused_op_list = op_config[op_name].get("fused_op_list", [])
+                individual_filters = []
+
+                for filter_config in fused_op_list:
+                    filter_name = list(filter_config.keys())[0]
+                    filter_args = filter_config[filter_name]
+                    # Load the individual filter
+                    loaded_filters = load_ops([{filter_name: filter_args}])
+                    if loaded_filters:
+                        individual_filters.append(loaded_filters[0])
+
+                # Create the fused filter with the actual filter objects
+                if individual_filters:
+                    from data_juicer.core.optimizer.fused_op import FusedFilter
+
+                    fused_filter = FusedFilter(name="fused_filter", fused_filters=individual_filters)
+                    # Force sequential execution to avoid parallel stats access issues
+                    fused_filter.execution_strategy = "sequential"
+
+                    # Process the fused filter
+                    if hasattr(fused_filter, "compute_stats_batched"):
+                        test_data = fused_filter.compute_stats_batched(test_data)
+                    if hasattr(fused_filter, "process_batched"):
+                        _ = list(fused_filter.process_batched(test_data))
+            elif op_name == "fused_mapper":
+                # Extract the fused_mappers list and create FusedMapper directly
+                mapper_config = op_config[op_name]
+                name = mapper_config.get("name", "fused_mapper")
+                fused_mappers = mapper_config.get("fused_mappers", [])
+
+                # Create the fused mapper directly
+                fused_mapper = FusedMapper(name=name, fused_mappers=fused_mappers)
+
+                # Execute the mapper
+                if hasattr(fused_mapper, "process_batched"):
+                    test_data = fused_mapper.process_batched(test_data)
+            else:
+                # Load the operation from config for non-fused operations
+                loaded_ops = load_ops([op_config])
+                if loaded_ops:
+                    op = loaded_ops[0]
+
+                    # Execute the operation
+                    if hasattr(op, "compute_stats_batched"):
+                        test_data = op.compute_stats_batched(test_data)
+                    if hasattr(op, "process_batched"):
+                        _ = list(op.process_batched(test_data))
 
     def _process_with_legacy_ops(self, legacy_ops: List, test_data: Dict[str, Any]):
         """Process test data with legacy fused operations."""
@@ -1417,45 +1431,84 @@ class PerformanceBenchmark:
 
                 for j, op_config in enumerate(optimized_ops):
                     logger.warning(f"  Optimized Op {j+1}/{len(optimized_ops)}: {op_config}")
-                    loaded_ops = load_ops([op_config])
-                    if loaded_ops:
-                        op = loaded_ops[0]
-                        logger.warning(f"    Loaded op: {type(op).__name__}")
 
-                        if hasattr(op, "compute_stats_batched"):
-                            data_fused_before = data_fused.copy()
-                            data_fused = op.compute_stats_batched(data_fused)
-                            logger.warning(f"    Stats computed: data keys={list(data_fused.keys())}")
-                            # Check if data was modified
-                            if data_fused_before != data_fused:
-                                logger.warning("    Data was modified during stats computation")
+                    # Special handling for fused_filter - we need to create the actual filter objects
+                    op_name = list(op_config.keys())[0]
+                    if op_name == "fused_filter":
+                        # Extract the fused_op_list and create individual filter objects
+                        fused_op_list = op_config[op_name].get("fused_op_list", [])
+                        individual_filters = []
 
-                        if hasattr(op, "process_batched"):
-                            result = list(op.process_batched(data_fused))
-                            # Handle both boolean masks and text content
-                            if result and isinstance(result[0], bool):
-                                op_mask = result
-                            else:
-                                # If it returns text content, create a mask based on non-empty results
-                                op_mask = [bool(item) for item in result]
+                        for filter_config in fused_op_list:
+                            filter_name = list(filter_config.keys())[0]
+                            filter_args = filter_config[filter_name]
+                            # Load the individual filter
+                            loaded_filters = load_ops([{filter_name: filter_args}])
+                            if loaded_filters:
+                                individual_filters.append(loaded_filters[0])
 
-                            # Check if op_mask has enough elements and idx is valid
-                            if op_mask and len(op_mask) > idx:
-                                fused_masks.append(op_mask[idx])
-                                mask_fused = [m and o for m, o in zip(mask_fused, op_mask)]
-                                logger.warning(f"    Result for sample {idx}: {op_mask[idx]} (passed={op_mask[idx]})")
-                                logger.warning(f"    Overall: {sum(op_mask)}/{len(op_mask)} samples passed")
-                                logger.warning(f"    Current masks so far: {fused_masks}")
-                            else:
-                                logger.warning(
-                                    f"    Warning: op_mask length {len(op_mask)} is insufficient for index {idx}"
-                                )
-                                fused_masks.append(True)  # Default to pass if mask is invalid
+                        # Create the fused filter with the actual filter objects
+                        if individual_filters:
+                            from data_juicer.core.optimizer.fused_op import FusedFilter
+
+                            op = FusedFilter(name="fused_filter", fused_filters=individual_filters)
+                            # Force sequential execution to avoid parallel stats access issues
+                            op.execution_strategy = "sequential"
                         else:
-                            logger.warning("    No process_batched method found")
+                            logger.warning("    Failed to create fused filter")
                             fused_masks.append(True)
+                            continue
+                    elif op_name == "fused_mapper":
+                        # Extract the fused_mappers list and create FusedMapper directly
+                        mapper_config = op_config[op_name]
+                        name = mapper_config.get("name", "fused_mapper")
+                        fused_mappers = mapper_config.get("fused_mappers", [])
+
+                        # Create the fused mapper directly
+                        op = FusedMapper(name=name, fused_mappers=fused_mappers)
                     else:
-                        logger.warning("    Failed to load op from config")
+                        # Load the operation from config for non-fused operations
+                        loaded_ops = load_ops([op_config])
+                        if loaded_ops:
+                            op = loaded_ops[0]
+                        else:
+                            logger.warning("    Failed to load op from config")
+                            fused_masks.append(True)
+                            continue
+
+                    logger.warning(f"    Loaded op: {type(op).__name__}")
+
+                    if hasattr(op, "compute_stats_batched"):
+                        data_fused_before = data_fused.copy()
+                        data_fused = op.compute_stats_batched(data_fused)
+                        logger.warning(f"    Stats computed: data keys={list(data_fused.keys())}")
+                        # Check if data was modified
+                        if data_fused_before != data_fused:
+                            logger.warning("    Data was modified during stats computation")
+
+                    if hasattr(op, "process_batched"):
+                        result = list(op.process_batched(data_fused))
+                        # Handle both boolean masks and text content
+                        if result and isinstance(result[0], bool):
+                            op_mask = result
+                        else:
+                            # If it returns text content, create a mask based on non-empty results
+                            op_mask = [bool(item) for item in result]
+
+                        # Check if op_mask has enough elements and idx is valid
+                        if op_mask and len(op_mask) > idx:
+                            fused_masks.append(op_mask[idx])
+                            mask_fused = [m and o for m, o in zip(mask_fused, op_mask)]
+                            logger.warning(f"    Result for sample {idx}: {op_mask[idx]} (passed={op_mask[idx]})")
+                            logger.warning(f"    Overall: {sum(op_mask)}/{len(op_mask)} samples passed")
+                            logger.warning(f"    Current masks so far: {fused_masks}")
+                        else:
+                            logger.warning(
+                                f"    Warning: op_mask length {len(op_mask)} is insufficient for index {idx}"
+                            )
+                            fused_masks.append(True)  # Default to pass if mask is invalid
+                    else:
+                        logger.warning("    No process_batched method found")
                         fused_masks.append(True)
 
                 # Check if masks are valid before accessing
@@ -1573,27 +1626,77 @@ class PerformanceBenchmark:
         final_mask = [True] * len(data["text"])
 
         for op_config in optimized_ops:
-            loaded_ops = load_ops([op_config])
-            if loaded_ops:
-                op = loaded_ops[0]
-                if hasattr(op, "compute_stats_batched"):
-                    data = op.compute_stats_batched(data)
-                if hasattr(op, "process_batched_for_validation"):
-                    # Use the new validation method that returns boolean masks
-                    mask = op.process_batched_for_validation(data)
-                    # Apply AND logic with the current final mask
-                    final_mask = [a and b for a, b in zip(final_mask, mask)]
-                elif hasattr(op, "process_batched"):
-                    result = list(op.process_batched(data))
-                    # Handle both boolean masks and text content
-                    if result and isinstance(result[0], bool):
-                        # Apply AND logic with the current final mask
-                        final_mask = [a and b for a, b in zip(final_mask, result)]
-                    else:
-                        # If it returns text content, create a mask based on non-empty results
-                        mask = [bool(item) for item in result]
+            # Special handling for fused_filter - we need to create the actual filter objects
+            op_name = list(op_config.keys())[0]
+            if op_name == "fused_filter":
+                # Extract the fused_op_list and create individual filter objects
+                fused_op_list = op_config[op_name].get("fused_op_list", [])
+                individual_filters = []
+
+                for filter_config in fused_op_list:
+                    filter_name = list(filter_config.keys())[0]
+                    filter_args = filter_config[filter_name]
+                    # Load the individual filter
+                    loaded_filters = load_ops([{filter_name: filter_args}])
+                    if loaded_filters:
+                        individual_filters.append(loaded_filters[0])
+
+                # Create the fused filter with the actual filter objects
+                if individual_filters:
+                    from data_juicer.core.optimizer.fused_op import FusedFilter
+
+                    fused_filter = FusedFilter(name="fused_filter", fused_filters=individual_filters)
+                    # Force sequential execution to avoid parallel stats access issues
+                    fused_filter.execution_strategy = "sequential"
+
+                    # Process the fused filter
+                    if hasattr(fused_filter, "compute_stats_batched"):
+                        data = fused_filter.compute_stats_batched(data)
+                    if hasattr(fused_filter, "process_batched_for_validation"):
+                        mask = fused_filter.process_batched_for_validation(data)
+                        final_mask = [a and b for a, b in zip(final_mask, mask)]
+                    elif hasattr(fused_filter, "process_batched"):
+                        result = list(fused_filter.process_batched(data))
+                        if result and isinstance(result[0], bool):
+                            final_mask = [a and b for a, b in zip(final_mask, result)]
+                        else:
+                            mask = [bool(item) for item in result]
+                            final_mask = [a and b for a, b in zip(final_mask, mask)]
+            elif op_name == "fused_mapper":
+                # Extract the fused_mappers list and create FusedMapper directly
+                mapper_config = op_config[op_name]
+                name = mapper_config.get("name", "fused_mapper")
+                fused_mappers = mapper_config.get("fused_mappers", [])
+
+                # Create the fused mapper directly
+                fused_mapper = FusedMapper(name=name, fused_mappers=fused_mappers)
+
+                # Execute the mapper
+                if hasattr(fused_mapper, "process_batched"):
+                    data = fused_mapper.process_batched(data)
+            else:
+                # Load the operation from config for non-fused operations
+                loaded_ops = load_ops([op_config])
+                if loaded_ops:
+                    op = loaded_ops[0]
+                    if hasattr(op, "compute_stats_batched"):
+                        data = op.compute_stats_batched(data)
+                    if hasattr(op, "process_batched_for_validation"):
+                        # Use the new validation method that returns boolean masks
+                        mask = op.process_batched_for_validation(data)
                         # Apply AND logic with the current final mask
                         final_mask = [a and b for a, b in zip(final_mask, mask)]
+                    elif hasattr(op, "process_batched"):
+                        result = list(op.process_batched(data))
+                        # Handle both boolean masks and text content
+                        if result and isinstance(result[0], bool):
+                            # Apply AND logic with the current final mask
+                            final_mask = [a and b for a, b in zip(final_mask, result)]
+                        else:
+                            # If it returns text content, create a mask based on non-empty results
+                            mask = [bool(item) for item in result]
+                            # Apply AND logic with the current final mask
+                            final_mask = [a and b for a, b in zip(final_mask, mask)]
 
         return final_mask
 
@@ -2558,9 +2661,9 @@ def main():
     parser = argparse.ArgumentParser(description="Performance Benchmark for Data-Juicer Filters")
     parser.add_argument(
         "--mode",
-        choices=["quick", "full", "complex_only", "pipeline"],
+        choices=["quick", "full", "complex_only", "pipeline", "recipe"],
         default="quick",
-        help="Benchmark mode: quick (3 basic filters), full (12 comprehensive filters), complex_only (7 complex filters), pipeline (optimizer workflow)",
+        help="Benchmark mode: quick (3 basic filters), full (12 comprehensive filters), complex_only (7 complex filters), pipeline (optimizer workflow), recipe (custom YAML pipeline)",
     )
     parser.add_argument(
         "--samples",
@@ -2579,6 +2682,12 @@ def main():
         default="sm",
         help="spaCy model size: sm (fast, ~12MB), md (balanced, ~40MB), lg (accurate, ~560MB)",
     )
+    parser.add_argument(
+        "--recipe-path",
+        type=str,
+        default=None,
+        help="Path to a YAML recipe for benchmarking (used only in recipe mode)",
+    )
 
     args = parser.parse_args()
 
@@ -2586,7 +2695,7 @@ def main():
     benchmark = PerformanceBenchmark()
 
     # Preload models to avoid loading delays during benchmark
-    if args.mode in ["complex_only", "full"]:
+    if args.mode in ["complex_only", "full", "recipe"]:
         preload_models_for_benchmark()
 
     # Create test data
@@ -2598,7 +2707,6 @@ def main():
     elif args.mode == "full":
         filters = benchmark.create_test_filters()  # Use comprehensive test filters (12 filters)
     elif args.mode == "complex_only":
-        # Use command-line specified spaCy model size for complex filters
         from data_juicer.ops.filter import (
             FlaggedWordFilter,
             LanguageIDScoreFilter,
@@ -2607,7 +2715,6 @@ def main():
             WordRepetitionFilter,
         )
 
-        # Get base complex filters
         base_filters = [
             PerplexityFilter(lang="en", model_key="gpt2", min_score=0.0, max_score=100.0),
             StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.5),
@@ -2615,14 +2722,64 @@ def main():
             LanguageIDScoreFilter(lang="en", min_score=0.5, max_score=1.0),
             WordRepetitionFilter(lang="en", min_ratio=0.0, max_ratio=0.3),
         ]
-
-        # Add spaCy filters with specified model size
-        spacy_filters = [
-            # create_filter_with_cached_model(TextEntityDependencyFilter, model_size=args.spacy_size, lang="en", min_dependency_num=1, any_or_all="all"),
-            # create_filter_with_cached_model(TextActionFilter, model_size=args.spacy_size, lang="en", min_action_num=1),
-        ]
-
+        spacy_filters = []
         filters = base_filters + spacy_filters
+    elif args.mode == "recipe":
+        # Load pipeline from YAML recipe using optimizer framework
+        if not args.recipe_path:
+            raise ValueError("--recipe-path must be specified in recipe mode!")
+        from data_juicer.core.optimizer.filter_fusion_strategy import (
+            FilterFusionStrategy,
+        )
+        from data_juicer.core.optimizer.mapper_fusion_strategy import (
+            MapperFusionStrategy,
+        )
+        from data_juicer.core.optimizer.optimizer import PipelineOptimizer
+        from data_juicer.core.pipeline_ast import PipelineAST
+
+        # Build AST from recipe
+        ast = PipelineAST()
+        ast.build_from_yaml(args.recipe_path)
+        logger.info(f"📋 Loaded recipe: {args.recipe_path}")
+        logger.info(f"Pipeline structure:\n{ast.visualize()}")
+        # Use optimizer to handle the full pipeline
+        optimizer = PipelineOptimizer([FilterFusionStrategy(), MapperFusionStrategy()])
+        # Optimize the pipeline
+        optimized_ast = optimizer.optimize(ast)
+        logger.info(f"🔧 Optimized pipeline structure:\n{optimized_ast.visualize()}")
+        # Convert optimized AST to operations for benchmarking
+        operations = benchmark._convert_ast_to_operations(optimized_ast)
+        # Debug: Log the extracted operations
+        logger.info(f"🔍 Extracted {len(operations)} operations from optimized AST:")
+        for i, op in enumerate(operations):
+            logger.info(f"  {i+1}: {op}")
+        # Load operations, handling fused_filter specially
+        from data_juicer.core.optimizer.fused_op import FusedFilter
+        from data_juicer.ops.load import load_ops
+
+        filters = []
+        for op_config in operations:
+            op_name = list(op_config.keys())[0]
+            op_args = op_config[op_name]
+            if op_name == "fused_filter":
+                fused_op_list = op_args.get("fused_op_list", [])
+                individual_filters = []
+                for filter_config in fused_op_list:
+                    filter_name = list(filter_config.keys())[0]
+                    filter_args = filter_config[filter_name]
+                    loaded_filters = load_ops([{filter_name: filter_args}])
+                    if loaded_filters:
+                        individual_filters.append(loaded_filters[0])
+                if individual_filters:
+                    fused_filter = FusedFilter(name="fused_filter", fused_filters=individual_filters)
+                    # Force sequential execution to avoid parallel stats access issues
+                    fused_filter.execution_strategy = "sequential"
+                    filters.append(fused_filter)
+            else:
+                loaded_ops = load_ops([op_config])
+                if loaded_ops:
+                    filters.append(loaded_ops[0])
+        logger.info(f"📊 Loaded {len(filters)} operations from optimized pipeline")
     else:  # pipeline mode
         filters = benchmark.create_test_filters()  # Use comprehensive test filters for pipeline mode
 

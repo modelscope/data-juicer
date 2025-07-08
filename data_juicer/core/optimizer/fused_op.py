@@ -5,11 +5,8 @@ import numpy as np
 from loguru import logger
 
 from data_juicer.ops import load_ops
-from data_juicer.ops.base_op import Filter, Mapper
+from data_juicer.ops.base_op import OPERATORS, Filter, Mapper
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.registry import Registry
-
-OPERATORS = Registry("operators")
 
 
 @OPERATORS.register_module("fused_filter")
@@ -456,9 +453,9 @@ class FusedFilter(Filter):
             # Sequential execution for dependent or complex filters
             for op in self.fused_filters:
                 if op.accelerator == "cuda":
-                    samples = op.compute_stats_batched(samples, rank=rank, context=True)
+                    samples = op.compute_stats_batched(samples, rank=rank)
                 else:
-                    samples = op.compute_stats_batched(samples, context=True)
+                    samples = op.compute_stats_batched(samples)
 
         # Clean up contexts
         for ctx in samples[Fields.context]:
@@ -604,6 +601,11 @@ class FusedMapper(Mapper):
         # Load the mapper operations
         self.fused_mappers = []
         for mapper_name in fused_mappers:
+            # Skip if this is a fused_mapper to avoid recursive instantiation
+            if mapper_name == "fused_mapper":
+                logger.warning("Skipping recursive fused_mapper in FusedMapper initialization")
+                continue
+
             mapper_config = {mapper_name: {}}
             mapper = load_ops([mapper_config])[0]
             self.fused_mappers.append(mapper)
