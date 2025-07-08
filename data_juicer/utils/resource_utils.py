@@ -1,8 +1,11 @@
 import subprocess
 
 import psutil
-import ray
 from loguru import logger
+
+from data_juicer.utils.lazy_loader import LazyLoader
+
+ray = LazyLoader("ray")
 
 NVSMI_REPORT = True
 
