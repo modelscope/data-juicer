@@ -1221,137 +1221,56 @@ class PerformanceBenchmark:
         mode: str = "quick",
         analyzer_insights: dict = None,
     ) -> Dict[str, Any]:
-        """
-        Run comprehensive performance benchmark comparing different execution strategies.
-
-        Args:
-            filters: List of filter operations to benchmark
-            test_data: Test dataset to process
-            mode: Benchmark mode ("quick", "full", "pipeline")
-            analyzer_insights: Optional analyzer insights for optimization
-
-        Returns:
-            Dictionary with benchmark results for each execution strategy
-        """
-        logger.info(f"🚀 Starting Performance Benchmark (Mode: {mode.upper()})")
+        """Run comprehensive benchmark comparing individual vs pipeline optimizer execution."""
+        logger.info("🚀 Starting Performance Benchmark")
         logger.info("=" * 60)
 
-        # Validate inputs
-        if not filters:
-            raise ValueError("No filters provided for benchmarking")
-        if not test_data or "text" not in test_data:
-            raise ValueError("Invalid test data provided")
+        # Get analyzer insights if not provided
+        if analyzer_insights is None:
+            logger.info("🔍 Getting analyzer insights...")
+            analyzer_insights = self.get_analyzer_insights(test_data)
 
-        # Prepare test data
-        test_data = test_data.copy()
-        logger.info(f"📊 Test Dataset: {len(test_data['text']):,} samples")
-        logger.info(f"🔧 Filters to benchmark: {len(filters)} ({mode} mode)")
-        if mode == "full":
-            logger.info(
-                "   Using comprehensive test filters (12 filters covering basic, quality, and advanced categories)"
-            )
-        elif mode == "quick":
-            logger.info("   Using quick test filters (3 basic filters)")
-        elif mode == "complex_only":
-            logger.info("   Using complex-only test filters (7 advanced filters with language models and NLP)")
-        elif mode == "complex":
-            logger.info("   Using complex test filters (7 advanced filters)")
+        # Run individual filters benchmark
+        logger.info("\n📊 INDIVIDUAL EXECUTION BENCHMARK")
+        logger.info("-" * 40)
+        individual_results = self.run_individual_filters_benchmark(filters, test_data)
 
-        # Run benchmarks based on mode
-        if mode == "complex_only":
-            # Use specialized complex filters benchmark
-            logger.info("\n🧠 COMPLEX FILTERS BENCHMARK (Multiple Strategies)")
-            logger.info("-" * 50)
-            complex_results = self.run_complex_filters_benchmark(filters, test_data, analyzer_insights)
+        # Run pipeline optimizer benchmark
+        logger.info("\n🔧 PIPELINE OPTIMIZER BENCHMARK")
+        logger.info("-" * 40)
+        pipeline_results = self.run_pipeline_optimizer_benchmark(filters, test_data, analyzer_insights)
 
-            # Extract individual and fused results for compatibility
-            individual_results = complex_results["individual"]
-            fused_results = complex_results["conservative_fusion"]  # Use conservative fusion as "fused"
-            pipeline_results = complex_results["smart_batching"]  # Use smart batching as "pipeline"
-
-            # Add complex results to main results
-            results = {
-                "individual": individual_results,
-                "fused": fused_results,
-                "pipeline_optimizer": pipeline_results,
-                "complex_strategies": complex_results,
-                "metadata": {
-                    "mode": mode,
-                    "filter_count": len(filters),
-                    "sample_count": len(test_data["text"]),
-                    "analyzer_insights_available": analyzer_insights is not None,
-                },
-            }
-        else:
-            # Run individual filter benchmarks
-            logger.info("\n📈 INDIVIDUAL FILTER BENCHMARKS")
-            logger.info("-" * 40)
-            individual_results = self.run_individual_filters_benchmark(filters, test_data)
-
-            # Run fused filter benchmarks (with fusion strategies)
-            logger.info("\n🔗 FUSED FILTER BENCHMARKS")
-            logger.info("-" * 40)
-            fused_results = self.run_fused_filters_benchmark(filters, test_data, analyzer_insights)
-
-            # Run pipeline optimizer benchmark (complete workflow)
-            logger.info("\n⚡ PIPELINE OPTIMIZER BENCHMARKS")
-            logger.info("-" * 40)
-            pipeline_results = self.run_pipeline_optimizer_benchmark(filters, test_data, analyzer_insights)
-
-            # Compile results
-            results = {
-                "individual": individual_results,
-                "fused": fused_results,
-                "pipeline_optimizer": pipeline_results,
-                "metadata": {
-                    "mode": mode,
-                    "filter_count": len(filters),
-                    "sample_count": len(test_data["text"]),
-                    "analyzer_insights_available": analyzer_insights is not None,
-                },
-            }
-
-        # Calculate performance comparisons
-        logger.info("\n🏆 PERFORMANCE COMPARISON")
-        logger.info("=" * 60)
-
-        # Individual vs Fused
+        # Calculate performance metrics
         individual_time = individual_results.total_time
-        fused_time = fused_results.total_time
         pipeline_time = pipeline_results.total_time
 
         if individual_time > 0:
-            fused_speedup = individual_time / fused_time
             pipeline_speedup = individual_time / pipeline_time
 
             logger.info(f"Individual execution: {individual_time:.3f}s ({individual_results.throughput:.1f} samples/s)")
-            logger.info(f"Fused execution:      {fused_time:.3f}s ({fused_results.throughput:.1f} samples/s)")
             logger.info(f"Pipeline optimizer:   {pipeline_time:.3f}s ({pipeline_results.throughput:.1f} samples/s)")
-            logger.info(f"Fused speedup:        {fused_speedup:.2f}x")
             logger.info(f"Pipeline speedup:     {pipeline_speedup:.2f}x")
 
             # Determine best strategy
-            best_time = min(individual_time, fused_time, pipeline_time)
+            best_time = min(individual_time, pipeline_time)
             if best_time == individual_time:
                 best_strategy = "Individual"
-            elif best_time == fused_time:
-                best_strategy = "Fused"
             else:
                 best_strategy = "Pipeline Optimizer"
 
             logger.info(f"🏆 Best strategy:      {best_strategy}")
 
-        # --- Validation: Compare results between individual and fused ---
-        logger.info("\n🔎 VALIDATING FUSED RESULTS AGAINST INDIVIDUAL EXECUTION")
+        # --- Validation: Compare results between individual and pipeline ---
+        logger.info("\n🔎 VALIDATING PIPELINE RESULTS AGAINST INDIVIDUAL EXECUTION")
         individual_mask = self.get_final_mask_from_filters(filters, test_data)
-        fused_mask = self.get_final_mask_from_fused(filters, test_data, analyzer_insights)
-        if individual_mask == fused_mask:
-            logger.info("✅ Fused results match individual execution!")
+        pipeline_mask = self.get_final_mask_from_fused(filters, test_data, analyzer_insights)
+        if individual_mask == pipeline_mask:
+            logger.info("✅ Pipeline results match individual execution!")
             mismatches = []
         else:
-            mismatches = [i for i, (a, b) in enumerate(zip(individual_mask, fused_mask)) if a != b]
+            mismatches = [i for i, (a, b) in enumerate(zip(individual_mask, pipeline_mask)) if a != b]
             logger.warning(
-                f"❌ Fused results do NOT match individual execution! {len(mismatches)} mismatches out of {len(individual_mask)} samples."
+                f"❌ Pipeline results do NOT match individual execution! {len(mismatches)} mismatches out of {len(individual_mask)} samples."
             )
             logger.warning(f"First 5 mismatches: {mismatches[:5]}")
             # Print debug info for first 3 mismatches
@@ -1401,8 +1320,8 @@ class PerformanceBenchmark:
 
                 logger.warning(f"  Individual final result: {all(ind_masks)} (all masks: {ind_masks})")
 
-                # Detailed fused execution debugging
-                logger.warning("🔗 FUSED EXECUTION (step-by-step):")
+                # Detailed pipeline execution debugging
+                logger.warning("🔗 PIPELINE EXECUTION (step-by-step):")
                 pipeline_config = self._build_pipeline_config_from_filters(filters)
                 from data_juicer.core.pipeline_ast import PipelineAST
 
@@ -1424,9 +1343,9 @@ class PerformanceBenchmark:
                 logger.warning(f"  Optimized ops: {len(optimized_ops)}")
                 logger.warning(f"  Optimization ratio: {len(optimized_ops)/len(filters):.2f}x")
 
-                data_fused = test_data.copy()
-                mask_fused = [True] * len(data_fused["text"])
-                fused_masks = []
+                data_pipeline = test_data.copy()
+                mask_pipeline = [True] * len(data_pipeline["text"])
+                pipeline_masks = []
                 from data_juicer.ops import load_ops
 
                 for j, op_config in enumerate(optimized_ops):
@@ -1456,7 +1375,7 @@ class PerformanceBenchmark:
                             op.execution_strategy = "sequential"
                         else:
                             logger.warning("    Failed to create fused filter")
-                            fused_masks.append(True)
+                            pipeline_masks.append(True)
                             continue
                     elif op_name == "fused_mapper":
                         # Extract the fused_mappers list and create FusedMapper directly
@@ -1465,6 +1384,8 @@ class PerformanceBenchmark:
                         fused_mappers = mapper_config.get("fused_mappers", [])
 
                         # Create the fused mapper directly
+                        from data_juicer.core.optimizer.fused_op import FusedMapper
+
                         op = FusedMapper(name=name, fused_mappers=fused_mappers)
                     else:
                         # Load the operation from config for non-fused operations
@@ -1473,21 +1394,21 @@ class PerformanceBenchmark:
                             op = loaded_ops[0]
                         else:
                             logger.warning("    Failed to load op from config")
-                            fused_masks.append(True)
+                            pipeline_masks.append(True)
                             continue
 
                     logger.warning(f"    Loaded op: {type(op).__name__}")
 
                     if hasattr(op, "compute_stats_batched"):
-                        data_fused_before = data_fused.copy()
-                        data_fused = op.compute_stats_batched(data_fused)
-                        logger.warning(f"    Stats computed: data keys={list(data_fused.keys())}")
+                        data_pipeline_before = data_pipeline.copy()
+                        data_pipeline = op.compute_stats_batched(data_pipeline)
+                        logger.warning(f"    Stats computed: data keys={list(data_pipeline.keys())}")
                         # Check if data was modified
-                        if data_fused_before != data_fused:
+                        if data_pipeline_before != data_pipeline:
                             logger.warning("    Data was modified during stats computation")
 
                     if hasattr(op, "process_batched"):
-                        result = list(op.process_batched(data_fused))
+                        result = list(op.process_batched(data_pipeline))
                         # Handle both boolean masks and text content
                         if result and isinstance(result[0], bool):
                             op_mask = result
@@ -1497,32 +1418,58 @@ class PerformanceBenchmark:
 
                         # Check if op_mask has enough elements and idx is valid
                         if op_mask and len(op_mask) > idx:
-                            fused_masks.append(op_mask[idx])
-                            mask_fused = [m and o for m, o in zip(mask_fused, op_mask)]
+                            pipeline_masks.append(op_mask[idx])
+                            mask_pipeline = [m and o for m, o in zip(mask_pipeline, op_mask)]
                             logger.warning(f"    Result for sample {idx}: {op_mask[idx]} (passed={op_mask[idx]})")
                             logger.warning(f"    Overall: {sum(op_mask)}/{len(op_mask)} samples passed")
-                            logger.warning(f"    Current masks so far: {fused_masks}")
+                            logger.warning(f"    Current masks so far: {pipeline_masks}")
                         else:
                             logger.warning(
                                 f"    Warning: op_mask length {len(op_mask)} is insufficient for index {idx}"
                             )
-                            fused_masks.append(True)  # Default to pass if mask is invalid
+                            pipeline_masks.append(True)  # Default to pass if mask is invalid
                     else:
                         logger.warning("    No process_batched method found")
-                        fused_masks.append(True)
+                        pipeline_masks.append(True)
 
                 # Check if masks are valid before accessing
                 individual_result = all(ind_masks) if ind_masks else True
-                fused_result = mask_fused[idx] if len(mask_fused) > idx else True
+                pipeline_result = mask_pipeline[idx] if len(mask_pipeline) > idx else True
 
-                logger.warning(f"  Fused final result: {fused_result} (all masks: {fused_masks})")
-                logger.warning(f"  Comparison: Individual={individual_result} vs Fused={fused_result}")
+                logger.warning(f"  Pipeline final result: {pipeline_result} (all masks: {pipeline_masks})")
+                logger.warning(f"  Comparison: Individual={individual_result} vs Pipeline={pipeline_result}")
                 logger.warning("--- End of mismatch analysis ---")
-        results["validation"] = {
-            "match": individual_mask == fused_mask,
-            "mismatches": mismatches if "mismatches" in locals() else [],
+
+        # Compile results
+        results = {
+            "mode": mode,
+            "num_samples": len(test_data["text"]),
+            "num_filters": len(filters),
+            "individual": {
+                "total_time": individual_results.total_time,
+                "stats_time": individual_results.stats_time,
+                "filter_time": individual_results.filter_time,
+                "memory_usage": individual_results.memory_usage,
+                "throughput": individual_results.throughput,
+            },
+            "pipeline": {
+                "total_time": pipeline_results.total_time,
+                "stats_time": pipeline_results.stats_time,
+                "filter_time": pipeline_results.filter_time,
+                "memory_usage": pipeline_results.memory_usage,
+                "throughput": pipeline_results.throughput,
+            },
+            "speedup": pipeline_speedup if individual_time > 0 else 0,
+            "best_strategy": best_strategy if individual_time > 0 else "Unknown",
+            "validation": {
+                "matches": len(mismatches) == 0,
+                "num_mismatches": len(mismatches),
+                "mismatch_indices": mismatches[:10],  # Store first 10 mismatches
+            },
+            "analyzer_insights": analyzer_insights,
         }
 
+        logger.info("\n✅ Benchmark completed successfully!")
         return results
 
     def get_quick_test_filters(self) -> List[Filter]:
