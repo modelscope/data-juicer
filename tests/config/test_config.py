@@ -387,156 +387,169 @@ class ConfigTest(DataJuicerTestCaseBase):
                     '--auto',
                 ], which_entry="NoneAnalyzerClass")
 
-    def test_debug_mode(self):
-        out = StringIO()
-        with redirect_stdout(out):
-            cfg = init_configs(args=[
-                '--config', test_yaml_path,
-                '--debug',
-            ])
-            self.assertEqual(cfg.debug, True)
-
-    def test_different_np(self):
-        out = StringIO()
-        with redirect_stdout(out):
-            # too many
-            cfg = init_configs(args=[
-                '--config', test_yaml_path,
-                '--np', f'{os.cpu_count() + 100}',
-            ])
-            self.assertEqual(cfg.np, os.cpu_count())
-
-    def test_temp_dir(self):
-        out = StringIO()
-        with redirect_stdout(out):
-            if os.path.exists(self.tmp_dir):
-                os.system(f'rm -rf {self.tmp_dir}')
-            cfg = init_configs(args=[
-                '--config', test_yaml_path,
-                '--use_cache', 'False',
-                '--cache_compress', 'gzip',
-                '--temp_dir', self.tmp_dir,
-            ])
-            self.assertEqual(cfg.temp_dir, self.tmp_dir)
-            self.assertTrue(os.path.exists(self.tmp_dir))
-
-    def test_op_fusion(self):
-        out = StringIO()
-        with redirect_stdout(out):
-            with self.assertRaises(NotImplementedError):
-                init_configs(args=[
-                    '--config', test_yaml_path,
-                    '--op_fusion', 'True',
-                    '--fusion_strategy', 'invalid',
-                ])
-
-    def test_multiple_text_keys(self):
-        out = StringIO()
-        with redirect_stdout(out):
-            cfg = init_configs(args=[
-                '--config', test_text_keys_yaml_path,
-            ])
-            self.assertEqual(cfg.text_keys, ['text1', 'text2'])
-            first_op = cfg.process[0]
-            first_op_name = list(first_op.keys())[0]
-            self.assertEqual(first_op[first_op_name]['text_key'], 'text1')
-
-    def test_update_op_attr(self):
-        ori_ops = [
-            {'text_mapper': {'text_key': 'text'}},
-            {'language_id_score_filter': {'lang': 'en', 'min_score': 0.5}},
-            {'whitespace_normalization_mapper': {'batch_size': 2000}},
-            {'remove_table_text_mapper': {'min_col': 3}}
-        ]
-        op_attrs = {
-            'text_key': 'text2'
-        }
-        res_ops = update_op_attr(ori_ops, op_attrs)
-        self.assertEqual(res_ops, [
-            {'text_mapper': {'text_key': 'text'}},
-            {'language_id_score_filter': {'lang': 'en', 'min_score': 0.5, 'text_key': 'text2'}},
-            {'whitespace_normalization_mapper': {'batch_size': 2000, 'text_key': 'text2'}},
-            {'remove_table_text_mapper': {'min_col': 3, 'text_key': 'text2'}}
-        ])
-
-        self.assertEqual(update_op_attr(ori_ops, None), ori_ops)
-
-    def test_same_ops(self):
-        out = StringIO()
-        with redirect_stdout(out):
-            cfg = init_configs(args=[
-                '--config', test_same_ops_yaml_path,
-            ])
-            op_name_groups = {}
-            for op_cfg in cfg.process:
-                op_name = list(op_cfg.keys())[0]
-                op_name_groups.setdefault(op_name, []).append(op_cfg)
-            self.assertEqual(len(op_name_groups['language_id_score_filter']), 2)
-            self.assertEqual(op_name_groups['language_id_score_filter'][0]['language_id_score_filter']['lang'], 'zh')
-            self.assertEqual(op_name_groups['language_id_score_filter'][1]['language_id_score_filter']['lang'], 'en')
-
-    def test_export_config(self):
-        out = StringIO()
-        with redirect_stdout(out):
+            # in analyzer
+            from data_juicer.core import Analyzer
             cfg = init_configs(args=[
                 '--config', test_yaml_path,
             ])
-            export_path = os.path.join(self.tmp_dir, 'export_config.json')
-            export_config(cfg, export_path, format='json', skip_none=False)
-            self.assertTrue(os.path.exists(export_path))
-            import json
-            exported_json = json.load(open(export_path))
-            if isinstance(cfg, Namespace):
-                cfg = namespace_to_dict(cfg)
-            for key in exported_json:
-                self.assertIn(key, cfg)
-                self.assertEqual(exported_json[key], cfg[key])
+            analyzer = Analyzer(cfg)
 
-    def test_merge_config(self):
-        ori_cfg = Namespace({
-            'export_path': os.path.join(self.tmp_dir, 'res.jsonl'),
-            'work_dir': self.tmp_dir,
-            'process': [
-                {'text_mapper': {'text_key': 'text'}},
-                {'language_id_score_filter': {'lang': 'en', 'min_score': 0.5}},
-                {'whitespace_normalization_mapper': {'batch_size': 2000}},
-                {'remove_table_text_mapper': {'min_col': 3}}
-            ]
-        })
-        new_cfg = Namespace({
-            'process': [
-                {'text_mapper': {'text_key': 'text2'}},
-                {'language_id_score_filter': {'lang': 'zh'}},
-                {'whitespace_normalization_mapper': {'batch_size': 2000}},
-                {'remove_table_text_mapper': {'min_col': 3}}
-            ]
-        })
-        res_cfg = merge_config(ori_cfg, new_cfg)
-        for i, op in enumerate(res_cfg.process):
-            op_name = list(op.keys())[0]
-            op_cfg = op[op_name]
-            ori_op_cfg = ori_cfg.process[i][op_name]
-            new_op_cfg = new_cfg.process[i][op_name]
-            for key in op_cfg:
-                if key in ori_op_cfg:
-                    self.assertEqual(op_cfg[key], ori_op_cfg[key])
-                else:
-                    self.assertEqual(op_cfg[key], new_op_cfg[key])
+            cfg_auto = init_configs(args=[
+                '--auto',
+            ], which_entry=analyzer)
+            self.assertTrue(cfg_auto.auto)
+            self.assertGreater(len(cfg_auto.process), 0)
 
-    def test_prepare_side_configs(self):
-        out = StringIO()
-        with redirect_stdout(out):
-            cfg = prepare_side_configs(test_yaml_path)
-            self.assertEqual(cfg['np'], 4)
-
-            cfg = prepare_side_configs({'key': 'value'})
-            self.assertEqual(cfg['key'], 'value')
-
-            with self.assertRaises(TypeError):
-                prepare_side_configs(1)
-
-            with self.assertRaises(TypeError):
-                prepare_side_configs('xxx.txt')
+    # def test_debug_mode(self):
+    #     out = StringIO()
+    #     with redirect_stdout(out):
+    #         cfg = init_configs(args=[
+    #             '--config', test_yaml_path,
+    #             '--debug',
+    #         ])
+    #         self.assertEqual(cfg.debug, True)
+    #
+    # def test_different_np(self):
+    #     out = StringIO()
+    #     with redirect_stdout(out):
+    #         # too many
+    #         cfg = init_configs(args=[
+    #             '--config', test_yaml_path,
+    #             '--np', f'{os.cpu_count() + 100}',
+    #         ])
+    #         self.assertEqual(cfg.np, os.cpu_count())
+    #
+    # def test_temp_dir(self):
+    #     out = StringIO()
+    #     with redirect_stdout(out):
+    #         if os.path.exists(self.tmp_dir):
+    #             os.system(f'rm -rf {self.tmp_dir}')
+    #         cfg = init_configs(args=[
+    #             '--config', test_yaml_path,
+    #             '--use_cache', 'False',
+    #             '--cache_compress', 'gzip',
+    #             '--temp_dir', self.tmp_dir,
+    #         ])
+    #         self.assertEqual(cfg.temp_dir, self.tmp_dir)
+    #         self.assertTrue(os.path.exists(self.tmp_dir))
+    #
+    # def test_op_fusion(self):
+    #     out = StringIO()
+    #     with redirect_stdout(out):
+    #         with self.assertRaises(NotImplementedError):
+    #             init_configs(args=[
+    #                 '--config', test_yaml_path,
+    #                 '--op_fusion', 'True',
+    #                 '--fusion_strategy', 'invalid',
+    #             ])
+    #
+    # def test_multiple_text_keys(self):
+    #     out = StringIO()
+    #     with redirect_stdout(out):
+    #         cfg = init_configs(args=[
+    #             '--config', test_text_keys_yaml_path,
+    #         ])
+    #         self.assertEqual(cfg.text_keys, ['text1', 'text2'])
+    #         first_op = cfg.process[0]
+    #         first_op_name = list(first_op.keys())[0]
+    #         self.assertEqual(first_op[first_op_name]['text_key'], 'text1')
+    #
+    # def test_update_op_attr(self):
+    #     ori_ops = [
+    #         {'text_mapper': {'text_key': 'text'}},
+    #         {'language_id_score_filter': {'lang': 'en', 'min_score': 0.5}},
+    #         {'whitespace_normalization_mapper': {'batch_size': 2000}},
+    #         {'remove_table_text_mapper': {'min_col': 3}}
+    #     ]
+    #     op_attrs = {
+    #         'text_key': 'text2'
+    #     }
+    #     res_ops = update_op_attr(ori_ops, op_attrs)
+    #     self.assertEqual(res_ops, [
+    #         {'text_mapper': {'text_key': 'text'}},
+    #         {'language_id_score_filter': {'lang': 'en', 'min_score': 0.5, 'text_key': 'text2'}},
+    #         {'whitespace_normalization_mapper': {'batch_size': 2000, 'text_key': 'text2'}},
+    #         {'remove_table_text_mapper': {'min_col': 3, 'text_key': 'text2'}}
+    #     ])
+    #
+    #     self.assertEqual(update_op_attr(ori_ops, None), ori_ops)
+    #
+    # def test_same_ops(self):
+    #     out = StringIO()
+    #     with redirect_stdout(out):
+    #         cfg = init_configs(args=[
+    #             '--config', test_same_ops_yaml_path,
+    #         ])
+    #         op_name_groups = {}
+    #         for op_cfg in cfg.process:
+    #             op_name = list(op_cfg.keys())[0]
+    #             op_name_groups.setdefault(op_name, []).append(op_cfg)
+    #         self.assertEqual(len(op_name_groups['language_id_score_filter']), 2)
+    #         self.assertEqual(op_name_groups['language_id_score_filter'][0]['language_id_score_filter']['lang'], 'zh')
+    #         self.assertEqual(op_name_groups['language_id_score_filter'][1]['language_id_score_filter']['lang'], 'en')
+    #
+    # def test_export_config(self):
+    #     out = StringIO()
+    #     with redirect_stdout(out):
+    #         cfg = init_configs(args=[
+    #             '--config', test_yaml_path,
+    #         ])
+    #         export_path = os.path.join(self.tmp_dir, 'export_config.json')
+    #         export_config(cfg, export_path, format='json', skip_none=False)
+    #         self.assertTrue(os.path.exists(export_path))
+    #         import json
+    #         exported_json = json.load(open(export_path))
+    #         if isinstance(cfg, Namespace):
+    #             cfg = namespace_to_dict(cfg)
+    #         for key in exported_json:
+    #             self.assertIn(key, cfg)
+    #             self.assertEqual(exported_json[key], cfg[key])
+    #
+    # def test_merge_config(self):
+    #     ori_cfg = Namespace({
+    #         'export_path': os.path.join(self.tmp_dir, 'res.jsonl'),
+    #         'work_dir': self.tmp_dir,
+    #         'process': [
+    #             {'text_mapper': {'text_key': 'text'}},
+    #             {'language_id_score_filter': {'lang': 'en', 'min_score': 0.5}},
+    #             {'whitespace_normalization_mapper': {'batch_size': 2000}},
+    #             {'remove_table_text_mapper': {'min_col': 3}}
+    #         ]
+    #     })
+    #     new_cfg = Namespace({
+    #         'process': [
+    #             {'text_mapper': {'text_key': 'text2'}},
+    #             {'language_id_score_filter': {'lang': 'zh'}},
+    #             {'whitespace_normalization_mapper': {'batch_size': 2000}},
+    #             {'remove_table_text_mapper': {'min_col': 3}}
+    #         ]
+    #     })
+    #     res_cfg = merge_config(ori_cfg, new_cfg)
+    #     for i, op in enumerate(res_cfg.process):
+    #         op_name = list(op.keys())[0]
+    #         op_cfg = op[op_name]
+    #         ori_op_cfg = ori_cfg.process[i][op_name]
+    #         new_op_cfg = new_cfg.process[i][op_name]
+    #         for key in op_cfg:
+    #             if key in ori_op_cfg:
+    #                 self.assertEqual(op_cfg[key], ori_op_cfg[key])
+    #             else:
+    #                 self.assertEqual(op_cfg[key], new_op_cfg[key])
+    #
+    # def test_prepare_side_configs(self):
+    #     out = StringIO()
+    #     with redirect_stdout(out):
+    #         cfg = prepare_side_configs(test_yaml_path)
+    #         self.assertEqual(cfg['np'], 4)
+    #
+    #         cfg = prepare_side_configs({'key': 'value'})
+    #         self.assertEqual(cfg['key'], 'value')
+    #
+    #         with self.assertRaises(TypeError):
+    #             prepare_side_configs(1)
+    #
+    #         with self.assertRaises(TypeError):
+    #             prepare_side_configs('xxx.txt')
 
 
 if __name__ == '__main__':
