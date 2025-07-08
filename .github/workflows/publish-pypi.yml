@@ -31,6 +31,13 @@ jobs:
       uses: pypa/hatch@install
     - name: Build package
       run: hatch build
+    - name: Install Wheel and Run Tests
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install dist/*.whl
+        python -c "import data_juicer; print(data_juicer.__version__)"
+        dj-process --help
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
