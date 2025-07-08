@@ -151,3 +151,26 @@ f"""\
 {OUTPUT_INSTRUCTIONS}
 """
 
+def multi_op_prompt(
+    op_states,
+    task_description=None,
+    user_prompt=None,
+):
+    multi_op_info = ""
+    for op_state in op_states:
+        multi_op_info += single_op_info(op_state) + "\n"
+    return \
+f"""\
+# Task Description
+{task_description}
+
+# Operator Infos
+{multi_op_info}
+
+# User Instructions
+{user_prompt}
+
+# Output Instructions
+{OUTPUT_INSTRUCTIONS}
+"""
+

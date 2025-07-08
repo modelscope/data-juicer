@@ -177,10 +177,16 @@ class StOperatorPool(OperatorPool):
         super(StOperatorPool, self).__init__(config_path=config_path)
         for op_name in self.pool:
             self.pool[op_name] = StOperator(self, state=self.pool[op_name].state)
-        self.items_per_page = 15  # Number of operators displayed per page
-        self.current_page = 1
-        self.search_term = ""
-        self.search_example = "e.g., filter|remove"
+        self.items_per_page = 8  # Number of operators displayed per page
+        
+        if 'current_page' not in st.session_state:
+            st.session_state.current_page = 1
+        if 'search_term' not in st.session_state:
+            st.session_state.search_term = ""
+            
+        self.current_page = st.session_state.current_page
+        self.search_term = st.session_state.search_term
+        self.search_example = "e.g., filter|language"
 
     def filter_operators(self):
         if not self.search_term:
@@ -215,23 +221,31 @@ class StOperatorPool(OperatorPool):
                 config_path = os.path.join(os.path.dirname(__file__), config_path)
                 st.write(f"Successfully export config to {config_path}.")
 
-            # search box
-            self.search_term = st.text_input(
+            def on_search_change():
+                st.session_state.current_page = 1
+
+            st.text_input(
                 "Search Operators",
-                value=self.search_term,
+                key="search_term",
                 placeholder=self.search_example,
+                on_change=on_search_change
             )
+            self.search_term = st.session_state.search_term
+
             # Show enabled only option
             st.checkbox(
                 emoji.emojize("Show enabled:check_mark_button: only"),
                 value=False,
                 key="show_enabled_only",
             )
+            
+            self.current_page = st.session_state.current_page
 
             # filter operator
             filtered_ops = self.filter_operators()
 
             total_ops = len(filtered_ops)
+            total_pages = math.ceil(total_ops / self.items_per_page) if total_ops > 0 else 1
 
             # Computes the operator displayed on the current page
             start_index = (self.current_page - 1) * self.items_per_page
@@ -242,21 +256,23 @@ class StOperatorPool(OperatorPool):
             for op_name in ops_to_render:
                 self.pool[op_name].render()
 
-            total_pages = math.ceil(total_ops / self.items_per_page)
-
             # paging controls
             cols = st.columns([0.3, 0.4, 0.3])
             with cols[0]:
-                if st.button("👈", disabled=self.current_page == 1):
-                    self.current_page -= 1
+                if st.button("←", disabled=self.current_page <= 1):
+                    st.session_state.current_page -= 1
+                    st.rerun()
+
             with cols[2]:
                 if st.button(
-                    "👉", disabled=self.current_page == total_pages or total_pages == 0
+                    "→", disabled=self.current_page >= total_pages
                 ):
-                    self.current_page += 1
+                    st.session_state.current_page += 1
+                    st.rerun()
 
             st.write(f"Page {self.current_page} of {total_pages}")
 
     def st_sync(self):
         for op_name in self.pool:
             self.pool[op_name].st_sync()
+

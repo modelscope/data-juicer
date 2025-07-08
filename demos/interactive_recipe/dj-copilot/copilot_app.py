@@ -416,7 +416,7 @@ def run_query(
     if len(query.content) == 0 or str(query.content).startswith("exit"):
         yield Msg(name="agent", role="assistant", content="")
 
-    query_language = "Chinese"
+    query_language = "english"
 
     if query.metadata is None:
         query.metadata = {}
@@ -571,7 +571,7 @@ def run_query(
         if "sources" in answer_meta and len(answer_meta["sources"]) > 0:
             answer.content = (
                 answer.content
-                + "\n\n###参考链接/reference：\n\n"
+                + "\n\n###Reference：\n\n"
                 + "\n\n".join(
                     answer_meta.get("sources", "[]"),
                 )

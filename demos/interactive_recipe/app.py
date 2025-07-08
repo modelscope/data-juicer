@@ -15,11 +15,11 @@ from data_juicer.core import Analyzer, DefaultExecutor
 from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.constant import Fields, StatsKeys
 
-from prompts import single_op_prompt
+from prompts import single_op_prompt, multi_op_prompt
 from assistant import consult
 from st_operator_pool import StOperatorPool
 from attributor import TextEmbdSimilarityAttributor
-from copilot_client import setup_copilot_client, call_copilot_service
+from copilot_client import call_copilot_service
 
 import time
 import threading
@@ -247,8 +247,10 @@ class Visualize:
     def llm_assistant(self):
         with st.expander('LLM Assistant', expanded=False):
             # default_prompt = get_default_prompt()
-            default_prompt = single_op_prompt(
-                op_state=self.op_pool[0].state,
+            # print(self.op_pool[0].state)
+            op_states = [op_state for _, op_state in self.op_pool.state.items()]
+            default_prompt = multi_op_prompt(
+                op_states=op_states,
                 task_description=st.session_state.task_description,
                 user_prompt=""
             )
@@ -283,10 +285,12 @@ class Visualize:
                                 else:
                                     raise ValueError(f"Invalid action {action}")
                             st.session_state.suggestions = None
+                        st.rerun()
                 with col2:
                     ignore_btn = st.button("Ignore", use_container_width=True)
                     if ignore_btn:
                         st.session_state.suggestions = None
+                    st.rerun()
 
 
     def analyze_process(self):
@@ -451,7 +455,8 @@ class Visualize:
                     thread.start()
                     
                     # Wait for the response
-                    animation_frames = ["Searching.", "Searching..", "Searching..."]
+                    wait_flag = "Searching"
+                    animation_frames = [wait_flag + ("." * i) for i in range(1, 4)]
                     frame_idx = 0
                     while thread.is_alive() and q.empty():
                         response_placeholder.markdown(animation_frames[frame_idx % len(animation_frames)])
@@ -485,7 +490,6 @@ class Visualize:
 
 
 def main():
-    setup_copilot_client()
     viz = Visualize()
     viz.visualize()
 

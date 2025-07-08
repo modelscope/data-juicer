@@ -2,6 +2,8 @@ import os
 import dashscope
 from http import HTTPStatus
 
+ORIGINAL_BASE_HTTP_API_URL = dashscope.base_http_api_url
+
 def setup_copilot_client():
     """
     Configures the dashscope client to target a specified Copilot service endpoint.
@@ -10,6 +12,12 @@ def setup_copilot_client():
     service_url = os.getenv("COPILOT_SERVICE_URL", "http://127.0.0.1:6009/api")
     dashscope.base_http_api_url = service_url
     print(f"Copilot client is set to target: {service_url}")
+
+def reset_copilot_client():
+    """
+    Resets the dashscope client to its original API endpoint.
+    """
+    dashscope.base_http_api_url = ORIGINAL_BASE_HTTP_API_URL
 
 
 def call_copilot_service(copilot_chat_history: list = []):
@@ -25,6 +33,8 @@ def call_copilot_service(copilot_chat_history: list = []):
     # Retrieve model name and API key from environment variables, using dummy defaults.
     model_name = os.getenv("COPILOT_MODEL_NAME", "dummy")
     api_key = os.getenv("DASHSCOPE_API_KEY", "dummy")
+    
+    setup_copilot_client()
 
     try:
         # Make a streaming API call to the language model.
@@ -34,6 +44,7 @@ def call_copilot_service(copilot_chat_history: list = []):
             messages=copilot_chat_history,
             result_format="messages",  # Specifies the response format.
             stream=True,  # Enables streaming mode.
+            
         )
 
         last_yielded_content = ""
@@ -60,9 +71,12 @@ def call_copilot_service(copilot_chat_history: list = []):
                 # Handle API-level errors (e.g., bad requests, server errors).
                 error_msg = f"API Error: {response.code} - {response.message}"
                 yield error_msg
-                return  # Terminate the generator on error.
+                # return  # Terminate the generator on error.
 
     except Exception as e:
         # Handle connection errors or other exceptions during the API call.
         error_msg = f"Failed to connect to Copilot service. Make sure it's running. Error: {str(e)}"
         yield error_msg
+    
+    finally:
+        reset_copilot_client()
