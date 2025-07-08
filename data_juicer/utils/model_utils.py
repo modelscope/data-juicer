@@ -104,6 +104,9 @@ def check_model(model_name, force=False):
         except:  # noqa: E722
             backup_model_link = get_backup_model_link(model_name)
             if backup_model_link is not None:
+                # Ensure backup_model_link is a string, not bytes
+                if isinstance(backup_model_link, bytes):
+                    backup_model_link = backup_model_link.decode("utf-8")
                 backup_model_link = os.path.join(backup_model_link, model_name)
             try:
                 wget.download(backup_model_link, cached_model_path)

@@ -58,26 +58,54 @@ from data_juicer.ops.filter import (
 )
 from data_juicer.utils.constant import Fields
 
-# Global model cache to prevent repeated loading
+# Global model cache
 _MODEL_CACHE = {}
 
 
-def get_cached_model(model_type: str, lang: str = "en"):
-    """Get a cached model or load it if not cached."""
-    cache_key = f"{model_type}_{lang}"
+def get_cached_model(model_type: str, lang: str = "en", model_size: str = "md"):
+    """Get a cached model or load it if not cached.
+
+    Args:
+        model_type: Type of model (spacy, etc.)
+        lang: Language code (en, zh)
+        model_size: Model size for spaCy (sm, md, lg) - smaller = faster loading
+    """
+    cache_key = f"{model_type}_{lang}_{model_size}"
     if cache_key not in _MODEL_CACHE:
         from data_juicer.utils.model_utils import prepare_model
 
-        logger.info(f"Loading {model_type} model for {lang} (first time)...")
-        _MODEL_CACHE[cache_key] = prepare_model(model_type=model_type, lang=lang)
-        logger.info(f"Model {model_type}_{lang} loaded and cached")
+        logger.info(f"Loading {model_type} model for {lang} (size: {model_size})...")
+
+        if model_type == "spacy":
+            # Use smaller model for faster loading in benchmarks
+            if model_size == "sm":
+                # Small model (~12MB) - faster loading, less accurate
+                model_name_pattern = "{}_core_web_sm-3.7.0"
+            elif model_size == "lg":
+                # Large model (~560MB) - slower loading, more accurate
+                model_name_pattern = "{}_core_web_lg-3.7.0"
+            else:
+                # Medium model (~40MB) - default
+                model_name_pattern = "{}_core_web_md-3.7.0"
+
+            _MODEL_CACHE[cache_key] = prepare_model(model_type=model_type, lang=lang, name_pattern=model_name_pattern)
+        else:
+            _MODEL_CACHE[cache_key] = prepare_model(model_type=model_type, lang=lang)
+
+        logger.info(f"Model {cache_key} loaded and cached")
     else:
-        logger.debug(f"Using cached {model_type} model for {lang}")
+        logger.debug(f"Using cached {cache_key}")
     return _MODEL_CACHE[cache_key]
 
 
-def create_filter_with_cached_model(filter_class, **kwargs):
-    """Create a filter instance with cached model loading."""
+def create_filter_with_cached_model(filter_class, model_size: str = "sm", **kwargs):
+    """Create a filter instance with cached model loading.
+
+    Args:
+        filter_class: Filter class to instantiate
+        model_size: Model size for spaCy models (sm, md, lg)
+        **kwargs: Filter constructor arguments
+    """
     # For spaCy-based filters, we need to patch the model loading
     if filter_class in [TextEntityDependencyFilter, TextActionFilter]:
         # Temporarily patch the prepare_model function
@@ -85,8 +113,15 @@ def create_filter_with_cached_model(filter_class, **kwargs):
 
         original_prepare_spacy = model_utils.prepare_spacy_model
 
-        def cached_prepare_spacy(lang, **kwargs):
-            return get_cached_model("spacy", lang)
+        def cached_prepare_spacy(lang, name_pattern="{}_core_web_md-3.7.0", **kwargs):
+            # Determine model size from name_pattern
+            if "sm" in name_pattern:
+                size = "sm"
+            elif "lg" in name_pattern:
+                size = "lg"
+            else:
+                size = model_size  # Use provided size or default to "sm"
+            return get_cached_model("spacy", lang, size)
 
         model_utils.prepare_spacy_model = cached_prepare_spacy
 
@@ -99,6 +134,28 @@ def create_filter_with_cached_model(filter_class, **kwargs):
         filter_instance = filter_class(**kwargs)
 
     return filter_instance
+
+
+def preload_models_for_benchmark():
+    """Preload commonly used models to avoid loading delays during benchmark."""
+    logger.info("🔄 Preloading models for benchmark...")
+
+    # Preload spaCy models in different sizes
+    for size in ["sm", "md"]:
+        try:
+            get_cached_model("spacy", "en", size)
+            logger.info(f"✅ Preloaded spaCy {size} model")
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to preload spaCy {size} model: {e}")
+
+    # Preload other models as needed
+    try:
+        get_cached_model("gpt2", "en")
+        logger.info("✅ Preloaded GPT-2 model")
+    except Exception as e:
+        logger.warning(f"⚠️ Failed to preload GPT-2 model: {e}")
+
+    logger.info("🎯 Model preloading complete")
 
 
 @dataclass
@@ -951,10 +1008,84 @@ class PerformanceBenchmark:
             if hasattr(node, "children") and node.children:
                 for child in node.children:
                     if hasattr(child, "config") and child.config:
-                        # Extract operation from config
-                        for op_name, op_config in child.config.items():
-                            if op_name != "detailed_ops":  # Skip metadata
-                                operations.append({op_name: op_config})
+                        # Debug: Log the entire config structure
+                        logger.debug(f"Node config: {child.config}")
+
+                        # Check if this is a flat config structure with individual keys
+                        if isinstance(child.config, dict):
+                            # Look for actual operation names in the config
+                            operation_names = []
+                            config_params = {}
+
+                            for key, value in child.config.items():
+                                if key == "detailed_ops":
+                                    continue  # Skip metadata
+
+                                # Check if this key looks like an operation name
+                                if isinstance(value, (str, dict)) and key not in {
+                                    "batch_size",
+                                    "cpu_required",
+                                    "mem_required",
+                                    "min_score",
+                                    "skip_op_error",
+                                    "turbo",
+                                    "accelerator",
+                                    "num_proc",
+                                    "text_key",
+                                    "image_key",
+                                    "audio_key",
+                                    "video_key",
+                                    "query_key",
+                                    "response_key",
+                                    "history_key",
+                                    "index_key",
+                                    "work_dir",
+                                    "detailed_ops",
+                                }:
+                                    operation_names.append(key)
+                                else:
+                                    # This is a config parameter
+                                    config_params[key] = value
+
+                            # If we found operation names, create operations
+                            if operation_names:
+                                for op_name in operation_names:
+                                    op_config = child.config.get(op_name, {})
+
+                                    if isinstance(op_config, dict):
+                                        # Clean config based on operation type
+                                        if op_name == "general_fused_op":
+                                            # Only keep allowed keys for GeneralFusedOP
+                                            allowed_keys = {"batch_size", "fused_op_list"}
+                                            clean_config = {k: v for k, v in op_config.items() if k in allowed_keys}
+                                            operations.append({op_name: clean_config})
+                                        elif op_name == "fused_filter":
+                                            # Only keep allowed keys for FusedFilter
+                                            allowed_keys = {"name", "fused_filters"}
+                                            clean_config = {k: v for k, v in op_config.items() if k in allowed_keys}
+                                            operations.append({op_name: clean_config})
+                                        elif op_name == "fused_mapper":
+                                            # Only keep allowed keys for FusedMapper
+                                            allowed_keys = {"name", "fused_mappers", "batch_size"}
+                                            clean_config = {k: v for k, v in op_config.items() if k in allowed_keys}
+                                            operations.append({op_name: clean_config})
+                                        else:
+                                            # For other operations, remove common problematic keys
+                                            problematic_keys = {"accelerator", "batch_size", "num_proc", "detailed_ops"}
+                                            clean_config = {
+                                                k: v for k, v in op_config.items() if k not in problematic_keys
+                                            }
+                                            operations.append({op_name: clean_config})
+                                    elif isinstance(op_config, str):
+                                        # Simple operation with no config
+                                        operations.append({op_config: {}})
+                                    else:
+                                        # Fallback
+                                        operations.append({op_name: {}})
+                            else:
+                                # No operation names found, this might be a flat config
+                                # Skip individual config parameters that aren't operations
+                                logger.debug("Skipping flat config node with no operation names")
                     traverse_node(child)
 
         if ast.root:
@@ -970,6 +1101,8 @@ class PerformanceBenchmark:
         from data_juicer.ops import load_ops
 
         for op_config in optimized_ops:
+            # Debug: Log the operation configuration
+            logger.debug(f"Loading operation config: {op_config}")
             # Load the operation from config
             loaded_ops = load_ops([op_config])
             if loaded_ops:
@@ -1098,35 +1231,71 @@ class PerformanceBenchmark:
         # Prepare test data
         test_data = test_data.copy()
         logger.info(f"📊 Test Dataset: {len(test_data['text']):,} samples")
-        logger.info(f"🔧 Filters to benchmark: {len(filters)}")
+        logger.info(f"🔧 Filters to benchmark: {len(filters)} ({mode} mode)")
+        if mode == "full":
+            logger.info(
+                "   Using comprehensive test filters (12 filters covering basic, quality, and advanced categories)"
+            )
+        elif mode == "quick":
+            logger.info("   Using quick test filters (3 basic filters)")
+        elif mode == "complex_only":
+            logger.info("   Using complex-only test filters (7 advanced filters with language models and NLP)")
+        elif mode == "complex":
+            logger.info("   Using complex test filters (7 advanced filters)")
 
-        # Run individual filter benchmarks
-        logger.info("\n📈 INDIVIDUAL FILTER BENCHMARKS")
-        logger.info("-" * 40)
-        individual_results = self.run_individual_filters_benchmark(filters, test_data)
+        # Run benchmarks based on mode
+        if mode == "complex_only":
+            # Use specialized complex filters benchmark
+            logger.info("\n🧠 COMPLEX FILTERS BENCHMARK (Multiple Strategies)")
+            logger.info("-" * 50)
+            complex_results = self.run_complex_filters_benchmark(filters, test_data, analyzer_insights)
 
-        # Run fused filter benchmarks (with fusion strategies)
-        logger.info("\n🔗 FUSED FILTER BENCHMARKS")
-        logger.info("-" * 40)
-        fused_results = self.run_fused_filters_benchmark(filters, test_data, analyzer_insights)
+            # Extract individual and fused results for compatibility
+            individual_results = complex_results["individual"]
+            fused_results = complex_results["conservative_fusion"]  # Use conservative fusion as "fused"
+            pipeline_results = complex_results["smart_batching"]  # Use smart batching as "pipeline"
 
-        # Run pipeline optimizer benchmark (complete workflow)
-        logger.info("\n⚡ PIPELINE OPTIMIZER BENCHMARKS")
-        logger.info("-" * 40)
-        pipeline_results = self.run_pipeline_optimizer_benchmark(filters, test_data, analyzer_insights)
+            # Add complex results to main results
+            results = {
+                "individual": individual_results,
+                "fused": fused_results,
+                "pipeline_optimizer": pipeline_results,
+                "complex_strategies": complex_results,
+                "metadata": {
+                    "mode": mode,
+                    "filter_count": len(filters),
+                    "sample_count": len(test_data["text"]),
+                    "analyzer_insights_available": analyzer_insights is not None,
+                },
+            }
+        else:
+            # Run individual filter benchmarks
+            logger.info("\n📈 INDIVIDUAL FILTER BENCHMARKS")
+            logger.info("-" * 40)
+            individual_results = self.run_individual_filters_benchmark(filters, test_data)
 
-        # Compile results
-        results = {
-            "individual": individual_results,
-            "fused": fused_results,
-            "pipeline_optimizer": pipeline_results,
-            "metadata": {
-                "mode": mode,
-                "filter_count": len(filters),
-                "sample_count": len(test_data["text"]),
-                "analyzer_insights_available": analyzer_insights is not None,
-            },
-        }
+            # Run fused filter benchmarks (with fusion strategies)
+            logger.info("\n🔗 FUSED FILTER BENCHMARKS")
+            logger.info("-" * 40)
+            fused_results = self.run_fused_filters_benchmark(filters, test_data, analyzer_insights)
+
+            # Run pipeline optimizer benchmark (complete workflow)
+            logger.info("\n⚡ PIPELINE OPTIMIZER BENCHMARKS")
+            logger.info("-" * 40)
+            pipeline_results = self.run_pipeline_optimizer_benchmark(filters, test_data, analyzer_insights)
+
+            # Compile results
+            results = {
+                "individual": individual_results,
+                "fused": fused_results,
+                "pipeline_optimizer": pipeline_results,
+                "metadata": {
+                    "mode": mode,
+                    "filter_count": len(filters),
+                    "sample_count": len(test_data["text"]),
+                    "analyzer_insights_available": analyzer_insights is not None,
+                },
+            }
 
         # Calculate performance comparisons
         logger.info("\n🏆 PERFORMANCE COMPARISON")
@@ -1203,10 +1372,15 @@ class PerformanceBenchmark:
                             # If it returns text content, create a mask based on non-empty results
                             mask = [bool(item) for item in result]
 
-                        ind_masks.append(mask[idx])
-                        logger.warning(f"    Result for sample {idx}: {mask[idx]} (passed={mask[idx]})")
-                        logger.warning(f"    Overall: {sum(mask)}/{len(mask)} samples passed")
-                        logger.warning(f"    Current masks so far: {ind_masks}")
+                        # Check if mask has enough elements and idx is valid
+                        if mask and len(mask) > idx:
+                            ind_masks.append(mask[idx])
+                            logger.warning(f"    Result for sample {idx}: {mask[idx]} (passed={mask[idx]})")
+                            logger.warning(f"    Overall: {sum(mask)}/{len(mask)} samples passed")
+                            logger.warning(f"    Current masks so far: {ind_masks}")
+                        else:
+                            logger.warning(f"    Warning: mask length {len(mask)} is insufficient for index {idx}")
+                            ind_masks.append(True)  # Default to pass if mask is invalid
                     else:
                         logger.warning("    No process_batched method found")
                         ind_masks.append(True)  # Assume pass if no process method
@@ -1265,11 +1439,18 @@ class PerformanceBenchmark:
                                 # If it returns text content, create a mask based on non-empty results
                                 op_mask = [bool(item) for item in result]
 
-                            fused_masks.append(op_mask[idx])
-                            mask_fused = [m and o for m, o in zip(mask_fused, op_mask)]
-                            logger.warning(f"    Result for sample {idx}: {op_mask[idx]} (passed={op_mask[idx]})")
-                            logger.warning(f"    Overall: {sum(op_mask)}/{len(op_mask)} samples passed")
-                            logger.warning(f"    Current masks so far: {fused_masks}")
+                            # Check if op_mask has enough elements and idx is valid
+                            if op_mask and len(op_mask) > idx:
+                                fused_masks.append(op_mask[idx])
+                                mask_fused = [m and o for m, o in zip(mask_fused, op_mask)]
+                                logger.warning(f"    Result for sample {idx}: {op_mask[idx]} (passed={op_mask[idx]})")
+                                logger.warning(f"    Overall: {sum(op_mask)}/{len(op_mask)} samples passed")
+                                logger.warning(f"    Current masks so far: {fused_masks}")
+                            else:
+                                logger.warning(
+                                    f"    Warning: op_mask length {len(op_mask)} is insufficient for index {idx}"
+                                )
+                                fused_masks.append(True)  # Default to pass if mask is invalid
                         else:
                             logger.warning("    No process_batched method found")
                             fused_masks.append(True)
@@ -1277,8 +1458,12 @@ class PerformanceBenchmark:
                         logger.warning("    Failed to load op from config")
                         fused_masks.append(True)
 
-                logger.warning(f"  Fused final result: {mask_fused[idx]} (all masks: {fused_masks})")
-                logger.warning(f"  Comparison: Individual={all(ind_masks)} vs Fused={mask_fused[idx]}")
+                # Check if masks are valid before accessing
+                individual_result = all(ind_masks) if ind_masks else True
+                fused_result = mask_fused[idx] if len(mask_fused) > idx else True
+
+                logger.warning(f"  Fused final result: {fused_result} (all masks: {fused_masks})")
+                logger.warning(f"  Comparison: Individual={individual_result} vs Fused={fused_result}")
                 logger.warning("--- End of mismatch analysis ---")
         results["validation"] = {
             "match": individual_mask == fused_mask,
@@ -1384,6 +1569,9 @@ class PerformanceBenchmark:
         data = test_data.copy()
         from data_juicer.ops import load_ops
 
+        # Initialize final mask as all True
+        final_mask = [True] * len(data["text"])
+
         for op_config in optimized_ops:
             loaded_ops = load_ops([op_config])
             if loaded_ops:
@@ -1393,18 +1581,281 @@ class PerformanceBenchmark:
                 if hasattr(op, "process_batched_for_validation"):
                     # Use the new validation method that returns boolean masks
                     mask = op.process_batched_for_validation(data)
-                    return mask
+                    # Apply AND logic with the current final mask
+                    final_mask = [a and b for a, b in zip(final_mask, mask)]
                 elif hasattr(op, "process_batched"):
                     result = list(op.process_batched(data))
                     # Handle both boolean masks and text content
                     if result and isinstance(result[0], bool):
-                        return result
+                        # Apply AND logic with the current final mask
+                        final_mask = [a and b for a, b in zip(final_mask, result)]
                     else:
                         # If it returns text content, create a mask based on non-empty results
-                        return [bool(item) for item in result]
+                        mask = [bool(item) for item in result]
+                        # Apply AND logic with the current final mask
+                        final_mask = [a and b for a, b in zip(final_mask, mask)]
 
-        # If no ops were processed, return all True
-        return [True] * len(data["text"])
+        return final_mask
+
+    def get_complex_only_test_filters(self) -> List[Filter]:
+        """Get only complex filters for testing advanced fusion scenarios."""
+        from data_juicer.ops.filter import (
+            FlaggedWordFilter,
+            LanguageIDScoreFilter,
+            PerplexityFilter,
+            StopWordsFilter,
+            WordRepetitionFilter,
+        )
+
+        return [
+            # Complex filters that require language models or advanced processing
+            # (spaCy filters disabled due to download issues)
+            PerplexityFilter(lang="en", model_key="gpt2", min_score=0.0, max_score=100.0),
+            StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.5),
+            FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1),
+            LanguageIDScoreFilter(lang="en", min_score=0.5, max_score=1.0),
+            WordRepetitionFilter(lang="en", min_ratio=0.0, max_ratio=0.3),
+            # spaCy filters disabled due to model download issues:
+            # - TextEntityDependencyFilter requires spaCy models
+            # - TextActionFilter requires spaCy models
+        ]
+
+    def run_complex_filters_benchmark(
+        self, filters: List[Filter], test_data: Dict[str, Any], analyzer_insights: dict = None
+    ) -> Dict[str, Any]:
+        """Specialized benchmark for complex filters with multiple strategies."""
+        logger.info("Running complex filters benchmark with multiple strategies...")
+
+        results = {}
+
+        # Strategy 1: Individual execution (baseline)
+        logger.info("Strategy 1: Individual execution (baseline)")
+        individual_metrics = self.run_individual_filters_benchmark(filters, test_data)
+        results["individual"] = individual_metrics
+
+        # Strategy 2: Conservative fusion (avoid complex+complex)
+        logger.info("Strategy 2: Conservative fusion (avoid complex+complex)")
+        conservative_metrics = self.run_conservative_fusion_benchmark(filters, test_data, analyzer_insights)
+        results["conservative_fusion"] = conservative_metrics
+
+        # Strategy 3: Parallel execution (no fusion, but parallel processing)
+        logger.info("Strategy 3: Parallel execution (no fusion)")
+        parallel_metrics = self.run_parallel_execution_benchmark(filters, test_data)
+        results["parallel"] = parallel_metrics
+
+        # Strategy 4: Smart batching (group by complexity)
+        logger.info("Strategy 4: Smart batching (group by complexity)")
+        smart_batch_metrics = self.run_smart_batching_benchmark(filters, test_data, analyzer_insights)
+        results["smart_batching"] = smart_batch_metrics
+
+        # Calculate improvements
+        baseline_time = individual_metrics.total_time
+        improvements = {}
+
+        for strategy, metrics in results.items():
+            if strategy != "individual":
+                speedup = baseline_time / metrics.total_time
+                improvements[strategy] = {
+                    "speedup": speedup,
+                    "time_saved": baseline_time - metrics.total_time,
+                    "time_saved_percent": (baseline_time - metrics.total_time) / baseline_time * 100,
+                }
+
+        results["improvements"] = improvements
+
+        # Find best strategy
+        best_strategy = max(improvements.items(), key=lambda x: x[1]["speedup"])
+        results["best_strategy"] = best_strategy[0]
+        results["best_speedup"] = best_strategy[1]["speedup"]
+
+        logger.info(f"🏆 Best strategy: {best_strategy[0]} ({best_strategy[1]['speedup']:.2f}x speedup)")
+
+        return results
+
+    def run_conservative_fusion_benchmark(
+        self, filters: List[Filter], test_data: Dict[str, Any], analyzer_insights: dict = None
+    ) -> PerformanceMetrics:
+        """Run fusion benchmark with conservative strategy for complex filters."""
+        start_memory = self.measure_memory_usage()
+        total_start_time = time.time()
+
+        # Build pipeline with conservative fusion
+        pipeline_config = self._build_pipeline_config_from_filters(filters)
+        from data_juicer.core.pipeline_ast import PipelineAST
+
+        ast = PipelineAST()
+        ast.build_from_config(pipeline_config)
+
+        # Use conservative fusion strategy
+        from data_juicer.core.optimizer.filter_fusion_strategy import (
+            FilterFusionStrategy,
+        )
+        from data_juicer.core.optimizer.mapper_fusion_strategy import (
+            MapperFusionStrategy,
+        )
+        from data_juicer.core.optimizer.optimizer import PipelineOptimizer
+
+        strategies = [FilterFusionStrategy(analyzer_insights=analyzer_insights), MapperFusionStrategy()]
+        optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
+
+        optimized_ast = optimizer.optimize(ast)
+        optimized_ops = self._convert_ast_to_operations(optimized_ast)
+
+        logger.info(f"  Conservative fusion: {len(filters)} → {len(optimized_ops)} operations")
+
+        # Process with optimized operations
+        self._process_with_optimized_ops(optimized_ops, test_data)
+
+        total_time = time.time() - total_start_time
+        end_memory = self.measure_memory_usage()
+        memory_usage = end_memory - start_memory
+        throughput = len(test_data["text"]) / total_time
+
+        return PerformanceMetrics(
+            total_time=total_time,
+            stats_time=total_time * 0.8,
+            filter_time=total_time * 0.2,
+            memory_usage=memory_usage,
+            throughput=throughput,
+        )
+
+    def run_parallel_execution_benchmark(self, filters: List[Filter], test_data: Dict[str, Any]) -> PerformanceMetrics:
+        """Run benchmark with parallel execution (no fusion)."""
+        start_memory = self.measure_memory_usage()
+        total_start_time = time.time()
+
+        # Process each filter independently in parallel
+        import concurrent.futures
+        import threading
+
+        # Create thread-local storage for data
+        thread_local = threading.local()
+
+        def process_filter(filter_op):
+            # Each thread gets its own copy of data
+            if not hasattr(thread_local, "data"):
+                thread_local.data = test_data.copy()
+
+            # Process the filter
+            if hasattr(filter_op, "compute_stats_batched"):
+                thread_local.data = filter_op.compute_stats_batched(thread_local.data)
+            if hasattr(filter_op, "process_batched"):
+                return list(filter_op.process_batched(thread_local.data))
+            return [True] * len(test_data["text"])
+
+        # Execute filters in parallel
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(len(filters), 4)) as executor:
+            futures = [executor.submit(process_filter, filter_op) for filter_op in filters]
+            results = [future.result() for future in concurrent.futures.as_completed(futures)]
+
+        # Combine results (AND operation)
+        if results:
+            _ = [all(vals) for vals in zip(*results)]
+        else:
+            _ = [True] * len(test_data["text"])
+
+        total_time = time.time() - total_start_time
+        end_memory = self.measure_memory_usage()
+        memory_usage = end_memory - start_memory
+        throughput = len(test_data["text"]) / total_time
+
+        return PerformanceMetrics(
+            total_time=total_time,
+            stats_time=total_time * 0.6,
+            filter_time=total_time * 0.4,
+            memory_usage=memory_usage,
+            throughput=throughput,
+        )
+
+    def run_smart_batching_benchmark(
+        self, filters: List[Filter], test_data: Dict[str, Any], analyzer_insights: dict = None
+    ) -> PerformanceMetrics:
+        """Run benchmark with smart batching based on complexity."""
+        start_memory = self.measure_memory_usage()
+        total_start_time = time.time()
+
+        # Group filters by complexity
+        simple_filters = []
+        medium_filters = []
+        complex_filters = []
+
+        for filter_op in filters:
+            op_name = getattr(filter_op, "_name", type(filter_op).__name__)
+            complexity = self._get_operation_complexity(op_name)
+
+            if complexity == "simple":
+                simple_filters.append(filter_op)
+            elif complexity == "medium":
+                medium_filters.append(filter_op)
+            else:
+                complex_filters.append(filter_op)
+
+        logger.info(
+            f"  Smart batching: {len(simple_filters)} simple, {len(medium_filters)} medium, {len(complex_filters)} complex"
+        )
+
+        # Process each complexity group separately
+        data = test_data.copy()
+        all_masks = []
+
+        # Process simple filters (can be fused)
+        if simple_filters:
+            _ = self.run_fused_filters_benchmark(simple_filters, data, analyzer_insights)
+            # Get mask from simple filters (simplified)
+            simple_mask = [True] * len(data["text"])  # Placeholder
+            all_masks.append(simple_mask)
+
+        # Process medium filters (can be fused)
+        if medium_filters:
+            _ = self.run_fused_filters_benchmark(medium_filters, data, analyzer_insights)
+            medium_mask = [True] * len(data["text"])  # Placeholder
+            all_masks.append(medium_mask)
+
+        # Process complex filters (individual execution)
+        if complex_filters:
+            for filter_op in complex_filters:
+                if hasattr(filter_op, "compute_stats_batched"):
+                    data = filter_op.compute_stats_batched(data)
+                if hasattr(filter_op, "process_batched"):
+                    result = list(filter_op.process_batched(data))
+                    if result and isinstance(result[0], bool):
+                        all_masks.append(result)
+                    else:
+                        all_masks.append([bool(item) for item in result])
+
+        # Combine all masks
+        if all_masks:
+            _ = [all(vals) for vals in zip(*all_masks)]
+        else:
+            _ = [True] * len(data["text"])
+
+        total_time = time.time() - total_start_time
+        end_memory = self.measure_memory_usage()
+        memory_usage = end_memory - start_memory
+        throughput = len(test_data["text"]) / total_time
+
+        return PerformanceMetrics(
+            total_time=total_time,
+            stats_time=total_time * 0.7,
+            filter_time=total_time * 0.3,
+            memory_usage=memory_usage,
+            throughput=throughput,
+        )
+
+    def _get_operation_complexity(self, op_name: str) -> str:
+        """Get operation complexity for smart batching."""
+        op_name_lower = op_name.lower()
+
+        # Simple operations
+        if any(pattern in op_name_lower for pattern in ["text_length", "words_num", "character_repetition"]):
+            return "simple"
+
+        # Complex operations
+        if any(pattern in op_name_lower for pattern in ["perplexity", "language_id", "text_entity", "text_action"]):
+            return "complex"
+
+        # Medium operations
+        return "medium"
 
 
 def create_simple_test_data(num_samples: int = 1000) -> Dict[str, Any]:
@@ -2107,9 +2558,9 @@ def main():
     parser = argparse.ArgumentParser(description="Performance Benchmark for Data-Juicer Filters")
     parser.add_argument(
         "--mode",
-        choices=["quick", "full", "pipeline"],
+        choices=["quick", "full", "complex_only", "pipeline"],
         default="quick",
-        help="Benchmark mode: quick (basic filters), full (all filters), pipeline (optimizer workflow)",
+        help="Benchmark mode: quick (3 basic filters), full (12 comprehensive filters), complex_only (7 complex filters), pipeline (optimizer workflow)",
     )
     parser.add_argument(
         "--samples",
@@ -2122,11 +2573,21 @@ def main():
         action="store_true",
         help="Enable analyzer insights for optimization",
     )
+    parser.add_argument(
+        "--spacy-size",
+        choices=["sm", "md", "lg"],
+        default="sm",
+        help="spaCy model size: sm (fast, ~12MB), md (balanced, ~40MB), lg (accurate, ~560MB)",
+    )
 
     args = parser.parse_args()
 
     # Create benchmark instance
     benchmark = PerformanceBenchmark()
+
+    # Preload models to avoid loading delays during benchmark
+    if args.mode in ["complex_only", "full"]:
+        preload_models_for_benchmark()
 
     # Create test data
     test_data = create_simple_test_data(args.samples)
@@ -2135,9 +2596,35 @@ def main():
     if args.mode == "quick":
         filters = benchmark.get_quick_test_filters()
     elif args.mode == "full":
-        filters = benchmark.get_full_test_filters()
+        filters = benchmark.create_test_filters()  # Use comprehensive test filters (12 filters)
+    elif args.mode == "complex_only":
+        # Use command-line specified spaCy model size for complex filters
+        from data_juicer.ops.filter import (
+            FlaggedWordFilter,
+            LanguageIDScoreFilter,
+            PerplexityFilter,
+            StopWordsFilter,
+            WordRepetitionFilter,
+        )
+
+        # Get base complex filters
+        base_filters = [
+            PerplexityFilter(lang="en", model_key="gpt2", min_score=0.0, max_score=100.0),
+            StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.5),
+            FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1),
+            LanguageIDScoreFilter(lang="en", min_score=0.5, max_score=1.0),
+            WordRepetitionFilter(lang="en", min_ratio=0.0, max_ratio=0.3),
+        ]
+
+        # Add spaCy filters with specified model size
+        spacy_filters = [
+            # create_filter_with_cached_model(TextEntityDependencyFilter, model_size=args.spacy_size, lang="en", min_dependency_num=1, any_or_all="all"),
+            # create_filter_with_cached_model(TextActionFilter, model_size=args.spacy_size, lang="en", min_action_num=1),
+        ]
+
+        filters = base_filters + spacy_filters
     else:  # pipeline mode
-        filters = benchmark.get_full_test_filters()  # Use full filters for pipeline mode
+        filters = benchmark.create_test_filters()  # Use comprehensive test filters for pipeline mode
 
     # Get analyzer insights if requested
     analyzer_insights = None

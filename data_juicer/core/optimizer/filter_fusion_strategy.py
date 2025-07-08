@@ -177,6 +177,10 @@ class FilterFusionStrategy(OptimizationStrategy):
             if self._has_dependency(node, op) or self._has_dependency(op, node):
                 return False
 
+        # Use smart complex filter fusion for better performance
+        if not self._smart_complex_filter_fusion(node, group):
+            return False
+
         # Use analyzer insights for advanced decisions
         if self.analyzer_insights:
             return self._analyzer_based_fusion_decision(node, group)
@@ -248,7 +252,7 @@ class FilterFusionStrategy(OptimizationStrategy):
         return False
 
     def _get_operation_complexity(self, op_name: str) -> str:
-        """Get the computational complexity of an operation.
+        """Get the computational complexity of an operation using dynamic analysis.
 
         Args:
             op_name: Name of the operation
@@ -256,18 +260,136 @@ class FilterFusionStrategy(OptimizationStrategy):
         Returns:
             Complexity level: 'simple', 'medium', or 'complex'
         """
-        simple_ops = {"text_length_filter", "words_num_filter", "character_repetition_filter"}
-        medium_ops = {"word_repetition_filter", "special_characters_filter", "alphanumeric_filter"}
-        complex_ops = {"perplexity_filter", "stopwords_filter", "flagged_words_filter"}
+        # First, try to get complexity from operation metadata if available
+        complexity = self._get_complexity_from_metadata(op_name)
+        if complexity:
+            return complexity
 
-        if op_name in simple_ops:
-            return "simple"
-        elif op_name in medium_ops:
-            return "medium"
-        elif op_name in complex_ops:
-            return "complex"
-        else:
-            return "medium"  # Default assumption
+        # Fallback to pattern-based analysis
+        return self._analyze_complexity_by_pattern(op_name)
+
+    def _get_complexity_from_metadata(self, op_name: str) -> Optional[str]:
+        """Get complexity from operation metadata or runtime analysis."""
+        # Try to load the actual operation to analyze its characteristics
+        try:
+            from data_juicer.ops import load_ops
+
+            # Create a minimal config to load the operation
+            op_config = {op_name: {}}
+            loaded_ops = load_ops([op_config])
+
+            if loaded_ops:
+                op = loaded_ops[0]
+                return self._analyze_operation_complexity(op)
+        except Exception:
+            pass
+
+        return None
+
+    def _analyze_operation_complexity(self, op) -> str:
+        """Analyze operation complexity based on its actual characteristics."""
+        complexity_indicators = {"simple": 0, "medium": 0, "complex": 0}
+
+        # Check for model dependencies (indicates complexity)
+        if hasattr(op, "config") and op.config:
+            config = op.config
+            if any(key in config for key in ["model_key", "sp_model_key", "kl_model_key"]):
+                complexity_indicators["complex"] += 2
+            if "lang" in config:
+                complexity_indicators["medium"] += 1
+
+        # Check for external dependencies
+        if hasattr(op, "_name"):
+            op_name = op._name.lower()
+
+            # Language model dependencies
+            if any(keyword in op_name for keyword in ["perplexity", "language", "spacy", "nlp"]):
+                complexity_indicators["complex"] += 2
+
+            # Statistical analysis dependencies
+            if any(keyword in op_name for keyword in ["repetition", "ratio", "statistics"]):
+                complexity_indicators["medium"] += 1
+
+            # Simple text processing
+            if any(keyword in op_name for keyword in ["length", "words", "characters"]):
+                complexity_indicators["simple"] += 1
+
+        # Check method complexity
+        if hasattr(op, "compute_stats_batched"):
+            # Analyze the method signature and docstring for complexity hints
+            method = op.compute_stats_batched
+            if hasattr(method, "__doc__") and method.__doc__:
+                doc = method.__doc__.lower()
+                if any(keyword in doc for keyword in ["model", "spacy", "nlp", "language"]):
+                    complexity_indicators["complex"] += 1
+                elif any(keyword in doc for keyword in ["statistics", "ratio", "analysis"]):
+                    complexity_indicators["medium"] += 1
+
+        # Determine final complexity
+        max_complexity = max(complexity_indicators.items(), key=lambda x: x[1])
+        if max_complexity[1] == 0:
+            return "medium"  # Default
+        return max_complexity[0]
+
+    def _analyze_complexity_by_pattern(self, op_name: str) -> str:
+        """Analyze complexity based on operation name patterns."""
+        op_name_lower = op_name.lower()
+
+        # Simple operations (basic text processing)
+        simple_patterns = [
+            "text_length",
+            "words_num",
+            "character_repetition",
+            "average_line_length",
+            "maximum_line_length",
+        ]
+
+        # Medium complexity operations (statistical analysis)
+        medium_patterns = ["word_repetition", "special_characters", "alphanumeric", "stopwords", "flagged_words"]
+
+        # Complex operations (language models, NLP)
+        complex_patterns = [
+            "perplexity",
+            "language_id",
+            "text_entity",
+            "text_action",
+            "spacy",
+            "nlp",
+            "dependency",
+            "pos_tag",
+        ]
+
+        # Check patterns
+        for pattern in simple_patterns:
+            if pattern in op_name_lower:
+                return "simple"
+
+        for pattern in complex_patterns:
+            if pattern in op_name_lower:
+                return "complex"
+
+        for pattern in medium_patterns:
+            if pattern in op_name_lower:
+                return "medium"
+
+        # Default to medium if no patterns match
+        return "medium"
+
+    def _get_adaptive_complexity(self, op_name: str, performance_data: Optional[Dict] = None) -> str:
+        """Get adaptive complexity based on performance data if available."""
+        if performance_data and op_name in performance_data:
+            # Use performance data to adjust complexity
+            avg_time = performance_data[op_name].get("avg_time", 0)
+
+            if avg_time < 0.001:  # Very fast
+                return "simple"
+            elif avg_time < 0.01:  # Fast
+                return "medium"
+            else:  # Slow
+                return "complex"
+
+        # Fall back to static analysis
+        return self._get_operation_complexity(op_name)
 
     def _has_dependency(self, op1: OpNode, op2: OpNode) -> bool:
         """Check if op1 depends on op2.
@@ -389,4 +511,131 @@ class FilterFusionStrategy(OptimizationStrategy):
 
         # Example: Operations that modify the same data structure
         # This is a placeholder for future operation-specific checks
+        return False
+
+    def _smart_complex_filter_fusion(self, node: OpNode, group: List[OpNode]) -> bool:
+        """Smart fusion decision for complex filters that may cause slowdown.
+
+        Args:
+            node: Operation to check
+            group: Group of operations
+
+        Returns:
+            True if fusion is recommended, False if it would cause slowdown
+        """
+        # Get complexity of current operation and group
+        node_complexity = self._get_operation_complexity(node.name)
+        group_complexities = [self._get_operation_complexity(op.name) for op in group]
+
+        # Rule 1: Never fuse complex operations together (causes slowdown)
+        if node_complexity == "complex" and any(c == "complex" for c in group_complexities):
+            logger.debug(f"Rejecting fusion: complex operation {node.name} with complex group")
+            return False
+
+        # Rule 2: Limit group size for complex operations (max 2 complex filters per group)
+        complex_count_in_group = sum(1 for c in group_complexities if c == "complex")
+        if node_complexity == "complex" and complex_count_in_group >= 2:
+            logger.debug(
+                f"Rejecting fusion: complex operation {node.name} would exceed max 2 complex filters per group"
+            )
+            return False
+
+        # Rule 3: Check for model conflicts
+        if self._has_model_conflicts(node, group):
+            logger.debug(f"Rejecting fusion: model conflicts detected for {node.name}")
+            return False
+
+        # Rule 4: Check memory requirements
+        if self._would_exceed_memory_limit(node, group):
+            logger.debug(f"Rejecting fusion: would exceed memory limit for {node.name}")
+            return False
+
+        # Rule 5: Check for sequential dependencies
+        if self._has_sequential_dependencies(node, group):
+            logger.debug(f"Rejecting fusion: sequential dependencies for {node.name}")
+            return False
+
+        return True
+
+    def _has_model_conflicts(self, node: OpNode, group: List[OpNode]) -> bool:
+        """Check if operations have conflicting model requirements."""
+        # Get model requirements for current operation
+        node_models = self._get_model_requirements(node)
+
+        # Check against group models
+        for op in group:
+            group_models = self._get_model_requirements(op)
+            # If both operations require different models of the same type
+            for model_type in node_models:
+                if model_type in group_models and node_models[model_type] != group_models[model_type]:
+                    return True
+        return False
+
+    def _get_model_requirements(self, node: OpNode) -> Dict[str, str]:
+        """Get model requirements for an operation."""
+        models = {}
+        config = node.config or {}
+
+        # Check for common model keys
+        for key in ["model_key", "sp_model_key", "kl_model_key"]:
+            if key in config:
+                models[key] = config[key]
+
+        # Check for language-specific models
+        if "lang" in config:
+            models["lang"] = config["lang"]
+
+        return models
+
+    def _would_exceed_memory_limit(self, node: OpNode, group: List[OpNode]) -> bool:
+        """Check if fusion would exceed memory limits."""
+        # Estimate memory usage for current operation
+        node_memory = self._estimate_operation_memory(node)
+
+        # Estimate memory for group
+        group_memory = sum(self._estimate_operation_memory(op) for op in group)
+
+        # Total estimated memory
+        total_memory = node_memory + group_memory
+
+        # Conservative memory limit (2GB)
+        memory_limit = 2 * 1024 * 1024 * 1024  # 2GB in bytes
+
+        return total_memory > memory_limit
+
+    def _estimate_operation_memory(self, node: OpNode) -> int:
+        """Estimate memory usage for an operation in bytes."""
+        complexity = self._get_operation_complexity(node.name)
+
+        # Rough memory estimates based on complexity
+        if complexity == "simple":
+            return 50 * 1024 * 1024  # 50MB
+        elif complexity == "medium":
+            return 200 * 1024 * 1024  # 200MB
+        else:  # complex
+            return 500 * 1024 * 1024  # 500MB
+
+    def _has_sequential_dependencies(self, node: OpNode, group: List[OpNode]) -> bool:
+        """Check if operations must be executed sequentially."""
+        # Check for data flow dependencies
+        for op in group:
+            if self._has_dependency(node, op) or self._has_dependency(op, node):
+                return True
+
+        # Check for operation-specific sequential requirements
+        node_name = node.name.lower()
+        group_names = [op.name.lower() for op in group]
+
+        # Some operations must be sequential
+        sequential_patterns = [
+            ("perplexity", "language_id"),  # Language detection before perplexity
+            ("text_entity", "text_action"),  # Entity detection before action analysis
+        ]
+
+        for pattern1, pattern2 in sequential_patterns:
+            if pattern1 in node_name and any(pattern2 in name for name in group_names):
+                return True
+            if pattern2 in node_name and any(pattern1 in name for name in group_names):
+                return True
+
         return False
