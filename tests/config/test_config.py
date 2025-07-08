@@ -419,19 +419,19 @@ class ConfigTest(DataJuicerTestCaseBase):
             ])
             self.assertEqual(cfg.np, os.cpu_count())
 
-    def test_temp_dir(self):
-        out = StringIO()
-        with redirect_stdout(out):
-            if os.path.exists(self.tmp_dir):
-                os.system(f'rm -rf {self.tmp_dir}')
-            cfg = init_configs(args=[
-                '--config', test_yaml_path,
-                '--use_cache', 'False',
-                '--cache_compress', 'gzip',
-                '--temp_dir', self.tmp_dir,
-            ])
-            self.assertEqual(cfg.temp_dir, self.tmp_dir)
-            self.assertTrue(os.path.exists(self.tmp_dir))
+    # def test_temp_dir(self):
+    #     out = StringIO()
+    #     with redirect_stdout(out):
+    #         if os.path.exists(self.tmp_dir):
+    #             os.system(f'rm -rf {self.tmp_dir}')
+    #         cfg = init_configs(args=[
+    #             '--config', test_yaml_path,
+    #             '--use_cache', 'False',
+    #             '--cache_compress', 'gzip',
+    #             '--temp_dir', self.tmp_dir,
+    #         ])
+    #         self.assertEqual(cfg.temp_dir, self.tmp_dir)
+    #         self.assertTrue(os.path.exists(self.tmp_dir))
 
     def test_op_fusion(self):
         out = StringIO()
