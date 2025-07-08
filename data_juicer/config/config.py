@@ -787,21 +787,27 @@ def update_op_process(cfg, parser, used_ops=None):
     op_name_count = {}
     for op_name in used_ops:
         op_config = op_configs.get(op_name)
-
+        op_config_list = []
         if op_name not in option_in_commands:
             # Update op params if set
             if op_config:
-                temp_cfg = parser.merge_config(dict_to_namespace({op_name: op_config}), temp_cfg)
+                for op_c in op_config:
+                    temp_cfg = parser.merge_config(dict_to_namespace({op_name: op_c}), temp_cfg)
+                    oc = namespace_to_dict(temp_cfg)[op_name]
+                    op_config_list.append(oc)
+                temp_cfg = parser.merge_config(dict_to_namespace({op_name: op_config_list}), temp_cfg)
         else:
             # Remove args that will be overridden by command line
             if op_config:
-                for full_option in full_option_in_commands:
-                    key = full_option.split(".")[1]
-                    if key in op_config:
-                        op_config.pop(key)
-
-                if op_config:
-                    temp_cfg = parser.merge_config(dict_to_namespace({op_name: op_config}), temp_cfg)
+                for op_c in op_config:
+                    for full_option in full_option_in_commands:
+                        key = full_option.split(".")[1]
+                        if key in op_c:
+                            op_c.pop(key)
+                    temp_cfg = parser.merge_config(dict_to_namespace({op_name: op_c}), temp_cfg)
+                    oc = namespace_to_dict(temp_cfg)[op_name]
+                    op_config_list.append(oc)
+                temp_cfg = parser.merge_config(dict_to_namespace({op_name: op_config_list}), temp_cfg)
 
         # Update op params
         internal_op_para = temp_cfg.get(op_name)
@@ -822,12 +828,6 @@ def update_op_process(cfg, parser, used_ops=None):
                                 else namespace_to_dict(internal_op_para[op_name_count[op_name]])
                             )
                         }
-                else:
-                    if list(op_in_process.keys())[0] == op_name:
-                        cfg.process[i] = {
-                            op_name: None if internal_op_para is None else namespace_to_dict(internal_op_para)
-                        }
-                        break
         else:
             # Add new operator
             cfg.process.append({op_name: None if internal_op_para is None else namespace_to_dict(internal_op_para)})
