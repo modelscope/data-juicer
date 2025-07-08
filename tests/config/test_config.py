@@ -5,7 +5,7 @@ from io import StringIO
 
 from jsonargparse import Namespace, namespace_to_dict
 
-from data_juicer.config.config import init_configs, get_default_cfg, update_op_attr, export_config, merge_config, prepare_side_configs
+from data_juicer.config import init_configs, get_default_cfg, update_op_attr, export_config, merge_config, prepare_side_configs
 from data_juicer.ops import load_ops
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
