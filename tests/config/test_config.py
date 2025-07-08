@@ -400,60 +400,60 @@ class ConfigTest(DataJuicerTestCaseBase):
             self.assertTrue(cfg_auto.auto)
             self.assertGreater(len(cfg_auto.process), 0)
 
-    # def test_debug_mode(self):
-    #     out = StringIO()
-    #     with redirect_stdout(out):
-    #         cfg = init_configs(args=[
-    #             '--config', test_yaml_path,
-    #             '--debug',
-    #         ])
-    #         self.assertEqual(cfg.debug, True)
-    #
-    # def test_different_np(self):
-    #     out = StringIO()
-    #     with redirect_stdout(out):
-    #         # too many
-    #         cfg = init_configs(args=[
-    #             '--config', test_yaml_path,
-    #             '--np', f'{os.cpu_count() + 100}',
-    #         ])
-    #         self.assertEqual(cfg.np, os.cpu_count())
-    #
-    # def test_temp_dir(self):
-    #     out = StringIO()
-    #     with redirect_stdout(out):
-    #         if os.path.exists(self.tmp_dir):
-    #             os.system(f'rm -rf {self.tmp_dir}')
-    #         cfg = init_configs(args=[
-    #             '--config', test_yaml_path,
-    #             '--use_cache', 'False',
-    #             '--cache_compress', 'gzip',
-    #             '--temp_dir', self.tmp_dir,
-    #         ])
-    #         self.assertEqual(cfg.temp_dir, self.tmp_dir)
-    #         self.assertTrue(os.path.exists(self.tmp_dir))
-    #
-    # def test_op_fusion(self):
-    #     out = StringIO()
-    #     with redirect_stdout(out):
-    #         with self.assertRaises(NotImplementedError):
-    #             init_configs(args=[
-    #                 '--config', test_yaml_path,
-    #                 '--op_fusion', 'True',
-    #                 '--fusion_strategy', 'invalid',
-    #             ])
-    #
-    # def test_multiple_text_keys(self):
-    #     out = StringIO()
-    #     with redirect_stdout(out):
-    #         cfg = init_configs(args=[
-    #             '--config', test_text_keys_yaml_path,
-    #         ])
-    #         self.assertEqual(cfg.text_keys, ['text1', 'text2'])
-    #         first_op = cfg.process[0]
-    #         first_op_name = list(first_op.keys())[0]
-    #         self.assertEqual(first_op[first_op_name]['text_key'], 'text1')
-    #
+    def test_debug_mode(self):
+        out = StringIO()
+        with redirect_stdout(out):
+            cfg = init_configs(args=[
+                '--config', test_yaml_path,
+                '--debug',
+            ])
+            self.assertEqual(cfg.debug, True)
+
+    def test_different_np(self):
+        out = StringIO()
+        with redirect_stdout(out):
+            # too many
+            cfg = init_configs(args=[
+                '--config', test_yaml_path,
+                '--np', f'{os.cpu_count() + 100}',
+            ])
+            self.assertEqual(cfg.np, os.cpu_count())
+
+    def test_temp_dir(self):
+        out = StringIO()
+        with redirect_stdout(out):
+            if os.path.exists(self.tmp_dir):
+                os.system(f'rm -rf {self.tmp_dir}')
+            cfg = init_configs(args=[
+                '--config', test_yaml_path,
+                '--use_cache', 'False',
+                '--cache_compress', 'gzip',
+                '--temp_dir', self.tmp_dir,
+            ])
+            self.assertEqual(cfg.temp_dir, self.tmp_dir)
+            self.assertTrue(os.path.exists(self.tmp_dir))
+
+    def test_op_fusion(self):
+        out = StringIO()
+        with redirect_stdout(out):
+            with self.assertRaises(NotImplementedError):
+                init_configs(args=[
+                    '--config', test_yaml_path,
+                    '--op_fusion', 'True',
+                    '--fusion_strategy', 'invalid',
+                ])
+
+    def test_multiple_text_keys(self):
+        out = StringIO()
+        with redirect_stdout(out):
+            cfg = init_configs(args=[
+                '--config', test_text_keys_yaml_path,
+            ])
+            self.assertEqual(cfg.text_keys, ['text1', 'text2'])
+            first_op = cfg.process[0]
+            first_op_name = list(first_op.keys())[0]
+            self.assertEqual(first_op[first_op_name]['text_key'], 'text1')
+
     # def test_update_op_attr(self):
     #     ori_ops = [
     #         {'text_mapper': {'text_key': 'text'}},
