@@ -701,6 +701,24 @@ process:
       prob_threshold: 0.8                                     # the predicted watermark probability threshold for samples, range from 0 to 1. Samples with watermark probability less than this threshold will be kept.
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
       mem_required: '500MB'                                   # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrain the maximum number of processes that can be launched
+  - in_context_influence_filter:                            # filter to keep texts whose in-context influence upon validation set within a specific range.
+      hf_model: 'Qwen/Qwen2.5-0.5B'                           # Huggingface embedding model name.
+      model_params: null                                      # Parameters for initializing the API model.
+      min_score: 1.0                                          # Minimum perplexity score.
+      max_score: 100.0                                        # Maximum perplexity score.
+      query_template: null                                    # Template for building the query string.
+      response_template: mull                                 # Template for building the response string.
+      valid_dataset: null                                     # The dataset to use for validation
+      task_desc: null                                         # The description of the validation task.
+      valid_as_demo: True                                     # If true, score =  L(A|Q) / L(A|task_desc, Q_v, A_v, Q); If false, score = L(A_v|Q) L(A_v|task_desc, Q, A, Q_v) .
+      n_shot: null                                           # The number of shots in validation.
+  - instruction_following_difficulty_filter:                 # filter to keep texts whose instruction follows difficulty (IFD, https://arxiv.org/abs/2308.12032) falls within a specific range."
+      hf_model: 'Qwen/Qwen2.5-0.5B'                           # Huggingface embedding model name.
+      model_params: null                                      # Parameters for initializing the API model.
+      min_score: 1.0                                          # Minimum perplexity score.
+      max_score: 100.0                                        # Maximum perplexity score.
+      query_template: null                                    # Template for building the query string.
+      response_template: mull                                 # Template for building the response string.
   - language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
       lang: en                                                # keep text in what language
       min_score: 0.8                                          # the min language scores to filter text
@@ -718,6 +736,15 @@ process:
       enable_vllm: false                                      # If true, use VLLM for loading hugging face or local llm. Otherwise, use API for reference.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+#      dim_required_keys: {}                                   # A list of keys used to calculate the average dimension score, only the dimension scores associated with these keys are used in the average calculation.
+#      param dummy_record: {}                                  # A dummy dict when valid record not available.
+  - llm_perplexity_filter:                                  # filter to keep samples with perplexity score, computed using a specified llm, within a specific range.
+      hf_model: 'Qwen/Qwen2.5-0.5B'                           # Huggingface embedding model name.
+      model_params: null                                      # Parameters for initializing the API model.
+      min_score: 1.0                                          # Minimum perplexity score.
+      max_score: 100.0                                        # Maximum perplexity score.
+      query_template: null                                    # Template for building the query string.
+      response_template: null                                 # Template for building the response string.
   - llm_quality_score_filter:                               # filter to keep sample with high quality score estimated by LLM.
       api_or_hf_model: 'gpt-4o'                               # API or huggingface model name.
       min_score: 0.5                                          # The lowest quality score threshold to keep the sample.
@@ -732,6 +759,27 @@ process:
       enable_vllm: false                                      # If true, use VLLM for loading hugging face or local llm. Otherwise, use API for reference.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+#      dim_required_keys: {}                                   # A list of keys used to calculate the average dimension score, only the dimension scores associated with these keys are used in the average calculation.
+#      dummy_record: {}                                        # A dummy dict when valid record not available.
+#  - llm_task_relevance_filter:                              # filter to keep sample with high relevance score to validation tasks estimated by LLM.
+#      api_or_hf_model: 'gpt-4o'                               # API or huggingface model name.
+#      min_score: 0.5                                          # The lowest quality score threshold to keep the sample.
+#      api_endpoint: null                                      # URL endpoint for the API.
+#      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+#      input_keys: ['text']                                    # Sub set of keys in the sample. Support data with multi fields such as 'query', 'analysis' and 'answer' in RFT data.
+#      field_names: ['text']                                   # Corresponding field names for input keys.
+#      system_prompt: null                                     # System prompt for the task.
+#      input_template: null                                    # The input template.
+#      field_template: null                                    # Template for each field in the prompt.
+#      try_num: 3                                              # The number of retry attempts when there is an API call error or outputs parsing error.
+#      enable_vllm: false                                      # If true, use VLLM for loading hugging face or local llm. Otherwise, use API for reference.
+#      model_params: {}                                        # Parameters for initializing the API model.
+#      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+#      dim_required_keys: {}                                   # A list of keys used to calculate the average dimension score, only the dimension scores associated with these keys are used in the average calculation.
+#      param dummy_record: {}                                  # A dummy dict when valid record not available.
+#      valid_dataset: null                                     # The dataset to use for validation
+#      task_desc: null                                         # The description of the validation task.
+#      n_shot: null                                           # The number of shots in validation.
   - maximum_line_length_filter:                             # filter text with the maximum length of lines out of specific range
       min_len: 10                                             # the min length of filter range
       max_len: 10000                                          # the max length of filter range
@@ -773,6 +821,18 @@ process:
   - text_action_filter:                                     # filter text according the number of action verb
       lang: en                                                # consider the words in what language
       min_action_num: 1                                       # text will be filtered whose verbs less the min action number
+  - text_embd_similarity_filter:                            # Filter to keep texts whose average embedding similarity to a set of given validation texts falls within a specific range.
+      api_or_hf_model: text-embedding-v4                      # API or huggingface embedding model name
+      is_hf_model: false                                      # indicates if the model is from HuggingFace
+      api_endpoint: embeddings                                # embedding URL endpoint for the API
+      response_path: data.0.embedding                         # path to extract content from the API response
+      model_params: null                                      # parameters for initializing the API model
+      min_score: 0.1                                          # the min average similarity to keep samples
+      max_score: 1.0                                          # the max average similarity to keep samples
+      valid_dataset: null                                     # the dataset to use for validation
+      ebd_dim: 1024                                           # the embedding's dimension via API
+      pooling: null                                           # strategy to extract embedding from the hidden states
+      input_template: null                                    # template for building the model input.
   - text_entity_dependency_filter:                          # filter text without non-independent entity nouns
       lang: en                                                # consider the words in what language
       min_dependency_num: 1                                   # the min number of adjacent edges of a non-independent noun in dependency tree
