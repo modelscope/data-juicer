@@ -11,6 +11,7 @@ from loguru import logger
 from data_juicer import cuda_device_count
 from data_juicer.core.data import DJDataset
 from data_juicer.core.data.schema import Schema
+from data_juicer.core.data.webdataset_utils import _custom_default_decoder
 from data_juicer.ops import Deduplicator, Filter, Mapper
 from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
@@ -238,6 +239,8 @@ class RayDataset(DJDataset):
     def read(cls, data_format: str, paths: Union[str, List[str]]) -> RayDataset:
         if data_format in {"json", "jsonl"}:
             return RayDataset.read_json(paths)
+        elif data_format == "webdataset":
+            return RayDataset.read_webdataset(paths)
         elif data_format in {
             "parquet",
             "images",
@@ -247,7 +250,6 @@ class RayDataset(DJDataset):
             "avro",
             "numpy",
             "tfrecords",
-            "webdataset",
             "binary_files",
             "lance",
         }:
@@ -264,6 +266,10 @@ class RayDataset(DJDataset):
             return read_json_stream(paths)
         except AttributeError:
             return ray.data.read_json(paths)
+
+    @classmethod
+    def read_webdataset(cls, paths: Union[str, List[str]]) -> RayDataset:
+        return ray.data.read_webdataset(paths, decoder=partial(_custom_default_decoder, format="PIL"))
 
     def to_list(self) -> list:
         return self.data.to_pandas().to_dict(orient="records")
