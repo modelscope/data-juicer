@@ -109,6 +109,7 @@ class TestRayExporter(unittest.TestCase):
 
         self.assertListEqual(data_list, self._pop_raw_data_keys([Fields.stats]))
 
+    @TEST_TAG('ray')
     def test_webdataset_multi_images(self):
         import io
         from PIL import Image
