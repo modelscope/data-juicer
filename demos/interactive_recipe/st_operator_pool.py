@@ -15,6 +15,7 @@ from wordcloud import WordCloud
 from data_juicer.utils.constant import Fields, StatsKeys
 
 from operator_pool import OperatorArg, Operator, OperatorPool
+from recipe_utils import RecipeManager
 
 
 all_ops_config_path = os.path.join(os.path.dirname(__file__), "./configs/all_ops.yaml") or os.path.join(os.path.dirname(__file__), "./configs/default_ops.yaml")
@@ -188,6 +189,13 @@ class StOperatorPool(OperatorPool):
             st.session_state.current_page = 1
         if 'search_term' not in st.session_state:
             st.session_state.search_term = ""
+        
+        recipes_path = os.path.abspath(os.path.join(
+            os.path.dirname(__file__), '../../configs/data_juicer_recipes'
+        ))
+        self.recipe_manager = RecipeManager(recipes_path, all_ops)
+        if 'reuse_recipe_dialog_open' not in st.session_state:
+            st.session_state.reuse_recipe_dialog_open = False
             
         self.current_page = st.session_state.current_page
         self.search_example = "e.g., filter|language"
@@ -222,7 +230,7 @@ class StOperatorPool(OperatorPool):
             st.session_state.edit_op_current_page = 1
 
         st.info(
-            "This demo is still under development, so the available operators are currently incomplete.\n"
+            "This demo is still under development, so the available operators are currently incomplete."
             "We provide over 100 operators. For the complete list of operators and their descriptions, please refer to "
             "[this page](https://modelscope.github.io/data-juicer/en/main/docs/Operators.html)."
         )
@@ -232,13 +240,23 @@ class StOperatorPool(OperatorPool):
         # LEFT COLUMN: Active Operators
         # ==================================================================
         with col_active:
-            st.subheader("Active Operators")
+            # Use columns to place header and "Remove All" button on the same line
+            header_col, btn_col = st.columns([0.6, 0.4])
+            with header_col:
+                st.subheader("Active Operators")
+            
             active_ops_list = sorted(list(st.session_state.edited_op_pool_names))
+            
+            with btn_col:
+                # Disable button if there are no active operators
+                if st.button("Remove All", key="remove_all_ops", disabled=not active_ops_list, use_container_width=True):
+                    st.session_state.edited_op_pool_names.clear()
+                    st.rerun()
+
             if not active_ops_list:
                 st.caption("No operators in the pool. Add some from the right!")
             
-            # Use a container with a fixed height and scrollbar for long lists
-            with st.container(height=450):
+            with st.container(height=420): # Adjusted height slightly
                 for op_name in active_ops_list:
                     row_col1, row_col2 = st.columns([0.8, 0.2])
                     with row_col1:
@@ -252,12 +270,12 @@ class StOperatorPool(OperatorPool):
         # RIGHT COLUMN: Available Operators
         # ==================================================================
         with col_available:
-            st.subheader("Available Operators")
+            header_col, btn_col = st.columns([0.5, 0.5])
+            with header_col:
+                st.subheader("Available Operators")
             
-            # All ops not currently in the edited pool
             available_ops_list = sorted(list(set(all_ops.keys()) - st.session_state.edited_op_pool_names))
 
-            # Search bar
             search_term = st.text_input(
                 "Search available operators",
                 key="edit_op_search_term",
@@ -265,8 +283,16 @@ class StOperatorPool(OperatorPool):
             )
             
             filtered_available_ops = self.filter_operators(search_term, available_ops_list)
-            
-            # Pagination for available operators
+
+            with btn_col:
+                # Disable button if the filtered list is empty
+                if st.button("Add All Filtered", key="add_all_ops", disabled=not filtered_available_ops, use_container_width=True):
+                    st.session_state.edited_op_pool_names.update(filtered_available_ops)
+                    # Optional: Clear search term for better UX
+                    if st.session_state.edit_op_search_term:
+                        st.session_state.edit_op_search_term = ""
+                    st.rerun()
+
             items_per_page = 5
             current_page = st.session_state.edit_op_current_page
             total_pages = math.ceil(len(filtered_available_ops) / items_per_page) if filtered_available_ops else 1
@@ -275,8 +301,7 @@ class StOperatorPool(OperatorPool):
             end_idx = start_idx + items_per_page
             ops_to_display = filtered_available_ops[start_idx:end_idx]
 
-            # Display list in a scrollable container
-            with st.container(height=325):
+            with st.container(height=300): # Adjusted height
                 if not ops_to_display:
                     st.caption("No matching operators found.")
                 for op_name in ops_to_display:
@@ -286,21 +311,18 @@ class StOperatorPool(OperatorPool):
                     with row_col2:
                         if st.button("➕", key=f"add_op_{op_name}", help=f"Add {op_name}"):
                             st.session_state.edited_op_pool_names.add(op_name)
-                            # Reset page to 1 after search to avoid being on a non-existent page
                             if search_term:
                                 st.session_state.edit_op_search_term = ""
                             st.rerun()
             
-            # Pagination controls
             p_col1, p_col2, p_col3 = st.columns([1, 2, 1])
-            if p_col1.button("←", disabled=current_page <= 1, use_container_width=True):
+            if p_col1.button("←", disabled=current_page <= 1, use_container_width=True, key="prev_avail_op"):
                 st.session_state.edit_op_current_page -= 1
                 st.rerun()
             p_col2.markdown(f"<div style='text-align: center; margin-top: 5px;'>Page {current_page} of {total_pages}</div>", unsafe_allow_html=True)
-            if p_col3.button("→", disabled=current_page >= total_pages, use_container_width=True):
+            if p_col3.button("→", disabled=current_page >= total_pages, use_container_width=True, key="next_avail_op"):
                 st.session_state.edit_op_current_page += 1
                 st.rerun()
-
 
         # ==================================================================
         # DIALOG ACTIONS: Apply or Cancel
@@ -326,6 +348,7 @@ class StOperatorPool(OperatorPool):
                 
                 self.st_sync() # IMPORTANT: Sync changes back to widget states
                 self._cleanup_edit_dialog_state()
+                st.session_state.current_page = 1
                 st.rerun()
 
         with btn_col2:
@@ -333,6 +356,82 @@ class StOperatorPool(OperatorPool):
                 self._cleanup_edit_dialog_state()
                 st.rerun()
 
+    @st.dialog("Reuse Example Recipe")
+    def render_reuse_example_recipe_dialog(self):
+        st.info(
+            "Select a pre-configured recipe to start with. "
+            "This will **replace** your current operator pool."
+            "For more information, please refer to [RecipeGallery](https://modelscope.github.io/data-juicer/en/main/docs/RecipeGallery.html)."
+            )
+
+        # Search bar for recipes
+        search_term = st.text_input("Search recipes by name", key="recipe_search_term").lower()
+
+        # Filter recipes based on search term
+        if search_term:
+            filtered_recipes = [r for r in self.recipe_manager.recipes if search_term in r.name.lower()]
+        else:
+            filtered_recipes = self.recipe_manager.recipes
+
+        if not self.recipe_manager.recipes:
+             st.error(f"No recipes found in the directory: {self.recipe_manager.recipes_dir}. Please check the path.")
+             if st.button("Close"):
+                st.session_state.reuse_recipe_dialog_open = False
+                st.rerun()
+             return
+        elif not filtered_recipes:
+            st.warning("No recipes match your search.")
+
+        # Display recipes as a list of expandable cards
+        with st.container(height=500):
+            for recipe in filtered_recipes:
+                with st.expander(f"**{recipe.name}**"):
+                    st.markdown("---") # Visual separator
+                    
+                    # Iterate through each operator and its configuration in the recipe
+                    for op_name, op_config in recipe.operators.items():
+                        st.markdown(f"**- {op_name}**")
+                        
+                        # Check if there are arguments to display
+                        args_from_recipe = op_config.get('args', {})
+                        if args_from_recipe:
+                            for arg_name, arg_details in args_from_recipe.items():
+                                param_col1, param_col2 = st.columns([0.4, 0.6])
+
+                                with param_col1:
+                                    st.caption(f"`{arg_name}`")
+
+                                with param_col2:
+                                    v = arg_details.get('v')
+                                    if v is not None:
+                                        display_v = v
+                                    else:
+                                        display_v = arg_details.get("default")
+
+                                    if isinstance(display_v, list):
+                                        display_v = f"[{', '.join(map(str, display_v))}]"
+                                    st.caption(f": {display_v}")
+                        else:
+                            st.caption("  *(no parameters)*")
+                        
+                        st.text("") # Add a little vertical space between operators
+
+                    st.markdown("---")
+                    if st.button("Apply this Recipe", key=f"apply_{recipe.path}", type="primary", use_container_width=True):
+                        logger.info(f"Applying recipe: {recipe.name}")
+                        
+                        # 1. Clear the current operator pool
+                        self.pool.clear()
+                        
+                        # 2. Add all operators from the selected recipe
+                        for op_name, op_config_to_add in recipe.operators.items():
+                            self.add_op(op_name, op_config_to_add)
+                        
+                        # 3. Sync state, close dialog, and refresh the app
+                        self.st_sync()
+                        st.session_state.reuse_recipe_dialog_open = False
+                        st.session_state.current_page = 1
+                        st.rerun()
 
     def render(self):
         with st.sidebar:
@@ -351,9 +450,13 @@ class StOperatorPool(OperatorPool):
                 config_path = os.path.join(os.path.dirname(__file__), config_path)
                 st.write(f"Successfully export config to {config_path}.")
 
-            # Button to open the new edit dialog
+            # Button to open the new dialog
             if st.button("⚙️ Edit Operator Pool", use_container_width=True):
                 st.session_state.edit_pool_dialog_open = True
+                
+            if st.button("🍽️ Reuse Example Recipe", use_container_width=True):
+                st.session_state.reuse_recipe_dialog_open = True
+
             # Show enabled only option
             st.checkbox(
                 emoji.emojize("Show enabled:check_mark_button: only"),
@@ -393,6 +496,9 @@ class StOperatorPool(OperatorPool):
             
         if st.session_state.get("edit_pool_dialog_open", False):
             self.render_edit_op_pool_dialog()
+        
+        if st.session_state.get("reuse_recipe_dialog_open", False):
+            self.render_reuse_example_recipe_dialog()
     
     def add_op(self, op_name, arg_state):
         state_copy = copy.deepcopy(arg_state)

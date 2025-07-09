@@ -1,3 +1,17 @@
+language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
+    args:
+        lang:                                                   # keep text in what language
+            type: list_str
+            default:
+                - en
+            options:
+                - en
+                - zh
+        min_score:                                              # the min language scores to filter text
+            type: float
+            default: 0.8
+            min: 0.0
+            max: 1.0
 alphanumeric_filter:
   args:
     max_ratio:
@@ -110,7 +124,7 @@ extract_tables_from_html_mapper:
 fix_unicode_mapper:
   args:
     normalization:
-      default: None
+      default: ''
       type: str
 human_preference_annotation_mapper:
   args:
@@ -124,7 +138,7 @@ human_preference_annotation_mapper:
       default: chosen
       type: str
     label_config_file:
-      default: None
+      default: ''
       type: str
     prompt_key:
       default: prompt
@@ -357,7 +371,7 @@ mllm_mapper:
       default: 0.2
       type: float
     top_p:
-      default: None
+      default: ''
       type: str
 nlpaug_en_mapper:
   args:
@@ -589,7 +603,7 @@ specified_numeric_field_filter:
       default: 9007199254740991
       type: int
     min_value:
-      default: -9223372036854775807
+      default: -9007199254740991
       type: int
 text_action_filter:
   args:
@@ -694,7 +708,7 @@ video_extract_frames_mapper:
       default: 0
       type: int
     frame_dir:
-      default: None
+      default: ''
       type: str
     frame_key:
       default: video_frames
