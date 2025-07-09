@@ -62,6 +62,50 @@ from data_juicer.utils.constant import Fields
 _MODEL_CACHE = {}
 
 
+def get_dataset_length(dataset) -> int:
+    """Get the length of a dataset, handling different formats."""
+    if isinstance(dataset, dict) and "text" in dataset:
+        return len(dataset["text"])
+    elif not isinstance(dataset, dict) and hasattr(dataset, "__len__"):
+        return len(dataset)
+    elif not isinstance(dataset, dict) and hasattr(dataset, "data") and hasattr(dataset.data, "__len__"):
+        return len(dataset.data)
+    else:
+        # Try to get length from column names
+        if not isinstance(dataset, dict) and hasattr(dataset, "column_names") and dataset.column_names:
+            first_col = dataset.column_names[0]
+            if hasattr(dataset, "__getitem__"):
+                return len(dataset[first_col])
+    return 0
+
+
+def get_dataset_texts(dataset) -> list:
+    """Get text data from a dataset, handling different formats."""
+    if isinstance(dataset, dict) and "text" in dataset:
+        return dataset["text"]
+    elif not isinstance(dataset, dict) and hasattr(dataset, "column_names") and "text" in dataset.column_names:
+        return dataset["text"]
+    elif not isinstance(dataset, dict) and hasattr(dataset, "__getitem__"):
+        # Try to find text column
+        if hasattr(dataset, "column_names"):
+            for col in dataset.column_names:
+                if "text" in col.lower():
+                    return dataset[col]
+        # Fallback to first column
+        if hasattr(dataset, "column_names") and dataset.column_names:
+            return dataset[dataset.column_names[0]]
+    elif not isinstance(dataset, dict) and hasattr(dataset, "data") and hasattr(dataset.data, "to_pandas"):
+        # Ray dataset
+        df = dataset.data.to_pandas()
+        if "text" in df.columns:
+            return df["text"].tolist()
+        # Use first string column
+        for col in df.columns:
+            if df[col].dtype == "object":
+                return df[col].tolist()
+    return []
+
+
 def get_cached_model(model_type: str, lang: str = "en", model_size: str = "md"):
     """Get a cached model or load it if not cached.
 
@@ -205,7 +249,7 @@ class PerformanceBenchmark:
 
         test_data = {"text": texts, Fields.stats: [{} for _ in range(num_samples)]}
 
-        logger.info(f"Created test data with {len(texts)} text samples")
+        logger.info(f"Created test data with {get_dataset_length(test_data)} text samples")
         return test_data
 
     def create_test_filters(self) -> List[Filter]:
@@ -309,14 +353,14 @@ class PerformanceBenchmark:
 
             # Extract insights from analyzer.overall_result (a DataFrame)
             overall = analyzer.overall_result
-            insights = {"dataset_size": len(dataset), "text_length": {}, "content_ratios": {}}
+            insights = {"dataset_size": get_dataset_length(dataset), "text_length": {}, "content_ratios": {}}
 
             # Log detailed statistics before cleanup
             logger.info("📊 DETAILED ANALYZER STATISTICS:")
             logger.info("=" * 50)
 
             if overall is not None:
-                logger.info(f"Dataset size: {len(dataset):,} samples")
+                logger.info(f"Dataset size: {get_dataset_length(dataset):,} samples")
                 logger.info(f"Available statistics: {list(overall.index)}")
 
                 # Log all available statistics
@@ -342,7 +386,7 @@ class PerformanceBenchmark:
             else:
                 # Fallback: compute basic stats manually
                 if hasattr(dataset, "column_names") and "text" in dataset.column_names:
-                    texts = dataset["text"]
+                    texts = get_dataset_texts(dataset)
                 else:
                     texts = []
                 if texts:
@@ -368,7 +412,7 @@ class PerformanceBenchmark:
 
             # Log optimization recommendations based on insights
             logger.info("🎯 OPTIMIZATION RECOMMENDATIONS:")
-            dataset_size = len(dataset)
+            dataset_size = get_dataset_length(dataset)
             if dataset_size > 100000:
                 logger.info("  📈 Large dataset detected - Fusion will provide significant benefits")
             elif dataset_size > 10000:
@@ -433,16 +477,16 @@ class PerformanceBenchmark:
             # Dict format
             texts = test_data["text"]
             logger.info("Data format: Dictionary")
+        elif (
+            not isinstance(test_data, dict) and hasattr(test_data, "column_names") and "text" in test_data.column_names
+        ):
+            texts = test_data["text"]
+            logger.info("Data format: HuggingFace Dataset")
         else:
-            # Assume it's a HuggingFace Dataset
-            if hasattr(test_data, "column_names") and "text" in test_data.column_names:
-                texts = test_data["text"]
-                logger.info("Data format: HuggingFace Dataset")
-            else:
-                texts = []
-                logger.warning("Data format: Unknown")
+            texts = []
+            logger.warning("Data format: Unknown")
 
-        logger.info(f"Dataset size: {len(texts):,} samples")
+        logger.info(f"Dataset size: {get_dataset_length(test_data):,} samples")
 
         if texts:
             lengths = [len(t) for t in texts]
@@ -466,7 +510,7 @@ class PerformanceBenchmark:
             logger.info(f"  {col}: {ratio:.3f} ({ratio*100:.1f}%)")
 
         logger.info("🎯 SIMULATED OPTIMIZATION RECOMMENDATIONS:")
-        dataset_size = len(texts) if texts else 0
+        dataset_size = get_dataset_length(test_data) if texts else 0
         if dataset_size > 100000:
             logger.info("  📈 Large dataset detected - Fusion will provide significant benefits")
         elif dataset_size > 10000:
@@ -482,7 +526,7 @@ class PerformanceBenchmark:
         logger.info("=" * 50)
 
         return {
-            "dataset_size": len(texts) if texts else 0,
+            "dataset_size": get_dataset_length(test_data) if texts else 0,
             "text_length": {"mean": mean_length, "std": std_length},
             "content_ratios": content_ratios,
         }
@@ -520,7 +564,9 @@ class PerformanceBenchmark:
         total_filter_time = 0.0
 
         for i, filter_op in enumerate(actual_filters):
-            logger.info(f"    Processing filter {i+1}/{len(actual_filters)}: {filter_op._name}")
+            logger.info(
+                f"    Processing filter {i+1}/{len(actual_filters)}: {getattr(filter_op, '_name', type(filter_op).__name__)}"
+            )
 
             # Compute stats for this filter
             stats_start = time.time()
@@ -547,7 +593,7 @@ class PerformanceBenchmark:
         total_time = time.time() - total_start_time
         end_memory = self.measure_memory_usage()
         memory_usage = end_memory - start_memory
-        throughput = len(test_data["text"]) / total_time
+        throughput = get_dataset_length(test_data) / total_time
 
         logger.info("  📊 INDIVIDUAL FILTERS BREAKDOWN:")
         logger.info(f"    Initialization: {init_time:.3f}s ({init_time/total_time*100:.1f}%)")
@@ -617,7 +663,7 @@ class PerformanceBenchmark:
         total_time = time.time() - total_start_time
         end_memory = self.measure_memory_usage()
         memory_usage = end_memory - start_memory
-        throughput = len(test_data["text"]) / total_time
+        throughput = get_dataset_length(test_data) / total_time
 
         logger.info("  📊 FUSION STRATEGY BREAKDOWN:")
         logger.info(f"    Total time: {total_time:.3f}s")
@@ -642,7 +688,7 @@ class PerformanceBenchmark:
 
         # Individual filter stats
         individual_stats = {}
-        total_samples = len(test_data["text"])
+        total_samples = get_dataset_length(test_data)
 
         for i, filter_op in enumerate(filters):
             op_name = getattr(filter_op, "_name", type(filter_op).__name__)
@@ -969,7 +1015,7 @@ class PerformanceBenchmark:
         total_time = time.time() - total_start_time
         end_memory = self.measure_memory_usage()
         memory_usage = end_memory - start_memory
-        throughput = len(test_data["text"]) / total_time
+        throughput = get_dataset_length(test_data) / total_time
 
         logger.info("  📊 PIPELINE OPTIMIZER BREAKDOWN:")
         logger.info(f"    Total time: {total_time:.3f}s")
@@ -987,26 +1033,21 @@ class PerformanceBenchmark:
         )
 
     def _build_pipeline_config_from_filters(self, filters: List[Filter]) -> Dict[str, Any]:
-        """Convert a list of filters to a pipeline configuration."""
         process_config = []
-
         for i, filter_op in enumerate(filters):
             op_name = getattr(filter_op, "_name", f"filter_{i}")
-
-            # Extract configuration from filter object
-            op_config = {}
-            if hasattr(filter_op, "config") and filter_op.config:
-                op_config = filter_op.config
+            op_config = getattr(filter_op, "config", None)
+            if op_config:
+                process_config.append({op_name: op_config})
             else:
                 # Create basic config from filter attributes
+                config_dict = {}
                 for attr in dir(filter_op):
                     if not attr.startswith("_") and not callable(getattr(filter_op, attr)):
                         value = getattr(filter_op, attr)
                         if isinstance(value, (int, float, str, bool)):
-                            op_config[attr] = value
-
-            process_config.append({op_name: op_config})
-
+                            config_dict[attr] = value
+                process_config.append({op_name: config_dict})
         return {"process": process_config}
 
     def _convert_ast_to_operations(self, ast) -> List:
@@ -1212,7 +1253,7 @@ class PerformanceBenchmark:
         total_time = time.time() - total_start_time
         end_memory = self.measure_memory_usage()
         memory_usage = end_memory - start_memory
-        throughput = len(test_data["text"]) / total_time
+        throughput = get_dataset_length(test_data) / total_time
 
         logger.info("  📊 LIGHTWEIGHT FUSION BREAKDOWN:")
         logger.info(f"    Initialization: {init_time:.3f}s ({init_time/total_time*100:.1f}%)")
@@ -1311,7 +1352,7 @@ class PerformanceBenchmark:
             # Print debug info for first 3 mismatches
             for idx in mismatches[:3]:
                 logger.warning(f"--- Mismatch at index {idx} ---")
-                logger.warning(f"Input text: {test_data['text'][idx]}")
+                logger.warning(f"Input text: {get_dataset_texts(test_data)[idx]}")
 
                 # Detailed individual execution debugging
                 logger.warning("🔍 INDIVIDUAL EXECUTION (step-by-step):")
@@ -1362,7 +1403,7 @@ class PerformanceBenchmark:
                 logger.warning(f"  Optimization ratio: {len(optimized_ops)/len(filters):.2f}x")
 
                 data_pipeline = test_data.copy()
-                mask_pipeline = [True] * len(data_pipeline["text"])
+                mask_pipeline = [True] * get_dataset_length(data_pipeline)
                 pipeline_masks = []
                 from data_juicer.ops import load_ops
 
@@ -1461,7 +1502,7 @@ class PerformanceBenchmark:
         # Compile results
         results = {
             "mode": mode,
-            "num_samples": len(test_data["text"]),
+            "num_samples": get_dataset_length(test_data),
             "num_filters": len(filters),
             "individual": {
                 "total_time": individual_results.total_time,
@@ -1558,7 +1599,7 @@ class PerformanceBenchmark:
         if masks:
             final_mask = [all(vals) for vals in zip(*masks)]
         else:
-            final_mask = [True] * len(data["text"])
+            final_mask = [True] * get_dataset_length(data)
         return final_mask
 
     def get_final_mask_from_fused(
@@ -1589,7 +1630,7 @@ class PerformanceBenchmark:
     def get_final_mask_from_optimized_ops(self, optimized_ops: List, test_data: Dict[str, Any]) -> list:
         """Compute the final boolean mask for each sample using optimized operations."""
         data = test_data.copy()
-        mask = [True] * len(data["text"])
+        mask = [True] * get_dataset_length(data)
         from data_juicer.ops import load_ops
 
         for op_config in optimized_ops:
@@ -1765,7 +1806,7 @@ class PerformanceBenchmark:
         total_time = time.time() - total_start_time
         end_memory = self.measure_memory_usage()
         memory_usage = end_memory - start_memory
-        throughput = len(test_data["text"]) / total_time
+        throughput = get_dataset_length(test_data) / total_time
 
         return PerformanceMetrics(
             total_time=total_time,
@@ -1797,7 +1838,7 @@ class PerformanceBenchmark:
                 thread_local.data = filter_op.compute_stats_batched(thread_local.data)
             if hasattr(filter_op, "process_batched"):
                 return list(filter_op.process_batched(thread_local.data))
-            return [True] * len(test_data["text"])
+            return [True] * get_dataset_length(test_data)
 
         # Execute filters in parallel
         with concurrent.futures.ThreadPoolExecutor(max_workers=min(len(filters), 4)) as executor:
@@ -1808,12 +1849,12 @@ class PerformanceBenchmark:
         if results:
             _ = [all(vals) for vals in zip(*results)]
         else:
-            _ = [True] * len(test_data["text"])
+            _ = [True] * get_dataset_length(test_data)
 
         total_time = time.time() - total_start_time
         end_memory = self.measure_memory_usage()
         memory_usage = end_memory - start_memory
-        throughput = len(test_data["text"]) / total_time
+        throughput = get_dataset_length(test_data) / total_time
 
         return PerformanceMetrics(
             total_time=total_time,
@@ -1858,13 +1899,13 @@ class PerformanceBenchmark:
         if simple_filters:
             _ = self.run_fused_filters_benchmark(simple_filters, data, analyzer_insights)
             # Get mask from simple filters (simplified)
-            simple_mask = [True] * len(data["text"])  # Placeholder
+            simple_mask = [True] * get_dataset_length(data)  # Placeholder
             all_masks.append(simple_mask)
 
         # Process medium filters (can be fused)
         if medium_filters:
             _ = self.run_fused_filters_benchmark(medium_filters, data, analyzer_insights)
-            medium_mask = [True] * len(data["text"])  # Placeholder
+            medium_mask = [True] * get_dataset_length(data)  # Placeholder
             all_masks.append(medium_mask)
 
         # Process complex filters (individual execution)
@@ -1883,12 +1924,12 @@ class PerformanceBenchmark:
         if all_masks:
             _ = [all(vals) for vals in zip(*all_masks)]
         else:
-            _ = [True] * len(data["text"])
+            _ = [True] * get_dataset_length(data)
 
         total_time = time.time() - total_start_time
         end_memory = self.measure_memory_usage()
         memory_usage = end_memory - start_memory
-        throughput = len(test_data["text"]) / total_time
+        throughput = get_dataset_length(test_data) / total_time
 
         return PerformanceMetrics(
             total_time=total_time,
@@ -2256,7 +2297,7 @@ def benchmark_fused_simple_with_insights(
     total_time = stats_time + filter_time
 
     # Calculate actual filtering statistics
-    total_samples = len(test_data["text"])
+    total_samples = get_dataset_length(test_data)
     passed_samples = sum(filter_results)
     pass_rate = (passed_samples / total_samples) * 100
 
@@ -2280,7 +2321,7 @@ def collect_filtering_stats(filters: List[Filter], test_data: Dict[str, Any]) ->
 
     # Individual filter stats
     individual_stats = {}
-    total_samples = len(test_data["text"])
+    total_samples = get_dataset_length(test_data)
 
     for i, filter_op in enumerate(filters):
         op_name = getattr(filter_op, "_name", type(filter_op).__name__)
@@ -2326,7 +2367,7 @@ def collect_filtering_stats_with_insights(
 
     # Individual filter stats
     individual_stats = {}
-    total_samples = len(test_data["text"])
+    total_samples = get_dataset_length(test_data)
 
     for i, filter_op in enumerate(filters):
         op_name = getattr(filter_op, "_name", type(filter_op).__name__)
@@ -2371,7 +2412,7 @@ def benchmark_individual_simple(filters: List[Filter], test_data: Dict[str, Any]
     total_stats_time = 0.0
     total_filter_time = 0.0
     total_time = 0.0
-    total_samples = len(test_data["text"])
+    total_samples = get_dataset_length(test_data)
 
     # Measure each filter independently (each processes original data)
     # This simulates running filters one by one, not in a pipeline
@@ -2641,6 +2682,12 @@ def main():
         default=None,
         help="Path to a YAML recipe for benchmarking (used only in recipe mode)",
     )
+    parser.add_argument(
+        "--dataset-path",
+        type=str,
+        default=None,
+        help="Path to a real dataset file (JSONL, JSON, CSV, etc.) to use instead of synthetic data",
+    )
 
     args = parser.parse_args()
 
@@ -2652,7 +2699,12 @@ def main():
         preload_models_for_benchmark()
 
     # Create test data
-    test_data = create_simple_test_data(args.samples)
+    if args.dataset_path:
+        logger.info(f"🎯 Using real dataset: {args.dataset_path}")
+        test_data = load_real_dataset(args.dataset_path, max_samples=args.samples)
+    else:
+        logger.info(f"🎲 Using synthetic data: {args.samples} samples")
+        test_data = create_simple_test_data(args.samples)
 
     # Get filters based on mode
     if args.mode == "quick":
@@ -2749,6 +2801,51 @@ def main():
     logger.info(f"📊 Results saved for mode: {args.mode}")
 
     return results
+
+
+def load_real_dataset(dataset_path: str, max_samples: int = None) -> Dict[str, Any]:
+    """
+    Load real dataset using DatasetBuilder.
+
+    Args:
+        dataset_path: Path to the dataset file
+        max_samples: Maximum number of samples to load (None for all)
+
+    Returns:
+        Dataset as returned by DatasetBuilder
+    """
+    from argparse import Namespace
+
+    from data_juicer.core.data.dataset_builder import DatasetBuilder
+
+    logger.info(f"📂 Loading real dataset from: {dataset_path}")
+
+    # Create a minimal config for DatasetBuilder
+    cfg = Namespace()
+    cfg.dataset_path = dataset_path
+
+    # Create DatasetBuilder instance
+    builder = DatasetBuilder(cfg, executor_type="default")
+
+    # Load the dataset
+    dataset = builder.load_dataset()
+
+    # Apply max_samples limit if specified
+    if max_samples and hasattr(dataset, "__len__") and len(dataset) > max_samples:
+        dataset = dataset.select(range(max_samples))
+        logger.info(f"✅ Limited to {max_samples} samples from {dataset_path}")
+    else:
+        logger.info(f"✅ Loaded {len(dataset)} samples from {dataset_path}")
+
+    # Log dataset info
+    if hasattr(dataset, "column_names"):
+        logger.info(f"📊 Dataset columns: {dataset.column_names}")
+        if "text" in dataset.column_names:
+            sample_texts = dataset["text"][:3] if len(dataset) >= 3 else dataset["text"]
+            avg_length = sum(len(str(t)) for t in sample_texts) / len(sample_texts) if sample_texts else 0
+            logger.info(f"📝 Sample text lengths: avg={avg_length:.1f} chars")
+
+    return dataset
 
 
 if __name__ == "__main__":
