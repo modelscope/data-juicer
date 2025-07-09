@@ -2,11 +2,11 @@ import os
 from typing import List, Union
 
 from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
+from jsonargparse import Namespace, dict_to_namespace
 from loguru import logger
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import find_files_with_suffix, is_absolute_path
-from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.registry import Registry
 
 FORMATTERS = Registry("Formatters")
@@ -138,7 +138,7 @@ def unify_format(
     dataset: Dataset,
     text_keys: Union[List[str], str] = "text",
     num_proc: int = 1,
-    global_cfg=None,
+    global_cfg: Union[dict, Namespace] = None,
 ) -> Dataset:
     """
     Get an unified internal format, conduct the following modifications.
@@ -203,18 +203,24 @@ def unify_format(
     logger.info(f"{len(dataset)} samples left after filtering empty text.")
 
     # 3. convert relative paths to absolute paths
-    if global_cfg:
+    if global_cfg is not None:
+        if isinstance(global_cfg, dict):
+            global_cfg = dict_to_namespace(global_cfg)
         # check and get dataset dir
-        if global_cfg.get("dataset_path", None) and os.path.exists(global_cfg.dataset_path):
+        if (
+            hasattr(global_cfg, "dataset_path")
+            and global_cfg.dataset_path is not None
+            and os.path.exists(global_cfg.dataset_path)
+        ):
             if os.path.isdir(global_cfg.dataset_path):
                 ds_dir = global_cfg.dataset_path
             else:
                 ds_dir = os.path.dirname(global_cfg.dataset_path)
         else:
             ds_dir = ""
-        image_key = global_cfg.get("image_key", SpecialTokens.image)
-        audio_key = global_cfg.get("audio_key", SpecialTokens.audio)
-        video_key = global_cfg.get("video_key", SpecialTokens.video)
+        image_key = global_cfg.image_key if hasattr(global_cfg, "image_key") else "images"
+        audio_key = global_cfg.audio_key if hasattr(global_cfg, "audio_key") else "audios"
+        video_key = global_cfg.video_key if hasattr(global_cfg, "video_key") else "videos"
 
         data_path_keys = []
         if image_key in dataset.features:

@@ -4,7 +4,7 @@ from data_juicer.core.data.load_strategy import (
     DefaultLocalDataLoadStrategy,
     RayLocalJsonDataLoadStrategy
 )
-from argparse import Namespace
+from jsonargparse import Namespace
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 from data_juicer.config import get_default_cfg
 import os

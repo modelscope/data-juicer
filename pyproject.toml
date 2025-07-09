@@ -185,7 +185,7 @@ build-backend = "hatchling.build"
 path = "data_juicer/__init__.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["data_juicer"]
+packages = ["data_juicer", "tools"]
 include = ["uv.lock", "pyproject.toml"]
 
 [tool.hatch.build]

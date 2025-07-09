@@ -19,8 +19,6 @@ jobs:
   unittest-single:
     runs-on: [GPU, unittest]
     environment: Testing
-    outputs:
-      total: ${{ steps.total.outputs.total }}
     steps:
     - uses: actions/checkout@v3
       with:
@@ -53,19 +51,14 @@ jobs:
       run: |
         docker compose exec -e OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ray-head bash -c 'python tests/run.py --tag standalone --mode regression'
         docker compose exec ray-head bash -c 'coverage combine'
+        docker compose exec ray-head bash -c 'mv .coverage .coverage.standalone'
 
     - name: Upload coverage report of standalone
       uses: actions/upload-artifact@v4
       with:
         name: coverage_report_standalone
         include-hidden-files: true
-        path: dj-${{ github.run_id }}/.coverage
-
-    - name: Get Total Coverage Result
-      id: total
-      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
-      run: |
-        echo "total=$(docker compose exec ray-head coverage report --format=total)" >> $GITHUB_OUTPUT
+        path: dj-${{ github.run_id }}/.coverage.standalone
 
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
@@ -107,13 +100,77 @@ jobs:
       run: |
         docker compose exec ray-head bash -c 'python tests/run.py --tag ray --mode regression'
         docker compose exec ray-head bash -c 'coverage combine'
+        docker compose exec ray-head bash -c 'mv .coverage .coverage.ray'
 
     - name: Upload coverage report of ray
       uses: actions/upload-artifact@v4
       with:
         name: coverage_report_ray
         include-hidden-files: true
+        path: dj-${{ github.run_id }}/.coverage.ray
+
+    - name: Remove docker compose
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      if: always()
+      run: |
+        docker compose down --remove-orphans
+
+    - name: Cleanup workspace
+      if: always()
+      run: |
+        rm -rf  dj-${{ github.run_id }}
+
+  combine-coverage:
+    needs: [unittest-single, unittest-dist]
+    runs-on: [GPU, unittest]
+    outputs:
+      total: ${{ steps.total.outputs.total }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        path: dj-${{ github.run_id }}
+        fetch-depth: 0
+
+    - name: Setup docker compose
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose up -d
+
+    - name: Install coverage
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose exec ray-head bash -c '/root/.local/bin/uv pip install --system coverage'
+
+    - name: Download Coverage Report Standalone
+      uses: actions/download-artifact@v4
+      with:
+        name: coverage_report_standalone
+        path: dj-${{ github.run_id }}
+
+    - name: Download Coverage Report Ray
+      uses: actions/download-artifact@v4
+      with:
+        name: coverage_report_ray
+        path: dj-${{ github.run_id }}
+
+    - name: Combine Coverage Reports
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose exec ray-head bash -c 'coverage combine'
+        docker compose exec ray-head bash -c 'coverage report -m'
+
+    - name: Upload Overall Coverage Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage_report_all
+        include-hidden-files: true
         path: dj-${{ github.run_id }}/.coverage
+
+    - name: Get Total Coverage Result
+      id: total
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        echo "total=$(docker compose exec ray-head coverage report --format=total)" >> $GITHUB_OUTPUT
 
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
@@ -128,7 +185,7 @@ jobs:
 
   dynamic-badge:
     runs-on: ubuntu-latest
-    needs: unittest-single
+    needs: combine-coverage
     steps:
     - name: "Create badge"
       # https://gist.github.com/HYLcool/f856b14416f08f73d05d32fd992a9c29
@@ -138,7 +195,7 @@ jobs:
         gistID: f856b14416f08f73d05d32fd992a9c29
         filename: total_cov.json
         label: Coverage
-        message: ${{ needs.unittest-single.outputs.total }}%
+        message: ${{ needs.combine-coverage.outputs.total }}%
         minColorRange: 60
         maxColorRange: 90
         valColorRange: ${{ needs.unittest-single.outputs.total }}
