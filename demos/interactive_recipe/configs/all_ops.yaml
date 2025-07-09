@@ -1,0 +1,944 @@
+alphanumeric_filter:
+  args:
+    max_ratio:
+      default: 9007199254740991
+      type: int
+    min_ratio:
+      default: 0.25
+      type: float
+    tokenization:
+      default: false
+      type: bool
+audio_add_gaussian_noise_mapper:
+  args:
+    max_amplitude:
+      default: 0.015
+      type: float
+    min_amplitude:
+      default: 0.001
+      type: float
+    p:
+      default: 0.5
+      type: float
+audio_duration_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    max_duration:
+      default: 9007199254740991
+      type: int
+    min_duration:
+      default: 0
+      type: int
+audio_nmf_snr_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    max_snr:
+      default: 9007199254740991
+      type: int
+    min_snr:
+      default: 0
+      type: int
+    nmf_iter_num:
+      default: 500
+      min: 0
+      type: int
+audio_size_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    max_size:
+      default: 1TB
+      type: str
+    min_size:
+      default: '0'
+      type: str
+average_line_length_filter:
+  args:
+    max_len:
+      default: 9007199254740991
+      type: int
+    min_len:
+      default: 10
+      type: int
+character_repetition_filter:
+  args:
+    max_ratio:
+      default: 0.5
+      type: float
+    min_ratio:
+      default: 0.0
+      type: float
+    rep_len:
+      default: 10
+      min: 0
+      type: int
+chinese_convert_mapper:
+  args:
+    mode:
+      default: s2t
+      type: str
+clean_copyright_mapper:
+  args: {}
+clean_html_mapper:
+  args: {}
+document_deduplicator:
+  args:
+    ignore_non_character:
+      default: false
+      type: bool
+    lowercase:
+      default: false
+      type: bool
+expand_macro_mapper:
+  args: {}
+extract_tables_from_html_mapper:
+  args:
+    include_header:
+      default: true
+      type: bool
+    retain_html_tags:
+      default: false
+      type: bool
+    tables_field_name:
+      default: html_tables
+      type: str
+fix_unicode_mapper:
+  args:
+    normalization:
+      default: None
+      type: str
+human_preference_annotation_mapper:
+  args:
+    answer1_key:
+      default: answer1
+      type: str
+    answer2_key:
+      default: answer2
+      type: str
+    chosen_key:
+      default: chosen
+      type: str
+    label_config_file:
+      default: None
+      type: str
+    prompt_key:
+      default: prompt
+      type: str
+    rejected_key:
+      default: rejected
+      type: str
+image_aesthetics_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    hf_scorer_model:
+      default: ''
+      type: str
+    max_score:
+      default: 1.0
+      type: float
+    min_score:
+      default: 0.5
+      type: float
+    trust_remote_code:
+      default: false
+      type: bool
+image_aspect_ratio_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    max_ratio:
+      default: 3.0
+      type: float
+    min_ratio:
+      default: 0.333
+      type: float
+image_blur_mapper:
+  args:
+    blur_type:
+      default: gaussian
+      type: str
+    p:
+      default: 0.2
+      type: float
+    radius:
+      default: 2
+      type: int
+image_deduplicator:
+  args:
+    consider_text:
+      default: false
+      type: bool
+    method:
+      default: phash
+      type: str
+image_face_count_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    cv_classifier:
+      default: ''
+      type: str
+    max_face_count:
+      default: 1
+      type: int
+    min_face_count:
+      default: 1
+      type: int
+image_face_ratio_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    cv_classifier:
+      default: ''
+      type: str
+    max_ratio:
+      default: 0.4
+      type: float
+    min_ratio:
+      default: 0.0
+      type: float
+image_nsfw_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    hf_nsfw_model:
+      default: Falconsai/nsfw_image_detection
+      type: str
+    max_score:
+      default: 0.5
+      type: float
+    trust_remote_code:
+      default: false
+      type: bool
+image_segment_mapper:
+  args:
+    conf:
+      default: 0.05
+      type: float
+    imgsz:
+      default: 1024
+      type: int
+    iou:
+      default: 0.5
+      type: float
+    model_path:
+      default: FastSAM-x.pt
+      type: str
+image_shape_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    max_height:
+      default: 9007199254740991
+      type: int
+    max_width:
+      default: 9007199254740991
+      type: int
+    min_height:
+      default: 1
+      type: int
+    min_width:
+      default: 1
+      type: int
+image_size_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    max_size:
+      default: 1TB
+      type: str
+    min_size:
+      default: '0'
+      type: str
+image_tagging_mapper:
+  args:
+    tag_field_name:
+      default: image_tags
+      type: str
+image_text_matching_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    hf_blip:
+      default: Salesforce/blip-itm-base-coco
+      type: str
+    horizontal_flip:
+      default: false
+      type: bool
+    max_score:
+      default: 1.0
+      type: float
+    min_score:
+      default: 0.003
+      type: float
+    reduce_mode:
+      default: avg
+      type: str
+    trust_remote_code:
+      default: false
+      type: bool
+    vertical_flip:
+      default: false
+      type: bool
+image_text_similarity_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    hf_clip:
+      default: openai/clip-vit-base-patch32
+      type: str
+    horizontal_flip:
+      default: false
+      type: bool
+    max_score:
+      default: 1.0
+      type: float
+    min_score:
+      default: 0.1
+      type: float
+    reduce_mode:
+      default: avg
+      type: str
+    trust_remote_code:
+      default: false
+      type: bool
+    vertical_flip:
+      default: false
+      type: bool
+image_watermark_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    hf_watermark_model:
+      default: amrul-hzz/watermark_detector
+      type: str
+    prob_threshold:
+      default: 0.8
+      type: float
+    trust_remote_code:
+      default: false
+      type: bool
+maximum_line_length_filter:
+  args:
+    max_len:
+      default: 9007199254740991
+      type: int
+    min_len:
+      default: 10
+      type: int
+mllm_mapper:
+  args:
+    hf_model:
+      default: llava-hf/llava-v1.6-vicuna-7b-hf
+      type: str
+    max_new_tokens:
+      default: 256
+      type: int
+    num_beams:
+      default: 1
+      type: int
+    temperature:
+      default: 0.2
+      type: float
+    top_p:
+      default: None
+      type: str
+nlpaug_en_mapper:
+  args:
+    aug_num:
+      default: 1
+      min: 0
+      type: int
+    delete_random_char:
+      default: false
+      type: bool
+    delete_random_word:
+      default: false
+      type: bool
+    insert_random_char:
+      default: false
+      type: bool
+    keep_original_sample:
+      default: true
+      type: bool
+    keyboard_error_char:
+      default: false
+      type: bool
+    ocr_error_char:
+      default: false
+      type: bool
+    sequential:
+      default: false
+      type: bool
+    spelling_error_word:
+      default: false
+      type: bool
+    split_random_word:
+      default: false
+      type: bool
+    swap_random_char:
+      default: false
+      type: bool
+    swap_random_word:
+      default: false
+      type: bool
+nlpcda_zh_mapper:
+  args:
+    aug_num:
+      default: 1
+      min: 0
+      type: int
+    delete_random_char:
+      default: false
+      type: bool
+    keep_original_sample:
+      default: true
+      type: bool
+    replace_equivalent_num:
+      default: false
+      type: bool
+    replace_homophone_char:
+      default: false
+      type: bool
+    replace_similar_word:
+      default: false
+      type: bool
+    sequential:
+      default: false
+      type: bool
+    swap_random_char:
+      default: false
+      type: bool
+perplexity_filter:
+  args:
+    lang:
+      default: en
+      type: str
+    max_ppl:
+      default: 1500
+      type: int
+phrase_grounding_recall_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    conf_thr:
+      default: 0.0
+      type: float
+    hf_owlvit:
+      default: google/owlvit-base-patch32
+      type: str
+    horizontal_flip:
+      default: false
+      type: bool
+    iou_thr:
+      default: 0.5
+      type: float
+    large_area_ratio_thr:
+      default: 0.95
+      type: float
+    max_recall:
+      default: 1.0
+      type: float
+    min_recall:
+      default: 0.1
+      type: float
+    reduce_mode:
+      default: avg
+      type: str
+    trust_remote_code:
+      default: false
+      type: bool
+    vertical_flip:
+      default: false
+      type: bool
+punctuation_normalization_mapper:
+  args: {}
+python_file_mapper:
+  args:
+    batched:
+      default: false
+      type: bool
+    file_path:
+      default: ''
+      type: str
+    function_name:
+      default: process_single
+      type: str
+python_lambda_mapper:
+  args:
+    batched:
+      default: false
+      type: bool
+    lambda_str:
+      default: ''
+      type: str
+ray_document_deduplicator:
+  args:
+    backend:
+      default: ray_actor
+      type: str
+    ignore_non_character:
+      default: false
+      type: bool
+    lowercase:
+      default: false
+      type: bool
+    redis_address:
+      default: redis://localhost:6379
+      type: str
+ray_image_deduplicator:
+  args:
+    backend:
+      default: ray_actor
+      type: str
+    method:
+      default: phash
+      type: str
+    redis_address:
+      default: redis://localhost:6379
+      type: str
+ray_video_deduplicator:
+  args:
+    backend:
+      default: ray_actor
+      type: str
+    redis_address:
+      default: redis://localhost:6379
+      type: str
+remove_bibliography_mapper:
+  args: {}
+remove_header_mapper:
+  args:
+    drop_no_head:
+      default: true
+      type: bool
+remove_long_words_mapper:
+  args:
+    max_len:
+      default: 9007199254740991
+      type: int
+    min_len:
+      default: 1
+      type: int
+remove_non_chinese_character_mapper:
+  args:
+    keep_alphabet:
+      default: true
+      type: bool
+    keep_number:
+      default: true
+      type: bool
+    keep_punc:
+      default: true
+      type: bool
+remove_repeat_sentences_mapper:
+  args:
+    ignore_special_character:
+      default: true
+      type: bool
+    lowercase:
+      default: false
+      type: bool
+    min_repeat_sentence_length:
+      default: 2
+      type: int
+remove_table_text_mapper:
+  args:
+    max_col:
+      default: 20
+      type: int
+    min_col:
+      default: 2
+      type: int
+sentence_split_mapper:
+  args:
+    lang:
+      default: en
+      type: str
+special_characters_filter:
+  args:
+    max_ratio:
+      default: 0.25
+      type: float
+    min_ratio:
+      default: 0.0
+      type: float
+specified_numeric_field_filter:
+  args:
+    field_key:
+      default: ''
+      type: str
+    max_value:
+      default: 9007199254740991
+      type: int
+    min_value:
+      default: -9223372036854775807
+      type: int
+text_action_filter:
+  args:
+    lang:
+      default: en
+      type: str
+    min_action_num:
+      default: 1
+      type: int
+text_entity_dependency_filter:
+  args:
+    any_or_all:
+      default: all
+      type: str
+    lang:
+      default: en
+      type: str
+    min_dependency_num:
+      default: 1
+      type: int
+text_length_filter:
+  args:
+    max_len:
+      default: 9007199254740991
+      type: int
+    min_len:
+      default: 10
+      type: int
+token_num_filter:
+  args:
+    hf_tokenizer:
+      default: EleutherAI/pythia-6.9b-deduped
+      type: str
+    max_num:
+      default: 9007199254740991
+      type: int
+    min_num:
+      default: 10
+      type: int
+video_aesthetics_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    frame_num:
+      default: 3
+      min: 0
+      type: int
+    frame_sampling_method:
+      default: uniform
+      type: str
+    hf_scorer_model:
+      default: ''
+      type: str
+    max_score:
+      default: 1.0
+      type: float
+    min_score:
+      default: 0.4
+      type: float
+    reduce_mode:
+      default: avg
+      type: str
+    trust_remote_code:
+      default: false
+      type: bool
+video_aspect_ratio_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    max_ratio:
+      default: 21/9
+      type: str
+    min_ratio:
+      default: 9/21
+      type: str
+video_captioning_from_audio_mapper:
+  args:
+    keep_original_sample:
+      default: true
+      type: bool
+video_deduplicator:
+  args:
+    consider_text:
+      default: false
+      type: bool
+video_duration_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    max_duration:
+      default: 9007199254740991
+      type: int
+    min_duration:
+      default: 0
+      type: int
+video_extract_frames_mapper:
+  args:
+    duration:
+      default: 0
+      type: int
+    frame_dir:
+      default: None
+      type: str
+    frame_key:
+      default: video_frames
+      type: str
+    frame_num:
+      default: 3
+      min: 0
+      type: int
+    frame_sampling_method:
+      default: all_keyframes
+      type: str
+video_face_blur_mapper:
+  args:
+    blur_type:
+      default: gaussian
+      type: str
+    cv_classifier:
+      default: ''
+      type: str
+    radius:
+      default: 2
+      type: int
+video_frames_text_similarity_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    frame_num:
+      default: 3
+      min: 0
+      type: int
+    frame_sampling_method:
+      default: all_keyframes
+      type: str
+    hf_clip:
+      default: openai/clip-vit-base-patch32
+      type: str
+    horizontal_flip:
+      default: false
+      type: bool
+    max_score:
+      default: 1.0
+      type: float
+    min_score:
+      default: 0.1
+      type: float
+    reduce_mode:
+      default: avg
+      type: str
+    trust_remote_code:
+      default: false
+      type: bool
+    vertical_flip:
+      default: false
+      type: bool
+video_nsfw_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    frame_num:
+      default: 3
+      min: 0
+      type: int
+    frame_sampling_method:
+      default: all_keyframes
+      type: str
+    hf_nsfw_model:
+      default: Falconsai/nsfw_image_detection
+      type: str
+    max_score:
+      default: 0.5
+      type: float
+    reduce_mode:
+      default: avg
+      type: str
+    trust_remote_code:
+      default: false
+      type: bool
+video_resize_aspect_ratio_mapper:
+  args:
+    max_ratio:
+      default: 21/9
+      type: str
+    min_ratio:
+      default: 9/21
+      type: str
+    strategy:
+      default: increase
+      type: str
+video_resize_resolution_mapper:
+  args:
+    force_divisible_by:
+      default: 2
+      min: 0
+      type: int
+    force_original_aspect_ratio:
+      default: disable
+      type: str
+    max_height:
+      default: 9007199254740991
+      type: int
+    max_width:
+      default: 9007199254740991
+      type: int
+    min_height:
+      default: 1
+      type: int
+    min_width:
+      default: 1
+      type: int
+video_resolution_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    max_height:
+      default: 9007199254740991
+      type: int
+    max_width:
+      default: 9007199254740991
+      type: int
+    min_height:
+      default: 1
+      type: int
+    min_width:
+      default: 1
+      type: int
+video_split_by_duration_mapper:
+  args:
+    keep_original_sample:
+      default: true
+      type: bool
+    min_last_split_duration:
+      default: 0
+      type: int
+    split_duration:
+      default: 10
+      type: int
+video_split_by_key_frame_mapper:
+  args:
+    keep_original_sample:
+      default: true
+      type: bool
+video_tagging_from_audio_mapper:
+  args:
+    hf_ast:
+      default: MIT/ast-finetuned-audioset-10-10-0.4593
+      type: str
+    tag_field_name:
+      default: video_audio_tags
+      type: str
+    trust_remote_code:
+      default: false
+      type: bool
+video_tagging_from_frames_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    contain:
+      default: any
+      type: str
+    frame_num:
+      default: 3
+      min: 0
+      type: int
+    frame_sampling_method:
+      default: all_keyframes
+      type: str
+    tag_field_name:
+      default: video_frame_tags
+      type: str
+    tags:
+      default:
+      - people
+      type: list_str
+video_tagging_from_frames_mapper:
+  args:
+    frame_num:
+      default: 3
+      min: 0
+      type: int
+    frame_sampling_method:
+      default: all_keyframes
+      type: str
+    tag_field_name:
+      default: video_frame_tags
+      type: str
+video_watermark_filter:
+  args:
+    any_or_all:
+      default: any
+      type: str
+    frame_num:
+      default: 3
+      min: 0
+      type: int
+    frame_sampling_method:
+      default: all_keyframes
+      type: str
+    hf_watermark_model:
+      default: amrul-hzz/watermark_detector
+      type: str
+    prob_threshold:
+      default: 0.8
+      type: float
+    reduce_mode:
+      default: avg
+      type: str
+    trust_remote_code:
+      default: false
+      type: bool
+whitespace_normalization_mapper:
+  args: {}
+word_repetition_filter:
+  args:
+    lang:
+      default: en
+      type: str
+    max_ratio:
+      default: 0.5
+      type: float
+    min_ratio:
+      default: 0.0
+      type: float
+    rep_len:
+      default: 10
+      min: 0
+      type: int
+    tokenization:
+      default: false
+      type: bool
+words_num_filter:
+  args:
+    lang:
+      default: en
+      type: str
+    max_num:
+      default: 9007199254740991
+      type: int
+    min_num:
+      default: 10
+      type: int
+    tokenization:
+      default: false
+      type: bool

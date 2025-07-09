@@ -1,5 +1,6 @@
 import oyaml as yaml
 import os
+import re
 import pandas as pd
 import json
 from collections import OrderedDict
@@ -95,11 +96,24 @@ class OperatorArg:
             for vv in v:
                 self.v_check(vv, type_only=type_only, element_check=True)
             return
-        if not isinstance(v, self.v_type):
-            raise ValueError(
-                f"OperatorArg v_check: type mismatch when check {self.name}={v}, \
-                expected {self.v_type} but got {type(v)}."
-            )
+        error = ValueError(
+            f"OperatorArg v_check: type mismatch when check {self.name}={v}, \
+            expected {self.v_type} but got {type(v)}."
+        )
+        if self.v_type == float:
+            if not isinstance(v, (int, float)):
+                raise error
+            v = float(v)
+        elif self.v_type == int:
+            if isinstance(v, float):
+                if not v.is_integer():
+                    raise error
+                v = int(v)
+            elif not isinstance(v, int):
+                raise error
+        else:
+            if not isinstance(v, self.v_type):
+                raise error 
         if type_only:
             return
         if self.v_options is not None and v not in self.v_options:
@@ -202,11 +216,16 @@ class Operator:
         self.desc = OP_DICT[self.name].get('class_desc', "no description")
         args = state.get('args', {})
         arg_descriptions = OP_DICT[self.name]['arguments'].split('\n')
+        arg_desc_dict = {}
+        for line in arg_descriptions:
+            m = re.match(r'^([^\(]+)\s*\(.+\):', line.strip())
+            if m:
+                arg_desc_dict[m.group(1).strip()] = line.strip()
         self.enabled = state.get('enabled', True)
         self.args = OrderedDict()
-        for i, (arg_name, arg_state) in enumerate(args.items()):
-            desc = arg_descriptions[i]
-            assert arg_name in desc, f"Operator: __init__: desc mismatch: op_name={self.name}, arg_name={arg_name}"
+        for arg_name, arg_state in args.items():
+            desc = arg_desc_dict.get(arg_name, None)
+            assert desc is not None, f"Operator: __init__: desc mismatch: op_name={self.name}, arg_name={arg_name}"
             arg_state.update(name=arg_name, desc=desc)
             self.args[arg_name] = OperatorArg(self, state=arg_state)
         self.stats = state.get('stats', {})
@@ -258,11 +277,14 @@ class OperatorPool:
     default_ops = None
     pool = None
 
-    def __init__(self, config_path=None):
-        if config_path is None:
+    def __init__(self, config_path=None, default_ops=None):
+        if config_path is None and default_ops is None:
             config_path = os.path.join(os.path.dirname(__file__), "./configs/default_ops.yaml")
-        with open(config_path, "r") as f:
-            self.default_ops = yaml.safe_load(f)
+        if default_ops is None:
+            with open(config_path, "r") as f:
+                self.default_ops = yaml.safe_load(f)
+        else:
+            self.default_ops = default_ops
         self.pool = OrderedDict()
         for op_name, arg_state in self.default_ops.items():
             arg_state.update(name=op_name)

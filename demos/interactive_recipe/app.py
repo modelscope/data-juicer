@@ -25,6 +25,7 @@ import time
 import threading
 import queue
 
+
 def call_service_in_thread(chat_history, q):
     try:
         response_generator = call_copilot_service(chat_history)
@@ -190,7 +191,6 @@ def get_enabled_op_info():
             op_info[op_name] = {"op_desc": OP_DICT[op_name]['class_desc']}
     return op_info
 
-
 class Visualize:
     op_pool = None
 
@@ -199,6 +199,7 @@ class Visualize:
         save_path = "./save/op_pool_state.yaml"
         if first_time:
             self.op_pool = StOperatorPool(config_path="./configs/default_ops.yaml")
+            # self.op_pool = StOperatorPool(default_ops=default_ops)
             self.op_pool.st_sync()
             st.session_state.op_pool = self.op_pool
             st.session_state.first_time = False
@@ -285,12 +286,10 @@ class Visualize:
                                 else:
                                     raise ValueError(f"Invalid action {action}")
                             st.session_state.suggestions = None
-                        st.rerun()
                 with col2:
                     ignore_btn = st.button("Ignore", use_container_width=True)
                     if ignore_btn:
                         st.session_state.suggestions = None
-                    st.rerun()
 
 
     def analyze_process(self):
