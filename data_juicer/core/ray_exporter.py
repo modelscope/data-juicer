@@ -91,7 +91,7 @@ class RayExporter:
         if self.export_format in {"json", "jsonl"}:
             return dataset.write_json(export_path, force_ascii=False)
         elif self.export_format == "webdataset":
-            from data_juicer.core.data.webdataset_utils import _custom_default_encoder
+            from data_juicer.utils.webdataset_utils import _custom_default_encoder
 
             return dataset.write_webdataset(export_path, encoder=_custom_default_encoder)
         else:

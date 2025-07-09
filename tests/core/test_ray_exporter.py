@@ -3,7 +3,6 @@ import os
 import os.path as osp
 import shutil
 import unittest
-import tempfile
 
 from data_juicer.utils.unittest_utils import TEST_TAG
 from data_juicer.core.ray_exporter import RayExporter
