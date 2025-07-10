@@ -183,6 +183,9 @@ def transfer_filename(original_filepath: Union[str, Path], op_name, **op_kwargs)
             abc__dj_hash_#{hash_val2}#.jpg
 
     """
+    # check if it's valid local path, if it's not, regard it as a remote path/url and return None
+    if not os.path.exists(original_filepath):
+        return original_filepath
     # produce the directory
     original_dir = os.path.dirname(original_filepath)
     dir_token = f"/{Fields.multimodal_data_output_dir}/"
@@ -387,11 +390,14 @@ def get_all_files_paths_under(root, recurse_subdirectories=True, followlinks=Fal
     return file_ls
 
 
-async def download_file(session: aiohttp.ClientSession, url: str, save_path: str, timeout: int = 300, **kwargs):
+async def download_file(
+    session: aiohttp.ClientSession, url: str, save_path: str = None, return_content=False, timeout: int = 300, **kwargs
+):
     """
     Download a file from a given URL and save it to a specified directory.
     :param url: The URL of the file to download.
     :param save_path: The path where the downloaded file will be saved.
+    :param return_content: Whether to return the content of the downloaded file.
     :param timeout: The timeout in seconds for each HTTP request.
     :param kwargs: The keyword arguments to pass to the HTTP request.
 
@@ -401,8 +407,18 @@ async def download_file(session: aiohttp.ClientSession, url: str, save_path: str
         url, timeout=aiohttp.ClientTimeout(total=timeout), raise_for_status=True, **kwargs
     ) as response:
 
-        with open(save_path, "wb") as f:
-            while chunk := await response.content.read():
-                f.write(chunk)
+        assert save_path or return_content, "save_path or return_content must be set."
+        content = b""
+
+        if save_path:
+            with open(save_path, "wb") as f:
+                while chunk := await response.content.read():
+                    f.write(chunk)
+                    content += chunk
+        else:
+            content = await response.read()
+
+        if return_content:
+            return response, content
 
         return response

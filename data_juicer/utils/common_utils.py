@@ -1,4 +1,5 @@
 import hashlib
+import inspect
 import sys
 
 import numpy as np
@@ -122,3 +123,17 @@ def is_float(s):
         return True
     except Exception:
         return False
+
+
+def check_op_method_param(method, param_name):
+    """
+    Check if the given method contains a parameter named param_name, or it contains parameter with **.
+    """
+    parameters = inspect.signature(method).parameters
+    # check if there are parameters with **
+    for name, param in parameters.items():
+        if name == param_name:
+            return True
+        if param.kind == inspect.Parameter.VAR_KEYWORD:
+            return True
+    return False
