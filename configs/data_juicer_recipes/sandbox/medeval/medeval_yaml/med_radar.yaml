@@ -1,0 +1,174 @@
+type: 'med_evaluator'
+med_task: 'parse_radar'
+
+input_path: "medeval/res/sub"
+output_path: "medeval/res/sub"
+title: "Med Evaluation Radar Chart"
+
+# Ultilized model for parsing
+model_dirs: ["raw", "ckpt"]
+model_order: ["raw", "ckpt"]
+model_colors:
+  raw: "#1f77b4"
+  ckpt: "#d62728"
+
+# Customized category color
+category_colors:
+  Domain Capability: "#1f77b4"
+  Risk & Security: "#ff7f0e"
+  Instruction Following: "#2ca02c"
+  Infer Performance: "#d62728"
+
+# Metrics value parser
+files:
+  - name: "MedAgents"
+    path: "medagents/stats.json"
+    metrics:
+      - name: "medagents_avg_score"
+        path: "results.overall_score"
+
+  - name: "MedJourney"
+    path: "medjourney/stats.json"
+    metrics:
+      - name: "medjourney_choice"
+        path: "results.choice"
+      - name: "medjourney_nlg"
+        path: "results.nlg"
+
+  - name: "MedSafety"
+    path: "medsafety/stats.json"
+    metrics:
+      - name: "medsafety_score"
+        path: "results.overall_score"
+
+  - name: "MedHallu"
+    path: "medhallu/stats.json"
+    metrics:
+      - name: "medhallu_with"
+        path: "results.overall.with_knowledge.f1"
+      - name: "medhallu_without"
+        path: "results.overall.without_knowledge.f1"
+
+  - name: "Flames"
+    path: "flames/stats.json"
+    metrics:
+      - name: "flames_harmless"
+        path: "result.harmless_rate"
+
+  - name: "IFEval"
+    path: "ifeval/stats.json"
+    metrics:
+      - name: "ifeval_prompt"
+        path: "results.prompt_level"
+      - name: "ifeval_instruction"
+        path: "results.inst_level"
+
+  - name: "InfoBench"
+    path: "infobench/stats.json"
+    metrics:
+      - name: "infobench_decomp"
+        path: "result.overall.accuracy"
+
+  - name: "Structflow"
+    path: "structflow/stats.json"
+    metrics:
+      - name: "structflow_wcsr"
+        path: "overall.WCSR"
+
+  - name: "Perf"
+    path: "perf/stats.json"
+    metrics:
+      - name: "perf_low_token"
+        path: "results.low_token"
+      - name: "perf_high_token"
+        path: "results.high_token"
+      - name: "perf_latency"
+        path: "results.low_latency"
+
+# Radar chart items
+items:
+  # Domain Capability
+  - category: "Domain Capability"
+    benchmark: "MedAgents"
+    metric: "Avg Score (Acc)"
+    result_key: "medagents_avg_score"
+
+  - category: "Domain Capability"
+    benchmark: "MedJourney"
+    metric: "Choice Question (bleu-1)"
+    result_key: "medjourney_choice"
+
+  - category: "Domain Capability"
+    benchmark: "MedJourney"
+    metric: "NLG Task (Rouge-L-F1)"
+    result_key: "medjourney_nlg"
+
+  # Risk & Security
+  - category: "Risk & Security"
+    benchmark: "MedSafety"
+    metric: "Avg Score"
+    result_key: "medsafety_score"
+    direction: "Minimize"
+    min: 1.0
+    max: 5.0
+
+  - category: "Risk & Security"
+    benchmark: "MedHallu"
+    metric: "w/ knowledge (F1)"
+    result_key: "medhallu_with"
+
+  - category: "Risk & Security"
+    benchmark: "MedHallu"
+    metric: "w/o knowledge (F1)"
+    result_key: "medhallu_without"
+
+  - category: "Risk & Security"
+    benchmark: "Flames"
+    metric: "Harmless (Rate)"
+    result_key: "flames_harmless"
+
+  # Instruction Following
+  - category: "Instruction Following"
+    benchmark: "IFEval"
+    metric: "Prompt (Acc)"
+    result_key: "ifeval_prompt"
+
+  - category: "Instruction Following"
+    benchmark: "IFEval"
+    metric: "Instruction (Acc)"
+    result_key: "ifeval_instruction"
+
+  - category: "Instruction Following"
+    benchmark: "InfoBench"
+    metric: "Decomposition (Acc)"
+    result_key: "infobench_decomp"
+    min: 0.0
+    max: 100.0
+
+  - category: "Instruction Following"
+    benchmark: "Structflow"
+    metric: "WCSR (Rate)"
+    result_key: "structflow_wcsr"
+
+  # Infer Performance
+  - category: "Infer Performance"
+    benchmark: "Perf"
+    metric: "Single Ouput (tok/s)"
+    result_key: "perf_low_token"
+    min: 0.0
+    max: 500.0
+
+  - category: "Infer Performance"
+    benchmark: "Perf"
+    metric: "Parallel Output (tok/s)"
+    result_key: "perf_high_token"
+    min: 1000.0
+    max: 10000.0
+
+  - category: "Infer Performance"
+    benchmark: "Perf"
+    metric: "Avg Latency (s)"
+    result_key: "perf_latency"
+    direction: "Minimize"
+    min: 3.0
+    max: 5.0
