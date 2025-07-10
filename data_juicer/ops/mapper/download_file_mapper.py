@@ -46,14 +46,16 @@ class DownloadFileMapper(Mapper):
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
 
-        # `save_field` is used to save the bytes content, which only supports images for now.
-        # So we set the `download_field` and `save_field` to the default ones for images.
-        self.download_field = download_field if download_field is not None else self.image_key
-        self.save_field = save_field if save_field is not None else self.image_bytes_key
+        self.download_field = download_field
         self.save_dir = save_dir
+        self.save_field = save_field
         self.resume_download = resume_download
         if not (self.save_dir or self.save_field):
-            raise ValueError("Either `save_dir` or `save_field` must be specified.")
+            logger.warning(
+                "Both `save_dir` and `save_field` are not specified. Use the default `image_bytes` key to "
+                "save the downloaded contents."
+            )
+            self.save_field = self.image_bytes_key
         if self.save_dir:
             os.makedirs(self.save_dir, exist_ok=True)
         self.timeout = timeout
