@@ -280,7 +280,7 @@ class PerformanceBenchmark:
         ]
 
         # Debug: Log all filters being created
-        logger.info(f"🔍 DEBUG: Created {len(filters)} filters:")
+        logger.debug(f"🔍 DEBUG: Created {len(filters)} filters:")
         for i, filter_op in enumerate(filters):
             filter_type = type(filter_op).__name__
             filter_name = getattr(filter_op, "_name", f"filter_{i}")
@@ -578,7 +578,7 @@ class PerformanceBenchmark:
 
         # DEBUG: Track sample counts and filter results
         original_sample_count = get_dataset_length(test_data)
-        logger.info(f"🔍 DEBUG INDIVIDUAL: Starting with {original_sample_count} samples")
+        logger.debug(f"🔍 DEBUG INDIVIDUAL: Starting with {original_sample_count} samples")
 
         for i, filter_op in enumerate(actual_filters):
             filter_name = getattr(filter_op, "_name", type(filter_op).__name__)
@@ -586,7 +586,7 @@ class PerformanceBenchmark:
 
             # DEBUG: Log current state before filter
             current_sample_count = get_dataset_length(samples_with_stats)
-            logger.info(f"🔍 DEBUG INDIVIDUAL: Before filter {i+1} ({filter_name}): {current_sample_count} samples")
+            logger.debug(f"🔍 DEBUG INDIVIDUAL: Before filter {i+1} ({filter_name}): {current_sample_count} samples")
 
             # Compute stats for this filter
             stats_start = time.time()
@@ -609,13 +609,13 @@ class PerformanceBenchmark:
                         logger.info(
                             f"🔍 DEBUG INDIVIDUAL: Filter {i+1} ({filter_name}) returned {result_count} booleans: {passed_count} passed, {result_count - passed_count} failed"
                         )
-                        logger.info(f"🔍 DEBUG INDIVIDUAL: Filter {i+1} mask (first 10): {result[:10]}")
+                        logger.debug(f"🔍 DEBUG INDIVIDUAL: Filter {i+1} mask (first 10): {result[:10]}")
                     else:
                         logger.info(
                             f"🔍 DEBUG INDIVIDUAL: Filter {i+1} ({filter_name}) returned {result_count} {result_type} items (likely mapper)"
                         )
                 else:
-                    logger.info(f"🔍 DEBUG INDIVIDUAL: Filter {i+1} ({filter_name}) returned empty result")
+                    logger.debug(f"🔍 DEBUG INDIVIDUAL: Filter {i+1} ({filter_name}) returned empty result")
 
             filter_time = time.time() - filter_start
             total_filter_time += filter_time
@@ -809,7 +809,7 @@ class PerformanceBenchmark:
 
         # DEBUG: Track sample counts and operation results
         original_sample_count = get_dataset_length(test_data)
-        logger.info(f"🔍 DEBUG PIPELINE: Starting with {original_sample_count} samples")
+        logger.debug(f"🔍 DEBUG PIPELINE: Starting with {original_sample_count} samples")
 
         data = test_data
         for op_idx, op_config in enumerate(optimized_ops):
@@ -818,18 +818,18 @@ class PerformanceBenchmark:
 
             # Special handling for fused_filter - we need to create the actual filter objects
             op_name = list(op_config.keys())[0]
-            logger.info(f"🔍 DEBUG PIPELINE: Processing op {op_idx+1}/{len(optimized_ops)}: {op_name}")
+            logger.debug(f"🔍 DEBUG PIPELINE: Processing op {op_idx+1}/{len(optimized_ops)}: {op_name}")
 
             # DEBUG: Log current state before operation
             current_sample_count = get_dataset_length(data)
-            logger.info(f"🔍 DEBUG PIPELINE: Before op {op_idx+1} ({op_name}): {current_sample_count} samples")
+            logger.debug(f"🔍 DEBUG PIPELINE: Before op {op_idx+1} ({op_name}): {current_sample_count} samples")
 
             if op_name == "fused_filter":
                 # Extract the fused_op_list and create individual filter objects
                 fused_op_list = op_config[op_name].get("fused_op_list", [])
                 individual_filters = []
 
-                logger.info(f"🔍 DEBUG PIPELINE: Fused filter contains {len(fused_op_list)} individual filters:")
+                logger.debug(f"🔍 DEBUG PIPELINE: Fused filter contains {len(fused_op_list)} individual filters:")
                 for filter_config in fused_op_list:
                     filter_name = list(filter_config.keys())[0]
                     filter_args = filter_config[filter_name]
@@ -849,11 +849,11 @@ class PerformanceBenchmark:
                     # Force parallel execution to match individual execution behavior
                     # (each filter sees original data, not filtered output from previous filters)
                     fused_filter.execution_strategy = "parallel"
-                    logger.info(f"🔍 DEBUG PIPELINE: Created fused filter with {len(individual_filters)} filters")
+                    logger.debug(f"🔍 DEBUG PIPELINE: Created fused filter with {len(individual_filters)} filters")
                     logger.info(
                         f"🔍 DEBUG PIPELINE: Fused filter execution strategy: {fused_filter.execution_strategy}"
                     )
-                    logger.info(f"🔍 DEBUG PIPELINE: Filter order: {[f._name for f in fused_filter.fused_filters]}")
+                    logger.debug(f"🔍 DEBUG PIPELINE: Filter order: {[f._name for f in fused_filter.fused_filters]}")
 
                     # Process the fused filter
                     if hasattr(fused_filter, "compute_stats_batched"):
@@ -870,13 +870,13 @@ class PerformanceBenchmark:
                                 logger.info(
                                     f"🔍 DEBUG PIPELINE: Fused filter returned {result_count} booleans: {passed_count} passed, {result_count - passed_count} failed"
                                 )
-                                logger.info(f"🔍 DEBUG PIPELINE: Fused filter mask (first 10): {result[:10]}")
+                                logger.debug(f"🔍 DEBUG PIPELINE: Fused filter mask (first 10): {result[:10]}")
                             else:
                                 logger.info(
                                     f"🔍 DEBUG PIPELINE: Fused filter returned {result_count} {result_type} items (likely mapper)"
                                 )
                         else:
-                            logger.info(f"🔍 DEBUG PIPELINE: Fused filter returned empty result")
+                            logger.debug(f"🔍 DEBUG PIPELINE: Fused filter returned empty result")
                 else:
                     logger.warning(f"🔍 DEBUG PIPELINE: Failed to create fused filter")
                     continue  # Skip if we can't create the fused filter
@@ -885,7 +885,7 @@ class PerformanceBenchmark:
                 loaded_ops = load_ops([op_config])
                 if loaded_ops:
                     op = loaded_ops[0]
-                    logger.info(f"🔍 DEBUG PIPELINE: Loaded op: {type(op).__name__}")
+                    logger.debug(f"🔍 DEBUG PIPELINE: Loaded op: {type(op).__name__}")
 
                     # Execute the operation
                     if hasattr(op, "compute_stats_batched"):
@@ -902,20 +902,20 @@ class PerformanceBenchmark:
                                 logger.info(
                                     f"🔍 DEBUG PIPELINE: Op {op_idx+1} ({op_name}) returned {result_count} booleans: {passed_count} passed, {result_count - passed_count} failed"
                                 )
-                                logger.info(f"🔍 DEBUG PIPELINE: Op {op_idx+1} mask (first 10): {result[:10]}")
+                                logger.debug(f"🔍 DEBUG PIPELINE: Op {op_idx+1} mask (first 10): {result[:10]}")
                             else:
                                 logger.info(
                                     f"🔍 DEBUG PIPELINE: Op {op_idx+1} ({op_name}) returned {result_count} {result_type} items (likely mapper)"
                                 )
                         else:
-                            logger.info(f"🔍 DEBUG PIPELINE: Op {op_idx+1} ({op_name}) returned empty result")
+                            logger.debug(f"🔍 DEBUG PIPELINE: Op {op_idx+1} ({op_name}) returned empty result")
                 else:
                     logger.warning(f"🔍 DEBUG PIPELINE: Failed to load op from config")
                     continue  # Skip if we can't load the operation
 
             # DEBUG: Log current state after operation
             current_sample_count = get_dataset_length(data)
-            logger.info(f"🔍 DEBUG PIPELINE: After op {op_idx+1} ({op_name}): {current_sample_count} samples")
+            logger.debug(f"🔍 DEBUG PIPELINE: After op {op_idx+1} ({op_name}): {current_sample_count} samples")
 
     def _extract_original_filters_from_fused(self, filters):
         """Extract original individual filters from fused filters for validation."""
@@ -1248,7 +1248,7 @@ class PerformanceBenchmark:
         # For validation, we need to compare the original individual filters to the optimized pipeline
         # In recipe mode, 'filters' might contain fused filters, so we need to extract the original filters
         original_filters = self._extract_original_filters_from_fused(filters)
-        logger.info(f"🔍 VALIDATION DEBUG: Extracted {len(original_filters)} original filters for validation")
+        logger.debug(f"🔍 VALIDATION DEBUG: Extracted {len(original_filters)} original filters for validation")
 
         # Run both individual and pipeline execution and save results
         individual_results_data = self._run_and_save_individual_execution(original_filters, test_data, validation_dir)
@@ -1294,7 +1294,7 @@ class PerformanceBenchmark:
         logger.info("🔍 Running individual execution for validation...")
 
         # Debug: Log all filters being processed
-        logger.info(f"🔍 DEBUG: Processing {len(filters)} filters in individual execution:")
+        logger.debug(f"🔍 DEBUG: Processing {len(filters)} filters in individual execution:")
         for i, filter_op in enumerate(filters):
             filter_type = type(filter_op).__name__
             filter_name = getattr(filter_op, "_name", f"filter_{i}")
@@ -1323,36 +1323,36 @@ class PerformanceBenchmark:
         test_data_with_ids = test_data.copy()
         test_data_with_ids["sample_id"] = list(range(original_length))
 
-        logger.info(f"🔍 DEBUG: Starting with {original_length} samples")
-        logger.info(f"🔍 DEBUG: Test data keys: {list(test_data_with_ids.keys())}")
-        logger.info(f"🔍 DEBUG: Text samples: {len(test_data_with_ids.get('text', []))}")
+        logger.debug(f"🔍 DEBUG: Starting with {original_length} samples")
+        logger.debug(f"🔍 DEBUG: Test data keys: {list(test_data_with_ids.keys())}")
+        logger.debug(f"🔍 DEBUG: Text samples: {len(test_data_with_ids.get('text', []))}")
 
         # Process through all filters
         data = test_data_with_ids
         for i, filter_op in enumerate(filters):
             filter_type = type(filter_op).__name__
             filter_name = getattr(filter_op, "_name", f"filter_{i}")
-            logger.info(f"🔍 DEBUG: Processing filter {i+1}/{len(filters)}: {filter_type} ({filter_name})")
-            logger.info(f"🔍 DEBUG: Data before filter {i+1}: {len(data.get('text', []))} samples")
-            logger.info(f"🔍 DEBUG: Text field type before filter {i+1}: {type(data.get('text', []))}")
+            logger.debug(f"🔍 DEBUG: Processing filter {i+1}/{len(filters)}: {filter_type} ({filter_name})")
+            logger.debug(f"🔍 DEBUG: Data before filter {i+1}: {len(data.get('text', []))} samples")
+            logger.debug(f"🔍 DEBUG: Text field type before filter {i+1}: {type(data.get('text', []))}")
             if data.get("text") and len(data["text"]) > 0:
-                logger.info(f"🔍 DEBUG: First text sample before filter {i+1}: {data['text'][0][:50]}...")
+                logger.debug(f"🔍 DEBUG: First text sample before filter {i+1}: {data['text'][0][:50]}...")
 
             if hasattr(filter_op, "compute_stats_batched"):
-                logger.info(f"🔍 DEBUG: Computing stats for filter {i+1}...")
+                logger.debug(f"🔍 DEBUG: Computing stats for filter {i+1}...")
                 data = filter_op.compute_stats_batched(data)
-                logger.info(f"🔍 DEBUG: After stats for filter {i+1}: {len(data.get('text', []))} samples")
+                logger.debug(f"🔍 DEBUG: After stats for filter {i+1}: {len(data.get('text', []))} samples")
             else:
-                logger.info(f"🔍 DEBUG: Filter {i+1} has no compute_stats_batched method")
+                logger.debug(f"🔍 DEBUG: Filter {i+1} has no compute_stats_batched method")
 
             if hasattr(filter_op, "process_batched"):
-                logger.info(f"🔍 DEBUG: Processing filter {i+1}...")
+                logger.debug(f"🔍 DEBUG: Processing filter {i+1}...")
                 result = list(filter_op.process_batched(data))
-                logger.info(f"🔍 DEBUG: Filter {i+1} result type: {type(result[0]) if result else 'None'}")
-                logger.info(f"🔍 DEBUG: Filter {i+1} result length: {len(result) if result else 0}")
+                logger.debug(f"🔍 DEBUG: Filter {i+1} result type: {type(result[0]) if result else 'None'}")
+                logger.debug(f"🔍 DEBUG: Filter {i+1} result length: {len(result) if result else 0}")
                 if result and len(result) > 0:
-                    logger.info(f"🔍 DEBUG: Filter {i+1} first result: {result[0]}")
-                    logger.info(f"🔍 DEBUG: Filter {i+1} first result type: {type(result[0])}")
+                    logger.debug(f"🔍 DEBUG: Filter {i+1} first result: {result[0]}")
+                    logger.debug(f"🔍 DEBUG: Filter {i+1} first result type: {type(result[0])}")
 
                 # Check if this is a filter (returns boolean) or mapper (returns transformed data)
                 # Handle both list and map objects that contain booleans
@@ -1380,8 +1380,8 @@ class PerformanceBenchmark:
                 ):
                     # This is a filter - apply boolean mask
                     mask = result
-                    logger.info(f"🔍 DEBUG: Filter {i+1} boolean mask: {sum(mask)}/{len(mask)} samples passed")
-                    logger.info(f"🔍 DEBUG: Filter {i+1} mask details: {mask[:10]}...")  # Show first 10 values
+                    logger.debug(f"🔍 DEBUG: Filter {i+1} boolean mask: {sum(mask)}/{len(mask)} samples passed")
+                    logger.debug(f"🔍 DEBUG: Filter {i+1} mask details: {mask[:10]}...")  # Show first 10 values
 
                     # Store the filter result for debugging
                     data[f"filter_result_filter_{i+1}"] = mask
@@ -1390,31 +1390,31 @@ class PerformanceBenchmark:
                     passed_indices = [idx for idx, passed in enumerate(mask) if passed]
                     if passed_indices:
                         # Update data to keep only passed samples
-                        logger.info(f"🔍 DEBUG: Before filtering - text field type: {type(data.get('text', []))}")
-                        logger.info(f"🔍 DEBUG: Before filtering - text field length: {len(data.get('text', []))}")
+                        logger.debug(f"🔍 DEBUG: Before filtering - text field type: {type(data.get('text', []))}")
+                        logger.debug(f"🔍 DEBUG: Before filtering - text field length: {len(data.get('text', []))}")
                         if data.get("text") and len(data["text"]) > 0:
-                            logger.info(f"🔍 DEBUG: Before filtering - first text sample: {data['text'][0][:50]}...")
+                            logger.debug(f"🔍 DEBUG: Before filtering - first text sample: {data['text'][0][:50]}...")
 
                         for key in data:
                             if isinstance(data[key], list) and len(data[key]) == len(mask):
                                 data[key] = [data[key][idx] for idx in passed_indices]
 
-                        logger.info(f"🔍 DEBUG: After filtering - text field type: {type(data.get('text', []))}")
-                        logger.info(f"🔍 DEBUG: After filtering - text field length: {len(data.get('text', []))}")
+                        logger.debug(f"🔍 DEBUG: After filtering - text field type: {type(data.get('text', []))}")
+                        logger.debug(f"🔍 DEBUG: After filtering - text field length: {len(data.get('text', []))}")
                         if data.get("text") and len(data["text"]) > 0:
-                            logger.info(f"🔍 DEBUG: After filtering - first text sample: {data['text'][0][:50]}...")
+                            logger.debug(f"🔍 DEBUG: After filtering - first text sample: {data['text'][0][:50]}...")
 
-                        logger.info(f"🔍 DEBUG: After filter {i+1}: {len(passed_indices)} samples remaining")
+                        logger.debug(f"🔍 DEBUG: After filter {i+1}: {len(passed_indices)} samples remaining")
                     else:
                         # No samples passed - clear all data
                         for key in data:
                             if isinstance(data[key], list):
                                 data[key] = []
-                        logger.info(f"🔍 DEBUG: After filter {i+1}: 0 samples remaining")
+                        logger.debug(f"🔍 DEBUG: After filter {i+1}: 0 samples remaining")
                         break
                 else:
                     # This is a mapper - transform the data
-                    logger.info(f"🔍 DEBUG: Mapper {i+1} transformed data: {len(result)} samples")
+                    logger.debug(f"🔍 DEBUG: Mapper {i+1} transformed data: {len(result)} samples")
                     # Update only the 'text' field
                     data["text"] = result
                     # Keep sample_ids and stats aligned
@@ -1422,15 +1422,15 @@ class PerformanceBenchmark:
                         data["sample_id"] = data["sample_id"][: len(result)]
                     if Fields.stats in data and len(data[Fields.stats]) != len(result):
                         data[Fields.stats] = data[Fields.stats][: len(result)]
-                    logger.info(f"🔍 DEBUG: After mapper {i+1}: {len(data.get('text', []))} samples")
+                    logger.debug(f"🔍 DEBUG: After mapper {i+1}: {len(data.get('text', []))} samples")
             else:
                 logger.warning(f"🔍 DEBUG: Filter {i+1} has no process_batched method")
 
-        logger.info(f"🔍 DEBUG: Final individual execution: {len(data.get('text', []))} samples")
-        logger.info(f"🔍 DEBUG: Final data keys: {list(data.keys())}")
-        logger.info(f"🔍 DEBUG: Final text field type: {type(data.get('text', []))}")
+        logger.debug(f"🔍 DEBUG: Final individual execution: {len(data.get('text', []))} samples")
+        logger.debug(f"🔍 DEBUG: Final data keys: {list(data.keys())}")
+        logger.debug(f"🔍 DEBUG: Final text field type: {type(data.get('text', []))}")
         if data.get("text") and len(data["text"]) > 0:
-            logger.info(f"🔍 DEBUG: Final first text sample: {data['text'][:50]}...")
+            logger.debug(f"🔍 DEBUG: Final first text sample: {data['text'][:50]}...")
 
         # SAFEGUARD: Ensure text field is always a list of strings after all filters
         if "text" in data and data["text"] and not all(isinstance(t, str) for t in data["text"]):
@@ -1450,7 +1450,7 @@ class PerformanceBenchmark:
         logger.info("🔍 Running pipeline execution for validation...")
 
         # Debug: Log all optimized operations being processed
-        logger.info(f"🔍 DEBUG: Processing {len(optimized_ops)} optimized operations in pipeline execution:")
+        logger.debug(f"🔍 DEBUG: Processing {len(optimized_ops)} optimized operations in pipeline execution:")
         for i, op_config in enumerate(optimized_ops):
             op_name = list(op_config.keys())[0]
             op_args = op_config[op_name]
@@ -1461,31 +1461,31 @@ class PerformanceBenchmark:
         test_data_with_ids = test_data.copy()
         test_data_with_ids["sample_id"] = list(range(original_length))
 
-        logger.info(f"🔍 DEBUG: Starting with {original_length} samples")
-        logger.info(f"🔍 DEBUG: Test data keys: {list(test_data_with_ids.keys())}")
-        logger.info(f"🔍 DEBUG: Text samples: {len(test_data_with_ids.get('text', []))}")
+        logger.debug(f"🔍 DEBUG: Starting with {original_length} samples")
+        logger.debug(f"🔍 DEBUG: Test data keys: {list(test_data_with_ids.keys())}")
+        logger.debug(f"🔍 DEBUG: Text samples: {len(test_data_with_ids.get('text', []))}")
 
         # Process with optimized operations
         data = test_data_with_ids
         from data_juicer.ops import load_ops
 
         for op_idx, op_config in enumerate(optimized_ops):
-            logger.info(f"🔍 DEBUG: Processing optimized op {op_idx+1}/{len(optimized_ops)}")
-            logger.info(f"🔍 DEBUG: Data before op {op_idx+1}: {len(data.get('text', []))} samples")
-            logger.info(f"🔍 DEBUG: Text field type before op {op_idx+1}: {type(data.get('text', []))}")
+            logger.debug(f"🔍 DEBUG: Processing optimized op {op_idx+1}/{len(optimized_ops)}")
+            logger.debug(f"🔍 DEBUG: Data before op {op_idx+1}: {len(data.get('text', []))} samples")
+            logger.debug(f"🔍 DEBUG: Text field type before op {op_idx+1}: {type(data.get('text', []))}")
             if data.get("text") and len(data["text"]) > 0:
-                logger.info(f"🔍 DEBUG: First text sample before op {op_idx+1}: {data['text'][0][:50]}...")
+                logger.debug(f"🔍 DEBUG: First text sample before op {op_idx+1}: {data['text'][0][:50]}...")
 
             # Special handling for fused_filter - we need to create the actual filter objects
             op_name = list(op_config.keys())[0]
-            logger.info(f"🔍 DEBUG: Op {op_idx+1} type: {op_name}")
+            logger.debug(f"🔍 DEBUG: Op {op_idx+1} type: {op_name}")
 
             if op_name == "fused_filter":
                 # Extract the fused_op_list and create individual filter objects
                 fused_op_list = op_config[op_name].get("fused_op_list", [])
                 individual_filters = []
 
-                logger.info(f"🔍 DEBUG: Fused filter contains {len(fused_op_list)} individual filters:")
+                logger.debug(f"🔍 DEBUG: Fused filter contains {len(fused_op_list)} individual filters:")
                 for filter_config in fused_op_list:
                     filter_name = list(filter_config.keys())[0]
                     filter_args = filter_config[filter_name]
@@ -1505,9 +1505,9 @@ class PerformanceBenchmark:
                     # Force sequential execution to match individual execution behavior exactly
                     # (process filters one by one in the same order as individual execution)
                     op.execution_strategy = "sequential"
-                    logger.info(f"🔍 DEBUG: Created fused filter with {len(individual_filters)} filters")
-                    logger.info(f"🔍 DEBUG: Fused filter execution strategy: {op.execution_strategy}")
-                    logger.info(f"🔍 DEBUG: Filter order: {[f._name for f in op.fused_filters]}")
+                    logger.debug(f"🔍 DEBUG: Created fused filter with {len(individual_filters)} filters")
+                    logger.debug(f"🔍 DEBUG: Fused filter execution strategy: {op.execution_strategy}")
+                    logger.debug(f"🔍 DEBUG: Filter order: {[f._name for f in op.fused_filters]}")
                 else:
                     logger.warning(f"🔍 DEBUG: Failed to create fused filter")
                     continue  # Skip if we can't create the fused filter
@@ -1516,27 +1516,27 @@ class PerformanceBenchmark:
                 loaded_ops = load_ops([op_config])
                 if loaded_ops:
                     op = loaded_ops[0]
-                    logger.info(f"🔍 DEBUG: Loaded op: {type(op).__name__}")
+                    logger.debug(f"🔍 DEBUG: Loaded op: {type(op).__name__}")
                 else:
                     logger.warning(f"🔍 DEBUG: Failed to load op from config")
                     continue  # Skip if we can't load the operation
 
             # Execute the operation
             if hasattr(op, "compute_stats_batched"):
-                logger.info(f"🔍 DEBUG: Computing stats for op {op_idx+1}...")
+                logger.debug(f"🔍 DEBUG: Computing stats for op {op_idx+1}...")
                 data = op.compute_stats_batched(data)
-                logger.info(f"🔍 DEBUG: After stats for op {op_idx+1}: {len(data.get('text', []))} samples")
+                logger.debug(f"🔍 DEBUG: After stats for op {op_idx+1}: {len(data.get('text', []))} samples")
             else:
-                logger.info(f"🔍 DEBUG: Op {op_idx+1} has no compute_stats_batched method")
+                logger.debug(f"🔍 DEBUG: Op {op_idx+1} has no compute_stats_batched method")
 
             if hasattr(op, "process_batched"):
-                logger.info(f"🔍 DEBUG: Processing op {op_idx+1}...")
+                logger.debug(f"🔍 DEBUG: Processing op {op_idx+1}...")
                 result = list(op.process_batched(data))
-                logger.info(f"🔍 DEBUG: Op {op_idx+1} result type: {type(result[0]) if result else 'None'}")
-                logger.info(f"🔍 DEBUG: Op {op_idx+1} result length: {len(result) if result else 0}")
+                logger.debug(f"🔍 DEBUG: Op {op_idx+1} result type: {type(result[0]) if result else 'None'}")
+                logger.debug(f"🔍 DEBUG: Op {op_idx+1} result length: {len(result) if result else 0}")
                 if result and len(result) > 0:
-                    logger.info(f"🔍 DEBUG: Op {op_idx+1} first result: {result[0]}")
-                    logger.info(f"🔍 DEBUG: Op {op_idx+1} first result type: {type(result[0])}")
+                    logger.debug(f"🔍 DEBUG: Op {op_idx+1} first result: {result[0]}")
+                    logger.debug(f"🔍 DEBUG: Op {op_idx+1} first result type: {type(result[0])}")
 
                 # Check if this is a filter (returns boolean) or mapper (returns transformed data)
                 # Handle both list and map objects that contain booleans
@@ -1564,8 +1564,8 @@ class PerformanceBenchmark:
                 ):
                     # This is a filter - apply boolean mask
                     mask = result
-                    logger.info(f"🔍 DEBUG: Op {op_idx+1} boolean mask: {sum(mask)}/{len(mask)} samples passed")
-                    logger.info(f"🔍 DEBUG: Op {op_idx+1} mask details: {mask[:10]}...")  # Show first 10 values
+                    logger.debug(f"🔍 DEBUG: Op {op_idx+1} boolean mask: {sum(mask)}/{len(mask)} samples passed")
+                    logger.debug(f"🔍 DEBUG: Op {op_idx+1} mask details: {mask[:10]}...")  # Show first 10 values
 
                     # Store the filter result for debugging
                     data[f"filter_result_op_{op_idx+1}"] = mask
@@ -1574,21 +1574,21 @@ class PerformanceBenchmark:
                     passed_indices = [idx for idx, passed in enumerate(mask) if passed]
                     if passed_indices:
                         # Update data to keep only passed samples
-                        logger.info(f"🔍 DEBUG: Before filtering - text field type: {type(data.get('text', []))}")
-                        logger.info(f"🔍 DEBUG: Before filtering - text field length: {len(data.get('text', []))}")
+                        logger.debug(f"🔍 DEBUG: Before filtering - text field type: {type(data.get('text', []))}")
+                        logger.debug(f"🔍 DEBUG: Before filtering - text field length: {len(data.get('text', []))}")
                         if data.get("text") and len(data["text"]) > 0:
-                            logger.info(f"🔍 DEBUG: Before filtering - first text sample: {data['text'][0][:50]}...")
+                            logger.debug(f"🔍 DEBUG: Before filtering - first text sample: {data['text'][0][:50]}...")
 
                         for key in data:
                             if isinstance(data[key], list) and len(data[key]) == len(mask):
                                 data[key] = [data[key][idx] for idx in passed_indices]
 
-                        logger.info(f"🔍 DEBUG: After filtering - text field type: {type(data.get('text', []))}")
-                        logger.info(f"🔍 DEBUG: After filtering - text field length: {len(data.get('text', []))}")
+                        logger.debug(f"🔍 DEBUG: After filtering - text field type: {type(data.get('text', []))}")
+                        logger.debug(f"🔍 DEBUG: After filtering - text field length: {len(data.get('text', []))}")
                         if data.get("text") and len(data["text"]) > 0:
-                            logger.info(f"🔍 DEBUG: After filtering - first text sample: {data['text'][0][:50]}...")
+                            logger.debug(f"🔍 DEBUG: After filtering - first text sample: {data['text'][0][:50]}...")
 
-                        logger.info(f"🔍 DEBUG: After op {op_idx+1}: {len(passed_indices)} samples remaining")
+                        logger.debug(f"🔍 DEBUG: After op {op_idx+1}: {len(passed_indices)} samples remaining")
 
                         # SAFEGUARD: Ensure text field is always a list of strings
                         if "text" in data:
@@ -1608,7 +1608,7 @@ class PerformanceBenchmark:
                         for key in data:
                             if isinstance(data[key], list):
                                 data[key] = []
-                        logger.info(f"🔍 DEBUG: After op {op_idx+1}: 0 samples remaining")
+                        logger.debug(f"🔍 DEBUG: After op {op_idx+1}: 0 samples remaining")
                         break
                 else:
                     # This is a mapper - update text data
@@ -1619,16 +1619,16 @@ class PerformanceBenchmark:
                             data["sample_id"] = data["sample_id"][: len(result)]
                         if Fields.stats in data and len(data[Fields.stats]) != len(result):
                             data[Fields.stats] = data[Fields.stats][: len(result)]
-                        logger.info(f"🔍 DEBUG: After mapper op {op_idx+1}: {len(data.get('text', []))} samples")
-                        logger.info(f"🔍 DEBUG: Data keys after mapper operation {op_idx+1}: {list(data.keys())}")
+                        logger.debug(f"🔍 DEBUG: After mapper op {op_idx+1}: {len(data.get('text', []))} samples")
+                        logger.debug(f"🔍 DEBUG: Data keys after mapper operation {op_idx+1}: {list(data.keys())}")
             else:
                 logger.warning(f"🔍 DEBUG: Op {op_idx+1} has no process_batched method")
 
-        logger.info(f"🔍 DEBUG: Final pipeline execution: {len(data.get('text', []))} samples")
-        logger.info(f"🔍 DEBUG: Final data keys: {list(data.keys())}")
-        logger.info(f"🔍 DEBUG: Final text field type: {type(data.get('text', []))}")
+        logger.debug(f"🔍 DEBUG: Final pipeline execution: {len(data.get('text', []))} samples")
+        logger.debug(f"🔍 DEBUG: Final data keys: {list(data.keys())}")
+        logger.debug(f"🔍 DEBUG: Final text field type: {type(data.get('text', []))}")
         if data.get("text") and len(data["text"]) > 0:
-            logger.info(f"🔍 DEBUG: Final first text sample: {data['text'][:50]}...")
+            logger.debug(f"🔍 DEBUG: Final first text sample: {data['text'][:50]}...")
 
         # Save pipeline execution results
         pipeline_results_file = os.path.join(validation_dir, "pipeline_execution_results.jsonl")
@@ -1663,21 +1663,21 @@ class PerformanceBenchmark:
         logger.info(f"💾 Saving results to {filepath}")
 
         # Debug data structure
-        logger.info(f"🔍 DEBUG: Data keys: {list(data.keys())}")
-        logger.info(f"🔍 DEBUG: Data structure: {data}")
+        logger.debug(f"🔍 DEBUG: Data keys: {list(data.keys())}")
+        logger.debug(f"🔍 DEBUG: Data structure: {data}")
 
         if "text" in data:
-            logger.info(f"🔍 DEBUG: Text field type: {type(data['text'])}")
+            logger.debug(f"🔍 DEBUG: Text field type: {type(data['text'])}")
             logger.info(
                 f"🔍 DEBUG: Text field length: {len(data['text']) if hasattr(data['text'], '__len__') else 'N/A'}"
             )
             if hasattr(data["text"], "__len__") and len(data["text"]) > 0:
-                logger.info(f"🔍 DEBUG: First text sample: {data['text'][0]}")
-                logger.info(f"🔍 DEBUG: First text sample type: {type(data['text'][0])}")
+                logger.debug(f"🔍 DEBUG: First text sample: {data['text'][0]}")
+                logger.debug(f"🔍 DEBUG: First text sample type: {type(data['text'][0])}")
 
         with open(filepath, "w", encoding="utf-8") as f:
             if "text" in data and "sample_id" in data:
-                logger.info("🔍 DEBUG: Using text and sample_id fields")
+                logger.debug("🔍 DEBUG: Using text and sample_id fields")
                 for i, (text, sample_id) in enumerate(zip(data["text"], data["sample_id"])):
                     result = {
                         "sample_id": self._convert_numpy_types(sample_id),
@@ -1696,7 +1696,7 @@ class PerformanceBenchmark:
 
                     f.write(json.dumps(result, ensure_ascii=False) + "\n")
             else:
-                logger.info("🔍 DEBUG: Using fallback - text field only")
+                logger.debug("🔍 DEBUG: Using fallback - text field only")
                 # Fallback if data structure is different
                 for i, text in enumerate(data.get("text", [])):
                     result = {"sample_id": i, "text": self._convert_numpy_types(text), "final_index": i}
@@ -2223,52 +2223,52 @@ class PerformanceBenchmark:
         logger.info("🔍 Running individual mixed operations execution for validation...")
 
         # Debug initial test_data
-        logger.info(f"🔍 DEBUG: Initial test_data keys: {list(test_data.keys())}")
-        logger.info(f"🔍 DEBUG: Initial test_data structure: {test_data}")
+        logger.debug(f"🔍 DEBUG: Initial test_data keys: {list(test_data.keys())}")
+        logger.debug(f"🔍 DEBUG: Initial test_data structure: {test_data}")
         if "text" in test_data:
-            logger.info(f"🔍 DEBUG: Initial text field type: {type(test_data['text'])}")
+            logger.debug(f"🔍 DEBUG: Initial text field type: {type(test_data['text'])}")
             logger.info(
                 f"🔍 DEBUG: Initial text field length: {len(test_data['text']) if hasattr(test_data['text'], '__len__') else 'N/A'}"
             )
             if hasattr(test_data["text"], "__len__") and len(test_data["text"]) > 0:
-                logger.info(f"🔍 DEBUG: Initial first text sample: {test_data['text'][0]}")
-                logger.info(f"🔍 DEBUG: Initial first text sample type: {type(test_data['text'][0])}")
+                logger.debug(f"🔍 DEBUG: Initial first text sample: {test_data['text'][0]}")
+                logger.debug(f"🔍 DEBUG: Initial first text sample type: {type(test_data['text'][0])}")
 
         # Add sample IDs to test data
         original_length = get_dataset_length(test_data)
         test_data_with_ids = test_data.copy()
         test_data_with_ids["sample_id"] = list(range(original_length))
 
-        logger.info(f"🔍 DEBUG: Starting with {original_length} samples")
-        logger.info(f"🔍 DEBUG: Test data keys: {list(test_data_with_ids.keys())}")
-        logger.info(f"🔍 DEBUG: Text samples: {len(test_data_with_ids.get('text', []))}")
+        logger.debug(f"🔍 DEBUG: Starting with {original_length} samples")
+        logger.debug(f"🔍 DEBUG: Test data keys: {list(test_data_with_ids.keys())}")
+        logger.debug(f"🔍 DEBUG: Text samples: {len(test_data_with_ids.get('text', []))}")
 
         # Process through all operations
         data = test_data_with_ids
         for i, op in enumerate(operations):
             op_type = type(op).__name__
-            logger.info(f"🔍 DEBUG: Processing operation {i+1}/{len(operations)}: {op_type}")
-            logger.info(f"🔍 DEBUG: Data before operation {i+1}: {len(data.get('text', []))} samples")
-            logger.info(f"🔍 DEBUG: Data keys before operation {i+1}: {list(data.keys())}")
+            logger.debug(f"🔍 DEBUG: Processing operation {i+1}/{len(operations)}: {op_type}")
+            logger.debug(f"🔍 DEBUG: Data before operation {i+1}: {len(data.get('text', []))} samples")
+            logger.debug(f"🔍 DEBUG: Data keys before operation {i+1}: {list(data.keys())}")
 
             if hasattr(op, "compute_stats_batched"):
                 data = op.compute_stats_batched(data)
-                logger.info(f"🔍 DEBUG: After stats for operation {i+1}: {len(data.get('text', []))} samples")
-                logger.info(f"🔍 DEBUG: Data keys after stats for operation {i+1}: {list(data.keys())}")
+                logger.debug(f"🔍 DEBUG: After stats for operation {i+1}: {len(data.get('text', []))} samples")
+                logger.debug(f"🔍 DEBUG: Data keys after stats for operation {i+1}: {list(data.keys())}")
 
             if hasattr(op, "process_batched"):
                 result = list(op.process_batched(data))
-                logger.info(f"🔍 DEBUG: Operation {i+1} result type: {type(result[0]) if result else 'None'}")
-                logger.info(f"🔍 DEBUG: Operation {i+1} result length: {len(result) if result else 0}")
+                logger.debug(f"🔍 DEBUG: Operation {i+1} result type: {type(result[0]) if result else 'None'}")
+                logger.debug(f"🔍 DEBUG: Operation {i+1} result length: {len(result) if result else 0}")
                 if result and len(result) > 0:
-                    logger.info(f"🔍 DEBUG: Operation {i+1} first result: {result[0]}")
-                    logger.info(f"🔍 DEBUG: Operation {i+1} first result type: {type(result[0])}")
+                    logger.debug(f"🔍 DEBUG: Operation {i+1} first result: {result[0]}")
+                    logger.debug(f"🔍 DEBUG: Operation {i+1} first result type: {type(result[0])}")
 
                 # Check if this is a filter (returns boolean) or mapper (returns transformed data)
                 if result and isinstance(result[0], bool):
                     # This is a filter - apply boolean mask
                     mask = result
-                    logger.info(f"🔍 DEBUG: Operation {i+1} boolean mask: {sum(mask)}/{len(mask)} samples passed")
+                    logger.debug(f"🔍 DEBUG: Operation {i+1} boolean mask: {sum(mask)}/{len(mask)} samples passed")
                     # Keep only samples that passed the filter
                     passed_indices = [idx for idx, passed in enumerate(mask) if passed]
                     if passed_indices:
@@ -2276,13 +2276,13 @@ class PerformanceBenchmark:
                         for key in data:
                             if isinstance(data[key], list) and len(data[key]) == len(mask):
                                 data[key] = [data[key][idx] for idx in passed_indices]
-                        logger.info(f"🔍 DEBUG: After operation {i+1}: {len(passed_indices)} samples remaining")
+                        logger.debug(f"🔍 DEBUG: After operation {i+1}: {len(passed_indices)} samples remaining")
                     else:
                         # No samples passed - clear all data
                         for key in data:
                             if isinstance(data[key], list):
                                 data[key] = []
-                        logger.info(f"🔍 DEBUG: After operation {i+1}: 0 samples remaining")
+                        logger.debug(f"🔍 DEBUG: After operation {i+1}: 0 samples remaining")
                         break
                 else:
                     # This is a mapper - update text data
@@ -2293,11 +2293,11 @@ class PerformanceBenchmark:
                             data["sample_id"] = data["sample_id"][: len(result)]
                         if Fields.stats in data and len(data[Fields.stats]) != len(result):
                             data[Fields.stats] = data[Fields.stats][: len(result)]
-                        logger.info(f"🔍 DEBUG: After mapper operation {i+1}: {len(data.get('text', []))} samples")
-                        logger.info(f"🔍 DEBUG: Data keys after mapper operation {i+1}: {list(data.keys())}")
+                        logger.debug(f"🔍 DEBUG: After mapper operation {i+1}: {len(data.get('text', []))} samples")
+                        logger.debug(f"🔍 DEBUG: Data keys after mapper operation {i+1}: {list(data.keys())}")
 
-        logger.info(f"🔍 DEBUG: Final individual execution: {len(data.get('text', []))} samples")
-        logger.info(f"🔍 DEBUG: Final data keys: {list(data.keys())}")
+        logger.debug(f"🔍 DEBUG: Final individual execution: {len(data.get('text', []))} samples")
+        logger.debug(f"🔍 DEBUG: Final data keys: {list(data.keys())}")
 
         # Save individual execution results
         individual_results_file = os.path.join(validation_dir, "individual_execution_results.jsonl")
@@ -2313,29 +2313,29 @@ class PerformanceBenchmark:
         logger.info("🔍 Running pipeline mixed operations execution for validation...")
 
         # Debug initial test_data
-        logger.info(f"🔍 DEBUG: Pipeline initial test_data keys: {list(test_data.keys())}")
-        logger.info(f"🔍 DEBUG: Pipeline initial test_data structure: {test_data}")
+        logger.debug(f"🔍 DEBUG: Pipeline initial test_data keys: {list(test_data.keys())}")
+        logger.debug(f"🔍 DEBUG: Pipeline initial test_data structure: {test_data}")
         if "text" in test_data:
-            logger.info(f"🔍 DEBUG: Pipeline initial text field type: {type(test_data['text'])}")
+            logger.debug(f"🔍 DEBUG: Pipeline initial text field type: {type(test_data['text'])}")
             logger.info(
                 f"🔍 DEBUG: Pipeline initial text field length: {len(test_data['text']) if hasattr(test_data['text'], '__len__') else 'N/A'}"
             )
             if hasattr(test_data["text"], "__len__") and len(test_data["text"]) > 0:
-                logger.info(f"🔍 DEBUG: Pipeline initial first text sample: {test_data['text'][0]}")
-                logger.info(f"🔍 DEBUG: Pipeline initial first text sample type: {type(test_data['text'][0])}")
+                logger.debug(f"🔍 DEBUG: Pipeline initial first text sample: {test_data['text'][0]}")
+                logger.debug(f"🔍 DEBUG: Pipeline initial first text sample type: {type(test_data['text'][0])}")
 
         # Add sample IDs to test data
         original_length = get_dataset_length(test_data)
         test_data_with_ids = test_data.copy()
         test_data_with_ids["sample_id"] = list(range(original_length))
 
-        logger.info(f"🔍 DEBUG: Pipeline starting with {original_length} samples")
-        logger.info(f"🔍 DEBUG: Pipeline test data keys: {list(test_data_with_ids.keys())}")
-        logger.info(f"🔍 DEBUG: Pipeline text samples: {len(test_data_with_ids.get('text', []))}")
+        logger.debug(f"🔍 DEBUG: Pipeline starting with {original_length} samples")
+        logger.debug(f"🔍 DEBUG: Pipeline test data keys: {list(test_data_with_ids.keys())}")
+        logger.debug(f"🔍 DEBUG: Pipeline text samples: {len(test_data_with_ids.get('text', []))}")
 
         # Convert AST back to config for pipeline execution
         config = self._convert_ast_to_config(ast)
-        logger.info(f"🔍 DEBUG: Pipeline config: {config}")
+        logger.debug(f"🔍 DEBUG: Pipeline config: {config}")
 
         # Create pipeline optimizer and optimize
         optimizer = PipelineOptimizer(strategies=[FilterFusionStrategy(), MapperFusionStrategy()])
@@ -2343,43 +2343,43 @@ class PerformanceBenchmark:
         # Create AST from config
         ast2 = PipelineAST()
         ast2.build_from_config(config)
-        logger.info("🔍 DEBUG: Pipeline AST created.")
+        logger.debug("🔍 DEBUG: Pipeline AST created.")
 
         # Optimize AST
         optimized_ast = optimizer.optimize(ast2)
-        logger.info("🔍 DEBUG: Pipeline optimized AST created.")
+        logger.debug("🔍 DEBUG: Pipeline optimized AST created.")
 
         # Convert optimized AST back to config
         optimized_config = self._convert_ast_to_config(optimized_ast)
-        logger.info(f"🔍 DEBUG: Pipeline optimized config: {optimized_config}")
+        logger.debug(f"🔍 DEBUG: Pipeline optimized config: {optimized_config}")
 
         # Load optimized operations
         optimized_ops = load_ops(optimized_config)
-        logger.info(f"🔍 DEBUG: Pipeline loaded {len(optimized_ops)} optimized operations")
+        logger.debug(f"🔍 DEBUG: Pipeline loaded {len(optimized_ops)} optimized operations")
 
         # Process with optimized operations
         data = test_data_with_ids
-        logger.info(f"🔍 DEBUG: Pipeline data before processing: {len(data.get('text', []))} samples")
-        logger.info(f"🔍 DEBUG: Pipeline data keys before processing: {list(data.keys())}")
+        logger.debug(f"🔍 DEBUG: Pipeline data before processing: {len(data.get('text', []))} samples")
+        logger.debug(f"🔍 DEBUG: Pipeline data keys before processing: {list(data.keys())}")
 
         for i, op in enumerate(optimized_ops):
             op_type = type(op).__name__
-            logger.info(f"🔍 DEBUG: Pipeline processing operation {i+1}/{len(optimized_ops)}: {op_type}")
-            logger.info(f"🔍 DEBUG: Pipeline data before operation {i+1}: {len(data.get('text', []))} samples")
-            logger.info(f"🔍 DEBUG: Pipeline data keys before operation {i+1}: {list(data.keys())}")
+            logger.debug(f"🔍 DEBUG: Pipeline processing operation {i+1}/{len(optimized_ops)}: {op_type}")
+            logger.debug(f"🔍 DEBUG: Pipeline data before operation {i+1}: {len(data.get('text', []))} samples")
+            logger.debug(f"🔍 DEBUG: Pipeline data keys before operation {i+1}: {list(data.keys())}")
 
             if hasattr(op, "compute_stats_batched"):
                 data = op.compute_stats_batched(data)
-                logger.info(f"🔍 DEBUG: Pipeline after stats for operation {i+1}: {len(data.get('text', []))} samples")
-                logger.info(f"🔍 DEBUG: Pipeline data keys after stats for operation {i+1}: {list(data.keys())}")
+                logger.debug(f"🔍 DEBUG: Pipeline after stats for operation {i+1}: {len(data.get('text', []))} samples")
+                logger.debug(f"🔍 DEBUG: Pipeline data keys after stats for operation {i+1}: {list(data.keys())}")
 
             if hasattr(op, "process_batched"):
                 result = list(op.process_batched(data))
-                logger.info(f"🔍 DEBUG: Pipeline operation {i+1} result type: {type(result[0]) if result else 'None'}")
-                logger.info(f"🔍 DEBUG: Pipeline operation {i+1} result length: {len(result) if result else 0}")
+                logger.debug(f"🔍 DEBUG: Pipeline operation {i+1} result type: {type(result[0]) if result else 'None'}")
+                logger.debug(f"🔍 DEBUG: Pipeline operation {i+1} result length: {len(result) if result else 0}")
                 if result and len(result) > 0:
-                    logger.info(f"🔍 DEBUG: Pipeline operation {i+1} first result: {result[0]}")
-                    logger.info(f"🔍 DEBUG: Pipeline operation {i+1} first result type: {type(result[0])}")
+                    logger.debug(f"🔍 DEBUG: Pipeline operation {i+1} first result: {result[0]}")
+                    logger.debug(f"🔍 DEBUG: Pipeline operation {i+1} first result type: {type(result[0])}")
 
                 # Check if this is a filter (returns boolean) or mapper (returns transformed data)
                 if result and isinstance(result[0], bool):
@@ -2403,7 +2403,7 @@ class PerformanceBenchmark:
                         for key in data:
                             if isinstance(data[key], list):
                                 data[key] = []
-                        logger.info(f"🔍 DEBUG: Pipeline after operation {i+1}: 0 samples remaining")
+                        logger.debug(f"🔍 DEBUG: Pipeline after operation {i+1}: 0 samples remaining")
                         break
                 else:
                     # This is a mapper - update text data
@@ -2417,10 +2417,10 @@ class PerformanceBenchmark:
                         logger.info(
                             f"🔍 DEBUG: Pipeline after mapper operation {i+1}: {len(data.get('text', []))} samples"
                         )
-                        logger.info(f"🔍 DEBUG: Pipeline data keys after mapper operation {i+1}: {list(data.keys())}")
+                        logger.debug(f"🔍 DEBUG: Pipeline data keys after mapper operation {i+1}: {list(data.keys())}")
 
-        logger.info(f"🔍 DEBUG: Pipeline final execution: {len(data.get('text', []))} samples")
-        logger.info(f"🔍 DEBUG: Pipeline final data keys: {list(data.keys())}")
+        logger.debug(f"🔍 DEBUG: Pipeline final execution: {len(data.get('text', []))} samples")
+        logger.debug(f"🔍 DEBUG: Pipeline final data keys: {list(data.keys())}")
 
         # Save pipeline execution results
         pipeline_results_file = os.path.join(validation_dir, "pipeline_execution_results.jsonl")
