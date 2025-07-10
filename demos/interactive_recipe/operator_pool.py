@@ -62,10 +62,10 @@ class OperatorArg:
         self.v_max = state.get('max', None)
 
         if self.v_min is not None:
-            self.v_check(self.v_min, type_only=True)
+            self.v_min = self.v_check(self.v_min, type_only=True)
         if self.v_max is not None:
-            self.v_check(self.v_max, type_only=True)
-        self.v_check(self.v_default)
+            self.v_max = self.v_check(self.v_max, type_only=True)
+        self.v_default = self.v_check(self.v_default)
         self.v = state.get('v', self.v_default)
 
     @property
@@ -95,14 +95,17 @@ class OperatorArg:
                 raise ValueError("OperatorArg __init__: v must be a list.")
             for vv in v:
                 self.v_check(vv, type_only=type_only, element_check=True)
-            return
+            return v
         error = ValueError(
             f"OperatorArg v_check: type mismatch when check {self.name}={v}, \
             expected {self.v_type} but got {type(v)}."
         )
         if self.v_type == float:
             if not isinstance(v, (int, float)):
-                raise error
+                try:
+                    v = float(v)
+                except:
+                    raise error
             v = float(v)
         elif self.v_type == int:
             if isinstance(v, float):
@@ -110,12 +113,15 @@ class OperatorArg:
                     raise error
                 v = int(v)
             elif not isinstance(v, int):
-                raise error
+                try:
+                    v = int(float(v))
+                except:
+                    raise error
         else:
             if not isinstance(v, self.v_type):
                 raise error 
         if type_only:
-            return
+            return v
         if self.v_options is not None and v not in self.v_options:
             raise ValueError(f"OperatorArg v_check: {self.name}={v} is not in options {self.v_options}.")
         if self.v_min is not None and v < self.v_min:
@@ -133,6 +139,7 @@ class OperatorArg:
         #     if query_key in self.op.args and v < self.op.args[query_key].v:
         #         raise ValueError(f"OperatorArg v_check: \
         #                            {self.name}={v} is less than {query_key}={self.op.args[query_key].v}")
+        return v
 
     @property
     def stats_apply(self):
@@ -174,7 +181,7 @@ class OperatorArg:
         return l
 
     def set_v(self, v):
-        self.v_check(v)
+        v = self.v_check(v)
         self.v = v
         self.save()
 
@@ -215,6 +222,7 @@ class Operator:
             raise ValueError(f"Operator: __init__: {self.name} is not a valid operator.")
         self.desc = OP_DICT[self.name].get('class_desc', "no description")
         args = state.get('args', {})
+        logger.info(f"Operator: __init__: {self.name} args: {args}")
         arg_descriptions = OP_DICT[self.name]['arguments'].split('\n')
         arg_desc_dict = {}
         for line in arg_descriptions:

@@ -16,7 +16,7 @@ alphanumeric_filter:
   args:
     max_ratio:
       default: 9007199254740991
-      type: int
+      type: float
     min_ratio:
       default: 0.25
       type: float
@@ -52,7 +52,7 @@ audio_nmf_snr_filter:
       type: str
     max_snr:
       default: 9007199254740991
-      type: int
+      type: float
     min_snr:
       default: 0
       type: int
@@ -601,7 +601,7 @@ specified_numeric_field_filter:
       type: str
     max_value:
       default: 9007199254740991
-      type: int
+      type: float
     min_value:
       default: -9007199254740991
       type: int
@@ -698,7 +698,7 @@ video_duration_filter:
       type: str
     max_duration:
       default: 9007199254740991
-      type: int
+      type: float
     min_duration:
       default: 0
       type: int

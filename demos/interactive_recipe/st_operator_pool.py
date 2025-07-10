@@ -426,6 +426,9 @@ class StOperatorPool(OperatorPool):
                         # 2. Add all operators from the selected recipe
                         for op_name, op_config_to_add in recipe.operators.items():
                             self.add_op(op_name, op_config_to_add)
+                            for arg_name, arg_details in op_config_to_add.get('args', {}).items():
+                                if arg_details.get("v") is not None:
+                                    self.pool[op_name].args[arg_name].set_v(arg_details["v"])
                         
                         # 3. Sync state, close dialog, and refresh the app
                         self.st_sync()
