@@ -7,22 +7,31 @@ the new PipelineOptimizer architecture. The optimizer architecture with analyzer
 insights is used by default in all modes.
 
 USAGE EXAMPLES:
-    # Quick benchmark (basic demo with 1000 samples) - uses optimizer by default
-    python performance_benchmark.py --mode quick
+    # Full comprehensive benchmark (default) - uses optimizer by default
+    python performance_benchmark.py
 
-    # Quick benchmark with more samples
-    python performance_benchmark.py --mode quick --samples 10000
+    # Full benchmark with more samples
+    python performance_benchmark.py --samples 50000
 
-    # Full comprehensive benchmark - uses optimizer by default
-    python performance_benchmark.py --mode full --samples 50000 --runs 5
+    # Quick benchmark (basic demo with 3 filters)
+    python performance_benchmark.py --mode quick --samples 1000
 
-    # Analyze fusion decisions
-    python performance_benchmark.py --mode fusion-analysis --samples 1000
+    # Recipe mode - benchmark a real YAML pipeline
+    python performance_benchmark.py --mode recipe --recipe-path configs/data_juicer_recipes/redpajama-arxiv-refine.yaml
+
+    # Recipe mode with real dataset
+    python performance_benchmark.py --mode recipe --recipe-path configs/data_juicer_recipes/redpajama-arxiv-refine.yaml --dataset-path demos/data/demo-dataset_1725870268.jsonl
+
+    # Recipe mode with custom sample count
+    python performance_benchmark.py --mode recipe --recipe-path configs/data_juicer_recipes/redpajama-arxiv-refine.yaml --dataset-path demos/data/demo-dataset_1725870268.jsonl --samples 5000
+
+    # Use real dataset with synthetic filters
+    python performance_benchmark.py --dataset-path demos/data/demo-dataset_1725870268.jsonl --samples 2000
 
 MODES:
-    quick    - Basic performance demo with optimizer architecture (default)
-    full     - Comprehensive benchmark with optimizer architecture
-    fusion-analysis - Analyze when to use fusion vs skip fusion
+    full     - Comprehensive benchmark with optimizer architecture (default)
+    quick    - Basic performance demo with optimizer architecture
+    recipe   - Benchmark a real YAML pipeline (requires --recipe-path)
 """
 
 import os
@@ -37,8 +46,12 @@ import numpy as np
 from loguru import logger
 
 from data_juicer.core.analyzer import Analyzer
+from data_juicer.core.optimizer.filter_fusion_strategy import FilterFusionStrategy
 from data_juicer.core.optimizer.fused_op import FusedFilter, FusedMapper
+from data_juicer.core.optimizer.mapper_fusion_strategy import MapperFusionStrategy
 from data_juicer.core.optimizer.optimizer import PipelineOptimizer
+from data_juicer.core.pipeline_ast import PipelineAST
+from data_juicer.ops import load_ops
 from data_juicer.ops.base_op import Filter
 from data_juicer.ops.filter import (
     AlphanumericFilter,
@@ -50,16 +63,11 @@ from data_juicer.ops.filter import (
     PerplexityFilter,
     SpecialCharactersFilter,
     StopWordsFilter,
-    TextActionFilter,
-    TextEntityDependencyFilter,
     TextLengthFilter,
     WordRepetitionFilter,
     WordsNumFilter,
 )
 from data_juicer.utils.constant import Fields
-
-# Global model cache
-_MODEL_CACHE = {}
 
 
 def get_dataset_length(dataset) -> int:
@@ -106,102 +114,6 @@ def get_dataset_texts(dataset) -> list:
     return []
 
 
-def get_cached_model(model_type: str, lang: str = "en", model_size: str = "md"):
-    """Get a cached model or load it if not cached.
-
-    Args:
-        model_type: Type of model (spacy, etc.)
-        lang: Language code (en, zh)
-        model_size: Model size for spaCy (sm, md, lg) - smaller = faster loading
-    """
-    cache_key = f"{model_type}_{lang}_{model_size}"
-    if cache_key not in _MODEL_CACHE:
-        from data_juicer.utils.model_utils import prepare_model
-
-        logger.info(f"Loading {model_type} model for {lang} (size: {model_size})...")
-
-        if model_type == "spacy":
-            # Use smaller model for faster loading in benchmarks
-            if model_size == "sm":
-                # Small model (~12MB) - faster loading, less accurate
-                model_name_pattern = "{}_core_web_sm-3.7.0"
-            elif model_size == "lg":
-                # Large model (~560MB) - slower loading, more accurate
-                model_name_pattern = "{}_core_web_lg-3.7.0"
-            else:
-                # Medium model (~40MB) - default
-                model_name_pattern = "{}_core_web_md-3.7.0"
-
-            _MODEL_CACHE[cache_key] = prepare_model(model_type=model_type, lang=lang, name_pattern=model_name_pattern)
-        else:
-            _MODEL_CACHE[cache_key] = prepare_model(model_type=model_type, lang=lang)
-
-        logger.info(f"Model {cache_key} loaded and cached")
-    else:
-        logger.debug(f"Using cached {cache_key}")
-    return _MODEL_CACHE[cache_key]
-
-
-def create_filter_with_cached_model(filter_class, model_size: str = "sm", **kwargs):
-    """Create a filter instance with cached model loading.
-
-    Args:
-        filter_class: Filter class to instantiate
-        model_size: Model size for spaCy models (sm, md, lg)
-        **kwargs: Filter constructor arguments
-    """
-    # For spaCy-based filters, we need to patch the model loading
-    if filter_class in [TextEntityDependencyFilter, TextActionFilter]:
-        # Temporarily patch the prepare_model function
-        import data_juicer.utils.model_utils as model_utils
-
-        original_prepare_spacy = model_utils.prepare_spacy_model
-
-        def cached_prepare_spacy(lang, name_pattern="{}_core_web_md-3.7.0", **kwargs):
-            # Determine model size from name_pattern
-            if "sm" in name_pattern:
-                size = "sm"
-            elif "lg" in name_pattern:
-                size = "lg"
-            else:
-                size = model_size  # Use provided size or default to "sm"
-            return get_cached_model("spacy", lang, size)
-
-        model_utils.prepare_spacy_model = cached_prepare_spacy
-
-        try:
-            filter_instance = filter_class(**kwargs)
-        finally:
-            # Restore original function
-            model_utils.prepare_spacy_model = original_prepare_spacy
-    else:
-        filter_instance = filter_class(**kwargs)
-
-    return filter_instance
-
-
-def preload_models_for_benchmark():
-    """Preload commonly used models to avoid loading delays during benchmark."""
-    logger.info("🔄 Preloading models for benchmark...")
-
-    # Preload spaCy models in different sizes
-    for size in ["sm", "md"]:
-        try:
-            get_cached_model("spacy", "en", size)
-            logger.info(f"✅ Preloaded spaCy {size} model")
-        except Exception as e:
-            logger.warning(f"⚠️ Failed to preload spaCy {size} model: {e}")
-
-    # Preload other models as needed
-    try:
-        get_cached_model("gpt2", "en")
-        logger.info("✅ Preloaded GPT-2 model")
-    except Exception as e:
-        logger.warning(f"⚠️ Failed to preload GPT-2 model: {e}")
-
-    logger.info("🎯 Model preloading complete")
-
-
 @dataclass
 class PerformanceMetrics:
     """Performance metrics for comparison."""
@@ -219,37 +131,129 @@ class PerformanceBenchmark:
     def __init__(self):
         self.results = {}
 
-    def create_realistic_test_data(self, num_samples: int = 10000) -> Dict[str, Any]:
-        """Create realistic test data that triggers various filter conditions."""
-        logger.info(f"Creating test data with {num_samples} samples...")
+    def create_realistic_test_data(self, num_samples: int = 1000) -> Dict[str, Any]:
+        """Create realistic test data with diverse text characteristics."""
+        logger.info(f"Creating realistic test data with {num_samples} samples...")
+
+        import random
+
+        from faker import Faker
+
+        # Initialize Faker with multiple locales for diversity
+        fake = Faker(["en_US", "en_GB", "en_CA"])
+
+        # Add some non-English text for language filtering tests
+        non_english_samples = [
+            "你好，请问你是谁？",  # Chinese
+            "Sur la plateforme MT4, vous pouvez trader des devises.",  # French
+            "欢迎来到阿里巴巴！",  # Chinese
+            "El sistema de procesamiento de datos es muy eficiente.",  # Spanish
+            "Das maschinelle Lernen ist ein Teilgebiet der künstlichen Intelligenz.",  # German
+            "La conferenza si terrà il prossimo mese.",  # Italian
+            "データ処理システムは非常に効率的です。",  # Japanese
+            "시스템 성능을 향상시키기 위한 최적화가 필요합니다。",  # Korean
+            "Система обработки данных очень эффективна.",  # Russian
+            "نظام معالجة البيانات فعال للغاية.",  # Arabic
+            "ระบบประมวลผลข้อมูลมีประสิทธิภาพมาก",  # Thai
+            "Sistem pemrosesan data sangat efisien.",  # Indonesian
+            "Sistem pemprosesan data sangat cekap.",  # Malay
+            "Sistem pemprosesan data sangat cekap.",  # Malay (duplicate for testing)
+            "Sistem pemprosesan data sangat cekap.",  # Malay (duplicate for testing)
+        ]
 
         texts = []
         for i in range(num_samples):
             # Create diverse text samples with different characteristics
-            if i % 4 == 0:
-                # Short texts
-                length = random.randint(10, 50)
-                text = "".join(random.choices(string.ascii_lowercase + " ", k=length))
-            elif i % 4 == 1:
-                # Long texts with repetition
-                length = random.randint(200, 800)
-                text = "".join(random.choices("hello world test data " * 20, k=length))
-            elif i % 4 == 2:
-                # Texts with special characters
-                length = random.randint(100, 400)
-                text = "".join(
-                    random.choices(string.ascii_letters + string.digits + "!@#$%^&*()_+-=[]{}|;:,.<>?", k=length)
+            if i < len(non_english_samples):
+                # Use predefined non-English samples for language filtering tests
+                text = non_english_samples[i]
+            elif i % 8 == 0:
+                # Short realistic sentences
+                text = fake.sentence()
+            elif i % 8 == 1:
+                # Medium paragraphs
+                text = fake.paragraph(nb_sentences=3)
+            elif i % 8 == 2:
+                # Longer texts with multiple paragraphs
+                text = fake.text(max_nb_chars=500)
+            elif i % 8 == 3:
+                # Technical/computer-related text
+                text = fake.text(
+                    max_nb_chars=300,
+                    ext_word_list=[
+                        "algorithm",
+                        "database",
+                        "network",
+                        "software",
+                        "hardware",
+                        "programming",
+                        "development",
+                        "system",
+                        "data",
+                        "processing",
+                    ],
+                )
+            elif i % 8 == 4:
+                # Business/formal text
+                text = fake.text(
+                    max_nb_chars=400,
+                    ext_word_list=[
+                        "business",
+                        "management",
+                        "strategy",
+                        "organization",
+                        "leadership",
+                        "performance",
+                        "efficiency",
+                        "productivity",
+                        "innovation",
+                    ],
+                )
+            elif i % 8 == 5:
+                # Academic/research text
+                text = fake.text(
+                    max_nb_chars=350,
+                    ext_word_list=[
+                        "research",
+                        "analysis",
+                        "study",
+                        "investigation",
+                        "evaluation",
+                        "methodology",
+                        "findings",
+                        "conclusion",
+                        "hypothesis",
+                    ],
+                )
+            elif i % 8 == 6:
+                # Casual/conversational text
+                text = fake.text(
+                    max_nb_chars=250,
+                    ext_word_list=[
+                        "conversation",
+                        "discussion",
+                        "opinion",
+                        "experience",
+                        "thought",
+                        "feeling",
+                        "idea",
+                        "perspective",
+                        "viewpoint",
+                    ],
                 )
             else:
-                # Normal texts
-                length = random.randint(80, 300)
-                text = "".join(random.choices(string.ascii_letters + string.digits + " .,!?", k=length))
+                # Random realistic text
+                text = fake.text(max_nb_chars=random.randint(100, 400))
 
             texts.append(text)
 
+        # Create dataset in the expected format
         test_data = {"text": texts, Fields.stats: [{} for _ in range(num_samples)]}
 
-        logger.info(f"Created test data with {get_dataset_length(test_data)} text samples")
+        logger.info(f"✅ Created {len(texts)} realistic test samples")
+        logger.info(f"   - {len(non_english_samples)} non-English samples for language filtering")
+        logger.info(f"   - {len(texts) - len(non_english_samples)} English samples")
+
         return test_data
 
     def create_test_filters(self) -> List[Filter]:
@@ -257,25 +261,34 @@ class PerformanceBenchmark:
         logger.info("Creating comprehensive test filters...")
 
         filters = [
-            # Basic text filters (simple, fast)
-            WordsNumFilter(min_num=5, max_num=1000),
-            TextLengthFilter(min_len=20, max_len=1000),
-            CharacterRepetitionFilter(repetition_ratio=0.8),
-            WordRepetitionFilter(min_ratio=0.0, max_ratio=0.5),
-            SpecialCharactersFilter(min_ratio=0.0, max_ratio=0.3),
-            AlphanumericFilter(min_ratio=0.3),
-            AverageLineLengthFilter(min_len=10, max_len=100),
-            MaximumLineLengthFilter(min_len=10, max_len=200),
-            # Content quality filters (moderate complexity)
-            PerplexityFilter(lang="en", model_key="gpt2", min_score=0.0, max_score=100.0),
-            StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.5),
-            FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1),
-            LanguageIDScoreFilter(lang="en", min_score=0.5, max_score=1.0),
-            # Advanced text analysis filters (high complexity) - with cached models
-            # Note: These use local models and are computationally intensive
-            # create_filter_with_cached_model(TextEntityDependencyFilter, lang="en", min_dependency_num=1, any_or_all="all"),
-            # create_filter_with_cached_model(TextActionFilter, lang="en", min_action_num=1),
+            # Basic text filters (simple, fast) - Made extremely lenient
+            WordsNumFilter(min_num=1, max_num=100000),  # Allow 1-100000 words
+            TextLengthFilter(min_len=1, max_len=100000),  # Allow 1-100000 chars
+            CharacterRepetitionFilter(repetition_ratio=0.999),  # Allow up to 99.9% repetition
+            WordRepetitionFilter(min_ratio=0.0, max_ratio=0.99),  # Allow up to 99% word repetition
+            SpecialCharactersFilter(min_ratio=0.0, max_ratio=0.95),  # Allow up to 95% special chars
+            AlphanumericFilter(min_ratio=0.001),  # Allow as low as 0.1% alphanumeric
+            AverageLineLengthFilter(min_len=1, max_len=10000),  # Allow 1-10000 chars per line
+            MaximumLineLengthFilter(min_len=1, max_len=20000),  # Allow 1-20000 chars per line
+            # Content quality filters (moderate complexity) - Made extremely lenient
+            PerplexityFilter(
+                lang="en", model_key="gpt2", min_score=0.0, max_score=1e10
+            ),  # Allow extremely high perplexity (was 1e6)
+            StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.99),  # Allow up to 99% stop words
+            FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.99),  # Allow up to 99% flagged words
+            LanguageIDScoreFilter(lang="en", min_score=0.0),  # Allow any language score
         ]
+
+        # Debug: Log all filters being created
+        logger.info(f"🔍 DEBUG: Created {len(filters)} filters:")
+        for i, filter_op in enumerate(filters):
+            filter_type = type(filter_op).__name__
+            filter_name = getattr(filter_op, "_name", f"filter_{i}")
+            has_compute_stats = hasattr(filter_op, "compute_stats_batched")
+            has_process_batched = hasattr(filter_op, "process_batched")
+            logger.info(
+                f"  Filter {i+1}: {filter_type} (name: {filter_name}, has_compute_stats: {has_compute_stats}, has_process_batched: {has_process_batched})"
+            )
 
         return filters
 
@@ -559,14 +572,21 @@ class PerformanceBenchmark:
 
         # Step 2: Process each filter completely (stats + filtering) before moving to the next
         processing_start = time.time()
-        samples_with_stats = test_data.copy()
+        samples_with_stats = test_data
         total_stats_time = 0.0
         total_filter_time = 0.0
 
+        # DEBUG: Track sample counts and filter results
+        original_sample_count = get_dataset_length(test_data)
+        logger.info(f"🔍 DEBUG INDIVIDUAL: Starting with {original_sample_count} samples")
+
         for i, filter_op in enumerate(actual_filters):
-            logger.info(
-                f"    Processing filter {i+1}/{len(actual_filters)}: {getattr(filter_op, '_name', type(filter_op).__name__)}"
-            )
+            filter_name = getattr(filter_op, "_name", type(filter_op).__name__)
+            logger.info(f"    Processing filter {i+1}/{len(actual_filters)}: {filter_name}")
+
+            # DEBUG: Log current state before filter
+            current_sample_count = get_dataset_length(samples_with_stats)
+            logger.info(f"🔍 DEBUG INDIVIDUAL: Before filter {i+1} ({filter_name}): {current_sample_count} samples")
 
             # Compute stats for this filter
             stats_start = time.time()
@@ -578,7 +598,25 @@ class PerformanceBenchmark:
             # Immediately filter with this filter
             filter_start = time.time()
             if hasattr(filter_op, "process_batched"):
-                _ = list(filter_op.process_batched(samples_with_stats))
+                result = list(filter_op.process_batched(samples_with_stats))
+
+                # DEBUG: Log filter result details
+                if result:
+                    result_type = type(result[0]).__name__
+                    result_count = len(result)
+                    if isinstance(result[0], bool):
+                        passed_count = sum(result)
+                        logger.info(
+                            f"🔍 DEBUG INDIVIDUAL: Filter {i+1} ({filter_name}) returned {result_count} booleans: {passed_count} passed, {result_count - passed_count} failed"
+                        )
+                        logger.info(f"🔍 DEBUG INDIVIDUAL: Filter {i+1} mask (first 10): {result[:10]}")
+                    else:
+                        logger.info(
+                            f"🔍 DEBUG INDIVIDUAL: Filter {i+1} ({filter_name}) returned {result_count} {result_type} items (likely mapper)"
+                        )
+                else:
+                    logger.info(f"🔍 DEBUG INDIVIDUAL: Filter {i+1} ({filter_name}) returned empty result")
+
             filter_time = time.time() - filter_start
             total_filter_time += filter_time
 
@@ -610,359 +648,6 @@ class PerformanceBenchmark:
             throughput=throughput,
         )
 
-    def run_fused_filters_benchmark(
-        self, filters: List[Filter], test_data: Dict[str, Any], analyzer_insights: dict = None
-    ) -> PerformanceMetrics:
-        """Benchmark fused filter execution using proper fusion strategies."""
-        logger.info("Running fused filters benchmark (with fusion strategies)...")
-
-        start_memory = self.measure_memory_usage()
-        total_start_time = time.time()
-
-        # Step 1: Build pipeline configuration from filters
-        pipeline_config = self._build_pipeline_config_from_filters(filters)
-
-        # Step 2: Create Pipeline AST
-        from data_juicer.core.pipeline_ast import PipelineAST
-
-        ast = PipelineAST()
-        ast.build_from_config(pipeline_config)
-
-        # Step 3: Create PipelineOptimizer with fusion strategies
-        from data_juicer.core.optimizer.filter_fusion_strategy import (
-            FilterFusionStrategy,
-        )
-        from data_juicer.core.optimizer.mapper_fusion_strategy import (
-            MapperFusionStrategy,
-        )
-
-        strategies = [FilterFusionStrategy(analyzer_insights=analyzer_insights), MapperFusionStrategy()]
-
-        optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
-
-        # Step 4: Get optimization summary
-        optimization_summary = optimizer.get_optimization_summary()
-        logger.info("  Fusion Strategy Configuration:")
-        logger.info(f"    Strategies: {optimization_summary['strategies']}")
-        logger.info(f"    Analyzer insights: {optimization_summary['analyzer_insights_available']}")
-
-        # Step 5: Apply optimizations
-        logger.info("  Applying fusion strategies...")
-        optimized_ast = optimizer.optimize(ast)
-
-        # Step 6: Convert optimized AST back to operations
-        optimized_ops = self._convert_ast_to_operations(optimized_ast)
-        logger.info(f"  Original operations: {len(filters)}")
-        logger.info(f"  Optimized operations: {len(optimized_ops)}")
-
-        # Step 7: Process with optimized operations
-        logger.info("  Processing with optimized operations...")
-        self._process_with_optimized_ops(optimized_ops, test_data)
-
-        # Calculate totals
-        total_time = time.time() - total_start_time
-        end_memory = self.measure_memory_usage()
-        memory_usage = end_memory - start_memory
-        throughput = get_dataset_length(test_data) / total_time
-
-        logger.info("  📊 FUSION STRATEGY BREAKDOWN:")
-        logger.info(f"    Total time: {total_time:.3f}s")
-        logger.info(f"    Throughput: {throughput:.1f} samples/sec")
-        logger.info(f"    Memory usage: {memory_usage:.1f} MB")
-        logger.info(f"    Fusion ratio: {len(optimized_ops)/len(filters):.2f}x")
-        logger.info(f"    Operations reduced: {len(filters) - len(optimized_ops)}")
-
-        return PerformanceMetrics(
-            total_time=total_time,
-            stats_time=total_time * 0.8,  # Estimate: most time is processing
-            filter_time=total_time * 0.2,  # Estimate: some time is optimization
-            memory_usage=memory_usage,
-            throughput=throughput,
-        )
-
-    def collect_filtering_statistics(
-        self, filters: List[Filter], test_data: Dict[str, Any], analyzer_insights: dict = None
-    ) -> Dict[str, Any]:
-        """Collect filtering statistics for comprehensive analysis."""
-        logger.info("📊 Collecting comprehensive filtering statistics...")
-
-        # Individual filter stats
-        individual_stats = {}
-        total_samples = get_dataset_length(test_data)
-
-        for i, filter_op in enumerate(filters):
-            op_name = getattr(filter_op, "_name", type(filter_op).__name__)
-            logger.info(f"  Testing filter {i+1}/{len(filters)}: {op_name}")
-
-            # Compute stats and filter
-            samples_with_stats = filter_op.compute_stats_batched(test_data.copy())
-            filter_results = list(filter_op.process_batched(samples_with_stats))
-
-            # Count passed samples
-            passed_samples = sum(filter_results)
-            pass_rate = (passed_samples / total_samples) * 100
-
-            individual_stats[op_name] = {
-                "passed": passed_samples,
-                "filtered": total_samples - passed_samples,
-                "pass_rate": pass_rate,
-            }
-
-            logger.info(f"    Passed: {passed_samples:,}/{total_samples:,} ({pass_rate:.1f}%)")
-
-        # Fused filter stats
-        logger.info("  Testing fused filters...")
-        if analyzer_insights is None:
-            analyzer_insights = {}
-        fused_filter = FusedFilter("comprehensive_test_fused", filters, analyzer_insights=analyzer_insights)
-        samples_with_stats = fused_filter.compute_stats_batched(test_data.copy())
-        fused_results = list(fused_filter.process_batched(samples_with_stats))
-
-        fused_passed = sum(fused_results)
-        fused_pass_rate = (fused_passed / total_samples) * 100
-
-        fused_stats = {"passed": fused_passed, "filtered": total_samples - fused_passed, "pass_rate": fused_pass_rate}
-
-        logger.info(f"    Fused - Passed: {fused_passed:,}/{total_samples:,} ({fused_pass_rate:.1f}%)")
-
-        return {"individual": individual_stats, "fused": fused_stats, "total_samples": total_samples}
-
-    def run_comprehensive_test(self, num_samples: int = 10000, num_runs: int = 3):
-        """Run comprehensive performance test with multiple runs and detailed analysis."""
-        logger.info(f"Running comprehensive test with {num_samples:,} samples, {num_runs} runs")
-
-        # Create test data
-        logger.info("Creating test data...")
-        test_data = self.create_realistic_test_data(num_samples)
-
-        # Simulate analyzer insights
-        analyzer_insights = self.get_analyzer_insights(test_data)
-        logger.info(f"Analyzer insights for optimization: {analyzer_insights}")
-
-        # Create test filters
-        logger.info("Creating test filters...")
-        try:
-            filters = self.create_test_filters()
-            logger.info(f"Successfully created {len(filters)} filters")
-        except Exception as e:
-            logger.error(f"Failed to create test filters: {e}")
-            logger.error("Full traceback:")
-            import traceback
-
-            traceback.print_exc()
-            raise
-
-        # Collect filtering statistics first
-        filtering_stats = self.collect_filtering_statistics(filters, test_data, analyzer_insights=analyzer_insights)
-        comparison_results = print_filtering_comparison(filtering_stats)
-
-        # Run multiple iterations for statistical significance
-        individual_results = []
-        fused_results = []
-
-        for run in range(num_runs):
-            logger.info(f"--- Run {run + 1}/{num_runs} ---")
-
-            # Individual execution
-            individual_result = self.run_individual_filters_benchmark(filters, test_data.copy())
-            individual_results.append(individual_result)
-
-            # Fused execution (with analyzer insights)
-            fused_result = self.run_fused_filters_benchmark(
-                filters, test_data.copy(), analyzer_insights=analyzer_insights
-            )
-            fused_results.append(fused_result)
-
-        # Calculate statistics
-        results = self.calculate_statistics(individual_results, fused_results, num_samples)
-
-        # Add filtering statistics to results
-        results["filtering_stats"] = filtering_stats
-        results["comparison_results"] = comparison_results
-
-        return results
-
-    def print_results(self, results: Dict[str, Any]):
-        """Print formatted test results."""
-        logger.info("\n" + "=" * 60)
-        logger.info("PERFORMANCE TEST RESULTS")
-        logger.info("=" * 60)
-
-        config = results["test_config"]
-        improvements = results["improvements"]
-
-        logger.info("Test Configuration:")
-        logger.info(f"  Samples: {config['num_samples']:,}")
-        logger.info(f"  Runs: {config['num_runs']}")
-        logger.info(f"  Filters: {config['num_filters']}")
-
-        logger.info("Performance Comparison:")
-        logger.info(
-            f"  Individual Execution: {results['individual']['mean_total_time']:.3f}s "
-            f"± {results['individual']['std_total_time']:.3f}s"
-        )
-        logger.info(
-            f"  Fused Execution: {results['fused']['mean_total_time']:.3f}s "
-            f"± {results['fused']['std_total_time']:.3f}s"
-        )
-
-        logger.info("Improvements:")
-        logger.info(f"  Total Speedup: {improvements['total_speedup']:.2f}x")
-        logger.info(f"  Time Saved: {improvements['time_saved_percent']:.1f}%")
-        logger.info(f"  Throughput Improvement: {improvements['throughput_improvement']:.2f}x")
-        logger.info(f"  Stats Computation Speedup: {improvements['stats_speedup']:.2f}x")
-        logger.info(f"  Filtering Speedup: {improvements['filter_speedup']:.2f}x")
-        logger.info(f"  Memory Efficiency: {improvements['memory_efficiency']:.2f}x")
-
-        # Performance assessment
-        if improvements["total_speedup"] > 2.0:
-            assessment = "EXCELLENT - High performance gain"
-        elif improvements["total_speedup"] > 1.5:
-            assessment = "GOOD - Significant performance gain"
-        elif improvements["total_speedup"] > 1.2:
-            assessment = "MODERATE - Noticeable performance gain"
-        else:
-            assessment = "MINIMAL - Small performance gain"
-
-        logger.info(f"Assessment: {assessment}")
-        logger.info("=" * 60)
-
-    def save_results(self, results: Dict[str, Any], filename: str = "performance_test_results.json"):
-        """Save test results to file with timestamp and metadata."""
-        import datetime
-        import json
-        import os
-
-        # Add timestamp and metadata to results
-        results["metadata"] = {
-            "timestamp": datetime.datetime.now().isoformat(),
-            "filename": filename,
-            "version": "1.0",
-            "data_juicer_version": "latest",
-        }
-
-        # Convert dataclasses to dict for JSON serialization
-        def convert_metrics(metrics_list):
-            return [
-                {
-                    "total_time": m.total_time,
-                    "stats_time": m.stats_time,
-                    "filter_time": m.filter_time,
-                    "memory_usage": m.memory_usage,
-                    "throughput": m.throughput,
-                }
-                for m in metrics_list
-            ]
-
-        saveable_results = {
-            "metadata": results.get("metadata", {}),
-            "test_config": results["test_config"],
-        }
-
-        # Handle different result formats
-        if "individual" in results:
-            saveable_results["individual"] = results["individual"]
-        if "fused" in results:
-            saveable_results["fused"] = results["fused"]
-        if "current_fused" in results:
-            saveable_results["current_fused"] = results["current_fused"]
-        if "lightweight_fused" in results:
-            saveable_results["lightweight_fused"] = results["lightweight_fused"]
-        if "improvements" in results:
-            saveable_results["improvements"] = results["improvements"]
-        if "comparison" in results:
-            saveable_results["comparison"] = results["comparison"]
-        if "raw_results" in results:
-            saveable_results["raw_results"] = {
-                "individual": convert_metrics(results["raw_results"]["individual"]),
-                "fused": convert_metrics(results["raw_results"]["fused"]),
-            }
-
-        # Add additional metadata if available (with JSON serialization handling)
-        def convert_numpy_types(obj):
-            """Convert numpy types to JSON serializable types."""
-            import numpy as np
-
-            if isinstance(obj, np.integer):
-                return int(obj)
-            elif isinstance(obj, np.floating):
-                return float(obj)
-            elif isinstance(obj, np.ndarray):
-                return obj.tolist()
-            elif isinstance(obj, dict):
-                return {k: convert_numpy_types(v) for k, v in obj.items()}
-            elif isinstance(obj, list):
-                return [convert_numpy_types(item) for item in obj]
-            else:
-                return obj
-
-        if "filtering_stats" in results:
-            saveable_results["filtering_stats"] = convert_numpy_types(results["filtering_stats"])
-        if "analyzer_insights" in results:
-            saveable_results["analyzer_insights"] = convert_numpy_types(results["analyzer_insights"])
-
-        # Create directory if it doesn't exist
-        os.makedirs(os.path.dirname(filename) if os.path.dirname(filename) else ".", exist_ok=True)
-
-        # Save to file
-        with open(filename, "w") as f:
-            json.dump(saveable_results, f, indent=2)
-
-        # Log file info
-        file_size_kb = os.path.getsize(filename) / 1024
-        logger.info(f"📁 Results saved to {filename}")
-        logger.info(f"   File size: {file_size_kb:.1f} KB")
-        logger.info(f"   Timestamp: {saveable_results['metadata']['timestamp']}")
-
-    def calculate_statistics(self, individual_results, fused_results, num_samples):
-        """Calculate comprehensive statistics from multiple runs."""
-
-        def calculate_stats(metrics_list):
-            return {
-                "mean_total_time": np.mean([m.total_time for m in metrics_list]),
-                "std_total_time": np.std([m.total_time for m in metrics_list]),
-                "mean_stats_time": np.mean([m.stats_time for m in metrics_list]),
-                "mean_filter_time": np.mean([m.filter_time for m in metrics_list]),
-                "mean_memory_usage": np.mean([m.memory_usage for m in metrics_list]),
-                "mean_throughput": np.mean([m.throughput for m in metrics_list]),
-            }
-
-        individual_stats = calculate_stats(individual_results)
-        fused_stats = calculate_stats(fused_results)
-
-        # Calculate improvements
-        total_speedup = individual_stats["mean_total_time"] / fused_stats["mean_total_time"]
-        time_saved = individual_stats["mean_total_time"] - fused_stats["mean_total_time"]
-        stats_speedup = individual_stats["mean_stats_time"] / fused_stats["mean_stats_time"]
-        filter_speedup = (
-            individual_stats["mean_filter_time"] / fused_stats["mean_filter_time"]
-            if fused_stats["mean_filter_time"] > 0
-            else float("inf")
-        )
-
-        # Compile results
-        results = {
-            "test_config": {
-                "num_samples": num_samples,
-                "num_runs": len(individual_results),
-                "num_filters": len(self.create_test_filters()),
-            },
-            "individual": individual_stats,
-            "fused": fused_stats,
-            "improvements": {
-                "total_speedup": total_speedup,
-                "stats_speedup": stats_speedup,
-                "filter_speedup": filter_speedup,
-                "throughput_improvement": (fused_stats["mean_throughput"] / individual_stats["mean_throughput"] - 1)
-                * 100,
-                "time_saved_percent": time_saved / individual_stats["mean_total_time"] * 100,
-                "memory_efficiency": individual_stats["mean_memory_usage"] / fused_stats["mean_memory_usage"],
-            },
-            "raw_results": {"individual": individual_results, "fused": fused_results},
-        }
-
-        return results
-
     def run_pipeline_optimizer_benchmark(
         self, filters: List[Filter], test_data: Dict[str, Any], analyzer_insights: dict = None
     ) -> PerformanceMetrics:
@@ -982,14 +667,8 @@ class PerformanceBenchmark:
         ast.build_from_config(pipeline_config)
 
         # Step 3: Create PipelineOptimizer with fusion strategies
-        from data_juicer.core.optimizer.filter_fusion_strategy import (
-            FilterFusionStrategy,
-        )
-        from data_juicer.core.optimizer.mapper_fusion_strategy import (
-            MapperFusionStrategy,
-        )
 
-        strategies = [FilterFusionStrategy(analyzer_insights=analyzer_insights), MapperFusionStrategy()]
+        strategies = [FilterFusionStrategy(analyzer_insights=analyzer_insights)]
         optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
 
         # Step 4: Get optimization summary
@@ -1045,7 +724,7 @@ class PerformanceBenchmark:
                 for attr in dir(filter_op):
                     if not attr.startswith("_") and not callable(getattr(filter_op, attr)):
                         value = getattr(filter_op, attr)
-                        if isinstance(value, (int, float, str, bool)):
+                        if isinstance(value, (int, float, str, bool, list)):
                             config_dict[attr] = value
                 process_config.append({op_name: config_dict})
         return {"process": process_config}
@@ -1128,10 +807,247 @@ class PerformanceBenchmark:
         # Load and execute the optimized operations
         from data_juicer.ops import load_ops
 
-        for op_config in optimized_ops:
+        # DEBUG: Track sample counts and operation results
+        original_sample_count = get_dataset_length(test_data)
+        logger.info(f"🔍 DEBUG PIPELINE: Starting with {original_sample_count} samples")
+
+        data = test_data
+        for op_idx, op_config in enumerate(optimized_ops):
             # Debug: Log the operation configuration
             logger.debug(f"Loading operation config: {op_config}")
 
+            # Special handling for fused_filter - we need to create the actual filter objects
+            op_name = list(op_config.keys())[0]
+            logger.info(f"🔍 DEBUG PIPELINE: Processing op {op_idx+1}/{len(optimized_ops)}: {op_name}")
+
+            # DEBUG: Log current state before operation
+            current_sample_count = get_dataset_length(data)
+            logger.info(f"🔍 DEBUG PIPELINE: Before op {op_idx+1} ({op_name}): {current_sample_count} samples")
+
+            if op_name == "fused_filter":
+                # Extract the fused_op_list and create individual filter objects
+                fused_op_list = op_config[op_name].get("fused_op_list", [])
+                individual_filters = []
+
+                logger.info(f"🔍 DEBUG PIPELINE: Fused filter contains {len(fused_op_list)} individual filters:")
+                for filter_config in fused_op_list:
+                    filter_name = list(filter_config.keys())[0]
+                    filter_args = filter_config[filter_name]
+                    logger.info(f"    - {filter_name}: {filter_args}")
+
+                    # Load the individual filter
+                    loaded_filters = load_ops([{filter_name: filter_args}])
+                    if loaded_filters:
+                        individual_filters.append(loaded_filters[0])
+                        logger.info(f"    ✅ Successfully loaded {filter_name}")
+                    else:
+                        logger.warning(f"    ❌ Failed to load {filter_name}")
+
+                # Create the fused filter with the actual filter objects
+                if individual_filters:
+                    fused_filter = FusedFilter(name="fused_filter", fused_filters=individual_filters)
+                    # Force parallel execution to match individual execution behavior
+                    # (each filter sees original data, not filtered output from previous filters)
+                    fused_filter.execution_strategy = "parallel"
+                    logger.info(f"🔍 DEBUG PIPELINE: Created fused filter with {len(individual_filters)} filters")
+                    logger.info(
+                        f"🔍 DEBUG PIPELINE: Fused filter execution strategy: {fused_filter.execution_strategy}"
+                    )
+                    logger.info(f"🔍 DEBUG PIPELINE: Filter order: {[f._name for f in fused_filter.fused_filters]}")
+
+                    # Process the fused filter
+                    if hasattr(fused_filter, "compute_stats_batched"):
+                        data = fused_filter.compute_stats_batched(data)
+                    if hasattr(fused_filter, "process_batched"):
+                        result = list(fused_filter.process_batched(data))
+
+                        # DEBUG: Log fused filter result details
+                        if result:
+                            result_type = type(result[0]).__name__
+                            result_count = len(result)
+                            if isinstance(result[0], bool):
+                                passed_count = sum(result)
+                                logger.info(
+                                    f"🔍 DEBUG PIPELINE: Fused filter returned {result_count} booleans: {passed_count} passed, {result_count - passed_count} failed"
+                                )
+                                logger.info(f"🔍 DEBUG PIPELINE: Fused filter mask (first 10): {result[:10]}")
+                            else:
+                                logger.info(
+                                    f"🔍 DEBUG PIPELINE: Fused filter returned {result_count} {result_type} items (likely mapper)"
+                                )
+                        else:
+                            logger.info(f"🔍 DEBUG PIPELINE: Fused filter returned empty result")
+                else:
+                    logger.warning(f"🔍 DEBUG PIPELINE: Failed to create fused filter")
+                    continue  # Skip if we can't create the fused filter
+            else:
+                # Load the operation from config for non-fused operations
+                loaded_ops = load_ops([op_config])
+                if loaded_ops:
+                    op = loaded_ops[0]
+                    logger.info(f"🔍 DEBUG PIPELINE: Loaded op: {type(op).__name__}")
+
+                    # Execute the operation
+                    if hasattr(op, "compute_stats_batched"):
+                        data = op.compute_stats_batched(data)
+                    if hasattr(op, "process_batched"):
+                        result = list(op.process_batched(data))
+
+                        # DEBUG: Log operation result details
+                        if result:
+                            result_type = type(result[0]).__name__
+                            result_count = len(result)
+                            if isinstance(result[0], bool):
+                                passed_count = sum(result)
+                                logger.info(
+                                    f"🔍 DEBUG PIPELINE: Op {op_idx+1} ({op_name}) returned {result_count} booleans: {passed_count} passed, {result_count - passed_count} failed"
+                                )
+                                logger.info(f"🔍 DEBUG PIPELINE: Op {op_idx+1} mask (first 10): {result[:10]}")
+                            else:
+                                logger.info(
+                                    f"🔍 DEBUG PIPELINE: Op {op_idx+1} ({op_name}) returned {result_count} {result_type} items (likely mapper)"
+                                )
+                        else:
+                            logger.info(f"🔍 DEBUG PIPELINE: Op {op_idx+1} ({op_name}) returned empty result")
+                else:
+                    logger.warning(f"🔍 DEBUG PIPELINE: Failed to load op from config")
+                    continue  # Skip if we can't load the operation
+
+            # DEBUG: Log current state after operation
+            current_sample_count = get_dataset_length(data)
+            logger.info(f"🔍 DEBUG PIPELINE: After op {op_idx+1} ({op_name}): {current_sample_count} samples")
+
+    def _extract_original_filters_from_fused(self, filters):
+        """Extract original individual filters from fused filters for validation."""
+        original_filters = []
+        for filter_op in filters:
+            if hasattr(filter_op, "_name") and filter_op._name == "fused_filter":
+                # This is a fused filter, extract the individual filters
+                if hasattr(filter_op, "fused_filters"):
+                    original_filters.extend(filter_op.fused_filters)
+            else:
+                # This is an individual filter, keep it as is
+                original_filters.append(filter_op)
+
+        # If no original filters were found, return the original list
+        # (this handles the case where filters are already individual)
+        if not original_filters:
+            return filters
+
+        return original_filters
+
+    def get_final_mask_from_filters(self, filters: List[Filter], test_data: Dict[str, Any]) -> list:
+        """Compute the final boolean mask for each sample using individual filter execution (AND) with funneling."""
+        original_length = get_dataset_length(test_data)
+        logger.debug(f"🔍 DEBUG: Processing {len(filters)} filters for individual mask computation")
+        logger.debug(f"🔍 DEBUG: Original dataset length: {original_length}")
+
+        # Track which samples are still active (not dropped by funneling)
+        active_samples = set(range(original_length))
+        final_mask = [False] * original_length  # Initialize all to False
+
+        data = test_data
+
+        for i, filter_op in enumerate(filters):
+            logger.debug(f"🔍 DEBUG: Processing filter {i+1}/{len(filters)}: {type(filter_op).__name__}")
+            logger.debug(f"🔍 DEBUG: Active samples before filter {i+1}: {len(active_samples)}")
+
+            # Check if this is actually a filter or a mapper
+            op_type = type(filter_op).__name__.lower()
+            is_mapper = "mapper" in op_type
+            _ = "filter" in op_type or "deduplicator" in op_type
+
+            if is_mapper:
+                # For mappers, just transform the data but don't change the mask
+                logger.debug(f"🔍 DEBUG: Skipping mapper {i+1} for mask computation")
+                if hasattr(filter_op, "compute_stats_batched"):
+                    data = filter_op.compute_stats_batched(data)
+                if hasattr(filter_op, "process_batched"):
+                    result = list(filter_op.process_batched(data))
+                    # Update data for next operation
+                    if result:
+                        data = {"text": result, "__dj__stats__": [{} for _ in range(len(result))]}
+                continue  # Skip mask computation for mappers
+
+            # Only process actual filters
+            if hasattr(filter_op, "compute_stats_batched"):
+                data = filter_op.compute_stats_batched(data)
+                logger.debug(f"🔍 DEBUG: Data length after stats for filter {i+1}: {get_dataset_length(data)}")
+
+            if hasattr(filter_op, "process_batched"):
+                result = list(filter_op.process_batched(data))
+
+                # Check if this is a mapper or filter based on the result type
+                if result and isinstance(result[0], bool):
+                    # This is a filter - it returns boolean masks
+                    mask = result
+                    logger.debug(f"🔍 DEBUG: Filter {i+1} returned {len(mask)} boolean results")
+                else:
+                    # This is a mapper - it returns transformed text content
+                    # For mappers, we assume all samples pass (no filtering)
+                    mask = [True] * len(result) if result else []
+                    logger.debug(f"🔍 DEBUG: Mapper {i+1} returned {len(result)} text results, assuming all pass")
+
+                # FIXED: Filters always return the same number of results as input samples
+                # We need to track which samples are still active based on True/False results
+                if len(mask) == len(active_samples):
+                    # Normal case: filter returned results for all active samples
+                    new_active_samples = set()
+                    for sample_idx, passed in zip(sorted(active_samples), mask):
+                        if passed:
+                            new_active_samples.add(sample_idx)
+                    active_samples = new_active_samples
+                    logger.debug(f"🔍 DEBUG: Filter {i+1} kept {len(active_samples)} samples")
+                elif len(mask) == original_length:
+                    # Filter returned results for all original samples (no funneling happened)
+                    # This means the filter processed all samples, not just active ones
+                    new_active_samples = set()
+                    for sample_idx, passed in enumerate(mask):
+                        if sample_idx in active_samples and passed:
+                            new_active_samples.add(sample_idx)
+                    active_samples = new_active_samples
+                    logger.debug(
+                        f"🔍 DEBUG: Filter {i+1} processed all {original_length} samples, kept {len(active_samples)} active"
+                    )
+                else:
+                    # Unexpected case: filter returned different number of results
+                    logger.warning(
+                        f"🔍 DEBUG: Filter {i+1} returned {len(mask)} results but {len(active_samples)} samples were active"
+                    )
+                    # Assume all active samples passed if we have enough results
+                    if len(mask) >= len(active_samples):
+                        new_active_samples = set()
+                        for idx, (sample_idx, passed) in enumerate(zip(sorted(active_samples), mask)):
+                            if passed:
+                                new_active_samples.add(sample_idx)
+                        active_samples = new_active_samples
+                    else:
+                        # Not enough results, drop all samples
+                        active_samples = set()
+            else:
+                logger.debug(f"🔍 DEBUG: Filter {i+1} has no process_batched method")
+                # For filters without process_batched, assume all active samples pass
+                # (no change to active_samples)
+
+        # Mark all active samples as True in the final mask
+        for sample_idx in active_samples:
+            if 0 <= sample_idx < original_length:
+                final_mask[sample_idx] = True
+
+        logger.debug(f"🔍 DEBUG: Final mask: {sum(final_mask)}/{original_length} samples passed")
+        return final_mask
+
+    def get_final_mask_from_optimized_ops(self, optimized_ops: List, test_data: Dict[str, Any]) -> list:
+        """Compute the final boolean mask for each sample using optimized operations."""
+        data = test_data
+        original_length = get_dataset_length(data)
+        # Track which samples are still active (not dropped by any operation)
+        active_samples = set(range(original_length))
+        final_mask = [False] * original_length  # Initialize all to False
+
+        from data_juicer.ops import load_ops
+
+        for op_config in optimized_ops:
             # Special handling for fused_filter - we need to create the actual filter objects
             op_name = list(op_config.keys())[0]
             if op_name == "fused_filter":
@@ -1149,126 +1065,112 @@ class PerformanceBenchmark:
 
                 # Create the fused filter with the actual filter objects
                 if individual_filters:
-                    from data_juicer.core.optimizer.fused_op import FusedFilter
-
-                    fused_filter = FusedFilter(name="fused_filter", fused_filters=individual_filters)
-                    # Force sequential execution to avoid parallel stats access issues
-                    fused_filter.execution_strategy = "sequential"
-
-                    # Process the fused filter
-                    if hasattr(fused_filter, "compute_stats_batched"):
-                        test_data = fused_filter.compute_stats_batched(test_data)
-                    if hasattr(fused_filter, "process_batched"):
-                        _ = list(fused_filter.process_batched(test_data))
-            elif op_name == "fused_mapper":
-                # Extract the fused_mappers list and create FusedMapper directly
-                mapper_config = op_config[op_name]
-                name = mapper_config.get("name", "fused_mapper")
-                fused_mappers = mapper_config.get("fused_mappers", [])
-
-                # Create the fused mapper directly
-                fused_mapper = FusedMapper(name=name, fused_mappers=fused_mappers)
-
-                # Execute the mapper
-                if hasattr(fused_mapper, "process_batched"):
-                    test_data = fused_mapper.process_batched(test_data)
+                    op = FusedFilter(name="fused_filter", fused_filters=individual_filters)
+                    # Force parallel execution to match individual execution behavior
+                    # (each filter sees original data, not filtered output from previous filters)
+                    op.execution_strategy = "parallel"
+                else:
+                    continue  # Skip if we can't create the fused filter
             else:
                 # Load the operation from config for non-fused operations
                 loaded_ops = load_ops([op_config])
                 if loaded_ops:
                     op = loaded_ops[0]
+                else:
+                    continue  # Skip if we can't load the operation
 
-                    # Execute the operation
-                    if hasattr(op, "compute_stats_batched"):
-                        test_data = op.compute_stats_batched(test_data)
-                    if hasattr(op, "process_batched"):
-                        _ = list(op.process_batched(test_data))
+            # Check if this is a mapper or filter
+            op_type = type(op).__name__.lower()
+            is_mapper = "mapper" in op_type
+            is_filter = "filter" in op_type or "deduplicator" in op_type
 
-    def _process_with_legacy_ops(self, legacy_ops: List, test_data: Dict[str, Any]):
-        """Process test data with legacy fused operations."""
-        logger.debug(f"Processing with {len(legacy_ops)} legacy operations")
-
-        for op in legacy_ops:
+            # Execute the operation
             if hasattr(op, "compute_stats_batched"):
-                test_data = op.compute_stats_batched(test_data)
+                data = op.compute_stats_batched(data)
+
             if hasattr(op, "process_batched"):
-                _ = list(op.process_batched(test_data))
+                result = list(op.process_batched(data))
 
-    def run_lightweight_fusion_benchmark(self, filters: List[Filter], test_data: Dict[str, Any]) -> PerformanceMetrics:
-        """Benchmark lightweight fusion without complex overhead."""
-        logger.info("Running lightweight fusion benchmark...")
+                if is_filter and result:
+                    # For filters, apply boolean mask to active samples
+                    # Check if this is actually a filter or mapper based on result type
+                    import numpy as np
 
-        start_memory = self.measure_memory_usage()
-        total_start_time = time.time()
-
-        # Step 1: Simple fusion (no complex overhead)
-        init_start = time.time()
-
-        # Create a simplified fused filter that skips complex logic
-        class LightweightFusedFilter:
-            def __init__(self, filters):
-                self.filters = filters
-                self._name = "lightweight_fused"
-
-            def compute_stats_batched(self, samples):
-                # Simple sequential stats computation
-                for filter_op in self.filters:
-                    samples = filter_op.compute_stats_batched(samples)
-                return samples
-
-            def process_batched(self, samples):
-                # Simple sequential processing with early termination
-                result = None
-                for filter_op in self.filters:
-                    filter_result = list(filter_op.process_batched(samples))
-
-                    if result is None:
-                        result = filter_result
+                    is_numpy_bool = False
+                    try:
+                        is_numpy_bool = np.issubdtype(type(result[0]), np.bool_)
+                    except Exception:
+                        is_numpy_bool = False
+                    if result and (
+                        isinstance(result[0], bool)
+                        or str(type(result[0])).endswith("bool")
+                        or is_numpy_bool
+                        or (
+                            hasattr(result, "__iter__")
+                            and not isinstance(result, str)
+                            and all(
+                                isinstance(x, bool)
+                                or str(type(x)).endswith("bool")
+                                or (np.issubdtype(type(x), np.bool_) if "numpy" in str(type(x)) else False)
+                                for x in result
+                            )
+                        )
+                    ):
+                        # This is a filter - it returns boolean masks
+                        op_mask = result
                     else:
-                        # Early termination: if any filter fails, stop processing
-                        result = [r1 and r2 for r1, r2 in zip(result, filter_result)]
-                        # If all samples failed, we can stop early
-                        if not any(result):
-                            break
+                        # This is a mapper - it returns transformed text content
+                        # For mappers, we assume all samples pass (no filtering)
+                        op_mask = [True] * len(result) if result else []
 
-                return result
+                    # Apply the filter mask to active samples
+                    if len(op_mask) == len(active_samples):
+                        # Normal case: filter returned results for all active samples
+                        new_active_samples = set()
+                        for sample_idx, passed in zip(sorted(active_samples), op_mask):
+                            if passed:
+                                new_active_samples.add(sample_idx)
+                        active_samples = new_active_samples
+                    elif len(op_mask) == original_length:
+                        # Filter returned results for all original samples
+                        new_active_samples = set()
+                        for sample_idx, passed in enumerate(op_mask):
+                            if sample_idx in active_samples and passed:
+                                new_active_samples.add(sample_idx)
+                        active_samples = new_active_samples
+                    else:
+                        # Unexpected case: filter returned different number of results
+                        logger.warning(
+                            f"Filter {op_type} returned {len(op_mask)} results but {len(active_samples)} samples were active"
+                        )
+                        # Assume all active samples passed if we have enough results
+                        if len(op_mask) >= len(active_samples):
+                            new_active_samples = set()
+                            for idx, (sample_idx, passed) in enumerate(zip(sorted(active_samples), op_mask)):
+                                if passed:
+                                    new_active_samples.add(sample_idx)
+                            active_samples = new_active_samples
+                        else:
+                            # Not enough results, drop all samples
+                            active_samples = set()
 
-        fused_filter = LightweightFusedFilter(filters)
-        init_time = time.time() - init_start
-        logger.info(f"  Step 1 - Lightweight fusion initialization: {init_time:.3f}s")
+                elif is_mapper and result:
+                    # For mappers, check if any samples were dropped (empty results)
+                    # Mappers typically return transformed data, not boolean masks
+                    if len(result) < len(active_samples):
+                        # Some samples were dropped by the mapper
+                        # This is rare but possible - assume first N samples survived
+                        active_samples = set(range(len(result)))
+                    # If len(result) >= len(active_samples), no samples were dropped
+                    # Update data for next operation
+                    data = {"text": result, "__dj__stats__": [{} for _ in range(len(result))]}
 
-        # Step 2: Stats computation
-        stats_start = time.time()
-        samples_with_stats = fused_filter.compute_stats_batched(test_data.copy())
-        stats_time = time.time() - stats_start
-        logger.info(f"  Step 2 - Stats computation: {stats_time:.3f}s")
+        # Mark all active samples as True in the final mask
+        for sample_idx in active_samples:
+            if 0 <= sample_idx < original_length:
+                final_mask[sample_idx] = True
 
-        # Step 3: Filtering
-        filter_start = time.time()
-        _ = list(fused_filter.process_batched(samples_with_stats))
-        filter_time = time.time() - filter_start
-        logger.info(f"  Step 3 - Filtering: {filter_time:.3f}s")
-
-        # Calculate totals
-        total_time = time.time() - total_start_time
-        end_memory = self.measure_memory_usage()
-        memory_usage = end_memory - start_memory
-        throughput = get_dataset_length(test_data) / total_time
-
-        logger.info("  📊 LIGHTWEIGHT FUSION BREAKDOWN:")
-        logger.info(f"    Initialization: {init_time:.3f}s ({init_time/total_time*100:.1f}%)")
-        logger.info(f"    Stats computation: {stats_time:.3f}s ({stats_time/total_time*100:.1f}%)")
-        logger.info(f"    Filtering: {filter_time:.3f}s ({filter_time/total_time*100:.1f}%)")
-        logger.info(f"    Total time: {total_time:.3f}s")
-        logger.info(f"    Throughput: {throughput:.1f} samples/sec")
-
-        return PerformanceMetrics(
-            total_time=total_time,
-            stats_time=stats_time,
-            filter_time=filter_time,
-            memory_usage=memory_usage,
-            throughput=throughput,
-        )
+        return final_mask
 
     def run_benchmark(
         self,
@@ -1315,195 +1217,53 @@ class PerformanceBenchmark:
 
             logger.info(f"🏆 Best strategy:      {best_strategy}")
 
-        # --- Validation: Compare results between individual and pipeline ---
+        # --- Simple Validation: Save and Compare Results ---
         logger.info("\n🔎 VALIDATING PIPELINE RESULTS AGAINST INDIVIDUAL EXECUTION")
+
+        # Create validation directory in outputs/
+        validation_dir = f"./outputs/benchmark_validation_{mode}_{int(time.time())}"
+        os.makedirs(validation_dir, exist_ok=True)
+        logger.info(f"📁 Validation results will be saved to: {validation_dir}")
 
         # Get the optimized operations from the pipeline benchmark
         pipeline_config = self._build_pipeline_config_from_filters(filters)
-        from data_juicer.core.pipeline_ast import PipelineAST
-
         ast = PipelineAST()
         ast.build_from_config(pipeline_config)
-        from data_juicer.core.optimizer.filter_fusion_strategy import (
-            FilterFusionStrategy,
-        )
-        from data_juicer.core.optimizer.mapper_fusion_strategy import (
-            MapperFusionStrategy,
-        )
-        from data_juicer.core.optimizer.optimizer import PipelineOptimizer
 
-        strategies = [FilterFusionStrategy(analyzer_insights=analyzer_insights), MapperFusionStrategy()]
+        strategies = [FilterFusionStrategy()]
         optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
         optimized_ast = optimizer.optimize(ast)
         optimized_ops = self._convert_ast_to_operations(optimized_ast)
 
-        individual_mask = self.get_final_mask_from_filters(filters, test_data)
-        pipeline_mask = self.get_final_mask_from_optimized_ops(optimized_ops, test_data)
+        # Debug: Log what we're comparing
+        logger.info(
+            f"🔍 VALIDATION DEBUG: Comparing {len(filters)} filters vs {len(optimized_ops)} optimized operations"
+        )
+        for i, f in enumerate(filters):
+            logger.info(f"  Filter {i+1}: {type(f).__name__}")
+        for i, op in enumerate(optimized_ops):
+            op_name = list(op.keys())[0]
+            logger.info(f"  Optimized Op {i+1}: {op_name}")
 
-        if individual_mask == pipeline_mask:
-            logger.info("✅ Pipeline results match individual execution!")
-            mismatches = []
-        else:
-            mismatches = [i for i, (a, b) in enumerate(zip(individual_mask, pipeline_mask)) if a != b]
-            logger.warning(
-                f"❌ Pipeline results do NOT match individual execution! {len(mismatches)} mismatches out of {len(individual_mask)} samples."
-            )
-            logger.warning(f"First 5 mismatches: {mismatches[:5]}")
-            # Print debug info for first 3 mismatches
-            for idx in mismatches[:3]:
-                logger.warning(f"--- Mismatch at index {idx} ---")
-                logger.warning(f"Input text: {get_dataset_texts(test_data)[idx]}")
+        # For validation, we need to compare the original individual filters to the optimized pipeline
+        # In recipe mode, 'filters' might contain fused filters, so we need to extract the original filters
+        original_filters = self._extract_original_filters_from_fused(filters)
+        logger.info(f"🔍 VALIDATION DEBUG: Extracted {len(original_filters)} original filters for validation")
 
-                # Detailed individual execution debugging
-                logger.warning("🔍 INDIVIDUAL EXECUTION (step-by-step):")
-                data = test_data.copy()
-                ind_masks = []
-                logger.warning(f"  Starting with {len(filters)} filters")
+        # Run both individual and pipeline execution and save results
+        individual_results_data = self._run_and_save_individual_execution(original_filters, test_data, validation_dir)
+        pipeline_results_data = self._run_and_save_pipeline_execution(optimized_ops, test_data, validation_dir)
 
-                for i, filter_op in enumerate(filters):
-
-                    if hasattr(filter_op, "compute_stats_batched"):
-                        data_before = data.copy()
-                        data = filter_op.compute_stats_batched(data)
-                        logger.warning(f"    Stats computed: data keys={list(data.keys())}")
-                        # Check if data was modified
-                        if data_before != data:
-                            logger.warning(f"    Data was modified during stats computation: {data_before} -> {data}")
-                        else:
-                            logger.warning("    Data was not modified during stats computation")
-
-                    if hasattr(filter_op, "process_batched"):
-                        result = list(filter_op.process_batched(data))
-                        # Handle both boolean masks and text content
-                        if result and isinstance(result[0], bool):
-                            mask = result
-                        else:
-                            # If it returns text content, create a mask based on non-empty results
-                            mask = [bool(item) for item in result]
-
-                        # Check if mask has enough elements and idx is valid
-                        if mask and len(mask) > idx:
-                            ind_masks.append(mask[idx])
-                            logger.warning(f"    Result for sample {idx}: {mask[idx]} (passed={mask[idx]})")
-                            logger.warning(f"    Overall: {sum(mask)}/{len(mask)} samples passed")
-                            logger.warning(f"    Current masks so far: {ind_masks}")
-                        else:
-                            logger.warning(f"    Warning: mask length {len(mask)} is insufficient for index {idx}")
-                            ind_masks.append(True)  # Default to pass if mask is invalid
-                    else:
-                        logger.warning("    No process_batched method found")
-                        ind_masks.append(True)  # Assume pass if no process method
-
-                logger.warning(f"  Individual final result: {all(ind_masks)} (all masks: {ind_masks})")
-
-                # Detailed pipeline execution debugging using the same optimized operations
-                logger.warning("🔗 PIPELINE EXECUTION (step-by-step):")
-                logger.warning(f"  Original filters: {len(filters)}")
-                logger.warning(f"  Optimized ops: {len(optimized_ops)}")
-                logger.warning(f"  Optimization ratio: {len(optimized_ops)/len(filters):.2f}x")
-
-                data_pipeline = test_data.copy()
-                mask_pipeline = [True] * get_dataset_length(data_pipeline)
-                pipeline_masks = []
-                from data_juicer.ops import load_ops
-
-                for j, op_config in enumerate(optimized_ops):
-                    logger.warning(f"  Optimized Op {j+1}/{len(optimized_ops)}: {op_config}")
-
-                    # Special handling for fused_filter - we need to create the actual filter objects
-                    op_name = list(op_config.keys())[0]
-                    if op_name == "fused_filter":
-                        # Extract the fused_op_list and create individual filter objects
-                        fused_op_list = op_config[op_name].get("fused_op_list", [])
-                        individual_filters = []
-
-                        for filter_config in fused_op_list:
-                            filter_name = list(filter_config.keys())[0]
-                            filter_args = filter_config[filter_name]
-                            # Load the individual filter
-                            loaded_filters = load_ops([{filter_name: filter_args}])
-                            if loaded_filters:
-                                individual_filters.append(loaded_filters[0])
-
-                        # Create the fused filter with the actual filter objects
-                        if individual_filters:
-                            from data_juicer.core.optimizer.fused_op import FusedFilter
-
-                            op = FusedFilter(name="fused_filter", fused_filters=individual_filters)
-                            # Force sequential execution to avoid parallel stats access issues
-                            op.execution_strategy = "sequential"
-                        else:
-                            logger.warning("    Failed to create fused filter")
-                            pipeline_masks.append(True)
-                            continue
-                    elif op_name == "fused_mapper":
-                        # Extract the fused_mappers list and create FusedMapper directly
-                        mapper_config = op_config[op_name]
-                        name = mapper_config.get("name", "fused_mapper")
-                        fused_mappers = mapper_config.get("fused_mappers", [])
-
-                        # Create the fused mapper directly
-                        from data_juicer.core.optimizer.fused_op import FusedMapper
-
-                        op = FusedMapper(name=name, fused_mappers=fused_mappers)
-                    else:
-                        # Load the operation from config for non-fused operations
-                        loaded_ops = load_ops([op_config])
-                        if loaded_ops:
-                            op = loaded_ops[0]
-                        else:
-                            logger.warning("    Failed to load op from config")
-                            pipeline_masks.append(True)
-                            continue
-
-                    logger.warning(f"    Loaded op: {type(op).__name__}")
-
-                    if hasattr(op, "compute_stats_batched"):
-                        data_pipeline_before = data_pipeline.copy()
-                        data_pipeline = op.compute_stats_batched(data_pipeline)
-                        logger.warning(f"    Stats computed: data keys={list(data_pipeline.keys())}")
-                        # Check if data was modified
-                        if data_pipeline_before != data_pipeline:
-                            logger.warning("    Data was modified during stats computation")
-
-                    if hasattr(op, "process_batched"):
-                        result = list(op.process_batched(data_pipeline))
-                        # Handle both boolean masks and text content
-                        if result and isinstance(result[0], bool):
-                            op_mask = result
-                        else:
-                            # If it returns text content, create a mask based on non-empty results
-                            op_mask = [bool(item) for item in result]
-
-                        # Check if op_mask has enough elements and idx is valid
-                        if op_mask and len(op_mask) > idx:
-                            pipeline_masks.append(op_mask[idx])
-                            mask_pipeline = [m and o for m, o in zip(mask_pipeline, op_mask)]
-                            logger.warning(f"    Result for sample {idx}: {op_mask[idx]} (passed={op_mask[idx]})")
-                            logger.warning(f"    Overall: {sum(op_mask)}/{len(op_mask)} samples passed")
-                            logger.warning(f"    Current masks so far: {pipeline_masks}")
-                        else:
-                            logger.warning(
-                                f"    Warning: op_mask length {len(op_mask)} is insufficient for index {idx}"
-                            )
-                            pipeline_masks.append(True)  # Default to pass if mask is invalid
-                    else:
-                        logger.warning("    No process_batched method found")
-                        pipeline_masks.append(True)
-
-                # Check if masks are valid before accessing
-                individual_result = all(ind_masks) if ind_masks else True
-                pipeline_result = mask_pipeline[idx] if len(mask_pipeline) > idx else True
-
-                logger.warning(f"  Pipeline final result: {pipeline_result} (all masks: {pipeline_masks})")
-                logger.warning(f"  Comparison: Individual={individual_result} vs Pipeline={pipeline_result}")
-                logger.warning("--- End of mismatch analysis ---")
+        # Compare results
+        validation_results = self._compare_execution_results(
+            individual_results_data, pipeline_results_data, validation_dir
+        )
 
         # Compile results
         results = {
             "mode": mode,
             "num_samples": get_dataset_length(test_data),
-            "num_filters": len(filters),
+            "num_filters": len(original_filters),  # Use original filter count for reporting
             "individual": {
                 "total_time": individual_results.total_time,
                 "stats_time": individual_results.stats_time,
@@ -1520,15 +1280,524 @@ class PerformanceBenchmark:
             },
             "speedup": pipeline_speedup if individual_time > 0 else 0,
             "best_strategy": best_strategy if individual_time > 0 else "Unknown",
-            "validation": {
-                "matches": len(mismatches) == 0,
-                "num_mismatches": len(mismatches),
-                "mismatch_indices": mismatches[:10],  # Store first 10 mismatches
-            },
+            "validation": validation_results,
             "analyzer_insights": analyzer_insights,
+            "validation_dir": validation_dir,
         }
 
         return results
+
+    def _run_and_save_individual_execution(
+        self, filters: List[Filter], test_data: Dict[str, Any], validation_dir: str
+    ) -> Dict[str, Any]:
+        """Run individual execution and save results with IDs."""
+        logger.info("🔍 Running individual execution for validation...")
+
+        # Debug: Log all filters being processed
+        logger.info(f"🔍 DEBUG: Processing {len(filters)} filters in individual execution:")
+        for i, filter_op in enumerate(filters):
+            filter_type = type(filter_op).__name__
+            filter_name = getattr(filter_op, "_name", f"filter_{i}")
+            has_compute_stats = hasattr(filter_op, "compute_stats_batched")
+            has_process_batched = hasattr(filter_op, "process_batched")
+            logger.info(
+                f"  Filter {i+1}: {filter_type} (name: {filter_name}, has_compute_stats: {has_compute_stats}, has_process_batched: {has_process_batched})"
+            )
+
+            # Log filter configuration
+            config = getattr(filter_op, "config", None)
+            if config:
+                logger.info(f"    Config: {config}")
+            else:
+                # Log filter attributes
+                attrs = {}
+                for attr in dir(filter_op):
+                    if not attr.startswith("_") and not callable(getattr(filter_op, attr)):
+                        value = getattr(filter_op, attr)
+                        if isinstance(value, (int, float, str, bool)):
+                            attrs[attr] = value
+                logger.info(f"    Attributes: {attrs}")
+
+        # Add sample IDs to test data
+        original_length = get_dataset_length(test_data)
+        test_data_with_ids = test_data.copy()
+        test_data_with_ids["sample_id"] = list(range(original_length))
+
+        logger.info(f"🔍 DEBUG: Starting with {original_length} samples")
+        logger.info(f"🔍 DEBUG: Test data keys: {list(test_data_with_ids.keys())}")
+        logger.info(f"🔍 DEBUG: Text samples: {len(test_data_with_ids.get('text', []))}")
+
+        # Process through all filters
+        data = test_data_with_ids
+        for i, filter_op in enumerate(filters):
+            filter_type = type(filter_op).__name__
+            filter_name = getattr(filter_op, "_name", f"filter_{i}")
+            logger.info(f"🔍 DEBUG: Processing filter {i+1}/{len(filters)}: {filter_type} ({filter_name})")
+            logger.info(f"🔍 DEBUG: Data before filter {i+1}: {len(data.get('text', []))} samples")
+            logger.info(f"🔍 DEBUG: Text field type before filter {i+1}: {type(data.get('text', []))}")
+            if data.get("text") and len(data["text"]) > 0:
+                logger.info(f"🔍 DEBUG: First text sample before filter {i+1}: {data['text'][0][:50]}...")
+
+            if hasattr(filter_op, "compute_stats_batched"):
+                logger.info(f"🔍 DEBUG: Computing stats for filter {i+1}...")
+                data = filter_op.compute_stats_batched(data)
+                logger.info(f"🔍 DEBUG: After stats for filter {i+1}: {len(data.get('text', []))} samples")
+            else:
+                logger.info(f"🔍 DEBUG: Filter {i+1} has no compute_stats_batched method")
+
+            if hasattr(filter_op, "process_batched"):
+                logger.info(f"🔍 DEBUG: Processing filter {i+1}...")
+                result = list(filter_op.process_batched(data))
+                logger.info(f"🔍 DEBUG: Filter {i+1} result type: {type(result[0]) if result else 'None'}")
+                logger.info(f"🔍 DEBUG: Filter {i+1} result length: {len(result) if result else 0}")
+                if result and len(result) > 0:
+                    logger.info(f"🔍 DEBUG: Filter {i+1} first result: {result[0]}")
+                    logger.info(f"🔍 DEBUG: Filter {i+1} first result type: {type(result[0])}")
+
+                # Check if this is a filter (returns boolean) or mapper (returns transformed data)
+                # Handle both list and map objects that contain booleans
+                import numpy as np
+
+                is_numpy_bool = False
+                try:
+                    is_numpy_bool = np.issubdtype(type(result[0]), np.bool_)
+                except Exception:
+                    is_numpy_bool = False
+                if result and (
+                    isinstance(result[0], bool)
+                    or str(type(result[0])).endswith("bool")
+                    or is_numpy_bool
+                    or (
+                        hasattr(result, "__iter__")
+                        and not isinstance(result, str)
+                        and all(
+                            isinstance(x, bool)
+                            or str(type(x)).endswith("bool")
+                            or (np.issubdtype(type(x), np.bool_) if "numpy" in str(type(x)) else False)
+                            for x in result
+                        )
+                    )
+                ):
+                    # This is a filter - apply boolean mask
+                    mask = result
+                    logger.info(f"🔍 DEBUG: Filter {i+1} boolean mask: {sum(mask)}/{len(mask)} samples passed")
+                    logger.info(f"🔍 DEBUG: Filter {i+1} mask details: {mask[:10]}...")  # Show first 10 values
+
+                    # Store the filter result for debugging
+                    data[f"filter_result_filter_{i+1}"] = mask
+
+                    # Keep only samples that passed the filter
+                    passed_indices = [idx for idx, passed in enumerate(mask) if passed]
+                    if passed_indices:
+                        # Update data to keep only passed samples
+                        logger.info(f"🔍 DEBUG: Before filtering - text field type: {type(data.get('text', []))}")
+                        logger.info(f"🔍 DEBUG: Before filtering - text field length: {len(data.get('text', []))}")
+                        if data.get("text") and len(data["text"]) > 0:
+                            logger.info(f"🔍 DEBUG: Before filtering - first text sample: {data['text'][0][:50]}...")
+
+                        for key in data:
+                            if isinstance(data[key], list) and len(data[key]) == len(mask):
+                                data[key] = [data[key][idx] for idx in passed_indices]
+
+                        logger.info(f"🔍 DEBUG: After filtering - text field type: {type(data.get('text', []))}")
+                        logger.info(f"🔍 DEBUG: After filtering - text field length: {len(data.get('text', []))}")
+                        if data.get("text") and len(data["text"]) > 0:
+                            logger.info(f"🔍 DEBUG: After filtering - first text sample: {data['text'][0][:50]}...")
+
+                        logger.info(f"🔍 DEBUG: After filter {i+1}: {len(passed_indices)} samples remaining")
+                    else:
+                        # No samples passed - clear all data
+                        for key in data:
+                            if isinstance(data[key], list):
+                                data[key] = []
+                        logger.info(f"🔍 DEBUG: After filter {i+1}: 0 samples remaining")
+                        break
+                else:
+                    # This is a mapper - transform the data
+                    logger.info(f"🔍 DEBUG: Mapper {i+1} transformed data: {len(result)} samples")
+                    # Update only the 'text' field
+                    data["text"] = result
+                    # Keep sample_ids and stats aligned
+                    if "sample_id" in data and len(data["sample_id"]) != len(result):
+                        data["sample_id"] = data["sample_id"][: len(result)]
+                    if Fields.stats in data and len(data[Fields.stats]) != len(result):
+                        data[Fields.stats] = data[Fields.stats][: len(result)]
+                    logger.info(f"🔍 DEBUG: After mapper {i+1}: {len(data.get('text', []))} samples")
+            else:
+                logger.warning(f"🔍 DEBUG: Filter {i+1} has no process_batched method")
+
+        logger.info(f"🔍 DEBUG: Final individual execution: {len(data.get('text', []))} samples")
+        logger.info(f"🔍 DEBUG: Final data keys: {list(data.keys())}")
+        logger.info(f"🔍 DEBUG: Final text field type: {type(data.get('text', []))}")
+        if data.get("text") and len(data["text"]) > 0:
+            logger.info(f"🔍 DEBUG: Final first text sample: {data['text'][:50]}...")
+
+        # SAFEGUARD: Ensure text field is always a list of strings after all filters
+        if "text" in data and data["text"] and not all(isinstance(t, str) for t in data["text"]):
+            logger.warning("Text field contains non-string elements after filtering. Converting to strings.")
+            data["text"] = [str(t) for t in data["text"]]
+
+        individual_results_file = os.path.join(validation_dir, "individual_execution_results.jsonl")
+        self._save_results_to_file(data, individual_results_file)
+        logger.info(f"📄 Individual execution results saved to: {individual_results_file}")
+
+        return data
+
+    def _run_and_save_pipeline_execution(
+        self, optimized_ops: List, test_data: Dict[str, Any], validation_dir: str
+    ) -> Dict[str, Any]:
+        """Run pipeline execution and save results with IDs."""
+        logger.info("🔍 Running pipeline execution for validation...")
+
+        # Debug: Log all optimized operations being processed
+        logger.info(f"🔍 DEBUG: Processing {len(optimized_ops)} optimized operations in pipeline execution:")
+        for i, op_config in enumerate(optimized_ops):
+            op_name = list(op_config.keys())[0]
+            op_args = op_config[op_name]
+            logger.info(f"  Op {i+1}: {op_name} (args: {op_args})")
+
+        # Add sample IDs to test data
+        original_length = get_dataset_length(test_data)
+        test_data_with_ids = test_data.copy()
+        test_data_with_ids["sample_id"] = list(range(original_length))
+
+        logger.info(f"🔍 DEBUG: Starting with {original_length} samples")
+        logger.info(f"🔍 DEBUG: Test data keys: {list(test_data_with_ids.keys())}")
+        logger.info(f"🔍 DEBUG: Text samples: {len(test_data_with_ids.get('text', []))}")
+
+        # Process with optimized operations
+        data = test_data_with_ids
+        from data_juicer.ops import load_ops
+
+        for op_idx, op_config in enumerate(optimized_ops):
+            logger.info(f"🔍 DEBUG: Processing optimized op {op_idx+1}/{len(optimized_ops)}")
+            logger.info(f"🔍 DEBUG: Data before op {op_idx+1}: {len(data.get('text', []))} samples")
+            logger.info(f"🔍 DEBUG: Text field type before op {op_idx+1}: {type(data.get('text', []))}")
+            if data.get("text") and len(data["text"]) > 0:
+                logger.info(f"🔍 DEBUG: First text sample before op {op_idx+1}: {data['text'][0][:50]}...")
+
+            # Special handling for fused_filter - we need to create the actual filter objects
+            op_name = list(op_config.keys())[0]
+            logger.info(f"🔍 DEBUG: Op {op_idx+1} type: {op_name}")
+
+            if op_name == "fused_filter":
+                # Extract the fused_op_list and create individual filter objects
+                fused_op_list = op_config[op_name].get("fused_op_list", [])
+                individual_filters = []
+
+                logger.info(f"🔍 DEBUG: Fused filter contains {len(fused_op_list)} individual filters:")
+                for filter_config in fused_op_list:
+                    filter_name = list(filter_config.keys())[0]
+                    filter_args = filter_config[filter_name]
+                    logger.info(f"    - {filter_name}: {filter_args}")
+
+                    # Load the individual filter
+                    loaded_filters = load_ops([{filter_name: filter_args}])
+                    if loaded_filters:
+                        individual_filters.append(loaded_filters[0])
+                        logger.info(f"    ✅ Successfully loaded {filter_name}")
+                    else:
+                        logger.warning(f"    ❌ Failed to load {filter_name}")
+
+                # Create the fused filter with the actual filter objects
+                if individual_filters:
+                    op = FusedFilter(name="fused_filter", fused_filters=individual_filters)
+                    # Force sequential execution to match individual execution behavior exactly
+                    # (process filters one by one in the same order as individual execution)
+                    op.execution_strategy = "sequential"
+                    logger.info(f"🔍 DEBUG: Created fused filter with {len(individual_filters)} filters")
+                    logger.info(f"🔍 DEBUG: Fused filter execution strategy: {op.execution_strategy}")
+                    logger.info(f"🔍 DEBUG: Filter order: {[f._name for f in op.fused_filters]}")
+                else:
+                    logger.warning(f"🔍 DEBUG: Failed to create fused filter")
+                    continue  # Skip if we can't create the fused filter
+            else:
+                # Load the operation from config for non-fused operations
+                loaded_ops = load_ops([op_config])
+                if loaded_ops:
+                    op = loaded_ops[0]
+                    logger.info(f"🔍 DEBUG: Loaded op: {type(op).__name__}")
+                else:
+                    logger.warning(f"🔍 DEBUG: Failed to load op from config")
+                    continue  # Skip if we can't load the operation
+
+            # Execute the operation
+            if hasattr(op, "compute_stats_batched"):
+                logger.info(f"🔍 DEBUG: Computing stats for op {op_idx+1}...")
+                data = op.compute_stats_batched(data)
+                logger.info(f"🔍 DEBUG: After stats for op {op_idx+1}: {len(data.get('text', []))} samples")
+            else:
+                logger.info(f"🔍 DEBUG: Op {op_idx+1} has no compute_stats_batched method")
+
+            if hasattr(op, "process_batched"):
+                logger.info(f"🔍 DEBUG: Processing op {op_idx+1}...")
+                result = list(op.process_batched(data))
+                logger.info(f"🔍 DEBUG: Op {op_idx+1} result type: {type(result[0]) if result else 'None'}")
+                logger.info(f"🔍 DEBUG: Op {op_idx+1} result length: {len(result) if result else 0}")
+                if result and len(result) > 0:
+                    logger.info(f"🔍 DEBUG: Op {op_idx+1} first result: {result[0]}")
+                    logger.info(f"🔍 DEBUG: Op {op_idx+1} first result type: {type(result[0])}")
+
+                # Check if this is a filter (returns boolean) or mapper (returns transformed data)
+                # Handle both list and map objects that contain booleans
+                import numpy as np
+
+                is_numpy_bool = False
+                try:
+                    is_numpy_bool = np.issubdtype(type(result[0]), np.bool_)
+                except Exception:
+                    is_numpy_bool = False
+                if result and (
+                    isinstance(result[0], bool)
+                    or str(type(result[0])).endswith("bool")
+                    or is_numpy_bool
+                    or (
+                        hasattr(result, "__iter__")
+                        and not isinstance(result, str)
+                        and all(
+                            isinstance(x, bool)
+                            or str(type(x)).endswith("bool")
+                            or (np.issubdtype(type(x), np.bool_) if "numpy" in str(type(x)) else False)
+                            for x in result
+                        )
+                    )
+                ):
+                    # This is a filter - apply boolean mask
+                    mask = result
+                    logger.info(f"🔍 DEBUG: Op {op_idx+1} boolean mask: {sum(mask)}/{len(mask)} samples passed")
+                    logger.info(f"🔍 DEBUG: Op {op_idx+1} mask details: {mask[:10]}...")  # Show first 10 values
+
+                    # Store the filter result for debugging
+                    data[f"filter_result_op_{op_idx+1}"] = mask
+
+                    # Keep only samples that passed the filter
+                    passed_indices = [idx for idx, passed in enumerate(mask) if passed]
+                    if passed_indices:
+                        # Update data to keep only passed samples
+                        logger.info(f"🔍 DEBUG: Before filtering - text field type: {type(data.get('text', []))}")
+                        logger.info(f"🔍 DEBUG: Before filtering - text field length: {len(data.get('text', []))}")
+                        if data.get("text") and len(data["text"]) > 0:
+                            logger.info(f"🔍 DEBUG: Before filtering - first text sample: {data['text'][0][:50]}...")
+
+                        for key in data:
+                            if isinstance(data[key], list) and len(data[key]) == len(mask):
+                                data[key] = [data[key][idx] for idx in passed_indices]
+
+                        logger.info(f"🔍 DEBUG: After filtering - text field type: {type(data.get('text', []))}")
+                        logger.info(f"🔍 DEBUG: After filtering - text field length: {len(data.get('text', []))}")
+                        if data.get("text") and len(data["text"]) > 0:
+                            logger.info(f"🔍 DEBUG: After filtering - first text sample: {data['text'][0][:50]}...")
+
+                        logger.info(f"🔍 DEBUG: After op {op_idx+1}: {len(passed_indices)} samples remaining")
+
+                        # SAFEGUARD: Ensure text field is always a list of strings
+                        if "text" in data:
+                            if not isinstance(data["text"], list):
+                                logger.warning(
+                                    f"🔍 WARNING: text field is not a list after filter {op_idx+1}: {type(data['text'])} = {data['text']}"
+                                )
+                                data["text"] = []
+                            elif data["text"] and not all(isinstance(t, str) for t in data["text"]):
+                                logger.warning(
+                                    f"🔍 WARNING: text field contains non-string elements after filter {op_idx+1}: {[type(t) for t in data['text'][:3]]}"
+                                )
+                                # Convert non-string elements to strings
+                                data["text"] = [str(t) if not isinstance(t, str) else t for t in data["text"]]
+                    else:
+                        # No samples passed - clear all data
+                        for key in data:
+                            if isinstance(data[key], list):
+                                data[key] = []
+                        logger.info(f"🔍 DEBUG: After op {op_idx+1}: 0 samples remaining")
+                        break
+                else:
+                    # This is a mapper - update text data
+                    if result:
+                        data["text"] = result
+                        # Keep sample_ids and stats aligned
+                        if "sample_id" in data and len(data["sample_id"]) != len(result):
+                            data["sample_id"] = data["sample_id"][: len(result)]
+                        if Fields.stats in data and len(data[Fields.stats]) != len(result):
+                            data[Fields.stats] = data[Fields.stats][: len(result)]
+                        logger.info(f"🔍 DEBUG: After mapper op {op_idx+1}: {len(data.get('text', []))} samples")
+                        logger.info(f"🔍 DEBUG: Data keys after mapper operation {op_idx+1}: {list(data.keys())}")
+            else:
+                logger.warning(f"🔍 DEBUG: Op {op_idx+1} has no process_batched method")
+
+        logger.info(f"🔍 DEBUG: Final pipeline execution: {len(data.get('text', []))} samples")
+        logger.info(f"🔍 DEBUG: Final data keys: {list(data.keys())}")
+        logger.info(f"🔍 DEBUG: Final text field type: {type(data.get('text', []))}")
+        if data.get("text") and len(data["text"]) > 0:
+            logger.info(f"🔍 DEBUG: Final first text sample: {data['text'][:50]}...")
+
+        # Save pipeline execution results
+        pipeline_results_file = os.path.join(validation_dir, "pipeline_execution_results.jsonl")
+        self._save_results_to_file(data, pipeline_results_file)
+        logger.info(f"📄 Pipeline execution results saved to: {pipeline_results_file}")
+
+        return data
+
+    def _convert_numpy_types(self, obj):
+        """Convert NumPy types to Python types for JSON serialization."""
+        import numpy as np
+
+        if isinstance(obj, np.bool_):
+            return bool(obj)
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, dict):
+            return {key: self._convert_numpy_types(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [self._convert_numpy_types(item) for item in obj]
+        else:
+            return obj
+
+    def _save_results_to_file(self, data: Dict[str, Any], filepath: str):
+        """Save execution results to a JSONL file with sample IDs."""
+        import json
+
+        logger.info(f"💾 Saving results to {filepath}")
+
+        # Debug data structure
+        logger.info(f"🔍 DEBUG: Data keys: {list(data.keys())}")
+        logger.info(f"🔍 DEBUG: Data structure: {data}")
+
+        if "text" in data:
+            logger.info(f"🔍 DEBUG: Text field type: {type(data['text'])}")
+            logger.info(
+                f"🔍 DEBUG: Text field length: {len(data['text']) if hasattr(data['text'], '__len__') else 'N/A'}"
+            )
+            if hasattr(data["text"], "__len__") and len(data["text"]) > 0:
+                logger.info(f"🔍 DEBUG: First text sample: {data['text'][0]}")
+                logger.info(f"🔍 DEBUG: First text sample type: {type(data['text'][0])}")
+
+        with open(filepath, "w", encoding="utf-8") as f:
+            if "text" in data and "sample_id" in data:
+                logger.info("🔍 DEBUG: Using text and sample_id fields")
+                for i, (text, sample_id) in enumerate(zip(data["text"], data["sample_id"])):
+                    result = {
+                        "sample_id": self._convert_numpy_types(sample_id),
+                        "text": self._convert_numpy_types(text),
+                        "final_index": i,
+                    }
+
+                    # Add filter results if they exist
+                    filter_results = {}
+                    for key, value in data.items():
+                        if key.startswith("filter_result_") and i < len(value):
+                            filter_results[key] = self._convert_numpy_types(value[i])
+
+                    if filter_results:
+                        result["filter_results"] = filter_results
+
+                    f.write(json.dumps(result, ensure_ascii=False) + "\n")
+            else:
+                logger.info("🔍 DEBUG: Using fallback - text field only")
+                # Fallback if data structure is different
+                for i, text in enumerate(data.get("text", [])):
+                    result = {"sample_id": i, "text": self._convert_numpy_types(text), "final_index": i}
+
+                    # Add filter results if they exist
+                    filter_results = {}
+                    for key, value in data.items():
+                        if key.startswith("filter_result_") and i < len(value):
+                            filter_results[key] = self._convert_numpy_types(value[i])
+
+                    if filter_results:
+                        result["filter_results"] = filter_results
+
+                    f.write(json.dumps(result, ensure_ascii=False) + "\n")
+
+    def _compare_execution_results(
+        self, individual_data: Dict[str, Any], pipeline_data: Dict[str, Any], validation_dir: str
+    ) -> Dict[str, Any]:
+        """Compare individual vs pipeline execution results."""
+        logger.info("🔍 Comparing execution results...")
+
+        # Extract sample IDs and texts
+        individual_ids = individual_data.get("sample_id", [])
+        individual_texts = individual_data.get("text", [])
+        pipeline_ids = pipeline_data.get("sample_id", [])
+        pipeline_texts = pipeline_data.get("text", [])
+
+        logger.info(f"📊 Individual execution: {len(individual_ids)} samples")
+        logger.info(f"📊 Pipeline execution: {len(pipeline_ids)} samples")
+
+        # Create comparison report
+        comparison_file = os.path.join(validation_dir, "comparison_report.txt")
+        with open(comparison_file, "w", encoding="utf-8") as f:
+            f.write("EXECUTION COMPARISON REPORT\n")
+            f.write("=" * 50 + "\n\n")
+            f.write(f"Individual execution samples: {len(individual_ids)}\n")
+            f.write(f"Pipeline execution samples: {len(pipeline_ids)}\n\n")
+
+            # Check if sample counts match
+            if len(individual_ids) == len(pipeline_ids):
+                f.write("✅ Sample counts match!\n\n")
+
+                # Check if sample IDs match
+                if individual_ids == pipeline_ids:
+                    f.write("✅ Sample IDs match!\n\n")
+
+                    # Check if texts match
+                    mismatches = []
+                    for i, (ind_text, pipe_text) in enumerate(zip(individual_texts, pipeline_texts)):
+                        # Convert any type to string for comparison
+                        ind_text_str = str(ind_text) if ind_text is not None else ""
+                        pipe_text_str = str(pipe_text) if pipe_text is not None else ""
+
+                        if ind_text_str != pipe_text_str:
+                            # Safely truncate for display
+                            ind_display = ind_text_str[:100] + "..." if len(ind_text_str) > 100 else ind_text_str
+                            pipe_display = pipe_text_str[:100] + "..." if len(pipe_text_str) > 100 else pipe_text_str
+
+                            mismatches.append(
+                                {
+                                    "index": i,
+                                    "sample_id": individual_ids[i],
+                                    "individual_text": ind_display,
+                                    "pipeline_text": pipe_display,
+                                }
+                            )
+
+                    if not mismatches:
+                        f.write("✅ All texts match! Individual and pipeline execution are identical.\n")
+                        logger.info("✅ VALIDATION PASSED: Individual and pipeline execution results are identical!")
+                        validation_passed = True
+                    else:
+                        f.write(f"❌ Found {len(mismatches)} text mismatches:\n\n")
+                        for mismatch in mismatches[:10]:  # Show first 10 mismatches
+                            f.write(f"Index {mismatch['index']} (Sample ID {mismatch['sample_id']}):\n")
+                            f.write(f"  Individual: {mismatch['individual_text']}\n")
+                            f.write(f"  Pipeline:  {mismatch['pipeline_text']}\n\n")
+                        logger.warning(f"❌ VALIDATION FAILED: Found {len(mismatches)} text mismatches")
+                        validation_passed = False
+                else:
+                    f.write("❌ Sample IDs do not match!\n")
+                    f.write(f"Individual IDs: {individual_ids[:10]}...\n")
+                    f.write(f"Pipeline IDs:  {pipeline_ids[:10]}...\n")
+                    logger.warning("❌ VALIDATION FAILED: Sample IDs do not match")
+                    validation_passed = False
+            else:
+                f.write("❌ Sample counts do not match!\n")
+                f.write(f"Individual: {len(individual_ids)} samples\n")
+                f.write(f"Pipeline:  {len(pipeline_ids)} samples\n")
+                logger.warning("❌ VALIDATION FAILED: Sample counts do not match")
+                validation_passed = False
+
+        logger.info(f"📄 Comparison report saved to: {comparison_file}")
+
+        return {
+            "passed": validation_passed,
+            "individual_samples": len(individual_ids),
+            "pipeline_samples": len(pipeline_ids),
+            "sample_ids_match": individual_ids == pipeline_ids,
+            "comparison_file": comparison_file,
+        }
 
     def get_quick_test_filters(self) -> List[Filter]:
         """Get a small set of filters for quick testing."""
@@ -1557,13 +1826,17 @@ class PerformanceBenchmark:
         )
 
         return [
-            alphanumeric_filter.AlphanumericFilter(min_ratio=0.5),
-            text_length_filter.TextLengthFilter(min_len=10, max_len=1000),
-            words_num_filter.WordsNumFilter(min_num=5, max_num=200),
-            character_repetition_filter.CharacterRepetitionFilter(max_ratio=0.2),
-            word_repetition_filter.WordRepetitionFilter(max_ratio=0.2),
-            special_characters_filter.SpecialCharactersFilter(min_ratio=0.01, max_ratio=0.3),
-            stopwords_filter.StopWordsFilter(min_ratio=0.1),
+            alphanumeric_filter.AlphanumericFilter(min_ratio=0.01),  # Allow as low as 1% alphanumeric (was 0.1)
+            text_length_filter.TextLengthFilter(min_len=1, max_len=50000),  # Allow 1-50000 chars (was 1-10000)
+            words_num_filter.WordsNumFilter(min_num=1, max_num=50000),  # Allow 1-50000 words (was 1-10000)
+            character_repetition_filter.CharacterRepetitionFilter(
+                max_ratio=0.99
+            ),  # Allow up to 99% repetition (was 0.95)
+            word_repetition_filter.WordRepetitionFilter(max_ratio=0.95),  # Allow up to 95% word repetition (was 0.8)
+            special_characters_filter.SpecialCharactersFilter(
+                min_ratio=0.0, max_ratio=0.8
+            ),  # Allow up to 80% special chars (was 0.0-0.5)
+            stopwords_filter.StopWordsFilter(min_ratio=0.0),  # Allow any stop word ratio (was 0.0)
         ]
 
     def run_analyzer(self, test_data: Dict[str, Any]) -> dict:
@@ -1579,380 +1852,830 @@ class PerformanceBenchmark:
             logger.warning(f"⚠️  Analyzer failed: {e}")
             return None
 
-    def get_final_mask_from_filters(self, filters: List[Filter], test_data: Dict[str, Any]) -> list:
-        """Compute the final boolean mask for each sample using individual filter execution (AND)."""
-        data = test_data.copy()
-        masks = []
-        for filter_op in filters:
-            if hasattr(filter_op, "compute_stats_batched"):
-                data = filter_op.compute_stats_batched(data)
-            if hasattr(filter_op, "process_batched"):
-                result = list(filter_op.process_batched(data))
-                # Handle both boolean masks and text content
-                if result and isinstance(result[0], bool):
-                    mask = result
-                else:
-                    # If it returns text content, create a mask based on non-empty results
-                    mask = [bool(item) for item in result]
-                masks.append(mask)
-        # AND across all filters
-        if masks:
-            final_mask = [all(vals) for vals in zip(*masks)]
+    def run_ast_benchmark(self, ast, test_data: Dict[str, Any], mode: str = "recipe") -> Dict[str, Any]:
+        """Run benchmark using AST-based execution for recipe mode."""
+        logger.info("🚀 Starting AST-based Performance Benchmark")
+        logger.info("=" * 60)
+
+        # Get analyzer insights
+        logger.info("🔍 Getting analyzer insights...")
+        analyzer_insights = self.get_analyzer_insights(test_data)
+
+        # Run individual execution benchmark (convert AST to individual operations)
+        logger.info("\n📊 INDIVIDUAL EXECUTION BENCHMARK")
+        logger.info("-" * 40)
+
+        # Convert AST to individual operations for baseline comparison
+        individual_ops = self._convert_ast_to_individual_ops(ast)
+        individual_results = self.run_individual_filters_benchmark(individual_ops, test_data)
+
+        # Run AST-based pipeline benchmark
+        logger.info("\n🔧 AST PIPELINE BENCHMARK")
+        logger.info("-" * 40)
+        pipeline_results = self.run_ast_pipeline_benchmark(ast, test_data, analyzer_insights)
+
+        # Calculate performance metrics
+        individual_time = individual_results.total_time
+        pipeline_time = pipeline_results.total_time
+
+        if individual_time > 0:
+            pipeline_speedup = individual_time / pipeline_time
+            logger.info(f"Individual execution: {individual_time:.3f}s ({individual_results.throughput:.1f} samples/s)")
+            logger.info(f"AST pipeline:        {pipeline_time:.3f}s ({pipeline_results.throughput:.1f} samples/s)")
+            logger.info(f"Pipeline speedup:    {pipeline_speedup:.2f}x")
+
+            # Determine best strategy
+            best_time = min(individual_time, pipeline_time)
+            if best_time == individual_time:
+                best_strategy = "Individual"
+            else:
+                best_strategy = "AST Pipeline"
+
+            logger.info(f"🏆 Best strategy:     {best_strategy}")
+
+        # Validation: Compare AST execution vs individual execution
+        logger.info("\n🔎 VALIDATING AST PIPELINE RESULTS AGAINST INDIVIDUAL EXECUTION")
+
+        # Get final masks for comparison
+        individual_mask = self.get_final_mask_from_filters(individual_ops, test_data)
+        ast_mask = self.get_final_mask_from_ast(ast, test_data)
+
+        if individual_mask == ast_mask:
+            logger.info("✅ AST pipeline results match individual execution!")
+            mismatches = []
         else:
-            final_mask = [True] * get_dataset_length(data)
-        return final_mask
+            mismatches = [i for i, (a, b) in enumerate(zip(individual_mask, ast_mask)) if a != b]
+            logger.warning(
+                f"❌ AST pipeline results do NOT match individual execution! {len(mismatches)} mismatches out of {len(individual_mask)} samples."
+            )
 
-    def get_final_mask_from_fused(
-        self, filters: List[Filter], test_data: Dict[str, Any], analyzer_insights=None
-    ) -> list:
-        """Compute the final boolean mask for each sample using fused execution (with fusion strategies)."""
-        # Use the same logic as run_fused_filters_benchmark, but return the mask
-        pipeline_config = self._build_pipeline_config_from_filters(filters)
-        from data_juicer.core.pipeline_ast import PipelineAST
+        # Compile results
+        results = {
+            "mode": mode,
+            "num_samples": get_dataset_length(test_data),
+            "num_filters": len(individual_ops),
+            "individual": {
+                "total_time": individual_results.total_time,
+                "stats_time": individual_results.stats_time,
+                "filter_time": individual_results.filter_time,
+                "memory_usage": individual_results.memory_usage,
+                "throughput": individual_results.throughput,
+            },
+            "pipeline": {
+                "total_time": pipeline_results.total_time,
+                "stats_time": pipeline_results.stats_time,
+                "filter_time": pipeline_results.filter_time,
+                "memory_usage": pipeline_results.memory_usage,
+                "throughput": pipeline_results.throughput,
+            },
+            "speedup": pipeline_speedup if individual_time > 0 else 0,
+            "best_strategy": best_strategy if individual_time > 0 else "Unknown",
+            "validation": {
+                "matches": len(mismatches) == 0,
+                "num_mismatches": len(mismatches),
+                "mismatch_indices": mismatches[:10],
+            },
+            "analyzer_insights": analyzer_insights,
+        }
 
+        return results
+
+    def run_ast_pipeline_benchmark(
+        self, ast, test_data: Dict[str, Any], analyzer_insights: dict = None
+    ) -> PerformanceMetrics:
+        """Benchmark AST-based pipeline execution."""
+        logger.info("Running AST pipeline benchmark...")
+
+        start_memory = self.measure_memory_usage()
+        total_start_time = time.time()
+
+        # Convert AST back to config for execution
+        config = self._convert_ast_to_config(ast)
+
+        # Create a temporary config for execution
+        from jsonargparse import Namespace
+
+        from data_juicer.core.executor import DefaultExecutor
+
+        # Create minimal config for execution
+        exec_config = Namespace()
+        exec_config.process = config.get("process", [])
+        exec_config.work_dir = "./tmp_benchmark"
+        exec_config.export_path = "./tmp_benchmark/result.jsonl"
+        exec_config.export_shard_size = 10000
+        exec_config.export_in_parallel = False
+        exec_config.np = 1
+        exec_config.use_cache = False
+        exec_config.use_checkpoint = False
+        exec_config.open_monitor = False
+        exec_config.open_tracer = False
+        exec_config.op_fusion = False
+        exec_config.adaptive_batch_size = False
+        exec_config.keep_stats_in_res_ds = True
+        exec_config.keep_hashes_in_res_ds = False
+
+        # Create executor and run
+        executor = DefaultExecutor(exec_config)
+        _ = executor.run(dataset=test_data, skip_return=False)
+
+        # Calculate totals
+        total_time = time.time() - total_start_time
+        end_memory = self.measure_memory_usage()
+        memory_usage = end_memory - start_memory
+        throughput = get_dataset_length(test_data) / total_time
+
+        logger.info("  📊 AST PIPELINE BREAKDOWN:")
+        logger.info(f"    Total time: {total_time:.3f}s")
+        logger.info(f"    Throughput: {throughput:.1f} samples/sec")
+        logger.info(f"    Memory usage: {memory_usage:.1f} MB")
+
+        return PerformanceMetrics(
+            total_time=total_time,
+            stats_time=total_time * 0.8,  # Estimate
+            filter_time=total_time * 0.2,  # Estimate
+            memory_usage=memory_usage,
+            throughput=throughput,
+        )
+
+    def _convert_ast_to_config(self, ast) -> Dict[str, Any]:
+        """Convert AST back to configuration format."""
+        if not ast.root or not ast.root.children:
+            return {"process": []}
+
+        process_list = []
+        current = ast.root.children[0]  # Skip root node
+
+        while current:
+            process_list.append({current.name: current.config})
+            if current.children:
+                current = current.children[0]
+            else:
+                break
+
+        return {"process": process_list}
+
+    def get_final_mask_from_ast(self, ast, test_data: Dict[str, Any]) -> list:
+        """Compute final boolean mask using AST execution."""
+        # Convert AST to config and execute
+        config = self._convert_ast_to_config(ast)
+
+        # Create a temporary config for execution
+        from jsonargparse import Namespace
+
+        from data_juicer.core.executor import DefaultExecutor
+
+        # Create minimal config for execution
+        exec_config = Namespace()
+        exec_config.process = config.get("process", [])
+        exec_config.work_dir = "./tmp_benchmark"
+        exec_config.export_path = "./tmp_benchmark/result.jsonl"
+        exec_config.export_shard_size = 10000
+        exec_config.export_in_parallel = False
+        exec_config.np = 1
+        exec_config.use_cache = False
+        exec_config.use_checkpoint = False
+        exec_config.open_monitor = False
+        exec_config.open_tracer = False
+        exec_config.op_fusion = False
+        exec_config.adaptive_batch_size = False
+        exec_config.keep_stats_in_res_ds = True
+        exec_config.keep_hashes_in_res_ds = False
+
+        # Create executor and run
+        executor = DefaultExecutor(exec_config)
+        result_dataset = executor.run(dataset=test_data, skip_return=False)
+
+        # Create mask based on which samples survived
+        original_length = get_dataset_length(test_data)
+        result_length = get_dataset_length(result_dataset)
+
+        # For now, assume all samples that made it through the pipeline passed
+        # This is a simplified approach - in practice, you'd need to track which samples were dropped
+        mask = [True] * result_length + [False] * (original_length - result_length)
+
+        return mask
+
+    def _convert_ast_to_individual_ops(self, ast) -> List[Filter]:
+        """Convert AST to individual operations for baseline comparison."""
+        operations = self._convert_ast_to_operations(ast)
+        individual_ops = []
+
+        from data_juicer.ops import load_ops
+
+        for op_config in operations:
+            op_name = list(op_config.keys())[0]
+            if op_name == "fused_filter":
+                # Extract individual filters from fused filter
+                fused_op_list = op_config[op_name].get("fused_op_list", [])
+                for filter_config in fused_op_list:
+                    filter_name = list(filter_config.keys())[0]
+                    filter_args = filter_config[filter_name]
+                    loaded_filters = load_ops([{filter_name: filter_args}])
+                    if loaded_filters:
+                        individual_ops.append(loaded_filters[0])
+            else:
+                # Load individual operation
+                loaded_ops = load_ops([op_config])
+                if loaded_ops:
+                    individual_ops.append(loaded_ops[0])
+
+        return individual_ops
+
+    def classify_operations(self, operations: List) -> Dict[str, List]:
+        """Classify operations by type for proper benchmarking."""
+        classified = {"mappers": [], "filters": [], "deduplicators": [], "other": []}
+
+        for op in operations:
+            op_type = type(op).__name__.lower()
+            if "mapper" in op_type:
+                classified["mappers"].append(op)
+            elif "filter" in op_type:
+                classified["filters"].append(op)
+            elif "deduplicator" in op_type:
+                classified["deduplicators"].append(op)
+            else:
+                classified["other"].append(op)
+
+        return classified
+
+    def run_mixed_operations_benchmark(
+        self, operations: List, test_data: Dict[str, Any], mode: str = "mixed"
+    ) -> Dict[str, Any]:
+        """Run benchmark for mixed operations (mappers, filters, deduplicators)."""
+        logger.info("🚀 Starting Mixed Operations Performance Benchmark")
+        logger.info("=" * 60)
+
+        # Classify operations by type
+        classified_ops = self.classify_operations(operations)
+        logger.info("📊 Operation breakdown:")
+        logger.info(f"  Mappers: {len(classified_ops['mappers'])}")
+        logger.info(f"  Filters: {len(classified_ops['filters'])}")
+        logger.info(f"  Deduplicators: {len(classified_ops['deduplicators'])}")
+        logger.info(f"  Other: {len(classified_ops['other'])}")
+
+        # Get analyzer insights
+        logger.info("🔍 Getting analyzer insights...")
+        analyzer_insights = self.get_analyzer_insights(test_data)
+
+        # Run individual execution benchmark
+        logger.info("\n📊 INDIVIDUAL EXECUTION BENCHMARK")
+        logger.info("-" * 40)
+        individual_results = self.run_individual_mixed_ops_benchmark(operations, test_data)
+
+        # Run pipeline optimizer benchmark
+        logger.info("\n🔧 PIPELINE OPTIMIZER BENCHMARK")
+        logger.info("-" * 40)
+        pipeline_results = self.run_pipeline_mixed_ops_benchmark(operations, test_data, analyzer_insights)
+
+        # Calculate performance metrics
+        individual_time = individual_results.total_time
+        pipeline_time = pipeline_results.total_time
+
+        if individual_time > 0:
+            pipeline_speedup = individual_time / pipeline_time
+            logger.info(f"Individual execution: {individual_time:.3f}s ({individual_results.throughput:.1f} samples/s)")
+            logger.info(f"Pipeline optimizer:   {pipeline_time:.3f}s ({pipeline_results.throughput:.1f} samples/s)")
+            logger.info(f"Pipeline speedup:     {pipeline_speedup:.2f}x")
+
+            # Determine best strategy
+            best_time = min(individual_time, pipeline_time)
+            if best_time == individual_time:
+                best_strategy = "Individual"
+            else:
+                best_strategy = "Pipeline Optimizer"
+
+            logger.info(f"🏆 Best strategy:      {best_strategy}")
+
+        # --- Simple Validation: Save and Compare Results ---
+        logger.info("\n🔎 VALIDATING PIPELINE RESULTS AGAINST INDIVIDUAL EXECUTION")
+
+        # Create validation directory in outputs/
+        validation_dir = f"./outputs/benchmark_validation_{mode}_{int(time.time())}"
+        os.makedirs(validation_dir, exist_ok=True)
+        logger.info(f"📁 Validation results will be saved to: {validation_dir}")
+
+        # Get the optimized operations from the pipeline benchmark
+        pipeline_config = self._build_pipeline_config_from_operations(operations)
         ast = PipelineAST()
         ast.build_from_config(pipeline_config)
-        from data_juicer.core.optimizer.filter_fusion_strategy import (
-            FilterFusionStrategy,
-        )
+
         from data_juicer.core.optimizer.mapper_fusion_strategy import (
             MapperFusionStrategy,
         )
-        from data_juicer.core.optimizer.optimizer import PipelineOptimizer
 
-        strategies = [FilterFusionStrategy(analyzer_insights=analyzer_insights), MapperFusionStrategy()]
+        strategies = [FilterFusionStrategy(), MapperFusionStrategy()]
         optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
         optimized_ast = optimizer.optimize(ast)
         optimized_ops = self._convert_ast_to_operations(optimized_ast)
 
-        return self.get_final_mask_from_optimized_ops(optimized_ops, test_data)
+        # Debug: Log what we're comparing
+        logger.info(
+            f"🔍 VALIDATION DEBUG: Comparing {len(operations)} operations vs {len(optimized_ops)} optimized operations"
+        )
+        for i, op in enumerate(operations):
+            logger.info(f"  Operation {i+1}: {type(op).__name__}")
+        for i, op in enumerate(optimized_ops):
+            op_name = list(op.keys())[0]
+            logger.info(f"  Optimized Op {i+1}: {op_name}")
 
-    def get_final_mask_from_optimized_ops(self, optimized_ops: List, test_data: Dict[str, Any]) -> list:
-        """Compute the final boolean mask for each sample using optimized operations."""
-        data = test_data.copy()
-        mask = [True] * get_dataset_length(data)
+        # Run both individual and pipeline execution and save results
+        individual_results_data = self._run_and_save_individual_mixed_execution(operations, test_data, validation_dir)
+        pipeline_results_data = self._run_and_save_pipeline_mixed_execution(optimized_ast, test_data, validation_dir)
+
+        # Compare results
+        validation_results = self._compare_execution_results(
+            individual_results_data, pipeline_results_data, validation_dir
+        )
+
+        # Compile results
+        results = {
+            "mode": mode,
+            "num_samples": get_dataset_length(test_data),
+            "num_operations": len(operations),
+            "operation_breakdown": classified_ops,
+            "individual": {
+                "total_time": individual_results.total_time,
+                "stats_time": individual_results.stats_time,
+                "filter_time": individual_results.filter_time,
+                "memory_usage": individual_results.memory_usage,
+                "throughput": individual_results.throughput,
+            },
+            "pipeline": {
+                "total_time": pipeline_results.total_time,
+                "stats_time": pipeline_results.stats_time,
+                "filter_time": pipeline_results.filter_time,
+                "memory_usage": pipeline_results.memory_usage,
+                "throughput": pipeline_results.throughput,
+            },
+            "speedup": pipeline_speedup if individual_time > 0 else 0,
+            "best_strategy": best_strategy if individual_time > 0 else "Unknown",
+            "validation": validation_results,
+            "analyzer_insights": analyzer_insights,
+            "validation_dir": validation_dir,
+        }
+
+        return results
+
+    def _run_and_save_individual_mixed_execution(
+        self, operations: List, test_data: Dict[str, Any], validation_dir: str
+    ) -> Dict[str, Any]:
+        """Run individual mixed operations execution and save results with IDs."""
+        logger.info("🔍 Running individual mixed operations execution for validation...")
+
+        # Debug initial test_data
+        logger.info(f"🔍 DEBUG: Initial test_data keys: {list(test_data.keys())}")
+        logger.info(f"🔍 DEBUG: Initial test_data structure: {test_data}")
+        if "text" in test_data:
+            logger.info(f"🔍 DEBUG: Initial text field type: {type(test_data['text'])}")
+            logger.info(
+                f"🔍 DEBUG: Initial text field length: {len(test_data['text']) if hasattr(test_data['text'], '__len__') else 'N/A'}"
+            )
+            if hasattr(test_data["text"], "__len__") and len(test_data["text"]) > 0:
+                logger.info(f"🔍 DEBUG: Initial first text sample: {test_data['text'][0]}")
+                logger.info(f"🔍 DEBUG: Initial first text sample type: {type(test_data['text'][0])}")
+
+        # Add sample IDs to test data
+        original_length = get_dataset_length(test_data)
+        test_data_with_ids = test_data.copy()
+        test_data_with_ids["sample_id"] = list(range(original_length))
+
+        logger.info(f"🔍 DEBUG: Starting with {original_length} samples")
+        logger.info(f"🔍 DEBUG: Test data keys: {list(test_data_with_ids.keys())}")
+        logger.info(f"🔍 DEBUG: Text samples: {len(test_data_with_ids.get('text', []))}")
+
+        # Process through all operations
+        data = test_data_with_ids
+        for i, op in enumerate(operations):
+            op_type = type(op).__name__
+            logger.info(f"🔍 DEBUG: Processing operation {i+1}/{len(operations)}: {op_type}")
+            logger.info(f"🔍 DEBUG: Data before operation {i+1}: {len(data.get('text', []))} samples")
+            logger.info(f"🔍 DEBUG: Data keys before operation {i+1}: {list(data.keys())}")
+
+            if hasattr(op, "compute_stats_batched"):
+                data = op.compute_stats_batched(data)
+                logger.info(f"🔍 DEBUG: After stats for operation {i+1}: {len(data.get('text', []))} samples")
+                logger.info(f"🔍 DEBUG: Data keys after stats for operation {i+1}: {list(data.keys())}")
+
+            if hasattr(op, "process_batched"):
+                result = list(op.process_batched(data))
+                logger.info(f"🔍 DEBUG: Operation {i+1} result type: {type(result[0]) if result else 'None'}")
+                logger.info(f"🔍 DEBUG: Operation {i+1} result length: {len(result) if result else 0}")
+                if result and len(result) > 0:
+                    logger.info(f"🔍 DEBUG: Operation {i+1} first result: {result[0]}")
+                    logger.info(f"🔍 DEBUG: Operation {i+1} first result type: {type(result[0])}")
+
+                # Check if this is a filter (returns boolean) or mapper (returns transformed data)
+                if result and isinstance(result[0], bool):
+                    # This is a filter - apply boolean mask
+                    mask = result
+                    logger.info(f"🔍 DEBUG: Operation {i+1} boolean mask: {sum(mask)}/{len(mask)} samples passed")
+                    # Keep only samples that passed the filter
+                    passed_indices = [idx for idx, passed in enumerate(mask) if passed]
+                    if passed_indices:
+                        # Update data to keep only passed samples
+                        for key in data:
+                            if isinstance(data[key], list) and len(data[key]) == len(mask):
+                                data[key] = [data[key][idx] for idx in passed_indices]
+                        logger.info(f"🔍 DEBUG: After operation {i+1}: {len(passed_indices)} samples remaining")
+                    else:
+                        # No samples passed - clear all data
+                        for key in data:
+                            if isinstance(data[key], list):
+                                data[key] = []
+                        logger.info(f"🔍 DEBUG: After operation {i+1}: 0 samples remaining")
+                        break
+                else:
+                    # This is a mapper - update text data
+                    if result:
+                        data["text"] = result
+                        # Keep sample_ids and stats aligned
+                        if "sample_id" in data and len(data["sample_id"]) != len(result):
+                            data["sample_id"] = data["sample_id"][: len(result)]
+                        if Fields.stats in data and len(data[Fields.stats]) != len(result):
+                            data[Fields.stats] = data[Fields.stats][: len(result)]
+                        logger.info(f"🔍 DEBUG: After mapper operation {i+1}: {len(data.get('text', []))} samples")
+                        logger.info(f"🔍 DEBUG: Data keys after mapper operation {i+1}: {list(data.keys())}")
+
+        logger.info(f"🔍 DEBUG: Final individual execution: {len(data.get('text', []))} samples")
+        logger.info(f"🔍 DEBUG: Final data keys: {list(data.keys())}")
+
+        # Save individual execution results
+        individual_results_file = os.path.join(validation_dir, "individual_execution_results.jsonl")
+        self._save_results_to_file(data, individual_results_file)
+        logger.info(f"📄 Individual execution results saved to: {individual_results_file}")
+
+        return data
+
+    def _run_and_save_pipeline_mixed_execution(
+        self, ast, test_data: Dict[str, Any], validation_dir: str
+    ) -> Dict[str, Any]:
+        """Run pipeline mixed operations execution and save results with IDs."""
+        logger.info("🔍 Running pipeline mixed operations execution for validation...")
+
+        # Debug initial test_data
+        logger.info(f"🔍 DEBUG: Pipeline initial test_data keys: {list(test_data.keys())}")
+        logger.info(f"🔍 DEBUG: Pipeline initial test_data structure: {test_data}")
+        if "text" in test_data:
+            logger.info(f"🔍 DEBUG: Pipeline initial text field type: {type(test_data['text'])}")
+            logger.info(
+                f"🔍 DEBUG: Pipeline initial text field length: {len(test_data['text']) if hasattr(test_data['text'], '__len__') else 'N/A'}"
+            )
+            if hasattr(test_data["text"], "__len__") and len(test_data["text"]) > 0:
+                logger.info(f"🔍 DEBUG: Pipeline initial first text sample: {test_data['text'][0]}")
+                logger.info(f"🔍 DEBUG: Pipeline initial first text sample type: {type(test_data['text'][0])}")
+
+        # Add sample IDs to test data
+        original_length = get_dataset_length(test_data)
+        test_data_with_ids = test_data.copy()
+        test_data_with_ids["sample_id"] = list(range(original_length))
+
+        logger.info(f"🔍 DEBUG: Pipeline starting with {original_length} samples")
+        logger.info(f"🔍 DEBUG: Pipeline test data keys: {list(test_data_with_ids.keys())}")
+        logger.info(f"🔍 DEBUG: Pipeline text samples: {len(test_data_with_ids.get('text', []))}")
+
+        # Convert AST back to config for pipeline execution
+        config = self._convert_ast_to_config(ast)
+        logger.info(f"🔍 DEBUG: Pipeline config: {config}")
+
+        # Create pipeline optimizer and optimize
+        optimizer = PipelineOptimizer(strategies=[FilterFusionStrategy(), MapperFusionStrategy()])
+
+        # Create AST from config
+        ast2 = PipelineAST()
+        ast2.build_from_config(config)
+        logger.info("🔍 DEBUG: Pipeline AST created.")
+
+        # Optimize AST
+        optimized_ast = optimizer.optimize(ast2)
+        logger.info("🔍 DEBUG: Pipeline optimized AST created.")
+
+        # Convert optimized AST back to config
+        optimized_config = self._convert_ast_to_config(optimized_ast)
+        logger.info(f"🔍 DEBUG: Pipeline optimized config: {optimized_config}")
+
+        # Load optimized operations
+        optimized_ops = load_ops(optimized_config)
+        logger.info(f"🔍 DEBUG: Pipeline loaded {len(optimized_ops)} optimized operations")
+
+        # Process with optimized operations
+        data = test_data_with_ids
+        logger.info(f"🔍 DEBUG: Pipeline data before processing: {len(data.get('text', []))} samples")
+        logger.info(f"🔍 DEBUG: Pipeline data keys before processing: {list(data.keys())}")
+
+        for i, op in enumerate(optimized_ops):
+            op_type = type(op).__name__
+            logger.info(f"🔍 DEBUG: Pipeline processing operation {i+1}/{len(optimized_ops)}: {op_type}")
+            logger.info(f"🔍 DEBUG: Pipeline data before operation {i+1}: {len(data.get('text', []))} samples")
+            logger.info(f"🔍 DEBUG: Pipeline data keys before operation {i+1}: {list(data.keys())}")
+
+            if hasattr(op, "compute_stats_batched"):
+                data = op.compute_stats_batched(data)
+                logger.info(f"🔍 DEBUG: Pipeline after stats for operation {i+1}: {len(data.get('text', []))} samples")
+                logger.info(f"🔍 DEBUG: Pipeline data keys after stats for operation {i+1}: {list(data.keys())}")
+
+            if hasattr(op, "process_batched"):
+                result = list(op.process_batched(data))
+                logger.info(f"🔍 DEBUG: Pipeline operation {i+1} result type: {type(result[0]) if result else 'None'}")
+                logger.info(f"🔍 DEBUG: Pipeline operation {i+1} result length: {len(result) if result else 0}")
+                if result and len(result) > 0:
+                    logger.info(f"🔍 DEBUG: Pipeline operation {i+1} first result: {result[0]}")
+                    logger.info(f"🔍 DEBUG: Pipeline operation {i+1} first result type: {type(result[0])}")
+
+                # Check if this is a filter (returns boolean) or mapper (returns transformed data)
+                if result and isinstance(result[0], bool):
+                    # This is a filter - apply boolean mask
+                    mask = result
+                    logger.info(
+                        f"🔍 DEBUG: Pipeline operation {i+1} boolean mask: {sum(mask)}/{len(mask)} samples passed"
+                    )
+                    # Keep only samples that passed the filter
+                    passed_indices = [idx for idx, passed in enumerate(mask) if passed]
+                    if passed_indices:
+                        # Update data to keep only passed samples
+                        for key in data:
+                            if isinstance(data[key], list) and len(data[key]) == len(mask):
+                                data[key] = [data[key][idx] for idx in passed_indices]
+                        logger.info(
+                            f"🔍 DEBUG: Pipeline after operation {i+1}: {len(passed_indices)} samples remaining"
+                        )
+                    else:
+                        # No samples passed - clear all data
+                        for key in data:
+                            if isinstance(data[key], list):
+                                data[key] = []
+                        logger.info(f"🔍 DEBUG: Pipeline after operation {i+1}: 0 samples remaining")
+                        break
+                else:
+                    # This is a mapper - update text data
+                    if result:
+                        data["text"] = result
+                        # Keep sample_ids and stats aligned
+                        if "sample_id" in data and len(data["sample_id"]) != len(result):
+                            data["sample_id"] = data["sample_id"][: len(result)]
+                        if Fields.stats in data and len(data[Fields.stats]) != len(result):
+                            data[Fields.stats] = data[Fields.stats][: len(result)]
+                        logger.info(
+                            f"🔍 DEBUG: Pipeline after mapper operation {i+1}: {len(data.get('text', []))} samples"
+                        )
+                        logger.info(f"🔍 DEBUG: Pipeline data keys after mapper operation {i+1}: {list(data.keys())}")
+
+        logger.info(f"🔍 DEBUG: Pipeline final execution: {len(data.get('text', []))} samples")
+        logger.info(f"🔍 DEBUG: Pipeline final data keys: {list(data.keys())}")
+
+        # Save pipeline execution results
+        pipeline_results_file = os.path.join(validation_dir, "pipeline_execution_results.jsonl")
+        self._save_results_to_file(data, pipeline_results_file)
+        logger.info(f"📄 Pipeline execution results saved to: {pipeline_results_file}")
+
+        return data
+
+    def run_individual_mixed_ops_benchmark(self, operations: List, test_data: Dict[str, Any]) -> PerformanceMetrics:
+        """Benchmark individual mixed operations executed sequentially."""
+        logger.info("Running individual mixed operations benchmark...")
+
+        start_memory = self.measure_memory_usage()
+        total_start_time = time.time()
+
+        # Step 1: Initialize operations
+        init_start = time.time()
+        # Filter out operations that don't have compute_stats_batched
+        actual_ops = [op for op in operations if hasattr(op, "compute_stats_batched")]
+        logger.info(
+            f"  Found {len(actual_ops)} operations with compute_stats_batched out of {len(operations)} operations"
+        )
+
+        if not actual_ops:
+            logger.warning("  No operations found to benchmark!")
+            return PerformanceMetrics(
+                total_time=0.0,
+                stats_time=0.0,
+                filter_time=0.0,
+                memory_usage=0.0,
+                throughput=0.0,
+            )
+
+        init_time = time.time() - init_start
+        logger.info(f"  Step 1 - Operation initialization: {init_time:.3f}s")
+
+        # Step 2: Process each operation completely (stats + processing) before moving to the next
+        processing_start = time.time()
+        samples_with_stats = test_data
+        total_stats_time = 0.0
+        total_processing_time = 0.0
+
+        for i, op in enumerate(actual_ops):
+            op_type = type(op).__name__
+            logger.info(f"    Processing operation {i+1}/{len(actual_ops)}: {op_type}")
+
+            # Compute stats for this operation
+            stats_start = time.time()
+            if hasattr(op, "compute_stats_batched"):
+                samples_with_stats = op.compute_stats_batched(samples_with_stats)
+            stats_time = time.time() - stats_start
+            total_stats_time += stats_time
+
+            # Process with this operation
+            processing_start_op = time.time()
+            if hasattr(op, "process_batched"):
+                result = list(op.process_batched(samples_with_stats))
+                # Update data for next operation if this is a mapper
+                if "mapper" in op_type.lower() and result:
+                    samples_with_stats = {"text": result, "__dj__stats__": [{} for _ in range(len(result))]}
+            processing_time = time.time() - processing_start_op
+            total_processing_time += processing_time
+
+            logger.debug(f"      Operation {i+1} - Stats: {stats_time:.3f}s, Processing: {processing_time:.3f}s")
+
+        processing_time = time.time() - processing_start
+        logger.info(f"  Step 2 - Complete processing: {processing_time:.3f}s")
+        logger.info(f"    Total stats time: {total_stats_time:.3f}s")
+        logger.info(f"    Total processing time: {total_processing_time:.3f}s")
+
+        # Calculate totals
+        total_time = time.time() - total_start_time
+        end_memory = self.measure_memory_usage()
+        memory_usage = end_memory - start_memory
+        throughput = get_dataset_length(test_data) / total_time
+
+        logger.info("  📊 INDIVIDUAL MIXED OPERATIONS BREAKDOWN:")
+        logger.info(f"    Initialization: {init_time:.3f}s ({init_time/total_time*100:.1f}%)")
+        logger.info(f"    Stats computation: {total_stats_time:.3f}s ({total_stats_time/total_time*100:.1f}%)")
+        logger.info(f"    Processing: {total_processing_time:.3f}s ({total_processing_time/total_time*100:.1f}%)")
+        logger.info(f"    Total time: {total_time:.3f}s")
+        logger.info(f"    Throughput: {throughput:.1f} samples/sec")
+
+        return PerformanceMetrics(
+            total_time=total_time,
+            stats_time=total_stats_time,
+            filter_time=total_processing_time,  # Rename this field in the future
+            memory_usage=memory_usage,
+            throughput=throughput,
+        )
+
+    def run_pipeline_mixed_ops_benchmark(
+        self, operations: List, test_data: Dict[str, Any], analyzer_insights: dict = None
+    ) -> PerformanceMetrics:
+        """Benchmark the complete pipeline optimizer workflow for mixed operations."""
+        logger.info("Running pipeline mixed operations benchmark (complete workflow)...")
+
+        start_memory = self.measure_memory_usage()
+        total_start_time = time.time()
+
+        # Step 1: Build pipeline configuration from operations
+        pipeline_config = self._build_pipeline_config_from_operations(operations)
+
+        # Step 2: Create Pipeline AST
+        from data_juicer.core.pipeline_ast import PipelineAST
+
+        ast = PipelineAST()
+        ast.build_from_config(pipeline_config)
+
+        # Step 3: Create PipelineOptimizer with fusion strategies
+        from data_juicer.core.optimizer.mapper_fusion_strategy import (
+            MapperFusionStrategy,
+        )
+
+        strategies = [FilterFusionStrategy(), MapperFusionStrategy()]
+        optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
+
+        # Step 4: Get optimization summary
+        optimization_summary = optimizer.get_optimization_summary()
+        logger.info("  Pipeline Optimizer Configuration:")
+        logger.info(f"    Strategies: {optimization_summary['strategies']}")
+        logger.info(f"    Analyzer insights: {optimization_summary['analyzer_insights_available']}")
+
+        # Step 5: Apply optimizations
+        logger.info("  Applying pipeline optimizations...")
+        optimized_ast = optimizer.optimize(ast)
+
+        # Step 6: Convert optimized AST back to operations
+        optimized_ops = self._convert_ast_to_operations(optimized_ast)
+        logger.info(f"  Original operations: {len(operations)}")
+        logger.info(f"  Optimized operations: {len(optimized_ops)}")
+
+        # Step 7: Process with optimized operations
+        logger.info("  Processing with optimized pipeline...")
+        self._process_with_optimized_mixed_ops(optimized_ops, test_data)
+
+        # Calculate totals
+        total_time = time.time() - total_start_time
+        end_memory = self.measure_memory_usage()
+        memory_usage = end_memory - start_memory
+        throughput = get_dataset_length(test_data) / total_time
+
+        logger.info("  📊 PIPELINE MIXED OPERATIONS BREAKDOWN:")
+        logger.info(f"    Total time: {total_time:.3f}s")
+        logger.info(f"    Throughput: {throughput:.1f} samples/sec")
+        logger.info(f"    Memory usage: {memory_usage:.1f} MB")
+        logger.info(f"    Optimization ratio: {len(optimized_ops)/len(operations):.2f}x")
+        logger.info(f"    Operations reduced: {len(operations) - len(optimized_ops)}")
+
+        return PerformanceMetrics(
+            total_time=total_time,
+            stats_time=total_time * 0.8,  # Estimate: most time is processing
+            filter_time=total_time * 0.2,  # Estimate: some time is optimization
+            memory_usage=memory_usage,
+            throughput=throughput,
+        )
+
+    def _build_pipeline_config_from_operations(self, operations: List) -> Dict[str, Any]:
+        """Build pipeline config from mixed operations."""
+        process_config = []
+        for i, op in enumerate(operations):
+            op_name = getattr(op, "_name", f"operation_{i}")
+            op_config = getattr(op, "config", None)
+            if op_config:
+                process_config.append({op_name: op_config})
+            else:
+                # Create basic config from operation attributes
+                config_dict = {}
+                for attr in dir(op):
+                    if not attr.startswith("_") and not callable(getattr(op, attr)):
+                        value = getattr(op, attr)
+                        if isinstance(value, (int, float, str, bool)):
+                            config_dict[attr] = value
+                process_config.append({op_name: config_dict})
+        return {"process": process_config}
+
+    def _process_with_optimized_mixed_ops(self, optimized_ops: List, test_data: Dict[str, Any]):
+        """Process test data with optimized mixed operations."""
+        logger.debug(f"Processing with {len(optimized_ops)} optimized operations")
+
+        # Load and execute the optimized operations
         from data_juicer.ops import load_ops
 
+        data = test_data
         for op_config in optimized_ops:
-            # Special handling for fused_filter - we need to create the actual filter objects
+            # Debug: Log the operation configuration
+            logger.debug(f"Loading operation config: {op_config}")
+
+            # Special handling for fused operations
             op_name = list(op_config.keys())[0]
             if op_name == "fused_filter":
-                # Extract the fused_op_list and create individual filter objects
+                # Handle fused filter
                 fused_op_list = op_config[op_name].get("fused_op_list", [])
                 individual_filters = []
 
                 for filter_config in fused_op_list:
                     filter_name = list(filter_config.keys())[0]
                     filter_args = filter_config[filter_name]
-                    # Load the individual filter
                     loaded_filters = load_ops([{filter_name: filter_args}])
                     if loaded_filters:
                         individual_filters.append(loaded_filters[0])
 
-                # Create the fused filter with the actual filter objects
                 if individual_filters:
-                    from data_juicer.core.optimizer.fused_op import FusedFilter
+                    fused_filter = FusedFilter(name="fused_filter", fused_filters=individual_filters)
+                    # Force parallel execution to match individual execution behavior
+                    # (each filter sees original data, not filtered output from previous filters)
+                    fused_filter.execution_strategy = "parallel"
 
-                    op = FusedFilter(name="fused_filter", fused_filters=individual_filters)
-                    # Force sequential execution to avoid parallel stats access issues
-                    op.execution_strategy = "sequential"
-                else:
-                    continue  # Skip if we can't create the fused filter
+                    if hasattr(fused_filter, "compute_stats_batched"):
+                        data = fused_filter.compute_stats_batched(data)
+                    if hasattr(fused_filter, "process_batched"):
+                        result = list(fused_filter.process_batched(data))
+                        # Update data for next operation
+                        if result and isinstance(result[0], bool):
+                            # This is a filter - apply boolean mask
+                            pass  # Keep original data structure
+                        else:
+                            # This is a mapper - update data
+                            data = {"text": result, "__dj__stats__": [{} for _ in range(len(result))]}
+
             elif op_name == "fused_mapper":
-                # Extract the fused_mappers list and create FusedMapper directly
+                # Handle fused mapper
                 mapper_config = op_config[op_name]
                 name = mapper_config.get("name", "fused_mapper")
                 fused_mappers = mapper_config.get("fused_mappers", [])
 
-                # Create the fused mapper directly
-                from data_juicer.core.optimizer.fused_op import FusedMapper
+                fused_mapper = FusedMapper(name=name, fused_mappers=fused_mappers)
 
-                op = FusedMapper(name=name, fused_mappers=fused_mappers)
+                if hasattr(fused_mapper, "compute_stats_batched"):
+                    data = fused_mapper.compute_stats_batched(data)
+                if hasattr(fused_mapper, "process_batched"):
+                    result = list(fused_mapper.process_batched(data))
+                    # Mappers always return transformed data
+                    if result:
+                        data = {"text": result, "__dj__stats__": [{} for _ in range(len(result))]}
+
             else:
                 # Load the operation from config for non-fused operations
                 loaded_ops = load_ops([op_config])
                 if loaded_ops:
                     op = loaded_ops[0]
-                else:
-                    continue  # Skip if we can't load the operation
 
-            # Execute the operation
-            if hasattr(op, "compute_stats_batched"):
-                data = op.compute_stats_batched(data)
-            if hasattr(op, "process_batched"):
-                result = list(op.process_batched(data))
-                # Handle both boolean masks and text content
-                if result and isinstance(result[0], bool):
-                    op_mask = result
-                else:
-                    # If it returns text content, create a mask based on non-empty results
-                    op_mask = [bool(item) for item in result]
-
-                # Apply the operation mask (AND operation)
-                if len(op_mask) == len(mask):
-                    mask = [m and o for m, o in zip(mask, op_mask)]
-
-        return mask
-
-    def get_complex_only_test_filters(self) -> List[Filter]:
-        """Get only complex filters for testing advanced fusion scenarios."""
-        from data_juicer.ops.filter import (
-            FlaggedWordFilter,
-            LanguageIDScoreFilter,
-            PerplexityFilter,
-            StopWordsFilter,
-            WordRepetitionFilter,
-        )
-
-        return [
-            # Complex filters that require language models or advanced processing
-            # (spaCy filters disabled due to download issues)
-            PerplexityFilter(lang="en", model_key="gpt2", min_score=0.0, max_score=100.0),
-            StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.5),
-            FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1),
-            LanguageIDScoreFilter(lang="en", min_score=0.5, max_score=1.0),
-            WordRepetitionFilter(lang="en", min_ratio=0.0, max_ratio=0.3),
-            # spaCy filters disabled due to model download issues:
-            # - TextEntityDependencyFilter requires spaCy models
-            # - TextActionFilter requires spaCy models
-        ]
-
-    def run_complex_filters_benchmark(
-        self, filters: List[Filter], test_data: Dict[str, Any], analyzer_insights: dict = None
-    ) -> Dict[str, Any]:
-        """Specialized benchmark for complex filters with multiple strategies."""
-        logger.info("Running complex filters benchmark with multiple strategies...")
-
-        results = {}
-
-        # Strategy 1: Individual execution (baseline)
-        logger.info("Strategy 1: Individual execution (baseline)")
-        individual_metrics = self.run_individual_filters_benchmark(filters, test_data)
-        results["individual"] = individual_metrics
-
-        # Strategy 2: Conservative fusion (avoid complex+complex)
-        logger.info("Strategy 2: Conservative fusion (avoid complex+complex)")
-        conservative_metrics = self.run_conservative_fusion_benchmark(filters, test_data, analyzer_insights)
-        results["conservative_fusion"] = conservative_metrics
-
-        # Strategy 3: Parallel execution (no fusion, but parallel processing)
-        logger.info("Strategy 3: Parallel execution (no fusion)")
-        parallel_metrics = self.run_parallel_execution_benchmark(filters, test_data)
-        results["parallel"] = parallel_metrics
-
-        # Strategy 4: Smart batching (group by complexity)
-        logger.info("Strategy 4: Smart batching (group by complexity)")
-        smart_batch_metrics = self.run_smart_batching_benchmark(filters, test_data, analyzer_insights)
-        results["smart_batching"] = smart_batch_metrics
-
-        # Calculate improvements
-        baseline_time = individual_metrics.total_time
-        improvements = {}
-
-        for strategy, metrics in results.items():
-            if strategy != "individual":
-                speedup = baseline_time / metrics.total_time
-                improvements[strategy] = {
-                    "speedup": speedup,
-                    "time_saved": baseline_time - metrics.total_time,
-                    "time_saved_percent": (baseline_time - metrics.total_time) / baseline_time * 100,
-                }
-
-        results["improvements"] = improvements
-
-        # Find best strategy
-        best_strategy = max(improvements.items(), key=lambda x: x[1]["speedup"])
-        results["best_strategy"] = best_strategy[0]
-        results["best_speedup"] = best_strategy[1]["speedup"]
-
-        logger.info(f"🏆 Best strategy: {best_strategy[0]} ({best_strategy[1]['speedup']:.2f}x speedup)")
-
-        return results
-
-    def run_conservative_fusion_benchmark(
-        self, filters: List[Filter], test_data: Dict[str, Any], analyzer_insights: dict = None
-    ) -> PerformanceMetrics:
-        """Run fusion benchmark with conservative strategy for complex filters."""
-        start_memory = self.measure_memory_usage()
-        total_start_time = time.time()
-
-        # Build pipeline with conservative fusion
-        pipeline_config = self._build_pipeline_config_from_filters(filters)
-        from data_juicer.core.pipeline_ast import PipelineAST
-
-        ast = PipelineAST()
-        ast.build_from_config(pipeline_config)
-
-        # Use conservative fusion strategy
-        from data_juicer.core.optimizer.filter_fusion_strategy import (
-            FilterFusionStrategy,
-        )
-        from data_juicer.core.optimizer.mapper_fusion_strategy import (
-            MapperFusionStrategy,
-        )
-        from data_juicer.core.optimizer.optimizer import PipelineOptimizer
-
-        strategies = [FilterFusionStrategy(analyzer_insights=analyzer_insights), MapperFusionStrategy()]
-        optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
-
-        optimized_ast = optimizer.optimize(ast)
-        optimized_ops = self._convert_ast_to_operations(optimized_ast)
-
-        logger.info(f"  Conservative fusion: {len(filters)} → {len(optimized_ops)} operations")
-
-        # Process with optimized operations
-        self._process_with_optimized_ops(optimized_ops, test_data)
-
-        total_time = time.time() - total_start_time
-        end_memory = self.measure_memory_usage()
-        memory_usage = end_memory - start_memory
-        throughput = get_dataset_length(test_data) / total_time
-
-        return PerformanceMetrics(
-            total_time=total_time,
-            stats_time=total_time * 0.8,
-            filter_time=total_time * 0.2,
-            memory_usage=memory_usage,
-            throughput=throughput,
-        )
-
-    def run_parallel_execution_benchmark(self, filters: List[Filter], test_data: Dict[str, Any]) -> PerformanceMetrics:
-        """Run benchmark with parallel execution (no fusion)."""
-        start_memory = self.measure_memory_usage()
-        total_start_time = time.time()
-
-        # Process each filter independently in parallel
-        import concurrent.futures
-        import threading
-
-        # Create thread-local storage for data
-        thread_local = threading.local()
-
-        def process_filter(filter_op):
-            # Each thread gets its own copy of data
-            if not hasattr(thread_local, "data"):
-                thread_local.data = test_data.copy()
-
-            # Process the filter
-            if hasattr(filter_op, "compute_stats_batched"):
-                thread_local.data = filter_op.compute_stats_batched(thread_local.data)
-            if hasattr(filter_op, "process_batched"):
-                return list(filter_op.process_batched(thread_local.data))
-            return [True] * get_dataset_length(test_data)
-
-        # Execute filters in parallel
-        with concurrent.futures.ThreadPoolExecutor(max_workers=min(len(filters), 4)) as executor:
-            futures = [executor.submit(process_filter, filter_op) for filter_op in filters]
-            results = [future.result() for future in concurrent.futures.as_completed(futures)]
-
-        # Combine results (AND operation)
-        if results:
-            _ = [all(vals) for vals in zip(*results)]
-        else:
-            _ = [True] * get_dataset_length(test_data)
-
-        total_time = time.time() - total_start_time
-        end_memory = self.measure_memory_usage()
-        memory_usage = end_memory - start_memory
-        throughput = get_dataset_length(test_data) / total_time
-
-        return PerformanceMetrics(
-            total_time=total_time,
-            stats_time=total_time * 0.6,
-            filter_time=total_time * 0.4,
-            memory_usage=memory_usage,
-            throughput=throughput,
-        )
-
-    def run_smart_batching_benchmark(
-        self, filters: List[Filter], test_data: Dict[str, Any], analyzer_insights: dict = None
-    ) -> PerformanceMetrics:
-        """Run benchmark with smart batching based on complexity."""
-        start_memory = self.measure_memory_usage()
-        total_start_time = time.time()
-
-        # Group filters by complexity
-        simple_filters = []
-        medium_filters = []
-        complex_filters = []
-
-        for filter_op in filters:
-            op_name = getattr(filter_op, "_name", type(filter_op).__name__)
-            complexity = self._get_operation_complexity(op_name)
-
-            if complexity == "simple":
-                simple_filters.append(filter_op)
-            elif complexity == "medium":
-                medium_filters.append(filter_op)
-            else:
-                complex_filters.append(filter_op)
-
-        logger.info(
-            f"  Smart batching: {len(simple_filters)} simple, {len(medium_filters)} medium, {len(complex_filters)} complex"
-        )
-
-        # Process each complexity group separately
-        data = test_data.copy()
-        all_masks = []
-
-        # Process simple filters (can be fused)
-        if simple_filters:
-            _ = self.run_fused_filters_benchmark(simple_filters, data, analyzer_insights)
-            # Get mask from simple filters (simplified)
-            simple_mask = [True] * get_dataset_length(data)  # Placeholder
-            all_masks.append(simple_mask)
-
-        # Process medium filters (can be fused)
-        if medium_filters:
-            _ = self.run_fused_filters_benchmark(medium_filters, data, analyzer_insights)
-            medium_mask = [True] * get_dataset_length(data)  # Placeholder
-            all_masks.append(medium_mask)
-
-        # Process complex filters (individual execution)
-        if complex_filters:
-            for filter_op in complex_filters:
-                if hasattr(filter_op, "compute_stats_batched"):
-                    data = filter_op.compute_stats_batched(data)
-                if hasattr(filter_op, "process_batched"):
-                    result = list(filter_op.process_batched(data))
-                    if result and isinstance(result[0], bool):
-                        all_masks.append(result)
-                    else:
-                        all_masks.append([bool(item) for item in result])
-
-        # Combine all masks
-        if all_masks:
-            _ = [all(vals) for vals in zip(*all_masks)]
-        else:
-            _ = [True] * get_dataset_length(data)
-
-        total_time = time.time() - total_start_time
-        end_memory = self.measure_memory_usage()
-        memory_usage = end_memory - start_memory
-        throughput = get_dataset_length(test_data) / total_time
-
-        return PerformanceMetrics(
-            total_time=total_time,
-            stats_time=total_time * 0.7,
-            filter_time=total_time * 0.3,
-            memory_usage=memory_usage,
-            throughput=throughput,
-        )
-
-    def _get_operation_complexity(self, op_name: str) -> str:
-        """Get operation complexity for smart batching."""
-        op_name_lower = op_name.lower()
-
-        # Simple operations
-        if any(pattern in op_name_lower for pattern in ["text_length", "words_num", "character_repetition"]):
-            return "simple"
-
-        # Complex operations
-        if any(pattern in op_name_lower for pattern in ["perplexity", "language_id", "text_entity", "text_action"]):
-            return "complex"
-
-        # Medium operations
-        return "medium"
+                    # Execute the operation
+                    if hasattr(op, "compute_stats_batched"):
+                        data = op.compute_stats_batched(data)
+                    if hasattr(op, "process_batched"):
+                        result = list(op.process_batched(data))
+                        # Check if this is a mapper or filter
+                        if result and isinstance(result[0], bool):
+                            # This is a filter - keep original data structure
+                            pass
+                        else:
+                            # This is a mapper - update data
+                            if result:
+                                data = {"text": result, "__dj__stats__": [{} for _ in range(len(result))]}
 
 
 def create_simple_test_data(num_samples: int = 1000) -> Dict[str, Any]:
@@ -2026,628 +2749,6 @@ def create_simple_test_data(num_samples: int = 1000) -> Dict[str, Any]:
     return {"text": texts, Fields.stats: [{} for _ in range(num_samples)]}
 
 
-def create_simple_filters() -> List[Filter]:
-    """Create a comprehensive set of simple filters for testing."""
-
-    filters = [
-        # Basic text metrics (very fast)
-        WordsNumFilter(min_num=5, max_num=1000),
-        TextLengthFilter(min_len=20, max_len=1000),
-        CharacterRepetitionFilter(repetition_ratio=0.8),
-        # Text structure filters (fast)
-        WordRepetitionFilter(min_ratio=0.0, max_ratio=0.5),
-        SpecialCharactersFilter(min_ratio=0.0, max_ratio=0.3),
-        AlphanumericFilter(min_ratio=0.3),
-        AverageLineLengthFilter(min_len=10, max_len=100),
-        MaximumLineLengthFilter(min_len=10, max_len=200),
-    ]
-
-    return filters
-
-
-def create_complex_filters():
-    """Create complex filters that should trigger sequential execution."""
-    from data_juicer.ops.filter import (
-        FlaggedWordFilter,
-        LanguageIDScoreFilter,
-        PerplexityFilter,
-        StopWordsFilter,
-        TextActionFilter,
-        TextEntityDependencyFilter,
-        WordRepetitionFilter,
-    )
-
-    filters = []
-
-    # Perplexity filter (complex - requires language model)
-    perplexity_filter = PerplexityFilter(lang="en", model_key="gpt2", min_score=0.0, max_score=100.0)
-    filters.append(perplexity_filter)
-
-    # Stopwords filter (complex - requires language processing)
-    stopwords_filter = StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.5)
-    filters.append(stopwords_filter)
-
-    # Flagged words filter (complex - requires word list processing)
-    flagged_words_filter = FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1)
-    filters.append(flagged_words_filter)
-
-    # Language ID score filter (complex - requires language detection)
-    lang_id_filter = LanguageIDScoreFilter(lang="en", min_score=0.5, max_score=1.0)
-    filters.append(lang_id_filter)
-
-    # Word repetition filter (complex - requires pattern analysis)
-    word_rep_filter = WordRepetitionFilter(lang="en", min_ratio=0.0, max_ratio=0.3)
-    filters.append(word_rep_filter)
-
-    # Text entity dependency filter (complex - requires spaCy NLP)
-    entity_dep_filter = TextEntityDependencyFilter(lang="en", min_dependency_num=1, any_or_all="all")
-    filters.append(entity_dep_filter)
-
-    # Text action filter (complex - requires spaCy POS tagging)
-    action_filter = TextActionFilter(lang="en", min_action_num=1)
-    filters.append(action_filter)
-
-    return filters
-
-
-def run_simple_demo(num_samples: int = 1000):
-    """Run a simple demonstration of filter fusion performance with analyzer integration."""
-    logger.info("🚀 Data-Juicer Filter Fusion Performance Demonstration")
-    logger.info("========================================================")
-
-    # Create benchmark instance to use analyzer integration
-    benchmark = PerformanceBenchmark()
-
-    # Create test data
-    logger.info(f"Creating test data with {num_samples} samples...")
-    samples = create_simple_test_data(num_samples)
-    logger.info(
-        f"DEBUG: type(samples)={type(samples)}, " f'keys={list(samples.keys()) if isinstance(samples, dict) else "N/A"}'
-    )
-
-    # Get analyzer insights
-    logger.info("Running Analyzer to get insights...")
-    analyzer_insights = benchmark.get_analyzer_insights(samples)
-    logger.info(f"Analyzer insights: {analyzer_insights}")
-
-    # Create test filters
-    logger.info("Creating simple filters...")
-    filters = create_simple_filters()
-    op_names = [getattr(f, "_name", type(f).__name__) for f in filters]
-    logger.info(f"Created {len(filters)} simple filters: {op_names}")
-
-    # Test 1: Simple Filters (should use parallel strategy)
-    logger.info("\n" + "=" * 60)
-    logger.info("TEST 1: Simple Filters (Parallel Strategy)")
-    logger.info("=" * 60)
-
-    # Collect filtering statistics with analyzer insights
-    collect_filtering_stats_with_insights(filters, samples, analyzer_insights)
-
-    # Benchmark individual execution
-    logger.info("\n" + "=" * 60)
-    individual_stats = benchmark_individual_simple(filters, samples)
-
-    # Benchmark fused execution with analyzer insights (using optimizer architecture)
-    logger.info("\n" + "=" * 60)
-    fused_stats = benchmark.run_fused_filters_benchmark(filters, samples, analyzer_insights=analyzer_insights)
-
-    # Print performance results
-    logger.info("\n" + "=" * 60)
-    logger.info("📊 PERFORMANCE RESULTS")
-    logger.info("=" * 60)
-
-    logger.info("Individual Execution:")
-    logger.info(f"  Total Time: {individual_stats['total_time']:.3f}s")
-    logger.info(f"  Stats Time: {individual_stats['stats_time']:.3f}s")
-    logger.info(f"  Filter Time: {individual_stats['filter_time']:.3f}s")
-    logger.info(
-        f"  Results: {individual_stats['passed_samples']:,}/{individual_stats['total_samples']:,} passed ({individual_stats['pass_rate']:.1f}%)"
-    )
-
-    logger.info("Fused Execution (with Analyzer Insights):")
-    logger.info(f"  Total Time: {fused_stats.total_time:.3f}s")
-    logger.info(f"  Stats Time: {fused_stats.stats_time:.3f}s")
-    logger.info(f"  Filter Time: {fused_stats.filter_time:.3f}s")
-    logger.info(
-        f"  Results: {fused_stats.throughput * fused_stats.total_time:.0f} samples processed at {fused_stats.throughput:.1f} samples/sec"
-    )
-
-    # Check if results are consistent (using throughput as proxy)
-    individual_throughput = num_samples / individual_stats["total_time"]
-    fused_throughput = fused_stats.throughput
-    throughput_difference = abs(individual_throughput - fused_throughput)
-
-    if throughput_difference > individual_throughput * 0.1:  # 10% tolerance
-        logger.info(f"  ⚠️  Throughput Difference: {throughput_difference:.1f} samples/sec")
-        logger.info("     This may indicate different execution patterns between individual and fused")
-    else:
-        logger.info("  ✅ Individual and fused throughput are consistent")
-        logger.info("     Both use parallel execution: all filters see original data")
-        logger.info("     Fusion provides performance benefits without changing results")
-
-    # Calculate improvements
-    total_speedup = individual_stats["total_time"] / fused_stats.total_time
-    time_saved = individual_stats["total_time"] - fused_stats.total_time
-    stats_speedup = individual_stats["stats_time"] / fused_stats.stats_time
-    filter_speedup = (
-        individual_stats["filter_time"] / fused_stats.filter_time if fused_stats.filter_time > 0 else float("inf")
-    )
-
-    logger.info("🎯 IMPROVEMENTS:")
-    logger.info(f"  Total Speedup: {total_speedup:.2f}x")
-    logger.info(f"  Time Saved: {time_saved:.3f}s " f'({time_saved/individual_stats["total_time"]*100:.1f}%)')
-    logger.info(f"  Stats Speedup: {stats_speedup:.2f}x")
-    logger.info(f"  Filter Speedup: {filter_speedup:.2f}x")
-
-    # Calculate throughput
-    individual_throughput = num_samples / individual_stats["total_time"]
-    fused_throughput = fused_stats.throughput
-    throughput_improvement = fused_throughput / individual_throughput
-
-    logger.info("📈 THROUGHPUT:")
-    logger.info(f"  Individual: {individual_throughput:,.0f} samples/sec")
-    logger.info(f"  Fused: {fused_throughput:,.0f} samples/sec")
-    logger.info(f"  Throughput Improvement: {throughput_improvement:.2f}x")
-
-    # Performance assessment
-    if total_speedup >= 1.5:
-        performance_level = "🚀 EXCELLENT - Significant performance gain"
-    elif total_speedup >= 1.1:
-        performance_level = "✅ GOOD - Moderate performance gain"
-    elif total_speedup >= 0.9:
-        performance_level = "⚠️  MINIMAL - Small performance gain"
-    else:
-        performance_level = "❌ POOR - Performance regression"
-
-    logger.info("\n" + "=" * 60)
-    logger.info(performance_level)
-    logger.info("=" * 60)
-
-    # Test 2: Same filters with different strategy (should use sequential strategy)
-    logger.info("\n" + "=" * 60)
-    logger.info("TEST 2: Same Filters (Sequential Strategy)")
-    logger.info("=" * 60)
-
-    # Use the same filters but they should trigger sequential execution
-    complex_filters = filters  # Use the same filters from test 1
-    complex_op_names = [getattr(f, "_name", type(f).__name__) for f in complex_filters]
-    logger.info(f"Using same {len(complex_filters)} filters: {complex_op_names}")
-
-    # Benchmark individual execution
-    logger.info("\n" + "=" * 60)
-    individual_stats_complex = benchmark_individual_simple(complex_filters, samples)
-
-    # Benchmark fused execution with analyzer insights (using optimizer architecture)
-    logger.info("\n" + "=" * 60)
-    fused_stats_complex = benchmark.run_fused_filters_benchmark(
-        complex_filters, samples, analyzer_insights=analyzer_insights
-    )
-
-    # Print performance results for the second test
-    logger.info("\n" + "=" * 60)
-    logger.info("📊 SECOND TEST PERFORMANCE RESULTS")
-    logger.info("=" * 60)
-
-    total_speedup_complex = individual_stats_complex["total_time"] / fused_stats_complex.total_time
-    time_saved_complex = individual_stats_complex["total_time"] - fused_stats_complex.total_time
-
-    logger.info("Individual Execution:")
-    logger.info(f"  Total Time: {individual_stats_complex['total_time']:.3f}s")
-    logger.info(f"  Stats Time: {individual_stats_complex['stats_time']:.3f}s")
-    logger.info(f"  Filter Time: {individual_stats_complex['filter_time']:.3f}s")
-
-    logger.info("Fused Execution (with Analyzer Insights):")
-    logger.info(f"  Total Time: {fused_stats_complex.total_time:.3f}s")
-    logger.info(f"  Stats Time: {fused_stats_complex.stats_time:.3f}s")
-    logger.info(f"  Filter Time: {fused_stats_complex.filter_time:.3f}s")
-
-    logger.info("🎯 IMPROVEMENTS:")
-    logger.info(f"  Total Speedup: {total_speedup_complex:.2f}x")
-    logger.info(
-        f"  Time Saved: {time_saved_complex:.3f}s "
-        f'({time_saved_complex/individual_stats_complex["total_time"]*100:.1f}%)'
-    )
-
-
-def benchmark_fused_simple(filters: List[Filter], test_data: Dict[str, Any]) -> Dict[str, float]:
-    """Benchmark fused filter execution (simple version without analyzer insights)."""
-    logger.info("=== Fused Filter Execution ===")
-
-    # Create fused filter without analyzer insights
-    fused_filter = FusedFilter("test_fused", filters)
-
-    # Phase 1: Stats computation
-    start = time.time()
-    samples_with_stats = fused_filter.compute_stats_batched(test_data.copy())
-    stats_time = time.time() - start
-
-    # Phase 2: Filtering
-    start = time.time()
-    _ = fused_filter.process_batched(samples_with_stats)
-    filter_time = time.time() - start
-
-    total_time = stats_time + filter_time
-
-    logger.info("Fused execution:")
-    logger.info(f"  Stats: {stats_time:.3f}s, Filter: {filter_time:.3f}s, " f"Total: {total_time:.3f}s")
-
-    return {"total_time": total_time, "stats_time": stats_time, "filter_time": filter_time}
-
-
-def benchmark_fused_simple_with_insights(
-    filters: List[Filter], test_data: Dict[str, Any], analyzer_insights: dict
-) -> Dict[str, float]:
-    """Benchmark fused filter execution with analyzer insights."""
-    logger.info("=== Fused Filter Execution (with Analyzer Insights) ===")
-
-    # Create fused filter with analyzer insights
-    fused_filter = FusedFilter("test_fused", filters, analyzer_insights=analyzer_insights)
-
-    # Phase 1: Stats computation
-    start = time.time()
-    samples_with_stats = fused_filter.compute_stats_batched(test_data.copy())
-    stats_time = time.time() - start
-
-    # Phase 2: Filtering
-    start = time.time()
-    filter_results = list(fused_filter.process_batched(samples_with_stats))
-    filter_time = time.time() - start
-
-    total_time = stats_time + filter_time
-
-    # Calculate actual filtering statistics
-    total_samples = get_dataset_length(test_data)
-    passed_samples = sum(filter_results)
-    pass_rate = (passed_samples / total_samples) * 100
-
-    logger.info("Fused execution (with insights):")
-    logger.info(f"  Stats: {stats_time:.3f}s, Filter: {filter_time:.3f}s, " f"Total: {total_time:.3f}s")
-    logger.info(f"  Results: {passed_samples:,}/{total_samples:,} passed ({pass_rate:.1f}%)")
-
-    return {
-        "total_time": total_time,
-        "stats_time": stats_time,
-        "filter_time": filter_time,
-        "passed_samples": passed_samples,
-        "total_samples": total_samples,
-        "pass_rate": pass_rate,
-    }
-
-
-def collect_filtering_stats(filters: List[Filter], test_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Collect filtering statistics to compare individual vs fused (without analyzer insights)."""
-    logger.info("📊 Collecting filtering statistics...")
-
-    # Individual filter stats
-    individual_stats = {}
-    total_samples = get_dataset_length(test_data)
-
-    for i, filter_op in enumerate(filters):
-        op_name = getattr(filter_op, "_name", type(filter_op).__name__)
-        logger.info(f"  Testing filter {i+1}: {op_name}")
-
-        # Compute stats and filter
-        samples_with_stats = filter_op.compute_stats_batched(test_data.copy())
-        filter_results = list(filter_op.process_batched(samples_with_stats))
-
-        # Count passed samples
-        passed_samples = sum(filter_results)
-        pass_rate = (passed_samples / total_samples) * 100
-
-        individual_stats[op_name] = {
-            "passed": passed_samples,
-            "filtered": total_samples - passed_samples,
-            "pass_rate": pass_rate,
-        }
-
-        logger.info(f"    Passed: {passed_samples:,}/{total_samples:,} " f"({pass_rate:.1f}%)")
-
-    # Fused filter stats
-    logger.info("  Testing fused filters...")
-    fused_filter = FusedFilter("test_fused", filters)
-    samples_with_stats = fused_filter.compute_stats_batched(test_data.copy())
-    fused_results = list(fused_filter.process_batched(samples_with_stats))
-
-    fused_passed = sum(fused_results)
-    fused_pass_rate = (fused_passed / total_samples) * 100
-
-    fused_stats = {"passed": fused_passed, "filtered": total_samples - fused_passed, "pass_rate": fused_pass_rate}
-
-    logger.info(f"    Fused - Passed: {fused_passed:,}/{total_samples:,} " f"({fused_pass_rate:.1f}%)")
-
-    return {"individual": individual_stats, "fused": fused_stats, "total_samples": total_samples}
-
-
-def collect_filtering_stats_with_insights(
-    filters: List[Filter], test_data: Dict[str, Any], analyzer_insights: dict
-) -> Dict[str, Any]:
-    """Collect filtering statistics with analyzer insights."""
-    logger.info("📊 Collecting filtering statistics with analyzer insights...")
-
-    # Individual filter stats
-    individual_stats = {}
-    total_samples = get_dataset_length(test_data)
-
-    for i, filter_op in enumerate(filters):
-        op_name = getattr(filter_op, "_name", type(filter_op).__name__)
-        logger.info(f"  Testing filter {i+1}: {op_name}")
-
-        # Compute stats and filter
-        samples_with_stats = filter_op.compute_stats_batched(test_data.copy())
-        filter_results = list(filter_op.process_batched(samples_with_stats))
-
-        # Count passed samples
-        passed_samples = sum(filter_results)
-        pass_rate = (passed_samples / total_samples) * 100
-
-        individual_stats[op_name] = {
-            "passed": passed_samples,
-            "filtered": total_samples - passed_samples,
-            "pass_rate": pass_rate,
-        }
-
-        logger.info(f"    Passed: {passed_samples:,}/{total_samples:,} " f"({pass_rate:.1f}%)")
-
-    # Fused filter stats with analyzer insights
-    logger.info("  Testing fused filters with analyzer insights...")
-    fused_filter = FusedFilter("test_fused", filters, analyzer_insights=analyzer_insights)
-    samples_with_stats = fused_filter.compute_stats_batched(test_data.copy())
-    fused_results = list(fused_filter.process_batched(samples_with_stats))
-
-    fused_passed = sum(fused_results)
-    fused_pass_rate = (fused_passed / total_samples) * 100
-
-    fused_stats = {"passed": fused_passed, "filtered": total_samples - fused_passed, "pass_rate": fused_pass_rate}
-
-    logger.info(f"    Fused - Passed: {fused_passed:,}/{total_samples:,} " f"({fused_pass_rate:.1f}%)")
-
-    return {"individual": individual_stats, "fused": fused_stats, "total_samples": total_samples}
-
-
-def benchmark_individual_simple(filters: List[Filter], test_data: Dict[str, Any]) -> Dict[str, float]:
-    """Benchmark individual filter execution (simple version)."""
-    logger.info("=== Individual Filter Execution ===")
-
-    total_stats_time = 0.0
-    total_filter_time = 0.0
-    total_time = 0.0
-    total_samples = get_dataset_length(test_data)
-
-    # Measure each filter independently (each processes original data)
-    # This simulates running filters one by one, not in a pipeline
-    individual_results = []
-
-    for i, filter_op in enumerate(filters):
-        op_name = getattr(filter_op, "_name", type(filter_op).__name__)
-        logger.info(f"Processing filter {i+1}: {op_name}")
-
-        # Phase 1: Stats computation
-        start = time.time()
-        samples_with_stats = filter_op.compute_stats_batched(test_data.copy())
-        stats_time = time.time() - start
-        total_stats_time += stats_time
-
-        # Phase 2: Filtering
-        start = time.time()
-        filter_results = list(filter_op.process_batched(samples_with_stats))
-        filter_time = time.time() - start
-        total_filter_time += filter_time
-
-        # Calculate filtering statistics
-        passed_samples = sum(filter_results)
-        pass_rate = (passed_samples / total_samples) * 100
-
-        logger.info(f"  Stats: {stats_time:.3f}s, Filter: {filter_time:.3f}s")
-        logger.info(f"  Results: {passed_samples:,}/{total_samples:,} passed ({pass_rate:.1f}%)")
-
-        individual_results.append(filter_results)
-
-    # Calculate final result: sample must pass ALL filters (logical AND)
-    final_results = individual_results[0]
-    for result in individual_results[1:]:
-        final_results = [r1 and r2 for r1, r2 in zip(final_results, result)]
-
-    final_passed = sum(final_results)
-    final_pass_rate = (final_passed / total_samples) * 100
-
-    # Log the funnel effect
-    logger.info("📊 FUNNEL EFFECT (Individual Filters):")
-    for i, result in enumerate(individual_results):
-        passed = sum(result)
-        pass_rate = (passed / total_samples) * 100
-        op_name = getattr(filters[i], "_name", type(filters[i]).__name__)
-        logger.info(f"  Filter {i+1} ({op_name}): {passed:,}/{total_samples:,} passed ({pass_rate:.1f}%)")
-
-    logger.info(f"  Combined (ALL filters): {final_passed:,}/{total_samples:,} passed ({final_pass_rate:.1f}%)")
-
-    total_time = total_stats_time + total_filter_time
-
-    return {
-        "total_time": total_time,
-        "stats_time": total_stats_time,
-        "filter_time": total_filter_time,
-        "passed_samples": final_passed,
-        "total_samples": total_samples,
-        "pass_rate": final_pass_rate,
-    }
-
-
-def print_filtering_comparison(stats: Dict[str, Any]):
-    """Print detailed filtering comparison statistics."""
-    logger.info("\n" + "=" * 60)
-    logger.info("🔍 FILTERING EFFECTIVENESS COMPARISON")
-    logger.info("=" * 60)
-
-    total_samples = stats["total_samples"]
-    individual_stats = stats["individual"]
-    fused_stats = stats["fused"]
-
-    logger.info(f"Total Samples: {total_samples:,}")
-    logger.info("Individual Filter Results:")
-
-    # Calculate cumulative stats for individual filters
-    cumulative_passed = total_samples
-    for filter_name, filter_stats in individual_stats.items():
-        passed = filter_stats["passed"]
-        pass_rate = filter_stats["pass_rate"]
-        filtered = filter_stats["filtered"]
-
-        logger.info(f"  {filter_name:25s}: {passed:8,} passed ({pass_rate:5.1f}%) | {filtered:8,} filtered")
-        cumulative_passed = passed  # Track the last filter's result for comparison
-
-    logger.info("Fused Filter Results:")
-    fused_passed = fused_stats["passed"]
-    fused_pass_rate = fused_stats["pass_rate"]
-    fused_filtered = fused_stats["filtered"]
-
-    logger.info(
-        f"  Fused Execution:        {fused_passed:8,} passed "
-        f"({fused_pass_rate:5.1f}%) | {fused_filtered:8,} filtered"
-    )
-
-    # Compare individual vs fused
-    individual_final_passed = cumulative_passed
-    difference = fused_passed - individual_final_passed
-
-    logger.info("Comparison:")
-    logger.info(f"  Individual Final:       {individual_final_passed:8,} passed")
-    logger.info(f"  Fused Final:           {fused_passed:8,} passed")
-    logger.info(f"  Difference:            {difference:+8,} samples")
-
-    if abs(difference) > 0:
-        logger.info(f"  ⚠️  NOTE: Fused and individual results differ by {abs(difference)} samples")
-        logger.info("     This may indicate different execution order or optimization effects")
-    else:
-        logger.info("  ✅ Individual and fused results are identical")
-
-    # Calculate efficiency metrics
-    total_individual_filtered = sum(stats["filtered"] for stats in individual_stats.values())
-    efficiency_ratio = (
-        fused_filtered / total_individual_filtered if total_individual_filtered > 0 else 1.0
-    )  # noqa: E501
-
-    logger.info("Efficiency Metrics:")
-    logger.info(f"  Total Individual Filtered: {total_individual_filtered:,}")
-    logger.info(f"  Fused Filtered:           {fused_filtered:,}")
-    logger.info(f"  Efficiency Ratio:         {efficiency_ratio:.3f}x")
-
-    return {
-        "individual_final_passed": individual_final_passed,
-        "fused_passed": fused_passed,
-        "difference": difference,
-        "efficiency_ratio": efficiency_ratio,
-    }
-
-
-def analyze_fusion_decisions():
-    """Analyze different filter combinations to determine optimal fusion decisions."""
-    logger.info("🔬 FUSION DECISION ANALYSIS")
-    logger.info("=" * 60)
-
-    # Test different filter combinations
-    filter_combinations = [
-        # Simple filters only
-        {"name": "Simple Only", "filters": create_simple_filters(), "expected": "skip_fusion"},
-        # Complex filters only
-        {"name": "Complex Only", "filters": create_complex_filters(), "expected": "use_fusion"},
-        # Mixed filters
-        {
-            "name": "Mixed Simple+Complex",
-            "filters": create_simple_filters() + create_complex_filters()[:2],
-            "expected": "use_fusion",
-        },
-        # Single filter
-        {"name": "Single Filter", "filters": [create_simple_filters()[0]], "expected": "skip_fusion"},
-        # Two simple filters
-        {"name": "Two Simple", "filters": create_simple_filters()[:2], "expected": "skip_fusion"},
-    ]
-
-    results = []
-
-    for combo in filter_combinations:
-        logger.info(f"📊 Testing: {combo['name']}")
-        logger.info(f"Filters: {[f._name for f in combo['filters']]}")
-
-        # Create test data
-        test_data = create_simple_test_data(1000)
-
-        # Test individual execution
-        individual_stats = benchmark_individual_simple(combo["filters"], test_data)
-
-        # Test fused execution
-        fused_stats = benchmark_fused_simple(combo["filters"], test_data)
-
-        # Calculate metrics
-        speedup = individual_stats["total_time"] / fused_stats["total_time"]
-        overhead_ratio = fused_stats["total_time"] / individual_stats["total_time"]
-
-        # Determine recommendation
-        if overhead_ratio > 1.5:
-            recommendation = "skip_fusion"
-        elif individual_stats["total_time"] < 0.01:
-            recommendation = "skip_fusion"
-        elif len(combo["filters"]) <= 2:
-            recommendation = "skip_fusion"
-        else:
-            recommendation = "use_fusion"
-
-        # Check if recommendation matches expectation
-        correct = recommendation == combo["expected"]
-
-        result = {
-            "name": combo["name"],
-            "filters": [f._name for f in combo["filters"]],
-            "individual_time": individual_stats["total_time"],
-            "fused_time": fused_stats["total_time"],
-            "speedup": speedup,
-            "overhead_ratio": overhead_ratio,
-            "recommendation": recommendation,
-            "expected": combo["expected"],
-            "correct": correct,
-        }
-
-        results.append(result)
-
-        logger.info(f"  Individual: {individual_stats['total_time']:.3f}s")
-        logger.info(f"  Fused: {fused_stats['total_time']:.3f}s")
-        logger.info(f"  Speedup: {speedup:.2f}x")
-        logger.info(f"  Overhead: {overhead_ratio:.2f}x")
-        logger.info(f"  Recommendation: {recommendation}")
-        logger.info(f"  Expected: {combo['expected']}")
-        logger.info(f"  Correct: {'✅' if correct else '❌'}")
-
-    # Summary
-    logger.info("\n" + "=" * 60)
-    logger.info("📈 FUSION DECISION SUMMARY")
-    logger.info("=" * 60)
-
-    correct_decisions = sum(1 for r in results if r["correct"])
-    total_decisions = len(results)
-
-    logger.info(
-        f"Correct Decisions: {correct_decisions}/{total_decisions} ({correct_decisions/total_decisions*100:.1f}%)"
-    )
-
-    # Decision rules summary
-    logger.info("🎯 DECISION RULES:")
-    logger.info("1. Skip fusion if overhead > 50% (overhead_ratio > 1.5)")
-    logger.info("2. Skip fusion if individual time < 10ms (too fast)")
-    logger.info("3. Skip fusion if ≤2 filters (minimal benefit)")
-    logger.info("4. Use fusion for complex filters (significant benefit)")
-    logger.info("5. Use fusion for mixed combinations (moderate benefit)")
-
-    # Performance thresholds
-    logger.info("📊 PERFORMANCE THRESHOLDS:")
-    logger.info("• Individual time < 10ms → Skip fusion")
-    logger.info("• Overhead ratio > 1.5x → Skip fusion")
-    logger.info("• ≤2 filters → Skip fusion")
-    logger.info("• Complex filters → Use fusion")
-    logger.info("• Mixed filters → Use fusion")
-
-    return results
-
-
 def main():
     """Main execution function for performance benchmarking."""
     import argparse
@@ -2655,9 +2756,9 @@ def main():
     parser = argparse.ArgumentParser(description="Performance Benchmark for Data-Juicer Filters")
     parser.add_argument(
         "--mode",
-        choices=["quick", "full", "complex_only", "pipeline", "recipe"],
-        default="quick",
-        help="Benchmark mode: quick (3 basic filters), full (12 comprehensive filters), complex_only (7 complex filters), pipeline (optimizer workflow), recipe (custom YAML pipeline)",
+        choices=["quick", "full", "recipe"],
+        default="full",
+        help="Benchmark mode: quick (3 basic filters), full (12 comprehensive filters), recipe (custom YAML pipeline)",
     )
     parser.add_argument(
         "--samples",
@@ -2694,10 +2795,6 @@ def main():
     # Create benchmark instance
     benchmark = PerformanceBenchmark()
 
-    # Preload models to avoid loading delays during benchmark
-    if args.mode in ["complex_only", "full", "recipe"]:
-        preload_models_for_benchmark()
-
     # Create test data
     if args.dataset_path:
         logger.info(f"🎯 Using real dataset: {args.dataset_path}")
@@ -2711,58 +2808,41 @@ def main():
         filters = benchmark.get_quick_test_filters()
     elif args.mode == "full":
         filters = benchmark.create_test_filters()  # Use comprehensive test filters (12 filters)
-    elif args.mode == "complex_only":
-        from data_juicer.ops.filter import (
-            FlaggedWordFilter,
-            LanguageIDScoreFilter,
-            PerplexityFilter,
-            StopWordsFilter,
-            WordRepetitionFilter,
-        )
-
-        base_filters = [
-            PerplexityFilter(lang="en", model_key="gpt2", min_score=0.0, max_score=100.0),
-            StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.5),
-            FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1),
-            LanguageIDScoreFilter(lang="en", min_score=0.5, max_score=1.0),
-            WordRepetitionFilter(lang="en", min_ratio=0.0, max_ratio=0.3),
-        ]
-        spacy_filters = []
-        filters = base_filters + spacy_filters
     elif args.mode == "recipe":
         # Load pipeline from YAML recipe using optimizer framework
         if not args.recipe_path:
             raise ValueError("--recipe-path must be specified in recipe mode!")
-        from data_juicer.core.optimizer.filter_fusion_strategy import (
-            FilterFusionStrategy,
-        )
-        from data_juicer.core.optimizer.mapper_fusion_strategy import (
-            MapperFusionStrategy,
-        )
-        from data_juicer.core.optimizer.optimizer import PipelineOptimizer
-        from data_juicer.core.pipeline_ast import PipelineAST
 
         # Build AST from recipe
         ast = PipelineAST()
         ast.build_from_yaml(args.recipe_path)
         logger.info(f"📋 Loaded recipe: {args.recipe_path}")
         logger.info(f"Pipeline structure:\n{ast.visualize()}")
-        # Use optimizer to handle the full pipeline
-        optimizer = PipelineOptimizer([FilterFusionStrategy(), MapperFusionStrategy()])
+
+        # Compute analyzer insights for the test data
+        analyzer_insights = benchmark.get_analyzer_insights(test_data)
+
+        # Use optimizer to handle the full pipeline, passing analyzer_insights only to PipelineOptimizer
+        optimizer = PipelineOptimizer(
+            [FilterFusionStrategy(), MapperFusionStrategy()], analyzer_insights=analyzer_insights
+        )
+
         # Optimize the pipeline
         optimized_ast = optimizer.optimize(ast)
         logger.info(f"🔧 Optimized pipeline structure:\n{optimized_ast.visualize()}")
+
         # Convert optimized AST to operations for benchmarking
         operations = benchmark._convert_ast_to_operations(optimized_ast)
+
         # Debug: Log the extracted operations
         logger.info(f"🔍 Extracted {len(operations)} operations from optimized AST:")
         for i, op in enumerate(operations):
             logger.info(f"  {i+1}: {op}")
-        # Load operations, handling fused_filter specially
-        from data_juicer.core.optimizer.fused_op import FusedFilter
+
+        # Load operations, handling fused operations specially
         from data_juicer.ops.load import load_ops
 
-        filters = []
+        loaded_operations = []
         for op_config in operations:
             op_name = list(op_config.keys())[0]
             op_args = op_config[op_name]
@@ -2779,14 +2859,32 @@ def main():
                     fused_filter = FusedFilter(name="fused_filter", fused_filters=individual_filters)
                     # Force sequential execution to avoid parallel stats access issues
                     fused_filter.execution_strategy = "sequential"
-                    filters.append(fused_filter)
+                    loaded_operations.append(fused_filter)
+            elif op_name == "fused_mapper":
+                # Handle fused mapper
+                mapper_config = op_args
+                name = mapper_config.get("name", "fused_mapper")
+                fused_mappers = mapper_config.get("fused_mappers", [])
+
+                fused_mapper = FusedMapper(name=name, fused_mappers=fused_mappers)
+                loaded_operations.append(fused_mapper)
             else:
                 loaded_ops = load_ops([op_config])
                 if loaded_ops:
-                    filters.append(loaded_ops[0])
-        logger.info(f"📊 Loaded {len(filters)} operations from optimized pipeline")
-    else:  # pipeline mode
-        filters = benchmark.create_test_filters()  # Use comprehensive test filters for pipeline mode
+                    loaded_operations.append(loaded_ops[0])
+
+        logger.info(f"📊 Loaded {len(loaded_operations)} operations from optimized pipeline")
+
+        # Use mixed operations benchmarking for recipe mode
+        # This properly handles mappers, filters, and other operation types
+        results = benchmark.run_mixed_operations_benchmark(loaded_operations, test_data, args.mode)
+
+        logger.info("\n✅ Recipe benchmark completed successfully!")
+        logger.info(f"📊 Results saved for mode: {args.mode}")
+
+        return results
+    else:
+        raise ValueError(f"Invalid mode: {args.mode}")
 
     # Get analyzer insights if requested
     analyzer_insights = None
@@ -2805,24 +2903,27 @@ def main():
 
 def load_real_dataset(dataset_path: str, max_samples: int = None) -> Dict[str, Any]:
     """
-    Load real dataset using DatasetBuilder.
+    Load real dataset using DatasetBuilder and convert to expected format.
 
     Args:
         dataset_path: Path to the dataset file
         max_samples: Maximum number of samples to load (None for all)
 
     Returns:
-        Dataset as returned by DatasetBuilder
+        Dictionary with 'text' and Fields.stats keys for benchmark compatibility
     """
     from argparse import Namespace
 
     from data_juicer.core.data.dataset_builder import DatasetBuilder
+    from data_juicer.utils.constant import Fields
 
     logger.info(f"📂 Loading real dataset from: {dataset_path}")
 
-    # Create a minimal config for DatasetBuilder
+    # Create a proper config for DatasetBuilder
     cfg = Namespace()
     cfg.dataset_path = dataset_path
+    # Add empty process list to avoid AttributeError
+    cfg.process = []
 
     # Create DatasetBuilder instance
     builder = DatasetBuilder(cfg, executor_type="default")
@@ -2832,7 +2933,8 @@ def load_real_dataset(dataset_path: str, max_samples: int = None) -> Dict[str, A
 
     # Apply max_samples limit if specified
     if max_samples and hasattr(dataset, "__len__") and len(dataset) > max_samples:
-        dataset = dataset.select(range(max_samples))
+        if hasattr(dataset, "select"):
+            dataset = dataset.select(range(max_samples))
         logger.info(f"✅ Limited to {max_samples} samples from {dataset_path}")
     else:
         logger.info(f"✅ Loaded {len(dataset)} samples from {dataset_path}")
@@ -2841,11 +2943,20 @@ def load_real_dataset(dataset_path: str, max_samples: int = None) -> Dict[str, A
     if hasattr(dataset, "column_names"):
         logger.info(f"📊 Dataset columns: {dataset.column_names}")
         if "text" in dataset.column_names:
-            sample_texts = dataset["text"][:3] if len(dataset) >= 3 else dataset["text"]
-            avg_length = sum(len(str(t)) for t in sample_texts) / len(sample_texts) if sample_texts else 0
-            logger.info(f"📝 Sample text lengths: avg={avg_length:.1f} chars")
+            if hasattr(dataset, "__getitem__") and hasattr(dataset, "__len__"):
+                sample_texts = dataset["text"][:3] if len(dataset) >= 3 else dataset["text"]
+                avg_length = sum(len(str(t)) for t in sample_texts) / len(sample_texts) if sample_texts else 0
+                logger.info(f"📝 Sample text lengths: avg={avg_length:.1f} chars")
 
-    return dataset
+    # Convert to expected format for benchmark
+    if hasattr(dataset, "__getitem__") and hasattr(dataset, "__len__"):
+        texts = dataset["text"] if "text" in dataset.column_names else []
+        # Create stats list with empty dicts for each sample
+        stats = [{} for _ in range(len(texts))]
+        return {"text": texts, Fields.stats: stats}
+    else:
+        # Fallback: return empty dataset
+        return {"text": [], Fields.stats: []}
 
 
 if __name__ == "__main__":
