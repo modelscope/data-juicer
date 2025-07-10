@@ -751,9 +751,12 @@ class PerformanceBenchmark:
 
                     # Handle different operation types
                     if op_name == "fused_mapper":
-                        # Extract fused mapper configuration
-                        if "fused_mapper" in op_config:
+                        # Extract fused mapper configuration - handle double nesting
+                        if "fused_mapper" in op_config and isinstance(op_config["fused_mapper"], dict):
                             mapper_config = op_config["fused_mapper"]
+                            # Check if there's another level of nesting
+                            if "fused_mapper" in mapper_config:
+                                mapper_config = mapper_config["fused_mapper"]
                             clean_config = {
                                 "name": mapper_config.get("name", "fused_mapper"),
                                 "fused_mappers": mapper_config.get("fused_mappers", []),
@@ -2349,13 +2352,39 @@ class PerformanceBenchmark:
         optimized_ast = optimizer.optimize(ast2)
         logger.debug("🔍 DEBUG: Pipeline optimized AST created.")
 
-        # Convert optimized AST back to config
-        optimized_config = self._convert_ast_to_config(optimized_ast)
-        logger.debug(f"🔍 DEBUG: Pipeline optimized config: {optimized_config}")
+        # Convert optimized AST back to operations (this handles the double nesting properly)
+        optimized_op_configs = self._convert_ast_to_operations(optimized_ast)
+        logger.info(f"🔍 DEBUG: Pipeline optimized operation configs: {optimized_op_configs}")
+        logger.debug(f"🔍 DEBUG: Pipeline loaded {len(optimized_op_configs)} optimized operation configs")
 
-        # Load optimized operations
-        optimized_ops = load_ops(optimized_config["process"])
-        logger.debug(f"🔍 DEBUG: Pipeline loaded {len(optimized_ops)} optimized operations")
+        # Load the operations from configs
+        optimized_ops = []
+        for op_config in optimized_op_configs:
+            op_name = list(op_config.keys())[0]
+            op_args = op_config[op_name]
+            if op_name == "fused_filter":
+                fused_op_list = op_args.get("fused_op_list", [])
+                individual_filters = []
+                for filter_config in fused_op_list:
+                    filter_name = list(filter_config.keys())[0]
+                    filter_args = filter_config[filter_name]
+                    loaded_filters = load_ops([{filter_name: filter_args}])
+                    if loaded_filters:
+                        individual_filters.append(loaded_filters[0])
+                if individual_filters:
+                    fused_filter = FusedFilter(name="fused_filter", fused_filters=individual_filters)
+                    fused_filter.execution_strategy = "sequential"
+                    optimized_ops.append(fused_filter)
+            elif op_name == "fused_mapper":
+                mapper_config = op_args
+                name = mapper_config.get("name", "fused_mapper")
+                fused_mappers = mapper_config.get("fused_mappers", [])
+                fused_mapper = FusedMapper(name=name, fused_mappers=fused_mappers)
+                optimized_ops.append(fused_mapper)
+            else:
+                loaded_ops = load_ops([op_config])
+                if loaded_ops:
+                    optimized_ops.append(loaded_ops[0])
 
         # Process with optimized operations
         data = test_data_with_ids
