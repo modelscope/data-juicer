@@ -2354,7 +2354,7 @@ class PerformanceBenchmark:
         logger.debug(f"🔍 DEBUG: Pipeline optimized config: {optimized_config}")
 
         # Load optimized operations
-        optimized_ops = load_ops(optimized_config)
+        optimized_ops = load_ops(optimized_config["process"])
         logger.debug(f"🔍 DEBUG: Pipeline loaded {len(optimized_ops)} optimized operations")
 
         # Process with optimized operations
