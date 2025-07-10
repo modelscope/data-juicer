@@ -15,39 +15,64 @@ class FusedFilter(Filter):
 
     _batched_op = True
 
-    def __init__(self, name: str, fused_filters: List[Filter], analyzer_insights: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self, name: str, fused_filters: List[Filter], analyzer_insights: Optional[Dict[str, Any]] = None, **kwargs
+    ):
         """Initialize the fused filter.
 
         Args:
             name: Name of the fused filter
             fused_filters: List of filters to fuse
             analyzer_insights: Optional dataset analysis insights for optimization
+            **kwargs: Extra config arguments (e.g., accelerator, batch_size, etc.)
         """
         super().__init__()
         self._name = name
         self.fused_filters = fused_filters
         self.analyzer_insights = analyzer_insights or {}
 
+        # Store extra config arguments as attributes
+        self.accelerator = kwargs.get("accelerator", "cpu")
+        self.batch_size = kwargs.get("batch_size", None)
+        self.cpu_required = kwargs.get("cpu_required", None)
+        self.mem_required = kwargs.get("mem_required", None)
+        self.num_proc = kwargs.get("num_proc", None)
+        self.skip_op_error = kwargs.get("skip_op_error", False)
+        self.turbo = kwargs.get("turbo", False)
+        self.text_key = kwargs.get("text_key", None)
+        self.image_key = kwargs.get("image_key", None)
+        self.audio_key = kwargs.get("audio_key", None)
+        self.video_key = kwargs.get("video_key", None)
+        self.history_key = kwargs.get("history_key", None)
+        self.query_key = kwargs.get("query_key", None)
+        self.response_key = kwargs.get("response_key", None)
+        self.execution_strategy = kwargs.get("execution_strategy", None)
+        self.has_dependencies = kwargs.get("has_dependencies", None)
+
         # Add recursion prevention flag
         self._in_performance_test = False
 
-        # Set accelerator based on available methods
-        if any(hasattr(op, "accelerator") and op.accelerator == "cuda" for op in self.fused_filters):
-            self.accelerator = "cuda"
-        else:
-            self.accelerator = "cpu"
+        # Set accelerator based on available methods (if not set by kwargs)
+        if self.accelerator is None:
+            if any(hasattr(op, "accelerator") and op.accelerator == "cuda" for op in self.fused_filters):
+                self.accelerator = "cuda"
+            else:
+                self.accelerator = "cpu"
 
-        # Update num_proc with the minimum of all fused filters
-        self.num_proc = min([op.runtime_np() for op in self.fused_filters])
+        # Update num_proc with the minimum of all fused filters if not set by kwargs
+        if self.num_proc is None:
+            self.num_proc = min([op.runtime_np() for op in self.fused_filters])
 
         # Store original operation configs (create simple config if not available)
         self._op_cfg = {}
         for op in self.fused_filters:
-            if hasattr(op, "config") and op.config:
-                self._op_cfg[op._name] = op.config
-            else:
+            op_name = getattr(op, "_name", None)
+            op_config = getattr(op, "config", None)
+            if op_name is not None and op_config:
+                self._op_cfg[op_name] = op_config
+            elif op_name is not None:
                 # Create a simple config for filters without explicit config
-                self._op_cfg[op._name] = {"inter_vars": [], "dependencies": []}
+                self._op_cfg[op_name] = {"inter_vars": [], "dependencies": []}
 
         # Analyze dependencies and determine execution strategy
         self._analyze_dependencies()
@@ -67,7 +92,7 @@ class FusedFilter(Filter):
             simple_count = sum(
                 1
                 for op in self.fused_filters
-                if op._name
+                if getattr(op, "_name", None)
                 in {
                     "text_length_filter",
                     "words_num_filter",
@@ -139,8 +164,8 @@ class FusedFilter(Filter):
     def _has_dependency(self, op1: Filter, op2: Filter) -> bool:
         """Check if op2 depends on op1's output."""
         # Get intermediate variables used by each operation from stored configs
-        op1_vars = set(self._op_cfg.get(op1._name, {}).get("inter_vars", []))
-        op2_vars = set(self._op_cfg.get(op2._name, {}).get("inter_vars", []))
+        op1_vars = set(self._op_cfg.get(getattr(op1, "_name", "<unknown>"), {}).get("inter_vars", []))
+        op2_vars = set(self._op_cfg.get(getattr(op2, "_name", "<unknown>"), {}).get("inter_vars", []))
 
         # Check if op2 uses any variables produced by op1
         return bool(op1_vars & op2_vars)
@@ -225,7 +250,7 @@ class FusedFilter(Filter):
                 "maximum_line_length_filter",
             }
 
-            if op._name in simple_filter_names:
+            if getattr(op, "_name", "<unknown>") in simple_filter_names:
                 simple_filters += 1
             else:
                 complex_filters += 1
@@ -256,7 +281,7 @@ class FusedFilter(Filter):
                 "maximum_line_length_filter",
             }
 
-            if op._name in simple_filter_names:
+            if getattr(op, "_name", "<unknown>") in simple_filter_names:
                 simple_filters += 1
             else:
                 complex_filters += 1
@@ -302,7 +327,8 @@ class FusedFilter(Filter):
             simple_count = sum(
                 1
                 for op in self.fused_filters
-                if op._name in {"text_length_filter", "words_num_filter", "character_repetition_filter"}
+                if getattr(op, "_name", "<unknown>")
+                in {"text_length_filter", "words_num_filter", "character_repetition_filter"}
             )
             if simple_count == len(self.fused_filters):
                 logger.debug("Small dataset with simple filters - skipping fusion")
@@ -333,7 +359,7 @@ class FusedFilter(Filter):
             "language_id_score_filter",
             "word_repetition_filter",
         }
-        complex_count = sum(1 for op in self.fused_filters if op._name in complex_filter_names)
+        complex_count = sum(1 for op in self.fused_filters if getattr(op, "_name", "<unknown>") in complex_filter_names)
 
         # Always use fusion for complex filters
         if complex_count > 0:

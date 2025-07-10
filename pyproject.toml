@@ -138,7 +138,6 @@ dev = [
     "build",  # package building
     "black>=25.1.0",
     "flake8-black",
-    "faker"
 ]
 
 # AI Services & APIs
