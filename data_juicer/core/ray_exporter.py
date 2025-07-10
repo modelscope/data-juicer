@@ -24,7 +24,7 @@ class RayExporter:
         # 'numpy',
     }
 
-    def __init__(self, export_path, keep_stats_in_res_ds=True, keep_hashes_in_res_ds=False, **kwargs):
+    def __init__(self, export_path, export_type=None, keep_stats_in_res_ds=True, keep_hashes_in_res_ds=False, **kwargs):
         """
         Initialization method.
 
@@ -37,7 +37,12 @@ class RayExporter:
         self.export_path = export_path
         self.keep_stats_in_res_ds = keep_stats_in_res_ds
         self.keep_hashes_in_res_ds = keep_hashes_in_res_ds
-        self.export_format = self._get_export_format(export_path)
+        self.export_format = self._get_export_format(export_path) if export_type is None else export_type
+        if self.export_format not in self._SUPPORTED_FORMATS:
+            raise NotImplementedError(
+                f'export data format "{self.export_format}" is not supported '
+                f"for now. Only support {self._SUPPORTED_FORMATS}. Please check export_type or export_path."
+            )
         self.export_extra_args = kwargs if kwargs is not None else {}
 
     def _get_export_format(self, export_path):
@@ -57,11 +62,6 @@ class RayExporter:
             suffix = "jsonl"
 
         export_format = suffix
-        if export_format not in self._SUPPORTED_FORMATS:
-            raise NotImplementedError(
-                f'export data format "{export_format}" is not supported '
-                f"for now. Only support {self._SUPPORTED_FORMATS}."
-            )
         return export_format
 
     def _export_impl(self, dataset, export_path, columns=None):

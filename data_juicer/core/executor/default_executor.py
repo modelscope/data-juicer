@@ -72,6 +72,7 @@ class DefaultExecutor(ExecutorBase):
         logger.info("Preparing exporter...")
         self.exporter = Exporter(
             self.cfg.export_path,
+            self.cfg.export_type,
             self.cfg.export_shard_size,
             self.cfg.export_in_parallel,
             self.cfg.np,

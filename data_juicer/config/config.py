@@ -168,6 +168,14 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 "directory of this process.",
             )
             parser.add_argument(
+                "--export_type",
+                type=str,
+                default=None,
+                help="The export format type. If it's not specified, Data-Juicer will parse from the export_path. The "
+                "supported types can be found in Exporter._router() for standalone mode and "
+                "RayExporter._SUPPORTED_FORMATS for ray mode",
+            )
+            parser.add_argument(
                 "--export_shard_size",
                 type=NonNegativeInt,
                 default=0,
