@@ -77,6 +77,7 @@ class DefaultExecutor(ExecutorBase):
             self.cfg.np,
             keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
             keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
+            **self.cfg.export_extra_args,
         )
 
         # setup tracer

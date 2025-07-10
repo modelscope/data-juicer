@@ -1,6 +1,6 @@
 import io
 import json
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 
 def _custom_default_decoder(sample: Dict[str, Any], format: Optional[Union[bool, str]] = True):
@@ -149,37 +149,30 @@ def _custom_default_encoder(sample: Dict[str, Any], format: Optional[Union[str, 
     return sample
 
 
-def reconstruct_custom_webdataset_format(
-    samples, json_fields: Optional[List[str]] = None, field_mapping: Optional[Dict[str, str]] = None
-):
+def reconstruct_custom_webdataset_format(samples, field_mapping: Optional[Dict[str, str]] = None):
     """
     Reconstruct the original dataset to the WebDataset format.
-    Assume there is always a `json` field to store the textual or meta info for each sample, and the fields to put into
-    the `json` field are specified by `json_fields` argument, which is a list of field keys.
-    For other required keys, they can be specified by `field_mapping` argument, which is a dict mapping from the target
+    For all keys, they can be specified by `field_mapping` argument, which is a dict mapping from the target
     field key in the result format to the source field key in the original samples.
 
     :param samples: the input samples batch to be reconstructed
-    :param json_fields: the field keys to construct the `json` field.
     :param field_mapping: the field mapping to construct the left fields.
     """
-    if json_fields is None:
-        json_fields = []
     if field_mapping is None:
         field_mapping = {}
-    assert isinstance(json_fields, list)
     assert isinstance(field_mapping, dict)
 
-    # construct the left fields
-    reconstructed_sample = {tgt_field: samples[src_field] for tgt_field, src_field in field_mapping.items()}
+    # not specified -- return the original samples
+    if len(field_mapping) == 0:
+        return samples
 
-    # construct the `json` field
-    json_contents = []
-    if len(json_fields) > 0:
-        sampled_field = json_fields[0]
-        for i in range(len(samples[sampled_field])):
-            json_contents.append({json_field: samples[json_field][i] for json_field in json_fields})
-        # put it to the `json` field
-        reconstructed_sample["json"] = json_contents
+    # construct the left fields
+    reconstructed_sample = {}
+    for tgt_field, src_field in field_mapping.items():
+        assert isinstance(src_field, str) or isinstance(src_field, list)
+        if isinstance(src_field, str):
+            reconstructed_sample[tgt_field] = samples[src_field]
+        elif isinstance(src_field, list):
+            reconstructed_sample[tgt_field] = {src_field_item: samples[src_field_item] for src_field_item in src_field}
 
     return reconstructed_sample

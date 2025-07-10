@@ -1,8 +1,10 @@
 import os
+from functools import partial
 
 from loguru import logger
 
 from data_juicer.utils.constant import Fields, HashKeys
+from data_juicer.utils.webdataset_utils import reconstruct_custom_webdataset_format
 
 
 class RayExporter:
@@ -22,7 +24,7 @@ class RayExporter:
         # 'numpy',
     }
 
-    def __init__(self, export_path, keep_stats_in_res_ds=True, keep_hashes_in_res_ds=False):
+    def __init__(self, export_path, keep_stats_in_res_ds=True, keep_hashes_in_res_ds=False, **kwargs):
         """
         Initialization method.
 
@@ -36,6 +38,7 @@ class RayExporter:
         self.keep_stats_in_res_ds = keep_stats_in_res_ds
         self.keep_hashes_in_res_ds = keep_hashes_in_res_ds
         self.export_format = self._get_export_format(export_path)
+        self.export_extra_args = kwargs if kwargs is not None else {}
 
     def _get_export_format(self, export_path):
         """
@@ -92,6 +95,12 @@ class RayExporter:
             return dataset.write_json(export_path, force_ascii=False)
         elif self.export_format == "webdataset":
             from data_juicer.utils.webdataset_utils import _custom_default_encoder
+
+            # check if we need to reconstruct the customized WebDataset format
+            field_mapping = self.export_extra_args.get("field_mapping", {})
+            if len(field_mapping) > 0:
+                reconstruct_func = partial(reconstruct_custom_webdataset_format, field_mapping=field_mapping)
+                dataset = dataset.map(reconstruct_func)
 
             return dataset.write_webdataset(export_path, encoder=_custom_default_encoder)
         else:

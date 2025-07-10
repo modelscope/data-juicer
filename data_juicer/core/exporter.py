@@ -25,6 +25,7 @@ class Exporter:
         keep_stats_in_res_ds=False,
         keep_hashes_in_res_ds=False,
         export_stats=True,
+        **kwargs,
     ):
         """
         Initialization method.

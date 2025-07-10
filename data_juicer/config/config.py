@@ -191,6 +191,13 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 "more time.",
             )
             parser.add_argument(
+                "--export_extra_args",
+                type=Dict,
+                default={},
+                help="Other optional arguments for exporting in dict. For example, the key mapping info for exporting "
+                "the WebDataset format.",
+            )
+            parser.add_argument(
                 "--keep_stats_in_res_ds",
                 type=bool,
                 default=False,
