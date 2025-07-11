@@ -849,8 +849,7 @@ class PerformanceBenchmark:
                 # Create the fused filter with the actual filter objects
                 if individual_filters:
                     fused_filter = FusedFilter(name="fused_filter", fused_filters=individual_filters)
-                    # Force parallel execution to match individual execution behavior
-                    # (each filter sees original data, not filtered output from previous filters)
+                    # Keep parallel execution for better performance
                     fused_filter.execution_strategy = "parallel"
                     logger.debug(f"🔍 DEBUG PIPELINE: Created fused filter with {len(individual_filters)} filters")
                     logger.info(
@@ -858,9 +857,16 @@ class PerformanceBenchmark:
                     )
                     logger.debug(f"🔍 DEBUG PIPELINE: Filter order: {[f._name for f in fused_filter.fused_filters]}")
 
-                    # Process the fused filter
-                    if hasattr(fused_filter, "compute_stats_batched"):
-                        data = fused_filter.compute_stats_batched(data)
+                    # IMPROVED: Front-load all stats computation for all filters before parallel processing
+                    logger.debug(
+                        f"🔍 DEBUG PIPELINE: Front-loading stats computation for all {len(individual_filters)} filters"
+                    )
+                    for i, filter_op in enumerate(individual_filters):
+                        logger.debug(f"🔍 DEBUG PIPELINE: Computing stats for filter {i+1}: {type(filter_op).__name__}")
+                        if hasattr(filter_op, "compute_stats_batched"):
+                            data = filter_op.compute_stats_batched(data)
+
+                    # Now process with the fused filter in parallel (all stats are already computed)
                     if hasattr(fused_filter, "process_batched"):
                         result = list(fused_filter.process_batched(data))
 
@@ -1191,15 +1197,15 @@ class PerformanceBenchmark:
             logger.info("🔍 Getting analyzer insights...")
             analyzer_insights = self.get_analyzer_insights(test_data)
 
-        # Run individual filters benchmark
-        logger.info("\n📊 INDIVIDUAL EXECUTION BENCHMARK")
-        logger.info("-" * 40)
-        individual_results = self.run_individual_filters_benchmark(filters, test_data)
-
-        # Run pipeline optimizer benchmark
-        logger.info("\n🔧 PIPELINE OPTIMIZER BENCHMARK")
+        # Run pipeline optimizer benchmark FIRST
+        logger.info("\n🔧 PIPELINE OPTIMIZER BENCHMARK (FIRST)")
         logger.info("-" * 40)
         pipeline_results = self.run_pipeline_optimizer_benchmark(filters, test_data, analyzer_insights)
+
+        # Run individual filters benchmark SECOND
+        logger.info("\n📊 INDIVIDUAL EXECUTION BENCHMARK (SECOND)")
+        logger.info("-" * 40)
+        individual_results = self.run_individual_filters_benchmark(filters, test_data)
 
         # Calculate performance metrics
         individual_time = individual_results.total_time
@@ -1207,8 +1213,12 @@ class PerformanceBenchmark:
 
         if individual_time > 0:
             pipeline_speedup = individual_time / pipeline_time
-            logger.info(f"Individual execution: {individual_time:.3f}s ({individual_results.throughput:.1f} samples/s)")
-            logger.info(f"Pipeline optimizer:   {pipeline_time:.3f}s ({pipeline_results.throughput:.1f} samples/s)")
+            logger.info(
+                f"Pipeline optimizer (FIRST): {pipeline_time:.3f}s ({pipeline_results.throughput:.1f} samples/s)"
+            )
+            logger.info(
+                f"Individual execution (SECOND): {individual_time:.3f}s ({individual_results.throughput:.1f} samples/s)"
+            )
             logger.info(f"Pipeline speedup:     {pipeline_speedup:.2f}x")
 
             # Determine best strategy
