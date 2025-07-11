@@ -19,8 +19,6 @@ class InstructionFollowingDifficultyFilterTest(DataJuicerTestCaseBase):
             op.compute_stats,
             batch_size=op.batch_size,
             )
-        for d in dataset:
-            print(f"text: {d['text']}\nifd_score: {d[Fields.stats][StatsKeys.ifd_score]}")
         dataset = dataset.filter(op.process, batch_size=op.batch_size)
         dataset_test = dataset.select_columns(column_names=['text'])
         res_list = dataset_test.to_list()

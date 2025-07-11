@@ -15,7 +15,7 @@ class TextEmbdSimilarityFilterTest(DataJuicerTestCaseBase):
     # export HF_ENDPOINT=
     # You can also set _hf_model="/your/local/path/to/model"
 
-    # _hf_model = "Qwen/Qwen3-Embedding-0.6B"
+    _hf_model = "Qwen/Qwen3-Embedding-0.6B"
     # _hf_model = "/your/local/path/to/Qwen3-Embedding-0.6B"
 
     text_key = "text"
@@ -26,8 +26,6 @@ class TextEmbdSimilarityFilterTest(DataJuicerTestCaseBase):
             dataset = dataset.add_column(name=Fields.stats, column=[{}] * dataset.num_rows)
 
         dataset = dataset.map(op.compute_stats, num_proc=num_proc, with_rank=True)
-        for d in dataset:
-            print(f"{d[self.text_key]}: {d[Fields.stats][StatsKeys.text_embd_similarity]}")
         dataset = dataset.filter(op.process, num_proc=num_proc)
         dataset = dataset.select_columns(column_names=[self.text_key])
         res_list = dataset.to_list()

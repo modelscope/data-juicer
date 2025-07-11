@@ -19,8 +19,6 @@ class InContextInfluenceFilterTest(DataJuicerTestCaseBase):
             op.compute_stats,
             batch_size=op.batch_size,
             )
-        for d in dataset:
-            print(f"text: {d['text']}\nin-context influence: {d[Fields.stats][StatsKeys.in_context_influence]}")
         dataset = dataset.filter(op.process, batch_size=op.batch_size)
         dataset_test = dataset.select_columns(column_names=['text'])
         res_list = dataset_test.to_list()

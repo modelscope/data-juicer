@@ -26,9 +26,6 @@ class LLMTaskRelevanceFilterTest(DataJuicerTestCaseBase):
             batch_size=op.batch_size
             )
         logger.info(dataset.to_list())
-        for d in dataset:
-            print(f"text: {d['text']}\nllm_task_relevance: {d[Fields.stats][StatsKeys.llm_task_relevance]}")
-            print(f"text: {d['text']}\nllm_task_relevance_record: {d[Fields.stats][StatsKeys.llm_task_relevance_record]}")
         dataset = dataset.filter(op.process, batch_size=op.batch_size)
         dataset_test = dataset.select_columns(column_names=['text'])
         res_list = dataset_test.to_list()
