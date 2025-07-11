@@ -236,8 +236,8 @@ class StatsKeysConstant(object):
     llm_difficulty_score = 'llm_difficulty_score'
     llm_difficulty_record = 'llm_difficulty_record'
     llm_perplexity = 'llm_perplexity'
-    # llm_task_relevance = 'llm_task_relevance'
-    # llm_task_relevance_record = 'llm_task_relevance_record'
+    llm_task_relevance = 'llm_task_relevance'
+    llm_task_relevance_record = 'llm_task_relevance_record'
 
     #  === image ===
     aspect_ratios = 'aspect_ratios'
