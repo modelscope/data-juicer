@@ -261,22 +261,22 @@ class PerformanceBenchmark:
         logger.info("Creating comprehensive test filters...")
 
         filters = [
-            # Basic text filters (simple, fast) - Made extremely lenient
-            WordsNumFilter(min_num=1, max_num=100000),  # Allow 1-100000 words
-            TextLengthFilter(min_len=1, max_len=100000),  # Allow 1-100000 chars
-            CharacterRepetitionFilter(repetition_ratio=0.999),  # Allow up to 99.9% repetition
-            WordRepetitionFilter(min_ratio=0.0, max_ratio=0.99),  # Allow up to 99% word repetition
-            SpecialCharactersFilter(min_ratio=0.0, max_ratio=0.95),  # Allow up to 95% special chars
-            AlphanumericFilter(min_ratio=0.001),  # Allow as low as 0.1% alphanumeric
-            AverageLineLengthFilter(min_len=1, max_len=10000),  # Allow 1-10000 chars per line
-            MaximumLineLengthFilter(min_len=1, max_len=20000),  # Allow 1-20000 chars per line
-            # Content quality filters (moderate complexity) - Made extremely lenient
+            # Basic text filters (simple, fast) - Realistic settings
+            WordsNumFilter(min_num=10, max_num=2000),  # 10-2000 words (was 1-100000)
+            TextLengthFilter(min_len=50, max_len=10000),  # 50-10000 chars (was 1-100000)
+            CharacterRepetitionFilter(repetition_ratio=0.3),  # Max 30% repetition (was 0.999)
+            WordRepetitionFilter(min_ratio=0.0, max_ratio=0.4),  # Max 40% word repetition (was 0.99)
+            SpecialCharactersFilter(min_ratio=0.0, max_ratio=0.3),  # Max 30% special chars (was 0.95)
+            AlphanumericFilter(min_ratio=0.5),  # At least 50% alphanumeric (was 0.001)
+            AverageLineLengthFilter(min_len=10, max_len=200),  # 10-200 chars per line (was 1-10000)
+            MaximumLineLengthFilter(min_len=10, max_len=500),  # 10-500 chars per line (was 1-20000)
+            # Content quality filters (moderate complexity) - Realistic settings
             PerplexityFilter(
-                lang="en", model_key="gpt2", min_score=0.0, max_score=1e10
-            ),  # Allow extremely high perplexity (was 1e6)
-            StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.99),  # Allow up to 99% stop words
-            FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.99),  # Allow up to 99% flagged words
-            LanguageIDScoreFilter(lang="en", min_score=0.0),  # Allow any language score
+                lang="en", model_key="gpt2", min_score=0.0, max_score=1000
+            ),  # Max perplexity 1000 (was 1e10)
+            StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.6),  # Max 60% stop words (was 0.99)
+            FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1),  # Max 10% flagged words (was 0.99)
+            LanguageIDScoreFilter(lang="en", min_score=0.5),  # At least 50% English confidence (was 0.0)
         ]
 
         # Debug: Log all filters being created
@@ -1889,9 +1889,9 @@ class PerformanceBenchmark:
         )
 
         return [
-            alphanumeric_filter.AlphanumericFilter(min_ratio=0.5),
-            text_length_filter.TextLengthFilter(min_len=10, max_len=1000),
-            words_num_filter.WordsNumFilter(min_num=5, max_num=200),
+            alphanumeric_filter.AlphanumericFilter(min_ratio=0.7),  # At least 70% alphanumeric (was 0.5)
+            text_length_filter.TextLengthFilter(min_len=50, max_len=2000),  # 50-2000 chars (was 10-1000)
+            words_num_filter.WordsNumFilter(min_num=10, max_num=400),  # 10-400 words (was 5-200)
         ]
 
     def create_full_test_filters(self) -> List[Filter]:
@@ -1907,17 +1907,15 @@ class PerformanceBenchmark:
         )
 
         return [
-            alphanumeric_filter.AlphanumericFilter(min_ratio=0.01),  # Allow as low as 1% alphanumeric (was 0.1)
-            text_length_filter.TextLengthFilter(min_len=1, max_len=50000),  # Allow 1-50000 chars (was 1-10000)
-            words_num_filter.WordsNumFilter(min_num=1, max_num=50000),  # Allow 1-50000 words (was 1-10000)
-            character_repetition_filter.CharacterRepetitionFilter(
-                max_ratio=0.99
-            ),  # Allow up to 99% repetition (was 0.95)
-            word_repetition_filter.WordRepetitionFilter(max_ratio=0.95),  # Allow up to 95% word repetition (was 0.8)
+            alphanumeric_filter.AlphanumericFilter(min_ratio=0.75),  # At least 75% alphanumeric (was 0.6)
+            text_length_filter.TextLengthFilter(min_len=200, max_len=3000),  # 200-3000 chars (was 100-5000)
+            words_num_filter.WordsNumFilter(min_num=30, max_num=500),  # 30-500 words (was 20-1000)
+            character_repetition_filter.CharacterRepetitionFilter(max_ratio=0.15),  # Max 15% repetition (was 0.25)
+            word_repetition_filter.WordRepetitionFilter(max_ratio=0.2),  # Max 20% word repetition (was 0.3)
             special_characters_filter.SpecialCharactersFilter(
-                min_ratio=0.0, max_ratio=0.8
-            ),  # Allow up to 80% special chars (was 0.0-0.5)
-            stopwords_filter.StopWordsFilter(min_ratio=0.0),  # Allow any stop word ratio (was 0.0)
+                min_ratio=0.0, max_ratio=0.15
+            ),  # Max 15% special chars (was 0.25)
+            stopwords_filter.StopWordsFilter(min_ratio=0.15, max_ratio=0.4),  # 15-40% stop words (was 0.1-0.5)
         ]
 
     def run_analyzer(self, test_data: Dict[str, Any]) -> dict:
@@ -2998,7 +2996,7 @@ def main():
     if args.mode == "quick":
         filters = benchmark.create_quick_test_filters()
     elif args.mode == "full":
-        filters = benchmark.create_full_test_filters()  # Use comprehensive test filters (12 filters)
+        filters = benchmark.create_test_filters()  # Use comprehensive test filters (12 filters)
     elif args.mode == "recipe":
         # Load pipeline from YAML recipe using optimizer framework
         if not args.recipe_path:
