@@ -19,7 +19,8 @@ OP_NAME = 'in_context_influence_filter'
 @ATTRIBUTION_FILTERS.register_module(OP_NAME)
 class InContextInfluenceFilter(LLMPerplexityFilter):
     """Filter to keep texts whose in-context influence upon validation set within a specific range."""
-    # TODO: aggregation
+    # This operator is currently under development and evaluation as part of an ongoing research project.
+    # The Data-Juicer team retains full copyright over this operator.
 
     _accelerator = 'cuda'
 
