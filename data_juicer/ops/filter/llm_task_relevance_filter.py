@@ -70,18 +70,6 @@ json
         'knowledge_alignment', 'potential_utility'
     ]
 
-    DEFAULT_DUMMY_RECORD = {
-        'dimension_scores': {
-            'topical_relevance': -1,
-            'linguistic_style_match': -1,
-            'task_match': -1,
-            'knowledge_alignment': -1,
-            'potential_utility': -1
-        },
-        'flags': ['dummy'],
-        'rationale': 'dummy record'
-    }
-
     def __init__(self,
                  api_or_hf_model: str = 'gpt-4o',
                  min_score: float = 0.5,
@@ -112,7 +100,6 @@ json
                 f"valid_dataset and task_desc are both None when initializing {OP_NAME}. \
                 'prepare_valid_feature' method should be manually called before applying the filter."
             )
-        self.dummy_record = self.DEFAULT_DUMMY_RECORD
 
     @property
     def valid_feature_ready(self):
@@ -181,14 +168,6 @@ json
         assert self.valid_feature_ready, 'Validation feature not ready yet. Call prepare_valid_feature first.'
 
         score, record, tags = self.generate_llm_analysis(sample, rank)
-
-        if record is None:
-            logger.warning(f'record is None, dummy_record={self.dummy_record}')
-
-        score = score or -1.
-        record = record or self.dummy_record
-        logger.info(f'score: {score}')
-        logger.info(f'record: {record}')
 
         sample[Fields.stats][StatsKeys.llm_task_relevance] = score
         sample[Fields.stats][StatsKeys.llm_task_relevance_record] = record
