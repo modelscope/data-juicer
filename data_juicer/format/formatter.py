@@ -205,16 +205,16 @@ def unify_format(
     # 3. convert relative paths to absolute paths
     if global_cfg:
         # check and get dataset dir
-        if global_cfg.get("dataset_path", None) and os.path.exists(global_cfg.dataset_path):
+        if getattr(global_cfg, "dataset_path", None) and os.path.exists(global_cfg.dataset_path):
             if os.path.isdir(global_cfg.dataset_path):
                 ds_dir = global_cfg.dataset_path
             else:
                 ds_dir = os.path.dirname(global_cfg.dataset_path)
         else:
             ds_dir = ""
-        image_key = global_cfg.get("image_key", SpecialTokens.image)
-        audio_key = global_cfg.get("audio_key", SpecialTokens.audio)
-        video_key = global_cfg.get("video_key", SpecialTokens.video)
+        image_key = getattr(global_cfg, "image_key", SpecialTokens.image)
+        audio_key = getattr(global_cfg, "audio_key", SpecialTokens.audio)
+        video_key = getattr(global_cfg, "video_key", SpecialTokens.video)
 
         data_path_keys = []
         if image_key in dataset.features:
