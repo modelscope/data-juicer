@@ -24,9 +24,9 @@ class OPRecord:
         return {
             "type": self.type,
             "name": self.name,
-            "description": self.desc,
+            "desc": self.desc,
             "tags": self.tags,
-            "signature": self.sig,
+            "sig": self.sig,
             "param_desc": self.param_desc,
         }
 
@@ -145,10 +145,9 @@ def extract_param_docstring(docstring):
     param_docstring = ""
     if not docstring:
         return param_docstring
-    param_pattern = re.compile(r"(:param\s+(?!args|kwargs)\w+:\s+([^:]*))")
-    matches = param_pattern.findall(docstring)
-    for match in matches:
-        param_docstring += f"    {match[0]}\n"
+    param_docstring = ":param ".join(docstring.split(":param"))
+    if ":param" not in param_docstring:
+        return ""
     return param_docstring
 
 
