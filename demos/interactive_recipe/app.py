@@ -8,14 +8,14 @@ import random
 import re
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
+from datasets import Dataset
 
 
 from data_juicer.config import init_configs
-from data_juicer.core import Analyzer, DefaultExecutor
+from data_juicer.core import Analyzer
 from data_juicer.ops.base_op import OPERATORS
-from data_juicer.utils.constant import Fields, StatsKeys
 
-from prompts import single_op_prompt, multi_op_prompt
+from prompts import multi_op_prompt
 from assistant import consult
 from st_operator_pool import StOperatorPool
 from attributor import TextEmbdSimilarityAttributor
@@ -93,6 +93,34 @@ def word_cloud(data_path):
     plt.savefig(img_path)
 
     return img_path
+
+
+def load_dataset_as_df(path, n=None):
+    d = None
+    if path.endswith(".jsonl"):
+        d = []
+        with open(path, "r") as f:
+            for line in f:
+                d.append(json.loads(line))
+        if n:
+            d = d[:n]
+        return pd.DataFrame(d)
+    else:
+        raise NotImplementedError("only jsonl files are supported")
+
+
+def load_dataset(path, n=None):
+    d = None
+    if path.endswith(".jsonl"):
+        d = []
+        with open(path, "r") as f:
+            for line in f:
+                d.append(json.loads(line))
+        if n:
+            d = d[:n]
+        return Dataset.from_list(d)
+    else:
+        raise NotImplementedError("only jsonl files are supported")
 
 
 @st.cache_data
@@ -373,26 +401,19 @@ class Visualize:
 
     def attribution(self):
         with st.expander('Data Attribution', expanded=False):
-            if st.session_state.get('analyzed_dataset', None) is None:
-                st.write("Run Analysis First.")
-                return
             example_valid_data_path = os.path.abspath(
                 os.path.join(os.path.dirname(__file__),
                              './data/demo-valid-dataset.jsonl'))
             st.text_area(label='Validation Data Path',
                          key='valid_data_path',
                          value=f'{example_valid_data_path}')
+            display_valid_dataset_details = st.checkbox('Display validation dataset details')
+            if display_valid_dataset_details:
+                st.dataframe(load_dataset_as_df(st.session_state.valid_data_path), use_container_width=True)
             attribution_btn = st.button("Attribute", use_container_width=True)
             if attribution_btn:
                 with st.spinner('Wait for attribution...'):
                     # TODO: formal attributors
-                    valid_data = []
-                    valid_data_path = st.session_state.valid_data_path
-                    assert valid_data_path.endswith('.jsonl')
-                    with open(example_valid_data_path) as f:
-                        for line in f:
-                            valid_data.append(json.loads(line))
-
                     attributor = TextEmbdSimilarityAttributor()
                     enabled_ops = [op_name for op_name in self.op_pool if self.op_pool[op_name].enabled]
                     enabled_op_stats_keys = []
@@ -400,21 +421,15 @@ class Visualize:
                         stats_key = self.op_pool[op_name].dj_stats_key
                         if stats_key is not None:
                             enabled_op_stats_keys.append(stats_key)
-                    analyzed_dataset = st.session_state.analyzed_dataset
-                    analyzed_dataset, attribution_result = \
-                        attributor.run(analyzed_dataset, valid_data, enabled_op_stats_keys)
-                    st.session_state['analyzed_dataset'] = analyzed_dataset
+                    dataset = st.session_state.get(
+                        "analyzed_dataset",
+                        load_dataset(st.session_state.dataset_path, n=st.session_state.downsampling_size)
+                    )
+                    valid_dataset = load_dataset(st.session_state.valid_data_path)
+                    attribution_result = attributor.run(dataset, valid_dataset, enabled_op_stats_keys)
                     st.session_state.attribution_result = attribution_result
             if st.session_state.get('attribution_result', None) is not None:
-                attribution_result = st.session_state.attribution_result
-                st.write("Strategy: Text Embedding Similarity Attribution")
-                enabled_ops = [op_name for op_name in self.op_pool if self.op_pool[op_name].enabled]
-                for op_name in enabled_ops:
-                    stats_key = self.op_pool[op_name].dj_stats_key
-                    if stats_key is None or stats_key not in attribution_result:
-                        continue
-                    pearsonr = attribution_result[stats_key]['pearsonr']
-                    st.write(f"{op_name} # Pearson correlation: {pearsonr}")
+                st.dataframe(pd.DataFrame(st.session_state.attribution_result), use_container_width=True)
     
     @st.dialog("Data-Juicer Q&A Copilot")
     def copilot_dialog(self):
