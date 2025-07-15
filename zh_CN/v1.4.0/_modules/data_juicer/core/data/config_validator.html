@@ -400,7 +400,7 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="n">ConfigValidationError</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Field &#39;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&#39; must be of &quot;</span>
-                        <span class="s2">&quot;type &#39;</span><span class="si">{expected_type.__name__}</span><span class="s2">&#39;, &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;type &#39;</span><span class="si">{</span><span class="n">expected_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;got &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
                     <span class="p">)</span>
 

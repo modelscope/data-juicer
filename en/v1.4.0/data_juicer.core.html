@@ -671,7 +671,7 @@
 <span id="data-juicer-core-adapter-module"></span><h2>data_juicer.core.adapter module<a class="headerlink" href="#module-data_juicer.core.adapter" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.core.adapter.Adapter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.adapter.</span></span><span class="sig-name descname"><span class="pre">Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/adapter.html#Adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.adapter.Adapter" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.adapter.</span></span><span class="sig-name descname"><span class="pre">Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/adapter.html#Adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.adapter.Adapter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.core.adapter.Adapter.MAX_BATCH_SIZE">
@@ -680,7 +680,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.adapter.Adapter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/adapter.html#Adapter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.adapter.Adapter.__init__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/adapter.html#Adapter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.adapter.Adapter.__init__" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1044,17 +1044,6 @@ add several extra fields on the first level:
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.monitor.Monitor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.monitor.Monitor.__init__" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.monitor.Monitor.monitor_all_resources">
-<span class="sig-name descname"><span class="pre">monitor_all_resources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.monitor_all_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.monitor.Monitor.monitor_all_resources" title="Link to this definition">¶</a></dt>
-<dd><p>Detect the resource utilization of all distributed nodes.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.monitor.Monitor.monitor_current_resources">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">monitor_current_resources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.monitor_current_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.monitor.Monitor.monitor_current_resources" title="Link to this definition">¶</a></dt>
 <dd><p>Detect the resource utilization of the current environment/machine.
@@ -1184,7 +1173,7 @@ modification by the Mapper</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.tracer.Tracer.trace_deduplicator">
-<span class="sig-name descname"><span class="pre">trace_deduplicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dup_pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/tracer.html#Tracer.trace_deduplicator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.tracer.Tracer.trace_deduplicator" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">trace_deduplicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dup_pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/tracer.html#Tracer.trace_deduplicator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.tracer.Tracer.trace_deduplicator" title="Link to this definition">¶</a></dt>
 <dd><p>Compare datasets before and after a Deduplicator.</p>
 <p>This will mainly show the near-duplicate sample pairs extracted
 by the Deduplicator. Different from the other two trace methods,
@@ -1212,7 +1201,7 @@ deduplicator</p></li>
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-data_juicer.core" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.core.Adapter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.</span></span><span class="sig-name descname"><span class="pre">Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/adapter.html#Adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Adapter" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.</span></span><span class="sig-name descname"><span class="pre">Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/adapter.html#Adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Adapter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.core.Adapter.MAX_BATCH_SIZE">
@@ -1221,7 +1210,7 @@ deduplicator</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.Adapter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/adapter.html#Adapter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Adapter.__init__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/adapter.html#Adapter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Adapter.__init__" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1558,7 +1547,8 @@ dataset will not be copied in-memory unless explicitly enabled by setting
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.ExecutorBase.run">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load_data_np</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_return</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/executor/base.html#ExecutorBase.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.ExecutorBase.run" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Abstract method for ExecutorBase.run</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -1568,7 +1558,7 @@ dataset will not be copied in-memory unless explicitly enabled by setting
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.ExecutorFactory.create_executor">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_executor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">executor_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="data_juicer.core.executor.html#data_juicer.core.executor.default_executor.DefaultExecutor" title="data_juicer.core.executor.default_executor.DefaultExecutor"><span class="pre">DefaultExecutor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="data_juicer.core.executor.html#data_juicer.core.executor.ray_executor.RayExecutor" title="data_juicer.core.executor.ray_executor.RayExecutor"><span class="pre">RayExecutor</span></a></span></span><a class="reference internal" href="_modules/data_juicer/core/executor/factory.html#ExecutorFactory.create_executor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.ExecutorFactory.create_executor" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_executor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">executor_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/executor/factory.html#ExecutorFactory.create_executor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.ExecutorFactory.create_executor" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1869,17 +1859,6 @@ add several extra fields on the first level:
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.Monitor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Monitor.__init__" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.Monitor.monitor_all_resources">
-<span class="sig-name descname"><span class="pre">monitor_all_resources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.monitor_all_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Monitor.monitor_all_resources" title="Link to this definition">¶</a></dt>
-<dd><p>Detect the resource utilization of all distributed nodes.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.Monitor.monitor_current_resources">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">monitor_current_resources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.monitor_current_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Monitor.monitor_current_resources" title="Link to this definition">¶</a></dt>
 <dd><p>Detect the resource utilization of the current environment/machine.
@@ -2006,7 +1985,7 @@ modification by the Mapper</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.Tracer.trace_deduplicator">
-<span class="sig-name descname"><span class="pre">trace_deduplicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dup_pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/tracer.html#Tracer.trace_deduplicator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Tracer.trace_deduplicator" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">trace_deduplicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dup_pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/tracer.html#Tracer.trace_deduplicator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Tracer.trace_deduplicator" title="Link to this definition">¶</a></dt>
 <dd><p>Compare datasets before and after a Deduplicator.</p>
 <p>This will mainly show the near-duplicate sample pairs extracted
 by the Deduplicator. Different from the other two trace methods,
@@ -2133,8 +2112,6 @@ deduplicator</p></li>
 <li><a class="reference internal" href="#data_juicer.core.monitor.resource_monitor"><code class="docutils literal notranslate"><span class="pre">resource_monitor()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.monitor.Monitor"><code class="docutils literal notranslate"><span class="pre">Monitor</span></code></a><ul>
 <li><a class="reference internal" href="#data_juicer.core.monitor.Monitor.DYNAMIC_FIELDS"><code class="docutils literal notranslate"><span class="pre">Monitor.DYNAMIC_FIELDS</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.monitor.Monitor.__init__"><code class="docutils literal notranslate"><span class="pre">Monitor.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.monitor.Monitor.monitor_all_resources"><code class="docutils literal notranslate"><span class="pre">Monitor.monitor_all_resources()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.monitor.Monitor.monitor_current_resources"><code class="docutils literal notranslate"><span class="pre">Monitor.monitor_current_resources()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.monitor.Monitor.draw_resource_util_graph"><code class="docutils literal notranslate"><span class="pre">Monitor.draw_resource_util_graph()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.monitor.Monitor.analyze_resource_util_list"><code class="docutils literal notranslate"><span class="pre">Monitor.analyze_resource_util_list()</span></code></a></li>
@@ -2227,8 +2204,6 @@ deduplicator</p></li>
 </li>
 <li><a class="reference internal" href="#data_juicer.core.Monitor"><code class="docutils literal notranslate"><span class="pre">Monitor</span></code></a><ul>
 <li><a class="reference internal" href="#data_juicer.core.Monitor.DYNAMIC_FIELDS"><code class="docutils literal notranslate"><span class="pre">Monitor.DYNAMIC_FIELDS</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.Monitor.__init__"><code class="docutils literal notranslate"><span class="pre">Monitor.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.Monitor.monitor_all_resources"><code class="docutils literal notranslate"><span class="pre">Monitor.monitor_all_resources()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.Monitor.monitor_current_resources"><code class="docutils literal notranslate"><span class="pre">Monitor.monitor_current_resources()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.Monitor.draw_resource_util_graph"><code class="docutils literal notranslate"><span class="pre">Monitor.draw_resource_util_graph()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.Monitor.analyze_resource_util_list"><code class="docutils literal notranslate"><span class="pre">Monitor.analyze_resource_util_list()</span></code></a></li>

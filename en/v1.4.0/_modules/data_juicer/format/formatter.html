@@ -350,11 +350,11 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetDict</span><span class="p">,</span> <span class="n">concatenate_datasets</span><span class="p">,</span> <span class="n">load_dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jsonargparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">dict_to_namespace</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_files_with_suffix</span><span class="p">,</span> <span class="n">is_absolute_path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecialTokens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Registry</span>
 
 <span class="n">FORMATTERS</span> <span class="o">=</span> <span class="n">Registry</span><span class="p">(</span><span class="s2">&quot;Formatters&quot;</span><span class="p">)</span>
@@ -515,7 +515,7 @@
     <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
     <span class="n">text_keys</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span>
     <span class="n">num_proc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">global_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">global_cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">Namespace</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get an unified internal format, conduct the following modifications.</span>
@@ -580,18 +580,24 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples left after filtering empty text.&quot;</span><span class="p">)</span>
 
     <span class="c1"># 3. convert relative paths to absolute paths</span>
-    <span class="k">if</span> <span class="n">global_cfg</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">global_cfg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">global_cfg</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">global_cfg</span> <span class="o">=</span> <span class="n">dict_to_namespace</span><span class="p">(</span><span class="n">global_cfg</span><span class="p">)</span>
         <span class="c1"># check and get dataset dir</span>
-        <span class="k">if</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dataset_path&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">hasattr</span><span class="p">(</span><span class="n">global_cfg</span><span class="p">,</span> <span class="s2">&quot;dataset_path&quot;</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
                 <span class="n">ds_dir</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ds_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">global_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ds_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="n">image_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_key&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
-        <span class="n">audio_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_key&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">audio</span><span class="p">)</span>
-        <span class="n">video_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;video_key&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="p">)</span>
+        <span class="n">image_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">image_key</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">global_cfg</span><span class="p">,</span> <span class="s2">&quot;image_key&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;images&quot;</span>
+        <span class="n">audio_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">audio_key</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">global_cfg</span><span class="p">,</span> <span class="s2">&quot;audio_key&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;audios&quot;</span>
+        <span class="n">video_key</span> <span class="o">=</span> <span class="n">global_cfg</span><span class="o">.</span><span class="n">video_key</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">global_cfg</span><span class="p">,</span> <span class="s2">&quot;video_key&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;videos&quot;</span>
 
         <span class="n">data_path_keys</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">image_key</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>

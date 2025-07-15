@@ -415,7 +415,7 @@
 
         <span class="c1"># init ray</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initializing Ray ...&quot;</span><span class="p">)</span>
-        <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">ray_address</span><span class="p">)</span>
+        <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">ray_address</span><span class="p">,</span> <span class="n">ignore_reinit_error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;.tmp&quot;</span><span class="p">,</span> <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_job_id</span><span class="p">())</span>
 
         <span class="c1"># absolute path resolution logic</span>
@@ -451,13 +451,8 @@
         <span class="n">ops</span> <span class="o">=</span> <span class="n">load_ops</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">op_fusion</span><span class="p">:</span>
-            <span class="n">probe_res</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">fusion_strategy</span> <span class="o">==</span> <span class="s2">&quot;probe&quot;</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Probe the OP speed for OP reordering...&quot;</span><span class="p">)</span>
-                <span class="n">probe_res</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapter</span><span class="o">.</span><span class="n">probe_small_batch</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">ops</span><span class="p">)</span>
-
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start OP fusion and reordering with strategy &quot;</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">fusion_strategy</span><span class="si">}</span><span class="s2">]...&quot;</span><span class="p">)</span>
-            <span class="n">ops</span> <span class="o">=</span> <span class="n">fuse_operators</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">probe_res</span><span class="p">)</span>
+            <span class="n">ops</span> <span class="o">=</span> <span class="n">fuse_operators</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="n">TempDirManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span><span class="p">):</span>
             <span class="c1"># 3. data process</span>

@@ -470,7 +470,12 @@ dj-analyze<span class="w"> </span>--auto<span class="w"> </span>--dataset_path<s
 <li><p><code class="docutils literal notranslate"><span class="pre">TAGGING_OPS</span></code>：装饰那些能在 meta 字段中产出 tags 或类别标签的算子。</p></li>
 </ul>
 </li>
+<li><p>有时会产生 &quot;Glyph missing&quot; 的警告，并且在分析结果图表中会出现一些非法字符。用户可以使用环境变量 <code class="docutils literal notranslate"><span class="pre">ANALYZER_FONT</span></code> 来指定合适的字体。例如：</p></li>
 </ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ANALYZER_FONT</span><span class="o">=</span><span class="s2">&quot;Heiti TC&quot;</span><span class="w">  </span><span class="c1"># 使用黑体来支持中文字符，这也是 Analyzer 的默认字体</span>
+python<span class="w"> </span>tools/analyze_data.py<span class="w"> </span>--config<span class="w"> </span>configs/demo/analyzer.yaml
+</pre></div>
+</div>
 </section>
 <section id="id6">
 <h2>数据可视化<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>

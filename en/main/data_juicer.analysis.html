@@ -366,8 +366,37 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
-<section id="data-juicer-analysis-collector-module">
-<h2>data_juicer.analysis.collector module<a class="headerlink" href="#data-juicer-analysis-collector-module" title="Link to this heading">¶</a></h2>
+<section id="module-data_juicer.analysis.collector">
+<span id="data-juicer-analysis-collector-module"></span><h2>data_juicer.analysis.collector module<a class="headerlink" href="#module-data_juicer.analysis.collector" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.analysis.collector.TextTokenDistCollector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.analysis.collector.</span></span><span class="sig-name descname"><span class="pre">TextTokenDistCollector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/collector.html#TextTokenDistCollector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.collector.TextTokenDistCollector" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Tokenize and collect distribution of tokens for given
+dataset with a specified tokenizer.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.analysis.collector.TextTokenDistCollector.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/collector.html#TextTokenDistCollector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.collector.TextTokenDistCollector.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tokenizer</strong> – tokenizer name on huggingface</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.analysis.collector.TextTokenDistCollector.collect">
+<span class="sig-name descname"><span class="pre">collect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Categorical</span></span></span><a class="reference internal" href="_modules/data_juicer/analysis/collector.html#TextTokenDistCollector.collect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.collector.TextTokenDistCollector.collect" title="Link to this definition">¶</a></dt>
+<dd><p>Tokenize and collect tokens distribution of input dataset
+:param data_path: path to input dataset.
+:param text_key: field keys that will be considered into token counts.
+:param num_proc: number of processes to count tokens.
+:return: token distribution.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-data_juicer.analysis.column_wise_analysis">
 <span id="data-juicer-analysis-column-wise-analysis-module"></span><h2>data_juicer.analysis.column_wise_analysis module<a class="headerlink" href="#module-data_juicer.analysis.column_wise_analysis" title="Link to this heading">¶</a></h2>
@@ -1141,7 +1170,14 @@ method of pandas.</p>
             <ul>
 <li><a class="reference internal" href="#">data_juicer.analysis package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#data-juicer-analysis-collector-module">data_juicer.analysis.collector module</a></li>
+<li><a class="reference internal" href="#module-data_juicer.analysis.collector">data_juicer.analysis.collector module</a><ul>
+<li><a class="reference internal" href="#data_juicer.analysis.collector.TextTokenDistCollector"><code class="docutils literal notranslate"><span class="pre">TextTokenDistCollector</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.analysis.collector.TextTokenDistCollector.__init__"><code class="docutils literal notranslate"><span class="pre">TextTokenDistCollector.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.analysis.collector.TextTokenDistCollector.collect"><code class="docutils literal notranslate"><span class="pre">TextTokenDistCollector.collect()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-data_juicer.analysis.column_wise_analysis">data_juicer.analysis.column_wise_analysis module</a><ul>
 <li><a class="reference internal" href="#data_juicer.analysis.column_wise_analysis.get_row_col"><code class="docutils literal notranslate"><span class="pre">get_row_col()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis"><code class="docutils literal notranslate"><span class="pre">ColumnWiseAnalysis</span></code></a><ul>

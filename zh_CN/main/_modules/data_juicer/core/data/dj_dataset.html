@@ -397,8 +397,7 @@
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.DJDataset.process">[文档]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operators</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">exporter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">checkpointer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tracer</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DJDataset</span><span class="p">:</span>  <span class="c1"># TODO: add type hint</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;process a list of operators on the dataset.&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;process a list of operators on the dataset.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="DJDataset.schema">
@@ -409,8 +408,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Schema: Dataset schema containing column names and types</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="DJDataset.get">
@@ -424,8 +422,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List[Any]: A list of rows from the dataset.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="DJDataset.get_column">
@@ -444,16 +441,14 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            KeyError: If column doesn&#39;t exist in dataset</span>
 <span class="sd">            ValueError: If k is negative</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="DJDataset.to_list">
 <a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.DJDataset.to_list">[文档]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the current dataset to a Python list.&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the current dataset to a Python list.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="DJDataset.contain_column">

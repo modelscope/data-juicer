@@ -828,6 +828,7 @@
             <span class="n">essential_cfg</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">essential_args</span><span class="p">)</span>
 
             <span class="c1"># Now add remaining arguments based on essential config</span>
+            <span class="n">used_ops</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">essential_cfg</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
                 <span class="c1"># Load config file to determine which operators are used</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">essential_cfg</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -930,19 +931,19 @@
         <span class="n">setup_logger</span><span class="p">(</span>
             <span class="n">save_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
             <span class="n">filename</span><span class="o">=</span><span class="n">logfile_name</span><span class="p">,</span>
-            <span class="n">level</span><span class="o">=</span><span class="s2">&quot;DEBUG&quot;</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
-            <span class="n">redirect</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">executor_type</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="s2">&quot;DEBUG&quot;</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+            <span class="n">redirect</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;executor_type&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="c1"># check and get dataset dir</span>
     <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dataset_path&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;dataset_path config is set and a valid local path&quot;</span><span class="p">)</span>
         <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dataset&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dataset_path&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dataset&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;dataset_path config is empty; dataset is present&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;dataset_path [</span><span class="si">{</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="si">}</span><span class="s2">] is not a valid &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;dataset_path [</span><span class="si">{</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dataset_path&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">] is not a valid &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;local path, AND dataset is not present. &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;Please check and retry, otherwise we &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;will treat dataset_path as a remote dataset or a &quot;</span>
@@ -951,7 +952,7 @@
 
     <span class="c1"># check number of processes np</span>
     <span class="n">sys_cpu_count</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">np</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;np&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">cfg</span><span class="o">.</span><span class="n">np</span> <span class="o">=</span> <span class="n">sys_cpu_count</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Number of processes `np` is not set, &quot;</span> <span class="sa">f</span><span class="s2">&quot;set it to cpu count [</span><span class="si">{</span><span class="n">sys_cpu_count</span><span class="si">}</span><span class="s2">] as default value.&quot;</span>
@@ -970,7 +971,7 @@
     <span class="c1"># whether or not to use cache management</span>
     <span class="c1"># disabling the cache or using checkpoint explicitly will turn off the</span>
     <span class="c1"># cache management.</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">use_cache</span> <span class="ow">or</span> <span class="n">cfg</span><span class="o">.</span><span class="n">use_checkpoint</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_cache&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">or</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_checkpoint&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Cache management of datasets is disabled.&quot;</span><span class="p">)</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">disable_caching</span>
 
@@ -991,7 +992,7 @@
         <span class="n">tempfile</span><span class="o">.</span><span class="n">tempdir</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">temp_dir</span>
 
     <span class="c1"># The checkpoint mode is not compatible with op fusion for now.</span>
-    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">op_fusion</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;op_fusion&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
         <span class="n">cfg</span><span class="o">.</span><span class="n">use_checkpoint</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">cfg</span><span class="o">.</span><span class="n">fusion_strategy</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">fusion_strategy</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">fusion_strategy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FUSION_STRATEGIES</span><span class="p">:</span>
@@ -1002,7 +1003,7 @@
     <span class="c1"># update huggingface datasets cache directory only when ds_cache_dir is set</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
 
-    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">ds_cache_dir</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ds_cache_dir&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Set dataset cache directory to </span><span class="si">{</span><span class="n">cfg</span><span class="o">.</span><span class="n">ds_cache_dir</span><span class="si">}</span><span class="s2"> &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;using the ds_cache_dir argument, which is &quot;</span>
@@ -1014,28 +1015,31 @@
         <span class="n">cfg</span><span class="o">.</span><span class="n">ds_cache_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">HF_DATASETS_CACHE</span><span class="p">)</span>
 
     <span class="c1"># update special tokens</span>
-    <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">image_special_token</span>
-    <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">eoc_special_token</span>
+    <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_special_token&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">audio</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_special_token&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">audio</span><span class="p">)</span>
+    <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;video_special_token&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="p">)</span>
+    <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;eoc_special_token&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="p">)</span>
 
     <span class="c1"># add all filters that produce stats</span>
-    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">auto</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
         <span class="n">cfg</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">load_ops_with_stats_meta</span><span class="p">()</span>
 
     <span class="c1"># Apply text_key modification during initializing configs</span>
     <span class="c1"># users can freely specify text_key for different ops using `text_key`</span>
     <span class="c1"># otherwise, set arg text_key of each op to text_keys</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">text_keys</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text_keys&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">text_keys</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">text_key</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">text_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">text_key</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">text_keys</span>
     <span class="n">op_attrs</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;text_key&quot;</span><span class="p">:</span> <span class="n">text_key</span><span class="p">,</span>
-        <span class="s2">&quot;image_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">image_key</span><span class="p">,</span>
-        <span class="s2">&quot;audio_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">audio_key</span><span class="p">,</span>
-        <span class="s2">&quot;video_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">video_key</span><span class="p">,</span>
+        <span class="s2">&quot;image_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_key&quot;</span><span class="p">,</span> <span class="s2">&quot;images&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;audio_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_key&quot;</span><span class="p">,</span> <span class="s2">&quot;audios&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;video_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;video_key&quot;</span><span class="p">,</span> <span class="s2">&quot;videos&quot;</span><span class="p">),</span>
         <span class="s2">&quot;num_proc&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">np</span><span class="p">,</span>
-        <span class="s2">&quot;turbo&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">turbo</span><span class="p">,</span>
-        <span class="s2">&quot;skip_op_error&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">skip_op_error</span><span class="p">,</span>
+        <span class="s2">&quot;turbo&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;turbo&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="s2">&quot;skip_op_error&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;skip_op_error&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
         <span class="s2">&quot;work_dir&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">cfg</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">update_op_attr</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="n">op_attrs</span><span class="p">)</span>
@@ -1260,7 +1264,7 @@
 <div class="viewcode-block" id="config_backup">
 <a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.config_backup">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">config_backup</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span>
     <span class="n">cfg_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">work_dir</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span>

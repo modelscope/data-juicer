@@ -352,6 +352,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">concatenate_datasets</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datasets.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_MAX_BATCH_SIZE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jsonargparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.analysis.measure</span><span class="w"> </span><span class="kn">import</span> <span class="n">RelatedTTestMeasure</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.monitor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Monitor</span>
@@ -368,7 +369,7 @@
 
 <div class="viewcode-block" id="Adapter.__init__">
 <a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
 
         <span class="c1"># insight mining related</span>
@@ -564,7 +565,7 @@
         <span class="n">new_cfg</span><span class="o">.</span><span class="n">auto</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">new_cfg</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_cfg</span><span class="o">.</span><span class="n">op_list_to_mine</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">new_cfg</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="p">[{</span><span class="n">op_name</span><span class="p">:</span> <span class="p">{}}</span> <span class="k">for</span> <span class="n">op_name</span> <span class="ow">in</span> <span class="n">new_cfg</span><span class="o">.</span><span class="n">op_list_to_mine</span><span class="p">]</span>
+            <span class="n">new_cfg</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="p">[{</span><span class="n">op_name</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;num_proc&quot;</span><span class="p">:</span> <span class="n">new_cfg</span><span class="o">.</span><span class="n">np</span><span class="p">}}</span> <span class="k">for</span> <span class="n">op_name</span> <span class="ow">in</span> <span class="n">new_cfg</span><span class="o">.</span><span class="n">op_list_to_mine</span><span class="p">]</span>
         <span class="c1"># update work dir</span>
         <span class="n">new_cfg</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;insight_mining&quot;</span><span class="p">,</span> <span class="n">current_state</span><span class="p">)</span>
         <span class="n">new_cfg</span><span class="o">.</span><span class="n">export_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_state</span><span class="si">}</span><span class="s2">.jsonl&quot;</span><span class="p">)</span>

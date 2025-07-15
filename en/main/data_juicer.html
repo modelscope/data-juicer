@@ -369,7 +369,14 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html#data-juicer-analysis-collector-module">data_juicer.analysis.collector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html#module-data_juicer.analysis.collector">data_juicer.analysis.collector module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.analysis.html#data_juicer.analysis.collector.TextTokenDistCollector"><code class="docutils literal notranslate"><span class="pre">TextTokenDistCollector</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.analysis.html#data_juicer.analysis.collector.TextTokenDistCollector.__init__"><code class="docutils literal notranslate"><span class="pre">TextTokenDistCollector.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.analysis.html#data_juicer.analysis.collector.TextTokenDistCollector.collect"><code class="docutils literal notranslate"><span class="pre">TextTokenDistCollector.collect()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html#module-data_juicer.analysis.column_wise_analysis">data_juicer.analysis.column_wise_analysis module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.analysis.html#data_juicer.analysis.column_wise_analysis.get_row_col"><code class="docutils literal notranslate"><span class="pre">get_row_col()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.analysis.html#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis"><code class="docutils literal notranslate"><span class="pre">ColumnWiseAnalysis</span></code></a><ul>
@@ -509,6 +516,7 @@
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.config.html#data_juicer.config.prepare_side_configs"><code class="docutils literal notranslate"><span class="pre">prepare_side_configs()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.config.html#data_juicer.config.get_default_cfg"><code class="docutils literal notranslate"><span class="pre">get_default_cfg()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.config.html#data_juicer.config.prepare_cfgs_for_export"><code class="docutils literal notranslate"><span class="pre">prepare_cfgs_for_export()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.config.html#data_juicer.config.update_op_attr"><code class="docutils literal notranslate"><span class="pre">update_op_attr()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -517,35 +525,188 @@
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.core.data.html">data_juicer.core.data package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#data-juicer-core-data-config-validator-module">data_juicer.core.data.config_validator module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#data-juicer-core-data-data-validator-module">data_juicer.core.data.data_validator module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#data-juicer-core-data-dataset-builder-module">data_juicer.core.data.dataset_builder module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#data-juicer-core-data-dj-dataset-module">data_juicer.core.data.dj_dataset module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#data-juicer-core-data-load-strategy-module">data_juicer.core.data.load_strategy module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#data-juicer-core-data-ray-dataset-module">data_juicer.core.data.ray_dataset module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#data-juicer-core-data-schema-module">data_juicer.core.data.schema module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#module-contents">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#module-data_juicer.core.data.config_validator">data_juicer.core.data.config_validator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#module-data_juicer.core.data.data_validator">data_juicer.core.data.data_validator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#module-data_juicer.core.data.dataset_builder">data_juicer.core.data.dataset_builder module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#module-data_juicer.core.data.dj_dataset">data_juicer.core.data.dj_dataset module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#module-data_juicer.core.data.load_strategy">data_juicer.core.data.load_strategy module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#module-data_juicer.core.data.ray_dataset">data_juicer.core.data.ray_dataset module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#module-data_juicer.core.data.schema">data_juicer.core.data.schema module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.data.html#module-data_juicer.core.data">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.core.executor.html">data_juicer.core.executor package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.core.executor.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.executor.html#data-juicer-core-executor-base-module">data_juicer.core.executor.base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.executor.html#data-juicer-core-executor-default-executor-module">data_juicer.core.executor.default_executor module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.executor.html#data-juicer-core-executor-factory-module">data_juicer.core.executor.factory module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.executor.html#data-juicer-core-executor-ray-executor-module">data_juicer.core.executor.ray_executor module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.executor.html#module-contents">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.executor.html#module-data_juicer.core.executor.base">data_juicer.core.executor.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.executor.html#module-data_juicer.core.executor.default_executor">data_juicer.core.executor.default_executor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.executor.html#module-data_juicer.core.executor.factory">data_juicer.core.executor.factory module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.executor.html#module-data_juicer.core.executor.ray_executor">data_juicer.core.executor.ray_executor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.executor.html#module-data_juicer.core.executor">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data-juicer-core-adapter-module">data_juicer.core.adapter module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data-juicer-core-analyzer-module">data_juicer.core.analyzer module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data-juicer-core-exporter-module">data_juicer.core.exporter module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data-juicer-core-monitor-module">data_juicer.core.monitor module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data-juicer-core-ray-exporter-module">data_juicer.core.ray_exporter module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data-juicer-core-tracer-module">data_juicer.core.tracer module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#module-data_juicer.core.adapter">data_juicer.core.adapter module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.adapter.Adapter"><code class="docutils literal notranslate"><span class="pre">Adapter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.adapter.Adapter.MAX_BATCH_SIZE"><code class="docutils literal notranslate"><span class="pre">Adapter.MAX_BATCH_SIZE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.adapter.Adapter.__init__"><code class="docutils literal notranslate"><span class="pre">Adapter.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.adapter.Adapter.execute_and_probe"><code class="docutils literal notranslate"><span class="pre">Adapter.execute_and_probe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.adapter.Adapter.take_batch"><code class="docutils literal notranslate"><span class="pre">Adapter.take_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.adapter.Adapter.adapt_workloads"><code class="docutils literal notranslate"><span class="pre">Adapter.adapt_workloads()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.adapter.Adapter.probe_small_batch"><code class="docutils literal notranslate"><span class="pre">Adapter.probe_small_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.adapter.Adapter.batch_size_strategy"><code class="docutils literal notranslate"><span class="pre">Adapter.batch_size_strategy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.adapter.Adapter.analyze_small_batch"><code class="docutils literal notranslate"><span class="pre">Adapter.analyze_small_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.adapter.Adapter.insight_mining"><code class="docutils literal notranslate"><span class="pre">Adapter.insight_mining()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#module-data_juicer.core.analyzer">data_juicer.core.analyzer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.analyzer.Analyzer"><code class="docutils literal notranslate"><span class="pre">Analyzer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.analyzer.Analyzer.__init__"><code class="docutils literal notranslate"><span class="pre">Analyzer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.analyzer.Analyzer.run"><code class="docutils literal notranslate"><span class="pre">Analyzer.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#module-data_juicer.core.exporter">data_juicer.core.exporter module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.exporter.Exporter"><code class="docutils literal notranslate"><span class="pre">Exporter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.exporter.Exporter.KiB"><code class="docutils literal notranslate"><span class="pre">Exporter.KiB</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.exporter.Exporter.MiB"><code class="docutils literal notranslate"><span class="pre">Exporter.MiB</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.exporter.Exporter.GiB"><code class="docutils literal notranslate"><span class="pre">Exporter.GiB</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.exporter.Exporter.TiB"><code class="docutils literal notranslate"><span class="pre">Exporter.TiB</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.exporter.Exporter.__init__"><code class="docutils literal notranslate"><span class="pre">Exporter.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.exporter.Exporter.export"><code class="docutils literal notranslate"><span class="pre">Exporter.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.exporter.Exporter.export_compute_stats"><code class="docutils literal notranslate"><span class="pre">Exporter.export_compute_stats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.exporter.Exporter.to_jsonl"><code class="docutils literal notranslate"><span class="pre">Exporter.to_jsonl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.exporter.Exporter.to_json"><code class="docutils literal notranslate"><span class="pre">Exporter.to_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.exporter.Exporter.to_parquet"><code class="docutils literal notranslate"><span class="pre">Exporter.to_parquet()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#module-data_juicer.core.monitor">data_juicer.core.monitor module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.resource_monitor"><code class="docutils literal notranslate"><span class="pre">resource_monitor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor"><code class="docutils literal notranslate"><span class="pre">Monitor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor.DYNAMIC_FIELDS"><code class="docutils literal notranslate"><span class="pre">Monitor.DYNAMIC_FIELDS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor.monitor_current_resources"><code class="docutils literal notranslate"><span class="pre">Monitor.monitor_current_resources()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor.draw_resource_util_graph"><code class="docutils literal notranslate"><span class="pre">Monitor.draw_resource_util_graph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor.analyze_resource_util_list"><code class="docutils literal notranslate"><span class="pre">Monitor.analyze_resource_util_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor.analyze_single_resource_util"><code class="docutils literal notranslate"><span class="pre">Monitor.analyze_single_resource_util()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor.monitor_func"><code class="docutils literal notranslate"><span class="pre">Monitor.monitor_func()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#module-data_juicer.core.ray_exporter">data_juicer.core.ray_exporter module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.ray_exporter.RayExporter"><code class="docutils literal notranslate"><span class="pre">RayExporter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.ray_exporter.RayExporter.__init__"><code class="docutils literal notranslate"><span class="pre">RayExporter.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.ray_exporter.RayExporter.export"><code class="docutils literal notranslate"><span class="pre">RayExporter.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#module-data_juicer.core.tracer">data_juicer.core.tracer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.tracer.Tracer"><code class="docutils literal notranslate"><span class="pre">Tracer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.tracer.Tracer.__init__"><code class="docutils literal notranslate"><span class="pre">Tracer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.tracer.Tracer.trace_mapper"><code class="docutils literal notranslate"><span class="pre">Tracer.trace_mapper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.tracer.Tracer.trace_batch_mapper"><code class="docutils literal notranslate"><span class="pre">Tracer.trace_batch_mapper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.tracer.Tracer.trace_filter"><code class="docutils literal notranslate"><span class="pre">Tracer.trace_filter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.tracer.Tracer.trace_deduplicator"><code class="docutils literal notranslate"><span class="pre">Tracer.trace_deduplicator()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#module-data_juicer.core">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Adapter"><code class="docutils literal notranslate"><span class="pre">Adapter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Adapter.MAX_BATCH_SIZE"><code class="docutils literal notranslate"><span class="pre">Adapter.MAX_BATCH_SIZE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Adapter.__init__"><code class="docutils literal notranslate"><span class="pre">Adapter.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Adapter.execute_and_probe"><code class="docutils literal notranslate"><span class="pre">Adapter.execute_and_probe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Adapter.take_batch"><code class="docutils literal notranslate"><span class="pre">Adapter.take_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Adapter.adapt_workloads"><code class="docutils literal notranslate"><span class="pre">Adapter.adapt_workloads()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Adapter.probe_small_batch"><code class="docutils literal notranslate"><span class="pre">Adapter.probe_small_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Adapter.batch_size_strategy"><code class="docutils literal notranslate"><span class="pre">Adapter.batch_size_strategy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Adapter.analyze_small_batch"><code class="docutils literal notranslate"><span class="pre">Adapter.analyze_small_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Adapter.insight_mining"><code class="docutils literal notranslate"><span class="pre">Adapter.insight_mining()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Analyzer"><code class="docutils literal notranslate"><span class="pre">Analyzer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Analyzer.__init__"><code class="docutils literal notranslate"><span class="pre">Analyzer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Analyzer.run"><code class="docutils literal notranslate"><span class="pre">Analyzer.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset"><code class="docutils literal notranslate"><span class="pre">NestedDataset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.__init__"><code class="docutils literal notranslate"><span class="pre">NestedDataset.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.schema"><code class="docutils literal notranslate"><span class="pre">NestedDataset.schema()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.get"><code class="docutils literal notranslate"><span class="pre">NestedDataset.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.get_column"><code class="docutils literal notranslate"><span class="pre">NestedDataset.get_column()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.process"><code class="docutils literal notranslate"><span class="pre">NestedDataset.process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.update_args"><code class="docutils literal notranslate"><span class="pre">NestedDataset.update_args()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.map"><code class="docutils literal notranslate"><span class="pre">NestedDataset.map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.filter"><code class="docutils literal notranslate"><span class="pre">NestedDataset.filter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.select"><code class="docutils literal notranslate"><span class="pre">NestedDataset.select()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.to_list"><code class="docutils literal notranslate"><span class="pre">NestedDataset.to_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.from_dict"><code class="docutils literal notranslate"><span class="pre">NestedDataset.from_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.add_column"><code class="docutils literal notranslate"><span class="pre">NestedDataset.add_column()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.select_columns"><code class="docutils literal notranslate"><span class="pre">NestedDataset.select_columns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.remove_columns"><code class="docutils literal notranslate"><span class="pre">NestedDataset.remove_columns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.cleanup_cache_files"><code class="docutils literal notranslate"><span class="pre">NestedDataset.cleanup_cache_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset.load_from_disk"><code class="docutils literal notranslate"><span class="pre">NestedDataset.load_from_disk()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.ExecutorBase"><code class="docutils literal notranslate"><span class="pre">ExecutorBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.ExecutorBase.__init__"><code class="docutils literal notranslate"><span class="pre">ExecutorBase.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.ExecutorBase.run"><code class="docutils literal notranslate"><span class="pre">ExecutorBase.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.ExecutorFactory"><code class="docutils literal notranslate"><span class="pre">ExecutorFactory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.ExecutorFactory.create_executor"><code class="docutils literal notranslate"><span class="pre">ExecutorFactory.create_executor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.DefaultExecutor"><code class="docutils literal notranslate"><span class="pre">DefaultExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.DefaultExecutor.__init__"><code class="docutils literal notranslate"><span class="pre">DefaultExecutor.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.DefaultExecutor.run"><code class="docutils literal notranslate"><span class="pre">DefaultExecutor.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.DefaultExecutor.sample_data"><code class="docutils literal notranslate"><span class="pre">DefaultExecutor.sample_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Exporter"><code class="docutils literal notranslate"><span class="pre">Exporter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Exporter.KiB"><code class="docutils literal notranslate"><span class="pre">Exporter.KiB</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Exporter.MiB"><code class="docutils literal notranslate"><span class="pre">Exporter.MiB</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Exporter.GiB"><code class="docutils literal notranslate"><span class="pre">Exporter.GiB</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Exporter.TiB"><code class="docutils literal notranslate"><span class="pre">Exporter.TiB</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Exporter.__init__"><code class="docutils literal notranslate"><span class="pre">Exporter.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Exporter.export"><code class="docutils literal notranslate"><span class="pre">Exporter.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Exporter.export_compute_stats"><code class="docutils literal notranslate"><span class="pre">Exporter.export_compute_stats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Exporter.to_jsonl"><code class="docutils literal notranslate"><span class="pre">Exporter.to_jsonl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Exporter.to_json"><code class="docutils literal notranslate"><span class="pre">Exporter.to_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Exporter.to_parquet"><code class="docutils literal notranslate"><span class="pre">Exporter.to_parquet()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.RayExporter"><code class="docutils literal notranslate"><span class="pre">RayExporter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.RayExporter.__init__"><code class="docutils literal notranslate"><span class="pre">RayExporter.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.RayExporter.export"><code class="docutils literal notranslate"><span class="pre">RayExporter.export()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor"><code class="docutils literal notranslate"><span class="pre">Monitor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor.DYNAMIC_FIELDS"><code class="docutils literal notranslate"><span class="pre">Monitor.DYNAMIC_FIELDS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor.monitor_current_resources"><code class="docutils literal notranslate"><span class="pre">Monitor.monitor_current_resources()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor.draw_resource_util_graph"><code class="docutils literal notranslate"><span class="pre">Monitor.draw_resource_util_graph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor.analyze_resource_util_list"><code class="docutils literal notranslate"><span class="pre">Monitor.analyze_resource_util_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor.analyze_single_resource_util"><code class="docutils literal notranslate"><span class="pre">Monitor.analyze_single_resource_util()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor.monitor_func"><code class="docutils literal notranslate"><span class="pre">Monitor.monitor_func()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Tracer"><code class="docutils literal notranslate"><span class="pre">Tracer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Tracer.__init__"><code class="docutils literal notranslate"><span class="pre">Tracer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Tracer.trace_mapper"><code class="docutils literal notranslate"><span class="pre">Tracer.trace_mapper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Tracer.trace_batch_mapper"><code class="docutils literal notranslate"><span class="pre">Tracer.trace_batch_mapper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Tracer.trace_filter"><code class="docutils literal notranslate"><span class="pre">Tracer.trace_filter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Tracer.trace_deduplicator"><code class="docutils literal notranslate"><span class="pre">Tracer.trace_deduplicator()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_juicer.download.html">data_juicer.download package</a><ul>
@@ -750,7 +911,7 @@
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#module-data_juicer.ops.common.helper_func">data_juicer.ops.common.helper_func module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data-juicer-ops-common-prompt2prompt-pipeline-module">data_juicer.ops.common.prompt2prompt_pipeline module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#module-data_juicer.ops.common.prompt2prompt_pipeline">data_juicer.ops.common.prompt2prompt_pipeline module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#module-data_juicer.ops.common.special_characters">data_juicer.ops.common.special_characters module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#module-data_juicer.ops.common">Module contents</a></li>
 </ul>
@@ -1543,6 +1704,7 @@
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.utils.html#module-data_juicer.utils.unittest_utils">data_juicer.utils.unittest_utils module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.utils.html#data_juicer.utils.unittest_utils.TEST_TAG"><code class="docutils literal notranslate"><span class="pre">TEST_TAG()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.utils.html#data_juicer.utils.unittest_utils.set_clear_model_flag"><code class="docutils literal notranslate"><span class="pre">set_clear_model_flag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.utils.html#data_juicer.utils.unittest_utils.set_from_fork_flag"><code class="docutils literal notranslate"><span class="pre">set_from_fork_flag()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase"><code class="docutils literal notranslate"><span class="pre">DataJuicerTestCaseBase</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.setUpClass"><code class="docutils literal notranslate"><span class="pre">DataJuicerTestCaseBase.setUpClass()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.tearDownClass"><code class="docutils literal notranslate"><span class="pre">DataJuicerTestCaseBase.tearDownClass()</span></code></a></li>

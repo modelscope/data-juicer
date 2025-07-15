@@ -350,11 +350,11 @@
           <h1>data_juicer.core.data.dataset_builder 源代码</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">shlex</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">argparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">concatenate_datasets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jsonargparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DJDataset</span><span class="p">,</span> <span class="n">NestedDataset</span>
@@ -379,6 +379,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">executor_type</span> <span class="o">=</span> <span class="n">executor_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">require_dataset_arg</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># initialize data validators</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validators</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;validators&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">validator_config</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">validators</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">validator_config</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Validator config must have a &quot;type&quot; key&#39;</span><span class="p">)</span>
+                <span class="n">validator_type</span> <span class="o">=</span> <span class="n">validator_config</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+                <span class="n">validator_cls</span> <span class="o">=</span> <span class="n">DataValidatorRegistry</span><span class="o">.</span><span class="n">get_validator</span><span class="p">(</span><span class="n">validator_type</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">validator_cls</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">validator_cls</span><span class="p">(</span><span class="n">validator_config</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No data validator found for </span><span class="si">{</span><span class="n">validator_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># priority: generated_dataset_config &gt; dataset_path &gt; dataset</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;generated_dataset_config&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">generated_dataset_config</span><span class="p">:</span>
@@ -425,11 +438,10 @@
             <span class="c1"># initialize data loading strategy</span>
             <span class="n">data_type</span> <span class="o">=</span> <span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">data_source</span> <span class="o">=</span> <span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">stra</span> <span class="o">=</span> <span class="n">DataLoadStrategyRegistry</span><span class="o">.</span><span class="n">get_strategy_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">executor_type</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">data_source</span><span class="p">)(</span>
-                <span class="n">ds_config</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span>
-            <span class="p">)</span>
+            <span class="n">stra</span> <span class="o">=</span> <span class="n">DataLoadStrategyRegistry</span><span class="o">.</span><span class="n">get_strategy_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">executor_type</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">data_source</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">stra</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No data load strategy found for&quot;</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">data_source</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">stra</span> <span class="o">=</span> <span class="n">stra</span><span class="p">(</span><span class="n">ds_config</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stra</span><span class="p">)</span>
 
         <span class="c1"># failed to initialize any load strategy</span>
@@ -445,20 +457,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">sample_numbers</span> <span class="o">=</span> <span class="n">get_sample_numbers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_sample_num</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span> <span class="k">for</span> <span class="n">stra</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sample_numbers</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">stra</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span><span class="p">]</span>
-
-        <span class="c1"># initialize data validators</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">validators</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;validators&quot;</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">validator_config</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">validators</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">validator_config</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Validator config must have a &quot;type&quot; key&#39;</span><span class="p">)</span>
-                <span class="n">validator_type</span> <span class="o">=</span> <span class="n">validator_config</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
-                <span class="n">validator_cls</span> <span class="o">=</span> <span class="n">DataValidatorRegistry</span><span class="o">.</span><span class="n">get_validator</span><span class="p">(</span><span class="n">validator_type</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">validator_cls</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">validator_cls</span><span class="p">(</span><span class="n">validator_config</span><span class="p">))</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No data validator found for </span><span class="si">{</span><span class="n">validator_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sample_numbers</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">stra</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="DatasetBuilder.load_dataset">

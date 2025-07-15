@@ -459,14 +459,7 @@
             <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
                 <span class="k">break</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] are &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;empty. Thus no comparison results would be &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;generated.&quot;</span>
-            <span class="p">)</span>
-            <span class="k">return</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;There are only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples -- less &quot;</span> <span class="sa">f</span><span class="s2">&quot;than expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s2"> samples.&quot;</span><span class="p">)</span>
 
         <span class="c1"># export the tracer results.</span>
@@ -519,14 +512,7 @@
                 <span class="c1"># have found all filtered samples, just stop.</span>
                 <span class="k">break</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] are all &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;the same. Thus no comparison results would be &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;generated.&quot;</span>
-            <span class="p">)</span>
-            <span class="k">return</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span><span class="si">}</span><span class="s2"> filtered samples &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] -- less than &quot;</span>
@@ -541,7 +527,7 @@
 
 <div class="viewcode-block" id="Tracer.trace_deduplicator">
 <a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.tracer.Tracer.trace_deduplicator">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">trace_deduplicator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dup_pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trace_deduplicator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dup_pairs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compare datasets before and after a Deduplicator.</span>
 

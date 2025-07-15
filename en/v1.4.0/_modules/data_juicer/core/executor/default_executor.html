@@ -556,13 +556,11 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">use_checkpoint</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_manager</span><span class="o">.</span><span class="n">ckpt_available</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading dataset from checkpoint...&quot;</span><span class="p">)</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_manager</span><span class="o">.</span><span class="n">load_ckpt</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;formatter&quot;</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading dataset from data formatter...&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading dataset from dataset builder...&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">load_data_np</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">load_data_np</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">np</span>
-            <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">load_data_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No dataset available to sample from.&quot;</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_builder</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">num_proc</span><span class="o">=</span><span class="n">load_data_np</span><span class="p">)</span>
 
         <span class="c1"># Perform sampling based on the specified algorithm</span>
         <span class="k">if</span> <span class="n">sample_algo</span> <span class="o">==</span> <span class="s2">&quot;uniform&quot;</span><span class="p">:</span>

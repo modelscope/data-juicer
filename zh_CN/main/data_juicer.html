@@ -518,6 +518,7 @@
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.config.html#data_juicer.config.prepare_side_configs"><code class="docutils literal notranslate"><span class="pre">prepare_side_configs()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.config.html#data_juicer.config.get_default_cfg"><code class="docutils literal notranslate"><span class="pre">get_default_cfg()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.config.html#data_juicer.config.prepare_cfgs_for_export"><code class="docutils literal notranslate"><span class="pre">prepare_cfgs_for_export()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.config.html#data_juicer.config.update_op_attr"><code class="docutils literal notranslate"><span class="pre">update_op_attr()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -591,8 +592,6 @@
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.resource_monitor"><code class="docutils literal notranslate"><span class="pre">resource_monitor()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor"><code class="docutils literal notranslate"><span class="pre">Monitor</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor.DYNAMIC_FIELDS"><code class="docutils literal notranslate"><span class="pre">Monitor.DYNAMIC_FIELDS</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor.__init__"><code class="docutils literal notranslate"><span class="pre">Monitor.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor.monitor_all_resources"><code class="docutils literal notranslate"><span class="pre">Monitor.monitor_all_resources()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor.monitor_current_resources"><code class="docutils literal notranslate"><span class="pre">Monitor.monitor_current_resources()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor.draw_resource_util_graph"><code class="docutils literal notranslate"><span class="pre">Monitor.draw_resource_util_graph()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.monitor.Monitor.analyze_resource_util_list"><code class="docutils literal notranslate"><span class="pre">Monitor.analyze_resource_util_list()</span></code></a></li>
@@ -693,8 +692,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor"><code class="docutils literal notranslate"><span class="pre">Monitor</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor.DYNAMIC_FIELDS"><code class="docutils literal notranslate"><span class="pre">Monitor.DYNAMIC_FIELDS</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor.__init__"><code class="docutils literal notranslate"><span class="pre">Monitor.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor.monitor_all_resources"><code class="docutils literal notranslate"><span class="pre">Monitor.monitor_all_resources()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor.monitor_current_resources"><code class="docutils literal notranslate"><span class="pre">Monitor.monitor_current_resources()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor.draw_resource_util_graph"><code class="docutils literal notranslate"><span class="pre">Monitor.draw_resource_util_graph()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor.analyze_resource_util_list"><code class="docutils literal notranslate"><span class="pre">Monitor.analyze_resource_util_list()</span></code></a></li>
@@ -1709,6 +1706,7 @@
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.utils.html#module-data_juicer.utils.unittest_utils">data_juicer.utils.unittest_utils module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.utils.html#data_juicer.utils.unittest_utils.TEST_TAG"><code class="docutils literal notranslate"><span class="pre">TEST_TAG()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.utils.html#data_juicer.utils.unittest_utils.set_clear_model_flag"><code class="docutils literal notranslate"><span class="pre">set_clear_model_flag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.utils.html#data_juicer.utils.unittest_utils.set_from_fork_flag"><code class="docutils literal notranslate"><span class="pre">set_from_fork_flag()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase"><code class="docutils literal notranslate"><span class="pre">DataJuicerTestCaseBase</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.setUpClass"><code class="docutils literal notranslate"><span class="pre">DataJuicerTestCaseBase.setUpClass()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.tearDownClass"><code class="docutils literal notranslate"><span class="pre">DataJuicerTestCaseBase.tearDownClass()</span></code></a></li>

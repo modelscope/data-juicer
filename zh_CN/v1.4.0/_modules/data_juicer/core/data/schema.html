@@ -461,7 +461,7 @@
         <span class="c1"># String types</span>
         <span class="k">if</span> <span class="n">pa</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_string</span><span class="p">(</span><span class="n">ray_type</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">str</span>
-        <span class="k">if</span> <span class="n">pa</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_binary</span><span class="p">(</span><span class="n">ray_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pa</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_binary</span><span class="p">(</span><span class="n">ray_type</span><span class="p">)</span> <span class="ow">or</span> <span class="n">pa</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_fixed_size_binary</span><span class="p">(</span><span class="n">ray_type</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">bytes</span>
 
         <span class="c1"># Numeric types</span>

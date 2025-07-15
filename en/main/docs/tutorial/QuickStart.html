@@ -469,7 +469,12 @@ dj-analyze<span class="w"> </span>--auto<span class="w"> </span>--dataset_path<s
 <li><p><code class="docutils literal notranslate"><span class="pre">TAGGING_OPS</span></code>: decorate OPs that <strong>DO</strong> produce tags/categories in meta field.</p></li>
 </ul>
 </li>
+<li><p>Sometimes, “Glyph missing” warning occurs and invalid characters show in the analyzed results figures. Users can specify appropriate font using the environment variable <code class="docutils literal notranslate"><span class="pre">ANALYZER_FONT</span></code>. For example:</p></li>
 </ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ANALYZER_FONT</span><span class="o">=</span><span class="s2">&quot;Heiti TC&quot;</span><span class="w">  </span><span class="c1"># Use Heiti for Chinese characters. And it&#39;s the default font for analyzer.</span>
+python<span class="w"> </span>tools/analyze_data.py<span class="w"> </span>--config<span class="w"> </span>configs/demo/analyzer.yaml
+</pre></div>
+</div>
 </section>
 <section id="data-visualization">
 <h2>Data Visualization<a class="headerlink" href="#data-visualization" title="Link to this heading">¶</a></h2>
