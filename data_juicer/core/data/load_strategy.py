@@ -1,11 +1,11 @@
 import fnmatch
 import os
 from abc import ABC, abstractmethod
-from argparse import Namespace
 from dataclasses import dataclass
 from typing import Dict, Optional, Type
 
 import datasets
+from jsonargparse import Namespace
 from loguru import logger
 
 from data_juicer.core.data import DJDataset
@@ -59,7 +59,7 @@ class DataLoadStrategy(ABC, ConfigValidator):
 
     @abstractmethod
     def load_data(self, **kwargs) -> DJDataset:
-        pass
+        """Need to be implemented in the"""
 
 
 class DataLoadStrategyRegistry:
@@ -165,7 +165,7 @@ class RayDataLoadStrategy(DataLoadStrategy):
 
     @abstractmethod
     def load_data(self, **kwargs) -> DJDataset:
-        pass
+        """Need to be implemented in the"""
 
 
 class DefaultDataLoadStrategy(DataLoadStrategy):
@@ -175,7 +175,7 @@ class DefaultDataLoadStrategy(DataLoadStrategy):
 
     @abstractmethod
     def load_data(self, **kwargs) -> DJDataset:
-        pass
+        """Need to be implemented in the"""
 
 
 # TODO dask support
@@ -321,7 +321,7 @@ class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
         suffixes = getattr(self.cfg, "suffixes", None)  # Default to None
         # if there is suffix_filter op, turn on the add_suffix flag
         add_suffix = False
-        process_list = self.cfg.get("process", [])
+        process_list = self.cfg.process if hasattr(self.cfg, "process") else []
         for op in process_list:
             op_name, _ = list(op.items())[0]
             if op_name == "suffix_filter":

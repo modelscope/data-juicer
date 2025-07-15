@@ -98,7 +98,7 @@ class Schema:
         # String types
         if pa.types.is_string(ray_type):
             return str
-        if pa.types.is_binary(ray_type):
+        if pa.types.is_binary(ray_type) or pa.types.is_fixed_size_binary(ray_type):
             return bytes
 
         # Numeric types

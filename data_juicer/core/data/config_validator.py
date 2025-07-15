@@ -43,7 +43,7 @@ class ConfigValidator:
                 if not isinstance(value, expected_type):
                     raise ConfigValidationError(
                         f"Field '{field}' must be of "
-                        "type '{expected_type.__name__}', "
+                        f"type '{expected_type.__name__}', "
                         f"got '{type(value).__name__}'"
                     )
 
