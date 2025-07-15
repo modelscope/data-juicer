@@ -194,13 +194,9 @@ class StOperatorPool(OperatorPool):
             os.path.dirname(__file__), '../../configs/data_juicer_recipes'
         ))
         self.recipe_manager = RecipeManager(recipes_path, all_ops)
-        if 'reuse_recipe_dialog_open' not in st.session_state:
-            st.session_state.reuse_recipe_dialog_open = False
             
         self.current_page = st.session_state.current_page
         self.search_example = "e.g., filter|language"
-        if 'edit_pool_dialog_open' not in st.session_state:
-            st.session_state.edit_pool_dialog_open = False
 
     def filter_operators(self, search_term, op_list):
         if not search_term:
@@ -215,11 +211,14 @@ class StOperatorPool(OperatorPool):
 
     def _cleanup_edit_dialog_state(self):
         """Helper function to clean up session state after dialog closes."""
-        keys_to_delete = ['edited_op_pool_names', 'edit_op_search_term', 'edit_op_current_page']
+        keys_to_delete = ['edited_op_pool_names', 'edit_op_search_term']
         for key in keys_to_delete:
             if key in st.session_state:
                 del st.session_state[key]
-        st.session_state.edit_pool_dialog_open = False
+    
+    def add_ops_and_clear_callback(self, ops_to_add):
+        st.session_state.edited_op_pool_names.update(ops_to_add)
+        st.session_state.edit_op_search_term = ""
 
     @st.dialog("Edit Operator Pool", width="large")
     def render_edit_op_pool_dialog(self):
@@ -262,10 +261,13 @@ class StOperatorPool(OperatorPool):
                     with row_col1:
                         st.markdown(f"**{op_name}**")
                     with row_col2:
-                        if st.button("➖", key=f"remove_op_{op_name}", help=f"Remove {op_name}"):
-                            st.session_state.edited_op_pool_names.remove(op_name)
-                            st.rerun()
-
+                        st.button(
+                            "➖", 
+                            key=f"remove_op_{op_name}", 
+                            help=f"Remove {op_name}",
+                            on_click=st.session_state.edited_op_pool_names.remove,
+                            args=(op_name,)
+                            )
         # ==================================================================
         # RIGHT COLUMN: Available Operators
         # ==================================================================
@@ -286,22 +288,18 @@ class StOperatorPool(OperatorPool):
 
             with btn_col:
                 # Disable button if the filtered list is empty
-                if st.button("Add All Filtered", key="add_all_ops", disabled=not filtered_available_ops, use_container_width=True):
-                    st.session_state.edited_op_pool_names.update(filtered_available_ops)
-                    # Optional: Clear search term for better UX
-                    if st.session_state.edit_op_search_term:
-                        st.session_state.edit_op_search_term = ""
-                    st.rerun()
+                st.button(
+                    "Add All Searched", 
+                    key="add_all_ops", 
+                    disabled=not filtered_available_ops, 
+                    use_container_width=True,
+                    on_click=self.add_ops_and_clear_callback,
+                    args=(filtered_available_ops,)
+                    )
 
-            items_per_page = 5
-            current_page = st.session_state.edit_op_current_page
-            total_pages = math.ceil(len(filtered_available_ops) / items_per_page) if filtered_available_ops else 1
-            
-            start_idx = (current_page - 1) * items_per_page
-            end_idx = start_idx + items_per_page
-            ops_to_display = filtered_available_ops[start_idx:end_idx]
+            ops_to_display = filtered_available_ops
 
-            with st.container(height=300): # Adjusted height
+            with st.container(height=350): # Adjusted height
                 if not ops_to_display:
                     st.caption("No matching operators found.")
                 for op_name in ops_to_display:
@@ -309,20 +307,7 @@ class StOperatorPool(OperatorPool):
                     with row_col1:
                         st.write(op_name)
                     with row_col2:
-                        if st.button("➕", key=f"add_op_{op_name}", help=f"Add {op_name}"):
-                            st.session_state.edited_op_pool_names.add(op_name)
-                            if search_term:
-                                st.session_state.edit_op_search_term = ""
-                            st.rerun()
-            
-            p_col1, p_col2, p_col3 = st.columns([1, 2, 1])
-            if p_col1.button("←", disabled=current_page <= 1, use_container_width=True, key="prev_avail_op"):
-                st.session_state.edit_op_current_page -= 1
-                st.rerun()
-            p_col2.markdown(f"<div style='text-align: center; margin-top: 5px;'>Page {current_page} of {total_pages}</div>", unsafe_allow_html=True)
-            if p_col3.button("→", disabled=current_page >= total_pages, use_container_width=True, key="next_avail_op"):
-                st.session_state.edit_op_current_page += 1
-                st.rerun()
+                        st.button("➕", key=f"add_op_{op_name}", help=f"Add {op_name}", on_click=self.add_ops_and_clear_callback, args=([op_name],))
 
         # ==================================================================
         # DIALOG ACTIONS: Apply or Cancel
@@ -376,7 +361,6 @@ class StOperatorPool(OperatorPool):
         if not self.recipe_manager.recipes:
              st.error(f"No recipes found in the directory: {self.recipe_manager.recipes_dir}. Please check the path.")
              if st.button("Close"):
-                st.session_state.reuse_recipe_dialog_open = False
                 st.rerun()
              return
         elif not filtered_recipes:
@@ -428,11 +412,11 @@ class StOperatorPool(OperatorPool):
                             self.add_op(op_name, op_config_to_add)
                             for arg_name, arg_details in op_config_to_add.get('args', {}).items():
                                 if arg_details.get("v") is not None:
-                                    self.pool[op_name].args[arg_name].set_v(arg_details["v"])
+                                    self.act(op_name=op_name, action_type="set_arg",
+                                                  arg_name=arg_name, v=arg_details["v"])
                         
                         # 3. Sync state, close dialog, and refresh the app
                         self.st_sync()
-                        st.session_state.reuse_recipe_dialog_open = False
                         st.session_state.current_page = 1
                         st.rerun()
 
@@ -455,10 +439,10 @@ class StOperatorPool(OperatorPool):
 
             # Button to open the new dialog
             if st.button("⚙️ Edit Operator Pool", use_container_width=True):
-                st.session_state.edit_pool_dialog_open = True
+                self.render_edit_op_pool_dialog()
                 
             if st.button("🍽️ Reuse Example Recipe", use_container_width=True):
-                st.session_state.reuse_recipe_dialog_open = True
+                self.render_reuse_example_recipe_dialog()
 
             # Show enabled only option
             st.checkbox(
@@ -497,12 +481,6 @@ class StOperatorPool(OperatorPool):
 
             st.write(f"Page {self.current_page} of {total_pages}")
             
-        if st.session_state.get("edit_pool_dialog_open", False):
-            self.render_edit_op_pool_dialog()
-        
-        if st.session_state.get("reuse_recipe_dialog_open", False):
-            self.render_reuse_example_recipe_dialog()
-    
     def add_op(self, op_name, arg_state):
         state_copy = copy.deepcopy(arg_state)
         state_copy.update(name=op_name)
