@@ -7,10 +7,10 @@ from data_juicer.ops.filter import LLMAnalysisFilter
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 
-torch = LazyLoader('torch')
-vllm = LazyLoader('vllm')
+torch = LazyLoader("torch")
+vllm = LazyLoader("vllm")
 
-OP_NAME = 'llm_task_relevance_filter'
+OP_NAME = "llm_task_relevance_filter"
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -19,6 +19,7 @@ class LLMTaskRelevanceFilter(LLMAnalysisFilter):
     """
     Filter to keep sample with high relevance score to validation tasks estimated by LLM.
     """
+
     # TODO: fix dataset cast error
 
     # avoid leading whitespace
@@ -66,19 +67,24 @@ json
 """  # noqa: E501
 
     DEFAULT_DIM_REQUIRED_KEYS = [
-        'topical_relevance', 'linguistic_style_match', 'task_match',
-        'knowledge_alignment', 'potential_utility'
+        "topical_relevance",
+        "linguistic_style_match",
+        "task_match",
+        "knowledge_alignment",
+        "potential_utility",
     ]
 
-    def __init__(self,
-                 api_or_hf_model: str = 'gpt-4o',
-                 min_score: float = 0.5,
-                 is_hf_model: bool = False,
-                 *,
-                 valid_dataset=None,
-                 task_desc: Optional[str] = None,
-                 n_shot: Optional[int] = None,
-                 **kwargs):
+    def __init__(
+        self,
+        api_or_hf_model: str = "gpt-4o",
+        min_score: float = 0.5,
+        is_hf_model: bool = False,
+        *,
+        valid_dataset=None,
+        task_desc: Optional[str] = None,
+        n_shot: Optional[int] = None,
+        **kwargs,
+    ):
         """
         Initialization method.
 
@@ -103,69 +109,59 @@ json
 
     @property
     def valid_feature_ready(self):
-        return 'valid_info' in self.valid_feature
+        return "valid_info" in self.valid_feature
 
-    def prepare_valid_feature(self,
-                              dataset=None,
-                              task_desc=None,
-                              n_shot=None,
-                              *args,
-                              **kwargs):
+    def prepare_valid_feature(self, dataset=None, task_desc=None, n_shot=None, *args, **kwargs):
         if dataset is None:
-            valid_data_block = ''
+            valid_data_block = ""
         else:
             n_shot = n_shot or len(dataset)
             sample = dataset[0]
             if not set(self.input_keys) <= set(sample.keys()):
-                logger.warning(
-                    f'Not all input keys {self.input_keys} are in the sample!')
+                logger.warning(f"Not all input keys {self.input_keys} are in the sample!")
             data_strs = []
             for i, sample in enumerate(dataset):
                 if i + 1 > n_shot:
                     break
                 field_strs = [
-                    self.field_template.format(field_name=n,
-                                               field_data=sample[k])
+                    self.field_template.format(field_name=n, field_data=sample[k])
                     for (k, n) in zip(self.input_keys, self.field_names)
                     if k in sample
                 ]
-                data_str = ('\n\n'.join(field_strs))
+                data_str = "\n\n".join(field_strs)
                 data_strs.append("'''\n{data}\n'''".format(data=data_str))
-            valid_data_block = '# Validation Data\n' + (
-                '\n\n'.join(data_strs)) + '\n\n'
+            valid_data_block = "# Validation Data\n" + ("\n\n".join(data_strs)) + "\n\n"
 
         if task_desc is None:
-            task_desc_block = ''
+            task_desc_block = ""
         else:
-            task_desc_block = f'# Task Description\n{task_desc}\n\n'
+            task_desc_block = f"# Task Description\n{task_desc}\n\n"
 
         valid_txt = task_desc_block + valid_data_block
         if len(valid_txt) == 0:
-            logger.warning(
-                'Empty validation information, please provide validation dataset or task description.'
-            )
+            logger.warning("Empty validation information, please provide validation dataset or task description.")
         else:
-            self.valid_feature['valid_info'] = valid_txt
+            self.valid_feature["valid_info"] = valid_txt
 
     def build_input(self, sample):
         if not set(self.input_keys) <= set(sample.keys()):
-            logger.warning(
-                f'Not all input keys {self.input_keys} are in the sample!')
+            logger.warning(f"Not all input keys {self.input_keys} are in the sample!")
         field_strs = [
             self.field_template.format(field_name=n, field_data=sample[k])
-            for (k, n) in zip(self.input_keys, self.field_names) if k in sample
+            for (k, n) in zip(self.input_keys, self.field_names)
+            if k in sample
         ]
-        data_str = '\n\n'.join(field_strs)
+        data_str = "\n\n".join(field_strs)
         input_prompt = self.input_template.format(data=data_str)
 
-        return self.valid_feature.get('valid_info', '') + input_prompt
+        return self.valid_feature.get("valid_info", "") + input_prompt
 
     def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if sample[Fields.stats].get(StatsKeys.llm_task_relevance, -1) >= 0:
             return sample
 
-        assert self.valid_feature_ready, 'Validation feature not ready yet. Call prepare_valid_feature first.'
+        assert self.valid_feature_ready, "Validation feature not ready yet. Call prepare_valid_feature first."
 
         score, record, tags = self.generate_llm_analysis(sample, rank)
 

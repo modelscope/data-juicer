@@ -6,31 +6,34 @@ from data_juicer.ops.filter.llm_perplexity_filter import LLMPerplexityFilter
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 
-torch = LazyLoader('torch')
-transformers = LazyLoader('transformers')
+torch = LazyLoader("torch")
+transformers = LazyLoader("transformers")
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-OP_NAME = 'in_context_influence_filter'
+OP_NAME = "in_context_influence_filter"
 
 
 @OPERATORS.register_module(OP_NAME)
 @ATTRIBUTION_FILTERS.register_module(OP_NAME)
 class InContextInfluenceFilter(LLMPerplexityFilter):
     """Filter to keep texts whose in-context influence upon validation set within a specific range."""
+
     # This operator is currently under development and evaluation as part of an ongoing research project.
     # The Data-Juicer team retains full copyright over this operator.
 
-    _accelerator = 'cuda'
+    _accelerator = "cuda"
 
-    def __init__(self,
-                 valid_dataset: Optional = None,
-                 task_desc: str = None,
-                 valid_as_demo=False,
-                 n_shot: Optional[int] = None,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        valid_dataset: Optional = None,
+        task_desc: str = None,
+        valid_as_demo=False,
+        n_shot: Optional[int] = None,
+        *args,
+        **kwargs,
+    ):
         """
         Initialization method.
 
@@ -44,8 +47,7 @@ class InContextInfluenceFilter(LLMPerplexityFilter):
         self.valid_as_demo = valid_as_demo
         self.task_desc = task_desc
         self.valid_feature = {}
-        if valid_dataset is not None or (task_desc is not None
-                                         and self.valid_as_demo):
+        if valid_dataset is not None or (task_desc is not None and self.valid_as_demo):
             self.prepare_valid_feature(valid_dataset, task_desc, n_shot)
         else:
             logger.warning(
@@ -55,26 +57,26 @@ class InContextInfluenceFilter(LLMPerplexityFilter):
 
     @property
     def valid_feature_ready(self):
-        return 'valid_samples' in self.valid_feature and 'valid_losses' in self.valid_feature
+        return "valid_samples" in self.valid_feature and "valid_losses" in self.valid_feature
 
     def prepare_valid_feature(self, dataset=None, task_desc=None, n_shot=None):
         n_shot = n_shot or len(dataset)
-        self.valid_feature['valid_samples'] = []
-        self.valid_feature['valid_losses'] = []
+        self.valid_feature["valid_samples"] = []
+        self.valid_feature["valid_losses"] = []
         for i, sample in enumerate(dataset):
             if i >= n_shot:
                 break
             sample_w_msgs = self.sample_with_messages(sample)
-            self.valid_feature['valid_samples'].append(sample_w_msgs)
+            self.valid_feature["valid_samples"].append(sample_w_msgs)
             loss = self._loss(sample_w_msgs)
-            self.valid_feature['valid_losses'].append(loss)
+            self.valid_feature["valid_losses"].append(loss)
 
     def compute_stats_single(self, sample, rank=None):
         # check if it's computed already
         if StatsKeys.in_context_influence in sample[Fields.stats]:
             return sample
 
-        assert self.valid_feature_ready, 'Validation feature not ready yet. Call prepare_valid_feature first.'
+        assert self.valid_feature_ready, "Validation feature not ready yet. Call prepare_valid_feature first."
 
         sample_w_msgs = self.sample_with_messages(sample)
 
@@ -82,25 +84,20 @@ class InContextInfluenceFilter(LLMPerplexityFilter):
         if self.valid_as_demo:
             # L(A|Q) / L(A|Q_v, A_v, Q)
             loss_wo_demo = self._loss(sample_w_msgs, rank=rank)
-            for valid_sample in self.valid_feature['valid_samples']:
-                loss_w_demo = self._loss(sample_w_msgs,
-                                         pre_example=valid_sample,
-                                         rank=rank)
+            for valid_sample in self.valid_feature["valid_samples"]:
+                loss_w_demo = self._loss(sample_w_msgs, pre_example=valid_sample, rank=rank)
                 scores.append(loss_wo_demo / loss_w_demo)
         else:
             # L(A_v|Q_v) / L(A_v|Q, A, Q_v)
             for valid_sample, loss_wo_demo in zip(
-                    self.valid_feature['valid_samples'],
-                    self.valid_feature['valid_losses']):
-                loss_w_demo = self._loss(valid_sample,
-                                         pre_example=sample_w_msgs,
-                                         rank=rank)
+                self.valid_feature["valid_samples"], self.valid_feature["valid_losses"]
+            ):
+                loss_w_demo = self._loss(valid_sample, pre_example=sample_w_msgs, rank=rank)
                 scores.append(loss_wo_demo / loss_w_demo)
 
         # TODO: aggregation strategies
         in_context_influence = sum(scores) / len(scores)
-        sample[Fields.stats][
-            StatsKeys.in_context_influence] = in_context_influence
+        sample[Fields.stats][StatsKeys.in_context_influence] = in_context_influence
 
         return sample
 

@@ -11,13 +11,13 @@ from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-torch = LazyLoader('torch')
-transformers = LazyLoader('transformers')
+torch = LazyLoader("torch")
+transformers = LazyLoader("transformers")
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-OP_NAME = 'text_embd_similarity_filter'
+OP_NAME = "text_embd_similarity_filter"
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -30,22 +30,24 @@ class TextEmbdSimilarityFilter(Filter):
     # TODO: aggregation strategies
     # TODO: truncation option
 
-    _accelerator = 'cuda'
+    _accelerator = "cuda"
 
-    def __init__(self,
-                 api_or_hf_model: str = 'text-embedding-v4',
-                 is_hf_model: bool = False,
-                 api_endpoint: str = 'embeddings',
-                 response_path: str = 'data.0.embedding',
-                 model_params: Optional[Dict] = None,
-                 min_score: ClosedUnitInterval = 0.1,
-                 max_score: ClosedUnitInterval = 1.0,
-                 valid_dataset: Optional = None,
-                 ebd_dim: int = 4096,
-                 pooling: Optional[str] = None,
-                 input_template: Optional[str] = None,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        api_or_hf_model: str = "text-embedding-v4",
+        is_hf_model: bool = False,
+        api_endpoint: str = "embeddings",
+        response_path: str = "data.0.embedding",
+        model_params: Optional[Dict] = None,
+        min_score: ClosedUnitInterval = 0.1,
+        max_score: ClosedUnitInterval = 1.0,
+        valid_dataset: Optional = None,
+        ebd_dim: int = 4096,
+        pooling: Optional[str] = None,
+        input_template: Optional[str] = None,
+        *args,
+        **kwargs,
+    ):
         """
         Initialization method.
 
@@ -71,7 +73,7 @@ class TextEmbdSimilarityFilter(Filter):
 
         if model_params is None:
             model_params = {}
-        kwargs.setdefault('mem_required', '1500MB')
+        kwargs.setdefault("mem_required", "1500MB")
         super().__init__(*args, **kwargs)
         self.api_or_hf_model = api_or_hf_model
         self.is_hf_model = is_hf_model
@@ -81,19 +83,20 @@ class TextEmbdSimilarityFilter(Filter):
         self.max_score = max_score
         self.ebd_dim = ebd_dim
         self.pooling = pooling
-        self.input_template = input_template or '{' + self.text_key + '}'
+        self.input_template = input_template or "{" + self.text_key + "}"
 
         if is_hf_model:
-            self.model_key = prepare_model(model_type='embedding',
-                                           model_path=api_or_hf_model,
-                                           pooling=pooling,
-                                           **model_params)
+            self.model_key = prepare_model(
+                model_type="embedding", model_path=api_or_hf_model, pooling=pooling, **model_params
+            )
         else:
-            self.model_key = prepare_model(model_type='api',
-                                           model=api_or_hf_model,
-                                           endpoint=self.api_endpoint,
-                                           response_path=self.response_path,
-                                           **model_params)
+            self.model_key = prepare_model(
+                model_type="api",
+                model=api_or_hf_model,
+                endpoint=self.api_endpoint,
+                response_path=self.response_path,
+                **model_params,
+            )
 
         self.valid_feature = {}
         if valid_dataset is None:
@@ -106,21 +109,18 @@ class TextEmbdSimilarityFilter(Filter):
 
     @property
     def valid_feature_ready(self):
-        return 'embeddings' in self.valid_feature
+        return "embeddings" in self.valid_feature
 
     def prepare_valid_feature(self, dataset, n_shot=None, *args, **kwargs):
         n_shot = n_shot or len(dataset)
         dataset = dataset.select(range(0, n_shot))
         embeddings = self._get_embd(dataset)
         # self.valid_feature = {"embeddings": embeddings}
-        self.valid_feature.update({'embeddings': embeddings})
+        self.valid_feature.update({"embeddings": embeddings})
 
     def _sample_to_text(self, sample):
         formatter = string.Formatter()
-        keys = [
-            field_name
-            for _, field_name, _, _ in formatter.parse(self.input_template)
-        ]
+        keys = [field_name for _, field_name, _, _ in formatter.parse(self.input_template)]
         valid_sample = True
         for k in keys:
             if k not in sample:
@@ -128,11 +128,10 @@ class TextEmbdSimilarityFilter(Filter):
                 break
         if valid_sample:
             return self.input_template.format(**sample)
-        assert 'messages' in sample
-        msgs = sample['messages']
-        contents = [msg['content'] for msg in msgs]
-        return self.input_template.format(
-            **dict(zip(keys, contents[:len(keys)])))
+        assert "messages" in sample
+        msgs = sample["messages"]
+        contents = [msg["content"] for msg in msgs]
+        return self.input_template.format(**dict(zip(keys, contents[: len(keys)])))
 
     def _get_embd_single(self, sample, rank=None):
         model = get_model(self.model_key, rank, self.use_cuda())
@@ -145,33 +144,26 @@ class TextEmbdSimilarityFilter(Filter):
             # Embeddings extract via API
             embedding = None
             try:
-                embedding = model(text,
-                                  dimensions=self.ebd_dim,
-                                  encoding_format='float')
+                embedding = model(text, dimensions=self.ebd_dim, encoding_format="float")
             except Exception as e:
-                logger.warning(f'Exception: {e}')
+                logger.warning(f"Exception: {e}")
             if embedding is not None:
                 return embedding
-            logger.debug('Trying to request with a list of texts.')
+            logger.debug("Trying to request with a list of texts.")
             sub_seq_length = len(text) // 9
-            text_list = [
-                text[i * sub_seq_length:(i + 1) * sub_seq_length]
-                for i in range(10)
-            ]
+            text_list = [text[i * sub_seq_length : (i + 1) * sub_seq_length] for i in range(10)]
             try:
-                embedding = model(text_list,
-                                  dimensions=self.ebd_dim,
-                                  encoding_format='float')
+                embedding = model(text_list, dimensions=self.ebd_dim, encoding_format="float")
             except Exception as e:
-                logger.warning(f'Exception: {e}')
+                logger.warning(f"Exception: {e}")
             if embedding is None:
-                logger.warning('Failed to extract embedding from text.')
+                logger.warning("Failed to extract embedding from text.")
 
         return embedding
 
     def _get_embd(self, dataset, rank=None):
         embeddings = []
-        for sample in tqdm(dataset, desc='Embedding', unit='sample'):
+        for sample in tqdm(dataset, desc="Embedding", unit="sample"):
             embedding = self._get_embd_single(sample, rank)
             embeddings.append(embedding)
         embeddings = np.array(embeddings, dtype=np.float64)
@@ -183,16 +175,19 @@ class TextEmbdSimilarityFilter(Filter):
         if StatsKeys.text_embd_similarity in sample[Fields.stats]:
             return sample
 
-        assert self.valid_feature_ready, 'Validation feature not ready yet. Call prepare_valid_feature first.'
+        assert self.valid_feature_ready, "Validation feature not ready yet. Call prepare_valid_feature first."
 
         embedding = self._get_embd_single(sample, rank)
         try:
-            similarity = torch.nn.functional.cosine_similarity(
-                torch.tensor(embedding).view(1, -1),
-                torch.from_numpy(
-                    self.valid_feature['embeddings'])).mean().item()
+            similarity = (
+                torch.nn.functional.cosine_similarity(
+                    torch.tensor(embedding).view(1, -1), torch.from_numpy(self.valid_feature["embeddings"])
+                )
+                .mean()
+                .item()
+            )
         except Exception as e:
-            logger.warning(f'Exception: {e}')
+            logger.warning(f"Exception: {e}")
             similarity = None
 
         sample[Fields.stats][StatsKeys.text_embd_similarity] = similarity
