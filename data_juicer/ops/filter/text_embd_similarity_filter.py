@@ -1,9 +1,9 @@
 import logging
 import string
 from typing import Dict, Optional
-from datasets import Dataset
 
 import numpy as np
+from datasets import Dataset
 from jsonargparse.typing import ClosedUnitInterval
 from tqdm import tqdm
 
