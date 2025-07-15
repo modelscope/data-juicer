@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+from datasets import Dataset
 
 from data_juicer.ops.base_op import ATTRIBUTION_FILTERS, OPERATORS
 from data_juicer.ops.filter.llm_perplexity_filter import LLMPerplexityFilter
@@ -27,9 +28,9 @@ class InContextInfluenceFilter(LLMPerplexityFilter):
 
     def __init__(
         self,
-        valid_dataset: Optional = None,
+        valid_dataset: Optional[Dataset] = None,
         task_desc: str = None,
-        valid_as_demo=False,
+        valid_as_demo: bool = False,
         n_shot: Optional[int] = None,
         *args,
         **kwargs,

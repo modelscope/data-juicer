@@ -1,6 +1,6 @@
 from typing import Optional
-
 from loguru import logger
+from datasets import Dataset
 
 from data_juicer.ops.base_op import ATTRIBUTION_FILTERS, OPERATORS
 from data_juicer.ops.filter import LLMAnalysisFilter
@@ -80,7 +80,7 @@ json
         min_score: float = 0.5,
         is_hf_model: bool = False,
         *,
-        valid_dataset=None,
+        valid_dataset: Optional[Dataset] = None,
         task_desc: Optional[str] = None,
         n_shot: Optional[int] = None,
         **kwargs,

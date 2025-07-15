@@ -1,6 +1,7 @@
 import logging
 import string
 from typing import Dict, Optional
+from datasets import Dataset
 
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval
@@ -41,7 +42,7 @@ class TextEmbdSimilarityFilter(Filter):
         model_params: Optional[Dict] = None,
         min_score: ClosedUnitInterval = 0.1,
         max_score: ClosedUnitInterval = 1.0,
-        valid_dataset: Optional = None,
+        valid_dataset: Optional[Dataset] = None,
         ebd_dim: int = 4096,
         pooling: Optional[str] = None,
         input_template: Optional[str] = None,
