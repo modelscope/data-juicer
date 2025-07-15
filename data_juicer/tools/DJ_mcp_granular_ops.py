@@ -29,8 +29,8 @@ def create_operator_function(op, mcp):
     This function dynamically creates a function that can be registered as an MCP tool,
     with proper signature and documentation based on the operator's __init__ method.
     """
-    sig = op["signature"]
-    docstring = op["description"]
+    sig = op["sig"]
+    docstring = op["desc"]
     param_docstring = op["param_desc"]
 
     # Create new function signature with dataset_path as first parameter

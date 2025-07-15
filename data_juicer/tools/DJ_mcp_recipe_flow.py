@@ -74,7 +74,7 @@ def get_data_processing_ops(
 
     ops_dict = dict()
     for op in op_results:
-        ops_dict[op["name"]] = "\n".join([op["description"], op["param_desc"], "Parameters: ", str(op["signature"])])
+        ops_dict[op["name"]] = "\n".join([op["desc"], op["param_desc"], "Parameters: ", str(op["sig"])])
 
     return ops_dict
 
