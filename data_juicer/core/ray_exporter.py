@@ -123,7 +123,7 @@ class RayExporter:
     @staticmethod
     def write_webdataset(dataset, export_path, **kwargs):
         """
-        Export method for json/jsonl target files.
+        Export method for webdataset target files.
 
         :param dataset: the dataset to export.
         :param export_path: the path to store the exported dataset.
@@ -144,7 +144,7 @@ class RayExporter:
     @staticmethod
     def write_others(dataset, export_path, **kwargs):
         """
-        Export method for json/jsonl target files.
+        Export method for other target files.
 
         :param dataset: the dataset to export.
         :param export_path: the path to store the exported dataset.
