@@ -5,39 +5,39 @@ from loguru import logger
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
-                                        load_image)
+from data_juicer.utils.mm_utils import detect_faces, load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, UNFORKABLE, Filter
 from ..op_fusion import LOADED_IMAGES
 
-cv2 = LazyLoader('cv2', 'opencv-python')
+cv2 = LazyLoader("cv2", "opencv-python")
 
-OP_NAME = 'image_face_count_filter'
+OP_NAME = "image_face_count_filter"
 
 
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageFaceCountFilter(Filter):
-    """Filter to keep samples with the number of faces within a specific range.
-    """
+    """Filter to keep samples with the number of faces within a specific range."""
 
     _default_kwargs = {
-        'scaleFactor': 1.1,
-        'minNeighbors': 3,
-        'minSize': None,
-        'maxSize': None,
+        "scaleFactor": 1.1,
+        "minNeighbors": 3,
+        "minSize": None,
+        "maxSize": None,
     }
 
-    def __init__(self,
-                 cv_classifier: str = '',
-                 min_face_count: int = 1,
-                 max_face_count: int = 1,
-                 any_or_all: str = 'any',
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        cv_classifier: str = "",
+        min_face_count: int = 1,
+        max_face_count: int = 1,
+        any_or_all: str = "any",
+        *args,
+        **kwargs,
+    ):
         """
         Initialization method.
 
@@ -54,9 +54,8 @@ class ImageFaceCountFilter(Filter):
         """
         super().__init__(*args, **kwargs)
 
-        if cv_classifier == '':
-            cv_classifier = os.path.join(cv2.data.haarcascades,
-                                         'haarcascade_frontalface_alt.xml')
+        if cv_classifier == "":
+            cv_classifier = os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_alt.xml")
 
         self.min_face_count = min_face_count
         self.max_face_count = max_face_count
@@ -66,13 +65,11 @@ class ImageFaceCountFilter(Filter):
             if key in self.extra_kwargs:
                 self.extra_kwargs[key] = kwargs[key]
 
-        if any_or_all not in ['any', 'all']:
-            raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
-                             f'Can only be one of ["any", "all"].')
-        self.any = (any_or_all == 'any')
+        if any_or_all not in ["any", "all"]:
+            raise ValueError(f"Keep strategy [{any_or_all}] is not supported. " f'Can only be one of ["any", "all"].')
+        self.any = any_or_all == "any"
 
-        self.model_key = prepare_model(model_type='opencv_classifier',
-                                       model_path=cv_classifier)
+        self.model_key = prepare_model(model_type="opencv_classifier", model_path=cv_classifier)
 
     def compute_stats_single(self, sample, context=False):
         # check if it's computed already
@@ -81,14 +78,12 @@ class ImageFaceCountFilter(Filter):
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][StatsKeys.face_counts] = np.array(
-                [], dtype=np.float64)
+            sample[Fields.stats][StatsKeys.face_counts] = np.array([], dtype=np.float64)
             return sample
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context,
-                                                loaded_image_keys, load_image)
+        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
 
         model = get_model(self.model_key)
 
@@ -98,13 +93,11 @@ class ImageFaceCountFilter(Filter):
             for key, image in images.items():
                 dets = detect_faces(image, model, **self.extra_kwargs)
                 face_counts[key] = len(dets)
-            logger.debug(f'face counts: {face_counts}')
+            logger.debug(f"face counts: {face_counts}")
         except Exception as e:
             logger.exception(e)
 
-        sample[Fields.stats][StatsKeys.face_counts] = [
-            face_counts[key] for key in loaded_image_keys
-        ]
+        sample[Fields.stats][StatsKeys.face_counts] = [face_counts[key] for key in loaded_image_keys]
         return sample
 
     def process_single(self, sample):
@@ -112,10 +105,7 @@ class ImageFaceCountFilter(Filter):
         if len(face_counts) <= 0:
             return True
 
-        keep_bools = np.array([
-            self.min_face_count <= face_count <= self.max_face_count
-            for face_count in face_counts
-        ])
+        keep_bools = np.array([self.min_face_count <= face_count <= self.max_face_count for face_count in face_counts])
 
         # different strategies
         if self.any:

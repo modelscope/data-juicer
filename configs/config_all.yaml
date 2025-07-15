@@ -274,6 +274,11 @@ process:
       tables_field_name: 'html_tables'                        # Field name to store the extracted tables.
       retain_html_tags: false,                                # If True, retains HTML tags in the tables; otherwise, removes them.
       include_header: true,                                   # If True, includes the table header; otherwise, excludes it. This parameter is effective only when `retain_html_tags` is False and applies solely to the extracted table content.
+  - download_file_mapper:                                   # download url files to local files
+      save_dir: null                                          # The directory to save downloaded files.
+      download_field: null                                    # The filed name to get the url to download.
+      timeout: 30                                             # The timeout in seconds for each HTTP request.
+      max_concurrent: 10                                      # Maximum concurrent downloads.
   - fix_unicode_mapper:                                     # fix unicode errors in text.
   - generate_qa_from_examples_mapper:                       # mapper to generate question and answer pairs from examples.
       hf_model: 'Qwen/Qwen2.5-7B-Instruct'                    # Model name on huggingface to generate question and answer pairs.
@@ -725,6 +730,7 @@ process:
   - llm_difficulty_score_filter:                            # filter to keep sample with high difficulty score estimated by LLM.
       api_or_hf_model: 'gpt-4o'                               # API or huggingface model name.
       min_score: 0.5                                          # The lowest difficulty score threshold to keep the sample.
+      is_hf_model: false                                      # Indicates if the model is from Hugging Face.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       input_keys: ['text']                                    # Sub set of keys in the sample. Support data with multi fields such as 'query', 'analysis' and 'answer' in RFT data.
@@ -748,6 +754,7 @@ process:
   - llm_quality_score_filter:                               # filter to keep sample with high quality score estimated by LLM.
       api_or_hf_model: 'gpt-4o'                               # API or huggingface model name.
       min_score: 0.5                                          # The lowest quality score threshold to keep the sample.
+      is_hf_model: false                                      # Indicates if the model is from Hugging Face.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       input_keys: ['text']                                    # Sub set of keys in the sample. Support data with multi fields such as 'query', 'analysis' and 'answer' in RFT data.

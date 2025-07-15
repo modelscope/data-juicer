@@ -37,6 +37,12 @@ jobs:
         docker compose exec ray-head bash -c '/root/.local/bin/uv pip install --system -e .\[all\]'
         docker compose exec ray-worker bash -c '/root/.local/bin/uv pip install --system -e .\[all\]'
 
+    - name: Print Pip Dependency Tree
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose exec ray-head bash -c '/root/.local/bin/uv pip install --system pipdeptree'
+        docker compose exec ray-head bash -c 'pipdeptree'
+
     - name: Clean dataset cache
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
@@ -46,6 +52,7 @@ jobs:
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
         docker compose exec -e OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ray-head bash -c 'python tests/run.py --tag standalone --mode regression'
+        docker compose exec ray-head bash -c 'coverage combine'
 
     - name: Upload coverage report of standalone
       uses: actions/upload-artifact@v4
@@ -99,6 +106,7 @@ jobs:
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
         docker compose exec ray-head bash -c 'python tests/run.py --tag ray --mode regression'
+        docker compose exec ray-head bash -c 'coverage combine'
 
     - name: Upload coverage report of ray
       uses: actions/upload-artifact@v4

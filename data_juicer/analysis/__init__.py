@@ -4,8 +4,8 @@ from .diversity_analysis import DiversityAnalysis
 from .overall_analysis import OverallAnalysis
 
 __all__ = [
-    'ColumnWiseAnalysis',
-    'CorrelationAnalysis',
-    'DiversityAnalysis',
-    'OverallAnalysis',
+    "ColumnWiseAnalysis",
+    "CorrelationAnalysis",
+    "DiversityAnalysis",
+    "OverallAnalysis",
 ]
