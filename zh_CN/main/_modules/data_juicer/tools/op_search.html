@@ -390,9 +390,9 @@
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">desc</span><span class="p">,</span>
+            <span class="s2">&quot;desc&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">desc</span><span class="p">,</span>
             <span class="s2">&quot;tags&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span>
-            <span class="s2">&quot;signature&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig</span><span class="p">,</span>
+            <span class="s2">&quot;sig&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig</span><span class="p">,</span>
             <span class="s2">&quot;param_desc&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_desc</span><span class="p">,</span>
         <span class="p">}</span></div>
 </div>
@@ -530,10 +530,9 @@
     <span class="n">param_docstring</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">docstring</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">param_docstring</span>
-    <span class="n">param_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(:param\s+(?!args|kwargs)\w+:\s+([^:]*))&quot;</span><span class="p">)</span>
-    <span class="n">matches</span> <span class="o">=</span> <span class="n">param_pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">docstring</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
-        <span class="n">param_docstring</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">param_docstring</span> <span class="o">=</span> <span class="s2">&quot;:param &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">docstring</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:param&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s2">&quot;:param&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">param_docstring</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
     <span class="k">return</span> <span class="n">param_docstring</span></div>
 
 
