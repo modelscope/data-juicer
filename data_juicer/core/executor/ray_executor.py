@@ -68,8 +68,10 @@ class RayExecutor(ExecutorBase):
         logger.info("Preparing exporter...")
         self.exporter = RayExporter(
             self.cfg.export_path,
+            self.cfg.export_type,
             keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
             keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
+            **self.cfg.export_extra_args,
         )
 
     def run(self, load_data_np: Optional[PositiveInt] = None, skip_return=False):

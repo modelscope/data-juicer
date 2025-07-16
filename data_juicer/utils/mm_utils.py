@@ -8,6 +8,7 @@ from typing import List, Optional, Tuple, Union
 
 import av
 import numpy as np
+import PIL
 from datasets import Audio, Image
 from loguru import logger
 from pydantic import PositiveInt
@@ -68,23 +69,84 @@ def remove_non_special_tokens(text):
     return text_with_only_special_tokens
 
 
-def load_data_with_context(sample, context, loaded_data_keys, load_func):
+def load_mm_bytes_from_sample(sample, mm_idx, mm_bytes_key=None, sample_idx=None):
+    # if mm_bytes_key is not specified or there is no bytes_key, return None
+    if mm_bytes_key is None or mm_bytes_key not in sample:
+        return None
+
+    mm_bytes_data = sample[mm_bytes_key]
+    if not isinstance(mm_bytes_data, list) or len(mm_bytes_data) == 0:
+        # invalid bytes data or no bytes data stored
+        return None
+    # check if the sample_idx is specified
+    if sample_idx is not None:
+        # it should be a batched sample
+        if sample_idx >= len(mm_bytes_data):
+            # invalid sample_idx
+            return None
+        sample_mm_bytes_data = mm_bytes_data[sample_idx]
+        if not isinstance(sample_mm_bytes_data, list) or len(sample_mm_bytes_data) == 0:
+            # invalid sample_mm_bytes_data or no sample_mm_bytes_data stored
+            return None
+        if mm_idx >= len(sample_mm_bytes_data):
+            # invalid mm_idx
+            return None
+        bytes_data = sample[mm_bytes_key][sample_idx][mm_idx]
+        if not isinstance(bytes_data, bytes):
+            # invalid bytes data
+            return None
+    else:
+        # it should be a single sample
+        if mm_idx >= len(mm_bytes_data):
+            # invalid mm_idx
+            return None
+        bytes_data = sample[mm_bytes_key][mm_idx]
+        if not isinstance(bytes_data, bytes):
+            # invalid bytes data
+            return None
+    return bytes_data
+
+
+def load_data_with_context(sample, context, loaded_data_keys, load_func, mm_bytes_key=None, sample_idx=None):
     """
     The unified loading function with contexts for multimodal data.
+
+    :param sample: can be a single sample or a batch of samples.
+    :param context: whether the context fields is activated.
+    :param loaded_data_keys: the data keys (paths) to load.
+    :param load_func: the function used to load the data.
+    :param mm_bytes_key: the key to store the data bytes if it exists. It's None by default.
+    :param sample_idx: the index of the current sample. Used for batched samples.
     """
     data = {}
-    for loaded_data_key in loaded_data_keys:
-        if context and loaded_data_key in sample[Fields.context]:
+    if context:
+        context_content = sample[Fields.context]
+        if sample_idx is not None and isinstance(context_content, list) and sample_idx < len(context_content):
+            context_content = context_content[sample_idx]
+    for idx, loaded_data_key in enumerate(loaded_data_keys):
+        if context and loaded_data_key in context_content:
             # load from context
-            data[loaded_data_key] = sample[Fields.context][loaded_data_key]
+            data[loaded_data_key] = context_content[loaded_data_key]
         else:
             if loaded_data_key not in data:
+                # check if it's already in bytes key
+                data_item = None
+                bytes_data = load_mm_bytes_from_sample(sample, idx, mm_bytes_key, sample_idx)
+                if bytes_data is not None:
+                    # load data_item from bytes data
+                    data_item = load_func(bytes_data)
                 # avoid load the same data
-                data_item = load_func(loaded_data_key)
+                if data_item is None:
+                    data_item = load_func(loaded_data_key)
                 data[loaded_data_key] = data_item
                 if context:
                     # store the data into context
-                    sample[Fields.context][loaded_data_key] = data_item
+                    if sample_idx is not None and isinstance(sample[Fields.context], list):
+                        if sample_idx < len(sample[Fields.context]):
+                            sample[Fields.context][sample_idx][loaded_data_key] = data_item
+                    else:
+                        sample[Fields.context][loaded_data_key] = data_item
+
     return sample, data
 
 
@@ -97,9 +159,12 @@ def load_images_byte(paths):
     return [load_image_byte(path) for path in paths]
 
 
-def load_image(path):
-    img_feature = Image()
-    img = img_feature.decode_example(img_feature.encode_example(path))
+def load_image(path_or_bytes):
+    if isinstance(path_or_bytes, bytes):
+        img = PIL.Image.open(io.BytesIO(path_or_bytes))
+    else:
+        img_feature = Image()
+        img = img_feature.decode_example(img_feature.encode_example(path_or_bytes))
     img = img.convert("RGB")
     return img
 

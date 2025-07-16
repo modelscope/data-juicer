@@ -168,6 +168,14 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 "directory of this process.",
             )
             parser.add_argument(
+                "--export_type",
+                type=str,
+                default=None,
+                help="The export format type. If it's not specified, Data-Juicer will parse from the export_path. The "
+                "supported types can be found in Exporter._router() for standalone mode and "
+                "RayExporter._SUPPORTED_FORMATS for ray mode",
+            )
+            parser.add_argument(
                 "--export_shard_size",
                 type=NonNegativeInt,
                 default=0,
@@ -189,6 +197,13 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 "due to the IO blocking, especially for very large datasets. "
                 "When this happens, False is a better choice, although it takes "
                 "more time.",
+            )
+            parser.add_argument(
+                "--export_extra_args",
+                type=Dict,
+                default={},
+                help="Other optional arguments for exporting in dict. For example, the key mapping info for exporting "
+                "the WebDataset format.",
             )
             parser.add_argument(
                 "--keep_stats_in_res_ds",
@@ -223,6 +238,12 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 type=str,
                 default="images",
                 help="Key name of field to store the list of sample image paths.",  # noqa: E251
+            )
+            parser.add_argument(
+                "--image_bytes_key",
+                type=str,
+                default="image_bytes",
+                help="Key name of field to store the list of sample image bytes.",  # noqa: E251
             )
             parser.add_argument(
                 "--image_special_token",
@@ -667,6 +688,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         "image_key": cfg.get("image_key", "images"),
         "audio_key": cfg.get("audio_key", "audios"),
         "video_key": cfg.get("video_key", "videos"),
+        "image_bytes_key": cfg.get("image_bytes_key", "image_bytes"),
         "num_proc": cfg.np,
         "turbo": cfg.get("turbo", False),
         "skip_op_error": cfg.get("skip_op_error", True),

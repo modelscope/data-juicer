@@ -21,7 +21,9 @@ def run_in_subprocess(cmd):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 universal_newlines=True,
-                bufsize=1  # Line buffered
+                bufsize=1,  # Line buffered
+                encoding='utf-8',
+                errors='ignore',
             )
 
             # Real-time output handling

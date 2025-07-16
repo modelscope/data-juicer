@@ -18,6 +18,7 @@ class Exporter:
     def __init__(
         self,
         export_path,
+        export_type=None,
         export_shard_size=0,
         export_in_parallel=True,
         num_proc=1,
@@ -25,6 +26,7 @@ class Exporter:
         keep_stats_in_res_ds=False,
         keep_hashes_in_res_ds=False,
         export_stats=True,
+        **kwargs,
     ):
         """
         Initialization method.
@@ -48,7 +50,13 @@ class Exporter:
         self.keep_stats_in_res_ds = keep_stats_in_res_ds
         self.keep_hashes_in_res_ds = keep_hashes_in_res_ds
         self.export_stats = export_stats
-        self.suffix = self._get_suffix(export_path)
+        self.suffix = self._get_suffix(export_path) if export_type is None else export_type
+        support_dict = self._router()
+        if self.suffix not in support_dict:
+            raise NotImplementedError(
+                f"Suffix of export path [{export_path}] or specified export_type [{export_type}] is not supported "
+                f"for now. Only support {list(support_dict.keys())}."
+            )
         self.num_proc = num_proc
         self.max_shard_size_str = ""
 
@@ -90,14 +98,6 @@ class Exporter:
         :return: the suffix of export_path.
         """
         suffix = export_path.split(".")[-1].lower()
-        support_dict = self._router()
-        if suffix not in support_dict:
-            raise NotImplementedError(
-                f"Suffix of export path ["
-                f"{export_path}] is not supported "
-                f"for now. Only support "
-                f"{list(support_dict.keys())}."
-            )
         return suffix
 
     def _export_impl(self, dataset, export_path, suffix, export_stats=True):

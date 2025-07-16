@@ -52,7 +52,9 @@ class ImageAspectRatioFilter(Filter):
                 continue
 
             # load images
-            samples, images = load_data_with_context(samples, context, loaded_image_keys, load_image)
+            samples, images = load_data_with_context(
+                samples, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key, sample_idx=i
+            )
 
             # compute aspect ratios for each image with W/H
             aspect_ratios = {key: (images[key].width / images[key].height) for key in images}

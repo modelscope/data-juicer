@@ -69,7 +69,9 @@ class ImageRemoveBackgroundMapper(Mapper):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
         processed = {}
 
         for image_key in loaded_image_keys:
@@ -77,9 +79,24 @@ class ImageRemoveBackgroundMapper(Mapper):
                 continue
 
             remove_image_key = transfer_filename(image_key, OP_NAME, **self._init_parameters)
-            name, _ = os.path.splitext(remove_image_key)
-            remove_image_key = f"{name}.png"
-            if not os.path.exists(remove_image_key) or remove_image_key not in images:
+            if remove_image_key != image_key:
+                name, _ = os.path.splitext(remove_image_key)
+                remove_image_key = f"{name}.png"
+                if not os.path.exists(remove_image_key) or remove_image_key not in images:
+                    rembg_image = rembg.remove(
+                        images[image_key],
+                        alpha_matting=self.alpha_matting,
+                        alpha_matting_foreground_threshold=self.alpha_matting_foreground_threshold,
+                        alpha_matting_background_threshold=self.alpha_matting_background_threshold,
+                        alpha_matting_erode_size=self.alpha_matting_erode_size,
+                        bgcolor=self.bgcolor,
+                    )
+                    rembg_image.save(remove_image_key, format="PNG")
+                    images[remove_image_key] = rembg_image
+                    if context:
+                        sample[Fields.context][remove_image_key] = rembg_image
+                processed[image_key] = remove_image_key
+            else:
                 rembg_image = rembg.remove(
                     images[image_key],
                     alpha_matting=self.alpha_matting,
@@ -88,15 +105,16 @@ class ImageRemoveBackgroundMapper(Mapper):
                     alpha_matting_erode_size=self.alpha_matting_erode_size,
                     bgcolor=self.bgcolor,
                 )
-                rembg_image.save(remove_image_key, format="PNG")
-                images[remove_image_key] = rembg_image
+                images[image_key] = rembg_image
+                processed[image_key] = image_key
                 if context:
-                    sample[Fields.context][remove_image_key] = rembg_image
-            processed[image_key] = remove_image_key
+                    sample[Fields.context][image_key] = rembg_image
 
         # when the file is modified, its source file needs to be updated.
         for i, value in enumerate(loaded_image_keys):
             if sample[Fields.source_file][i] != value and processed[value] != value:
                 sample[Fields.source_file][i] = processed[value]
+            if self.image_bytes_key in sample and i < len(sample[self.image_bytes_key]):
+                sample[self.image_bytes_key][i] = images[processed[value]].tobytes()
         sample[self.image_key] = [processed[key] for key in loaded_image_keys]
         return sample

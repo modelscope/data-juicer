@@ -16,8 +16,8 @@ from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import is_remote_path
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.process_utils import calculate_np
+from data_juicer.utils.webdataset_utils import _custom_default_decoder
 
 ray = LazyLoader("ray")
 
@@ -53,9 +53,9 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     path_keys = []
     columns = dataset.columns()
     for key in [
-        cfg.get("video_key", SpecialTokens.video),
-        cfg.get("image_key", SpecialTokens.image),
-        cfg.get("audio_key", SpecialTokens.audio),
+        cfg.get("video_key", "videos"),
+        cfg.get("image_key", "images"),
+        cfg.get("audio_key", "audios"),
     ]:
         if key in columns:
             path_keys.append(key)
@@ -239,6 +239,8 @@ class RayDataset(DJDataset):
     def read(cls, data_format: str, paths: Union[str, List[str]]) -> RayDataset:
         if data_format in {"json", "jsonl"}:
             return RayDataset.read_json(paths)
+        elif data_format == "webdataset":
+            return RayDataset.read_webdataset(paths)
         elif data_format in {
             "parquet",
             "images",
@@ -248,7 +250,6 @@ class RayDataset(DJDataset):
             "avro",
             "numpy",
             "tfrecords",
-            "webdataset",
             "binary_files",
             "lance",
         }:
@@ -265,6 +266,10 @@ class RayDataset(DJDataset):
             return read_json_stream(paths)
         except AttributeError:
             return ray.data.read_json(paths)
+
+    @classmethod
+    def read_webdataset(cls, paths: Union[str, List[str]]) -> RayDataset:
+        return ray.data.read_webdataset(paths, decoder=partial(_custom_default_decoder, format="PIL"))
 
     def to_list(self) -> list:
         return self.data.to_pandas().to_dict(orient="records")

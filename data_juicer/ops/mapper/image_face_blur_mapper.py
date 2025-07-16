@@ -85,7 +85,9 @@ class ImageFaceBlurMapper(Mapper):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         model = get_model(self.model_key)
 
@@ -97,6 +99,7 @@ class ImageFaceBlurMapper(Mapper):
 
         # blur face regions
         key_mapping = {}
+        new_images = {}
         for key, image in images.items():
             dets = face_detections[key]
             # only blur when detected face
@@ -107,18 +110,23 @@ class ImageFaceBlurMapper(Mapper):
                     blured_roi = image.crop(box).filter(self.blur)
                     blured_image.paste(blured_roi, box)
                 blured_image_key = transfer_filename(key, OP_NAME, **self._init_parameters)
-                blured_image.save(blured_image_key)
+                if blured_image_key != key:
+                    blured_image.save(blured_image_key)
                 key_mapping[key] = blured_image_key
+                new_images[blured_image_key] = blured_image
                 if context:
                     sample[Fields.context][blured_image_key] = blured_image
             else:
                 key_mapping[key] = key
+        images.update(new_images)
 
         # when the file is modified, its source file needs to be updated.
         for i, value in enumerate(loaded_image_keys):
             if sample[Fields.source_file][i] != value:
                 if key_mapping[value] != value:
                     sample[Fields.source_file][i] = value
+            if self.image_bytes_key in sample and i < len(sample[self.image_bytes_key]):
+                sample[self.image_bytes_key][i] = images[key_mapping[value]].tobytes()
 
         sample[self.image_key] = [key_mapping[key] for key in loaded_image_keys]
         return sample

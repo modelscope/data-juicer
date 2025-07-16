@@ -72,11 +72,13 @@ class DefaultExecutor(ExecutorBase):
         logger.info("Preparing exporter...")
         self.exporter = Exporter(
             self.cfg.export_path,
+            self.cfg.export_type,
             self.cfg.export_shard_size,
             self.cfg.export_in_parallel,
             self.cfg.np,
             keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
             keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
+            **self.cfg.export_extra_args,
         )
 
         # setup tracer

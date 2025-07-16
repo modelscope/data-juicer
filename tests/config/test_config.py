@@ -62,6 +62,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                     'whitespace_normalization_mapper': {
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
                         'query_key': 'query',
@@ -85,6 +86,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'min_score': 0.8,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
                         'query_key': 'query',
@@ -158,6 +160,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'min_score': 0.8,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
                         'query_key': 'query',
@@ -182,6 +185,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'min_score': 0.8,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
                         'query_key': 'query',
@@ -206,6 +210,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'min_score': 0.8,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
                         'query_key': 'query',
@@ -230,6 +235,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'min_score': 0.6,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
                         'query_key': 'query',
@@ -254,6 +260,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'min_score': 0.5,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
                         'query_key': 'query',
@@ -278,8 +285,8 @@ class ConfigTest(DataJuicerTestCaseBase):
         from data_juicer.ops.base_op import OPERATORS
 
         base_class_params = {
-            'text_key', 'image_key', 'audio_key', 'video_key', 'query_key', 'response_key', 'history_key',
-            'accelerator', 'turbo', 'batch_size', 'num_proc', 'cpu_required', 'mem_required', 'work_dir',
+            'text_key', 'image_key', 'image_bytes_key', 'audio_key', 'video_key', 'query_key', 'response_key',
+            'history_key', 'accelerator', 'turbo', 'batch_size', 'num_proc', 'cpu_required', 'mem_required', 'work_dir',
         }
 
         parser = ArgumentParser(default_env=True, default_config_files=None)

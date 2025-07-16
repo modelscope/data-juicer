@@ -71,7 +71,9 @@ class ImageDeduplicator(Deduplicator):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         # compute hash
         for key in images:
