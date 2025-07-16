@@ -30,6 +30,14 @@ Data-Juicer 是一个一站式系统，面向大模型的文本及多模态数�
 
 Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多的功能和数据菜谱。热烈欢迎您加入我们（issues/PRs/[Slack频道](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8275bc8g7ypp) /[钉钉群](https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11)/...），一起推进大模型的数据-模型协同开发和研究应用！
 
+[Demo Video] DataJuicer-Agent:数据处理，即刻启程！
+
+https://github.com/user-attachments/assets/58aea900-e51f-4ec2-b1c0-eead97967893
+
+[Demo Video] DataJuicer-Sandbox: 降本增效，优化数据-模型协同开发！
+
+https://github.com/user-attachments/assets/a45f0eee-0f0e-4ffe-9a42-d9a55370089d
+
 
 ----
 
@@ -75,7 +83,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 ## 为什么选择 Data-Juicer？
 
-<img src="https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png" align="center" width="600" />
+<img src="https://img.alicdn.com/imgextra/i4/O1CN015URK6i21KU3XdkUpK_!!6000000006966-2-tps-3994-3956.png" align="center" width="500" />
 
 - **系统化和可重用**：
 系统化地为用户提供 100 多个核心 [算子](docs/Operators.md) 和 50 多个可重用的数据菜谱和
