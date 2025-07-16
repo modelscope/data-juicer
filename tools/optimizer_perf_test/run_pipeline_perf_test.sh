@@ -147,15 +147,15 @@ print_info "Running command: $CMD"
 # Run the test
 if eval $CMD; then
     print_success "Pipeline performance test completed successfully!"
-    
+
     # Show results summary
     RESULTS_FILE="$OUTPUT_DIR/results.json"
     REPORT_FILE="$OUTPUT_DIR/performance_report.md"
-    
+
     if [[ -f "$RESULTS_FILE" ]]; then
         print_info "Results saved to: $RESULTS_FILE"
     fi
-    
+
     if [[ -f "$REPORT_FILE" ]]; then
         print_info "Report generated: $REPORT_FILE"
         echo ""
@@ -165,8 +165,8 @@ if eval $CMD; then
         echo "..."
         echo "=================="
     fi
-    
+
 else
     print_error "Pipeline performance test failed!"
     exit 1
-fi 
+fi
