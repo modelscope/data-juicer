@@ -56,10 +56,9 @@ class InContextInfluenceFilterTest(DataJuicerTestCaseBase):
             max_score=100.0,
             query_template="{text}",
             response_template="{answer}",
-            task_desc="",
             valid_as_demo=False,
         )
-        op.prepare_valid_feature(valid_dataset=valid_dataset)
+        op.prepare_valid_feature(valid_dataset)
         self._run_test(dataset, tgt_list, op)
 
 
