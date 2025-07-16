@@ -3,8 +3,8 @@
 
 # Data Processing for and with Foundation Models
 
-<img src="https://img.alicdn.com/imgextra/i4/O1CN015URK6i21KU3XdkUpK_!!6000000006966-2-tps-3994-3956.png" align="center" width="500" />
-
+ <img src="https://img.alicdn.com/imgextra/i1/O1CN01fUfM5A1vPclzPQ6VI_!!6000000006165-0-tps-1792-1024.jpg" width = "533" height = "300" alt="Data-Juicer"/>
+ 
 ![](https://img.shields.io/badge/language-Python-214870.svg)
 ![](https://img.shields.io/badge/license-Apache--2.0-000000.svg)
 [![pypi version](https://img.shields.io/pypi/v/py-data-juicer?logo=pypi&color=026cad)](https://pypi.org/project/py-data-juicer)
@@ -84,7 +84,7 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 
 ## Why Data-Juicer?
 
-<img src="https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png" align="center" width="600" />
+<img src="https://img.alicdn.com/imgextra/i4/O1CN015URK6i21KU3XdkUpK_!!6000000006966-2-tps-3994-3956.png" align="center" width="500" />
 
 - **Systematic & Reusable**:
   Empowering users with a systematic library of 100+ core [OPs](docs/Operators.md), and 50+ reusable config recipes and 
