@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, List, Optional
 
 from datasets import Dataset
 from loguru import logger
@@ -81,7 +81,7 @@ json
         min_score: float = 0.5,
         is_hf_model: bool = False,
         *,
-        valid_dataset: Optional[Dataset] = None,
+        valid_dataset: Optional[List[Dict]] = None,
         task_desc: Optional[str] = None,
         n_shot: Optional[int] = None,
         **kwargs,
@@ -101,7 +101,7 @@ json
         super().__init__(api_or_hf_model, min_score, is_hf_model, **kwargs)
         self.valid_feature = {}
         if valid_dataset is not None or task_desc is not None:
-            self.prepare_valid_feature(valid_dataset, task_desc, n_shot)
+            self.prepare_valid_feature(Dataset.from_list(valid_dataset), task_desc, n_shot)
         else:
             logger.warning(
                 f"valid_dataset and task_desc are both None when initializing {OP_NAME}. \

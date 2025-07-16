@@ -11,9 +11,6 @@ class TextEmbdSimilarityFilterTest(DataJuicerTestCaseBase):
     # before running this test, set below environment variables:
     # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
     # export OPENAI_API_KEY=your_dashscope_key
-    # You may also want to set a HuggingFace mirror:
-    # export HF_ENDPOINT=
-    # You can also set _hf_model="/your/local/path/to/model"
 
     _hf_model = "Qwen/Qwen3-Embedding-0.6B"
     # _hf_model = "/your/local/path/to/Qwen3-Embedding-0.6B"
@@ -32,8 +29,6 @@ class TextEmbdSimilarityFilterTest(DataJuicerTestCaseBase):
         self.assertEqual(res_list, tgt_list)
 
     def test_api(self):
-        # There is a lovely cat.: 0.8729813917122569
-        # It is challenging to train a large language model.: 0.18843449163619097
 
         ds_list = [
             {"text": "There is a lovely cat."},
@@ -53,15 +48,12 @@ class TextEmbdSimilarityFilterTest(DataJuicerTestCaseBase):
             is_hf_model=False,
             min_score=0.7,
             max_score=1.0,
-            valid_dataset=valid_dataset,
             ebd_dim=2048
         )
+        op.prepare_valid_feature(valid_dataset)
         self._run_filter(dataset, op, tgt_list)
 
     def test_rft_data(self):
-        # It is challenging to train a large language model.: 0.13767443833760368
-        # What is the capital of France?: -0.005663444401337793
-        # James writes a 3-page letter to 2 different friends twice a week. How many pages does he write a year?: 0.26087964645289496
         ds_list = [
             {
                 "text": "It is challenging to train a large language model.",
@@ -103,20 +95,13 @@ class TextEmbdSimilarityFilterTest(DataJuicerTestCaseBase):
             is_hf_model=False,
             min_score=0.2,
             max_score=1.0,
-            valid_dataset=valid_dataset,
             ebd_dim=2048,
             input_template="{text} {analysis} {answer}",
         )
+        op.prepare_valid_feature(valid_dataset)
         self._run_filter(dataset, op, tgt_list)
 
     def test_hf_model(self):
-        # Qwen2.5-0.5B
-        # There is a lovely cat.: 0.9947869215551567
-        # It is challenge to train a large language model.: 0.9575336775664838
-
-        # Qwen3-Embedding-0.6B
-        # There is a lovely cat.: 0.9788846977681771
-        # It is challenging to train a large language model.: 0.7693187777619259
 
         ds_list = [
             {"text": "There is a lovely cat."},
@@ -136,18 +121,11 @@ class TextEmbdSimilarityFilterTest(DataJuicerTestCaseBase):
             is_hf_model=True,
             min_score=0.97,
             max_score=1.0,
-            valid_dataset=valid_dataset,
         )
+        op.prepare_valid_feature(valid_dataset)
         self._run_filter(dataset, op, tgt_list)
 
     def test_hf_model_mean_pooling(self):
-        # Qwen2.5-0.5B
-        # There is a lovely cat.: 0.9844945317534439
-        # It is challenge to train a large language model.: 0.9529140280767296
-
-        # Qwen3-Embedding-0.6B
-        # There is a lovely cat.: 0.9929390865000141
-        # It is challenging to train a large language model.: 0.9114617110787353
 
         ds_list = [
             {"text": "There is a lovely cat."},
@@ -167,16 +145,12 @@ class TextEmbdSimilarityFilterTest(DataJuicerTestCaseBase):
             is_hf_model=True,
             min_score=0.97,
             max_score=1.0,
-            valid_dataset=valid_dataset,
             pooling="mean"
         )
+        op.prepare_valid_feature(valid_dataset)
         self._run_filter(dataset, op, tgt_list)
 
     def test_hf_model_weighted_mean_pooling(self):
-        # There is a lovely cat.: 0.9981918123065499
-        # It is challenge to train a large language model.: 0.9836871411997816
-        # There is a lovely cat.: 0.9977831055096531
-        # It is challenging to train a large language model.: 0.964693103548219
         ds_list = [
             {"text": "There is a lovely cat."},
             {"text": "It is challenging to train a large language model."}
@@ -195,9 +169,9 @@ class TextEmbdSimilarityFilterTest(DataJuicerTestCaseBase):
             is_hf_model=True,
             min_score=0.99,
             max_score=1.0,
-            valid_dataset=valid_dataset,
             pooling="weighted_mean"
         )
+        op.prepare_valid_feature(valid_dataset)
         self._run_filter(dataset, op, tgt_list)
 
 

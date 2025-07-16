@@ -1,10 +1,10 @@
-import logging
 import string
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import numpy as np
 from datasets import Dataset
 from jsonargparse.typing import ClosedUnitInterval
+from loguru import logger
 from tqdm import tqdm
 
 from data_juicer.ops.base_op import ATTRIBUTION_FILTERS, OPERATORS, Filter
@@ -14,9 +14,6 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 
 torch = LazyLoader("torch")
 transformers = LazyLoader("transformers")
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 OP_NAME = "text_embd_similarity_filter"
 
@@ -42,7 +39,7 @@ class TextEmbdSimilarityFilter(Filter):
         model_params: Optional[Dict] = None,
         min_score: ClosedUnitInterval = 0.1,
         max_score: ClosedUnitInterval = 1.0,
-        valid_dataset: Optional[Dataset] = None,
+        valid_dataset: Optional[List[Dict]] = None,
         ebd_dim: int = 4096,
         pooling: Optional[str] = None,
         input_template: Optional[str] = None,
@@ -106,7 +103,7 @@ class TextEmbdSimilarityFilter(Filter):
             prepare_valid_feature' method should be manually called before applying the filter."
             )
         else:
-            self.prepare_valid_feature(valid_dataset)
+            self.prepare_valid_feature(Dataset.from_list(valid_dataset))
 
     @property
     def valid_feature_ready(self):

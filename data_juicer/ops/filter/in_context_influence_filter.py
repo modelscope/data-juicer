@@ -1,7 +1,7 @@
-import logging
-from typing import Optional
+from typing import Dict, List, Optional
 
 from datasets import Dataset
+from loguru import logger
 
 from data_juicer.ops.base_op import ATTRIBUTION_FILTERS, OPERATORS
 from data_juicer.ops.filter.llm_perplexity_filter import LLMPerplexityFilter
@@ -10,9 +10,6 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 torch = LazyLoader("torch")
 transformers = LazyLoader("transformers")
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 OP_NAME = "in_context_influence_filter"
 
@@ -29,7 +26,7 @@ class InContextInfluenceFilter(LLMPerplexityFilter):
 
     def __init__(
         self,
-        valid_dataset: Optional[Dataset] = None,
+        valid_dataset: Optional[List[Dict]] = None,
         task_desc: str = None,
         valid_as_demo: bool = False,
         n_shot: Optional[int] = None,
@@ -40,6 +37,7 @@ class InContextInfluenceFilter(LLMPerplexityFilter):
         Initialization method.
 
         :param valid_dataset: The dataset to use for validation.
+            If None, 'self.prepare_valid_feature' should be manually called before applying the filter.
         :param task_desc: The description of the validation task.
         :param valid_as_demo: If true, score =  L(A|Q) / L(A|task_desc, Q_v, A_v, Q);
                               If false, score = L(A_v|Q) L(A_v|task_desc, Q, A, Q_v).
@@ -49,8 +47,8 @@ class InContextInfluenceFilter(LLMPerplexityFilter):
         self.valid_as_demo = valid_as_demo
         self.task_desc = task_desc
         self.valid_feature = {}
-        if valid_dataset is not None or (task_desc is not None and self.valid_as_demo):
-            self.prepare_valid_feature(valid_dataset, task_desc, n_shot)
+        if valid_dataset is not None:
+            self.prepare_valid_feature(Dataset.from_list(valid_dataset), task_desc, n_shot)
         else:
             logger.warning(
                 f"valid_dataset and task_desc are both None when initializing {OP_NAME}. \
@@ -61,14 +59,14 @@ class InContextInfluenceFilter(LLMPerplexityFilter):
     def valid_feature_ready(self):
         return "valid_samples" in self.valid_feature and "valid_losses" in self.valid_feature
 
-    def prepare_valid_feature(self, dataset=None, task_desc=None, n_shot=None):
+    def prepare_valid_feature(self, dataset=None, task_desc=None, n_shot=None, *args, **kwargs):
         n_shot = n_shot or len(dataset)
         self.valid_feature["valid_samples"] = []
         self.valid_feature["valid_losses"] = []
         for i, sample in enumerate(dataset):
             if i >= n_shot:
                 break
-            sample_w_msgs = self.sample_with_messages(sample)
+            sample_w_msgs = self.sample_with_messages(sample, system_prompt=task_desc)
             self.valid_feature["valid_samples"].append(sample_w_msgs)
             loss = self._loss(sample_w_msgs)
             self.valid_feature["valid_losses"].append(loss)

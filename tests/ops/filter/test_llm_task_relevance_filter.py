@@ -32,12 +32,6 @@ class LLMTaskRelevanceFilterTest(DataJuicerTestCaseBase):
         self.assertEqual(res_list, tgt_list)
 
     def test_default_case(self):
-        # text: It is challenging to train a large language model.
-        # llm_task_relevance: 0.2
-        # text: Q: What is the capital of France? …
-        # llm_task_relevance: 0.24
-        # text: Q: James writes a 3-page letter to …
-        # llm_task_relevance: 1.0
         ds_list = [
             {"text": "It is challenging to train a large language model."},
             {"text": "Q: What is the capital of France? A: The question asks for a factual piece of information about the capital city of France. The answer is straightforward and does not require any specialized knowledge or complex reasoning. The capital of France is Paris."}, # noqa: E501
@@ -55,18 +49,11 @@ class LLMTaskRelevanceFilterTest(DataJuicerTestCaseBase):
         task_desc = "To solve high school-level math problems."
         op = LLMTaskRelevanceFilter(
             api_or_hf_model=self.api_or_hf_model,
-            valid_dataset=valid_dataset,
-            task_desc=task_desc
         )
+        op.prepare_valid_feature(valid_dataset, task_desc)
         self._run_test(dataset, op, tgt_list)
 
     def test_rft_data(self):
-        # text: It is challenging to train a large language model.
-        # llm_task_relevance: 0.2
-        # text: What is the capital of France?
-        # llm_task_relevance: 0.2
-        # text: James writes a 3-page letter to 2 different friends twice a week. How many pages does he write a year?
-        # llm_task_relevance: 0.8
         ds_list = [
             {
                 "text": "It is challenging to train a large language model.",
@@ -109,9 +96,8 @@ class LLMTaskRelevanceFilterTest(DataJuicerTestCaseBase):
             min_score=0.5,
             input_keys=['text', 'analysis', 'answer'],
             field_names=['Query', 'Analysis', 'Answer'],
-            valid_dataset=valid_dataset,
-            task_desc=task_desc,
         )
+        op.prepare_valid_feature(valid_dataset, task_desc)
         self._run_test(dataset, op, tgt_list)
 
 

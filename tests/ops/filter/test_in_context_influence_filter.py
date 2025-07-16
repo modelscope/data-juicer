@@ -3,7 +3,7 @@ import unittest
 from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.filter.in_context_influence_filter import InContextInfluenceFilter
-from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
@@ -50,26 +50,16 @@ class InContextInfluenceFilterTest(DataJuicerTestCaseBase):
         ]
         dataset = Dataset.from_list(ds_list)
         valid_dataset = Dataset.from_list(vs_list)
-        # op = InContextInfluenceFilter(
-        #     hf_model=self._hf_model,
-        #     min_score=1.0,
-        #     max_score=100.0,
-        #     query_template="Question: {text}",
-        #     response_template="Answer: {answer}",
-        #     valid_dataset=valid_dataset,
-        #     task_desc="",
-        #     valid_as_demo=False,
-        # )
         op = InContextInfluenceFilter(
             hf_model=self._hf_model,
             min_score=1.0,
             max_score=100.0,
             query_template="{text}",
             response_template="{answer}",
-            valid_dataset=valid_dataset,
             task_desc="",
             valid_as_demo=False,
         )
+        op.prepare_valid_feature(valid_dataset=valid_dataset)
         self._run_test(dataset, tgt_list, op)
 
 
