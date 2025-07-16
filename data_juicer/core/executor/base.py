@@ -15,4 +15,4 @@ class ExecutorBase(ABC):
 
     @abstractmethod
     def run(self, load_data_np: Optional[PositiveInt] = None, skip_return=False):
-        raise NotImplementedError
+        """Abstract method for ExecutorBase.run"""

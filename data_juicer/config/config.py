@@ -485,6 +485,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
             essential_cfg = parser.parse_args(args=essential_args)
 
             # Now add remaining arguments based on essential config
+            used_ops = None
             if essential_cfg.config:
                 # Load config file to determine which operators are used
                 with open(os.path.abspath(essential_cfg.config[0])) as f:
@@ -581,19 +582,19 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         setup_logger(
             save_dir=log_dir,
             filename=logfile_name,
-            level="DEBUG" if cfg.debug else "INFO",
-            redirect=cfg.executor_type == "default",
+            level="DEBUG" if cfg.get("debug", False) else "INFO",
+            redirect=cfg.get("executor_type", "default") == "default",
         )
 
     # check and get dataset dir
     if cfg.get("dataset_path", None) and os.path.exists(cfg.dataset_path):
         logger.info("dataset_path config is set and a valid local path")
         cfg.dataset_path = os.path.abspath(cfg.dataset_path)
-    elif cfg.dataset_path == "" and cfg.get("dataset", None):
+    elif cfg.get("dataset_path", "") == "" and cfg.get("dataset", None):
         logger.info("dataset_path config is empty; dataset is present")
     else:
         logger.warning(
-            f"dataset_path [{cfg.dataset_path}] is not a valid "
+            f"dataset_path [{cfg.get('dataset_path', '')}] is not a valid "
             f"local path, AND dataset is not present. "
             f"Please check and retry, otherwise we "
             f"will treat dataset_path as a remote dataset or a "
@@ -602,7 +603,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
 
     # check number of processes np
     sys_cpu_count = os.cpu_count()
-    if not cfg.np:
+    if cfg.get("np", None) is None:
         cfg.np = sys_cpu_count
         logger.warning(
             f"Number of processes `np` is not set, " f"set it to cpu count [{sys_cpu_count}] as default value."
@@ -621,7 +622,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
     # whether or not to use cache management
     # disabling the cache or using checkpoint explicitly will turn off the
     # cache management.
-    if not cfg.use_cache or cfg.use_checkpoint:
+    if not cfg.get("use_cache", True) or cfg.get("use_checkpoint", False):
         logger.warning("Cache management of datasets is disabled.")
         from datasets import disable_caching
 
@@ -642,7 +643,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         tempfile.tempdir = cfg.temp_dir
 
     # The checkpoint mode is not compatible with op fusion for now.
-    if cfg.op_fusion:
+    if cfg.get("op_fusion", False):
         cfg.use_checkpoint = False
         cfg.fusion_strategy = cfg.fusion_strategy.lower()
         if cfg.fusion_strategy not in FUSION_STRATEGIES:
@@ -653,7 +654,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
     # update huggingface datasets cache directory only when ds_cache_dir is set
     from datasets import config
 
-    if cfg.ds_cache_dir:
+    if cfg.get("ds_cache_dir", None) is not None:
         logger.warning(
             f"Set dataset cache directory to {cfg.ds_cache_dir} "
             f"using the ds_cache_dir argument, which is "
@@ -665,29 +666,32 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         cfg.ds_cache_dir = str(config.HF_DATASETS_CACHE)
 
     # update special tokens
-    SpecialTokens.image = cfg.image_special_token
-    SpecialTokens.eoc = cfg.eoc_special_token
+    SpecialTokens.image = cfg.get("image_special_token", SpecialTokens.image)
+    SpecialTokens.audio = cfg.get("audio_special_token", SpecialTokens.audio)
+    SpecialTokens.video = cfg.get("video_special_token", SpecialTokens.video)
+    SpecialTokens.eoc = cfg.get("eoc_special_token", SpecialTokens.eoc)
 
     # add all filters that produce stats
-    if cfg.auto:
+    if cfg.get("auto", False):
         cfg.process = load_ops_with_stats_meta()
 
     # Apply text_key modification during initializing configs
     # users can freely specify text_key for different ops using `text_key`
     # otherwise, set arg text_key of each op to text_keys
+    cfg.text_keys = cfg.get("text_keys", "text")
     if isinstance(cfg.text_keys, list):
         text_key = cfg.text_keys[0]
     else:
         text_key = cfg.text_keys
     op_attrs = {
         "text_key": text_key,
-        "image_key": cfg.image_key,
-        "audio_key": cfg.audio_key,
-        "video_key": cfg.video_key,
-        "image_bytes_key": cfg.image_bytes_key,
+        "image_key": cfg.get("image_key", "images"),
+        "audio_key": cfg.get("audio_key", "audios"),
+        "video_key": cfg.get("video_key", "videos"),
+        "image_bytes_key": cfg.get("image_bytes_key", "image_bytes"),
         "num_proc": cfg.np,
-        "turbo": cfg.turbo,
-        "skip_op_error": cfg.skip_op_error,
+        "turbo": cfg.get("turbo", False),
+        "skip_op_error": cfg.get("skip_op_error", True),
         "work_dir": cfg.work_dir,
     }
     cfg.process = update_op_attr(cfg.process, op_attrs)
@@ -800,27 +804,36 @@ def update_op_process(cfg, parser, used_ops=None):
         cfg.process = []
 
     # Create direct mapping of operator names to their configs
-    op_configs = {list(op.keys())[0]: op[list(op.keys())[0]] for op in cfg.process}
+    op_configs = {}
+    for op in cfg.process:
+        op_configs.setdefault(list(op.keys())[0], []).append(op[list(op.keys())[0]])
 
     # Process each used operator
     temp_cfg = cfg
+    op_name_count = {}
     for op_name in used_ops:
         op_config = op_configs.get(op_name)
-
+        op_config_list = []
         if op_name not in option_in_commands:
             # Update op params if set
             if op_config:
-                temp_cfg = parser.merge_config(dict_to_namespace({op_name: op_config}), temp_cfg)
+                for op_c in op_config:
+                    temp_cfg = parser.merge_config(dict_to_namespace({op_name: op_c}), temp_cfg)
+                    oc = namespace_to_dict(temp_cfg)[op_name]
+                    op_config_list.append(oc)
+                temp_cfg = parser.merge_config(dict_to_namespace({op_name: op_config_list}), temp_cfg)
         else:
             # Remove args that will be overridden by command line
             if op_config:
-                for full_option in full_option_in_commands:
-                    key = full_option.split(".")[1]
-                    if key in op_config:
-                        op_config.pop(key)
-
-                if op_config:
-                    temp_cfg = parser.merge_config(dict_to_namespace({op_name: op_config}), temp_cfg)
+                for op_c in op_config:
+                    for full_option in full_option_in_commands:
+                        key = full_option.split(".")[1]
+                        if key in op_c:
+                            op_c.pop(key)
+                    temp_cfg = parser.merge_config(dict_to_namespace({op_name: op_c}), temp_cfg)
+                    oc = namespace_to_dict(temp_cfg)[op_name]
+                    op_config_list.append(oc)
+                temp_cfg = parser.merge_config(dict_to_namespace({op_name: op_config_list}), temp_cfg)
 
         # Update op params
         internal_op_para = temp_cfg.get(op_name)
@@ -828,11 +841,19 @@ def update_op_process(cfg, parser, used_ops=None):
         if op_name in op_configs:
             # Update existing operator
             for i, op_in_process in enumerate(cfg.process):
-                if list(op_in_process.keys())[0] == op_name:
-                    cfg.process[i] = {
-                        op_name: None if internal_op_para is None else namespace_to_dict(internal_op_para)
-                    }
-                    break
+                if isinstance(internal_op_para, list):
+                    if list(op_in_process.keys())[0] == op_name:
+                        if op_name not in op_name_count:
+                            op_name_count[op_name] = 0
+                        else:
+                            op_name_count[op_name] += 1
+                        cfg.process[i] = {
+                            op_name: (
+                                None
+                                if internal_op_para is None
+                                else namespace_to_dict(internal_op_para[op_name_count[op_name]])
+                            )
+                        }
         else:
             # Add new operator
             cfg.process.append({op_name: None if internal_op_para is None else namespace_to_dict(internal_op_para)})
@@ -877,7 +898,7 @@ def namespace_to_arg_list(namespace, prefix="", includes=None, excludes=None):
 
 
 def config_backup(cfg: Namespace):
-    if not cfg.config:
+    if not cfg.get("config", None):
         return
     cfg_path = os.path.abspath(cfg.config[0])
     work_dir = cfg.work_dir
@@ -1038,7 +1059,7 @@ def prepare_side_configs(ori_config: Union[str, Namespace, Dict]):
     return config
 
 
-def get_init_configs(cfg: Union[Namespace, Dict]):
+def get_init_configs(cfg: Union[Namespace, Dict], load_configs_only: bool = True):
     """
     set init configs of data-juicer for cfg
     """
@@ -1049,7 +1070,7 @@ def get_init_configs(cfg: Union[Namespace, Dict]):
     # create a temp config file
     with open(temp_file, "w") as f:
         json.dump(prepare_cfgs_for_export(cfg), f)
-    inited_dj_cfg = init_configs(["--config", temp_file], load_configs_only=True)
+    inited_dj_cfg = init_configs(["--config", temp_file], load_configs_only=load_configs_only)
     return inited_dj_cfg
 
 

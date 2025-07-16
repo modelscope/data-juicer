@@ -6,7 +6,8 @@ from data_juicer.core.data.data_validator import (
     DataValidationError, 
     RequiredFieldsValidator,
     SwiftMessagesValidator,
-    DataJuicerFormatValidator
+    DataJuicerFormatValidator,
+    DataValidatorRegistry
 )
 
 
@@ -40,15 +41,15 @@ class RequiredFieldsValidatorTest(DataJuicerTestCaseBase):
 
         # Create dataset
         self.dataset = NestedDataset(datasets.Dataset.from_list(self.data))
-    
 
     def test_basic_validation(self):
         """Test basic field validation"""
         config = {
+            'type': 'required_fields',
             'required_fields': ['text', 'metadata'],
             'allow_missing': .25
         }
-        validator = RequiredFieldsValidator(config)
+        validator = DataValidatorRegistry.get_validator(config['type'])(config)
         
         # Should pass
         validator.validate(self.dataset)
@@ -365,15 +366,15 @@ class TestDataJuicerFormatValidator(DataJuicerTestCaseBase):
             'query': 'How do I code?',
             'response': 'Here is how...',
             'history': [
-                [123, 'A1']  # query should be string
+                [123, 456]  # query should be string
             ]
         }
 
-        with self.assertRaises(Exception) as exc:
+        with self.assertRaises(DataValidationError) as exc:
             # from_list will raise an exception if the content has inconsistent types
             dataset = NestedDataset(datasets.Dataset.from_list([data]))
-            # self.validator.validate(dataset)
-        self.assertIn("could not convert", str(exc.exception).lower())
+            self.validator.validate(dataset)
+        self.assertIn("must be string", str(exc.exception).lower())
 
     def test_invalid_system_type(self):
         """Test conversation with invalid system type"""
@@ -387,6 +388,38 @@ class TestDataJuicerFormatValidator(DataJuicerTestCaseBase):
         with self.assertRaises(DataValidationError) as exc:
             self.validator.validate(dataset)
         self.assertIn("'system' must be string", str(exc.exception))
+
+    def test_invalid_history_array(self):
+        """Test valid conversation with system message"""
+        data = {
+            'system': 'Be helpful',
+            'instruction': 'Help me with this',
+            'query': 'How do I code?',
+            'response': 'Here is how...',
+            'history': 'history_str',
+        }
+        with self.assertRaises(DataValidationError) as exc:
+            # from_list will raise an exception if the content has inconsistent types
+            dataset = NestedDataset(datasets.Dataset.from_list([data]))
+            self.validator.validate(dataset)
+        self.assertIn("must be an array", str(exc.exception).lower())
+
+    def test_missing_rate_exceeded(self):
+        data = {
+            'instruction': ['Help me with this', 'other inst', None, None, None],
+            'query': ['How do I code?', None, None, None, None],
+            'response': ['Here is how...', 'Here is how...', 'Here is how...', 'Here is how...', 'Here is how...'],
+        }
+        config = {
+            'required_fields': ['query', 'response'],
+            'allow_missing': .25
+        }
+        validator = RequiredFieldsValidator(config)
+        with self.assertRaises(DataValidationError) as exc:
+            # from_list will raise an exception if the content has inconsistent types
+            dataset = NestedDataset(datasets.Dataset.from_dict(data))
+            validator.validate(dataset)
+        self.assertIn("missing values, exceeding allowed", str(exc.exception).lower())
 
 
 if __name__ == '__main__':

@@ -14,6 +14,7 @@ from data_juicer.utils.model_utils import free_models
 transformers = LazyLoader("transformers")
 
 CLEAR_MODEL = False
+FROM_FORK = False
 
 
 def TEST_TAG(*tags):
@@ -52,6 +53,15 @@ def set_clear_model_flag(flag):
         print("CLEAR DOWNLOADED MODELS AFTER UNITTESTS.")
     else:
         print("KEEP DOWNLOADED MODELS AFTER UNITTESTS.")
+
+
+def set_from_fork_flag(flag):
+    global FROM_FORK
+    FROM_FORK = flag
+    if FROM_FORK:
+        print("This unit test is activated from a forked repo.")
+    else:
+        print("This unit test is activated from a dev branch.")
 
 
 class DataJuicerTestCaseBase(unittest.TestCase):

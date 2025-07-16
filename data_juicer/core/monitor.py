@@ -87,16 +87,6 @@ class Monitor:
         "GPU util.",
     }
 
-    def __init__(self):
-        pass
-
-    def monitor_all_resources(self):
-        """
-        Detect the resource utilization of all distributed nodes.
-        """
-        # TODO
-        raise NotImplementedError
-
     @staticmethod
     def monitor_current_resources():
         """

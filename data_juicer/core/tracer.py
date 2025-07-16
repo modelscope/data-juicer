@@ -101,14 +101,7 @@ class Tracer:
             if i + 1 >= self.show_num:
                 break
 
-        if len(aug_dict) == 0:
-            logger.warning(
-                f"Datasets before and after op [{op_name}] are "
-                f"empty. Thus no comparison results would be "
-                f"generated."
-            )
-            return
-        elif len(aug_dict) < self.show_num:
+        if len(aug_dict) < self.show_num:
             logger.warning(f"There are only {len(aug_dict)} samples -- less " f"than expected {self.show_num} samples.")
 
         # export the tracer results.
@@ -158,14 +151,7 @@ class Tracer:
                 # have found all filtered samples, just stop.
                 break
             i += 1
-        if len(filter_dict) == 0:
-            logger.warning(
-                f"Datasets before and after op [{op_name}] are all "
-                f"the same. Thus no comparison results would be "
-                f"generated."
-            )
-            return
-        elif len(filter_dict) < self.show_num:
+        if len(filter_dict) < self.show_num:
             logger.warning(
                 f"There are {len(filter_dict)} filtered samples "
                 f"before and after op [{op_name}] -- less than "
@@ -177,7 +163,7 @@ class Tracer:
         filter_df = pd.DataFrame(filter_dict)
         filter_df.to_json(os.path.join(self.work_dir, res_name), orient="records", lines=True, force_ascii=False)
 
-    def trace_deduplicator(self, op_name: str, dup_pairs: list):
+    def trace_deduplicator(self, op_name: str, dup_pairs: dict):
         """
         Compare datasets before and after a Deduplicator.
 

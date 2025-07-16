@@ -1,6 +1,7 @@
 import math
 import os
 
+import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import pandas as pd
 from tqdm import tqdm
@@ -9,6 +10,12 @@ from wordcloud import WordCloud
 from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 
 from .overall_analysis import OverallAnalysis
+
+FONT = os.environ.get("ANALYZER_FONT", "Heiti TC")
+FONT_PATH = fm.findfont(FONT)
+
+plt.rcParams["font.sans-serif"] = [FONT]
+plt.rcParams["axes.unicode_minus"] = False
 
 
 def get_row_col(total_num, factor=2):
@@ -302,7 +309,7 @@ class ColumnWiseAnalysis:
             else:
                 word_nums[w] = 1
 
-        wc = WordCloud(width=400, height=320)
+        wc = WordCloud(font_path=FONT_PATH, width=400, height=320)
         wc.generate_from_frequencies(word_nums)
 
         if ax is None:
