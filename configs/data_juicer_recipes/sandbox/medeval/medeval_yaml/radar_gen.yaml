@@ -1,0 +1,159 @@
+type: 'med_evaluator'
+med_task: 'radar'
+radar_type: manual
+output_path: "medeval/res/radar_gen"
+title: "Radar Comparison"
+
+# Customized category color
+category_colors:
+  Domain Capability: "#1f77b4"
+  Risk & Security: "#ff7f0e"
+  Instruction Following: "#2ca02c"
+  Infer Performance: "#d62728"
+
+# Customized model color
+model_colors:
+  raw: "#1f77b4"
+  qw25-1.5b: "#ff7f0e"
+
+# Data items
+items:
+  - category: Domain Capability
+    benchmark: MedAgents
+    metric: Avg Score (Acc)
+    min: 0.0
+    max: 1.0
+    direction: Maximize
+    results:
+      raw: 0.5034
+      qw25-1.5b: 0.4971
+
+  - category: Domain Capability
+    benchmark: MedJourney
+    metric: Choice Question (bleu-1)
+    min: 0.0
+    max: 1.0
+    direction: Maximize
+    results:
+      raw: 0.6368
+      qw25-1.5b: 0.6392
+
+  - category: Domain Capability
+    benchmark: MedJourney
+    metric: NLG Task (Rouge-L-F1)
+    min: 0.0
+    max: 1.0
+    direction: Maximize
+    results:
+      raw: 0.1352
+      qw25-1.5b: 0.1333
+
+  - category: Risk & Security
+    benchmark: MedSafety
+    metric: Avg Score (1-5)
+    min: 1.0
+    max: 5.0
+    direction: Maximize
+    results:
+      raw: 2.33
+      qw25-1.5b: 2.38
+
+  - category: Risk & Security
+    benchmark: MedHallu
+    metric: w/o knowledge (F1)
+    min: 0.0
+    max: 1.0
+    direction: Maximize
+    results:
+      raw: 0.4491
+      qw25-1.5b: 0.4027
+
+  - category: Risk & Security
+    benchmark: MedHallu
+    metric: w/ knowledge (F1)
+    min: 0.0
+    max: 1.0
+    direction: Maximize
+    results:
+      raw: 0.3668
+      qw25-1.5b: 0.4088
+
+  - category: Risk & Security
+    benchmark: Flames
+    metric: Overall Harmless (Rate)
+    min: 0.0
+    max: 1.0
+    direction: Maximize
+    results:
+      raw: 0.3268
+      qw25-1.5b: 0.3509
+
+  - category: Instruction Following
+    benchmark: IFEval
+    metric: Prompt-Level (Acc)
+    min: 0.0
+    max: 1.0
+    direction: Maximize
+    results:
+      raw: 0.7246
+      qw25-1.5b: 0.7117
+
+  - category: Instruction Following
+    benchmark: IFEval
+    metric: Instruction-Level (Acc)
+    min: 0.0
+    max: 1.0
+    direction: Maximize
+    results:
+      raw: 0.8016
+      qw25-1.5b: 0.792
+
+  - category: Instruction Following
+    benchmark: InfoBench
+    metric: Overall Decomposition (Acc)
+    min: 0.0
+    max: 1.0
+    direction: Maximize
+    results:
+      raw: 0.8156
+      qw25-1.5b: 0.8267
+
+  - category: Instruction Following
+    benchmark: StructFlow
+    metric: WCSR (Rate)
+    min: 0.0
+    max: 1.0
+    direction: Maximize
+    results:
+      raw: 0.9484
+      qw25-1.5b: 0.9438
+
+  - category: Infer Performance
+    benchmark: Perf
+    metric: Avg Output (tok/s)
+    min: 0.0
+    max: 2500.0
+    direction: Maximize
+    results:
+      raw: 1962.48
+      qw25-1.5b: 1995.68
+
+  - category: Infer Performance
+    benchmark: Perf
+    metric: Highest RPS (s)
+    min: 0.0
+    max: 5.0
+    direction: Maximize
+    results:
+      raw: 3.86
+      qw25-1.5b: 4.37
+
+  - category: Infer Performance
+    benchmark: Perf
+    metric: Lowest Latency (s)
+    min: 0.0
+    max: 10.0
+    direction: Minimize
+    results:
+      raw: 7.316
+      qw25-1.5b: 7.808
