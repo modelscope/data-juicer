@@ -40,7 +40,7 @@ import shutil
 import string
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from loguru import logger
@@ -130,131 +130,6 @@ class PerformanceBenchmark:
 
     def __init__(self):
         self.results = {}
-
-    def create_realistic_test_data(self, num_samples: int = 1000) -> Dict[str, Any]:
-        """Create realistic test data with diverse text characteristics."""
-        logger.info(f"Creating realistic test data with {num_samples} samples...")
-
-        import random
-
-        from faker import Faker
-
-        # Initialize Faker with multiple locales for diversity
-        fake = Faker(["en_US", "en_GB", "en_CA"])
-
-        # Add some non-English text for language filtering tests
-        non_english_samples = [
-            "你好，请问你是谁？",  # Chinese
-            "Sur la plateforme MT4, vous pouvez trader des devises.",  # French
-            "欢迎来到阿里巴巴！",  # Chinese
-            "El sistema de procesamiento de datos es muy eficiente.",  # Spanish
-            "Das maschinelle Lernen ist ein Teilgebiet der künstlichen Intelligenz.",  # German
-            "La conferenza si terrà il prossimo mese.",  # Italian
-            "データ処理システムは非常に効率的です。",  # Japanese
-            "시스템 성능을 향상시키기 위한 최적화가 필요합니다。",  # Korean
-            "Система обработки данных очень эффективна.",  # Russian
-            "نظام معالجة البيانات فعال للغاية.",  # Arabic
-            "ระบบประมวลผลข้อมูลมีประสิทธิภาพมาก",  # Thai
-            "Sistem pemrosesan data sangat efisien.",  # Indonesian
-            "Sistem pemprosesan data sangat cekap.",  # Malay
-            "Sistem pemprosesan data sangat cekap.",  # Malay (duplicate for testing)
-            "Sistem pemprosesan data sangat cekap.",  # Malay (duplicate for testing)
-        ]
-
-        texts = []
-        for i in range(num_samples):
-            # Create diverse text samples with different characteristics
-            if i < len(non_english_samples):
-                # Use predefined non-English samples for language filtering tests
-                text = non_english_samples[i]
-            elif i % 8 == 0:
-                # Short realistic sentences
-                text = fake.sentence()
-            elif i % 8 == 1:
-                # Medium paragraphs
-                text = fake.paragraph(nb_sentences=3)
-            elif i % 8 == 2:
-                # Longer texts with multiple paragraphs
-                text = fake.text(max_nb_chars=500)
-            elif i % 8 == 3:
-                # Technical/computer-related text
-                text = fake.text(
-                    max_nb_chars=300,
-                    ext_word_list=[
-                        "algorithm",
-                        "database",
-                        "network",
-                        "software",
-                        "hardware",
-                        "programming",
-                        "development",
-                        "system",
-                        "data",
-                        "processing",
-                    ],
-                )
-            elif i % 8 == 4:
-                # Business/formal text
-                text = fake.text(
-                    max_nb_chars=400,
-                    ext_word_list=[
-                        "business",
-                        "management",
-                        "strategy",
-                        "organization",
-                        "leadership",
-                        "performance",
-                        "efficiency",
-                        "productivity",
-                        "innovation",
-                    ],
-                )
-            elif i % 8 == 5:
-                # Academic/research text
-                text = fake.text(
-                    max_nb_chars=350,
-                    ext_word_list=[
-                        "research",
-                        "analysis",
-                        "study",
-                        "investigation",
-                        "evaluation",
-                        "methodology",
-                        "findings",
-                        "conclusion",
-                        "hypothesis",
-                    ],
-                )
-            elif i % 8 == 6:
-                # Casual/conversational text
-                text = fake.text(
-                    max_nb_chars=250,
-                    ext_word_list=[
-                        "conversation",
-                        "discussion",
-                        "opinion",
-                        "experience",
-                        "thought",
-                        "feeling",
-                        "idea",
-                        "perspective",
-                        "viewpoint",
-                    ],
-                )
-            else:
-                # Random realistic text
-                text = fake.text(max_nb_chars=random.randint(100, 400))
-
-            texts.append(text)
-
-        # Create dataset in the expected format
-        test_data = {"text": texts, Fields.stats: [{} for _ in range(num_samples)]}
-
-        logger.info(f"✅ Created {len(texts)} realistic test samples")
-        logger.info(f"   - {len(non_english_samples)} non-English samples for language filtering")
-        logger.info(f"   - {len(texts) - len(non_english_samples)} English samples")
-
-        return test_data
 
     def create_test_filters(self) -> List[Filter]:
         """Create a comprehensive set of test filters covering different categories."""
@@ -588,39 +463,19 @@ class PerformanceBenchmark:
             current_sample_count = get_dataset_length(samples_with_stats)
             logger.debug(f"🔍 DEBUG INDIVIDUAL: Before filter {i+1} ({filter_name}): {current_sample_count} samples")
 
-            # Compute stats for this filter
-            stats_start = time.time()
-            if hasattr(filter_op, "compute_stats_batched"):
-                samples_with_stats = filter_op.compute_stats_batched(samples_with_stats)
-            stats_time = time.time() - stats_start
-            total_stats_time += stats_time
-
-            # Immediately filter with this filter
+            # Run the filter with reduction
             filter_start = time.time()
-            if hasattr(filter_op, "process_batched"):
-                result = list(filter_op.process_batched(samples_with_stats))
-
-                # DEBUG: Log filter result details
-                if result:
-                    result_type = type(result[0]).__name__
-                    result_count = len(result)
-                    if isinstance(result[0], bool):
-                        passed_count = sum(result)
-                        logger.info(
-                            f"🔍 DEBUG INDIVIDUAL: Filter {i+1} ({filter_name}) returned {result_count} booleans: {passed_count} passed, {result_count - passed_count} failed"
-                        )
-                        logger.debug(f"🔍 DEBUG INDIVIDUAL: Filter {i+1} mask (first 10): {result[:10]}")
-                    else:
-                        logger.info(
-                            f"🔍 DEBUG INDIVIDUAL: Filter {i+1} ({filter_name}) returned {result_count} {result_type} items (likely mapper)"
-                        )
-                else:
-                    logger.debug(f"🔍 DEBUG INDIVIDUAL: Filter {i+1} ({filter_name}) returned empty result")
-
+            samples_with_stats = filter_op.run(samples_with_stats, reduce=True)
             filter_time = time.time() - filter_start
             total_filter_time += filter_time
 
-            logger.debug(f"      Filter {i+1} - Stats: {stats_time:.3f}s, Filter: {filter_time:.3f}s")
+            # Log after filtering (without showing text content)
+            final_sample_count = get_dataset_length(samples_with_stats)
+            logger.info(f"    After filter {i+1}: {final_sample_count} samples remain")
+            logger.debug(f"      Filter {i+1} - Filter: {filter_time:.3f}s")
+            if final_sample_count == 0:
+                logger.info(f"    All samples filtered out at filter {i+1}. Stopping.")
+                break
 
         processing_time = time.time() - processing_start
         logger.info(f"  Step 2 - Complete processing: {processing_time:.3f}s")
@@ -631,7 +486,9 @@ class PerformanceBenchmark:
         total_time = time.time() - total_start_time
         end_memory = self.measure_memory_usage()
         memory_usage = end_memory - start_memory
-        throughput = get_dataset_length(test_data) / total_time
+        # Use final sample count for throughput since we're actually filtering
+        final_sample_count = get_dataset_length(samples_with_stats)
+        throughput = final_sample_count / total_time
 
         logger.info("  📊 INDIVIDUAL FILTERS BREAKDOWN:")
         logger.info(f"    Initialization: {init_time:.3f}s ({init_time/total_time*100:.1f}%)")
@@ -688,13 +545,13 @@ class PerformanceBenchmark:
 
         # Step 7: Process with optimized operations
         logger.info("  Processing with optimized pipeline...")
-        self._process_with_optimized_ops(optimized_ops, test_data)
+        final_sample_count = self._process_with_optimized_ops(optimized_ops, test_data)
 
         # Calculate totals
         total_time = time.time() - total_start_time
         end_memory = self.measure_memory_usage()
         memory_usage = end_memory - start_memory
-        throughput = get_dataset_length(test_data) / total_time
+        throughput = final_sample_count / total_time
 
         logger.info("  📊 PIPELINE OPTIMIZER BREAKDOWN:")
         logger.info(f"    Total time: {total_time:.3f}s")
@@ -803,7 +660,7 @@ class PerformanceBenchmark:
 
         return operations
 
-    def _process_with_optimized_ops(self, optimized_ops: List, test_data: Dict[str, Any]):
+    def _process_with_optimized_ops(self, optimized_ops: List, test_data: Dict[str, Any]) -> int:
         """Process test data with optimized operations."""
         logger.debug(f"Processing with {len(optimized_ops)} optimized operations")
 
@@ -925,6 +782,11 @@ class PerformanceBenchmark:
             # DEBUG: Log current state after operation
             current_sample_count = get_dataset_length(data)
             logger.debug(f"🔍 DEBUG PIPELINE: After op {op_idx+1} ({op_name}): {current_sample_count} samples")
+
+        # Return final sample count
+        final_sample_count = get_dataset_length(data)
+        logger.info(f"  Final pipeline sample count: {final_sample_count}")
+        return final_sample_count
 
     def _extract_original_filters_from_fused(self, filters):
         """Extract original individual filters from fused filters for validation."""
@@ -1187,6 +1049,7 @@ class PerformanceBenchmark:
         test_data: Dict[str, Any],
         mode: str = "quick",
         analyzer_insights: dict = None,
+        benchmark_type: str = "both",
     ) -> Dict[str, Any]:
         """Run comprehensive benchmark comparing individual vs pipeline optimizer execution."""
         logger.info("🚀 Starting Performance Benchmark")
@@ -1197,102 +1060,120 @@ class PerformanceBenchmark:
             logger.info("🔍 Getting analyzer insights...")
             analyzer_insights = self.get_analyzer_insights(test_data)
 
-        # Run pipeline optimizer benchmark FIRST
-        logger.info("\n🔧 PIPELINE OPTIMIZER BENCHMARK (FIRST)")
-        logger.info("-" * 40)
-        pipeline_results = self.run_pipeline_optimizer_benchmark(filters, test_data, analyzer_insights)
+        # Run benchmarks based on benchmark_type
+        pipeline_results = None
+        individual_results = None
 
-        # Run individual filters benchmark SECOND
-        logger.info("\n📊 INDIVIDUAL EXECUTION BENCHMARK (SECOND)")
-        logger.info("-" * 40)
-        individual_results = self.run_individual_filters_benchmark(filters, test_data)
+        if benchmark_type in ["pipeline", "both"]:
+            logger.info("\n🔧 PIPELINE OPTIMIZER BENCHMARK")
+            logger.info("-" * 40)
+            pipeline_results = self.run_pipeline_optimizer_benchmark(filters, test_data, analyzer_insights)
+
+        if benchmark_type in ["individual", "both"]:
+            logger.info("\n📊 INDIVIDUAL EXECUTION BENCHMARK")
+            logger.info("-" * 40)
+            individual_results = self.run_individual_filters_benchmark(filters, test_data)
 
         # Calculate performance metrics
-        individual_time = individual_results.total_time
-        pipeline_time = pipeline_results.total_time
+        individual_time = individual_results.total_time if individual_results else 0
+        pipeline_time = pipeline_results.total_time if pipeline_results else 0
 
-        if individual_time > 0:
-            pipeline_speedup = individual_time / pipeline_time
+        # Log results based on what was run
+        if benchmark_type == "pipeline" and pipeline_results:
+            logger.info(f"Pipeline optimizer: {pipeline_time:.3f}s ({pipeline_results.throughput:.1f} samples/s)")
+        elif benchmark_type == "individual" and individual_results:
+            logger.info(f"Individual execution: {individual_time:.3f}s ({individual_results.throughput:.1f} samples/s)")
+        elif benchmark_type == "both" and individual_results and pipeline_results:
+            if individual_time > 0:
+                pipeline_speedup = individual_time / pipeline_time
+                logger.info(f"Pipeline optimizer: {pipeline_time:.3f}s ({pipeline_results.throughput:.1f} samples/s)")
+                logger.info(
+                    f"Individual execution: {individual_time:.3f}s ({individual_results.throughput:.1f} samples/s)"
+                )
+                logger.info(f"Pipeline speedup:     {pipeline_speedup:.2f}x")
+
+                # Determine best strategy
+                best_time = min(individual_time, pipeline_time)
+                if best_time == individual_time:
+                    best_strategy = "Individual"
+                else:
+                    best_strategy = "Pipeline Optimizer"
+
+                logger.info(f"🏆 Best strategy:      {best_strategy}")
+
+        # --- Validation: Only run when both benchmarks are executed ---
+        validation_results = None
+        validation_dir = None
+        original_filters = self._extract_original_filters_from_fused(filters)  # Always extract for results
+
+        if benchmark_type == "both":
+            logger.info("\n🔎 VALIDATING PIPELINE RESULTS AGAINST INDIVIDUAL EXECUTION")
+
+            # Create validation directory in outputs/
+            validation_dir = f"./outputs/benchmark_validation_{mode}_{int(time.time())}"
+            os.makedirs(validation_dir, exist_ok=True)
+            logger.info(f"📁 Validation results will be saved to: {validation_dir}")
+
+            # Get the optimized operations from the pipeline benchmark
+            pipeline_config = self._build_pipeline_config_from_filters(filters)
+            ast = PipelineAST()
+            ast.build_from_config(pipeline_config)
+
+            from data_juicer.core.optimizer.strategy import OptimizationStrategy
+
+            strategies: List[OptimizationStrategy] = [FilterFusionStrategy()]
+            optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
+            optimized_ast = optimizer.optimize(ast)
+            optimized_ops = self._convert_ast_to_operations(optimized_ast)
+
+            # Debug: Log what we're comparing
             logger.info(
-                f"Pipeline optimizer (FIRST): {pipeline_time:.3f}s ({pipeline_results.throughput:.1f} samples/s)"
+                f"🔍 VALIDATION DEBUG: Comparing {len(filters)} filters vs {len(optimized_ops)} optimized operations"
             )
-            logger.info(
-                f"Individual execution (SECOND): {individual_time:.3f}s ({individual_results.throughput:.1f} samples/s)"
+            for i, f in enumerate(filters):
+                logger.info(f"  Filter {i+1}: {type(f).__name__}")
+            for i, op in enumerate(optimized_ops):
+                op_name = list(op.keys())[0]
+                logger.info(f"  Optimized Op {i+1}: {op_name}")
+
+            # For validation, we need to compare the original individual filters to the optimized pipeline
+            # In recipe mode, 'filters' might contain fused filters, so we need to extract the original filters
+            original_filters = self._extract_original_filters_from_fused(filters)
+            logger.debug(f"🔍 VALIDATION DEBUG: Extracted {len(original_filters)} original filters for validation")
+
+            # Run both individual and pipeline execution and save results
+            individual_results_data = self._run_and_save_individual_execution(
+                original_filters, test_data, validation_dir
             )
-            logger.info(f"Pipeline speedup:     {pipeline_speedup:.2f}x")
+            pipeline_results_data = self._run_and_save_pipeline_execution(optimized_ops, test_data, validation_dir)
 
-            # Determine best strategy
-            best_time = min(individual_time, pipeline_time)
-            if best_time == individual_time:
-                best_strategy = "Individual"
-            else:
-                best_strategy = "Pipeline Optimizer"
-
-            logger.info(f"🏆 Best strategy:      {best_strategy}")
-
-        # --- Simple Validation: Save and Compare Results ---
-        logger.info("\n🔎 VALIDATING PIPELINE RESULTS AGAINST INDIVIDUAL EXECUTION")
-
-        # Create validation directory in outputs/
-        validation_dir = f"./outputs/benchmark_validation_{mode}_{int(time.time())}"
-        os.makedirs(validation_dir, exist_ok=True)
-        logger.info(f"📁 Validation results will be saved to: {validation_dir}")
-
-        # Get the optimized operations from the pipeline benchmark
-        pipeline_config = self._build_pipeline_config_from_filters(filters)
-        ast = PipelineAST()
-        ast.build_from_config(pipeline_config)
-
-        strategies = [FilterFusionStrategy()]
-        optimizer = PipelineOptimizer(strategies=strategies, analyzer_insights=analyzer_insights)
-        optimized_ast = optimizer.optimize(ast)
-        optimized_ops = self._convert_ast_to_operations(optimized_ast)
-
-        # Debug: Log what we're comparing
-        logger.info(
-            f"🔍 VALIDATION DEBUG: Comparing {len(filters)} filters vs {len(optimized_ops)} optimized operations"
-        )
-        for i, f in enumerate(filters):
-            logger.info(f"  Filter {i+1}: {type(f).__name__}")
-        for i, op in enumerate(optimized_ops):
-            op_name = list(op.keys())[0]
-            logger.info(f"  Optimized Op {i+1}: {op_name}")
-
-        # For validation, we need to compare the original individual filters to the optimized pipeline
-        # In recipe mode, 'filters' might contain fused filters, so we need to extract the original filters
-        original_filters = self._extract_original_filters_from_fused(filters)
-        logger.debug(f"🔍 VALIDATION DEBUG: Extracted {len(original_filters)} original filters for validation")
-
-        # Run both individual and pipeline execution and save results
-        individual_results_data = self._run_and_save_individual_execution(original_filters, test_data, validation_dir)
-        pipeline_results_data = self._run_and_save_pipeline_execution(optimized_ops, test_data, validation_dir)
-
-        # Compare results
-        validation_results = self._compare_execution_results(
-            individual_results_data, pipeline_results_data, validation_dir
-        )
+            # Compare results
+            validation_results = self._compare_execution_results(
+                individual_results_data, pipeline_results_data, validation_dir
+            )
 
         # Compile results
         results = {
             "mode": mode,
+            "benchmark_type": benchmark_type,
             "num_samples": get_dataset_length(test_data),
             "num_filters": len(original_filters),  # Use original filter count for reporting
             "individual": {
-                "total_time": individual_results.total_time,
-                "stats_time": individual_results.stats_time,
-                "filter_time": individual_results.filter_time,
-                "memory_usage": individual_results.memory_usage,
-                "throughput": individual_results.throughput,
+                "total_time": individual_results.total_time if individual_results else 0,
+                "stats_time": individual_results.stats_time if individual_results else 0,
+                "filter_time": individual_results.filter_time if individual_results else 0,
+                "memory_usage": individual_results.memory_usage if individual_results else 0,
+                "throughput": individual_results.throughput if individual_results else 0,
             },
             "pipeline": {
-                "total_time": pipeline_results.total_time,
-                "stats_time": pipeline_results.stats_time,
-                "filter_time": pipeline_results.filter_time,
-                "memory_usage": pipeline_results.memory_usage,
-                "throughput": pipeline_results.throughput,
+                "total_time": pipeline_results.total_time if pipeline_results else 0,
+                "stats_time": pipeline_results.stats_time if pipeline_results else 0,
+                "filter_time": pipeline_results.filter_time if pipeline_results else 0,
+                "memory_usage": pipeline_results.memory_usage if pipeline_results else 0,
+                "throughput": pipeline_results.throughput if pipeline_results else 0,
             },
-            "speedup": pipeline_speedup if individual_time > 0 else 0,
-            "best_strategy": best_strategy if individual_time > 0 else "Unknown",
+            "speedup": pipeline_speedup if individual_time > 0 and pipeline_time > 0 else 0,
+            "best_strategy": best_strategy if individual_time > 0 and pipeline_time > 0 else "Unknown",
             "validation": validation_results,
             "analyzer_insights": analyzer_insights,
             "validation_dir": validation_dir,
@@ -1348,8 +1229,6 @@ class PerformanceBenchmark:
             logger.debug(f"🔍 DEBUG: Processing filter {i+1}/{len(filters)}: {filter_type} ({filter_name})")
             logger.debug(f"🔍 DEBUG: Data before filter {i+1}: {len(data.get('text', []))} samples")
             logger.debug(f"🔍 DEBUG: Text field type before filter {i+1}: {type(data.get('text', []))}")
-            if data.get("text") and len(data["text"]) > 0:
-                logger.debug(f"🔍 DEBUG: First text sample before filter {i+1}: {data['text'][0][:50]}...")
 
             if hasattr(filter_op, "compute_stats_batched"):
                 logger.debug(f"🔍 DEBUG: Computing stats for filter {i+1}...")
@@ -1423,7 +1302,7 @@ class PerformanceBenchmark:
                         for key in data:
                             if isinstance(data[key], list):
                                 data[key] = []
-                        logger.debug(f"🔍 DEBUG: After filter {i+1}: 0 samples remaining")
+                        logger.debug(f"🔍 DEBUG: After filter {i+1}: 0 samples remaining - stopping")
                         break
                 else:
                     # This is a mapper - transform the data
@@ -1705,7 +1584,7 @@ class PerformanceBenchmark:
             else:
                 logger.info(f"🔍 INFO: Final text field has {len(data['text'])} samples")
                 if len(data["text"]) > 0:
-                    logger.info(
+                    logger.debug(
                         f"🔍 INFO: First text sample: {data['text'][0][:100] if isinstance(data['text'][0], str) else str(data['text'][0])[:100]}"
                     )
 
@@ -2030,7 +1909,7 @@ class PerformanceBenchmark:
         return results
 
     def run_ast_pipeline_benchmark(
-        self, ast, test_data: Dict[str, Any], analyzer_insights: dict = None
+        self, ast, test_data: Dict[str, Any], analyzer_insights: Optional[Dict[str, Any]] = None
     ) -> PerformanceMetrics:
         """Benchmark AST-based pipeline execution."""
         logger.info("Running AST pipeline benchmark...")
@@ -2877,6 +2756,190 @@ class PerformanceBenchmark:
                                 data = {"text": result, "__dj__stats__": [{} for _ in range(len(result))]}
 
 
+def load_real_dataset(dataset_path: str, max_samples: int = None) -> Dict[str, Any]:
+    """
+    Load real dataset using DatasetBuilder and convert to expected format.
+
+    Args:
+        dataset_path: Path to the dataset file
+        max_samples: Maximum number of samples to load (None for all)
+
+    Returns:
+        Dictionary with 'text' and Fields.stats keys for benchmark compatibility
+    """
+    from argparse import Namespace
+
+    from data_juicer.core.data.dataset_builder import DatasetBuilder
+    from data_juicer.utils.constant import Fields
+
+    logger.info(f"📂 Loading real dataset from: {dataset_path}")
+
+    # Create a proper config for DatasetBuilder
+    cfg = Namespace()
+    cfg.dataset_path = dataset_path
+    # Add empty process list to avoid AttributeError
+    cfg.process = []
+
+    # Create DatasetBuilder instance
+    builder = DatasetBuilder(cfg, executor_type="default")
+
+    # Load the dataset
+    dataset = builder.load_dataset()
+
+    # Apply max_samples limit if specified
+    if max_samples is not None and hasattr(dataset, "__len__") and len(dataset) > max_samples:
+        if hasattr(dataset, "select"):
+            dataset = dataset.select(range(max_samples))
+        logger.info(f"✅ Limited to {max_samples} samples from {dataset_path}")
+    else:
+        logger.info(f"✅ Loaded {len(dataset)} samples from {dataset_path}")
+
+    # Log dataset info
+    if hasattr(dataset, "column_names"):
+        logger.info(f"📊 Dataset columns: {dataset.column_names}")
+        if "text" in dataset.column_names:
+            if hasattr(dataset, "__getitem__") and hasattr(dataset, "__len__"):
+                sample_texts = dataset["text"][:3] if len(dataset) >= 3 else dataset["text"]
+                avg_length = sum(len(str(t)) for t in sample_texts) / len(sample_texts) if sample_texts else 0
+                logger.info(f"📝 Sample text lengths: avg={avg_length:.1f} chars")
+
+    # Convert to expected format for benchmark
+    if hasattr(dataset, "__getitem__") and hasattr(dataset, "__len__"):
+        texts = dataset["text"] if "text" in dataset.column_names else []
+        # Create stats list with empty dicts for each sample
+        stats = [{} for _ in range(len(texts))]
+        return {"text": texts, Fields.stats: stats}
+    else:
+        # Fallback: return empty dataset
+        return {"text": [], Fields.stats: []}
+
+
+def create_realistic_test_data(num_samples: int = 1000) -> Dict[str, Any]:
+    """Create realistic test data with diverse text characteristics."""
+    logger.info(f"Creating realistic test data with {num_samples} samples...")
+
+    import random
+
+    from faker import Faker
+
+    # Initialize Faker with multiple locales for diversity
+    fake = Faker(["en_US", "en_GB", "en_CA"])
+
+    # Add some non-English text for language filtering tests
+    non_english_samples = [
+        "你好，请问你是谁？",  # Chinese
+        "Sur la plateforme MT4, vous pouvez trader des devises.",  # French
+        "欢迎来到阿里巴巴！",  # Chinese
+        "El sistema de procesamiento de datos es muy eficiente.",  # Spanish
+        "Das maschinelle Lernen ist ein Teilgebiet der künstlichen Intelligenz.",  # German
+        "La conferenza si terrà il prossimo mese.",  # Italian
+        "データ処理システムは非常に効率的です。",  # Japanese
+        "시스템 성능을 향상시키기 위한 최적화가 필요합니다。",  # Korean
+        "Система обработки данных очень эффективна.",  # Russian
+        "نظام معالجة البيانات فعال للغاية.",  # Arabic
+        "ระบบประมวลผลข้อมูลมีประสิทธิภาพมาก",  # Thai
+        "Sistem pemrosesan data sangat efisien.",  # Indonesian
+        "Sistem pemprosesan data sangat cekap.",  # Malay
+        "Sistem pemprosesan data sangat cekap.",  # Malay (duplicate for testing)
+        "Sistem pemprosesan data sangat cekap.",  # Malay (duplicate for testing)
+    ]
+
+    texts = []
+    for i in range(num_samples):
+        # Create diverse text samples with different characteristics
+        if i < len(non_english_samples):
+            # Use predefined non-English samples for language filtering tests
+            text = non_english_samples[i]
+        elif i % 8 == 0:
+            # Short realistic sentences
+            text = fake.sentence()
+        elif i % 8 == 1:
+            # Medium paragraphs
+            text = fake.paragraph(nb_sentences=3)
+        elif i % 8 == 2:
+            # Longer texts with multiple paragraphs
+            text = fake.text(max_nb_chars=500)
+        elif i % 8 == 3:
+            # Technical/computer-related text
+            text = fake.text(
+                max_nb_chars=300,
+                ext_word_list=[
+                    "algorithm",
+                    "database",
+                    "network",
+                    "software",
+                    "hardware",
+                    "programming",
+                    "development",
+                    "system",
+                    "data",
+                    "processing",
+                ],
+            )
+        elif i % 8 == 4:
+            # Business/formal text
+            text = fake.text(
+                max_nb_chars=400,
+                ext_word_list=[
+                    "business",
+                    "management",
+                    "strategy",
+                    "organization",
+                    "leadership",
+                    "performance",
+                    "efficiency",
+                    "productivity",
+                    "innovation",
+                ],
+            )
+        elif i % 8 == 5:
+            # Academic/research text
+            text = fake.text(
+                max_nb_chars=350,
+                ext_word_list=[
+                    "research",
+                    "analysis",
+                    "study",
+                    "investigation",
+                    "evaluation",
+                    "methodology",
+                    "findings",
+                    "conclusion",
+                    "hypothesis",
+                ],
+            )
+        elif i % 8 == 6:
+            # Casual/conversational text
+            text = fake.text(
+                max_nb_chars=250,
+                ext_word_list=[
+                    "conversation",
+                    "discussion",
+                    "opinion",
+                    "experience",
+                    "thought",
+                    "feeling",
+                    "idea",
+                    "perspective",
+                    "viewpoint",
+                ],
+            )
+        else:
+            # Random realistic text
+            text = fake.text(max_nb_chars=random.randint(100, 400))
+
+        texts.append(text)
+
+    # Create dataset in the expected format
+    test_data = {"text": texts, Fields.stats: [{} for _ in range(num_samples)]}
+
+    logger.info(f"✅ Created {len(texts)} realistic test samples")
+    logger.info(f"   - {len(non_english_samples)} non-English samples for language filtering")
+    logger.info(f"   - {len(texts) - len(non_english_samples)} English samples")
+
+    return test_data
+
+
 def create_simple_test_data(num_samples: int = 1000) -> Dict[str, Any]:
     """Create comprehensive test data covering different text characteristics."""
     logger.info(f"Creating {num_samples:,} comprehensive test samples...")
@@ -2952,7 +3015,9 @@ def main():
     """Main execution function for performance benchmarking."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Performance Benchmark for Data-Juicer Filters")
+    parser = argparse.ArgumentParser(
+        description="Performance Benchmark for Data-Juicer Filters - Run individual or pipeline benchmarks separately to avoid caching effects"
+    )
     parser.add_argument(
         "--mode",
         choices=["quick", "full", "recipe"],
@@ -2988,6 +3053,12 @@ def main():
         default=None,
         help="Path to a real dataset file (JSONL, JSON, CSV, etc.) to use instead of synthetic data",
     )
+    parser.add_argument(
+        "--benchmark-type",
+        choices=["pipeline", "individual", "both"],
+        default="both",
+        help="Type of benchmark to run: pipeline (optimized), individual (sequential), or both (comparison)",
+    )
 
     args = parser.parse_args()
 
@@ -3000,7 +3071,7 @@ def main():
         test_data = load_real_dataset(args.dataset_path, max_samples=args.samples)
     else:
         logger.info(f"🎲 Using synthetic data: {args.samples} samples")
-        test_data = benchmark.create_realistic_test_data(args.samples)
+        test_data = create_realistic_test_data(args.samples)
 
     # Get filters based on mode
     if args.mode == "quick":
@@ -3109,70 +3180,12 @@ def main():
         analyzer_insights = benchmark.run_analyzer(test_data)
 
     # Run comprehensive benchmark with fusion strategies
-    results = benchmark.run_benchmark(filters, test_data, args.mode, analyzer_insights)
+    results = benchmark.run_benchmark(filters, test_data, args.mode, analyzer_insights, args.benchmark_type)
 
     logger.info("\n✅ Benchmark completed successfully!")
     logger.info(f"📊 Results saved for mode: {args.mode}")
 
     return results
-
-
-def load_real_dataset(dataset_path: str, max_samples: int = None) -> Dict[str, Any]:
-    """
-    Load real dataset using DatasetBuilder and convert to expected format.
-
-    Args:
-        dataset_path: Path to the dataset file
-        max_samples: Maximum number of samples to load (None for all)
-
-    Returns:
-        Dictionary with 'text' and Fields.stats keys for benchmark compatibility
-    """
-    from argparse import Namespace
-
-    from data_juicer.core.data.dataset_builder import DatasetBuilder
-    from data_juicer.utils.constant import Fields
-
-    logger.info(f"📂 Loading real dataset from: {dataset_path}")
-
-    # Create a proper config for DatasetBuilder
-    cfg = Namespace()
-    cfg.dataset_path = dataset_path
-    # Add empty process list to avoid AttributeError
-    cfg.process = []
-
-    # Create DatasetBuilder instance
-    builder = DatasetBuilder(cfg, executor_type="default")
-
-    # Load the dataset
-    dataset = builder.load_dataset()
-
-    # Apply max_samples limit if specified
-    if max_samples is not None and hasattr(dataset, "__len__") and len(dataset) > max_samples:
-        if hasattr(dataset, "select"):
-            dataset = dataset.select(range(max_samples))
-        logger.info(f"✅ Limited to {max_samples} samples from {dataset_path}")
-    else:
-        logger.info(f"✅ Loaded {len(dataset)} samples from {dataset_path}")
-
-    # Log dataset info
-    if hasattr(dataset, "column_names"):
-        logger.info(f"📊 Dataset columns: {dataset.column_names}")
-        if "text" in dataset.column_names:
-            if hasattr(dataset, "__getitem__") and hasattr(dataset, "__len__"):
-                sample_texts = dataset["text"][:3] if len(dataset) >= 3 else dataset["text"]
-                avg_length = sum(len(str(t)) for t in sample_texts) / len(sample_texts) if sample_texts else 0
-                logger.info(f"📝 Sample text lengths: avg={avg_length:.1f} chars")
-
-    # Convert to expected format for benchmark
-    if hasattr(dataset, "__getitem__") and hasattr(dataset, "__len__"):
-        texts = dataset["text"] if "text" in dataset.column_names else []
-        # Create stats list with empty dicts for each sample
-        stats = [{} for _ in range(len(texts))]
-        return {"text": texts, Fields.stats: stats}
-    else:
-        # Fallback: return empty dataset
-        return {"text": [], Fields.stats: []}
 
 
 if __name__ == "__main__":
