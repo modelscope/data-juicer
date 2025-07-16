@@ -584,6 +584,12 @@ the total token nums of sub string lists are similar.</p>
 <span class="sig-prename descclassname"><span class="pre">data_juicer.utils.common_utils.</span></span><span class="sig-name descname"><span class="pre">is_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/common_utils.html#is_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.common_utils.is_float" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.common_utils.check_op_method_param">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.common_utils.</span></span><span class="sig-name descname"><span class="pre">check_op_method_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/common_utils.html#check_op_method_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.common_utils.check_op_method_param" title="Link to this definition">¶</a></dt>
+<dd><p>Check if the given method contains a parameter named param_name, or it contains parameter with <a href="#id1"><span class="problematic" id="id2">**</span></a>.</p>
+</dd></dl>
+
 </section>
 <section id="module-data_juicer.utils.compress">
 <span id="data-juicer-utils-compress-module"></span><h2>data_juicer.utils.compress module<a class="headerlink" href="#module-data_juicer.utils.compress" title="Link to this heading">¶</a></h2>
@@ -1566,7 +1572,7 @@ print(res) # {“AlphanumericFilter”: [“alnum_ratio”, “alpha_token_ratio
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>logfile_path</strong> (<cite>str</cite>) – The file path to be read.</p></li>
-<li><p><strong>skip_existing_content</strong> (<cite>bool</cite>, defaults to <a href="#id1"><span class="problematic" id="id2">`</span></a>False) – If True, read from the end, otherwise read from the beginning.</p></li>
+<li><p><strong>skip_existing_content</strong> (<cite>bool</cite>, defaults to <a href="#id3"><span class="problematic" id="id4">`</span></a>False) – If True, read from the end, otherwise read from the beginning.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1763,10 +1769,11 @@ number of files.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.file_utils.download_file">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">download_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClientSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#download_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.download_file" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">download_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClientSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_content</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#download_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.download_file" title="Link to this definition">¶</a></dt>
 <dd><p>Download a file from a given URL and save it to a specified directory.
 :param url: The URL of the file to download.
 :param save_path: The path where the downloaded file will be saved.
+:param return_content: Whether to return the content of the downloaded file.
 :param timeout: The timeout in seconds for each HTTP request.
 :param kwargs: The keyword arguments to pass to the HTTP request.</p>
 <dl class="field-list simple">
@@ -2107,9 +2114,26 @@ AUTO is faster when there are no video latency.</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.load_mm_bytes_from_sample">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_mm_bytes_from_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mm_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mm_bytes_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_mm_bytes_from_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_mm_bytes_from_sample" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.mm_utils.load_data_with_context">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_data_with_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loaded_data_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_data_with_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_data_with_context" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_data_with_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loaded_data_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mm_bytes_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_data_with_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_data_with_context" title="Link to this definition">¶</a></dt>
 <dd><p>The unified loading function with contexts for multimodal data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample</strong> – can be a single sample or a batch of samples.</p></li>
+<li><p><strong>context</strong> – whether the context fields is activated.</p></li>
+<li><p><strong>loaded_data_keys</strong> – the data keys (paths) to load.</p></li>
+<li><p><strong>load_func</strong> – the function used to load the data.</p></li>
+<li><p><strong>mm_bytes_key</strong> – the key to store the data bytes if it exists. It’s None by default.</p></li>
+<li><p><strong>sample_idx</strong> – the index of the current sample. Used for batched samples.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2124,7 +2148,7 @@ AUTO is faster when there are no video latency.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.mm_utils.load_image">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_image" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_or_bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_image" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -2479,7 +2503,7 @@ signature.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A dictionary containing only the arguments that match the
-function’s signature, preserving any <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs if applicable.</p>
+function’s signature, preserving any <a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs if applicable.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3195,6 +3219,25 @@ Currently, <cite>standalone</cite>, <cite>ray</cite> are supported.</p>
 <dd></dd></dl>
 
 </section>
+<section id="module-data_juicer.utils.webdataset_utils">
+<span id="data-juicer-utils-webdataset-utils-module"></span><h2>data_juicer.utils.webdataset_utils module<a class="headerlink" href="#module-data_juicer.utils.webdataset_utils" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.webdataset_utils.reconstruct_custom_webdataset_format">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.webdataset_utils.</span></span><span class="sig-name descname"><span class="pre">reconstruct_custom_webdataset_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/webdataset_utils.html#reconstruct_custom_webdataset_format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.webdataset_utils.reconstruct_custom_webdataset_format" title="Link to this definition">¶</a></dt>
+<dd><p>Reconstruct the original dataset to the WebDataset format.
+For all keys, they can be specified by <cite>field_mapping</cite> argument, which is a dict mapping from the target
+field key in the result format to the source field key in the original samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples</strong> – the input samples batch to be reconstructed</p></li>
+<li><p><strong>field_mapping</strong> – the field mapping to construct the left fields.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-data_juicer.utils">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-data_juicer.utils" title="Link to this heading">¶</a></h2>
 </section>
@@ -3272,6 +3315,7 @@ Currently, <cite>standalone</cite>, <cite>ray</cite> are supported.</p>
 <li><a class="reference internal" href="#data_juicer.utils.common_utils.is_string_list"><code class="docutils literal notranslate"><span class="pre">is_string_list()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.common_utils.avg_split_string_list_under_limit"><code class="docutils literal notranslate"><span class="pre">avg_split_string_list_under_limit()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.common_utils.is_float"><code class="docutils literal notranslate"><span class="pre">is_float()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.common_utils.check_op_method_param"><code class="docutils literal notranslate"><span class="pre">check_op_method_param()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-data_juicer.utils.compress">data_juicer.utils.compress module</a><ul>
@@ -3548,6 +3592,7 @@ Currently, <cite>standalone</cite>, <cite>ray</cite> are supported.</p>
 <li><a class="reference internal" href="#data_juicer.utils.mm_utils.get_special_tokens"><code class="docutils literal notranslate"><span class="pre">get_special_tokens()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.mm_utils.remove_special_tokens"><code class="docutils literal notranslate"><span class="pre">remove_special_tokens()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.mm_utils.remove_non_special_tokens"><code class="docutils literal notranslate"><span class="pre">remove_non_special_tokens()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.mm_utils.load_mm_bytes_from_sample"><code class="docutils literal notranslate"><span class="pre">load_mm_bytes_from_sample()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.mm_utils.load_data_with_context"><code class="docutils literal notranslate"><span class="pre">load_data_with_context()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.mm_utils.load_images"><code class="docutils literal notranslate"><span class="pre">load_images()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.mm_utils.load_images_byte"><code class="docutils literal notranslate"><span class="pre">load_images_byte()</span></code></a></li>
@@ -3672,6 +3717,10 @@ Currently, <cite>standalone</cite>, <cite>ray</cite> are supported.</p>
 <li><a class="reference internal" href="#data_juicer.utils.unittest_utils.get_diff_files"><code class="docutils literal notranslate"><span class="pre">get_diff_files()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.unittest_utils.find_corresponding_test_file"><code class="docutils literal notranslate"><span class="pre">find_corresponding_test_file()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.unittest_utils.get_partial_test_cases"><code class="docutils literal notranslate"><span class="pre">get_partial_test_cases()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-data_juicer.utils.webdataset_utils">data_juicer.utils.webdataset_utils module</a><ul>
+<li><a class="reference internal" href="#data_juicer.utils.webdataset_utils.reconstruct_custom_webdataset_format"><code class="docutils literal notranslate"><span class="pre">reconstruct_custom_webdataset_format()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-data_juicer.utils">Module contents</a></li>

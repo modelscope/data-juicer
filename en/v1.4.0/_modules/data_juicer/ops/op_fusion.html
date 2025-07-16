@@ -353,6 +353,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops.base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OP</span><span class="p">,</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">Mapper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops.load</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_ops</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.common_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_op_method_param</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">InterVars</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Registry</span>
 
@@ -548,7 +549,7 @@
 <div class="viewcode-block" id="GeneralFusedOP">
 <a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.GeneralFusedOP">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;general_fused_op&quot;</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">GeneralFusedOP</span><span class="p">(</span><span class="n">OP</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GeneralFusedOP</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An explicitly fused operator designed to execute multiple sequential</span>
 <span class="sd">    operations (OPs) on the same batch, enabling fine-grained control over</span>
 <span class="sd">    data processing.&quot;&quot;&quot;</span>
@@ -577,23 +578,48 @@
 <div class="viewcode-block" id="GeneralFusedOP.process_batched">
 <a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.GeneralFusedOP.process_batched">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+
+        <span class="kn">import</span><span class="w"> </span><span class="nn">av</span>
+
+        <span class="n">tmp_samples</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+
+        <span class="c1"># context for the intermediate vars</span>
+        <span class="n">sample_key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp_samples</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp_samples</span><span class="p">[</span><span class="n">sample_key</span><span class="p">])</span>
+        <span class="n">tmp_samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{}</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)]</span>
+
         <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_ops</span><span class="p">:</span>
             <span class="n">process_args</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rank&quot;</span><span class="p">:</span> <span class="n">rank</span><span class="p">}</span> <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span> <span class="k">else</span> <span class="p">{}</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">Mapper</span><span class="p">):</span>
-                <span class="n">samples</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">process_batched</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="o">**</span><span class="n">process_args</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">check_op_method_param</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="s2">&quot;context&quot;</span><span class="p">):</span>
+                    <span class="c1"># add context param only when the core process method of this OP contains this param</span>
+                    <span class="n">process_args</span><span class="p">[</span><span class="s2">&quot;context&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">samples</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">process_batched</span><span class="p">(</span><span class="n">tmp_samples</span><span class="p">,</span> <span class="o">**</span><span class="n">process_args</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">Filter</span><span class="p">):</span>
-                <span class="n">samples</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">compute_stats_batched</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="o">**</span><span class="n">process_args</span><span class="p">)</span>
-                <span class="n">indicators</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">process_batched</span><span class="p">(</span><span class="n">samples</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">check_op_method_param</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">,</span> <span class="s2">&quot;context&quot;</span><span class="p">):</span>
+                    <span class="c1"># add context param only when the core process method of this OP contains this param</span>
+                    <span class="n">process_args</span><span class="p">[</span><span class="s2">&quot;context&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">tmp_samples</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">compute_stats_batched</span><span class="p">(</span><span class="n">tmp_samples</span><span class="p">,</span> <span class="o">**</span><span class="n">process_args</span><span class="p">)</span>
+                <span class="n">indicators</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">process_batched</span><span class="p">(</span><span class="n">tmp_samples</span><span class="p">))</span>
                 <span class="n">new_samples</span> <span class="o">=</span> <span class="p">{}</span>
-                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
-                    <span class="n">new_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span> <span class="k">for</span> <span class="n">val</span><span class="p">,</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">indicators</span><span class="p">)</span> <span class="k">if</span> <span class="n">indicator</span><span class="p">]</span>
-                <span class="n">samples</span> <span class="o">=</span> <span class="n">new_samples</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">tmp_samples</span><span class="p">:</span>
+                    <span class="n">new_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span> <span class="k">for</span> <span class="n">val</span><span class="p">,</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tmp_samples</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">indicators</span><span class="p">)</span> <span class="k">if</span> <span class="n">indicator</span><span class="p">]</span>
+                <span class="n">tmp_samples</span> <span class="o">=</span> <span class="n">new_samples</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;FusedOP does not support OP </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s2"> of type &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">op</span><span class="p">)</span><span class="si">}</span><span class="s2"> and only supports Mapper and Filter now.&quot;</span>
                 <span class="p">)</span>
-        <span class="k">return</span> <span class="n">samples</span></div>
+        <span class="c1"># clean up the contexts after processing</span>
+        <span class="c1"># check if there are containers that need to be closed</span>
+        <span class="k">for</span> <span class="n">ctx</span> <span class="ow">in</span> <span class="n">tmp_samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">context_key</span> <span class="ow">in</span> <span class="n">ctx</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ctx</span><span class="p">[</span><span class="n">context_key</span><span class="p">],</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">):</span>
+                    <span class="n">ctx</span><span class="p">[</span><span class="n">context_key</span><span class="p">]</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">video</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="n">ctx</span><span class="p">[</span><span class="n">context_key</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">tmp_samples</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tmp_samples</span></div>
 
 
 <div class="viewcode-block" id="GeneralFusedOP.run">

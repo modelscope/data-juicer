@@ -407,7 +407,9 @@
                 <span class="k">continue</span>
 
             <span class="c1"># load images</span>
-            <span class="n">samples</span><span class="p">,</span> <span class="n">images</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">loaded_image_keys</span><span class="p">,</span> <span class="n">load_image</span><span class="p">)</span>
+            <span class="n">samples</span><span class="p">,</span> <span class="n">images</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span>
+                <span class="n">samples</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">loaded_image_keys</span><span class="p">,</span> <span class="n">load_image</span><span class="p">,</span> <span class="n">mm_bytes_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">image_bytes_key</span><span class="p">,</span> <span class="n">sample_idx</span><span class="o">=</span><span class="n">i</span>
+            <span class="p">)</span>
 
             <span class="c1"># compute aspect ratios for each image with W/H</span>
             <span class="n">aspect_ratios</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="n">images</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">images</span><span class="p">}</span>

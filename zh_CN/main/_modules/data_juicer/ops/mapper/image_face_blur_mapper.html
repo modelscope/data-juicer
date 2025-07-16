@@ -451,7 +451,9 @@
 
         <span class="c1"># load images</span>
         <span class="n">loaded_image_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span>
-        <span class="n">sample</span><span class="p">,</span> <span class="n">images</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">loaded_image_keys</span><span class="p">,</span> <span class="n">load_image</span><span class="p">)</span>
+        <span class="n">sample</span><span class="p">,</span> <span class="n">images</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span>
+            <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">loaded_image_keys</span><span class="p">,</span> <span class="n">load_image</span><span class="p">,</span> <span class="n">mm_bytes_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">image_bytes_key</span>
+        <span class="p">)</span>
 
         <span class="n">model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">)</span>
 
@@ -463,6 +465,7 @@
 
         <span class="c1"># blur face regions</span>
         <span class="n">key_mapping</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">new_images</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">dets</span> <span class="o">=</span> <span class="n">face_detections</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="c1"># only blur when detected face</span>
@@ -473,18 +476,23 @@
                     <span class="n">blured_roi</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">box</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blur</span><span class="p">)</span>
                     <span class="n">blured_image</span><span class="o">.</span><span class="n">paste</span><span class="p">(</span><span class="n">blured_roi</span><span class="p">,</span> <span class="n">box</span><span class="p">)</span>
                 <span class="n">blured_image_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
-                <span class="n">blured_image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">blured_image_key</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">blured_image_key</span> <span class="o">!=</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="n">blured_image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">blured_image_key</span><span class="p">)</span>
                 <span class="n">key_mapping</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">blured_image_key</span>
+                <span class="n">new_images</span><span class="p">[</span><span class="n">blured_image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">blured_image</span>
                 <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
                     <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">blured_image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">blured_image</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">key_mapping</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="n">images</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_images</span><span class="p">)</span>
 
         <span class="c1"># when the file is modified, its source file needs to be updated.</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loaded_image_keys</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">key_mapping</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
                     <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_bytes_key</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_bytes_key</span><span class="p">]):</span>
+                <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_bytes_key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="n">key_mapping</span><span class="p">[</span><span class="n">value</span><span class="p">]]</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
 
         <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">key_mapping</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loaded_image_keys</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">sample</span></div>

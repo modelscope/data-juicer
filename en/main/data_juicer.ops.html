@@ -3079,6 +3079,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -3157,6 +3159,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -3210,6 +3214,8 @@ to be processed</p></li>
 <li><p><strong>audio_key</strong> – the key name of field that stores sample audio list
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
 to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
@@ -3289,6 +3295,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -3356,6 +3364,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -3405,6 +3415,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -3453,6 +3465,8 @@ to be processed</p></li>
 <li><p><strong>audio_key</strong> – the key name of field that stores sample audio list
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
 to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
@@ -3868,14 +3882,14 @@ definitions and objects.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.ops.op_fusion.GeneralFusedOP">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.op_fusion.</span></span><span class="sig-name descname"><span class="pre">GeneralFusedOP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fused_op_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/op_fusion.html#GeneralFusedOP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.op_fusion.GeneralFusedOP" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.base_op.OP" title="data_juicer.ops.base_op.OP"><code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
 <p>An explicitly fused operator designed to execute multiple sequential
 operations (OPs) on the same batch, enabling fine-grained control over
 data processing.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.op_fusion.GeneralFusedOP.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fused_op_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/op_fusion.html#GeneralFusedOP.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.op_fusion.GeneralFusedOP.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>Base class of operators.</p>
+<dd><p>Base class that conducts data editing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -3887,13 +3901,12 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
 queries and responses</p></li>
-<li><p><strong>index_key</strong> – index the samples before process if not None</p></li>
-<li><p><strong>batch_size</strong> – the batch size for processing</p></li>
-<li><p><strong>work_dir</strong> – the working directory for this operator</p></li>
 </ul>
 </dd>
 </dl>
@@ -3947,6 +3960,8 @@ to be processed</p></li>
 <li><p><strong>audio_key</strong> – the key name of field that stores sample audio list
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
 to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
@@ -4026,6 +4041,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -4079,6 +4096,8 @@ to be processed</p></li>
 <li><p><strong>audio_key</strong> – the key name of field that stores sample audio list
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
 to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
@@ -4147,6 +4166,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -4196,6 +4217,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -4244,6 +4267,8 @@ to be processed</p></li>
 <li><p><strong>audio_key</strong> – the key name of field that stores sample audio list
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
 to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>

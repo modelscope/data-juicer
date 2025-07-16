@@ -156,6 +156,14 @@ data\_juicer.utils.unittest\_utils module
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.utils.webdataset\_utils module
+-------------------------------------------
+
+.. automodule:: data_juicer.utils.webdataset_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

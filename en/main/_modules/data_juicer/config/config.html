@@ -530,6 +530,14 @@
                 <span class="s2">&quot;directory of this process.&quot;</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+                <span class="s2">&quot;--export_type&quot;</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The export format type. If it&#39;s not specified, Data-Juicer will parse from the export_path. The &quot;</span>
+                <span class="s2">&quot;supported types can be found in Exporter._router() for standalone mode and &quot;</span>
+                <span class="s2">&quot;RayExporter._SUPPORTED_FORMATS for ray mode&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
                 <span class="s2">&quot;--export_shard_size&quot;</span><span class="p">,</span>
                 <span class="nb">type</span><span class="o">=</span><span class="n">NonNegativeInt</span><span class="p">,</span>
                 <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -551,6 +559,13 @@
                 <span class="s2">&quot;due to the IO blocking, especially for very large datasets. &quot;</span>
                 <span class="s2">&quot;When this happens, False is a better choice, although it takes &quot;</span>
                 <span class="s2">&quot;more time.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+                <span class="s2">&quot;--export_extra_args&quot;</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">Dict</span><span class="p">,</span>
+                <span class="n">default</span><span class="o">=</span><span class="p">{},</span>
+                <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Other optional arguments for exporting in dict. For example, the key mapping info for exporting &quot;</span>
+                <span class="s2">&quot;the WebDataset format.&quot;</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
                 <span class="s2">&quot;--keep_stats_in_res_ds&quot;</span><span class="p">,</span>
@@ -585,6 +600,12 @@
                 <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
                 <span class="n">default</span><span class="o">=</span><span class="s2">&quot;images&quot;</span><span class="p">,</span>
                 <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Key name of field to store the list of sample image paths.&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E251</span>
+            <span class="p">)</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+                <span class="s2">&quot;--image_bytes_key&quot;</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                <span class="n">default</span><span class="o">=</span><span class="s2">&quot;image_bytes&quot;</span><span class="p">,</span>
+                <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Key name of field to store the list of sample image bytes.&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E251</span>
             <span class="p">)</span>
             <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
                 <span class="s2">&quot;--image_special_token&quot;</span><span class="p">,</span>
@@ -1035,6 +1056,7 @@
         <span class="s2">&quot;image_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_key&quot;</span><span class="p">,</span> <span class="s2">&quot;images&quot;</span><span class="p">),</span>
         <span class="s2">&quot;audio_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_key&quot;</span><span class="p">,</span> <span class="s2">&quot;audios&quot;</span><span class="p">),</span>
         <span class="s2">&quot;video_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;video_key&quot;</span><span class="p">,</span> <span class="s2">&quot;videos&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;image_bytes_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_bytes_key&quot;</span><span class="p">,</span> <span class="s2">&quot;image_bytes&quot;</span><span class="p">),</span>
         <span class="s2">&quot;num_proc&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">np</span><span class="p">,</span>
         <span class="s2">&quot;turbo&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;turbo&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
         <span class="s2">&quot;skip_op_error&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;skip_op_error&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>

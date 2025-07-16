@@ -373,8 +373,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_remote_path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecialTokens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.process_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.webdataset_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_custom_default_decoder</span>
 
 <span class="n">ray</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;ray&quot;</span><span class="p">)</span>
 
@@ -418,9 +418,9 @@
     <span class="n">path_keys</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">columns</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">columns</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span>
-        <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;video_key&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="p">),</span>
-        <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_key&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span><span class="p">),</span>
-        <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_key&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">audio</span><span class="p">),</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;video_key&quot;</span><span class="p">,</span> <span class="s2">&quot;videos&quot;</span><span class="p">),</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_key&quot;</span><span class="p">,</span> <span class="s2">&quot;images&quot;</span><span class="p">),</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_key&quot;</span><span class="p">,</span> <span class="s2">&quot;audios&quot;</span><span class="p">),</span>
     <span class="p">]:</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
             <span class="n">path_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -633,6 +633,8 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">RayDataset</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">data_format</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;jsonl&quot;</span><span class="p">}:</span>
             <span class="k">return</span> <span class="n">RayDataset</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">data_format</span> <span class="o">==</span> <span class="s2">&quot;webdataset&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RayDataset</span><span class="o">.</span><span class="n">read_webdataset</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">data_format</span> <span class="ow">in</span> <span class="p">{</span>
             <span class="s2">&quot;parquet&quot;</span><span class="p">,</span>
             <span class="s2">&quot;images&quot;</span><span class="p">,</span>
@@ -642,7 +644,6 @@
             <span class="s2">&quot;avro&quot;</span><span class="p">,</span>
             <span class="s2">&quot;numpy&quot;</span><span class="p">,</span>
             <span class="s2">&quot;tfrecords&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;webdataset&quot;</span><span class="p">,</span>
             <span class="s2">&quot;binary_files&quot;</span><span class="p">,</span>
             <span class="s2">&quot;lance&quot;</span><span class="p">,</span>
         <span class="p">}:</span>
@@ -662,6 +663,13 @@
             <span class="k">return</span> <span class="n">read_json_stream</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RayDataset.read_webdataset">
+<a class="viewcode-back" href="../../../../data_juicer.core.data.html#data_juicer.core.data.ray_dataset.RayDataset.read_webdataset">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_webdataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">RayDataset</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_webdataset</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">decoder</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">_custom_default_decoder</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;PIL&quot;</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="RayDataset.to_list">

@@ -365,6 +365,7 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">av</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">PIL</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Audio</span><span class="p">,</span> <span class="n">Image</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">PositiveInt</span>
@@ -437,25 +438,89 @@
 
 
 
+<div class="viewcode-block" id="load_mm_bytes_from_sample">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_mm_bytes_from_sample">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_mm_bytes_from_sample</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">mm_idx</span><span class="p">,</span> <span class="n">mm_bytes_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># if mm_bytes_key is not specified or there is no bytes_key, return None</span>
+    <span class="k">if</span> <span class="n">mm_bytes_key</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">mm_bytes_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">mm_bytes_data</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">mm_bytes_key</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mm_bytes_data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">mm_bytes_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># invalid bytes data or no bytes data stored</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="c1"># check if the sample_idx is specified</span>
+    <span class="k">if</span> <span class="n">sample_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># it should be a batched sample</span>
+        <span class="k">if</span> <span class="n">sample_idx</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mm_bytes_data</span><span class="p">):</span>
+            <span class="c1"># invalid sample_idx</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">sample_mm_bytes_data</span> <span class="o">=</span> <span class="n">mm_bytes_data</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample_mm_bytes_data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample_mm_bytes_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># invalid sample_mm_bytes_data or no sample_mm_bytes_data stored</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">mm_idx</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample_mm_bytes_data</span><span class="p">):</span>
+            <span class="c1"># invalid mm_idx</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">bytes_data</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">mm_bytes_key</span><span class="p">][</span><span class="n">sample_idx</span><span class="p">][</span><span class="n">mm_idx</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bytes_data</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="c1"># invalid bytes data</span>
+            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># it should be a single sample</span>
+        <span class="k">if</span> <span class="n">mm_idx</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mm_bytes_data</span><span class="p">):</span>
+            <span class="c1"># invalid mm_idx</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">bytes_data</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">mm_bytes_key</span><span class="p">][</span><span class="n">mm_idx</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bytes_data</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="c1"># invalid bytes data</span>
+            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">bytes_data</span></div>
+
+
+
 <div class="viewcode-block" id="load_data_with_context">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_data_with_context">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">loaded_data_keys</span><span class="p">,</span> <span class="n">load_func</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">loaded_data_keys</span><span class="p">,</span> <span class="n">load_func</span><span class="p">,</span> <span class="n">mm_bytes_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The unified loading function with contexts for multimodal data.</span>
+
+<span class="sd">    :param sample: can be a single sample or a batch of samples.</span>
+<span class="sd">    :param context: whether the context fields is activated.</span>
+<span class="sd">    :param loaded_data_keys: the data keys (paths) to load.</span>
+<span class="sd">    :param load_func: the function used to load the data.</span>
+<span class="sd">    :param mm_bytes_key: the key to store the data bytes if it exists. It&#39;s None by default.</span>
+<span class="sd">    :param sample_idx: the index of the current sample. Used for batched samples.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">loaded_data_key</span> <span class="ow">in</span> <span class="n">loaded_data_keys</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">context</span> <span class="ow">and</span> <span class="n">loaded_data_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
+        <span class="n">context_content</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">sample_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">context_content</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sample_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">context_content</span><span class="p">):</span>
+            <span class="n">context_content</span> <span class="o">=</span> <span class="n">context_content</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">loaded_data_key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loaded_data_keys</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">context</span> <span class="ow">and</span> <span class="n">loaded_data_key</span> <span class="ow">in</span> <span class="n">context_content</span><span class="p">:</span>
             <span class="c1"># load from context</span>
-            <span class="n">data</span><span class="p">[</span><span class="n">loaded_data_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">loaded_data_key</span><span class="p">]</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">loaded_data_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">context_content</span><span class="p">[</span><span class="n">loaded_data_key</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">loaded_data_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="c1"># check if it&#39;s already in bytes key</span>
+                <span class="n">data_item</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">bytes_data</span> <span class="o">=</span> <span class="n">load_mm_bytes_from_sample</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">mm_bytes_key</span><span class="p">,</span> <span class="n">sample_idx</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">bytes_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># load data_item from bytes data</span>
+                    <span class="n">data_item</span> <span class="o">=</span> <span class="n">load_func</span><span class="p">(</span><span class="n">bytes_data</span><span class="p">)</span>
                 <span class="c1"># avoid load the same data</span>
-                <span class="n">data_item</span> <span class="o">=</span> <span class="n">load_func</span><span class="p">(</span><span class="n">loaded_data_key</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">data_item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">data_item</span> <span class="o">=</span> <span class="n">load_func</span><span class="p">(</span><span class="n">loaded_data_key</span><span class="p">)</span>
                 <span class="n">data</span><span class="p">[</span><span class="n">loaded_data_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_item</span>
                 <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
                     <span class="c1"># store the data into context</span>
-                    <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">loaded_data_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_item</span>
+                    <span class="k">if</span> <span class="n">sample_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">sample_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">]):</span>
+                            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">sample_idx</span><span class="p">][</span><span class="n">loaded_data_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_item</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">loaded_data_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_item</span>
+
     <span class="k">return</span> <span class="n">sample</span><span class="p">,</span> <span class="n">data</span></div>
 
 
@@ -477,9 +542,12 @@
 
 <div class="viewcode-block" id="load_image">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_image">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">load_image</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="n">img_feature</span> <span class="o">=</span> <span class="n">Image</span><span class="p">()</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">img_feature</span><span class="o">.</span><span class="n">decode_example</span><span class="p">(</span><span class="n">img_feature</span><span class="o">.</span><span class="n">encode_example</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_image</span><span class="p">(</span><span class="n">path_or_bytes</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path_or_bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">PIL</span><span class="o">.</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">path_or_bytes</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">img_feature</span> <span class="o">=</span> <span class="n">Image</span><span class="p">()</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">img_feature</span><span class="o">.</span><span class="n">decode_example</span><span class="p">(</span><span class="n">img_feature</span><span class="o">.</span><span class="n">encode_example</span><span class="p">(</span><span class="n">path_or_bytes</span><span class="p">))</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">img</span></div>
 

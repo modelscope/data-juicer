@@ -347,10 +347,12 @@
         <article role="main" id="furo-main-content">
           <h1>Source code for data_juicer.core.ray_exporter</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">HashKeys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.webdataset_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">reconstruct_custom_webdataset_format</span>
 
 
 <div class="viewcode-block" id="RayExporter">
@@ -374,7 +376,7 @@
 
 <div class="viewcode-block" id="RayExporter.__init__">
 <a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.RayExporter.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="n">keep_stats_in_res_ds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">keep_hashes_in_res_ds</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="n">export_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep_stats_in_res_ds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">keep_hashes_in_res_ds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -387,7 +389,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">export_path</span> <span class="o">=</span> <span class="n">export_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_stats_in_res_ds</span> <span class="o">=</span> <span class="n">keep_stats_in_res_ds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_hashes_in_res_ds</span> <span class="o">=</span> <span class="n">keep_hashes_in_res_ds</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">export_format</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_export_format</span><span class="p">(</span><span class="n">export_path</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_format</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_export_format</span><span class="p">(</span><span class="n">export_path</span><span class="p">)</span> <span class="k">if</span> <span class="n">export_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">export_type</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SUPPORTED_FORMATS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;export data format &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">export_format</span><span class="si">}</span><span class="s1">&quot; is not supported &#39;</span>
+                <span class="sa">f</span><span class="s2">&quot;for now. Only support </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_SUPPORTED_FORMATS</span><span class="si">}</span><span class="s2">. Please check export_type or export_path.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_extra_args</span> <span class="o">=</span> <span class="n">kwargs</span> <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_export_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
@@ -407,11 +415,6 @@
             <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;jsonl&quot;</span>
 
         <span class="n">export_format</span> <span class="o">=</span> <span class="n">suffix</span>
-        <span class="k">if</span> <span class="n">export_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SUPPORTED_FORMATS</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;export data format &quot;</span><span class="si">{</span><span class="n">export_format</span><span class="si">}</span><span class="s1">&quot; is not supported &#39;</span>
-                <span class="sa">f</span><span class="s2">&quot;for now. Only support </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_SUPPORTED_FORMATS</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
         <span class="k">return</span> <span class="n">export_format</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_export_impl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -441,10 +444,12 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">removed_fields</span><span class="p">):</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">drop_columns</span><span class="p">(</span><span class="n">removed_fields</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_format</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;jsonl&quot;</span><span class="p">}:</span>
-            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">export_path</span><span class="p">,</span> <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;write_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">export_format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span><span class="n">export_path</span><span class="p">)</span>
+        <span class="n">export_method</span> <span class="o">=</span> <span class="n">RayExporter</span><span class="o">.</span><span class="n">_router</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">export_format</span><span class="p">]</span>
+        <span class="n">export_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;export_extra_args&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_extra_args</span><span class="p">,</span>
+            <span class="s2">&quot;export_format&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_format</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">export_method</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="o">**</span><span class="n">export_kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RayExporter.export">
 <a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.RayExporter.export">[docs]</a>
@@ -457,7 +462,80 @@
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_export_impl</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_path</span><span class="p">,</span> <span class="n">columns</span><span class="p">)</span></div>
-</div>
+
+
+<div class="viewcode-block" id="RayExporter.write_json">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.RayExporter.write_json">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_json</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export method for json/jsonl target files.</span>
+
+<span class="sd">        :param dataset: the dataset to export.</span>
+<span class="sd">        :param export_path: the path to store the exported dataset.</span>
+<span class="sd">        :param kwargs: extra arguments.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">export_path</span><span class="p">,</span> <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RayExporter.write_webdataset">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.RayExporter.write_webdataset">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_webdataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export method for webdataset target files.</span>
+
+<span class="sd">        :param dataset: the dataset to export.</span>
+<span class="sd">        :param export_path: the path to store the exported dataset.</span>
+<span class="sd">        :param kwargs: extra arguments.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.webdataset_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_custom_default_encoder</span>
+
+        <span class="c1"># check if we need to reconstruct the customized WebDataset format</span>
+        <span class="n">export_extra_args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;export_extra_args&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">field_mapping</span> <span class="o">=</span> <span class="n">export_extra_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;field_mapping&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">field_mapping</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">reconstruct_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">reconstruct_custom_webdataset_format</span><span class="p">,</span> <span class="n">field_mapping</span><span class="o">=</span><span class="n">field_mapping</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">reconstruct_func</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">write_webdataset</span><span class="p">(</span><span class="n">export_path</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">_custom_default_encoder</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RayExporter.write_others">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.RayExporter.write_others">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_others</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export method for other target files.</span>
+
+<span class="sd">        :param dataset: the dataset to export.</span>
+<span class="sd">        :param export_path: the path to store the exported dataset.</span>
+<span class="sd">        :param kwargs: extra arguments.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">export_format</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;export_format&quot;</span><span class="p">,</span> <span class="s2">&quot;parquet&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;write_</span><span class="si">{</span><span class="n">export_format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span><span class="n">export_path</span><span class="p">)</span></div>
+
+
+    <span class="c1"># suffix to export method</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_router</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A router from different suffixes to corresponding export methods.</span>
+
+<span class="sd">        :return: A dict router.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;jsonl&quot;</span><span class="p">:</span> <span class="n">RayExporter</span><span class="o">.</span><span class="n">write_json</span><span class="p">,</span>
+            <span class="s2">&quot;json&quot;</span><span class="p">:</span> <span class="n">RayExporter</span><span class="o">.</span><span class="n">write_json</span><span class="p">,</span>
+            <span class="s2">&quot;webdataset&quot;</span><span class="p">:</span> <span class="n">RayExporter</span><span class="o">.</span><span class="n">write_webdataset</span><span class="p">,</span>
+            <span class="s2">&quot;parquet&quot;</span><span class="p">:</span> <span class="n">RayExporter</span><span class="o">.</span><span class="n">write_others</span><span class="p">,</span>
+            <span class="s2">&quot;csv&quot;</span><span class="p">:</span> <span class="n">RayExporter</span><span class="o">.</span><span class="n">write_others</span><span class="p">,</span>
+            <span class="s2">&quot;tfrecords&quot;</span><span class="p">:</span> <span class="n">RayExporter</span><span class="o">.</span><span class="n">write_others</span><span class="p">,</span>
+            <span class="s2">&quot;lance&quot;</span><span class="p">:</span> <span class="n">RayExporter</span><span class="o">.</span><span class="n">write_others</span><span class="p">,</span>
+        <span class="p">}</span></div>
 
 </pre></div>
         </article>

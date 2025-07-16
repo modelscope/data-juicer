@@ -369,7 +369,7 @@
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.DownloadFileMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DownloadFileMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to download url files to local files.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to download url files to local files or load them into memory.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -377,8 +377,10 @@
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.DownloadFileMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">download_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">save_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">resume_download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
         <span class="n">max_concurrent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
@@ -389,6 +391,8 @@
 
 <span class="sd">        :param save_dir: The directory to save downloaded files.</span>
 <span class="sd">        :param download_field: The filed name to get the url to download.</span>
+<span class="sd">        :param save_field: The filed name to save the downloaded file content.</span>
+<span class="sd">        :param resume_download: Whether to resume download. if True, skip the sample if it exists.</span>
 <span class="sd">        :param max_concurrent: Maximum concurrent downloads.</span>
 <span class="sd">        :param args: extra args</span>
 <span class="sd">        :param kwargs: extra args</span>
@@ -398,71 +402,101 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">download_field</span> <span class="o">=</span> <span class="n">download_field</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_field</span> <span class="o">=</span> <span class="n">save_field</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resume_download</span> <span class="o">=</span> <span class="n">resume_download</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_field</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Both `save_dir` and `save_field` are not specified. Use the default `image_bytes` key to &quot;</span>
+                <span class="s2">&quot;save the downloaded contents.&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_bytes_key</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_concurrent</span> <span class="o">=</span> <span class="n">max_concurrent</span></div>
 
 
 <div class="viewcode-block" id="DownloadFileMapper.download_files_async">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.DownloadFileMapper.download_files_async">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">download_files_async</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urls</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">download_files_async</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urls</span><span class="p">,</span> <span class="n">return_contents</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_download_file</span><span class="p">(</span>
-            <span class="n">session</span><span class="p">:</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">,</span> <span class="n">semaphore</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="n">session</span><span class="p">:</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">,</span>
+            <span class="n">semaphore</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span><span class="p">,</span>
+            <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">save_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">return_content</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-                <span class="n">save_path</span> <span class="o">=</span> <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-                <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;success&quot;</span>
-                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_path</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="n">idx</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="kc">None</span>
+                <span class="n">status</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">save_path</span> <span class="o">=</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+                <span class="c1"># local file</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">is_remote_path</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">return_content</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                            <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">save_dir</span><span class="p">:</span>
+                        <span class="n">save_path</span> <span class="o">=</span> <span class="n">url</span>
+                    <span class="k">return</span> <span class="n">idx</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">content</span>
+
+                <span class="c1"># skip already downloaded files</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">save_dir</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">return_content</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">idx</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">content</span>
+
+                <span class="k">if</span> <span class="n">save_dir</span><span class="p">:</span>
+                    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+                    <span class="n">save_path</span> <span class="o">=</span> <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_path</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">return_content</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                                <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                        <span class="k">return</span> <span class="n">idx</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">content</span>
 
                 <span class="k">async</span> <span class="k">with</span> <span class="n">semaphore</span><span class="p">:</span>
-                    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">download_file</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="k">await</span> <span class="n">download_file</span><span class="p">(</span>
+                        <span class="n">session</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">return_content</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                    <span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;failed&quot;</span>
                 <span class="n">response</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
                 <span class="n">save_path</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="kc">None</span>
 
-            <span class="k">return</span> <span class="n">idx</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">response</span>
+            <span class="k">return</span> <span class="n">idx</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">content</span>
 
-        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_downloads</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_downloads</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">return_contents</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">semaphore</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_concurrent</span><span class="p">)</span>
             <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
                 <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="n">_download_file</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">semaphore</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
+                    <span class="n">_download_file</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">semaphore</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">return_contents</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
                 <span class="p">]</span>
                 <span class="k">return</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_downloads</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_downloads</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">return_contents</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
         <span class="n">results</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">results</span></div>
 
 
-<div class="viewcode-block" id="DownloadFileMapper.download_nested_urls">
-<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.DownloadFileMapper.download_nested_urls">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">download_nested_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nested_urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span> <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_flat_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nested_urls</span><span class="p">):</span>
         <span class="n">flat_urls</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">structure_info</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># save as original index, sub index</span>
 
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">urls</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nested_urls</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">sub_idx</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">urls</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">is_remote_path</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
-                        <span class="n">flat_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-                        <span class="n">structure_info</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="n">sub_idx</span><span class="p">))</span>
+                    <span class="n">flat_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                    <span class="n">structure_info</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="n">sub_idx</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">is_remote_path</span><span class="p">(</span><span class="n">urls</span><span class="p">):</span>
-                    <span class="n">flat_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
-                    <span class="n">structure_info</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># -1 means single str element</span>
+                <span class="n">flat_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
+                <span class="n">structure_info</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># -1 means single str element</span>
 
-        <span class="n">download_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">download_files_async</span><span class="p">(</span>
-            <span class="n">flat_urls</span><span class="p">,</span>
-            <span class="n">save_dir</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">flat_urls</span><span class="p">,</span> <span class="n">structure_info</span>
 
-        <span class="n">keep_failed_url</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_path_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nested_urls</span><span class="p">,</span> <span class="n">keep_failed_url</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">keep_failed_url</span><span class="p">:</span>
             <span class="n">reconstructed</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">nested_urls</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -473,20 +507,70 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">reconstructed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 
+        <span class="k">return</span> <span class="n">reconstructed</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_save_field_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nested_urls</span><span class="p">,</span> <span class="n">save_field_contents</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">save_field_contents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">save_field_contents</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">nested_urls</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">save_field_contents</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">save_field_contents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># check whether the save_field_contents format is correct and correct it automatically</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nested_urls</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">save_field_contents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">save_field_contents</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+                        <span class="n">save_field_contents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">save_field_contents</span>
+
+<div class="viewcode-block" id="DownloadFileMapper.download_nested_urls">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.DownloadFileMapper.download_nested_urls">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">download_nested_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nested_urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span> <span class="n">save_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_field_contents</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">flat_urls</span><span class="p">,</span> <span class="n">structure_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flat_urls</span><span class="p">(</span><span class="n">nested_urls</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">save_field_contents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># not save contents, set return_contents to False</span>
+            <span class="n">return_contents</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">flat_urls</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if original content None, set bool value to True to get content else False to skip reload it</span>
+            <span class="n">return_contents</span> <span class="o">=</span> <span class="p">[</span><span class="ow">not</span> <span class="n">c</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">save_field_contents</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+
+        <span class="n">download_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">download_files_async</span><span class="p">(</span>
+            <span class="n">flat_urls</span><span class="p">,</span>
+            <span class="n">return_contents</span><span class="p">,</span>
+            <span class="n">save_dir</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">:</span>
+            <span class="n">reconstructed_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_path_struct</span><span class="p">(</span><span class="n">nested_urls</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reconstructed_path</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="n">failed_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">download_results</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">download_results</span><span class="p">):</span>
             <span class="n">orig_idx</span><span class="p">,</span> <span class="n">sub_idx</span> <span class="o">=</span> <span class="n">structure_info</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;success&quot;</span><span class="p">:</span>
                 <span class="n">save_path</span> <span class="o">=</span> <span class="n">flat_urls</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="n">failed_info</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
 
-            <span class="c1"># TODO: add download stats</span>
-            <span class="k">if</span> <span class="n">sub_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                <span class="n">reconstructed</span><span class="p">[</span><span class="n">orig_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">save_path</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">reconstructed</span><span class="p">[</span><span class="n">orig_idx</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">save_path</span>
+            <span class="k">if</span> <span class="n">save_field_contents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">return_contents</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">sub_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                        <span class="n">save_field_contents</span><span class="p">[</span><span class="n">orig_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">save_field_contents</span><span class="p">[</span><span class="n">orig_idx</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span>
 
-        <span class="k">return</span> <span class="n">reconstructed</span><span class="p">,</span> <span class="n">failed_info</span></div>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">:</span>
+                <span class="c1"># TODO: add download stats</span>
+                <span class="k">if</span> <span class="n">sub_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">reconstructed_path</span><span class="p">[</span><span class="n">orig_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">save_path</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">reconstructed_path</span><span class="p">[</span><span class="n">orig_idx</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">save_path</span>
+
+        <span class="k">return</span> <span class="n">save_field_contents</span><span class="p">,</span> <span class="n">reconstructed_path</span><span class="p">,</span> <span class="n">failed_info</span></div>
 
 
 <div class="viewcode-block" id="DownloadFileMapper.process_batched">
@@ -497,9 +581,31 @@
 
         <span class="n">batch_nested_urls</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">download_field</span><span class="p">]</span>
 
-        <span class="n">reconstructed</span><span class="p">,</span> <span class="n">failed_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">download_nested_urls</span><span class="p">(</span><span class="n">batch_nested_urls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_field</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">resume_download</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_field</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_field</span><span class="si">}</span><span class="s2"> is already in samples. &#39;</span><span class="se">\</span>
+<span class="s2">                        &#39;If you want to resume download, please set `resume_download=True`&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">save_field_contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_save_field_struct</span><span class="p">(</span><span class="n">batch_nested_urls</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
+                    <span class="n">save_field_contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_save_field_struct</span><span class="p">(</span><span class="n">batch_nested_urls</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">save_field_contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_save_field_struct</span><span class="p">(</span><span class="n">batch_nested_urls</span><span class="p">,</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">save_field</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">save_field_contents</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">download_field</span><span class="p">]</span> <span class="o">=</span> <span class="n">reconstructed</span>
+        <span class="n">save_field_contents</span><span class="p">,</span> <span class="n">reconstructed_path</span><span class="p">,</span> <span class="n">failed_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">download_nested_urls</span><span class="p">(</span>
+            <span class="n">batch_nested_urls</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">save_field_contents</span><span class="o">=</span><span class="n">save_field_contents</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">:</span>
+            <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">download_field</span><span class="p">]</span> <span class="o">=</span> <span class="n">reconstructed_path</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_field</span><span class="p">:</span>
+            <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">save_field</span><span class="p">]</span> <span class="o">=</span> <span class="n">save_field_contents</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">failed_info</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed files:</span><span class="se">\n</span><span class="si">{</span><span class="n">failed_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
