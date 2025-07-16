@@ -36,6 +36,14 @@ We provide a [playground](http://8.138.149.181/) with a managed JupyterLab. [Try
 
 Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets.  We welcome you to join us (via issues, PRs, [Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw)  channel, [DingDing](https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11) group, ...), in promoting data-model co-development along with research and applications of foundation models!
 
+[Demo Video] DataJuicer-Agent: Quick start your data processing journey!
+
+https://github.com/user-attachments/assets/58aea900-e51f-4ec2-b1c0-eead97967893
+
+[Demo Video] DataJuicer-Sandbox: Better data-model co-dev at a lower cost!
+
+https://github.com/user-attachments/assets/a45f0eee-0f0e-4ffe-9a42-d9a55370089d
+
 
 ## News
 - 🛠️ [2025-06-04] How to process feedback data in the "era of experience"? We propose [Trinity-RFT: A General-Purpose and Unified Framework for Reinforcement Fine-Tuning of LLMs](https://arxiv.org/abs/2505.17826), which leverages Data-Juicer for its data pipelines tailored for RFT scenarios.
