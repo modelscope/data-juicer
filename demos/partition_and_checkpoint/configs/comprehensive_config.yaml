@@ -1,0 +1,137 @@
+# Comprehensive Partitioning and Checkpointing Configuration
+# This configuration demonstrates all features of the enhanced partitioned Ray executor
+
+# Basic configuration
+project_name: 'comprehensive-partitioning-demo'
+dataset_path: 'demos/data/comprehensive_demo_dataset.jsonl'
+export_path: 'demos/output/comprehensive_result.jsonl'
+
+# Ray configuration
+executor_type: 'ray_partitioned'  # Use the original partitioned executor
+ray_address: 'auto'  # Auto-detect Ray cluster
+
+# Partitioning configuration
+partition_size: 1000  # Number of samples per partition (small for demo)
+max_partition_size_mb: 64  # Maximum partition size in MB
+enable_fault_tolerance: true  # Enable fault tolerance features
+max_retries: 3  # Maximum retry attempts per partition
+preserve_intermediate_data: true  # Save intermediate data after each operation
+cleanup_temp_files: false  # Keep temporary files for analysis
+
+# Data format configuration for performance optimization
+storage_format: 'parquet'  # parquet, arrow, jsonl - Use parquet for maximum compression
+use_arrow_batches: true  # Use Arrow batch format for processing (recommended)
+arrow_batch_size: 1000  # Arrow batch size for processing
+arrow_memory_mapping: false  # Enable memory mapping for Arrow files (use for large files)
+
+# Processing configuration
+np: 4  # Number of processes (will be overridden by Ray cluster resources)
+use_cache: false  # Disable cache for partitioned processing
+op_fusion: true  # Enable operator fusion
+fusion_strategy: 'probe'  # Use probe-based fusion strategy
+
+# Processing pipeline - Simple operations for demo
+process:
+  - whitespace_normalization_mapper:
+  - text_length_filter:
+      min_len: 50
+      max_len: 2000
+  - language_id_score_filter:
+      lang: 'en'
+      min_score: 0.8
+
+# Work directory for checkpoints and temporary files
+work_dir: './demos/work_dir_comprehensive'
+
+# Event logging configuration - Enhanced with latest features
+event_logging:
+  enabled: true
+  log_level: 'INFO'  # DEBUG, INFO, WARNING, ERROR
+  max_log_size_mb: 100
+  backup_count: 5
+  log_to_console: true  # Output events to console
+  log_to_file: true  # Output events to file
+  log_file_path: 'logs/events.jsonl'  # Custom log file path
+  compression: 'gzip'  # Compress log files
+  include_metadata: true  # Include metadata in events
+  include_stack_traces: true  # Include stack traces for errors
+  async_logging: true  # Use async logging for better performance
+  batch_size: 50  # Batch size for async logging
+  flush_interval_seconds: 1  # Flush interval for async logging
+  max_queue_size: 1000  # Maximum queue size for async logging
+
+# Checkpointing configuration - Enhanced with latest features
+checkpointing:
+  enabled: true
+  storage_format: 'parquet'  # Format for checkpoint files (parquet, arrow, jsonl)
+  compression: 'snappy'  # Compression for checkpoint files
+  max_checkpoints_per_partition: 10  # Maximum checkpoints to keep per partition
+  cleanup_old_checkpoints: true  # Automatically clean up old checkpoints
+  checkpoint_interval: 5  # Checkpoint every N operations
+  atomic_operations: true  # Ensure checkpoint consistency
+  validate_checkpoints: true  # Validate checkpoint integrity
+  checkpoint_retention_days: 7  # Keep checkpoints for N days
+
+# Monitoring configuration - Enhanced with latest features
+monitoring:
+  enabled: true
+  refresh_interval_seconds: 5
+  show_recent_events: 10
+  show_partition_details: true
+  real_time_monitoring: true  # Enable real-time event monitoring
+  performance_tracking: true  # Track performance metrics
+  resource_monitoring: true  # Monitor CPU, memory, I/O usage
+  alert_on_errors: true  # Send alerts on errors
+  alert_on_performance_degradation: true  # Alert on performance issues
+
+# Recovery configuration - Enhanced with latest features
+recovery:
+  enabled: true
+  max_retries: 3
+  retry_delay_seconds: 5
+  use_checkpoints_for_recovery: true
+  restart_from_beginning_if_no_checkpoint: true
+  exponential_backoff: true  # Use exponential backoff for retries
+  max_retry_delay_seconds: 300  # Maximum delay between retries
+  retry_on_transient_errors: true  # Retry on transient errors
+  skip_on_permanent_errors: true  # Skip partitions with permanent errors
+  recovery_strategy: 'checkpoint_first'  # checkpoint_first, retry_first, skip_failed
+
+# Performance tuning - Enhanced with latest features
+performance:
+  batch_size: 1000
+  prefetch_factor: 2
+  num_workers: 4
+  memory_limit_gb: 8
+  enable_compression: true
+  use_arrow_batches: true
+  arrow_batch_size: 1000
+  memory_mapping: false  # Enable memory mapping for large files
+  parallel_merging: true  # Merge results in parallel
+  load_balancing: true  # Balance load across partitions
+  adaptive_partitioning: false  # Dynamically adjust partition size
+  priority_queuing: false  # Process partitions with priority
+
+# Advanced features - Latest additions
+advanced:
+  enable_adaptive_partitioning: false  # Dynamically adjust partition size
+  enable_load_balancing: true  # Balance load across partitions
+  enable_priority_queuing: false  # Process partitions with priority
+  enable_parallel_merging: true  # Merge results in parallel
+  enable_metadata_tracking: true  # Track detailed metadata
+  enable_performance_profiling: true  # Profile operation performance
+  enable_resource_optimization: true  # Optimize resource usage
+  enable_error_classification: true  # Classify errors as transient/permanent
+  enable_graceful_degradation: true  # Continue processing on partial failures
+  enable_audit_trail: true  # Maintain complete audit trail
+
+# Ray-specific optimizations
+ray:
+  num_cpus: 8  # Number of CPUs to use
+  num_gpus: 0  # Number of GPUs to use
+  memory: 16000000000  # Memory limit in bytes
+  object_store_memory: 8000000000  # Object store memory in bytes
+  enable_object_reconstruction: true  # Enable object reconstruction
+  object_timeout_milliseconds: 1000  # Object timeout
+  enable_ray_dashboard: true  # Enable Ray dashboard
+  ray_dashboard_port: 8265  # Ray dashboard port 

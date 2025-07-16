@@ -1,0 +1,66 @@
+# Event Logging Configuration Example for Data-Juicer Executors
+# This configuration can be used with any executor (default, ray, ray_partitioned, etc.)
+
+# Basic executor configuration
+executor_type: "default"  # Can be: default, ray, ray_partitioned
+work_dir: "./work_dir"
+
+# Dataset configuration
+dataset_path: "demos/data/demo-dataset_1725870268.jsonl"
+export_path: "./output.jsonl"
+
+# Processing pipeline
+process:
+  - name: "text_length_filter"
+    args:
+      min_len: 10
+      max_len: 1000
+  
+  - name: "text_cleaning"
+    args:
+      text_key: "text"
+  
+  - name: "language_id_score_filter"
+    args:
+      lang: "en"
+      min_score: 0.8
+
+# Event Logging Configuration
+# This enables comprehensive event logging for any executor
+event_logging:
+  enabled: true                    # Enable/disable event logging
+  log_level: "INFO"               # Log level: DEBUG, INFO, WARNING, ERROR
+  max_log_size_mb: 100            # Maximum log file size before rotation
+  backup_count: 5                 # Number of backup log files to keep
+
+# Optional: Ray-specific configuration (if using Ray executor)
+ray_address: "auto"               # Ray cluster address
+
+# Optional: Partitioned Ray configuration (if using ray_partitioned executor)
+partition_size: 10000             # Samples per partition
+max_partition_size_mb: 128        # Maximum partition size
+enable_fault_tolerance: true      # Enable fault tolerance
+max_retries: 3                    # Retry attempts per partition
+preserve_intermediate_data: false # Save intermediate data
+storage_format: "parquet"         # parquet, arrow, jsonl
+use_arrow_batches: true           # Use Arrow batch format
+
+# Optional: Checkpointing configuration (for partitioned executors)
+checkpointing:
+  enabled: true
+  storage_format: "parquet"
+  compression: "snappy"
+  max_checkpoints_per_partition: 10
+  cleanup_old_checkpoints: true
+
+# Other common configurations
+use_cache: false
+use_checkpoint: false
+np: 4                            # Number of processes
+export_shard_size: 10000         # Export shard size
+export_in_parallel: false
+keep_stats_in_res_ds: false
+keep_hashes_in_res_ds: false
+open_tracer: false
+trace_num: 10
+op_list_to_trace: [] 
