@@ -889,6 +889,10 @@ class PerformanceBenchmark:
             "analyzer_insights": analyzer_insights,
         }
 
+        # Write results to output files in "both" mode
+        if benchmark_type == "both":
+            self._write_benchmark_results(results, mode, filters)
+
         return results
 
     def _run_and_save_individual_execution(
@@ -1533,6 +1537,130 @@ class PerformanceBenchmark:
         except Exception as e:
             logger.warning(f"⚠️  Analyzer failed: {e}")
             return None
+
+    def _write_benchmark_results(self, results: Dict[str, Any], mode: str, filters: List[Filter]) -> None:
+        import json
+        from datetime import datetime
+
+        # Create output directory
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_dir = f"outputs/benchmark_results_{mode}_{timestamp}"
+        os.makedirs(output_dir, exist_ok=True)
+
+        logger.info(f"📁 Writing benchmark results to: {output_dir}")
+
+        # Write main results JSON
+        results_file = os.path.join(output_dir, "benchmark_results.json")
+        with open(results_file, "w", encoding="utf-8") as f:
+            json.dump(results, f, indent=2, ensure_ascii=False, default=str)
+        logger.info(f"📄 Main results saved to: {results_file}")
+
+        # Write detailed performance report
+        report_file = os.path.join(output_dir, "performance_report.txt")
+        with open(report_file, "w", encoding="utf-8") as f:
+            f.write("DATA-JUICER PERFORMANCE BENCHMARK REPORT\n")
+            f.write("=" * 50 + "\n\n")
+
+            f.write(f"Benchmark Configuration:\n")
+            f.write(f"  Mode: {mode}\n")
+            f.write(f"  Number of filters: {results['num_filters']}\n")
+            f.write(f"  Number of samples: {results['num_samples']:,}\n")
+            f.write(f"  Benchmark type: {results['benchmark_type']}\n\n")
+
+            f.write("Performance Results:\n")
+            f.write("-" * 30 + "\n")
+
+            # Individual execution results
+            f.write("Individual Execution:\n")
+            individual = results["individual"]
+            f.write(f"  Total time: {individual['total_time']:.3f}s\n")
+            f.write(f"  Stats computation: {individual['stats_time']:.3f}s\n")
+            f.write(f"  Filtering: {individual['filter_time']:.3f}s\n")
+            f.write(f"  Memory usage: {individual['memory_usage']:.1f} MB\n")
+            f.write(f"  Throughput: {individual['throughput']:.1f} samples/sec\n\n")
+
+            # Pipeline execution results
+            f.write("Pipeline Execution (FusedFilter):\n")
+            pipeline = results["pipeline"]
+            f.write(f"  Total time: {pipeline['total_time']:.3f}s\n")
+            f.write(f"  Stats computation: {pipeline['stats_time']:.3f}s\n")
+            f.write(f"  Filtering: {pipeline['filter_time']:.3f}s\n")
+            f.write(f"  Memory usage: {pipeline['memory_usage']:.1f} MB\n")
+            f.write(f"  Throughput: {pipeline['throughput']:.1f} samples/sec\n\n")
+
+            # Performance comparison
+            if individual["total_time"] > 0 and pipeline["total_time"] > 0:
+                speedup = individual["total_time"] / pipeline["total_time"]
+                f.write("Performance Comparison:\n")
+                f.write("-" * 30 + "\n")
+                f.write(f"  Speedup: {speedup:.2f}x\n")
+                f.write(
+                    f"  Time savings: {((individual['total_time'] - pipeline['total_time']) / individual['total_time'] * 100):.1f}%\n"
+                )
+                f.write(
+                    f"  Throughput improvement: {((pipeline['throughput'] - individual['throughput']) / individual['throughput'] * 100):.1f}%\n"
+                )
+
+            # Correctness validation
+            if results.get("correctness_passed") is not None:
+                f.write("\nCorrectness Validation:\n")
+                f.write("-" * 30 + "\n")
+                if results["correctness_passed"]:
+                    f.write("  ✅ PASSED: Individual and pipeline execution produce identical results\n")
+                else:
+                    f.write("  ❌ FAILED: Individual and pipeline execution produce different results\n")
+
+            # Filter details
+            f.write("\nFilter Details:\n")
+            f.write("-" * 30 + "\n")
+            for i, filter_op in enumerate(filters):
+                filter_name = getattr(filter_op, "_name", type(filter_op).__name__)
+                f.write(f"  {i+1}. {filter_name}\n")
+
+            # Analyzer insights (if available)
+            if results.get("analyzer_insights"):
+                f.write("\nAnalyzer Insights:\n")
+                f.write("-" * 30 + "\n")
+                insights = results["analyzer_insights"]
+                if isinstance(insights, dict):
+                    for key, value in insights.items():
+                        if isinstance(value, dict):
+                            f.write(f"  {key}:\n")
+                            for sub_key, sub_value in value.items():
+                                f.write(f"    {sub_key}: {sub_value}\n")
+                        else:
+                            f.write(f"  {key}: {value}\n")
+        logger.info(f"📄 Performance report saved to: {report_file}")
+
+        # Write CSV summary for easy analysis
+        csv_file = os.path.join(output_dir, "performance_summary.csv")
+        with open(csv_file, "w", encoding="utf-8") as f:
+            f.write("total_time,stats_time,filter_time,memory_usage,throughput\n")
+            f.write(
+                f"{individual['total_time']:.3f},{individual['stats_time']:.3f},{individual['filter_time']:.3f},{individual['memory_usage']:.1f},{individual['throughput']:.1f}\n"
+            )
+            f.write(
+                f"{pipeline['total_time']:.3f},{pipeline['stats_time']:.3f},{pipeline['filter_time']:.3f},{pipeline['memory_usage']:.1f},{pipeline['throughput']:.1f}\n"
+            )
+            f.write(
+                f"{(individual['total_time'] - pipeline['total_time']):.3f},{(individual['stats_time'] - pipeline['stats_time']):.3f},{(individual['filter_time'] - pipeline['filter_time']):.3f},{(individual['memory_usage'] - pipeline['memory_usage']):.1f},{(pipeline['throughput'] - individual['throughput']):.1f}\n"
+            )
+        logger.info(f"📄 Performance summary CSV saved to: {csv_file}")
+
+        # Write configuration file
+        config_file = os.path.join(output_dir, "benchmark_config.json")
+        config = {
+            "mode": mode,
+            "num_filters": len(filters),
+            "filters": [getattr(f, "_name", type(f).__name__) for f in filters],
+            "timestamp": timestamp,
+            "benchmark_type": results["benchmark_type"],
+        }
+        with open(config_file, "w", encoding="utf-8") as f:
+            json.dump(config, f, indent=2, ensure_ascii=False)
+        logger.info(f"📄 Configuration saved to: {config_file}")
+
+        logger.info(f"✅ All benchmark results written to: {output_dir}")
 
 
 def load_real_dataset(dataset_path: str, max_samples: Optional[int] = None) -> Any:
