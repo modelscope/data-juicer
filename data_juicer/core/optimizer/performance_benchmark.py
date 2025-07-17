@@ -59,10 +59,11 @@ from data_juicer.ops.filter import (
     FlaggedWordFilter,
     LanguageIDScoreFilter,
     MaximumLineLengthFilter,
-    PerplexityFilter,
     SpecialCharactersFilter,
     StopWordsFilter,
+    TextActionFilter,
     TextLengthFilter,
+    TokenNumFilter,
     WordRepetitionFilter,
     WordsNumFilter,
 )
@@ -130,12 +131,11 @@ class PerformanceBenchmark:
     def __init__(self):
         self.results = {}
 
-    def create_test_filters(self) -> List[Filter]:
+    def create_full_test_filters(self) -> List[Filter]:
         """Create a comprehensive set of test filters covering different categories."""
         logger.info("Creating comprehensive test filters...")
 
         filters = [
-            # Basic text filters (simple, fast) - Realistic settings
             WordsNumFilter(min_num=10, max_num=2000),  # 10-2000 words (was 1-100000)
             TextLengthFilter(min_len=50, max_len=10000),  # 50-10000 chars (was 1-100000)
             CharacterRepetitionFilter(repetition_ratio=0.3),  # Max 30% repetition (was 0.999)
@@ -144,10 +144,8 @@ class PerformanceBenchmark:
             AlphanumericFilter(min_ratio=0.5),  # At least 50% alphanumeric (was 0.001)
             AverageLineLengthFilter(min_len=10, max_len=200),  # 10-200 chars per line (was 1-10000)
             MaximumLineLengthFilter(min_len=10, max_len=500),  # 10-500 chars per line (was 1-20000)
-            # Content quality filters (moderate complexity) - Realistic settings
-            PerplexityFilter(
-                lang="en", model_key="gpt2", min_score=0.0, max_score=1000
-            ),  # Max perplexity 1000 (was 1e10)
+            TokenNumFilter(min_num=50, max_num=1000),  # 50-1000 tokens using HuggingFace tokenizer
+            TextActionFilter(lang="en", min_action_num=1),  # At least 1 action (verb) using spaCy
             StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.6),  # Max 60% stop words (was 0.99)
             FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1),  # Max 10% flagged words (was 0.99)
             LanguageIDScoreFilter(lang="en", min_score=0.5),  # At least 50% English confidence (was 0.0)
@@ -1497,30 +1495,6 @@ class PerformanceBenchmark:
             words_num_filter.WordsNumFilter(min_num=10, max_num=400),  # 10-400 words (was 5-200)
         ]
 
-    def create_full_test_filters(self) -> List[Filter]:
-        """Get a comprehensive set of filters for full testing."""
-        from data_juicer.ops.filter import (
-            alphanumeric_filter,
-            character_repetition_filter,
-            special_characters_filter,
-            stopwords_filter,
-            text_length_filter,
-            word_repetition_filter,
-            words_num_filter,
-        )
-
-        return [
-            alphanumeric_filter.AlphanumericFilter(min_ratio=0.75),  # At least 75% alphanumeric (was 0.6)
-            text_length_filter.TextLengthFilter(min_len=200, max_len=3000),  # 200-3000 chars (was 100-5000)
-            words_num_filter.WordsNumFilter(min_num=30, max_num=500),  # 30-500 words (was 20-1000)
-            character_repetition_filter.CharacterRepetitionFilter(max_ratio=0.15),  # Max 15% repetition (was 0.25)
-            word_repetition_filter.WordRepetitionFilter(max_ratio=0.2),  # Max 20% word repetition (was 0.3)
-            special_characters_filter.SpecialCharactersFilter(
-                min_ratio=0.0, max_ratio=0.15
-            ),  # Max 15% special chars (was 0.25)
-            stopwords_filter.StopWordsFilter(min_ratio=0.15, max_ratio=0.4),  # 15-40% stop words (was 0.1-0.5)
-        ]
-
     def run_analyzer(self, test_data: Any) -> Optional[Dict[str, Any]]:
         """Run analyzer to get insights for optimization."""
         try:
@@ -1987,7 +1961,7 @@ def main():
     if args.mode == "quick":
         filters = benchmark.create_quick_test_filters()
     elif args.mode == "full":
-        filters = benchmark.create_test_filters()  # Use comprehensive test filters (12 filters)
+        filters = benchmark.create_full_test_filters()  # Use comprehensive test filters (13 filters)
     elif args.mode == "recipe":
         # Simple recipe loading - just load the process list from YAML
         if not args.recipe_path:

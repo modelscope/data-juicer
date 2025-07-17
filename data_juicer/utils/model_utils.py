@@ -1047,11 +1047,11 @@ def get_model(model_key=None, rank=None, use_cuda=False):
             else:
                 device = "cpu"
 
-            logger.info(f"Loading model with device={device}")
+            logger.info(f"Loading model with device={device}, model_key={model_key}")
             MODEL_ZOO[model_key] = model_key(device=device)
-            logger.debug("Model loaded and cached")
+            logger.info(f"Model loaded and cached, model_key={model_key}")
         else:
-            logger.debug("Model found in cache, reusing")
+            logger.info(f"Model found in cache, reusing, model_key={model_key}")
 
         return MODEL_ZOO[model_key]
     else:
