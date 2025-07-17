@@ -119,6 +119,14 @@ def check_model(model_name, force=False):
     return cached_model_path
 
 
+def check_cache_model(model_name):
+    cached_model_path = os.path.join(DJMC, model_name)
+    if os.path.exists(cached_model_path):
+        return cached_model_path
+    
+    return model_name
+
+
 def filter_arguments(func, args_dict):
     """
     Filters and returns only the valid arguments for a given function
@@ -355,7 +363,7 @@ def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type, **mod
         )
 
     pipeline = diffusion_type_to_pipeline[diffusion_type]
-    model = pipeline.from_pretrained(pretrained_model_name_or_path, **model_params)
+    model = pipeline.from_pretrained(check_cache_model(pretrained_model_name_or_path), **model_params)
     if device:
         model = model.to(device)
 
@@ -420,6 +428,7 @@ def prepare_huggingface_model(
                 model_params["device"] = device
                 logger.warning("accelerate not found, using device directly")
 
+    pretrained_model_name_or_path = check_cache_model(pretrained_model_name_or_path)
     processor = transformers.AutoProcessor.from_pretrained(pretrained_model_name_or_path, **model_params)
 
     if return_model:
@@ -583,6 +592,7 @@ def prepare_recognizeAnything_model(
 
 
 def prepare_sdxl_prompt2prompt(pretrained_model_name_or_path, pipe_func, torch_dtype="fp32", device="cpu"):
+    pretrained_model_name_or_path = check_cache_model(pretrained_model_name_or_path)
     if torch_dtype == "fp32":
         model = pipe_func.from_pretrained(
             pretrained_model_name_or_path, torch_dtype=torch.float32, use_safetensors=True
@@ -643,6 +653,7 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path, *, return_mod
                 model_params["device"] = device
                 logger.warning("accelerate not found, using device directly")
 
+    pretrained_model_name_or_path = check_cache_model(pretrained_model_name_or_path)
     processor = transformers.CLIPProcessor.from_pretrained(pretrained_model_name_or_path, **model_params)
     if not return_model:
         return processor
@@ -830,6 +841,7 @@ def prepare_video_blip_model(pretrained_model_name_or_path, *, return_model=True
             # Initialize weights and apply final processing
             self.post_init()
 
+    pretrained_model_name_or_path = check_cache_model(pretrained_model_name_or_path)
     processor = transformers.AutoProcessor.from_pretrained(pretrained_model_name_or_path, **model_params)
     if return_model:
         model_class = VideoBlipForConditionalGeneration
@@ -850,7 +862,7 @@ def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
     if model_params.get("device", "").startswith("cuda:"):
         model_params["device"] = "cuda"
 
-    model = vllm.LLM(model=pretrained_model_name_or_path, generation_config="auto", **model_params)
+    model = vllm.LLM(model=check_cache_model(pretrained_model_name_or_path), generation_config="auto", **model_params)
     tokenizer = model.get_tokenizer()
 
     return (model, tokenizer)
@@ -868,6 +880,7 @@ def prepare_embedding_model(model_path, **model_params):
     if "device" in model_params:
         device = model_params.pop("device")
 
+    model_path = check_cache_model(model_path)
     tokenizer = transformers.AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     model = transformers.AutoModel.from_pretrained(model_path, trust_remote_code=True).to(device).eval()
 
@@ -912,7 +925,7 @@ def update_sampling_params(sampling_params, pretrained_model_name_or_path, enabl
 
     # try to get the generation configs
     from transformers import GenerationConfig
-
+    pretrained_model_name_or_path = check_cache_model(pretrained_model_name_or_path)
     try:
         model_generation_config = GenerationConfig.from_pretrained(pretrained_model_name_or_path).to_dict()
     except:  # noqa: E722
