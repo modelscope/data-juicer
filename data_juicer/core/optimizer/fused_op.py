@@ -34,8 +34,8 @@ class FusedFilter(Filter):
         # Store extra config arguments as attributes
         self.accelerator = kwargs.get("accelerator", "cpu")
         self.batch_size = kwargs.get("batch_size", None)
-        self.cpu_required = kwargs.get("cpu_required", None)
-        self.mem_required = kwargs.get("mem_required", None)
+        self.cpu_required = kwargs.get("cpu_required", 1)  # Default to 1 CPU
+        self.mem_required = kwargs.get("mem_required", 1)  # Default to 1 GB
         self.num_proc = kwargs.get("num_proc", None)
         self.skip_op_error = kwargs.get("skip_op_error", False)
         self.turbo = kwargs.get("turbo", False)
@@ -573,13 +573,14 @@ class FusedFilter(Filter):
 
         return result
 
-    def run(self, dataset, *, exporter=None, tracer=None):
+    def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
         """Run the fused filter on a dataset.
 
         Args:
             dataset: Dataset to process
             exporter: Optional exporter for results
             tracer: Optional tracer for monitoring
+            reduce: Whether to apply filtering (True) or just compute stats (False)
 
         Returns:
             Processed dataset
@@ -594,14 +595,31 @@ class FusedFilter(Filter):
         for op in self.fused_filters:
             dataset = Filter.run(op, dataset)
 
-        # Process the dataset
+        # Compute stats for all filters
         new_dataset = dataset.map(
-            self.process_batched,
-            num_proc=self.num_proc,
+            self.compute_stats,
+            num_proc=self.runtime_np(),
             with_rank=self.use_cuda(),
             batch_size=self.batch_size,
-            desc=self._name + "_process",
+            desc=self._name + "_compute_stats",
         )
+
+        # Export stats if requested
+        if exporter and self.stats_export_path is not None:
+            exporter.export_compute_stats(new_dataset, self.stats_export_path)
+
+        # Apply filtering if reduce=True
+        if reduce:
+            new_dataset = new_dataset.filter(
+                self.process, num_proc=self.runtime_np(), batch_size=self.batch_size, desc=self._name + "_process"
+            )
+            if tracer:
+                tracer.trace_filter(self._name, dataset, new_dataset)
+
+        # Free models to save memory
+        from data_juicer.utils.model_utils import free_models
+
+        free_models()
 
         return new_dataset
 
