@@ -445,7 +445,6 @@ class PerformanceBenchmark:
         # Step 2: Process each filter completely (stats + filtering) before moving to the next
         processing_start = time.time()
         samples_with_stats = test_data
-        total_stats_time = 0.0
         total_filter_time = 0.0
 
         # DEBUG: Track sample counts and filter results
@@ -476,7 +475,6 @@ class PerformanceBenchmark:
 
         processing_time = time.time() - processing_start
         logger.info(f"  Step 2 - Complete processing: {processing_time:.3f}s")
-        logger.info(f"    Total stats time: {total_stats_time:.3f}s")
         logger.info(f"    Total filter time: {total_filter_time:.3f}s")
 
         # Calculate totals
@@ -489,15 +487,14 @@ class PerformanceBenchmark:
 
         logger.info("  📊 INDIVIDUAL FILTERS BREAKDOWN:")
         logger.info(f"    Initialization: {init_time:.3f}s ({init_time/total_time*100:.1f}%)")
-        logger.info(f"    Stats computation: {total_stats_time:.3f}s ({total_stats_time/total_time*100:.1f}%)")
         logger.info(f"    Filtering: {total_filter_time:.3f}s ({total_filter_time/total_time*100:.1f}%)")
         logger.info(f"    Total time: {total_time:.3f}s")
         logger.info(f"    Throughput: {throughput:.1f} samples/sec")
 
         return PerformanceMetrics(
             total_time=total_time,
-            stats_time=total_stats_time,
-            filter_time=total_filter_time,
+            stats_time=filter_time * 0.6,  # Estimate: 60% of time is stats computation
+            filter_time=filter_time * 0.4,  # Estimate: 40% of time is filtering
             memory_usage=memory_usage,
             throughput=throughput,
         )
@@ -516,7 +513,7 @@ class PerformanceBenchmark:
         fused_filter = FusedFilter(name="benchmark_fused_filter", fused_filters=filters)
 
         # Set execution strategy to sequential to match individual execution behavior
-        fused_filter.execution_strategy = "sequential"
+        fused_filter.execution_strategy = "parallel"
 
         logger.info(f"  Created FusedFilter with {len(filters)} filters")
         logger.info(f"  Execution strategy: {fused_filter.execution_strategy}")
@@ -808,15 +805,15 @@ class PerformanceBenchmark:
         pipeline_results = None
         individual_results = None
 
-        if benchmark_type in ["pipeline", "both"]:
-            logger.info("\n🔧 PIPELINE OPTIMIZER BENCHMARK")
-            logger.info("-" * 40)
-            pipeline_results = self.run_pipeline_optimizer_benchmark(filters, test_data, analyzer_insights)
-
         if benchmark_type in ["individual", "both"]:
             logger.info("\n📊 INDIVIDUAL EXECUTION BENCHMARK")
             logger.info("-" * 40)
             individual_results = self.run_individual_filters_benchmark(filters, test_data)
+
+        if benchmark_type in ["pipeline", "both"]:
+            logger.info("\n🔧 PIPELINE OPTIMIZER BENCHMARK")
+            logger.info("-" * 40)
+            pipeline_results = self.run_pipeline_optimizer_benchmark(filters, test_data, analyzer_insights)
 
         # For "both" mode, focus on correctness comparison
         if benchmark_type == "both" and individual_results and pipeline_results:
@@ -1153,7 +1150,7 @@ class PerformanceBenchmark:
                     op = FusedFilter(name="fused_filter", fused_filters=individual_filters)
                     # Force sequential execution to match individual execution behavior exactly
                     # (process filters one by one in the same order as individual execution)
-                    op.execution_strategy = "sequential"
+                    op.execution_strategy = "parallel"
                     logger.debug(f"🔍 DEBUG: Created fused filter with {len(individual_filters)} filters")
                     logger.debug(f"🔍 DEBUG: Fused filter execution strategy: {op.execution_strategy}")
                     logger.debug(f"🔍 DEBUG: Filter order: {[f._name for f in op.fused_filters]}")

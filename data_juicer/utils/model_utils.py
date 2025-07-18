@@ -1036,9 +1036,9 @@ def get_model(model_key=None, rank=None, use_cuda=False):
             import traceback
 
             stack_trace = traceback.format_stack()[-3:]  # Last 3 frames
-            logger.debug(f"Model key not found in MODEL_ZOO ({mp.current_process().name})")
-            logger.debug(f"Model key: {model_key}")
-            logger.debug(f"Call stack:\n{''.join(stack_trace)}")
+            logger.info(f"Model key not found in MODEL_ZOO ({mp.current_process().name})")
+            logger.info(f"Model key: {model_key}")
+            logger.info(f"Call stack:\n{''.join(stack_trace)}")
 
             if use_cuda:
                 rank = rank if rank is not None else 0
@@ -1051,7 +1051,7 @@ def get_model(model_key=None, rank=None, use_cuda=False):
             MODEL_ZOO[model_key] = model_key(device=device)
             logger.info(f"Model loaded and cached, model_key={model_key}")
         else:
-            logger.info(f"Model found in cache, reusing, model_key={model_key}")
+            logger.debug(f"Model found in cache, reusing, model_key={model_key}")
 
         return MODEL_ZOO[model_key]
     else:
