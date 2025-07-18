@@ -17,6 +17,28 @@ from data_juicer.utils.common_utils import dict_to_hash
 from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 
 
+class Sizes:
+    KiB = 2**10  # 1024
+    MiB = 2**20  # 1024*1024
+    GiB = 2**30  # 1024*1024*1024
+    TiB = 2**40  # 1024*1024*1024*1024
+
+
+def byte_size_to_size_str(byte_size: int):
+    # get the string format of shard size
+    if byte_size // Sizes.TiB:
+        size_str = "%.2f TiB" % (byte_size / Sizes.TiB)
+    elif byte_size // Sizes.GiB:
+        size_str = "%.2f GiB" % (byte_size / Sizes.GiB)
+    elif byte_size // Sizes.MiB:
+        size_str = "%.2f MiB" % (byte_size / Sizes.MiB)
+    elif byte_size // Sizes.KiB:
+        size_str = "%.2f KiB" % (byte_size / Sizes.KiB)
+    else:
+        size_str = "%.2f Bytes" % byte_size
+    return size_str
+
+
 async def follow_read(
     logfile_path: str,
     skip_existing_content: bool = False,
