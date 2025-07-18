@@ -20,6 +20,7 @@ from data_juicer.utils.nltk_utils import (
     patch_nltk_pickle_security,
 )
 
+from .cache_utils import DATA_JUICER_EXTERNAL_MODELS_HOME as DJEMH
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
 
 torch = LazyLoader("torch")
@@ -38,8 +39,6 @@ openai = LazyLoader("openai")
 ultralytics = LazyLoader("ultralytics")
 tiktoken = LazyLoader("tiktoken")
 dashscope = LazyLoader("dashscope")
-
-DATA_JUICER_MODELS_HOME = os.getenv("DATA_JUICER_MODELS_HOME", None)
 
 MODEL_ZOO = {}
 
@@ -88,8 +87,8 @@ def check_model(model_name, force=False):
     if not force and os.path.exists(model_name):
         return model_name
 
-    if not force and DATA_JUICER_MODELS_HOME and os.path.exists(os.path.join(DATA_JUICER_MODELS_HOME, model_name)):
-        return os.path.join(DATA_JUICER_MODELS_HOME, model_name)
+    if not force and DJEMH and os.path.exists(os.path.join(DJEMH, model_name)):
+        return os.path.join(DJEMH, model_name)
 
     if not os.path.exists(DJMC):
         os.makedirs(DJMC)
@@ -125,10 +124,10 @@ def check_model(model_name, force=False):
 
 
 def check_model_home(model_name):
-    if not DATA_JUICER_MODELS_HOME:
+    if not DJEMH:
         return model_name
 
-    cached_model_path = os.path.join(DATA_JUICER_MODELS_HOME, model_name)
+    cached_model_path = os.path.join(DJEMH, model_name)
     if os.path.exists(cached_model_path):
         return cached_model_path
     return model_name
