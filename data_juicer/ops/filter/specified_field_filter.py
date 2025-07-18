@@ -1,5 +1,7 @@
 from typing import List
 
+from data_juicer.utils.constant import Fields
+
 from ..base_op import NON_STATS_FILTERS, OPERATORS, Filter
 
 OP_NAME = "specified_field_filter"
@@ -33,20 +35,28 @@ class SpecifiedFieldFilter(Filter):
         self.target_value = target_value
 
     def compute_stats_single(self, sample):
+        # get the value from the original field
+        field_value = sample
+        for key in self.field_key.split("."):
+            assert key in field_value.keys(), "'{}' not in {}".format(key, field_value.keys())
+            field_value = field_value[key]
+        # copy it into the stats field
+        if self.field_key not in sample[Fields.stats]:
+            sample[Fields.stats][self.field_key] = field_value
         return sample
 
     def process_single(self, sample):
         if not (self.field_key and self.target_value):
             return True
 
-        field_value = sample
-        for key in self.field_key.split("."):
-            assert key in field_value.keys(), "'{}' not in {}".format(key, field_value.keys())
-            field_value = field_value[key]
+        field_value = sample[Fields.stats][self.field_key]
 
         if not (isinstance(field_value, list) or isinstance(field_value, tuple)):
             field_value = [field_value]
+        res_bool = True
         for value in field_value:
             if value not in self.target_value:
-                return False
-        return True
+                res_bool = False
+        if self.reversed_range:
+            res_bool = not res_bool
+        return res_bool

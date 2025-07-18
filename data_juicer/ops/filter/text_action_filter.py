@@ -57,7 +57,4 @@ class TextActionFilter(Filter):
 
     def process_single(self, sample):
         num_action = sample[Fields.stats][StatsKeys.num_action]
-        if self.min_action_num <= num_action:
-            return True
-        else:
-            return False
+        return self.get_keep_boolean(num_action, self.min_action_num)

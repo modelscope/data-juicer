@@ -190,7 +190,10 @@ class VideoAestheticsFilter(Filter):
             return True
 
         keep_bools = np.array(
-            [self.min_score <= aesthetics_score <= self.max_score for aesthetics_score in aesthetics_scores]
+            [
+                self.get_keep_boolean(aesthetics_score, self.min_score, self.max_score)
+                for aesthetics_score in aesthetics_scores
+            ]
         )
 
         # different strategies

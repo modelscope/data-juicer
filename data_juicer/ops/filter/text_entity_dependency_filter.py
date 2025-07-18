@@ -80,7 +80,9 @@ class TextEntityDependencyFilter(Filter):
 
     def process_single(self, sample):
         num_dependency_edges = sample[Fields.stats][StatsKeys.num_dependency_edges]
-        keep_bools = np.array([self.min_dependency_num <= num_edge for num_edge in num_dependency_edges])
+        keep_bools = np.array(
+            [self.get_keep_boolean(num_edge, self.min_dependency_num) for num_edge in num_dependency_edges]
+        )
         # omit the samples without entity
         if len(keep_bools) <= 0:
             return False
