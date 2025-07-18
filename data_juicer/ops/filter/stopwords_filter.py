@@ -43,7 +43,7 @@ class StopWordsFilter(Filter):
             languages
         :param tokenization: whether to use model to tokenize documents
         :param min_ratio: The min filter ratio in this op.
-        :param min_ratio: The max filter ratio in this op.
+        :param max_ratio: The max filter ratio in this op.
         :param stopwords_dir: The directory storing the stopwords
             file(s) whose name includes "stopwords" and in json format
         :param use_words_aug: Whether to augment words, especially for

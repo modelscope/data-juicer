@@ -44,7 +44,7 @@ class FlaggedWordFilter(Filter):
             "all", we will adopt the one merged from all the available
             languages
         :param tokenization: Whether to use model to tokenize documents
-        :param max_ratio: The min filter ratio in this op.
+        :param min_ratio: The min filter ratio in this op.
         :param max_ratio: The max filter ratio in this op.
         :param flagged_words_dir: The directory storing the
             flagged_words file(s) whose name includes "flagged_words"

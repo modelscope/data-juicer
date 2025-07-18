@@ -123,7 +123,7 @@ json
 
         :param api_or_hf_model: API or huggingface model name.
         :param min_score: The min score threshold to keep the sample.
-        :param min_score: The max score threshold to keep the sample.
+        :param max_score: The max score threshold to keep the sample.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.

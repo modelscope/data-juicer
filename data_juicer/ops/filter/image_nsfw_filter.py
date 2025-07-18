@@ -34,7 +34,7 @@ class ImageNSFWFilter(Filter):
         Initialization method.
 
         :param hf_nsfw_model: nsfw detection model name on huggingface.
-        :param max_score: the min nsfw score threshold for samples.
+        :param min_score: the min nsfw score threshold for samples.
             range from 0 to 1.
         :param max_score: the max nsfw score threshold for samples.
             range from 0 to 1.
