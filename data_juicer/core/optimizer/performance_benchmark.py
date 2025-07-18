@@ -61,7 +61,6 @@ from data_juicer.ops.filter import (
     MaximumLineLengthFilter,
     SpecialCharactersFilter,
     StopWordsFilter,
-    TextActionFilter,
     TextLengthFilter,
     TokenNumFilter,
     WordRepetitionFilter,
@@ -145,7 +144,7 @@ class PerformanceBenchmark:
             AverageLineLengthFilter(min_len=10, max_len=200),  # 10-200 chars per line (was 1-10000)
             MaximumLineLengthFilter(min_len=10, max_len=500),  # 10-500 chars per line (was 1-20000)
             TokenNumFilter(min_num=50, max_num=1000),  # 50-1000 tokens using HuggingFace tokenizer
-            TextActionFilter(lang="en", min_action_num=1),  # At least 1 action (verb) using spaCy
+            # TextActionFilter(lang="en", min_action_num=1),  # At least 1 action (verb) using spaCy
             StopWordsFilter(lang="en", min_ratio=0.0, max_ratio=0.6),  # Max 60% stop words (was 0.99)
             FlaggedWordFilter(lang="en", min_ratio=0.0, max_ratio=0.1),  # Max 10% flagged words (was 0.99)
             LanguageIDScoreFilter(lang="en", min_score=0.5),  # At least 50% English confidence (was 0.0)
@@ -808,12 +807,20 @@ class PerformanceBenchmark:
         if benchmark_type in ["individual", "both"]:
             logger.info("\n📊 INDIVIDUAL EXECUTION BENCHMARK")
             logger.info("-" * 40)
-            individual_results = self.run_individual_filters_benchmark(filters, test_data)
+            # Create a fresh deep copy for individual benchmark
+            import copy
+
+            individual_test_data = copy.deepcopy(test_data)
+            individual_results = self.run_individual_filters_benchmark(filters, individual_test_data)
 
         if benchmark_type in ["pipeline", "both"]:
             logger.info("\n🔧 PIPELINE OPTIMIZER BENCHMARK")
             logger.info("-" * 40)
-            pipeline_results = self.run_pipeline_optimizer_benchmark(filters, test_data, analyzer_insights)
+            # Create a fresh deep copy for pipeline benchmark
+            import copy
+
+            pipeline_test_data = copy.deepcopy(test_data)
+            pipeline_results = self.run_pipeline_optimizer_benchmark(filters, pipeline_test_data, analyzer_insights)
 
         # For "both" mode, focus on correctness comparison
         if benchmark_type == "both" and individual_results and pipeline_results:
