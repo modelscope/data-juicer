@@ -71,6 +71,6 @@ class SpecifiedNumericFieldFilter(Filter):
 
         if is_number(field_value):
             field_value = float(field_value)
-            return self.min_value <= field_value <= self.max_value
+            return self.get_keep_boolean(field_value, self.min_value, self.max_value)
         else:
             return False

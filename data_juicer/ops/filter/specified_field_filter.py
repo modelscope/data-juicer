@@ -53,7 +53,10 @@ class SpecifiedFieldFilter(Filter):
 
         if not (isinstance(field_value, list) or isinstance(field_value, tuple)):
             field_value = [field_value]
+        res_bool = True
         for value in field_value:
             if value not in self.target_value:
-                return False
-        return True
+                res_bool = False
+        if self.reversed_range:
+            res_bool = not res_bool
+        return res_bool
