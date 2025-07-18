@@ -125,6 +125,9 @@ def check_model(model_name, force=False):
 
 
 def check_model_home(model_name):
+    if not DATA_JUICER_MODELS_HOME:
+        return model_name
+
     cached_model_path = os.path.join(DATA_JUICER_MODELS_HOME, model_name)
     if os.path.exists(cached_model_path):
         return cached_model_path
