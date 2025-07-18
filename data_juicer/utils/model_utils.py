@@ -167,9 +167,10 @@ class ChatAPIModel:
         self._client = openai.OpenAI(**client_args)
         if self.model is None:
             logger.warning("No model specified. Using the first available model from the server.")
-            if len(self._client.models.list().data) == 0:
+            models_list = self._client.models.list().data
+            if len(models_list) == 0:
                 raise ValueError("No models available on the server.")
-            self.model = self._client.models.list().data[0].id
+            self.model = models_list[0].id
 
     def __call__(self, messages, **kwargs):
         """
