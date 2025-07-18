@@ -1,0 +1,746 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Post Tuning Tools" href="../post_tuning_dialog/README.html" /><link rel="prev" title="Format Conversion Tools" href="../README.html" />
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>Multimodal Tools - data-juicer</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sidebar-menu.css?v=dcc41d8a" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">data-juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">data-juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial/DJ-Cookbook.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial/Installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial/QuickStart.html">Quick Start</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">docs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/RecipeGallery.html">Data Recipe Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DatasetCfg.html">Dataset Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/BadDataExhibition.html">“Bad” Data Exhibition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_SORA.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_service.html">DJ_service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DeveloperGuide.html">How-to Guide for Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Distributed.html">Distributed Data Processing in Data-Juicer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Sandbox.html">Sandbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../demos/README.html">Demos</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">tools</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../distributed_deduplication/README.html">Distributed Fuzzy Deduplication Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evaluator/README.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evaluator/gpt_eval/README.html">GPT EVAL: Evaluate your model with OpenAI API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evaluator/recorder/README.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">Format Conversion Tools</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Multimodal Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../post_tuning_dialog/README.html">Post Tuning Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hpo/README.html">Hyper-parameter Optimization for Data Recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mm_eval/inception_metrics/README.html">Metrics for video generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../postprocess/README.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocess/README.html">Preprocess Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quality_classifier/README.html">Data Scoring</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">thirdparty</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../thirdparty/LLM_ecosystems/README.html">LLM Ecosystems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../thirdparty/models/README.html">Third-party Model Library</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of data_juicer.core package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.core.data.html">data_juicer.core.data package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.core.executor.html">data_juicer.core.executor package</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of data_juicer.ops package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.aggregator.html">data_juicer.ops.aggregator package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.grouper.html">data_juicer.ops.grouper package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+    <div class="current-info">
+        <span class="current-lang">en</span>|<span class="current-version">v1.4.1</span>
+    </div>
+    <div class="dropdown-panel">
+        
+        <div class="section">
+            <dt>Language</dt>
+            <dd>
+                
+                <a href="../../../../../en/v1.4.1/tools/fmt_conversion/multimodal/README.html"
+                    class="active" >
+                    English
+                </a>
+                
+                <a href="../../../../../zh_CN/v1.4.1/tools/fmt_conversion/multimodal/README_ZH.html"
+                    >
+                    简体中文
+                </a>
+                
+            </dd>
+        </div>
+        
+
+        
+        <div class="section">
+            <dt>Version</dt>
+            <dd>
+                    <a href="README.html">v1.4.1</a>
+                    <a href="../../../../main/tools/fmt_conversion/multimodal/README.html">main</a>
+            </dd>
+        </div>
+        
+    </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../../_sources/tools/fmt_conversion/multimodal/README.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="multimodal-tools">
+<h1>Multimodal Tools<a class="headerlink" href="#multimodal-tools" title="Link to this heading">¶</a></h1>
+<p>This folder contains some scripts and tools for multimodal datasets before and after using Data-Juicer.</p>
+<section id="convert-absolute-path-to-relative-path">
+<h2>Convert Absolute Path to Relative Path<a class="headerlink" href="#convert-absolute-path-to-relative-path" title="Link to this heading">¶</a></h2>
+<p>After being processed by Data-Juicer, the output multimodal data paths are absolute and could originate from diverse sources, being stored under various root directories.
+To convert absolute paths to relative paths and facilitate data migration, we provide a tool to carry out this transformation. This tool also supports copying related multimodal data from multiple sources into a single directory.
+Both input and output of this utility conform to Data-Juicer’s data format. If you wish to convert the data into another format while maintaining relative paths, please run this tool before proceeding with the dataset format conversion in the following section.
+To learn more about the usage of the absolute to relative path conversion tool, you can execute the following command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/fmt_conversion/multimodal/absolute_path_to_relative_path.py<span class="w"> </span>--help
+</pre></div>
+</div>
+</section>
+<section id="dataset-format-conversion">
+<h2>Dataset Format Conversion<a class="headerlink" href="#dataset-format-conversion" title="Link to this heading">¶</a></h2>
+<p>Due to large format diversity among different multimodal datasets and works,
+Data-Juicer propose a novel intermediate text-based interleaved data format for multimodal dataset, which
+is based on chunk-wise formats such MMC4 dataset.</p>
+<p>In the Data-Juicer format, a multimodal sample or document is based on a text,
+which consists of several text chunks. Each chunk is a semantic unit, and all the
+multimodal information in a chunk should talk about the same thing and be aligned
+with each other.</p>
+<p>Here is a multimodal sample example in Data-Juicer format below.</p>
+<ul class="simple">
+<li><p>It includes 4 chunks split by the special token <code class="docutils literal notranslate"><span class="pre">&lt;|__dj__eoc|&gt;</span></code>.</p></li>
+<li><p>In addition to texts, there are 3 other modalities: images, audios, videos.
+They are stored on the disk and their paths are
+listed in the corresponding first-level fields in the sample.</p></li>
+<li><p>Other modalities are represented as special tokens in the text (e.g. image – <code class="docutils literal notranslate"><span class="pre">&lt;__dj__image&gt;</span></code>).
+The special tokens of each modality correspond to the paths in the order of appearance.
+(e.g. the two image tokens in the third chunk are images of antarctica_map and europe_map respectively)</p></li>
+<li><p>There could be multiple types of modalities and multiple modality special tokens in a single chunk,
+and they are semantically aligned with each other and text in this chunk.
+The position of special tokens can be random in a chunk. (In general, they are usually before or after the text.)</p></li>
+<li><p>For multimodal samples, unlike text-only samples, the computed stats for other
+modalities could be a list of stats for the list of multimodal data (e.g. image_widths in this sample).</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;__dj__image&gt; Antarctica is Earth&#39;s southernmost and least-populated continent. &lt;|__dj__eoc|&gt; &quot;</span>
+          <span class="s2">&quot;&lt;__dj__video&gt; &lt;__dj__audio&gt; Situated almost entirely south of the Antarctic Circle and surrounded by the &quot;</span>
+          <span class="s2">&quot;Southern Ocean (also known as the Antarctic Ocean), it contains the geographic South Pole. &lt;|__dj__eoc|&gt; &quot;</span>
+          <span class="s2">&quot;Antarctica is the fifth-largest continent, being about 40</span><span class="si">% la</span><span class="s2">rger than Europe, &quot;</span>
+          <span class="s2">&quot;and has an area of 14,200,000 km2 (5,500,000 sq mi). &lt;__dj__image&gt; &lt;__dj__image&gt; &lt;|__dj__eoc|&gt; &quot;</span>
+          <span class="s2">&quot;Most of Antarctica is covered by the Antarctic ice sheet, &quot;</span>
+          <span class="s2">&quot;with an average thickness of 1.9 km (1.2 mi). &lt;|__dj__eoc|&gt;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;images&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&quot;path/to/the/image/of/antarctica_snowfield&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;path/to/the/image/of/antarctica_map&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;path/to/the/image/of/europe_map&quot;</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;audios&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&quot;path/to/the/audio/of/sound_of_waves_in_Antarctic_Ocean&quot;</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;videos&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&quot;path/to/the/video/of/remote_sensing_view_of_antarctica&quot;</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="s2">&quot;customized&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;xxx&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;stats&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;lang&quot;</span><span class="p">:</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image_widths&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">224</span><span class="p">,</span> <span class="mi">336</span><span class="p">,</span> <span class="mi">512</span><span class="p">],</span>
+    <span class="o">...</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>According to this format, Data-Juicer provided several dataset format conversion tools for some popular multimodal
+works.</p>
+<p>These tools consist of two types:</p>
+<ul class="simple">
+<li><p>Other format to Data-Juicer format: These tools are in <code class="docutils literal notranslate"><span class="pre">source_format_to_data_juicer_format</span></code> directory. They help to convert datasets in other formats to target datasets in Data-Juicer format.</p></li>
+<li><p>Data-Juicer format to other format: These tools are in <code class="docutils literal notranslate"><span class="pre">data_juicer_format_to_target_format</span></code> directory. They help to convert datasets in Data-Juicer formats to target datasets in target format.</p></li>
+</ul>
+<p>For now, dataset formats that are supported by Data-Juicer are listed in the following table.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Format</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>source_format_to_data_juicer_format</p></th>
+<th class="head"><p>data_juicer_format_to_target_format</p></th>
+<th class="head"><p>Ref.</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>LLaVA-like</p></td>
+<td><p>image-text</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">llava_to_dj.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dj_to_llava.py</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format">Format Description</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>MMC4-like</p></td>
+<td><p>image-text</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mmc4_to_dj.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dj_to_mmc4.py</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/allenai/mmc4#documents">Format Description</a></p></td>
+</tr>
+<tr class="row-even"><td><p>WavCaps-like</p></td>
+<td><p>audio-text</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wavcaps_to_dj.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dj_to_wavcaps.py</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/XinhaoMei/WavCaps#table-of-contents">Format Description</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Video-ChatGPT-like</p></td>
+<td><p>video-text</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">video_chatgpt_to_dj.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dj_to_video_chatgpt.py</span></code></p></td>
+<td><p>[Format Description](<a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tools/fmt_conversion/multimodal/">https://github.com/modelscope/data-juicer/blob/main/tools/fmt_conversion/multimodal/</a> https:/github.com/mbzuai-oryx/Video-ChatGPT/tree/main/data)</p></td>
+</tr>
+<tr class="row-even"><td><p>Youku-mPLUG-like</p></td>
+<td><p>video-text</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">youku_to_dj.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dj_to_youku.py</span></code></p></td>
+<td><p><a class="reference external" href="https://modelscope.cn/datasets/modelscope/Youku-AliceMind/summary">Format Description</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>InternVid-like</p></td>
+<td><p>video-text</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">internvid_to_dj.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dj_to_internvid.py</span></code></p></td>
+<td><p><a class="reference external" href="https://huggingface.co/datasets/OpenGVLab/InternVid">Format Description</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>For all tools, you can run the following command to find out the usage of them:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># e.g. llava_to_dj.py</span>
+python<span class="w"> </span>tools/fmt_conversion/multimodal/source_format_to_data_juicer_format/llava_to_dj.py<span class="w"> </span>--help
+</pre></div>
+</div>
+<p>Before using these tools, you might need to take a glance at the reference
+materials in the above tables for each format, to better know the detail format
+information and understand the arguments for each tool.</p>
+<section id="notice">
+<h3>Notice<a class="headerlink" href="#notice" title="Link to this heading">¶</a></h3>
+<p>There might be some tiny differences after converting a source dataset to Data-Juicer
+format and convert it back. However, these differences have nearly no effects
+on the semantics of datasets. Here we will show these tiny differences in detail
+for each source format.</p>
+<section id="llava-like">
+<h4>LLaVA-like<a class="headerlink" href="#llava-like" title="Link to this heading">¶</a></h4>
+<p>The format of LLaVA-like datasets are defined <a class="reference external" href="https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format">here</a>.
+Although it’s simple, but in real scenarios, there might be some slight variations
+in some samples.</p>
+<p>Here we take the <a class="reference external" href="https://huggingface.co/datasets/liuhaotian/LLaVA-Instruct-150K/blob/main/llava_v1_5_mix665k.json">visual instruction tuning dataset</a> as an example,
+and show how these variations influence the dataset format. The table below
+shows the number of different samples between the original dataset and the
+dataset after processing. There are 665,298 samples in the original dataset.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>process</p></th>
+<th class="head"><p># of diff.</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1. apply <code class="docutils literal notranslate"><span class="pre">llava_to_dj.py</span></code> and <code class="docutils literal notranslate"><span class="pre">dj_to_llava.py</span></code></p></td>
+<td><p>113,501</p></td>
+</tr>
+<tr class="row-odd"><td><p>2. convert integer ids to string ids in the original dataset</p></td>
+<td><p>41,361</p></td>
+</tr>
+<tr class="row-even"><td><p>3. strip whitespaces before and after values of conversations in the original dataset</p></td>
+<td><p>40,688</p></td>
+</tr>
+<tr class="row-odd"><td><p>4. add <code class="docutils literal notranslate"><span class="pre">'model':</span> <span class="pre">''</span></code> fields in the converted dataset</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>It’s worth noticing that processes 2-4 won’t influence the semantics of sample conversations in the dataset.
+Thus we think the dataset after conversion can align with the original dataset.</p>
+<p>Finally, the only 1 sample is different because there are some extra useless fields (“text”, “markdown”)
+in the conversations, which is shown below. But the “from” and “value” fields are the same between original
+and converted datasets, so we can regard this sample is aligned with the original one as well.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="err">#</span><span class="w"> </span><span class="err">origi</span><span class="kc">nal</span><span class="w"> </span><span class="err">co</span><span class="kc">n</span><span class="err">versa</span><span class="kc">t</span><span class="err">io</span><span class="kc">ns</span>
+<span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="s2">&quot;human&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;sentry self hosted api 504&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="s2">&quot;gpt&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="s2">&quot;A 504 error when using the Sentry self-hosted API typically indicates that the API request timed out. This means that the server hosting the API did not receive a response from the client within the expected time frame.\n\nHere are a few possible reasons for a 504 error when using the Sentry self-hosted API:\n\nSlow network connection: The API request may be taking longer than expected due to a slow network connection. Check your network connection and try again.\n\nServer overload: The server hosting the API may be overloaded with requests. Try again later when the server load has decreased.\n\nLarge dataset: If you are trying to retrieve a large amount of data, the API request may take longer than expected. Try breaking up the request into smaller chunks or optimizing the query to retrieve only the necessary data.\n\nAPI endpoint issues: There may be issues with the specific API endpoint you are using. Try using a different endpoint or contact the Sentry support team for assistance.\n\nTo resolve a 504 error when using the Sentry self-hosted API, try the following:\n\nCheck your network connection and ensure that it is stable.\n\nVerify that the server hosting the API is not overloaded with requests.\n\nOptimize the query to retrieve only the necessary data.\n\nTry using a different API endpoint.\n\nIf the issue persists, contact the Sentry support team for assistance.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;A 504 error when using the Sentry self-hosted API typically indicates that the API request timed out. This means that the server hosting the API did not receive a response from the client within the expected time frame.\n\nHere are a few possible reasons for a 504 error when using the Sentry self-hosted API:\n\n1. Slow network connection: The API request may be taking longer than expected due to a slow network connection. Check your network connection and try again.\n2. Server overload: The server hosting the API may be overloaded with requests. Try again later when the server load has decreased.\n3. Large dataset: If you are trying to retrieve a large amount of data, the API request may take longer than expected. Try breaking up the request into smaller chunks or optimizing the query to retrieve only the necessary data.\n4. API endpoint issues: There may be issues with the specific API endpoint you are using. Try using a different endpoint or contact the Sentry support team for assistance.\n\nTo resolve a 504 error when using the Sentry self-hosted API, try the following:\n\n1. Check your network connection and ensure that it is stable.\n2. Verify that the server hosting the API is not overloaded with requests.\n3. Optimize the query to retrieve only the necessary data.\n4. Try using a different API endpoint.\n\nIf the issue persists, contact the Sentry support team for assistance.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;markdown&quot;</span><span class="p">:{</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;answer-markdown&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;answer&quot;</span><span class="p">:</span><span class="s2">&quot;A 504 error when using the Sentry self-hosted API typically indicates that the API request timed out. This means that the server hosting the API did not receive a response from the client within the expected time frame.\n\nHere are a few possible reasons for a 504 error when using the Sentry self-hosted API:\n\n1. Slow network connection: The API request may be taking longer than expected due to a slow network connection. Check your network connection and try again.\n\n2. Server overload: The server hosting the API may be overloaded with requests. Try again later when the server load has decreased.\n\n3. Large dataset: If you are trying to retrieve a large amount of data, the API request may take longer than expected. Try breaking up the request into smaller chunks or optimizing the query to retrieve only the necessary data.\n\n4. API endpoint issues: There may be issues with the specific API endpoint you are using. Try using a different endpoint or contact the Sentry support team for assistance.\n\nTo resolve a 504 error when using the Sentry self-hosted API, try the following:\n\n1. Check your network connection and ensure that it is stable.\n\n2. Verify that the server hosting the API is not overloaded with requests.\n\n3. Optimize the query to retrieve only the necessary data.\n\n4. Try using a different API endpoint.\n\nIf the issue persists, contact the Sentry support team for assistance.&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">]</span>
+
+<span class="err">#</span><span class="w"> </span><span class="err">co</span><span class="kc">n</span><span class="err">ver</span><span class="kc">te</span><span class="err">d</span><span class="w"> </span><span class="err">co</span><span class="kc">n</span><span class="err">versa</span><span class="kc">t</span><span class="err">io</span><span class="kc">ns</span>
+<span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="s2">&quot;human&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;sentry self hosted api 504&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="s2">&quot;gpt&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;A 504 error when using the Sentry self-hosted API typically indicates that the API request timed out. This means that the server hosting the API did not receive a response from the client within the expected time frame.\n\nHere are a few possible reasons for a 504 error when using the Sentry self-hosted API:\n\n1. Slow network connection: The API request may be taking longer than expected due to a slow network connection. Check your network connection and try again.\n2. Server overload: The server hosting the API may be overloaded with requests. Try again later when the server load has decreased.\n3. Large dataset: If you are trying to retrieve a large amount of data, the API request may take longer than expected. Try breaking up the request into smaller chunks or optimizing the query to retrieve only the necessary data.\n4. API endpoint issues: There may be issues with the specific API endpoint you are using. Try using a different endpoint or contact the Sentry support team for assistance.\n\nTo resolve a 504 error when using the Sentry self-hosted API, try the following:\n\n1. Check your network connection and ensure that it is stable.\n2. Verify that the server hosting the API is not overloaded with requests.\n3. Optimize the query to retrieve only the necessary data.\n4. Try using a different API endpoint.\n\nIf the issue persists, contact the Sentry support team for assistance.&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="mmc4-like">
+<h4>MMC4-like<a class="headerlink" href="#mmc4-like" title="Link to this heading">¶</a></h4>
+<p>The format of MMC4-like datasets are defined <a class="reference external" href="https://github.com/allenai/mmc4#documents">here</a>. Except <code class="docutils literal notranslate"><span class="pre">image_info</span></code> and <code class="docutils literal notranslate"><span class="pre">text_list</span></code>,
+which are used when converting them to Data-Juicer format, there is an important field <code class="docutils literal notranslate"><span class="pre">similarity_matrix</span></code>. Similarity matrix is
+a matrix of shape <code class="docutils literal notranslate"><span class="pre">len(image_info)</span> <span class="pre">x</span> <span class="pre">len(text_list)</span></code>, which means it highly depends on the numbers of images and text sentences and their
+orders.</p>
+<p>However, when processing such datasets with Data-Juicer, images or sentences might be removed from a sample by Filters, and they could be
+modified by some Mappers. Thus, after processing, this similarity matrix might be no longer aligned with <code class="docutils literal notranslate"><span class="pre">image_info</span></code> or <code class="docutils literal notranslate"><span class="pre">text_list</span></code>.
+Users should be cautious about this point if you need this matrix in later usages.</p>
+<p>Despite these extra fields, tools for MMC4 can perfectly convert MMC4-like datasets to Data-Juicer-format datasets and convert them back~</p>
+</section>
+<section id="wavcaps-like">
+<h4>WavCaps-like<a class="headerlink" href="#wavcaps-like" title="Link to this heading">¶</a></h4>
+<p>The <a class="reference external" href="https://github.com/XinhaoMei/WavCaps#dataset">WavCaps</a> is composed of four sub-datasets: <a class="reference external" href="https://freesound.org/">FreeSound</a>, <a class="reference external" href="https://sound-effects.bbcrewind.co.uk/">BBC Sound Effects</a>,<a class="reference external" href="https://soundbible.com/">SoundBible</a> and <a class="reference external" href="https://research.google.com/audioset/download_strong.html">AudioSet Strongly-labelled Subset</a>. Each sub-dataset has different fields. For example, the ‘description’ field is included in SoundBible, but does not exist in AudioSet. To ensure that the different sub-datasets can be properly merged after conversion, the union of all fields from the sub-datasets is used during the wavcaps_to_dj stage, and all fields are fully retained during the dj_to_wavcaps stage.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="err">#</span><span class="w"> </span><span class="err">origi</span><span class="kc">nal</span><span class="w"> </span><span class="err">da</span><span class="kc">taset</span>
+<span class="p">{</span><span class="w"> </span><span class="nt">&quot;num_captions_per_audio&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">        </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Airplane Landing Airport&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Large commercial airplane landing at an airport runway.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Daniel Simion&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;href&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2219-Airplane-Landing-Airport.html&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;caption&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;An airplane is landing.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2219&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">14.1424375</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;audio&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wav_path&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;download_link&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://soundbible.com/grab.php?id=2219&amp;type=wav&quot;</span><span class="p">}]</span>
+<span class="p">}</span>
+
+<span class="err">#</span><span class="w"> </span><span class="err">co</span><span class="kc">n</span><span class="err">ver</span><span class="kc">te</span><span class="err">d</span><span class="w"> </span><span class="err">da</span><span class="kc">taset</span>
+<span class="p">{</span><span class="w"> </span><span class="nt">&quot;num_captions_per_audio&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">        </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Airplane Landing Airport&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Large commercial airplane landing at an airport runway.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Daniel Simion&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;href&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2219-Airplane-Landing-Airport.html&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;caption&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;An airplane is landing.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2219&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;duration&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">14.1424375</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;audio&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wav_path&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;download_link&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://soundbible.com/grab.php?id=2219&amp;type=wav&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="video-chatgpt-like">
+<h4>Video-ChatGPT-like<a class="headerlink" href="#video-chatgpt-like" title="Link to this heading">¶</a></h4>
+<p>The Video-ChatGPT dataset contains 3 types of data with unified format:</p>
+<ul class="simple">
+<li><p>Topics for Video summarization</p></li>
+<li><p>Description-based question-answers (exploring spatial, temporal, relationships, and reasoning concepts);</p></li>
+<li><p>and Creative/generative question-answers.
+They all obey the <code class="docutils literal notranslate"><span class="pre">&lt;question,</span> <span class="pre">answer,</span> <span class="pre">video_id&gt;</span></code> format, where the <code class="docutils literal notranslate"><span class="pre">video_id</span></code> is in the form “v_youtube_id”. We suppose that users have downloaded these videos already, and they need to specify the corresponding storage directory when using the converter tool.</p></li>
+</ul>
+</section>
+<section id="youku-mplug-like">
+<h4>Youku-mPLUG-like<a class="headerlink" href="#youku-mplug-like" title="Link to this heading">¶</a></h4>
+<p>The Youku-mPLUG dataset contains 4 types of format: pretrain, classification, retrieval, captioning.
+They are slightly different from each other in field name or other attributes, but all of them obey the <code class="docutils literal notranslate"><span class="pre">&lt;video,</span> <span class="pre">caption&gt;</span></code> format.</p>
+</section>
+<section id="internvid-like">
+<h4>InternVid-like<a class="headerlink" href="#internvid-like" title="Link to this heading">¶</a></h4>
+<p>The InternVid dataset contains 4 fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">YoutubeID</span></code>: the Youtube ID of the video used in the sample.
+We suppose that users have downloaded these videos already
+and this field is replaced with its storage path.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Start_timestamp</span></code>: the start timestamp in string of the video clip for the
+corresponding caption.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">End_timestamp</span></code>: the end timestamp in string of the video clip for the
+corresponding caption.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Caption</span></code>: the corresponding caption for the video clip.</p></li>
+</ul>
+<p>As we can see, the caption in this dataset corresponds to the video clip
+specified by the start/end timestamps instead of the whole video. So the
+conversion tool will cut the specified video clip for you if the argument
+<code class="docutils literal notranslate"><span class="pre">cut_videos</span></code> is set to True. You can cut before conversion by yourself as well.</p>
+</section>
+<section id="msr-vtt-like">
+<h4>MSR-VTT-like<a class="headerlink" href="#msr-vtt-like" title="Link to this heading">¶</a></h4>
+<p>MSR-VTT dataset contains multiple fields, here we use 2 fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">video_id</span></code>: the video file name without suffix used in the sample.
+We suppose that users have downloaded these videos already。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">caption</span></code>: the corresponding caption for the video.</p></li>
+</ul>
+</section>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../post_tuning_dialog/README.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Post Tuning Tools</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../README.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Format Conversion Tools</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Multimodal Tools</a><ul>
+<li><a class="reference internal" href="#convert-absolute-path-to-relative-path">Convert Absolute Path to Relative Path</a></li>
+<li><a class="reference internal" href="#dataset-format-conversion">Dataset Format Conversion</a><ul>
+<li><a class="reference internal" href="#notice">Notice</a><ul>
+<li><a class="reference internal" href="#llava-like">LLaVA-like</a></li>
+<li><a class="reference internal" href="#mmc4-like">MMC4-like</a></li>
+<li><a class="reference internal" href="#wavcaps-like">WavCaps-like</a></li>
+<li><a class="reference internal" href="#video-chatgpt-like">Video-ChatGPT-like</a></li>
+<li><a class="reference internal" href="#youku-mplug-like">Youku-mPLUG-like</a></li>
+<li><a class="reference internal" href="#internvid-like">InternVid-like</a></li>
+<li><a class="reference internal" href="#msr-vtt-like">MSR-VTT-like</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

@@ -39,6 +39,15 @@
   <body>
     
 
+<p>
+  <strong>
+    
+    You're reading the documentation from the main branch.
+    For the latest released version, please have a look at <a href="../../../../v1.4.1/index.html">v1.4.1</a>.
+    
+  </strong>
+</p>
+
 
     <script>
       document.body.dataset.theme = localStorage.getItem("theme") || "auto";
@@ -309,6 +318,7 @@
         <div class="section">
             <dt>Version</dt>
             <dd>
+                    <a href="../../../../v1.4.1/index.html">v1.4.1</a>
                     <a href="model_utils.html">main</a>
             </dd>
         </div>
@@ -367,6 +377,7 @@
     <span class="n">patch_nltk_pickle_security</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATA_JUICER_EXTERNAL_MODELS_HOME</span> <span class="k">as</span> <span class="n">DJEMH</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.cache_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATA_JUICER_MODELS_CACHE</span> <span class="k">as</span> <span class="n">DJMC</span>
 
 <span class="n">torch</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
@@ -438,6 +449,9 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">force</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">model_name</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">model_name</span>
 
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">force</span> <span class="ow">and</span> <span class="n">DJEMH</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DJEMH</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DJEMH</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DJMC</span><span class="p">):</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">DJMC</span><span class="p">)</span>
 
@@ -469,6 +483,19 @@
                     <span class="sa">f</span><span class="s2">&quot;manually from </span><span class="si">{</span><span class="n">model_link</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">backup_model_link</span><span class="si">}</span><span class="s2"> &quot;</span>
                 <span class="p">)</span>
     <span class="k">return</span> <span class="n">cached_model_path</span></div>
+
+
+
+<div class="viewcode-block" id="check_model_home">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.check_model_home">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_model_home</span><span class="p">(</span><span class="n">model_name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">DJEMH</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">model_name</span>
+
+    <span class="n">cached_model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DJEMH</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cached_model_path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cached_model_path</span>
+    <span class="k">return</span> <span class="n">model_name</span></div>
 
 
 
@@ -728,7 +755,7 @@
         <span class="p">)</span>
 
     <span class="n">pipeline</span> <span class="o">=</span> <span class="n">diffusion_type_to_pipeline</span><span class="p">[</span><span class="n">diffusion_type</span><span class="p">]</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">check_model_home</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">),</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">device</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
@@ -802,6 +829,7 @@
                 <span class="n">model_params</span><span class="p">[</span><span class="s2">&quot;device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;accelerate not found, using device directly&quot;</span><span class="p">)</span>
 
+    <span class="n">pretrained_model_name_or_path</span> <span class="o">=</span> <span class="n">check_model_home</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">)</span>
     <span class="n">processor</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">return_model</span><span class="p">:</span>
@@ -983,6 +1011,7 @@
 <div class="viewcode-block" id="prepare_sdxl_prompt2prompt">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_sdxl_prompt2prompt">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_sdxl_prompt2prompt</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="n">pipe_func</span><span class="p">,</span> <span class="n">torch_dtype</span><span class="o">=</span><span class="s2">&quot;fp32&quot;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">):</span>
+    <span class="n">pretrained_model_name_or_path</span> <span class="o">=</span> <span class="n">check_model_home</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">torch_dtype</span> <span class="o">==</span> <span class="s2">&quot;fp32&quot;</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">pipe_func</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
             <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">use_safetensors</span><span class="o">=</span><span class="kc">True</span>
@@ -1052,6 +1081,7 @@
                 <span class="n">model_params</span><span class="p">[</span><span class="s2">&quot;device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;accelerate not found, using device directly&quot;</span><span class="p">)</span>
 
+    <span class="n">pretrained_model_name_or_path</span> <span class="o">=</span> <span class="n">check_model_home</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">)</span>
     <span class="n">processor</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">CLIPProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">return_model</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">processor</span>
@@ -1245,6 +1275,7 @@
             <span class="c1"># Initialize weights and apply final processing</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">post_init</span><span class="p">()</span>
 
+    <span class="n">pretrained_model_name_or_path</span> <span class="o">=</span> <span class="n">check_model_home</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">)</span>
     <span class="n">processor</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">return_model</span><span class="p">:</span>
         <span class="n">model_class</span> <span class="o">=</span> <span class="n">VideoBlipForConditionalGeneration</span>
@@ -1268,7 +1299,7 @@
     <span class="k">if</span> <span class="n">model_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;device&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;cuda:&quot;</span><span class="p">):</span>
         <span class="n">model_params</span><span class="p">[</span><span class="s2">&quot;device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
-    <span class="n">model</span> <span class="o">=</span> <span class="n">vllm</span><span class="o">.</span><span class="n">LLM</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="n">generation_config</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">vllm</span><span class="o">.</span><span class="n">LLM</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">check_model_home</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">),</span> <span class="n">generation_config</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
     <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_tokenizer</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span></div>
@@ -1289,6 +1320,7 @@
     <span class="k">if</span> <span class="s2">&quot;device&quot;</span> <span class="ow">in</span> <span class="n">model_params</span><span class="p">:</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;device&quot;</span><span class="p">)</span>
 
+    <span class="n">model_path</span> <span class="o">=</span> <span class="n">check_model_home</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
     <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
@@ -1337,6 +1369,7 @@
     <span class="c1"># try to get the generation configs</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenerationConfig</span>
 
+    <span class="n">pretrained_model_name_or_path</span> <span class="o">=</span> <span class="n">check_model_home</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">model_generation_config</span> <span class="o">=</span> <span class="n">GenerationConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
     <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
