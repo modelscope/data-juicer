@@ -211,6 +211,8 @@ class StatsKeysConstant(object):
     avg_line_length = "avg_line_length"
     char_rep_ratio = "char_rep_ratio"
     flagged_words_ratio = "flagged_words_ratio"
+    in_context_influence = "in_context_influence"
+    ifd_score = "ifd_score"
     lang = "lang"
     lang_score = "lang_score"
     max_line_length = "max_line_length"
@@ -218,6 +220,7 @@ class StatsKeysConstant(object):
     special_char_ratio = "special_char_ratio"
     stopwords_ratio = "stopwords_ratio"
     text_len = "text_len"
+    text_embd_similarity = "text_embd_similarity"
     text_pair_similarity = "text_pair_similarity"
     num_action = "num_action"
     num_dependency_edges = "num_dependency_edges"
@@ -230,6 +233,9 @@ class StatsKeysConstant(object):
     llm_quality_record = "llm_quality_record"
     llm_difficulty_score = "llm_difficulty_score"
     llm_difficulty_record = "llm_difficulty_record"
+    llm_perplexity = "llm_perplexity"
+    llm_task_relevance = "llm_task_relevance"
+    llm_task_relevance_record = "llm_task_relevance_record"
 
     #  === image ===
     aspect_ratios = "aspect_ratios"
