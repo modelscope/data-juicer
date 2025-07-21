@@ -29,7 +29,7 @@ class VideoSplitBySceneMapper(Mapper):
     """Mapper to cut videos into scene clips."""
 
     # Define shared detector keys and their properties
-    avaliable_detectors = {
+    available_detectors = {
         "ContentDetector": ["weights", "luma_only", "kernel_size"],
         "AdaptiveDetector": [
             "window_width",
@@ -66,10 +66,10 @@ class VideoSplitBySceneMapper(Mapper):
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
 
-        if detector not in self.avaliable_detectors:
+        if detector not in self.available_detectors:
             raise ValueError(
                 f"Scene detector {detector} is not supported. "
-                f"Can only be one of {list(self.avaliable_detectors.keys())}"
+                f"Can only be one of {list(self.available_detectors.keys())}"
             )
 
         self.detector = detector
@@ -78,9 +78,9 @@ class VideoSplitBySceneMapper(Mapper):
         self.show_progress = show_progress
 
         # prepare detector args
-        avaliable_kwargs = self.avaliable_detectors[self.detector]
+        available_kwargs = self.available_detectors[self.detector]
         self.detector_class = getattr(scenedetect.detectors, self.detector)
-        self.detector_kwargs = {key: kwargs[key] for key in avaliable_kwargs if key in kwargs}
+        self.detector_kwargs = {key: kwargs[key] for key in available_kwargs if key in kwargs}
 
     def process_single(self, sample, context=False):
         # there is no video in this sample
