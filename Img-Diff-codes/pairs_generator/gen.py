@@ -46,21 +46,16 @@ if __name__ == "__main__":
         data = json.load(f)
 
     for temp_caption in tqdm.tqdm(data):
-        # temp_caption = temp_caption["conversations"][1]["value"]
         with torch.no_grad():
             with torch.inference_mode():
-                # for temp_idx in range(5):
 
                 msg = "Here is a sentence: \"" + temp_caption + "\". Please replace one entity in this sentence with another entity, such as an animal, a vehicle, or a piece of furniture. Please only answer with the replaced sentence."
-                # print(msg)
                 conv = get_conversation_template(model_path)
                 conv.append_message(conv.roles[0], msg)
                 conv.append_message(conv.roles[1], None)
                 PROMPT = conv.get_prompt()
                 ids = tokenizer.encode(PROMPT)
                 input_ids = torch.LongTensor([ids]).to("cuda")
-
-
             
                 seed_everything(random.randint(1,10000))
                 
@@ -71,7 +66,6 @@ if __name__ == "__main__":
                     temperature=0.8
                 )
                 out_text = tokenizer.decode(out[0])
-                # out_text = tokenizer.batch_decode(out)
                     
                 answer = out_text.replace(PROMPT, "").replace("\nEND", "").replace("</s>", "").replace("<s>", "").strip()
 
@@ -82,18 +76,9 @@ if __name__ == "__main__":
                 if "---" in answer:
                     answer = answer.split("---")[-1].strip()
 
-
-                # print(answer)
-                # print(temp_caption)
-                # print(answer)
                 temp_json = {"input":temp_caption, "output":answer}
-
-                # print(temp_json)
                 answer_json.append(temp_json)
-
                 temp_caption = answer
-
-                # break
 
     with open(args.output_path, "w") as new_f:
         new_f.write(json.dumps(answer_json))
