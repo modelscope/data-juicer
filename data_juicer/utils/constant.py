@@ -230,6 +230,8 @@ class StatsKeysConstant(object):
     llm_quality_record = "llm_quality_record"
     llm_difficulty_score = "llm_difficulty_score"
     llm_difficulty_record = "llm_difficulty_record"
+    text_ebd_diversity = "text_ebd_diversity"
+    text_ebd_diversity_score = "text_ebd_diversity_score"
 
     #  === image ===
     aspect_ratios = "aspect_ratios"
