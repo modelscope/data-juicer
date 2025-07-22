@@ -15,7 +15,11 @@ from sphinx import project as sphinx_project
 release = version
 
 # -- Path setup --------------------------------------------------------------
+current_dir = os.path.dirname(__file__)
 sys.path.insert(0, os.path.abspath("../../"))
+sys.path.insert(0, current_dir)
+
+from custom_myst import ReplaceVideoLinksTransform
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -51,7 +55,7 @@ myst_enable_extensions = [
 smv_tag_whitelist = rf"^v{release}$"
 smv_branch_whitelist = r"^main$"
 smv_released_pattern = r"^refs/tags/v\d+\.\d+\.\d+$"
-smv_remote_whitelist = r'^origin$'
+smv_remote_whitelist = r"^origin$"
 
 # apidoc settings
 apidoc_module_dir = "../../../data_juicer"
@@ -72,7 +76,7 @@ exclude_patterns = ["build", "demos/process_video_on_ray/data/Note.md"]
 # The theme to use for HTML and HTML Help pages.
 # See the documentation for a list of builtin themes.
 html_theme = "furo"
-html_title = "data-juicer"
+html_title = "Data Juicer"
 
 # Sidebar configuration
 html_sidebars = {
@@ -201,30 +205,6 @@ def update_metadata_docnames(app, config):
     for version_name, _ in metadata.items():
         app.config.smv_metadata[version_name]["docnames"] = updated_docnames
 
-def versions_a_lt_or_eq_to_b(version_a, version_b):
-
-    def is_valid_version(version):
-        return bool(re.match(r"^v\d+\.\d+\.\d+$", version))
-
-    if not is_valid_version(version_a):
-        return False
-
-    if not is_valid_version(version_b):
-        raise ValueError(f"Invalid version format for version_b: {version_b}")
-
-    try:
-        parts_a = [int(x) for x in version_a[1:].split(".")]
-        parts_b = [int(x) for x in version_b[1:].split(".")]
-
-        for i in range(3):
-            if parts_a[i] < parts_b[i]:
-                return True
-            elif parts_a[i] > parts_b[i]:
-                return False
-
-        return True
-    except ValueError:
-        raise ValueError("Version numbers must be numeric")
 
 def rebuild_source_dir(app, config):
     """Rebuild source directory for documentation"""
@@ -298,6 +278,7 @@ def setup(app):
     """Setup Sphinx application hooks"""
     current_version = app.config.smv_current_version
     print(f"Current version: {current_version}")
+    app.add_transform(ReplaceVideoLinksTransform)
     app.config.smv_latest_version = f"v{release}"
     app.connect("config-inited", copy_sphinx_doc_to_build)
     app.connect("config-inited", rebuild_source_dir)
