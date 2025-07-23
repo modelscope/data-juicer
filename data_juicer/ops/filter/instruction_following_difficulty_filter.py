@@ -41,4 +41,4 @@ class InstructionFollowingDifficultyFilter(LLMPerplexityFilter):
     def process_single(self, sample):
         score = sample[Fields.stats][StatsKeys.ifd_score]
 
-        return self.min_score <= score <= self.max_score
+        return self.get_keep_boolean(score, self.min_score, self.max_score)
