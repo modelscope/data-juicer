@@ -1,0 +1,94 @@
+# Example configuration for configurable checkpointing in PartitionedRayExecutor
+# This demonstrates different checkpoint strategies for balancing performance and recovery
+#
+# Available checkpoint strategies (CheckpointStrategy enum):
+# - "every_op": Checkpoint after every operation (most resilient, slowest)
+# - "every_partition": Checkpoint only at partition completion (fastest, least resilient)
+# - "every_n_ops": Checkpoint after every N operations (balanced)
+# - "manual": Checkpoint only after specified operations (user-controlled)
+# - "disabled": Disable checkpointing entirely (fastest, no recovery)
+
+# Global parameters
+project_name: 'demo-checkpoint-strategies'
+dataset_path: './demos/data/demo-dataset.jsonl'
+export_path: './outputs/demo-checkpoint-strategies/processed.jsonl'
+work_dir: './outputs/demo-checkpoint-strategies'
+
+# Executor configuration
+executor_type: 'ray_partitioned'
+ray_address: 'auto'
+
+# Partitioning configuration
+partition_size: 5000  # samples per partition
+enable_fault_tolerance: true
+max_retries: 3
+
+# Data format configuration
+storage_format: 'parquet'  # parquet, arrow, jsonl
+
+# Checkpoint configuration examples
+# Uncomment one of the following strategies:
+
+# Strategy 1: Checkpoint after every operation (most resilient, slowest)
+checkpoint:
+  enabled: true
+  strategy: "every_op"  # CheckpointStrategy.EVERY_OP
+
+# Strategy 2: Checkpoint after every N operations (balanced)
+# checkpoint:
+#   enabled: true
+#   strategy: "every_n_ops"  # CheckpointStrategy.EVERY_N_OPS
+#   n_ops: 3  # Checkpoint after every 3 operations
+
+# Strategy 3: Checkpoint only at partition completion (fastest, least resilient)
+# checkpoint:
+#   enabled: true
+#   strategy: "every_partition"  # CheckpointStrategy.EVERY_PARTITION
+
+# Strategy 4: Manual checkpoint - only checkpoint after specific operations
+# checkpoint:
+#   enabled: true
+#   strategy: "manual"  # CheckpointStrategy.MANUAL
+#   op_names: ["deduplicate", "fix_unicode_mapper"]  # Only checkpoint after these ops
+
+# Strategy 5: Disable checkpointing entirely (fastest, no recovery)
+# checkpoint:
+#   enabled: true
+#   strategy: "disabled"  # CheckpointStrategy.DISABLED
+
+# Process schedule - using actual DataJuicer OPs
+process:
+  - text_length_filter:
+      min_len: 10
+      max_len: 1000
+
+  - language_id_score_filter:
+      lang: "en"
+      min_score: 0.8
+
+  - clean_links_mapper:
+      repl: ""  # Remove URLs/links
+
+  - clean_email_mapper:
+      repl: ""  # Remove email addresses
+
+  - clean_ip_mapper:
+      repl: ""  # Remove IP addresses
+
+  - deduplicate:
+      method: "exact"
+      field: "text"
+
+  - fix_unicode_mapper:
+      normalization: "NFKC"  # Unicode normalization
+
+  - remove_specific_chars_mapper:
+      chars_to_remove: "◆●■►▼▲▴∆▻▷❖♡□"  # Remove specific characters
+
+  - whitespace_normalization_mapper: {}  # Normalize whitespace
+
+# Event logging configuration: events_{job_id}.jsonl - Machine-readable JSONL for resumption and analysis
+event_logging:
+  enabled: true  # Enable/disable event logging entirely
+  max_log_size_mb: 100  # Max size for loguru log file before rotation
+  backup_count: 5  # Number of backup log files to keep

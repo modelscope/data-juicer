@@ -439,6 +439,13 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
             )
             parser.add_argument("--ray_address", type=str, default="auto", help="The address of the Ray cluster.")
 
+            parser.add_argument(
+                "--job_id",
+                type=str,
+                default=None,
+                help="Custom job ID for resumption and tracking. If not provided, a unique ID will be auto-generated.",
+            )
+
             parser.add_argument("--debug", action="store_true", help="Whether to run in debug mode.")
 
             # Filter out non-essential arguments for initial parsing

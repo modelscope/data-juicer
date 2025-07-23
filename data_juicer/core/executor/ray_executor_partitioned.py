@@ -19,6 +19,7 @@ import shutil
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
+from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
 from jsonargparse import Namespace
@@ -33,6 +34,16 @@ from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
 
 ray = LazyLoader("ray")
+
+
+class CheckpointStrategy(Enum):
+    """Checkpoint strategies for controlling when to create checkpoints."""
+
+    EVERY_OP = "every_op"  # Checkpoint after every operation
+    EVERY_PARTITION = "every_partition"  # Checkpoint only at partition completion
+    EVERY_N_OPS = "every_n_ops"  # Checkpoint after every N operations
+    MANUAL = "manual"  # Checkpoint only after specified operations
+    DISABLED = "disabled"  # Disable checkpointing entirely
 
 
 @dataclass
@@ -114,18 +125,31 @@ class PartitionedRayExecutor(ExecutorBase):
         self.max_retries = getattr(self.cfg, "max_retries", 3)
         self.preserve_intermediate_data = getattr(self.cfg, "preserve_intermediate_data", False)
 
+        # Checkpoint configuration
+        checkpoint_cfg = getattr(self.cfg, "checkpoint", {})
+        self.checkpoint_enabled = checkpoint_cfg.get("enabled", True)
+
+        # Parse checkpoint strategy with validation
+        strategy_str = checkpoint_cfg.get("strategy", "every_op")
+        try:
+            self.checkpoint_strategy = CheckpointStrategy(strategy_str)
+        except ValueError:
+            logger.warning(f"Unknown checkpoint strategy: {strategy_str}, defaulting to EVERY_OP")
+            self.checkpoint_strategy = CheckpointStrategy.EVERY_OP
+
+        # If strategy is DISABLED, disable checkpointing regardless of enabled flag
+        if self.checkpoint_strategy == CheckpointStrategy.DISABLED:
+            self.checkpoint_enabled = False
+
+        self.checkpoint_n_ops = checkpoint_cfg.get("n_ops", 1)
+        self.checkpoint_op_names = checkpoint_cfg.get("op_names", [])
+
         # Data format configuration for performance
         self.storage_format = getattr(self.cfg, "storage_format", "parquet")  # parquet, arrow, jsonl - for disk storage
         self.use_arrow_batches = getattr(
             self.cfg, "use_arrow_batches", True
         )  # Use Arrow batch format for processing (recommended)
         self.arrow_batch_size = getattr(self.cfg, "arrow_batch_size", 1000)  # Arrow batch size for processing
-
-        # Checkpointing strategy config
-        self.checkpoint_cfg = getattr(self.cfg, "checkpoint", {})
-        self.checkpoint_strategy = self.checkpoint_cfg.get("strategy", "every_op")
-        self.checkpoint_n_ops = self.checkpoint_cfg.get("n_ops", 1)
-        self.checkpoint_op_names = set(self.checkpoint_cfg.get("op_names", []))
 
         # Initialize Ray
         logger.info("Initializing Ray for partitioned execution...")
@@ -174,6 +198,25 @@ class PartitionedRayExecutor(ExecutorBase):
 
         # Dataset mapping
         self.dataset_mapping: Optional[DatasetMapping] = None
+
+    def _should_checkpoint(self, op_idx: int, op_name: str, partition_id: int) -> bool:
+        """Determine if checkpoint should be created based on configuration strategy."""
+        if not self.checkpoint_enabled:
+            return False
+
+        if self.checkpoint_strategy == CheckpointStrategy.EVERY_OP:
+            return True
+        elif self.checkpoint_strategy == CheckpointStrategy.EVERY_PARTITION:
+            return False  # Will be handled at partition completion
+        elif self.checkpoint_strategy == CheckpointStrategy.EVERY_N_OPS:
+            return (op_idx + 1) % self.checkpoint_n_ops == 0
+        elif self.checkpoint_strategy == CheckpointStrategy.MANUAL:
+            return op_name in self.checkpoint_op_names
+        elif self.checkpoint_strategy == CheckpointStrategy.DISABLED:
+            return False
+        else:
+            logger.warning(f"Unknown checkpoint strategy: {self.checkpoint_strategy}, defaulting to every_op")
+            return True
 
     def _log_event(self, event: ProcessingEvent):
         """Log a processing event."""
@@ -383,19 +426,6 @@ class PartitionedRayExecutor(ExecutorBase):
             return DatasetMapping(**mapping_data)
         return None
 
-    def should_checkpoint(self, op_idx, op_name):
-        """Determine whether to checkpoint after this op based on config."""
-        strategy = self.checkpoint_strategy
-        if strategy == "every_op":
-            return True
-        elif strategy == "every_partition":
-            return False  # Only checkpoint at partition end
-        elif strategy == "every_n_ops":
-            return (op_idx + 1) % self.checkpoint_n_ops == 0
-        elif strategy == "manual":
-            return op_name in self.checkpoint_op_names
-        return False
-
     def _process_partition(self, partition_path: str, ops: List, partition_id: int) -> Dict[str, Any]:
         """Process a single partition with fault tolerance and intermediate data preservation."""
         logger.info(f"Processing partition {partition_id}: {partition_path}")
@@ -466,7 +496,7 @@ class PartitionedRayExecutor(ExecutorBase):
                 logger.debug(f"Applying op {op_idx+1}/{len(ops)}: {op._name} to partition {partition_id}")
 
                 # Save intermediate state if enabled (using configurable format)
-                if self.preserve_intermediate_data and self.should_checkpoint(op_idx, op._name):
+                if self._should_checkpoint(op_idx, op._name, partition_id):
                     if self.storage_format == "parquet":
                         intermediate_path = os.path.join(
                             partition_intermediate_dir, f"after_op_{op_idx:03d}_{op._name}.parquet"
@@ -476,19 +506,26 @@ class PartitionedRayExecutor(ExecutorBase):
                         intermediate_path = os.path.join(
                             partition_intermediate_dir, f"after_op_{op_idx:03d}_{op._name}.arrow"
                         )
+                        # Convert to Arrow table and save as Feather format with compression
                         import pyarrow.feather as feather
 
+                        # Use Arrow batch format for better performance
                         if hasattr(current_dataset, "to_arrow_refs"):
+                            # Use Arrow batch format directly if available
                             arrow_refs = current_dataset.to_arrow_refs()
                             tables = ray.get(arrow_refs)
                             if tables:
                                 table = tables[0] if len(tables) == 1 else pa.concat_tables(tables)
                             else:
+                                # Fallback to pandas conversion
                                 df = current_dataset.to_pandas()
                                 table = pa.Table.from_pandas(df)
                         else:
+                            # Fallback to pandas conversion
                             df = current_dataset.to_pandas()
                             table = pa.Table.from_pandas(df)
+
+                        # Save with compression for better storage efficiency
                         feather.write_feather(table, intermediate_path, compression="lz4")
                     else:
                         intermediate_path = os.path.join(
@@ -496,6 +533,20 @@ class PartitionedRayExecutor(ExecutorBase):
                         )
                         current_dataset.write_json(intermediate_path, force_ascii=False)
                     logger.debug(f"Saved intermediate state to {intermediate_path}")
+
+                    # Log checkpoint event for intermediate state
+                    self._log_event(
+                        ProcessingEvent(
+                            event_id=f"op_checkpoint_{partition_id}_{op_idx}_{int(time.time())}",
+                            event_type="operation_checkpoint",
+                            timestamp=time.time(),
+                            partition_id=partition_id,
+                            operation_name=op._name,
+                            operation_idx=op_idx,
+                            message=f"Created checkpoint for {op._name} on partition {partition_id}",
+                            metadata={"checkpoint_path": intermediate_path},
+                        )
+                    )
 
                 # Apply operation
                 if hasattr(op, "compute_stats_batched"):
@@ -538,6 +589,27 @@ class PartitionedRayExecutor(ExecutorBase):
             else:
                 output_path = os.path.join(self.results_dir, f"partition_{partition_id:06d}_processed.jsonl")
                 current_dataset.write_json(output_path, force_ascii=False)
+
+            # Create checkpoint at partition completion if strategy is "every_partition"
+            if self.checkpoint_strategy == CheckpointStrategy.EVERY_PARTITION and self.checkpoint_enabled:
+                partition_checkpoint_path = os.path.join(
+                    self.checkpoint_dir, f"partition_{partition_id:06d}_final.parquet"
+                )
+                current_dataset.write_parquet(partition_checkpoint_path)
+
+                # Log checkpoint event
+                self._log_event(
+                    ProcessingEvent(
+                        event_id=f"partition_checkpoint_{partition_id}_{int(time.time())}",
+                        event_type="partition_checkpoint",
+                        timestamp=time.time(),
+                        partition_id=partition_id,
+                        message=f"Created final checkpoint for partition {partition_id}",
+                        metadata={"checkpoint_path": partition_checkpoint_path},
+                    )
+                )
+
+                logger.debug(f"Created partition checkpoint: {partition_checkpoint_path}")
 
             # Update partition status
             if self.dataset_mapping and partition_id < len(self.dataset_mapping.partitions):
