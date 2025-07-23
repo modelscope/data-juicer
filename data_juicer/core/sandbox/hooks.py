@@ -7,6 +7,7 @@ from loguru import logger
 
 from data_juicer.config import get_init_configs, prepare_side_configs
 from data_juicer.core.data.dj_dataset import nested_query
+from data_juicer.core.sandbox.context_infos import ContextInfos, JobInfos
 from data_juicer.core.sandbox.factories import (
     data_analyzer_factory,
     data_evaluator_factory,
@@ -48,17 +49,17 @@ class BaseHook:
         # extra config for some other specific jobs
         self.extra_cfg = job_cfg.get(JobRequiredKeys.extra_configs.value, None)
 
-    def run(self, **context_infos):
-        self._input_updating_hook(**context_infos)
+    def run(self, context_infos: ContextInfos):
+        self._input_updating_hook(context_infos)
 
-        outputs = self.hook(**context_infos)
+        outputs = self.hook()
 
         if outputs:
             return self._output_recording_hook(outputs)
         else:
-            return context_infos
+            return None
 
-    def _input_updating_hook(self, **context_infos):
+    def _input_updating_hook(self, context_infos: ContextInfos):
         self.specify_dj_and_extra_configs(allow_fail=True)
 
         prev_dj_cfg = deepcopy(self.dj_cfg) if self.dj_cfg else None
@@ -99,34 +100,12 @@ class BaseHook:
                     raise ValueError(f'Need to specify the job result keys precisely for inputs to '
                                      f'find the target values. Only got [{key_in_history}].')
                 # find the last non-empty job_infos
-                pipeline_keys = list(context_infos.keys())
-                if len(pipeline_keys) == 0:
+                if len(context_infos) == 0:
                     raise ValueError(f'Cannot find the previous non-empty job infos for [{key_in_history}].')
-                last_idx = len(pipeline_keys) - 1
-                history_job_infos = context_infos[pipeline_keys[last_idx]]
-                while len(history_job_infos) == 0:
-                    last_idx -= 1
-                    if last_idx < 0:
-                        raise ValueError(f'Cannot find the previous non-empty job infos for [{key_in_history}].')
-                    history_job_infos = context_infos[pipeline_keys[last_idx]]
-                # get the last job_infos
-                history_job_infos = history_job_infos[-1]
+                history_job_infos = context_infos.get_the_last_job_infos()
                 key_in_history_parts = key_in_history_parts[1:]
-            else:
-                # get the target job_infos according to pipeline_name and job meta_name
-                # get the latest infos
-                if len(key_in_history_parts) <= 2:
-                    raise ValueError(f'Need to specify the job result keys precisely for inputs to '
-                                     f'find the target values in addition to the pipeline name and meta name of jobs.'
-                                     f'Only got [{key_in_history}].')
-                pipeline_name = key_in_history_parts[0]
-                meta_name = key_in_history_parts[1]
-                job_info_list = context_infos[pipeline_name]
-                for job_info in job_info_list:
-                    if job_info['meta_name'] == meta_name:
-                        history_job_infos = job_info
-                        key_in_history_parts = key_in_history_parts[2:]
-                        break
+            # query target values
+            target_value = history_job_infos['.'.join(key_in_history_parts)]
             # check which config group to update
             cfg_type = key_to_updated_parts[0]
             if cfg_type == JobRequiredKeys.dj_configs.value:
@@ -136,8 +115,6 @@ class BaseHook:
             else:
                 raise ValueError(f'The key {key_to_updated_parts[0]} to update is not supported.')
             key_to_updated_parts = key_to_updated_parts[1:]
-            # query target values
-            target_value = nested_query(history_job_infos, '.'.join(key_in_history_parts))
             # update the target key
             if len(key_to_updated_parts) > 0:
                 if len(key_to_updated_parts) > 1:
@@ -170,9 +147,7 @@ class BaseHook:
                 f'## HOOK [{self.hook_type}]: The number of outputs does not match the number of output keys. '
                 f'Expected {len(self.output_keys)} but got {len(outputs)}'
             )
-        curr_job_infos = {'meta_name': self.meta_name}
-        for key, ret in zip(self.output_keys, outputs):
-            curr_job_infos[key] = ret
+        curr_job_infos = JobInfos(self.meta_name, self.output_keys, outputs)
         return curr_job_infos
 
     def hook(self, **kwargs):

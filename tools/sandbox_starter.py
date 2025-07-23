@@ -1,7 +1,7 @@
 import os
 import time
 from argparse import ArgumentError
-from typing import List, Union
+from typing import List, Optional, Union
 
 from jsonargparse import ActionConfigFile, ArgumentParser
 from loguru import logger
@@ -66,6 +66,40 @@ def init_sandbox_configs(args=None):
         type=Union[List[str], List[dict]],
         default=[],
         help="List of params for each evaluation jobs.",
+    )
+
+    # iterative target related
+    parser.add_argument(
+        "--max_iter_num",
+        type=int,
+        default=1,
+        help="Maximum number of iterations for iterative target. "
+        "If set to a positive integer, the pipelines will run "
+        "iteratively until the maximum number of iterations is reached. "
+        "If set to 0, you must set the iter_target and the pipelines will "
+        "run iteratively until the iter_target is satisfied. ",
+    )
+
+    parser.add_argument(
+        "--iter_targets",
+        type=Optional[List[str]],
+        default=[],
+        help="Targets for iterative pipelines. "
+        "If set, the pipelines will run iteratively until the target is satisfied or for the max iteration number. "
+        "The target is a dict with the following keys: "
+        "'targets': a list of str targets to monitor. The format of a single target should be "
+        "'<pipeline_name>.<hook_meta_name>.<hook_output_name> [>|>=|<|<=|==] <target_value>', where the "
+        "pipeline/hook/output names must come from the existing ones in the pipelines."
+        "If not set, the target will be evaluated iteratively until the maximum number of iterations is reached. ",
+    )
+
+    parser.add_argument(
+        "--iter_targets_mode",
+        type=str,
+        default="all",
+        help="The mode to check the iterative targets for stopping the pipelines. "
+        "'all': all targets must be satisfied. "
+        "'any': any satisfied target is OK. ",
     )
 
     try:
