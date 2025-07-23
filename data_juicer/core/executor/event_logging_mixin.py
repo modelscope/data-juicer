@@ -25,6 +25,7 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional
+from uuid import uuid4
 
 from loguru import logger
 
@@ -32,16 +33,17 @@ from loguru import logger
 class EventType(Enum):
     """Types of events that can be logged."""
 
-    OPERATION_START = "operation_start"
-    OPERATION_COMPLETE = "operation_complete"
-    OPERATION_ERROR = "operation_error"
+    JOB_START = "job_start"
+    JOB_COMPLETE = "job_complete"
+    JOB_FAILED = "job_failed"
     PARTITION_START = "partition_start"
     PARTITION_COMPLETE = "partition_complete"
-    PARTITION_ERROR = "partition_error"
+    PARTITION_FAILED = "partition_failed"
+    OP_START = "op_start"
+    OP_COMPLETE = "op_complete"
+    OP_FAILED = "op_failed"
     CHECKPOINT_SAVE = "checkpoint_save"
     CHECKPOINT_LOAD = "checkpoint_load"
-    DATASET_LOAD = "dataset_load"
-    DATASET_SAVE = "dataset_save"
     PROCESSING_START = "processing_start"
     PROCESSING_COMPLETE = "processing_complete"
     PROCESSING_ERROR = "processing_error"
@@ -59,40 +61,43 @@ class Event:
     event_type: EventType
     timestamp: float
     message: str
+    job_id: Optional[str] = None
     partition_id: Optional[int] = None
     operation_name: Optional[str] = None
+    operation_idx: Optional[int] = None
+    status: Optional[str] = None
     duration: Optional[float] = None
     error_message: Optional[str] = None
     stack_trace: Optional[str] = None
+    retry_count: Optional[int] = None
+    checkpoint_path: Optional[str] = None
+    op_args: Optional[Dict[str, Any]] = None
+    input_rows: Optional[int] = None
+    output_rows: Optional[int] = None
+    output_path: Optional[str] = None
+    partition_meta: Optional[Dict[str, Any]] = None
+    config: Optional[Dict[str, Any]] = None
     metadata: Optional[Dict[str, Any]] = None
     resource_usage: Optional[Dict[str, Any]] = None
     performance_metrics: Optional[Dict[str, Any]] = None
 
 
 class EventLogger:
-    """Event logging system with real-time capabilities."""
+    """Event logging system with real-time capabilities and JSONL event log for resumability."""
 
-    def __init__(self, log_dir: str, max_log_size_mb: int = 100, backup_count: int = 5):
-        """Initialize the event logger."""
+    def __init__(self, log_dir: str, max_log_size_mb: int = 100, backup_count: int = 5, job_id: Optional[str] = None):
         self.log_dir = Path(log_dir)
         self.log_dir.mkdir(parents=True, exist_ok=True)
-
         self.max_log_size_mb = max_log_size_mb
         self.backup_count = backup_count
-
-        # Event storage
-        self.events: deque = deque(maxlen=10000)  # Keep last 10k events in memory
+        self.job_id = job_id or f"{datetime.utcnow().isoformat()}-{uuid4().hex[:8]}"
+        self.events: deque = deque(maxlen=10000)
         self.event_lock = threading.Lock()
-
-        # Performance tracking
         self.performance_metrics = defaultdict(list)
         self.resource_usage = defaultdict(list)
-
-        # Setup file logging
         self._setup_file_logging()
-
-        # Start background cleanup thread
         self._start_cleanup_thread()
+        self.jsonl_file = self.log_dir / f"events_{self.job_id}.jsonl"
 
     def _setup_file_logging(self):
         """Setup file-based logging."""
@@ -135,19 +140,24 @@ class EventLogger:
             logger.warning(f"Error cleaning up old logs: {e}")
 
     def log_event(self, event: Event):
-        """Log an event."""
+        """Log an event (to memory, loguru, and JSONL for resumability)."""
         with self.event_lock:
+            event.job_id = self.job_id
             self.events.append(event)
-
-            # Log to file
+            # Log to file (loguru)
             log_message = self._format_event_for_logging(event)
             logger.info(log_message)
-
+            # Write to JSONL for resumability
+            with open(self.jsonl_file, "a") as f:
+                f.write(
+                    json.dumps(
+                        {k: (v.value if isinstance(v, Enum) else v) for k, v in event.__dict__.items() if v is not None}
+                    )
+                    + "\n"
+                )
             # Track performance metrics
             if event.performance_metrics:
                 self.performance_metrics[event.operation_name or "unknown"].append(event.performance_metrics)
-
-            # Track resource usage
             if event.resource_usage:
                 self.resource_usage[event.operation_name or "unknown"].append(event.resource_usage)
 
@@ -360,8 +370,9 @@ class EventLoggingMixin:
         log_dir = os.path.join(self.work_dir, "event_logs")
         max_log_size = event_config.get("max_log_size_mb", 100)
         backup_count = event_config.get("backup_count", 5)
+        job_id = getattr(self, "job_id", None)
 
-        self.event_logger = EventLogger(log_dir, max_log_size, backup_count)
+        self.event_logger = EventLogger(log_dir, max_log_size, backup_count, job_id=job_id)
 
         # Log initialization
         self._log_event(EventType.INFO, f"Event logging initialized for {self.executor_type} executor")
@@ -374,52 +385,102 @@ class EventLoggingMixin:
         event = Event(event_type=event_type, timestamp=time.time(), message=message, **kwargs)
         self.event_logger.log_event(event)
 
-    def _log_operation_start(self, operation_name: str, partition_id: Optional[int] = None, **kwargs):
-        """Log the start of an operation."""
+    # Add new logging methods for job, partition, and op events
+    def log_job_start(self, config, total_partitions):
+        self._log_event(EventType.JOB_START, "Job started", config=config, total_partitions=total_partitions)
+
+    def log_job_complete(self, status, duration):
+        self._log_event(EventType.JOB_COMPLETE, "Job completed", status=status, duration=duration)
+
+    def log_job_failed(self, error_message, duration):
         self._log_event(
-            EventType.OPERATION_START,
-            f"Starting operation: {operation_name}",
-            operation_name=operation_name,
-            partition_id=partition_id,
-            **kwargs,
+            EventType.JOB_FAILED, "Job failed", status="failed", error_message=error_message, duration=duration
         )
 
-    def _log_operation_complete(
-        self, operation_name: str, duration: float, partition_id: Optional[int] = None, **kwargs
+    def log_partition_start(self, partition_id, partition_meta):
+        self._log_event(
+            EventType.PARTITION_START,
+            f"Partition {partition_id} started",
+            partition_id=partition_id,
+            partition_meta=partition_meta,
+        )
+
+    def log_partition_complete(self, partition_id, duration, output_path):
+        self._log_event(
+            EventType.PARTITION_COMPLETE,
+            f"Partition {partition_id} completed",
+            partition_id=partition_id,
+            duration=duration,
+            output_path=output_path,
+            status="success",
+        )
+
+    def log_partition_failed(self, partition_id, error_message, retry_count):
+        self._log_event(
+            EventType.PARTITION_FAILED,
+            f"Partition {partition_id} failed",
+            partition_id=partition_id,
+            error_message=error_message,
+            retry_count=retry_count,
+            status="failed",
+        )
+
+    def log_op_start(self, partition_id, operation_name, operation_idx, op_args):
+        self._log_event(
+            EventType.OP_START,
+            f"Op {operation_name} (idx {operation_idx}) started on partition {partition_id}",
+            partition_id=partition_id,
+            operation_name=operation_name,
+            operation_idx=operation_idx,
+            op_args=op_args,
+        )
+
+    def log_op_complete(
+        self, partition_id, operation_name, operation_idx, duration, checkpoint_path, input_rows, output_rows
     ):
-        """Log the completion of an operation."""
         self._log_event(
-            EventType.OPERATION_COMPLETE,
-            f"Completed operation: {operation_name} in {duration:.3f}s",
-            operation_name=operation_name,
-            duration=duration,
+            EventType.OP_COMPLETE,
+            f"Op {operation_name} (idx {operation_idx}) completed on partition {partition_id}",
             partition_id=partition_id,
-            **kwargs,
+            operation_name=operation_name,
+            operation_idx=operation_idx,
+            duration=duration,
+            checkpoint_path=checkpoint_path,
+            input_rows=input_rows,
+            output_rows=output_rows,
+            status="success",
         )
 
-    def _log_operation_error(self, operation_name: str, error: Exception, partition_id: Optional[int] = None, **kwargs):
-        """Log an operation error."""
-        import traceback
-
+    def log_op_failed(self, partition_id, operation_name, operation_idx, error_message, retry_count):
         self._log_event(
-            EventType.OPERATION_ERROR,
-            f"Error in operation: {operation_name} - {str(error)}",
-            operation_name=operation_name,
-            error_message=str(error),
-            stack_trace=traceback.format_exc(),
+            EventType.OP_FAILED,
+            f"Op {operation_name} (idx {operation_idx}) failed on partition {partition_id}",
             partition_id=partition_id,
-            **kwargs,
+            operation_name=operation_name,
+            operation_idx=operation_idx,
+            error_message=error_message,
+            retry_count=retry_count,
+            status="failed",
         )
 
-    def _log_performance_metric(self, operation_name: str, duration: float, throughput: float, **kwargs):
-        """Log a performance metric."""
+    def log_checkpoint_save(self, partition_id, operation_name, operation_idx, checkpoint_path):
         self._log_event(
-            EventType.PERFORMANCE_METRIC,
-            f"Performance: {operation_name} - {duration:.3f}s, {throughput:.1f} samples/s",
+            EventType.CHECKPOINT_SAVE,
+            f"Checkpoint saved for op {operation_name} (idx {operation_idx}) on partition {partition_id}",
+            partition_id=partition_id,
             operation_name=operation_name,
-            duration=duration,
-            performance_metrics={"duration": duration, "throughput": throughput},
-            **kwargs,
+            operation_idx=operation_idx,
+            checkpoint_path=checkpoint_path,
+        )
+
+    def log_checkpoint_load(self, partition_id, operation_name, operation_idx, checkpoint_path):
+        self._log_event(
+            EventType.CHECKPOINT_LOAD,
+            f"Checkpoint loaded for op {operation_name} (idx {operation_idx}) on partition {partition_id}",
+            partition_id=partition_id,
+            operation_name=operation_name,
+            operation_idx=operation_idx,
+            checkpoint_path=checkpoint_path,
         )
 
     def get_events(self, **kwargs) -> List[Event]:

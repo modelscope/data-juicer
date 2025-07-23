@@ -121,6 +121,12 @@ class PartitionedRayExecutor(ExecutorBase):
         )  # Use Arrow batch format for processing (recommended)
         self.arrow_batch_size = getattr(self.cfg, "arrow_batch_size", 1000)  # Arrow batch size for processing
 
+        # Checkpointing strategy config
+        self.checkpoint_cfg = getattr(self.cfg, "checkpoint", {})
+        self.checkpoint_strategy = self.checkpoint_cfg.get("strategy", "every_op")
+        self.checkpoint_n_ops = self.checkpoint_cfg.get("n_ops", 1)
+        self.checkpoint_op_names = set(self.checkpoint_cfg.get("op_names", []))
+
         # Initialize Ray
         logger.info("Initializing Ray for partitioned execution...")
         ray.init(getattr(self.cfg, "ray_address", "auto"))
@@ -377,6 +383,19 @@ class PartitionedRayExecutor(ExecutorBase):
             return DatasetMapping(**mapping_data)
         return None
 
+    def should_checkpoint(self, op_idx, op_name):
+        """Determine whether to checkpoint after this op based on config."""
+        strategy = self.checkpoint_strategy
+        if strategy == "every_op":
+            return True
+        elif strategy == "every_partition":
+            return False  # Only checkpoint at partition end
+        elif strategy == "every_n_ops":
+            return (op_idx + 1) % self.checkpoint_n_ops == 0
+        elif strategy == "manual":
+            return op_name in self.checkpoint_op_names
+        return False
+
     def _process_partition(self, partition_path: str, ops: List, partition_id: int) -> Dict[str, Any]:
         """Process a single partition with fault tolerance and intermediate data preservation."""
         logger.info(f"Processing partition {partition_id}: {partition_path}")
@@ -447,7 +466,7 @@ class PartitionedRayExecutor(ExecutorBase):
                 logger.debug(f"Applying op {op_idx+1}/{len(ops)}: {op._name} to partition {partition_id}")
 
                 # Save intermediate state if enabled (using configurable format)
-                if self.preserve_intermediate_data:
+                if self.preserve_intermediate_data and self.should_checkpoint(op_idx, op._name):
                     if self.storage_format == "parquet":
                         intermediate_path = os.path.join(
                             partition_intermediate_dir, f"after_op_{op_idx:03d}_{op._name}.parquet"
@@ -457,26 +476,19 @@ class PartitionedRayExecutor(ExecutorBase):
                         intermediate_path = os.path.join(
                             partition_intermediate_dir, f"after_op_{op_idx:03d}_{op._name}.arrow"
                         )
-                        # Convert to Arrow table and save as Feather format with compression
                         import pyarrow.feather as feather
 
-                        # Use Arrow batch format for better performance
                         if hasattr(current_dataset, "to_arrow_refs"):
-                            # Use Arrow batch format directly if available
                             arrow_refs = current_dataset.to_arrow_refs()
                             tables = ray.get(arrow_refs)
                             if tables:
                                 table = tables[0] if len(tables) == 1 else pa.concat_tables(tables)
                             else:
-                                # Fallback to pandas conversion
                                 df = current_dataset.to_pandas()
                                 table = pa.Table.from_pandas(df)
                         else:
-                            # Fallback to pandas conversion
                             df = current_dataset.to_pandas()
                             table = pa.Table.from_pandas(df)
-
-                        # Save with compression for better storage efficiency
                         feather.write_feather(table, intermediate_path, compression="lz4")
                     else:
                         intermediate_path = os.path.join(
