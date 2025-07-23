@@ -63,9 +63,9 @@ def cluster_similarity_planning(
     # At least one of the cluster should have similiarity at least
     # IRRELEVANT_MAX_THRESHOLD
     # otherwise, only backup agent will be used
-    IRRELEVANT_MAX_THRESHOLD = 0.35
+    IRRELEVANT_MAX_THRESHOLD = 0.15
     # only clusters with at least MIN_THRESHOLD will be considered
-    MIN_THRESHOLD = 0.3
+    MIN_THRESHOLD = 0.13
 
     # STEP 1: retrieve cluster-level similarities from rag agents
     model_manager = ModelManager.get_instance()

@@ -14,7 +14,12 @@ Before running, set below environment variables:
 
 ```bash
 export DASHSCOPE_API_KEY=your_dashscope_key
-````
+```
+
+Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
 Start the copilot server (replace the `PATH_TO_DJ_REPO` variable in `setup_server.sh` with the absolute path to your data-juicer repository):
 
@@ -27,7 +32,6 @@ Note: It is strongly recommended to create a clean data-juicer repository to avo
 
 Launch the demo with streamlit:
 ```bash
-cd ..
 streamlit run app.py
 ```
 

@@ -133,6 +133,19 @@
               ]
             }
           }
+        },
+        "store_and_index": {
+          "transformations": [
+            {
+              "create_object": true,
+              "module": "llama_index.core.node_parser",
+              "class": "SentenceSplitter",
+              "init_args": {
+                "chunk_size": 1500,
+                "chunk_overlap": 200
+              }
+            }
+          ]
         }
       }
     ]
