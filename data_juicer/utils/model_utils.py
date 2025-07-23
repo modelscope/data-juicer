@@ -3,6 +3,7 @@ import inspect
 import io
 import os
 from contextlib import redirect_stderr
+from functools import partial
 from pickle import UnpicklingError
 from typing import Optional, Union
 
@@ -984,42 +985,11 @@ def prepare_model(model_type, **model_kwargs):
         list(MODEL_FUNCTION_MAPPING.keys())
     )
     model_func = MODEL_FUNCTION_MAPPING[model_type]
-
-    # Create a stable model key based on model type and sorted kwargs
-    # This ensures the same model with same parameters gets the same key
-    sorted_kwargs = sorted(model_kwargs.items())
-    model_key_str = f"{model_type}:{sorted_kwargs}"
-
-    # Check if model is already in cache using the stable key
-    global MODEL_ZOO
-    if model_key_str not in MODEL_ZOO:
-        logger.debug(f"Model key not found in cache for {model_type} with kwargs: {model_kwargs}")
-        if model_type in _MODELS_WITHOUT_FILE_LOCK:
-            # initialize once in the main process to safely download model files
-            # and also load into cache to avoid repeated loading
-            try:
-                logger.info(f"Loading {model_type} model into cache (first time)")
-                MODEL_ZOO[model_key_str] = model_func(**model_kwargs)
-                logger.debug(f"Successfully loaded {model_type} model into cache")
-            except Exception as e:
-                logger.warning(f"Failed to pre-load {model_type} model into cache: {e}")
-                # Continue without pre-loading if it fails
-        else:
-            # For models that need file locks, we can't pre-load them here
-            # They will be loaded when get_model is called
-            logger.debug(f"Skipping pre-load for {model_type} (needs file lock)")
-    else:
-        logger.debug(f"{model_type} model already in cache (reusing)")
-
-    # Return a function that will use the cached model
-    def get_cached_model(device="cpu"):
-        if model_key_str in MODEL_ZOO:
-            return MODEL_ZOO[model_key_str]
-        else:
-            # Fallback: load the model if not in cache
-            return model_func(**model_kwargs)
-
-    return get_cached_model
+    model_key = partial(model_func, **model_kwargs)
+    if model_type in _MODELS_WITHOUT_FILE_LOCK:
+        # initialize once in the main process to safely download model files
+        model_key()
+    return model_key
 
 
 def get_model(model_key=None, rank=None, use_cuda=False):
@@ -1027,43 +997,16 @@ def get_model(model_key=None, rank=None, use_cuda=False):
         return None
 
     global MODEL_ZOO
-
-    # Handle both old partial function keys and new string keys
-    if callable(model_key):
-        # Old style: model_key is a partial function
-        if model_key not in MODEL_ZOO:
-            # Add stack trace to see where this is being called from
-            import traceback
-
-            stack_trace = traceback.format_stack()[-3:]  # Last 3 frames
-            logger.info(f"Model key not found in MODEL_ZOO ({mp.current_process().name})")
-            logger.info(f"Model key: {model_key}")
-            logger.info(f"Call stack:\n{''.join(stack_trace)}")
-
-            if use_cuda:
-                rank = rank if rank is not None else 0
-                rank = rank % cuda_device_count()
-                device = f"cuda:{rank}"
-            else:
-                device = "cpu"
-
-            logger.info(f"Loading model with device={device}, model_key={model_key}")
-            MODEL_ZOO[model_key] = model_key(device=device)
-            logger.info(f"Model loaded and cached, model_key={model_key}")
-        else:
-            logger.debug(f"Model found in cache, reusing, model_key={model_key}")
-
-        return MODEL_ZOO[model_key]
-    else:
-        # New style: model_key is a function that handles caching internally
+    if model_key not in MODEL_ZOO:
+        logger.debug(f"{model_key} not found in MODEL_ZOO ({mp.current_process().name})")
         if use_cuda:
             rank = rank if rank is not None else 0
             rank = rank % cuda_device_count()
             device = f"cuda:{rank}"
         else:
             device = "cpu"
-
-        return model_key(device=device)
+        MODEL_ZOO[model_key] = model_key(device=device)
+    return MODEL_ZOO[model_key]
 
 
 def free_models(clear_model_zoo=True):

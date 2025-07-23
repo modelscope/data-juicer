@@ -501,28 +501,156 @@ class PerformanceBenchmark:
     def run_pipeline_optimizer_benchmark(
         self, filters: List[Filter], test_data: Any, analyzer_insights: Optional[Dict[str, Any]] = None
     ) -> PerformanceMetrics:
-        """Benchmark the complete pipeline optimizer workflow using FusedFilter."""
-        logger.info("Running pipeline optimizer benchmark (using FusedFilter)...")
+        """Benchmark the complete pipeline optimizer workflow using PipelineOptimizer."""
+        logger.info("Running pipeline optimizer benchmark (using PipelineOptimizer)...")
 
         start_memory = self.measure_memory_usage()
         total_start_time = time.time()
 
-        # Create a FusedFilter with all the individual filters
-        logger.info("  Creating FusedFilter with all filters...")
-        fused_filter = FusedFilter(name="benchmark_fused_filter", fused_filters=filters)
+        # Create a PipelineAST from the filters using config format
+        logger.info("  Creating PipelineAST from filters...")
+        from data_juicer.core.pipeline_ast import PipelineAST
 
-        # Set execution strategy to sequential to match individual execution behavior
-        fused_filter.execution_strategy = "parallel"
+        # Convert filters to config format
+        process_config = []
+        for filter_op in filters:
+            # Create config from filter's initialization parameters
+            # Use _op_cfg if available, otherwise create from filter attributes
+            if hasattr(filter_op, "_op_cfg") and filter_op._op_cfg:
+                config = filter_op._op_cfg[filter_op._name]
+            else:
+                # Extract config from filter's __dict__, excluding internal attributes
+                config = {}
+                for key, value in filter_op.__dict__.items():
+                    if not key.startswith("_") and key not in [
+                        "text_key",
+                        "image_key",
+                        "audio_key",
+                        "video_key",
+                        "query_key",
+                        "response_key",
+                        "history_key",
+                        "index_key",
+                        "batch_size",
+                        "work_dir",
+                        "skip_op_error",
+                        "accelerator",
+                        "num_proc",
+                        "cpu_required",
+                        "mem_required",
+                        "turbo",
+                        "stats_export_path",
+                    ]:
+                        config[key] = value
+            process_config.append({filter_op._name: config})
 
-        logger.info(f"  Created FusedFilter with {len(filters)} filters")
-        logger.info(f"  Execution strategy: {fused_filter.execution_strategy}")
+        # Build AST from config
+        ast = PipelineAST()
+        ast.build_from_config({"process": process_config})
 
-        # Process with the fused filter using the run method
-        logger.info("  Processing with FusedFilter...")
+        logger.info(f"  Created PipelineAST with {len(filters)} filters")
+        logger.info("  📋 Original Pipeline Structure:")
+        self._log_ast_structure(ast, "Original")
 
-        # Use the run method which handles dataset conversion internally
+        # Create PipelineOptimizer with analyzer insights
+        logger.info("  Creating PipelineOptimizer...")
+        from data_juicer.core.optimizer.optimizer import PipelineOptimizer
+
+        optimizer = PipelineOptimizer(analyzer_insights=analyzer_insights)
+
+        # Get optimization summary
+        opt_summary = optimizer.get_optimization_summary()
+        logger.info(f"  Optimization strategies: {opt_summary['strategies']}")
+        logger.info(f"  Analyzer insights available: {opt_summary['analyzer_insights_available']}")
+
+        # Optimize the pipeline
+        logger.info("  Optimizing pipeline...")
+        optimized_ast = optimizer.optimize(ast)
+
+        # Log detailed optimization results
+        logger.info("  📊 Optimization Results:")
+        self._log_ast_structure(optimized_ast, "Optimized")
+
+        # Convert optimized AST back to operations
+        logger.info("  Converting optimized AST to operations...")
+        optimized_ops = self._ast_to_operations(optimized_ast)
+
+        logger.info(f"  Optimized pipeline has {len(optimized_ops)} operations")
+
+        # Optimize batch sizes for better performance
+        self._optimize_batch_sizes(optimized_ops, test_data)
+
+        # Process with the optimized operations
+        logger.info("  Processing with optimized pipeline...")
         filter_start = time.time()
-        data = fused_filter.run(test_data)
+
+        # Execute the optimized operations
+        data = test_data
+        logger.info(f"  🔍 Processing {len(optimized_ops)} optimized operations:")
+        for i, op_config in enumerate(optimized_ops):
+            op_name = list(op_config.keys())[0]
+            logger.info(f"    Op {i+1}: {op_name}")
+            if op_name == "fused_filter":
+                # Handle fused filter
+                logger.info(f"    🔍 Processing fused_filter operation {i+1}")
+                fused_op_list = op_config[op_name].get("fused_op_list", [])
+                logger.info(f"      Fused op list: {fused_op_list}")
+                individual_filters = []
+
+                for filter_config in fused_op_list:
+                    filter_name = list(filter_config.keys())[0]
+                    filter_args = filter_config[filter_name]
+                    logger.info(f"      Loading filter: {filter_name} with args: {filter_args}")
+                    from data_juicer.ops import load_ops
+
+                    loaded_filters = load_ops([{filter_name: filter_args}])
+                    if loaded_filters:
+                        individual_filters.append(loaded_filters[0])
+                        logger.info(f"      ✅ Successfully loaded {filter_name}")
+                    else:
+                        logger.warning(f"      ❌ Failed to load {filter_name}")
+
+                if individual_filters:
+                    from data_juicer.core.optimizer.fused_op import FusedFilter
+
+                    # Optimize fusion settings for performance
+                    fused_filter = FusedFilter(
+                        name="optimized_fused_filter",
+                        fused_filters=individual_filters,
+                        # Force sequential execution to match individual behavior
+                        execution_strategy="sequential",
+                        # Skip performance testing for large datasets
+                        turbo=True,
+                        # Optimize batch size and memory usage
+                        batch_size=1000,
+                        # Reduce memory usage
+                        mem_required=0.5,
+                        # Use fewer processes for better memory efficiency
+                        num_proc=6,
+                    )
+
+                    # Debug: Log fusion decision
+                    logger.info(f"  🔍 Creating FusedFilter with {len(individual_filters)} filters:")
+                    for f in individual_filters:
+                        logger.info(f"    - {f._name}")
+
+                    # Force fusion to be used (override the decision)
+                    fused_filter._should_skip_fusion = lambda x: False
+                    # Skip performance testing entirely
+                    fused_filter._in_performance_test = True
+
+                    logger.info(f"    🔍 Running FusedFilter with {len(individual_filters)} filters...")
+                    data = fused_filter.run(data)
+                    logger.info(f"    ✅ FusedFilter completed, data has {get_dataset_length(data)} samples")
+            else:
+                # Handle individual operations
+                from data_juicer.ops import load_ops
+
+                loaded_ops = load_ops([op_config])
+                if loaded_ops:
+                    op = loaded_ops[0]
+                    data = op.run(data)
+
         filter_time = time.time() - filter_start
 
         # Calculate totals
@@ -546,6 +674,107 @@ class PerformanceBenchmark:
             memory_usage=memory_usage,
             throughput=throughput,
         )
+
+    def _optimize_batch_sizes(self, optimized_ops: List[Dict], test_data: Any):
+        """Optimize batch sizes for better performance."""
+        dataset_size = get_dataset_length(test_data)
+
+        # Simple batch size optimization based on dataset size
+        if dataset_size > 100000:
+            optimal_batch_size = 2000
+        elif dataset_size > 10000:
+            optimal_batch_size = 1000
+        else:
+            optimal_batch_size = 500
+
+        logger.info(f"  Optimizing batch sizes for dataset of {dataset_size:,} samples")
+        logger.info(f"  Recommended batch size: {optimal_batch_size}")
+
+        # Update batch sizes in fused operations
+        for op_config in optimized_ops:
+            op_name = list(op_config.keys())[0]
+            if op_name == "fused_filter":
+                if "general_fused_op" not in op_config[op_name]:
+                    op_config[op_name]["general_fused_op"] = {}
+                op_config[op_name]["general_fused_op"]["batch_size"] = optimal_batch_size
+            elif op_name == "fused_mapper":
+                if "fused_mapper" not in op_config[op_name]:
+                    op_config[op_name]["fused_mapper"] = {}
+                op_config[op_name]["fused_mapper"]["batch_size"] = optimal_batch_size
+
+    def _log_ast_structure(self, ast, prefix: str = ""):
+        """Log the structure of an AST for debugging."""
+        from data_juicer.core.pipeline_ast import OpType
+
+        def traverse_node(node, level=0):
+            indent = "  " * level
+            if node.op_type == OpType.ROOT:
+                logger.info(f"{indent}{prefix} AST Root")
+            elif node.op_type == OpType.FILTER:
+                # Check if this is a fused filter by looking at the config
+                if node.config and "general_fused_op" in node.config:
+                    fused_ops = node.config["general_fused_op"].get("detailed_ops", [])
+                    logger.info(f"{indent}├─ Fused Filter: {node.name} ({len(fused_ops)} operations)")
+                    for op_name in fused_ops:
+                        logger.info(f"{indent}  ├─ {op_name}")
+                else:
+                    logger.info(f"{indent}├─ Filter: {node.name}")
+            elif node.op_type == OpType.MAPPER:
+                # Check if this is a fused mapper by looking at the config
+                if node.config and "fused_mapper" in node.config:
+                    fused_ops = node.config["fused_mapper"].get("detailed_ops", [])
+                    logger.info(f"{indent}├─ Fused Mapper: {node.name} ({len(fused_ops)} operations)")
+                    for op_name in fused_ops:
+                        logger.info(f"{indent}  ├─ {op_name}")
+                else:
+                    logger.info(f"{indent}├─ Mapper: {node.name}")
+            else:
+                logger.info(f"{indent}├─ {node.op_type}: {node.name}")
+
+            # Always recurse to children
+            for child in node.children:
+                traverse_node(child, level + 1)
+
+        traverse_node(ast.root)
+
+    def _ast_to_operations(self, ast) -> List[Dict]:
+        """Convert PipelineAST back to operation configurations."""
+        from data_juicer.core.pipeline_ast import OpType
+
+        operations = []
+
+        def traverse_node(node):
+            logger.debug(
+                f"🔍 AST Node: {node.name}, type: {node.op_type}, config keys: {list(node.config.keys()) if node.config else 'None'}"
+            )
+
+            if node.op_type == OpType.FILTER:
+                # Check if this is a fused filter
+                if node.config and "general_fused_op" in node.config:
+                    logger.debug(f"🔍 Found fused filter: {node.name}")
+                    logger.debug(f"🔍 Fused config: {node.config['general_fused_op']}")
+                    # Keep the fused operation as a single unit
+                    operations.append({node.name: node.config})
+                else:
+                    logger.debug(f"🔍 Found regular filter: {node.name}")
+                    # Regular filter
+                    operations.append({node.name: node.config})
+            elif node.op_type == OpType.MAPPER:
+                # Check if this is a fused mapper
+                if node.config and "fused_mapper" in node.config:
+                    logger.debug(f"🔍 Found fused mapper: {node.name}")
+                    # Keep the fused operation as a single unit
+                    operations.append({node.name: node.config})
+                else:
+                    logger.debug(f"🔍 Found regular mapper: {node.name}")
+                    # Regular mapper
+                    operations.append({node.name: node.config})
+
+            for child in node.children:
+                traverse_node(child)
+
+        traverse_node(ast.root)
+        return operations
 
     def get_final_mask_from_filters(self, filters: List[Filter], test_data: Any) -> list:
         """Compute the final boolean mask for each sample using individual filter execution (AND) with funneling."""
@@ -796,9 +1025,9 @@ class PerformanceBenchmark:
         logger.info("=" * 60)
 
         # Get analyzer insights if not provided
-        if analyzer_insights is None:
-            logger.info("🔍 Getting analyzer insights...")
-            analyzer_insights = self.get_analyzer_insights(test_data)
+        # if analyzer_insights is None:
+        #     logger.info("🔍 Getting analyzer insights...")
+        #     analyzer_insights = self.get_analyzer_insights(test_data)
 
         # Run benchmarks based on benchmark_type
         pipeline_results = None
@@ -1672,17 +1901,27 @@ def load_real_dataset(dataset_path: str, max_samples: Optional[int] = None) -> A
 
     # Apply max_samples limit if specified
     if max_samples is not None:
-        # Get dataset length safely
         try:
             dataset_length = get_dataset_length(dataset)
             if dataset_length > max_samples:
-                # For DJDataset, we need to use a different approach
-                # Just log that we're using the full dataset for now
-                logger.info(
-                    f"⚠️  Dataset has {dataset_length} samples, using all (max_samples not implemented for DJDataset)"
-                )
-        except Exception:
-            logger.info(f"⚠️  Could not determine dataset length, using full dataset")
+                # HuggingFace/NestedDataset
+                if hasattr(dataset, "select"):
+                    dataset = dataset.select(range(max_samples))
+                    logger.info(f"✅ Limited dataset to {max_samples} samples using select()")
+                # RayDataset
+                elif hasattr(dataset, "limit"):
+                    dataset = dataset.limit(max_samples)
+                    logger.info(f"✅ Limited dataset to {max_samples} samples using limit()")
+                # Dict format
+                elif isinstance(dataset, dict) and "text" in dataset:
+                    for key in dataset:
+                        if isinstance(dataset[key], list):
+                            dataset[key] = dataset[key][:max_samples]
+                    logger.info(f"✅ Limited dataset to {max_samples} samples (dict format)")
+                else:
+                    logger.warning("⚠️  max_samples not implemented for this dataset type")
+        except Exception as e:
+            logger.warning(f"⚠️  Could not limit dataset to max_samples: {e}")
     else:
         logger.info(f"✅ Loaded dataset from {dataset_path}")
 
