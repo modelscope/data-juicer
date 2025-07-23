@@ -29,6 +29,7 @@ from pydantic import PositiveInt
 from data_juicer.core.adapter import Adapter
 from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.executor import ExecutorBase
+from data_juicer.core.executor.event_logging_mixin import EventLoggingMixin
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -98,7 +99,7 @@ class DatasetMapping:
             self.partitions = []
 
 
-class PartitionedRayExecutor(ExecutorBase):
+class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
     """
     Fault-tolerant Ray executor with partitioning optimization.
 
@@ -198,6 +199,56 @@ class PartitionedRayExecutor(ExecutorBase):
 
         # Dataset mapping
         self.dataset_mapping: Optional[DatasetMapping] = None
+
+    def _get_job_specific_paths(self):
+        """Get job-specific directory paths if event logging is enabled."""
+        if hasattr(self, "event_logger") and self.event_logger:
+            # Use job-specific directories
+            job_id = self.event_logger.job_id
+            job_dir = os.path.join(self.work_dir, job_id)
+
+            # Use configured checkpoint directory if available
+            checkpoint_dir = getattr(self.cfg, "checkpoint_dir", None)
+            if checkpoint_dir:
+                job_checkpoint_dir = os.path.join(checkpoint_dir, job_id)
+            else:
+                job_checkpoint_dir = os.path.join(job_dir, "checkpoints")
+
+            return {
+                "checkpoint_dir": job_checkpoint_dir,
+                "metadata_dir": os.path.join(job_dir, "metadata"),
+                "partitions_dir": os.path.join(job_dir, "partitions"),
+                "intermediate_dir": os.path.join(job_dir, "intermediate"),
+                "results_dir": os.path.join(job_dir, "results"),
+            }
+        else:
+            # Use shared directories (backward compatibility)
+            return {
+                "checkpoint_dir": os.path.join(self.work_dir, "checkpoints"),
+                "metadata_dir": os.path.join(self.work_dir, "metadata"),
+                "partitions_dir": os.path.join(self.work_dir, "partitions"),
+                "intermediate_dir": os.path.join(self.work_dir, "intermediate"),
+                "results_dir": os.path.join(self.work_dir, "results"),
+            }
+
+    def _update_directories_for_job(self):
+        """Update directory paths to use job-specific directories if available."""
+        job_paths = self._get_job_specific_paths()
+        self.checkpoint_dir = job_paths["checkpoint_dir"]
+        self.metadata_dir = job_paths["metadata_dir"]
+        self.partitions_dir = job_paths["partitions_dir"]
+        self.intermediate_dir = job_paths["intermediate_dir"]
+        self.results_dir = job_paths["results_dir"]
+
+        # Create job-specific directories
+        for dir_path in [
+            self.checkpoint_dir,
+            self.metadata_dir,
+            self.partitions_dir,
+            self.intermediate_dir,
+            self.results_dir,
+        ]:
+            os.makedirs(dir_path, exist_ok=True)
 
     def _should_checkpoint(self, op_idx: int, op_name: str, partition_id: int) -> bool:
         """Determine if checkpoint should be created based on configuration strategy."""
@@ -782,6 +833,9 @@ class PartitionedRayExecutor(ExecutorBase):
         # 1. Load dataset
         logger.info("Loading dataset with Ray...")
         dataset = self.datasetbuilder.load_dataset(num_proc=load_data_np)
+
+        # Update directories for job-specific paths if event logging is enabled
+        self._update_directories_for_job()
 
         # 2. Extract and prepare operations
         logger.info("Preparing process operators...")

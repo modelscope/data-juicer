@@ -17,6 +17,7 @@ Features:
 
 import json
 import os
+import re
 import threading
 import time
 from collections import defaultdict, deque
@@ -90,14 +91,16 @@ class EventLogger:
         self.log_dir.mkdir(parents=True, exist_ok=True)
         self.max_log_size_mb = max_log_size_mb
         self.backup_count = backup_count
-        self.job_id = job_id or f"{datetime.utcnow().isoformat()}-{uuid4().hex[:8]}"
+        # Use provided job_id or generate a simple timestamp-based one
+        self.job_id = job_id or f"{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}-{uuid4().hex[:6]}"
         self.events: deque = deque(maxlen=10000)
         self.event_lock = threading.Lock()
         self.performance_metrics = defaultdict(list)
         self.resource_usage = defaultdict(list)
         self._setup_file_logging()
         self._start_cleanup_thread()
-        self.jsonl_file = self.log_dir / f"events_{self.job_id}.jsonl"
+        # Use simpler filename since we're in job-specific directory
+        self.jsonl_file = self.log_dir / "events.jsonl"
 
     def _setup_file_logging(self):
         """Setup file-based logging."""
@@ -344,6 +347,31 @@ class EventLogger:
             last_event_count = len(current_events)
             time.sleep(0.1)  # Check every 100ms
 
+    @classmethod
+    def list_available_jobs(cls, work_dir: str) -> List[Dict[str, Any]]:
+        """List available jobs for resumption from a work directory."""
+        available_jobs = []
+
+        if not os.path.exists(work_dir):
+            return available_jobs
+
+        # Look for job directories (each job has its own directory)
+        for item in os.listdir(work_dir):
+            job_dir = os.path.join(work_dir, item)
+            if os.path.isdir(job_dir):
+                summary_file = os.path.join(job_dir, "job_summary.json")
+                if os.path.exists(summary_file):
+                    try:
+                        with open(summary_file, "r") as f:
+                            job_summary = json.load(f)
+                        job_summary["work_dir"] = work_dir
+                        job_summary["job_dir"] = job_dir
+                        available_jobs.append(job_summary)
+                    except Exception as e:
+                        logger.warning(f"Failed to load job summary from {summary_file}: {e}")
+
+        return available_jobs
+
 
 class EventLoggingMixin:
     """Mixin to add event logging capabilities to any executor."""
@@ -366,16 +394,205 @@ class EventLoggingMixin:
             self.event_logger = None
             return
 
-        # Setup event logger
-        log_dir = os.path.join(self.work_dir, "event_logs")
+        # Use job_id from config if provided, otherwise auto-generate
+        job_id = getattr(self.cfg, "job_id", None)
+
+        # Create job-specific directory structure
+        if job_id:
+            # Use provided job_id
+            job_dir = os.path.join(self.work_dir, job_id)
+        else:
+            # Auto-generate job_id with timestamp and config name
+            timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+            config_name = self._get_config_name()
+            unique_suffix = uuid4().hex[:6]
+            job_id = f"{timestamp}_{config_name}_{unique_suffix}"
+            job_dir = os.path.join(self.work_dir, job_id)
+
+        # Create job directory and subdirectories
+        os.makedirs(job_dir, exist_ok=True)
+        event_logs_dir = os.path.join(job_dir, "event_logs")
+        os.makedirs(event_logs_dir, exist_ok=True)
+
+        # Setup event logger in job-specific directory
         max_log_size = event_config.get("max_log_size_mb", 100)
         backup_count = event_config.get("backup_count", 5)
-        job_id = getattr(self, "job_id", None)
 
-        self.event_logger = EventLogger(log_dir, max_log_size, backup_count, job_id=job_id)
+        self.event_logger = EventLogger(event_logs_dir, max_log_size, backup_count, job_id=job_id)
+
+        # If job_id is provided, validate resumption
+        if getattr(self.cfg, "job_id", None):
+            if not self._validate_job_resumption(job_id):
+                logger.warning("Job resumption validation failed, continuing with new job")
+
+        # Create and display job summary
+        self._create_job_summary(job_id, job_dir)
 
         # Log initialization
         self._log_event(EventType.INFO, f"Event logging initialized for {self.executor_type} executor")
+
+    def _create_job_summary(self, job_id: str, job_dir: str):
+        """Create and display job summary for easy resumption."""
+        # Get separate storage paths if configured
+        event_log_dir = getattr(self.cfg, "event_log_dir", None)
+        checkpoint_dir = getattr(self.cfg, "checkpoint_dir", None)
+
+        # Use configured paths or fall back to job-specific directories
+        if event_log_dir:
+            # Use configured event log directory with job subdirectory
+            job_event_log_dir = os.path.join(event_log_dir, job_id, "event_logs")
+        else:
+            # Use job-specific directory
+            job_event_log_dir = os.path.join(job_dir, "event_logs")
+
+        if checkpoint_dir:
+            # Use configured checkpoint directory with job subdirectory
+            job_checkpoint_dir = os.path.join(checkpoint_dir, job_id)
+        else:
+            # Use job-specific directory
+            job_checkpoint_dir = os.path.join(job_dir, "checkpoints")
+
+        job_metadata_dir = os.path.join(job_dir, "metadata")
+
+        job_summary = {
+            "job_id": job_id,
+            "start_time": time.time(),
+            "work_dir": self.work_dir,
+            "job_dir": job_dir,
+            "config_file": getattr(self.cfg, "config", None),
+            "executor_type": getattr(self, "executor_type", "unknown"),
+            "status": "running",
+            "resumption_command": f"python -m data_juicer --config {getattr(self.cfg, 'config', 'config.yaml')} --job_id {job_id}",
+            "event_log_file": os.path.join(job_event_log_dir, "events.jsonl"),
+            "event_log_dir": job_event_log_dir,
+            "checkpoint_dir": job_checkpoint_dir,
+            "metadata_dir": job_metadata_dir,
+            "storage_config": {
+                "event_log_dir": event_log_dir,
+                "checkpoint_dir": checkpoint_dir,
+            },
+        }
+
+        # Create directories
+        os.makedirs(job_event_log_dir, exist_ok=True)
+        os.makedirs(job_checkpoint_dir, exist_ok=True)
+        os.makedirs(job_metadata_dir, exist_ok=True)
+
+        # Save job summary in job-specific directory
+        summary_file = os.path.join(job_dir, "job_summary.json")
+        with open(summary_file, "w") as f:
+            json.dump(job_summary, f, indent=2, default=str)
+
+        # Display job info to user
+        logger.info("=" * 60)
+        logger.info("DataJuicer Job Started")
+        logger.info("=" * 60)
+        logger.info(f"Job ID: {job_id}")
+        logger.info(f"Job Directory: {job_dir}")
+        logger.info(f"Work Directory: {self.work_dir}")
+        logger.info(f"Event Logs: {job_summary['event_log_file']}")
+        logger.info(f"Checkpoints: {job_checkpoint_dir}")
+        if event_log_dir:
+            logger.info(f"Event Log Storage: {event_log_dir} (configured)")
+        if checkpoint_dir:
+            logger.info(f"Checkpoint Storage: {checkpoint_dir} (configured)")
+        logger.info("=" * 60)
+        logger.info("To resume this job later, use:")
+        logger.info(f"  {job_summary['resumption_command']}")
+        logger.info("=" * 60)
+
+    def _update_job_summary(self, status: str, end_time: Optional[float] = None, error_message: Optional[str] = None):
+        """Update job summary with completion status."""
+        job_id = self.event_logger.job_id
+        job_dir = os.path.join(self.work_dir, job_id)
+        summary_file = os.path.join(job_dir, "job_summary.json")
+
+        if not os.path.exists(summary_file):
+            return
+
+        with open(summary_file, "r") as f:
+            job_summary = json.load(f)
+
+        job_summary.update(
+            {
+                "status": status,
+                "end_time": end_time or time.time(),
+                "duration": (end_time or time.time()) - job_summary.get("start_time", time.time()),
+                "error_message": error_message,
+            }
+        )
+
+        with open(summary_file, "w") as f:
+            json.dump(job_summary, f, indent=2, default=str)
+
+        # Display completion info
+        if status == "completed":
+            logger.info("=" * 60)
+            logger.info("DataJuicer Job Completed Successfully")
+            logger.info(f"Duration: {job_summary['duration']:.2f} seconds")
+            logger.info("=" * 60)
+        elif status == "failed":
+            logger.error("=" * 60)
+            logger.error("DataJuicer Job Failed")
+            logger.error(f"Error: {error_message}")
+            logger.error(f"Duration: {job_summary['duration']:.2f} seconds")
+            logger.error("=" * 60)
+            logger.error("To resume this job, use:")
+            logger.error(f"  {job_summary['resumption_command']}")
+            logger.error("=" * 60)
+
+    def _load_job_summary(self) -> Optional[Dict[str, Any]]:
+        """Load job summary if it exists."""
+        job_id = getattr(self.cfg, "job_id", None)
+        if not job_id:
+            return None
+
+        job_dir = os.path.join(self.work_dir, job_id)
+        summary_file = os.path.join(job_dir, "job_summary.json")
+
+        if os.path.exists(summary_file):
+            with open(summary_file, "r") as f:
+                return json.load(f)
+        return None
+
+    def _validate_job_resumption(self, job_id: str) -> bool:
+        """Validate that the provided job_id matches existing work directory."""
+        job_summary = self._load_job_summary()
+        if not job_summary:
+            logger.warning(f"No job summary found for job_id: {job_id}")
+            return False
+
+        if job_summary.get("job_id") != job_id:
+            logger.error(f"Job ID mismatch: provided '{job_id}' but found '{job_summary.get('job_id')}'")
+            return False
+
+        logger.info(f"Resuming job: {job_id}")
+        logger.info(f"Job directory: {job_summary.get('job_dir', 'unknown')}")
+        logger.info(f"Previous status: {job_summary.get('status', 'unknown')}")
+        if job_summary.get("error_message"):
+            logger.warning(f"Previous error: {job_summary['error_message']}")
+        return True
+
+    def _get_config_name(self) -> str:
+        """Extract a meaningful name from config file or project name."""
+        # Try to get config file name first
+        config_file = getattr(self.cfg, "config", None)
+        if config_file:
+            # Extract filename without extension and path
+            config_name = os.path.splitext(os.path.basename(config_file))[0]
+            # Clean up the name (remove special chars, limit length)
+            config_name = re.sub(r"[^a-zA-Z0-9_-]", "_", config_name)
+            config_name = config_name[:20]  # Limit length
+            if config_name:
+                return config_name
+
+        # Fall back to project name
+        project_name = getattr(self.cfg, "project_name", "dj")
+        # Clean up project name
+        project_name = re.sub(r"[^a-zA-Z0-9_-]", "_", project_name)
+        project_name = project_name[:15]  # Limit length
+
+        return project_name
 
     def _log_event(self, event_type: EventType, message: str, **kwargs):
         """Log an event if event logging is enabled."""
@@ -391,11 +608,13 @@ class EventLoggingMixin:
 
     def log_job_complete(self, status, duration):
         self._log_event(EventType.JOB_COMPLETE, "Job completed", status=status, duration=duration)
+        self._update_job_summary("completed", error_message=None)
 
     def log_job_failed(self, error_message, duration):
         self._log_event(
             EventType.JOB_FAILED, "Job failed", status="failed", error_message=error_message, duration=duration
         )
+        self._update_job_summary("failed", error_message=error_message)
 
     def log_partition_start(self, partition_id, partition_meta):
         self._log_event(

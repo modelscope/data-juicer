@@ -7,12 +7,69 @@
 # - "every_n_ops": Checkpoint after every N operations (balanced)
 # - "manual": Checkpoint only after specified operations (user-controlled)
 # - "disabled": Disable checkpointing entirely (fastest, no recovery)
+#
+# RESUMPTION AND JOB ID:
+# - For automatic resumption: Just run the same command again
+#   python -m data_juicer --config configs/demo/checkpoint_config_example.yaml
+# - For custom job ID tracking: Add --job_id parameter
+#   python -m data_juicer --config configs/demo/checkpoint_config_example.yaml --job_id my_experiment_001
+# - Job ID is used for event log filenames and tracking across multiple runs
+#
+# COMPLETE USER EXPERIENCE:
+# 1. Start job:
+#    python -m data_juicer --config configs/demo/checkpoint_config_example.yaml
+#    # Output shows: Job ID (timestamp_configname_suffix), job directory, resumption command
+#    # Example: 20241201_143022_checkpoint_config_example_abc123
+#
+# 2. If job fails, resume with:
+#    python -m data_juicer --config configs/demo/checkpoint_config_example.yaml --job_id <job_id>
+#    # System validates job_id and shows previous status
+#
+# 3. Directory structure (flexible storage):
+#    Option A: All in work_dir (default)
+#    {work_dir}/
+#    ├── 20241201_143022_checkpoint_config_example_abc123/  # Job-specific directory
+#    │   ├── job_summary.json         # Job metadata and status
+#    │   ├── event_logs/
+#    │   │   ├── events.log           # Human-readable logs
+#    │   │   └── events.jsonl         # Machine-readable for resumption
+#    │   ├── checkpoints/             # Job-specific checkpoint data
+#    │   │   ├── partition_000000/
+#    │   │   │   ├── op_000_clean_links_mapper.parquet
+#    │   │   │   └── op_001_clean_email_mapper.parquet
+#    │   │   └── checkpoint_1701432000.json
+#    │   └── metadata/                # Job-specific metadata
+#    │       └── dataset_mapping.json
+#
+#    Option B: Separate storage (configured)
+#    {work_dir}/
+#    ├── 20241201_143022_checkpoint_config_example_abc123/  # Job metadata only
+#    │   └── job_summary.json
+#    /fast/ssd/event_logs/            # Fast storage for event logs
+#    ├── 20241201_143022_checkpoint_config_example_abc123/
+#    │   └── event_logs/
+#    │       ├── events.log
+#    │       └── events.jsonl
+#    /large/hdd/checkpoints/          # Large storage for checkpoints
+#    ├── 20241201_143022_checkpoint_config_example_abc123/
+#    │   ├── partition_000000/
+#    │   │   ├── op_000_clean_links_mapper.parquet
+#    │   │   └── op_001_clean_email_mapper.parquet
+#    │   └── checkpoint_1701432000.json
+#    └── results/                     # Shared final results
 
 # Global parameters
 project_name: 'demo-checkpoint-strategies'
 dataset_path: './demos/data/demo-dataset.jsonl'
 export_path: './outputs/demo-checkpoint-strategies/processed.jsonl'
-work_dir: './outputs/demo-checkpoint-strategies'
+work_dir: "./outputs/demo-checkpoint-strategies"
+
+# Separate storage configuration (optional)
+# Event logs: Fast storage (SSD, local disk) - small files, frequent writes
+event_log_dir: "/fast/ssd/event_logs"  # Optional: separate fast storage for event logs
+
+# Checkpoints: Large storage (HDD, network storage) - large files, infrequent writes
+checkpoint_dir: "/large/hdd/checkpoints"  # Optional: separate large storage for checkpoints
 
 # Executor configuration
 executor_type: 'ray_partitioned'
@@ -89,6 +146,6 @@ process:
 
 # Event logging configuration: events_{job_id}.jsonl - Machine-readable JSONL for resumption and analysis
 event_logging:
-  enabled: true  # Enable/disable event logging entirely
-  max_log_size_mb: 100  # Max size for loguru log file before rotation
-  backup_count: 5  # Number of backup log files to keep
+  enabled: true
+  max_log_size_mb: 100
+  backup_count: 5
