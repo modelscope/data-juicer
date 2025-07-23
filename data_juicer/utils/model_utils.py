@@ -20,6 +20,7 @@ from data_juicer.utils.nltk_utils import (
     patch_nltk_pickle_security,
 )
 
+from .cache_utils import DATA_JUICER_EXTERNAL_MODELS_HOME as DJEMH
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
 
 torch = LazyLoader("torch")
@@ -86,6 +87,9 @@ def check_model(model_name, force=False):
     if not force and os.path.exists(model_name):
         return model_name
 
+    if not force and DJEMH and os.path.exists(os.path.join(DJEMH, model_name)):
+        return os.path.join(DJEMH, model_name)
+
     if not os.path.exists(DJMC):
         os.makedirs(DJMC)
 
@@ -117,6 +121,16 @@ def check_model(model_name, force=False):
                     f"manually from {model_link} or {backup_model_link} "
                 )
     return cached_model_path
+
+
+def check_model_home(model_name):
+    if not DJEMH:
+        return model_name
+
+    cached_model_path = os.path.join(DJEMH, model_name)
+    if os.path.exists(cached_model_path):
+        return cached_model_path
+    return model_name
 
 
 def filter_arguments(func, args_dict):
@@ -367,7 +381,7 @@ def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type, **mod
         )
 
     pipeline = diffusion_type_to_pipeline[diffusion_type]
-    model = pipeline.from_pretrained(pretrained_model_name_or_path, **model_params)
+    model = pipeline.from_pretrained(check_model_home(pretrained_model_name_or_path), **model_params)
     if device:
         model = model.to(device)
 
@@ -432,6 +446,7 @@ def prepare_huggingface_model(
                 model_params["device"] = device
                 logger.warning("accelerate not found, using device directly")
 
+    pretrained_model_name_or_path = check_model_home(pretrained_model_name_or_path)
     processor = transformers.AutoProcessor.from_pretrained(pretrained_model_name_or_path, **model_params)
 
     if return_model:
@@ -595,6 +610,7 @@ def prepare_recognizeAnything_model(
 
 
 def prepare_sdxl_prompt2prompt(pretrained_model_name_or_path, pipe_func, torch_dtype="fp32", device="cpu"):
+    pretrained_model_name_or_path = check_model_home(pretrained_model_name_or_path)
     if torch_dtype == "fp32":
         model = pipe_func.from_pretrained(
             pretrained_model_name_or_path, torch_dtype=torch.float32, use_safetensors=True
@@ -655,6 +671,7 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path, *, return_mod
                 model_params["device"] = device
                 logger.warning("accelerate not found, using device directly")
 
+    pretrained_model_name_or_path = check_model_home(pretrained_model_name_or_path)
     processor = transformers.CLIPProcessor.from_pretrained(pretrained_model_name_or_path, **model_params)
     if not return_model:
         return processor
@@ -842,6 +859,7 @@ def prepare_video_blip_model(pretrained_model_name_or_path, *, return_model=True
             # Initialize weights and apply final processing
             self.post_init()
 
+    pretrained_model_name_or_path = check_model_home(pretrained_model_name_or_path)
     processor = transformers.AutoProcessor.from_pretrained(pretrained_model_name_or_path, **model_params)
     if return_model:
         model_class = VideoBlipForConditionalGeneration
@@ -862,7 +880,7 @@ def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
     if model_params.get("device", "").startswith("cuda:"):
         model_params["device"] = "cuda"
 
-    model = vllm.LLM(model=pretrained_model_name_or_path, generation_config="auto", **model_params)
+    model = vllm.LLM(model=check_model_home(pretrained_model_name_or_path), generation_config="auto", **model_params)
     tokenizer = model.get_tokenizer()
 
     return (model, tokenizer)
@@ -879,18 +897,47 @@ def prepare_embedding_model(model_path, **model_params):
     logger.info("Loading embedding model using transformers...")
     if "device" in model_params:
         device = model_params.pop("device")
+    else:
+        device = "cpu"
+        logger.warning("'device' not specified in 'model_params'. Using 'cpu'.")
+    if "pooling" in model_params:
+        # pooling strategy to extract embedding from the hidden states. https://arxiv.org/abs/2503.01807
+        # None: default option, the hidden state of the last token.
+        # "mean": uniform mean of hidden states.
+        # "weighted_mean": weighted mean of hidden states. https://arxiv.org/abs/2202.08904
+        pooling = model_params.pop("pooling")
+    else:
+        pooling = None
 
+    model_path = check_model_home(model_path)
     tokenizer = transformers.AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     model = transformers.AutoModel.from_pretrained(model_path, trust_remote_code=True).to(device).eval()
 
     def last_token_pool(last_hidden_states: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
         left_padding = attention_mask[:, -1].sum() == attention_mask.shape[0]
-        if left_padding:
-            return last_hidden_states[:, -1]
-        else:
-            sequence_lengths = attention_mask.sum(dim=1) - 1
-            batch_size = last_hidden_states.shape[0]
-            return last_hidden_states[torch.arange(batch_size, device=last_hidden_states.device), sequence_lengths]
+        mask = None
+        if pooling not in ["mean", "weighted_mean"]:
+            # return the embedding of the last token
+            if left_padding:
+                return last_hidden_states[:, -1]
+            else:
+                sequence_lengths = attention_mask.sum(dim=1) - 1
+                batch_size = last_hidden_states.shape[0]
+                return last_hidden_states[torch.arange(batch_size, device=last_hidden_states.device), sequence_lengths]
+        elif pooling == "mean":
+            mask = attention_mask
+        elif pooling == "weighted_mean":
+            if left_padding:
+                sequence_lengths = attention_mask.sum(dim=1)
+                tmp = list(range(1, attention_mask.shape[1] + 1))
+                mask = torch.tensor([tmp[seq_len:] + tmp[:seq_len] for seq_len in sequence_lengths.tolist()]).to(
+                    attention_mask.device
+                )
+            else:
+                mask = torch.arange(1, attention_mask.shape[1] + 1)
+            mask = mask * attention_mask / attention_mask.shape[1]
+        masked_hidden_states = last_hidden_states * mask.unsqueeze(-1)
+        return torch.mean(masked_hidden_states, dim=1)
 
     def encode(text, prompt_name=None, max_len=4096):
         if prompt_name:
@@ -925,6 +972,7 @@ def update_sampling_params(sampling_params, pretrained_model_name_or_path, enabl
     # try to get the generation configs
     from transformers import GenerationConfig
 
+    pretrained_model_name_or_path = check_model_home(pretrained_model_name_or_path)
     try:
         model_generation_config = GenerationConfig.from_pretrained(pretrained_model_name_or_path).to_dict()
     except:  # noqa: E722
