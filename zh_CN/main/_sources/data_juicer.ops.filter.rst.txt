@@ -156,6 +156,22 @@ data\_juicer.ops.filter.image\_watermark\_filter module
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.filter.in\_context\_influence\_filter module
+-------------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.in_context_influence_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.ops.filter.instruction\_following\_difficulty\_filter module
+-------------------------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.instruction_following_difficulty_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.filter.language\_id\_score\_filter module
 ----------------------------------------------------------
 
@@ -180,10 +196,26 @@ data\_juicer.ops.filter.llm\_difficulty\_score\_filter module
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.filter.llm\_perplexity\_filter module
+------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.llm_perplexity_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.filter.llm\_quality\_score\_filter module
 ----------------------------------------------------------
 
 .. automodule:: data_juicer.ops.filter.llm_quality_score_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.ops.filter.llm\_task\_relevance\_filter module
+-----------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.llm_task_relevance_filter
    :members:
    :undoc-members:
    :show-inheritance:
@@ -256,6 +288,14 @@ data\_juicer.ops.filter.text\_action\_filter module
 ---------------------------------------------------
 
 .. automodule:: data_juicer.ops.filter.text_action_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.ops.filter.text\_embd\_similarity\_filter module
+-------------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.text_embd_similarity_filter
    :members:
    :undoc-members:
    :show-inheritance:
