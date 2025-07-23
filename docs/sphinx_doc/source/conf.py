@@ -7,10 +7,12 @@ import os
 import re
 import sys
 import shutil
+import subprocess
 from pathlib import Path
+from sphinx import project as sphinx_project
 from data_juicer import __version__ as version
 
-from sphinx import project as sphinx_project
+from packaging import version as pv
 
 release = version
 
@@ -50,9 +52,37 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
+
+def is_valid_tag(tag):
+    try:
+        if not re.match(r"^v\d+\.\d+\.\d+$", tag):
+            return False
+        ver = pv.parse(tag)
+        min_ver = pv.parse("v1.4.0")
+        return ver >= min_ver
+    except Exception:
+        return False
+
+
+def get_filtered_tags():
+    result = subprocess.run(["git", "tag"], stdout=subprocess.PIPE, text=True, check=True)
+    tags = result.stdout.strip().split("\n") if result.stdout else []
+
+    valid_tags = [tag for tag in tags if is_valid_tag(tag)]
+
+    escaped_tags = [re.escape(tag) for tag in valid_tags]
+
+    return r"^(" + "|".join(escaped_tags) + r")$"
+
+
 # sphinx_multiversion configuration
 # smv_tag_whitelist = r"^v\d+\.\d+\.\d+$"
-smv_tag_whitelist = rf"^v{release}$"
+try:
+    smv_tag_whitelist = get_filtered_tags()
+except Exception as e:
+    print(f"Warning: Failed to get git tags for multi-version docs, falling back to current version. Error: {e}", file=sys.stderr)
+    smv_tag_whitelist = rf"^v{release}$"
+
 smv_branch_whitelist = r"^main$"
 smv_released_pattern = r"^refs/tags/v\d+\.\d+\.\d+$"
 smv_remote_whitelist = r"^origin$"
@@ -149,19 +179,13 @@ def find_zh_exclusions(app, config):
                 base_name, ext = os.path.splitext(file)
                 zh_file = f"{base_name}_ZH{ext}"
                 zh_file_path = os.path.join(root, zh_file)
-                rel_path = os.path.normpath(
-                    os.path.relpath(os.path.join(root, file), app.srcdir)
-                )
+                rel_path = os.path.normpath(os.path.relpath(os.path.join(root, file), app.srcdir))
 
                 # If Chinese version exists, add to exclusions
                 if os.path.exists(zh_file_path):
                     zh_exclusions.append(rel_path)
                 else:
-                    non_zh_pages.add(
-                        os.path.normpath(
-                            os.path.relpath(os.path.join(root, base_name), app.srcdir)
-                        )
-                    )
+                    non_zh_pages.add(os.path.normpath(os.path.relpath(os.path.join(root, base_name), app.srcdir)))
 
     if config.language == "zh_CN":
         config.exclude_patterns.extend(zh_exclusions)
@@ -193,9 +217,7 @@ def update_metadata_docnames(app, config):
     if hasattr(app.config, "smv_metadata"):
         metadata = app.config.smv_metadata
     else:
-        print(
-            "smv_metadata not found in app.config.  sphinx_multiversion likely not initialized yet."
-        )
+        print("smv_metadata not found in app.config.  sphinx_multiversion likely not initialized yet.")
         return
 
     main_sourcedir = metadata["main"].get("sourcedir")
