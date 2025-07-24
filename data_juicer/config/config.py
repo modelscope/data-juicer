@@ -505,61 +505,171 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
             parser.add_argument("--ray_address", type=str, default="auto", help="The address of the Ray cluster.")
 
             # Partitioning configuration for PartitionedRayExecutor
+            # Support both flat and nested partition configuration
             parser.add_argument(
                 "--partition_size",
                 type=int,
                 default=10000,
-                help="Number of samples per partition for PartitionedRayExecutor",
+                help="Number of samples per partition for PartitionedRayExecutor (legacy flat config)",
             )
             parser.add_argument(
                 "--max_partition_size_mb",
                 type=int,
                 default=128,
-                help="Maximum partition size in MB for PartitionedRayExecutor",
+                help="Maximum partition size in MB for PartitionedRayExecutor (legacy flat config)",
             )
             parser.add_argument(
                 "--enable_fault_tolerance",
                 type=bool,
                 default=True,
-                help="Enable fault tolerance for PartitionedRayExecutor",
+                help="Enable fault tolerance for PartitionedRayExecutor (legacy flat config)",
             )
             parser.add_argument(
                 "--max_retries",
                 type=int,
                 default=3,
-                help="Maximum number of retries for failed partitions",
+                help="Maximum number of retries for failed partitions (legacy flat config)",
             )
             parser.add_argument(
                 "--preserve_intermediate_data",
                 type=bool,
                 default=False,
-                help="Preserve intermediate data for debugging",
+                help="Preserve intermediate data for debugging (legacy flat config)",
             )
-            # Data format configuration
+
+            # Nested partition configuration (new structure)
+            parser.add_argument(
+                "--partition.auto_configure",
+                type=bool,
+                default=False,
+                help="Automatically determine optimal partition size based on data modality (nested partition config)",
+            )
+            parser.add_argument(
+                "--partition.size",
+                type=int,
+                default=10000,
+                help="Number of samples per partition (nested partition config, used when auto_configure=false)",
+            )
+            parser.add_argument(
+                "--partition.max_size_mb",
+                type=int,
+                default=128,
+                help="Maximum partition size in MB (nested partition config)",
+            )
+
+            # Fault tolerance configuration (nested under partition)
+            parser.add_argument(
+                "--partition.enable_fault_tolerance",
+                type=bool,
+                default=True,
+                help="Enable fault tolerance for partitions (nested partition config)",
+            )
+            parser.add_argument(
+                "--partition.max_retries",
+                type=int,
+                default=3,
+                help="Maximum number of retries for failed partitions (nested partition config)",
+            )
+            parser.add_argument(
+                "--partition.retry_backoff",
+                type=str,
+                default="exponential",
+                choices=["exponential", "linear", "fixed"],
+                help="Retry backoff strategy for partitions (nested partition config)",
+            )
+
+            # Intermediate storage configuration (new structure) - includes file lifecycle management
+            parser.add_argument(
+                "--intermediate_storage.preserve_intermediate_data",
+                type=bool,
+                default=False,
+                help="Preserve intermediate data for debugging (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.cleanup_temp_files",
+                type=bool,
+                default=True,
+                help="Clean up temporary files after processing (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.cleanup_on_success",
+                type=bool,
+                default=False,
+                help="Clean up intermediate files even on successful completion (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.retention_policy",
+                type=str,
+                default="keep_all",
+                choices=["keep_all", "keep_failed_only", "cleanup_all"],
+                help="File retention policy (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.max_retention_days",
+                type=int,
+                default=7,
+                help="Maximum retention days for files (nested intermediate_storage config)",
+            )
+
+            # Intermediate storage format configuration
+            parser.add_argument(
+                "--intermediate_storage.format",
+                type=str,
+                default="parquet",
+                choices=["parquet", "arrow", "jsonl"],
+                help="Storage format for checkpoints and intermediate data (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.compression",
+                type=str,
+                default="snappy",
+                choices=["snappy", "gzip", "none"],
+                help="Compression format for storage files (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.use_arrow_batches",
+                type=bool,
+                default=True,
+                help="Use Arrow batch format for processing (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.arrow_batch_size",
+                type=int,
+                default=1000,
+                help="Arrow batch size for processing (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.arrow_memory_mapping",
+                type=bool,
+                default=False,
+                help="Use memory mapping for Arrow files (nested intermediate_storage config)",
+            )
+
+            # Data format configuration (legacy flat config)
             parser.add_argument(
                 "--storage_format",
                 type=str,
                 default="parquet",
                 choices=["parquet", "arrow", "jsonl"],
-                help="Storage format for checkpoints and intermediate data",
+                help="Storage format for checkpoints and intermediate data (legacy flat config)",
             )
             parser.add_argument(
                 "--use_arrow_batches",
                 type=bool,
                 default=True,
-                help="Use Arrow batch format for processing",
+                help="Use Arrow batch format for processing (legacy flat config)",
             )
             parser.add_argument(
                 "--arrow_batch_size",
                 type=int,
                 default=1000,
-                help="Arrow batch size for processing",
+                help="Arrow batch size for processing (legacy flat config)",
             )
             parser.add_argument(
                 "--arrow_memory_mapping",
                 type=bool,
                 default=False,
-                help="Use memory mapping for Arrow files",
+                help="Use memory mapping for Arrow files (legacy flat config)",
             )
 
             parser.add_argument("--debug", action="store_true", help="Whether to run in debug mode.")
