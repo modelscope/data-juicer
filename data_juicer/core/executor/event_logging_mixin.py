@@ -112,7 +112,7 @@ class EventLogger:
             format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level} | {message}",
             level="INFO",
             rotation=f"{self.max_log_size_mb} MB",
-            retention=f"{self.backup_count} files",
+            retention=self.backup_count,  # Use number directly, not string
             compression="gz",
         )
 
@@ -378,8 +378,6 @@ class EventLoggingMixin:
 
     def __init__(self, *args, **kwargs):
         """Initialize the mixin."""
-        super().__init__(*args, **kwargs)
-
         # Initialize event logging if not already done
         if not hasattr(self, "event_logger"):
             self._setup_event_logging()
@@ -411,10 +409,19 @@ class EventLoggingMixin:
 
         # Create job directory and subdirectories
         os.makedirs(job_dir, exist_ok=True)
-        event_logs_dir = os.path.join(job_dir, "event_logs")
+
+        # Determine event log directory - use configured path if available
+        event_log_dir = getattr(self.cfg, "event_log_dir", None)
+        if event_log_dir:
+            # Use configured event log directory with job subdirectory
+            event_logs_dir = os.path.join(event_log_dir, job_id, "event_logs")
+        else:
+            # Use job-specific directory
+            event_logs_dir = os.path.join(job_dir, "event_logs")
+
         os.makedirs(event_logs_dir, exist_ok=True)
 
-        # Setup event logger in job-specific directory
+        # Setup event logger in the determined directory
         max_log_size = event_config.get("max_log_size_mb", 100)
         backup_count = event_config.get("backup_count", 5)
 
@@ -462,7 +469,7 @@ class EventLoggingMixin:
             "config_file": getattr(self.cfg, "config", None),
             "executor_type": getattr(self, "executor_type", "unknown"),
             "status": "running",
-            "resumption_command": f"python -m data_juicer --config {getattr(self.cfg, 'config', 'config.yaml')} --job_id {job_id}",
+            "resumption_command": f"dj-process --config {getattr(self.cfg, 'config', 'config.yaml')} --job_id {job_id}",
             "event_log_file": os.path.join(job_event_log_dir, "events.jsonl"),
             "event_log_dir": job_event_log_dir,
             "checkpoint_dir": job_checkpoint_dir,
