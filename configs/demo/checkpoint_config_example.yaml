@@ -20,7 +20,7 @@ event_log_dir: "/tmp/fast_event_logs"  # Optional: separate fast storage for eve
 checkpoint_dir: "/tmp/large_checkpoints"  # Optional: separate large storage for checkpoints
 
 # Executor configuration
-executor_type: "ray_partitioned"  # Use our enhanced partitioned executor
+executor_type: "default"  # Use our enhanced partitioned executor
 
 
 # Intermediate storage configuration for partition and checkpoint data (format, compression, and lifecycle management)
@@ -121,7 +121,6 @@ process:
       max_ratio: 0.3
 
 # Export configuration
-export_shard_size: 10000
 export_in_parallel: true
 keep_stats_in_res_ds: true
 keep_hashes_in_res_ds: true
