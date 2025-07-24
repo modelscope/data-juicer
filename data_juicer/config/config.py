@@ -118,8 +118,8 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 "--executor_type",
                 type=str,
                 default="default",
-                choices=["default", "ray"],
-                help='Type of executor, support "default" or "ray" for now.',
+                choices=["default", "ray", "ray_partitioned"],
+                help='Type of executor, support "default", "ray", or "ray_partitioned".',
             )
             parser.add_argument(
                 "--dataset_path",
@@ -333,6 +333,71 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 "checkpoint are changed, all ops will be rerun from the "
                 "beginning.",
             )
+            # Enhanced checkpoint configuration for PartitionedRayExecutor
+            parser.add_argument(
+                "--checkpoint.enabled",
+                type=bool,
+                default=True,
+                help="Enable enhanced checkpointing for PartitionedRayExecutor",
+            )
+            parser.add_argument(
+                "--checkpoint.strategy",
+                type=str,
+                default="every_op",
+                choices=["every_op", "every_partition", "every_n_ops", "manual", "disabled"],
+                help="Checkpoint strategy: every_op, every_partition, every_n_ops, manual, disabled",
+            )
+            parser.add_argument(
+                "--checkpoint.n_ops",
+                type=int,
+                default=1,
+                help="Number of operations between checkpoints for every_n_ops strategy",
+            )
+            parser.add_argument(
+                "--checkpoint.op_names",
+                type=List[str],
+                default=[],
+                help="List of operation names to checkpoint for manual strategy",
+            )
+            # Event logging configuration
+            parser.add_argument(
+                "--event_logging.enabled",
+                type=bool,
+                default=True,
+                help="Enable event logging for job tracking and resumption",
+            )
+            parser.add_argument(
+                "--event_logging.max_log_size_mb",
+                type=int,
+                default=100,
+                help="Maximum log file size in MB before rotation",
+            )
+            parser.add_argument(
+                "--event_logging.backup_count",
+                type=int,
+                default=5,
+                help="Number of backup log files to keep",
+            )
+            # Storage configuration
+            parser.add_argument(
+                "--event_log_dir",
+                type=str,
+                default=None,
+                help="Separate directory for event logs (fast storage)",
+            )
+            parser.add_argument(
+                "--checkpoint_dir",
+                type=str,
+                default=None,
+                help="Separate directory for checkpoints (large storage)",
+            )
+            # Job management
+            parser.add_argument(
+                "--job_id",
+                type=str,
+                default=None,
+                help="Custom job ID for resumption and tracking. If not provided, a unique ID will be auto-generated.",
+            )
             parser.add_argument(
                 "--temp_dir",
                 type=str,
@@ -439,11 +504,62 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
             )
             parser.add_argument("--ray_address", type=str, default="auto", help="The address of the Ray cluster.")
 
+            # Partitioning configuration for PartitionedRayExecutor
             parser.add_argument(
-                "--job_id",
+                "--partition_size",
+                type=int,
+                default=10000,
+                help="Number of samples per partition for PartitionedRayExecutor",
+            )
+            parser.add_argument(
+                "--max_partition_size_mb",
+                type=int,
+                default=128,
+                help="Maximum partition size in MB for PartitionedRayExecutor",
+            )
+            parser.add_argument(
+                "--enable_fault_tolerance",
+                type=bool,
+                default=True,
+                help="Enable fault tolerance for PartitionedRayExecutor",
+            )
+            parser.add_argument(
+                "--max_retries",
+                type=int,
+                default=3,
+                help="Maximum number of retries for failed partitions",
+            )
+            parser.add_argument(
+                "--preserve_intermediate_data",
+                type=bool,
+                default=False,
+                help="Preserve intermediate data for debugging",
+            )
+            # Data format configuration
+            parser.add_argument(
+                "--storage_format",
                 type=str,
-                default=None,
-                help="Custom job ID for resumption and tracking. If not provided, a unique ID will be auto-generated.",
+                default="parquet",
+                choices=["parquet", "arrow", "jsonl"],
+                help="Storage format for checkpoints and intermediate data",
+            )
+            parser.add_argument(
+                "--use_arrow_batches",
+                type=bool,
+                default=True,
+                help="Use Arrow batch format for processing",
+            )
+            parser.add_argument(
+                "--arrow_batch_size",
+                type=int,
+                default=1000,
+                help="Arrow batch size for processing",
+            )
+            parser.add_argument(
+                "--arrow_memory_mapping",
+                type=bool,
+                default=False,
+                help="Use memory mapping for Arrow files",
             )
 
             parser.add_argument("--debug", action="store_true", help="Whether to run in debug mode.")
