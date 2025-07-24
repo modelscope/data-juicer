@@ -1,0 +1,1338 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Awesome Data-Model Co-Development of MLLMs" href="awesome_llm_data.html" /><link rel="prev" title="Distributed Data Processing in Data-Juicer" href="Distributed.html" />
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+        <title>Sandbox - Data Juicer</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sidebar-menu.css?v=dcc41d8a" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+<p>
+  <strong>
+    
+    You're reading an old version of this documentation.
+    If you want up-to-date information, please have a look at <a href="../../v1.4.1/docs/Sandbox.html">v1.4.1</a>.
+    
+  </strong>
+</p>
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Data Juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">Data Juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/DJ-Cookbook.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/Installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/QuickStart.html">Quick Start</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">docs</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RecipeGallery.html">Data Recipe Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DatasetCfg.html">Dataset Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BadDataExhibition.html">“Bad” Data Exhibition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DJ_SORA.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DJ_service.html">DJ_service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeveloperGuide.html">How-to Guide for Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Distributed.html">Distributed Data Processing in Data-Juicer</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Sandbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../demos/README.html">Demos</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tools/distributed_deduplication/README.html">Distributed Fuzzy Deduplication Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/README.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/gpt_eval/README.html">GPT EVAL: Evaluate your model with OpenAI API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/recorder/README.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/README.html">Format Conversion Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README.html">Multimodal Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README.html">Post Tuning Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/hpo/README.html">Hyper-parameter Optimization for Data Recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README.html">Metrics for video generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/postprocess/README.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/preprocess/README.html">Preprocess Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/quality_classifier/README.html">Data Scoring</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">thirdparty</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README.html">LLM Ecosystems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/models/README.html">Third-party Model Library</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../data_juicer.core.html">data_juicer.core package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of data_juicer.core package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../data_juicer.core.data.html">data_juicer.core.data package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data_juicer.core.executor.html">data_juicer.core.executor package</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../data_juicer.ops.html">data_juicer.ops package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of data_juicer.ops package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.aggregator.html">data_juicer.ops.aggregator package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.grouper.html">data_juicer.ops.grouper package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data_juicer.format.html">data_juicer.format package</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+    <div class="current-info">
+        <span class="current-lang">en</span>|<span class="current-version">v1.4.0</span>
+    </div>
+    <div class="dropdown-panel">
+        
+        <div class="section">
+            <dt>Language</dt>
+            <dd>
+                
+                <a href="../../../en/v1.4.0/docs/Sandbox.html"
+                    class="active" >
+                    English
+                </a>
+                
+                <a href="../../../zh_CN/v1.4.0/docs/Sandbox_ZH.html"
+                    >
+                    简体中文
+                </a>
+                
+            </dd>
+        </div>
+        
+
+        
+        <div class="section">
+            <dt>Version</dt>
+            <dd>
+                    <a href="Sandbox.html">v1.4.0</a>
+                    <a href="../../v1.4.1/docs/Sandbox.html">v1.4.1</a>
+                    <a href="../../main/docs/Sandbox.html">main</a>
+            </dd>
+        </div>
+        
+    </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/docs/Sandbox.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="sandbox">
+<h1>Sandbox<a class="headerlink" href="#sandbox" title="Link to this heading">¶</a></h1>
+<section id="user-guide">
+<h2>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading">¶</a></h2>
+<section id="what-is-dj-sandbox">
+<h3>What is DJ-Sandbox?<a class="headerlink" href="#what-is-dj-sandbox" title="Link to this heading">¶</a></h3>
+<p>In Data-Juicer, the DJ-Sandbox is a middleware that links data and model feedback, enabling high performance and low-cost verification across a wide range of tasks. It aims to provide users with the best practices for continuously enhancing data-model recipes, featuring low overhead, portability, and guidance. In the sandbox, users can quickly experiment, iterate, and refine recipes based on small-scale datasets and models before scaling up to produce high-quality data to serve large-scale models.</p>
+<p>In addition to the basic data optimization and recipe refinement features offered by Data-Juicer, users can seamlessly use configurable components such as data probing and analysis, model training and evaluation, and data and model feedback-based recipe refinement to form preferred pipelines for data-model research and development.</p>
+<p>For more detailed information, please refer to our <a class="reference external" href="http://arxiv.org/abs/2407.11784">paper</a> (ICML’25 spotlight).</p>
+</section>
+<section id="applications-and-use-cases">
+<h3>Applications and Use-Cases<a class="headerlink" href="#applications-and-use-cases" title="Link to this heading">¶</a></h3>
+<p>We apply the sandbox to many cutting-edge models, such as Mini-Gemini and InternVL-2.0 (two LLaVA-inspired models for image-to-text generation), EasyAnimate and T2V-Turbo (two Diffusion Transformer-based models for text-to-video generation), and a CLIP model for image-text pre-training. Among these, we have secured a new leading position on the <a class="reference external" href="https://huggingface.co/spaces/Vchitect/VBench_Leaderboard">VBench</a> text-to-video leaderboard.
+<img alt="top-1_in_vbench" src="https://img.alicdn.com/imgextra/i1/O1CN01I9wHW91UNnX9wtCWu_!!6000000002506-2-tps-1275-668.png" /></p>
+<p>The model is now publicly available on the ModelScope and HuggingFace platforms, and the training dataset has also been available.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Open-source model or dataset</p></th>
+<th class="head"><p>Link</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Data-Juicer (T2V, 147k)</p></td>
+<td><p><a class="reference external" href="https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V">ModelScope</a> <br> <a class="reference external" href="https://huggingface.co/datajuicer/Data-Juicer-T2V">HuggingFace</a></p></td>
+<td><p>Corresponding to Data-Juicer (T2V-Turbo) model in VBench leaderboard</p></td>
+</tr>
+<tr class="row-odd"><td><p>Data-Juicer (DJ, 228k)</p></td>
+<td><p><a class="reference external" href="https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V-v2">ModelScope</a> <br> <a class="reference external" href="https://huggingface.co/datajuicer/Data-Juicer-T2V-v2">HuggingFace</a></p></td>
+<td><p>Corresponding to Data-Juicer (2024-09-23, T2V-Turbo) model in VBench leaderboard</p></td>
+</tr>
+<tr class="row-even"><td><p>data_juicer_t2v_optimal_data_pool</p></td>
+<td><p><a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool.zip">Aliyun</a> <br> <a class="reference external" href="https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-optimal-data-pool">ModelScope</a>  <br> <a class="reference external" href="https://huggingface.co/datasets/datajuicer/data-juicer-t2v-optimal-data-pool">HuggingFace</a></p></td>
+<td><p>The training dataset of Data-Juicer (T2V, 147k)</p></td>
+</tr>
+<tr class="row-odd"><td><p>data_juicer_t2v_evolution_data_pool</p></td>
+<td><p><a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool_s2.zip">Aliyun</a> <br> <a class="reference external" href="https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-evolution-data-pool">ModelScope</a></p></td>
+<td><p>The training dataset of Data-Juicer (2024-09-23, T2V-Turbo)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Following is the case study for Data-Juicer (DJ, 228k) outputs.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Prompt</p></th>
+<th class="head"><p>Generated Video</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>A beautiful coastal beach in spring, waves lapping on sand, zoom out</p></td>
+<td><p><a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case0.mp4"><img alt="Case 0" src="https://img.alicdn.com/imgextra/i1/O1CN01KuJeOE1Ylqnk9zYkc_!!6000000003100-2-tps-2048-320.png" /></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>a boat accelerating to gain speed</p></td>
+<td><p><a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case1.mp4"><img alt="Case 1" src="https://img.alicdn.com/imgextra/i2/O1CN01i1iMFE1TKlIUlqE8d_!!6000000002364-2-tps-2048-320.png" /></a></p></td>
+</tr>
+<tr class="row-even"><td><p>A boat sailing leisurely along the Seine River with the Eiffel Tower in background by Hokusai, in the style of Ukiyo</p></td>
+<td><p><a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case2.mp4"><img alt="Case 2" src="https://img.alicdn.com/imgextra/i2/O1CN01u2cjJE1RBwRFeCFuo_!!6000000002074-2-tps-2048-320.png" /></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>a bottle on the left of a wine glass, front view</p></td>
+<td><p><a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case3.mp4"><img alt="Case 3" src="https://img.alicdn.com/imgextra/i4/O1CN01vdMm6Q1xWc1CoJZW6_!!6000000006451-2-tps-2048-320.png" /></a></p></td>
+</tr>
+<tr class="row-even"><td><p>A corgi’s head depicted as an explosion of a nebula</p></td>
+<td><p><a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case4.mp4"><img alt="Case 4" src="https://img.alicdn.com/imgextra/i2/O1CN014oPB8Q1IrJg0AbUUg_!!6000000000946-2-tps-2048-320.png" /></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>A graceful ballerina doing a pirouette on a dimly lit stage, with soft spotlight highlighting her movements.</p></td>
+<td><p><a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case5.mp4"><img alt="Case 5" src="https://img.alicdn.com/imgextra/i4/O1CN01yNlsVu1ymvkJgkvY8_!!6000000006622-2-tps-2048-320.png" /></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>To reproduce the paper’s experiments, please refer to the sandbox usage guide below, the experimental process in the following figure, the <a class="reference external" href="http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip">initial dataset</a>, and the configuration file demos for the process: <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/1_single_op_pipeline.yaml">1_single_op_pipeline.yaml</a>, <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/2_multi_op_pipeline.yaml">2_multi_op_pipeline.yaml</a>, <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/data_juicer_recipes/sandbox/easyanimate_text_to_video/3_duplicate_pipeline.yaml">3_duplicate_pipeline.yaml</a>.
+<img alt="bench_bottom_up" src="https://img.alicdn.com/imgextra/i2/O1CN01xvu2fo1HU80biR6Q5_!!6000000000760-2-tps-7756-3693.png" /></p>
+</section>
+<section id="quick-start">
+<h3>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h3>
+<section id="requirements">
+<h4>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">¶</a></h4>
+<p>Before using sandbox, you might need to install sandbox-related dependencies by running the command below:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>sandbox<span class="o">]</span>
+</pre></div>
+</div>
+<p>And prepare third-party libraries used in sandbox (e.g., EasyAnimate, VBench, InternVL, etc.) according to their official instructions, or you can simply clone the third-party repositories from GitHub and leave the installation process to our <code class="docutils literal notranslate"><span class="pre">EnvManager</span></code> during sandbox running.</p>
+<p><strong>NOTICE</strong>: some sandbox-related dependencies require extra domain dependencies.</p>
+<ol class="arabic simple">
+<li><p>To use <a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a>, you need to execute the following installation script:</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>thirdparty/models/
+bash<span class="w"> </span>setup_easyanimate.sh
+<span class="nb">cd</span><span class="w"> </span>../../
+</pre></div>
+</div>
+<p>If some Module-Not-Found errors are raised by these third-party libraries when running the sandbox, users need to check their docs first.</p>
+</section>
+<section id="prepare-configuration-files-for-sandbox">
+<h4>Prepare Configuration Files for Sandbox<a class="headerlink" href="#prepare-configuration-files-for-sandbox" title="Link to this heading">¶</a></h4>
+<p>The sandbox will sequentially execute four types of jobs: Data/Model Probe (<code class="docutils literal notranslate"><span class="pre">probe_job_configs</span></code>), Iterative Recipe Refinement based on Probe Results(<code class="docutils literal notranslate"><span class="pre">refine_recipe_job_configs</span></code>), Dataset Processing and Model Training (<code class="docutils literal notranslate"><span class="pre">execution_job_configs</span></code>) and Data/Model Evaluation (<code class="docutils literal notranslate"><span class="pre">evaluation_job_configs</span></code>). Within each category of jobs, jobs are carried out in the order specified by the configured job list. Each task requires specifying: the hook for mounting this job (<code class="docutils literal notranslate"><span class="pre">hook</span></code>), the tag name for identifying the hook (<code class="docutils literal notranslate"><span class="pre">meta_name</span></code>), Data-Juicer data processing parameters (<code class="docutils literal notranslate"><span class="pre">dj_configs</span></code>), as well as other specific parameters for the job (<code class="docutils literal notranslate"><span class="pre">extra_configs</span></code>). Among these parameters, hook is required, while others may be left empty. dj_configs can refer to the full Data-Juicer data processing parameters available in <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml">config_all.yaml</a>. The <code class="docutils literal notranslate"><span class="pre">extra_configs</span></code> are task-specific parameters without restrictions. They can include parameters for model training, inference, evaluation, etc. For example, <code class="docutils literal notranslate"><span class="pre">path_k_sigma_recipe</span></code> can be used to specify the path for saving the data recipe refined using the k-sigma method. An example of a sandbox configuration file can be found at <code class="docutils literal notranslate"><span class="pre">configs/demo/sandbox/sandbox.yaml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sandbox config example</span>
+
+<span class="c1"># global parameters</span>
+<span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;demo-sandbox&#39;</span>
+<span class="nt">experiment_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;demo-sandbox-run0&#39;</span><span class="w">              </span><span class="c1"># for wandb tracer name</span>
+<span class="nt">hpo_config</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">                                  </span><span class="c1"># path to a configuration file when using auto-HPO tool.</span>
+
+<span class="c1"># configs for each job, the jobs will be executed according to the order in the list</span>
+<span class="nt">probe_job_configs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hook</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;ProbeViaAnalyzerHook&#39;</span>
+<span class="w">    </span><span class="nt">meta_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;analysis_ori_data&#39;</span>
+<span class="w">    </span><span class="nt">dj_configs</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;configs/demo/process.yaml&#39;</span>
+<span class="w">    </span><span class="nt">extra_configs</span><span class="p">:</span>
+
+<span class="nt">refine_recipe_job_configs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hook</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;RefineRecipeViaKSigmaHook&#39;</span>
+<span class="w">    </span><span class="nt">meta_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;analysis_ori_data&#39;</span>
+<span class="w">    </span><span class="nt">dj_configs</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;configs/demo/process.yaml&#39;</span>
+<span class="w">    </span><span class="nt">extra_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">path_k_sigma_recipe</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./outputs/demo-process/k_sigma_new_recipe.yaml&#39;</span>
+
+<span class="nt">execution_job_configs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hook</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;ProcessDataHook&#39;</span>
+<span class="w">    </span><span class="nt">meta_name</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">dj_configs</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;./outputs/demo-process/k_sigma_new_recipe.yaml&#39;</span>
+<span class="w">    </span><span class="nt">extra_configs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hook</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;TrainModelHook&#39;</span>
+<span class="w">    </span><span class="nt">meta_name</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">dj_configs</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">extra_configs</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;configs/demo/sandbox/gpt3_extra_train_config.json&#39;</span>
+
+<span class="nt">evaluation_job_configs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hook</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;ProbeViaAnalyzerHook&#39;</span>
+<span class="w">    </span><span class="nt">meta_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;analysis_processed_data&#39;</span>
+<span class="w">    </span><span class="nt">dj_configs</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;configs/demo/process.yaml&#39;</span>
+<span class="w">    </span><span class="nt">extra_configs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hook</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;EvaluateDataHook&#39;</span>
+<span class="w">    </span><span class="nt">meta_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;eval_data&#39;</span>
+<span class="w">    </span><span class="nt">dj_configs</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">extra_configs</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;configs/demo/sandbox/gpt3_data_quality_eval_config.yaml&#39;</span>
+</pre></div>
+</div>
+<p>Based on this configuration file, sandbox:</p>
+<ol class="arabic simple">
+<li><p>Execute the Data-Juicer data analysis function to calculate specified metrics for each piece of data, for example, in <code class="docutils literal notranslate"><span class="pre">configs/demo/process.yaml</span></code>, the <code class="docutils literal notranslate"><span class="pre">language_id_score_filter</span></code> is designated to calculate language scores.</p></li>
+<li><p>With the results from Data-Juicer data analysis, fine-tune the data recipe using the k-sigma method. Note that the <code class="docutils literal notranslate"><span class="pre">meta_name</span></code> here is set the same as the <code class="docutils literal notranslate"><span class="pre">meta_name</span></code> used during data analysis to query the results from W&amp;B.</p></li>
+<li><p>Execute Data-Juicer’s data filtering function with the data recipe fine-tuned by the k-sigma method.</p></li>
+<li><p>Train the model with the filtered data.</p></li>
+<li><p>Analyze the data after filtering.</p></li>
+<li><p>Score the data after filtering with a scorer.</p></li>
+</ol>
+<p>When there are multiple pipelines needed in your config file, you can name each pipeline and organize them in a <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> field:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sandbox config example</span>
+
+<span class="c1"># global parameters</span>
+<span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;demo-sandbox&#39;</span>
+<span class="nt">experiment_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;demo-sandbox-run0&#39;</span><span class="w">              </span><span class="c1"># for wandb tracer name</span>
+<span class="nt">hpo_config</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">                                  </span><span class="c1"># path to a configuration file when using auto-HPO tool.</span>
+
+<span class="nt">pipelines</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pipeline_1</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">probe_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">  </span><span class="nt">pipeline_2</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">probe_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">    </span><span class="nt">refine_recipe_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">  </span><span class="nt">pipeline_3</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">probe_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">    </span><span class="nt">execution_job_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+</pre></div>
+</div>
+<p>In this example, there are 3 pipelines organized in the <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> field, named <code class="docutils literal notranslate"><span class="pre">pipeline_1</span></code>, <code class="docutils literal notranslate"><span class="pre">pipeline_2</span></code>, and <code class="docutils literal notranslate"><span class="pre">pipeline_3</span></code>. Each of them has their own different types of jobs. You can find a practical example of such config file for InternVL sandbox experiments in <code class="docutils literal notranslate"><span class="pre">configs/data_juicer_recipes/sandbox/internvl_coco_caption/sandbox_internvl_coco_caption.yaml</span></code>.</p>
+<p>For the single-pipeline format, the only pipeline is named “anonymous” in default.</p>
+<blockquote>
+<div><p>[!Important]</p>
+<p>The single pipeline format without <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> field and the multi-pipeline format with <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> field are both supported but can not be used at the same time.</p>
+</div></blockquote>
+</section>
+<section id="start-sandbox">
+<h4>Start Sandbox<a class="headerlink" href="#start-sandbox" title="Link to this heading">¶</a></h4>
+<p>The entry point for running the sandbox is <code class="docutils literal notranslate"><span class="pre">tools/sandbox_starter.py</span></code>. The usage is similar to the data processing and analysis tool, requiring specifying the sandbox configuration file:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml</span>
+</pre></div>
+</div>
+<p>Once the run is started, the sandbox will sequentially execute each of the predefined pipeline steps according to the configuration file. The default one trial of the pipeline mainly includes four major steps:</p>
+<ol class="arabic simple">
+<li><p><strong>Data/Model Probe</strong>: This step provides probes into the input dataset/model, such as analysing the dataset or analysing the data produced by model inference, to guide the subsequent steps.</p></li>
+<li><p><strong>Iterative Recipe Refinement based on Probe Results</strong>: This step refines and optimizes the recipe hyperparameters based on the data/model probes. For example, the operator (OP) hyperparameters in the data recipe can be adjusted using the k-sigma method based on the data probes.</p></li>
+<li><p><strong>Dataset Processing and Model Training</strong>: This step processes and cleans the input dataset based on the refined recipe. If model training is configured in the sandbox, the processed dataset will also be used to train the configured model.</p></li>
+<li><p><strong>Data/Model Evaluation</strong>: This step evaluates the processed dataset and the model trained in the previous step (if applicable). The evaluation methods may include analysis of the processed dataset and specified benchmark evaluations based on the configuration.</p></li>
+</ol>
+<p>Once this completes one trial of the sandbox pipeline run, the user can validate the effectiveness of the experiment in data production by comparing the probes and evaluation results before and after recipe refinement and dataset processing.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">hpo_config</span></code> is set in the configuration file and appropriate optimization objectives and OP hyperparameters to be refined are configured within it, the sandbox will perform multiple trials of pipeline runs in the form of Hyperparameter Optimization (HPO) and automatically conduct iterative refinement and optimization of the operator hyperparameters. The preparation of this configuration file can be referenced from the <a class="reference external" href="https://github.com/modelscope/data-juicer/tree/main/tools/hpo">HPO tool</a>.</p>
+</section>
+</section>
+<section id="component-factory">
+<h3>Component Factory<a class="headerlink" href="#component-factory" title="Link to this heading">¶</a></h3>
+<p>In a single trial of the sandbox pipeline, four major steps involve various configurable components. Each of these components corresponds to a factory class used to initialize them:</p>
+<ul class="simple">
+<li><p><strong>Data Processing (DataExecutor)</strong>: Executor for dataset processing, i.e., the Executor of Data-Juicer</p></li>
+<li><p><strong>Data Pool Manipulator (DataPoolManipulator)</strong>: Manipulator for data pools, i.e., construction, combination</p></li>
+<li><p><strong>General Data Processing (GeneralDataExecutor)</strong>: General executor for dataset processing, i.e., dataset format conversion</p></li>
+<li><p><strong>Data Analyzing（DataAnalyzer）</strong>: Analyzer for dataset, i.e., the analyzer of Data-Juicer</p></li>
+<li><p><strong>Data Evaluation (DataEvaluator)</strong>: Evaluator on the quality of the dataset</p></li>
+<li><p><strong>General Data Probe (GeneralProbe)</strong>: General probe components for the dataset</p></li>
+<li><p><strong>Model-Data Evaluation (ModelInferEvaluator)</strong>: Evaluator of dataset quality using the model’s inference results</p></li>
+<li><p><strong>Model Training (ModelTrainExecutor)</strong>: Executor for model training</p></li>
+<li><p><strong>Model Inference (ModelInferExecutor)</strong>: Executor for model inference</p></li>
+<li><p><strong>Model Evaluation (ModelEvaluator)</strong>: Evaluator on the performance of the model</p></li>
+</ul>
+<p>Except for DataExecutor and DataAnalyzer, the rest of the components can be specified in the configuration file using the <code class="docutils literal notranslate"><span class="pre">type</span></code> parameter to choose a specific execution or evaluation type. For example, the data evaluation component supports a <code class="docutils literal notranslate"><span class="pre">type</span></code> of <code class="docutils literal notranslate"><span class="pre">&quot;dj_text_quality_classifier&quot;</span></code> to utilize Data-Juicer’s text quality classifier tool for evaluating the dataset, while the model training component <code class="docutils literal notranslate"><span class="pre">type</span></code> can be set to <code class="docutils literal notranslate"><span class="pre">&quot;modelscope&quot;</span></code> to train a model from the ModelScope platform.</p>
+<p>The currently supported component factories and the components supported within each factory are as follows:</p>
+<ul class="simple">
+<li><p>DataExecutorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DJExecutor</span></code></p></td>
+<td><p>The data process module of Data-Juicer</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>DataPoolManipulatorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolConstruction</span></code></p></td>
+<td><p>Construct data pool from specified analyzed data source</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolCombination</span></code></p></td>
+<td><p>Combine specified data pools</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolDuplication</span></code></p></td>
+<td><p>Duplicate a data pool for specified times</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolDownsampling</span></code></p></td>
+<td><p>Randomly downsample data pools to specified scale</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>GeneralDataExecutorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">COCOCaptionToDJConversion</span></code></p></td>
+<td><p>Convert InternVL COCO Caption datasets to DJ format</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html">InternVL COCO Caption</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">COCOCaptionMetaGeneration</span></code></p></td>
+<td><p>Generate meta file for InternVL COCO Caption datasets</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html">InternVL COCO Caption</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>DataAnalyzerFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DJAnalyzer</span></code></p></td>
+<td><p>The data analysis module of Data-Juicer</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>DataEvaluatorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Gpt3QualityEvaluator</span></code></p></td>
+<td><p>Evaluate the quality of a dataset using the GPT-3 text quality classifier reproduced by Data-Juicer.</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of the object to be evaluated by the evaluator, currently only supports <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code>.<br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: A useless parameter.<br /></p></td>
+<td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/tree/main/tools/quality_classifier">Data-Juicer Quality Classifier Toolkit</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">VBenchEvaluator</span></code></p></td>
+<td><p>Evaluate the generated videos according to given prompts in multi dimensions</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of the object to be evaluated by the evaluator, currently only supports <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code><br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: A useless parameter.<br />- Return: The average score of generated videos in multi dimensions.<br /></p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2311.17982">VBench paper</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InceptionEvaluator</span></code></p></td>
+<td><p>Evaluate the generated videos by features extracted from video classification models.</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of the object to be evaluated by the evaluator, currently only supports <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code><br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: A useless parameter.<br />- Return: A dictionary of scores in the given metric. <br /></p></td>
+<td><p><a class="reference external" href="https://github.com/NVlabs/long-video-gan/tree/main/metrics">Inception Metrics</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>GeneralProbeFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolRanking</span></code></p></td>
+<td><p>Rank data pools according to specified evaluation metrics</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>ModelInferEvaluatorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ModelscopeInferExecutor</span></code></p></td>
+<td><p>Perform inference on a model from the ModelScope platform using a specified sampled dataset, and return the inference results.</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model inference. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;modelscope&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: Sampled dataset to be fed into model inference.<br /></p></td>
+<td><p><a class="reference external" href="https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%8E%A8%E7%90%86Pipeline">ModelScope Docs of Model Inference</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>ModelTrainExecutorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ModelscopeTrainExecutor</span></code></p></td>
+<td><p>Perform a training task on a model from the ModelScope platform using specified datasets, and monitor the change in training loss.</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model training. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;modelscope&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: A useless parameter.<br /></p></td>
+<td><p><a class="reference external" href="https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%AE%AD%E7%BB%83Train">ModelScope Docs of Model Training</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EasyAnimateTrainExecutor</span></code></p></td>
+<td><p>Perform a LoRA training task on EasyAnimate text-to-video model, and monitor the change in training loss.</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model training. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;easyanimate&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: A useless parameter.<br /></p></td>
+<td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TrinityRFTTrainExecutor</span></code></p></td>
+<td><p>Perform a reinforcement fine-tuning task based on Trinity-RFT framework, and monitor the change in training states.</p></td>
+<td><p>- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: Could be the path to Trinity configs.</p></td>
+<td><p><a class="reference external" href="https://github.com/modelscope/Trinity-RFT">Trinity-RFT</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">InternVLCOCOCaptionTrainExecutor</span></code></p></td>
+<td><p>Perform a LoRA fine-tuning task on InternVL2 for COCO Caption task, and monitor the change in training loss and learning rate.</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html">InternVL COCO Caption</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>ModelInferExecutorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EasyAnimateInferExecutor</span></code></p></td>
+<td><p>Perform inference on EasyAnimate text-to-video model with the prompts from VBench, and save the generated videos.</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model inference. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;easyanimate&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: A useless parameter.<br /></p></td>
+<td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p>ModelEvaluatorFactory</p></li>
+</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Desc. of Method <code class="docutils literal notranslate"><span class="pre">run</span></code></p></th>
+<th class="head"><p>Reference Materials</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InternVLCOCOCaptionEvaluator</span></code></p></td>
+<td><p>Evaluate Bleu-1/2/3/4, METEOR, ROUGE_L, and CIDEr for InternVL COCO Caption task</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model">InternVL COCO Caption</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Please refer to <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/factories.py</span></code> for detailed definitions.</p>
+</section>
+<section id="context-sharing">
+<h3>Context Sharing<a class="headerlink" href="#context-sharing" title="Link to this heading">¶</a></h3>
+<p>Sometimes, information needs to be shared between different hooks. For example, the <code class="docutils literal notranslate"><span class="pre">TrainModelHook</span></code> needs to share the model checkpoint path with the <code class="docutils literal notranslate"><span class="pre">EvaluateModelHook</span></code> to perform evaluation on the model after training.</p>
+<p>To achieve this, we integrate a global, both cross-hook and cross-pipeline information container called <code class="docutils literal notranslate"><span class="pre">context_infos</span></code> to store the executed results of hooks in each pipeline. The <code class="docutils literal notranslate"><span class="pre">context_infos</span></code> are constructed automatically when the pipeline is executed.</p>
+<section id="resume-mode">
+<h4>Resume Mode<a class="headerlink" href="#resume-mode" title="Link to this heading">¶</a></h4>
+<p>After each pipeline is finished, the <code class="docutils literal notranslate"><span class="pre">context_infos</span></code> are saved on disk. Based on this, Sandbox allows a pipeline-level resume mode to continue the sandbox execution from the last pipeline checkpoint. All we need to do is to set the <code class="docutils literal notranslate"><span class="pre">resume</span></code> parameter in the sandbox configuration file to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+</section>
+<section id="input-output-and-local-parameter-of-hooks">
+<h4>Input, Output, and Local Parameter of Hooks<a class="headerlink" href="#input-output-and-local-parameter-of-hooks" title="Link to this heading">¶</a></h4>
+<p>To obtain the context infos, three new parameters are added to the hook:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">input</span></code>: used to obtain results from the previous hook stored in the context infos, and update it in the configuration of the current hook.</p>
+<ul>
+<li><p>Basic usage: <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;:</span> <span class="pre">&lt;key_in_context_infos&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;</span></code> is the key in the configuration of the current hook to be updated, and <code class="docutils literal notranslate"><span class="pre">&lt;key_in_context_infos&gt;</span></code> is the key of the previous result stored in the context infos.</p></li>
+<li><p>Each pair of input parameters would replace the values in the <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;</span></code> with the values in the context infos with key <code class="docutils literal notranslate"><span class="pre">&lt;key_in_context_infos&gt;</span></code>. Nested keys using dot (<code class="docutils literal notranslate"><span class="pre">.</span></code>) notation are supported for both of them.</p></li>
+<li><p>If only the result from the last hook is needed, a simple <code class="docutils literal notranslate"><span class="pre">-1</span></code> can be used as the hook key in the <code class="docutils literal notranslate"><span class="pre">&lt;key_in_context_infos&gt;</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output</span></code>: used to store the results of the current hook in the context infos.</p>
+<ul>
+<li><p>Basic usage: <code class="docutils literal notranslate"><span class="pre">[&lt;res_1_name&gt;,</span> <span class="pre">&lt;res_2_name&gt;,</span> <span class="pre">...]</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;res_i_name&gt;</span></code> represents the <code class="docutils literal notranslate"><span class="pre">i</span></code>th output result of the current hook. If the <code class="docutils literal notranslate"><span class="pre">output</span></code> parameter is not specified, simple “res_i” is used automatically for the <code class="docutils literal notranslate"><span class="pre">i</span></code>th output result.</p></li>
+<li><p>After the hook is executed, the results of the current hook are stored as dict in the context infos with the keys specified in the <code class="docutils literal notranslate"><span class="pre">output</span></code> parameter.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">local</span></code>: used to update the configuration of the current hook locally with specified values.</p>
+<ul>
+<li><p>Basic usage: <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;:</span> <span class="pre">&lt;value&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;</span></code> is the key in the configuration of the current hook to be updated, and <code class="docutils literal notranslate"><span class="pre">&lt;value&gt;</span></code> is the target value.</p></li>
+<li><p>Each pair of local parameters would replace the values in the <code class="docutils literal notranslate"><span class="pre">&lt;key_to_updated&gt;</span></code> with the values specified in the <code class="docutils literal notranslate"><span class="pre">&lt;value&gt;</span></code>. Nested keys using dot (<code class="docutils literal notranslate"><span class="pre">.</span></code>) notation are supported.</p></li>
+</ul>
+</li>
+</ul>
+<p>An example of a hook using these parameters is shown below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">xxx_hook</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">meta_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">job_xxx</span>
+<span class="w">  </span><span class="nt">input</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">dj_configs.dataset_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pipeline1.name3.res4_key</span>
+<span class="w">    </span><span class="nt">extra_configs.meta_paths</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-1.res5_key</span>
+<span class="w">  </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;res6_key&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;res7_key&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">local</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">extra_configs.arg2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">42</span>
+<span class="w">  </span><span class="nt">dj_configs</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;/path/to/dj_configs.yaml&#39;</span>
+<span class="w">  </span><span class="nt">extra_configs</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">arg1</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;arg1_val&quot;</span>
+<span class="w">    </span><span class="nt">arg2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">404</span>
+<span class="w">    </span><span class="nt">meta_paths</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&lt;placeholder&gt;&quot;</span>
+</pre></div>
+</div>
+<p>In this hook, it uses all three parameters:</p>
+<ul class="simple">
+<li><p>In <code class="docutils literal notranslate"><span class="pre">input</span></code>, the hook replaces the <code class="docutils literal notranslate"><span class="pre">dataset_path</span></code> in the <code class="docutils literal notranslate"><span class="pre">dj_configs</span></code> in YAML format with the value of the <code class="docutils literal notranslate"><span class="pre">res4_key</span></code> stored in the context infos of the previous hook with <code class="docutils literal notranslate"><span class="pre">meta_name</span></code> “name3” in the pipeline named “pipeline1”. Beside, it replace the <code class="docutils literal notranslate"><span class="pre">meta_paths</span></code> in the <code class="docutils literal notranslate"><span class="pre">extra_configs</span></code> with the value of the <code class="docutils literal notranslate"><span class="pre">res5_key</span></code> stored in the context infos of the previous hook specified by “-1”.</p></li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">output</span></code>, the hook outputs two results named <code class="docutils literal notranslate"><span class="pre">res6_key</span></code> and <code class="docutils literal notranslate"><span class="pre">res7_key</span></code>, which will be stored in the context infos as following:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;job_xxx&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;res6_key&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">output_1</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s1">&#39;res7_key&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">output_2</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>In <code class="docutils literal notranslate"><span class="pre">local</span></code>, the hook replaces the original value of <code class="docutils literal notranslate"><span class="pre">arg2</span></code> in the <code class="docutils literal notranslate"><span class="pre">extra_configs</span></code>, which is 404 before, with the target value 42.</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="developer-guide">
+<h2>Developer Guide<a class="headerlink" href="#developer-guide" title="Link to this heading">¶</a></h2>
+<p>As mentioned in the previous section, developers can develop customized configurable components and add them to the corresponding factory classes, then route to appropriate instantiation methods using the <code class="docutils literal notranslate"><span class="pre">type</span></code> parameter. Once the components are implemented, developers can encapsulate them as hooks and register the hooks into the job list. After the job list is orchestrated in the pipeline, when the sandbox pipeline is executed, each job in the job list will be executed in sequence at each step. Each of these parts - components, component factory, hooks, job lists, and the registration and execution orchestration of the pipeline - can be customized by the developer. The relationship among these parts is illustrated in the diagram below.
+<img alt="sandbox-pipeline" src="https://img.alicdn.com/imgextra/i3/O1CN01ERmGre1uz3luKOn4n_!!6000000006107-2-tps-4655-1918.png" /></p>
+<section id="the-internal-implementation-of-components">
+<h3>The Internal Implementation of Components<a class="headerlink" href="#the-internal-implementation-of-components" title="Link to this heading">¶</a></h3>
+<p>Currently, components are mainly divided into three major categories:</p>
+<ul class="simple">
+<li><p><strong>Executor</strong>: Since the data executor is already handled by the Data-Juicer’s Executor, the executor here specifically refers to the model executor, including model training, inference, evaluation, etc. The code is located in <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/model_executors.py</span></code>.</p></li>
+<li><p><strong>Evaluator</strong>: Used for evaluating the quality and performance of datasets or models. The code is located in <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/evaluators.py</span></code>.</p></li>
+<li><p><strong>DataPoolManipulator</strong>: Used for manipulating the data pool, such as construction, combination, sampling, etc. The code is located in <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/data_pool_manipulators.py</span></code>.</p></li>
+</ul>
+<section id="executor">
+<h4>Executor<a class="headerlink" href="#executor" title="Link to this heading">¶</a></h4>
+<p>The core function of the model executor is to train, infer, or evaluate the model specified in the configuration file with the specified dataset. The model executor needs to inherit from <code class="docutils literal notranslate"><span class="pre">BaseModelExecutor</span></code> and implement several core methods:</p>
+<ul class="simple">
+<li><p>The specific behavior of the model executor (training, inference, evaluation, etc.) needs to be defined in the <code class="docutils literal notranslate"><span class="pre">_run</span></code> method.</p></li>
+<li><p>The model executor does not return any value. Key metrics that need to be monitored during execution are usually parsed from the logs produced by the model executor (such as loss, evaluation results, etc.). The parsing and monitoring process needs to be defined by the <code class="docutils literal notranslate"><span class="pre">_watch_run</span></code> method.</p></li>
+<li><p>Model executor requires input from a dataset, so the <code class="docutils literal notranslate"><span class="pre">data_connector</span></code> method needs to be implemented to convert the dataset from the sandbox’s format to the format required by the model framework or library.</p></li>
+</ul>
+<p>It is important to note that, to monitor the change of training metrics (e.g., loss) promptly during the model training process, logs generated during training need to be monitored. Therefore, both the <code class="docutils literal notranslate"><span class="pre">_run</span></code> method for executing model training and the <code class="docutils literal notranslate"><span class="pre">watch_run</span></code> method for monitoring logs need to be asynchronous methods, indicated by the <code class="docutils literal notranslate"><span class="pre">async</span></code> keyword. In the <code class="docutils literal notranslate"><span class="pre">run</span></code> method, we redirect the standard output stream (stdout) and standard error stream (stderr) to a designated log file before the training starts. Then, we create two asynchronous tasks to execute the aforementioned two methods, each performing the following tasks:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">_run</span></code> method: After loading the dataset, it starts model training based on the model training configuration. Upon completion of training, it outputs a predefined task completion identifier to the standard output stream, which has been redirected to the designated log file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">watch_run</span></code> method: It monitors the designated log file, reads it line by line, and calls the <code class="docutils literal notranslate"><span class="pre">_watch_run</span></code> method. The called method is customized based on the model training framework and used to parse the latest log content line, extract key metrics, and monitor them until the predefined task completion identifier is read.</p></li>
+</ul>
+</section>
+<section id="evaluator">
+<h4>Evaluator<a class="headerlink" href="#evaluator" title="Link to this heading">¶</a></h4>
+<p>The core function of the evaluator is to evaluate the quality and performance of the target using some specific methods and return the evaluation result, usually a numerical value. The evaluator needs to inherit from the base class <code class="docutils literal notranslate"><span class="pre">BaseEvaluator</span></code> and implement the <code class="docutils literal notranslate"><span class="pre">run</span></code> method. The <code class="docutils literal notranslate"><span class="pre">run</span></code> method typically takes two required parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of evaluation, used for internal evaluation type routine within a certain evaluator.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: The object to be evaluated.</p></li>
+</ul>
+<p>Users can also extend the usage of these two parameters based on their implementation.</p>
+</section>
+<section id="datapoolmanipulator">
+<h4>DataPoolManipulator<a class="headerlink" href="#datapoolmanipulator" title="Link to this heading">¶</a></h4>
+<p>The core function of the data pool manipulator is to manipulate the data pool, such as construction, combination, sampling, etc. The data pool manipulator needs to inherit from the base class <code class="docutils literal notranslate"><span class="pre">BaseDataPoolManipulator</span></code> and implement the <code class="docutils literal notranslate"><span class="pre">run</span></code> method. The <code class="docutils literal notranslate"><span class="pre">run</span></code> method. The necessary parameters usually come from the input data pool configs in the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method, covering input data pools, export paths, and specific parameters for each type of manipulators.</p>
+<p>Users can refer to the doc string of the <code class="docutils literal notranslate"><span class="pre">run</span></code> method of each manipulator for more details in <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/data_pool_manipulators.py</span></code>.</p>
+</section>
+</section>
+<section id="pipeline-hook">
+<h3>Pipeline Hook<a class="headerlink" href="#pipeline-hook" title="Link to this heading">¶</a></h3>
+<p>As mentioned at the start of this section, in the pipeline, we need to implement several hooks to connect components with the pipeline execution steps through the job list. Activated hooks will be registered in the pipeline’s job list and then executed one by one during the pipeline execution at each step. The job lists for the four corresponding steps are as follows:</p>
+<ol class="arabic simple">
+<li><p><strong>Data/Model Probe</strong>: Probe job list – probe_jobs</p></li>
+<li><p><strong>Iterative Recipe Refinement based on Probe Results</strong>: Refinement job list – refine_recipe_jobs</p></li>
+<li><p><strong>Data Processing and Model Training</strong>: Execution job list - execution_jobs</p></li>
+<li><p><strong>Data/Model Evaluation</strong>: Evaluation job list - evaluation_jobs</p></li>
+</ol>
+<p>In general, we only need to implement one type of hook function for a type of component factory. In addition to hooks that depend on components, some hooks depend on the existing functionality and tools of Data-Juicer or other third-party libraries. The correspondence among these hooks, dependent components, tools, and job lists is as follows:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Hook</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Dependent Component Factory</p></th>
+<th class="head"><p>Dependent Tool or Library</p></th>
+<th class="head"><p>Registered Job List</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ProbeViaAnalyzerHook</span></code></p></td>
+<td><p>Analyze and probe the quality and diversity distribution of the dataset</p></td>
+<td><p>DataAnalyzerFactory</p></td>
+<td><p>Data-Juicer Analyzer</p></td>
+<td><p>- probe_jobs<br />- evaluation_jobs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ProbeViaModelInferHook</span></code></p></td>
+<td><p>Analyze and understand the impact of the dataset on the model, explore and probe “difficult” and “dirty” data</p></td>
+<td><p>DataExecutorFactory <br />ModelInferEvaluatorFactory</p></td>
+<td><p>Data-Juicer Executor</p></td>
+<td><p>- probe_jobs<br />- evaluation_jobs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GeneralProbeHook</span></code></p></td>
+<td><p>General hook for probing the dataset, including ranking the datasets and so on</p></td>
+<td><p>GeneralProbeFactory</p></td>
+<td><p>-</p></td>
+<td><p>- probe_jobs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RefineRecipeViaKSigmaHook</span></code></p></td>
+<td><p>Refine data recipe hyperparameters using the k-sigma method based on the probe results of the dataset</p></td>
+<td><p>-</p></td>
+<td><p>k-sigma recipe refinement tool of Data-Juicer Hyperparameter Optimization (HPO) toolkit</p></td>
+<td><p>- refine_recipe_jobs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RefineRecipeViaModelFeedbackHook</span></code></p></td>
+<td><p>Refine data recipe hyperparameters using model probe and feedback results</p></td>
+<td><p>TODO</p></td>
+<td><p>-</p></td>
+<td><p>- refine_recipe_jobs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ProcessDataHook</span></code></p></td>
+<td><p>Process and clean the dataset based on the current data recipe</p></td>
+<td><p>DataExecutorFactory</p></td>
+<td><p>Data-Juicer Executor</p></td>
+<td><p>- execution_jobs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolManipulationHook</span></code></p></td>
+<td><p>Data pool manipulation,  including construction, combination, sampling, etc.</p></td>
+<td><p>DataPoolManipulatorFactory</p></td>
+<td><p>-</p></td>
+<td><p>- execution_jobs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GeneralDataExecutorHook</span></code></p></td>
+<td><p>General data processing for dataset, including format conversion, etc.</p></td>
+<td><p>GeneralDataExecutorFactory</p></td>
+<td><p>-</p></td>
+<td><p>- execution_jobs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TrainModelHook</span></code></p></td>
+<td><p>Train a model based on the current dataset</p></td>
+<td><p>ModelTrainExecutorFactory</p></td>
+<td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a> <br/> <a class="reference external" href="https://internvl.readthedocs.io/en/latest/index.html">InternVL</a></p></td>
+<td><p>- execution_jobs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">InferModelHook</span></code></p></td>
+<td><p>The model generates output based on the given input</p></td>
+<td><p>ModelInferExecutorFactory</p></td>
+<td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a></p></td>
+<td><p>- execution_jobs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EvaluateDataHook</span></code></p></td>
+<td><p>Evaluate the dataset in terms of data quality and other dimensions</p></td>
+<td><p>DataEvaluatorFactory</p></td>
+<td><p><a class="reference internal" href="../tools/mm_eval/inception_metrics/README.html"><span class="std std-doc">inception metrics</span></a> for images and videos, such as FID and FVD <br /> <a class="reference internal" href="../tools/mm_eval/vbench_metrics/README.html"><span class="std std-doc">VBench</span></a></p></td>
+<td><p>- evaluation_jobs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EvaluateModelHook</span></code></p></td>
+<td><p>Evaluate the trained model</p></td>
+<td><p>ModelEvaluatorFactory</p></td>
+<td><p><a class="reference external" href="https://internvl.readthedocs.io/en/latest/tutorials/coco_caption_finetune.html#evaluating-the-fine-tuned-model">InternVL COCO Caption</a></p></td>
+<td><p>- evaluation_jobs</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>It is worth noting that a hook can be registered in multiple job lists, as this hook can play different roles in different steps of the pipeline. For example, we can analyze and probe both the pre-processed and post-processed datasets to compare the changes in quality, diversity, and other dimensions before and after data processing.</p>
+</section>
+<section id="customized-sandbox-pipeline">
+<h3>Customized Sandbox Pipeline<a class="headerlink" href="#customized-sandbox-pipeline" title="Link to this heading">¶</a></h3>
+<p>Users can directly modify the job configuration list in the parameter configuration file to achieve task modification and orchestration.</p>
+</section>
+<section id="watcher">
+<h3>Watcher<a class="headerlink" href="#watcher" title="Link to this heading">¶</a></h3>
+<p>In the above sections, the concept of “monitoring” is repeatedly mentioned. The pipeline will monitor several metrics produced in each step, and these monitoring processes are implemented by <code class="docutils literal notranslate"><span class="pre">SandboxWatcher</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">SandboxWatcher</span></code> is based on wandb library and mainly includes four methods:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">setup_sweep</span></code>: This method is called in the multi-trial HPO mode, which is supported by the sweep module in wandb library. Therefore, the additional <code class="docutils literal notranslate"><span class="pre">hpo_config</span></code> configuration for sweep initialization is required to be passed into the sandbox configuration file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">watch_cfgs</span></code>: This method monitors and updates the sandbox experiments and configuration files of various components.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">watch</span></code>: This method monitors a specific metric or experiment result and records it in the wandb log.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query</span></code>: This method queries a specific metric or experiment result from the wandb log.</p></li>
+</ul>
+</section>
+<section id="details-of-context-infos">
+<h3>Details of Context Infos<a class="headerlink" href="#details-of-context-infos" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">context_infos</span></code> consists of two levels:</p>
+<ul class="simple">
+<li><p>pipeline level: it’s the 1st level of <code class="docutils literal notranslate"><span class="pre">context_infos</span></code>, which is a dict with keys are the pipeline names and values are a list of context information of each job in this pipeline.</p></li>
+<li><p>job level: it’s the 2nd level of <code class="docutils literal notranslate"><span class="pre">context_infos</span></code>, which is a list of dicts, each dict represents the context information of a specific job, with <code class="docutils literal notranslate"><span class="pre">meta_name</span></code> to identify the job and other key-value pairs with keys are the name of the outputs of this job and values are the output values.</p></li>
+</ul>
+<p>Here is an example of <code class="docutils literal notranslate"><span class="pre">context_infos</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;pipeline_0&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;name1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res1_key&#39;</span><span class="p">:</span> <span class="s1">&#39;res1_value&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res2_key&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">res2_value</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;name2&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res3_key&#39;</span><span class="p">:</span> <span class="s1">&#39;res3_value&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;pipeline_1&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;name3&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res4_key&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">res4_value</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;pipeline_2&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;meta_name&#39;</span><span class="p">:</span> <span class="s1">&#39;name4&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;res5_key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;res5_1_value&#39;</span><span class="p">,</span> <span class="s1">&#39;res5_2_value&#39;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="environment-manager">
+<h3>Environment Manager<a class="headerlink" href="#environment-manager" title="Link to this heading">¶</a></h3>
+<p>Sandbox supports different kinds of third-party libraries for training, evaluation and so on. If we put all of them into
+one environment, version conflicts on some important and complex dependencies will occur. Therefore, we provide an
+easy-to-use environment manager to manage different environments for different third-party libraries, allow users to run
+commands in isolated environments independently.</p>
+<p>The basic class of environment is <code class="docutils literal notranslate"><span class="pre">Env</span></code> in <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/env_manager.py</span></code> implemented as below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Env</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+  
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_availability</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check the availability of the environment manager.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if an environment exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">install_py_deps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Install Python dependencies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run a command in this environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;This method must be implemented in subclass.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It consists of five main abstract methods:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">create</span></code>: create an environment if it’s not existing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">check_availability</span></code>: check the availability of the environment manager (e.g., <code class="docutils literal notranslate"><span class="pre">conda</span></code>, <code class="docutils literal notranslate"><span class="pre">venv</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">exists</span></code>: check if an environment exists.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">install_py_deps</span></code>: install Python dependencies. Usually support three ways: a “requirements.txt” file path, a dependency list, or a directory path to a library code base.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_cmd</span></code>: run a command in this environment.</p></li>
+</ul>
+<p>Now we provide two concrete implementations of <code class="docutils literal notranslate"><span class="pre">Env</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CondaEnv</span></code>: use <code class="docutils literal notranslate"><span class="pre">conda</span></code> or <code class="docutils literal notranslate"><span class="pre">mamba</span></code> to manage environments.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VirtualEnv</span></code>: use <code class="docutils literal notranslate"><span class="pre">venv</span></code>, <code class="docutils literal notranslate"><span class="pre">virtualenv</span></code>, or <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">venv</span></code> to manage environments.</p></li>
+</ul>
+<p>When initializing the environment manager, we can specify the environment manager to use by setting the <code class="docutils literal notranslate"><span class="pre">env_manager</span></code> parameter in the configuration file and the name of the environment by setting the <code class="docutils literal notranslate"><span class="pre">env_name</span></code> parameter. An example of the basic usage is as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.sandbox.env_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ENV_ROUTER</span>
+
+<span class="n">env_manager</span> <span class="o">=</span> <span class="s1">&#39;conda&#39;</span>
+<span class="n">env_name</span> <span class="o">=</span> <span class="s1">&#39;new_conda_env&#39;</span>
+
+<span class="c1"># create an environment</span>
+<span class="n">env</span> <span class="o">=</span>  <span class="n">ENV_ROUTER</span><span class="p">[</span><span class="n">env_manager</span><span class="p">](</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">modelscope</span><span class="o">/</span><span class="n">data</span><span class="o">-</span><span class="n">juicer</span><span class="o">/</span><span class="n">blob</span><span class="o">/</span><span class="n">main</span><span class="o">/</span><span class="n">docs</span><span class="o">/</span>
+  <span class="n">env_name</span><span class="o">=</span><span class="n">env_name</span><span class="p">,</span>
+  <span class="n">env_manager</span><span class="o">=</span><span class="n">env_manager</span><span class="p">)</span>
+<span class="c1"># check the availability</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">env</span><span class="o">.</span><span class="n">check_availability</span><span class="p">():</span>
+    <span class="c1"># this env manager is not available</span>
+    <span class="n">exit</span><span class="p">()</span>
+<span class="c1"># create a new env. If it&#39;s already existing, use the existing one</span>
+<span class="n">env</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+<span class="c1"># install extra dependencies</span>
+<span class="c1"># use a &quot;requirements.txt&quot; file</span>
+<span class="n">env</span><span class="o">.</span><span class="n">install_py_deps</span><span class="p">(</span><span class="s2">&quot;/path/to/requirements.txt&quot;</span><span class="p">)</span>
+<span class="c1"># use a dependency list</span>
+<span class="n">env</span><span class="o">.</span><span class="n">install_py_deps</span><span class="p">([</span><span class="s2">&quot;torch&quot;</span><span class="p">,</span> <span class="s2">&quot;torchvision&quot;</span><span class="p">])</span>
+<span class="c1"># use a directory path to a library code base, e.g., InternVL</span>
+<span class="n">env</span><span class="o">.</span><span class="n">install_py_deps</span><span class="p">(</span><span class="s2">&quot;/path/to/a/third-party/library&quot;</span><span class="p">)</span>
+
+<span class="c1"># run a command in this environment</span>
+<span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;python train.py&quot;</span>
+<span class="n">env</span><span class="o">.</span><span class="n">run_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A complete example of using the environment manager in a hook is available in the <code class="docutils literal notranslate"><span class="pre">InternVLCOCOCaptionEvaluator</span></code> class in <code class="docutils literal notranslate"><span class="pre">data_juicer/core/sandbox/specific_hooks/intervl_coco_captioning/model_hooks.py</span></code>.</p>
+</section>
+</section>
+<section id="q-a">
+<h2>Q&amp;A<a class="headerlink" href="#q-a" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> when training InternVL:</p></li>
+</ol>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>RuntimeError: 
+        CUDA Setup failed despite GPU being available. Please run the following command to get more information:
+
+        python -m bitsandbytes
+
+        Inspect the output of the command and see if you can locate CUDA libraries. You might need to add them
+        to your LD_LIBRARY_PATH. If you suspect a bug, please take the information from python -m bitsandbytes
+        and open an issue at: https://github.com/TimDettmers/bitsandbytes/issues
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Reason: it might be the reason of incompatibility of CUDA, PyTorch, and bitsandbytes. Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">bitsandbytes</span></code> for more details.</p></li>
+<li><p>Solution:</p>
+<ul>
+<li><p>Remove the version limitation of bitsandbytes in <code class="docutils literal notranslate"><span class="pre">requirements/internvl_chat.txt</span></code> in the home of InternVL to avoid install the error version again when starting the env. Then reinstall it with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">uninstall</span> <span class="pre">bitsandbytes</span> <span class="pre">&amp;&amp;</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">bitsandbytes</span></code>.</p></li>
+<li><p>If the above solution does not work, reinstall the PyTorch that is compatible with the CUDA version of your GPU, and repeat the above step, until the command <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">bitsandbytes</span></code> outputs SUCCESS.</p></li>
+<li><p>Then, the <code class="docutils literal notranslate"><span class="pre">flash-attn</span></code> needs to be reinstalled as well.</p></li>
+</ul>
+</li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p><code class="docutils literal notranslate"><span class="pre">AssertionError</span></code> when training InternVL:</p></li>
+</ol>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>AssertionError: It is illegal to call Engine.step() inside no_sync context manager
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Solution: downgrade the version of <code class="docutils literal notranslate"><span class="pre">deepspeed</span></code> to <code class="docutils literal notranslate"><span class="pre">0.15.4</span></code>, and remove the version limitation of <code class="docutils literal notranslate"><span class="pre">deepspeed</span></code> in both <code class="docutils literal notranslate"><span class="pre">requirements/internvl_chat.txt</span></code> and <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> in the home of InternVL.</p></li>
+</ul>
+<ol class="arabic simple" start="3">
+<li><p><code class="docutils literal notranslate"><span class="pre">java</span> <span class="pre">not</span> <span class="pre">found</span></code> when evaluating InternVL:</p></li>
+</ol>
+<ul class="simple">
+<li><p>Solution: install java.</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="awesome_llm_data.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Awesome Data-Model Co-Development of MLLMs </div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="Distributed.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Distributed Data Processing in Data-Juicer</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Sandbox</a><ul>
+<li><a class="reference internal" href="#user-guide">User Guide</a><ul>
+<li><a class="reference internal" href="#what-is-dj-sandbox">What is DJ-Sandbox?</a></li>
+<li><a class="reference internal" href="#applications-and-use-cases">Applications and Use-Cases</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#prepare-configuration-files-for-sandbox">Prepare Configuration Files for Sandbox</a></li>
+<li><a class="reference internal" href="#start-sandbox">Start Sandbox</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#component-factory">Component Factory</a></li>
+<li><a class="reference internal" href="#context-sharing">Context Sharing</a><ul>
+<li><a class="reference internal" href="#resume-mode">Resume Mode</a></li>
+<li><a class="reference internal" href="#input-output-and-local-parameter-of-hooks">Input, Output, and Local Parameter of Hooks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#developer-guide">Developer Guide</a><ul>
+<li><a class="reference internal" href="#the-internal-implementation-of-components">The Internal Implementation of Components</a><ul>
+<li><a class="reference internal" href="#executor">Executor</a></li>
+<li><a class="reference internal" href="#evaluator">Evaluator</a></li>
+<li><a class="reference internal" href="#datapoolmanipulator">DataPoolManipulator</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pipeline-hook">Pipeline Hook</a></li>
+<li><a class="reference internal" href="#customized-sandbox-pipeline">Customized Sandbox Pipeline</a></li>
+<li><a class="reference internal" href="#watcher">Watcher</a></li>
+<li><a class="reference internal" href="#details-of-context-infos">Details of Context Infos</a></li>
+<li><a class="reference internal" href="#environment-manager">Environment Manager</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#q-a">Q&amp;A</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="../_static/documentation_options.js?v=350a9c04"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

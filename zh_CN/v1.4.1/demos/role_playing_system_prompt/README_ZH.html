@@ -6,7 +6,7 @@
 <link rel="index" title="索引" href="../../genindex.html" /><link rel="search" title="搜索" href="../../search.html" /><link rel="next" title="分布式模糊去重工具" href="../../tools/distributed_deduplication/README_ZH.html" /><link rel="prev" title="自动化评测：HELM 评测及可视化" href="../auto_evaluation_helm/README_ZH.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
-        <title>为LLM构造角色扮演的system prompt - data-juicer</title>
+        <title>为LLM构造角色扮演的system prompt - Data Juicer</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -170,7 +170,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index_ZH.html"><div class="brand">data-juicer</div></a>
+      <a href="../../index_ZH.html"><div class="brand">Data Juicer</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -193,7 +193,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index_ZH.html">
   
-  <span class="sidebar-brand-text">data-juicer</span>
+  <span class="sidebar-brand-text">Data Juicer</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="搜索" name="q" aria-label="搜索">
@@ -311,6 +311,7 @@
         <div class="section">
             <dt>Version</dt>
             <dd>
+                    <a href="../../../v1.4.0/demos/role_playing_system_prompt/README_ZH.html">v1.4.0</a>
                     <a href="README_ZH.html">v1.4.1</a>
                     <a href="../../../main/demos/role_playing_system_prompt/README_ZH.html">main</a>
             </dd>
@@ -356,7 +357,10 @@
           <section id="llmsystem-prompt">
 <h1>为LLM构造角色扮演的system prompt<a class="headerlink" href="#llmsystem-prompt" title="Link to this heading">¶</a></h1>
 <p>在该Demo中，我们展示了如何通过Data-Juicer的菜谱，生成让LLM扮演剧本中给定角色的system prompt。我们这里以《西游记》为例。下面是在少量剧本上的演示：</p>
-<p><a class="reference external" href="https://github.com/user-attachments/assets/20499385-1791-4089-8074-cebefe8c7e80">https://github.com/user-attachments/assets/20499385-1791-4089-8074-cebefe8c7e80</a></p>
+<p><video controls width="100%" height="auto" playsinline>
+  <source src="https://github.com/user-attachments/assets/20499385-1791-4089-8074-cebefe8c7e80" type="video/mp4">
+  Your browser does not support the video tag.
+</video></p>
 <section id="id1">
 <h2>数据准备<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
 <p>将《西游记》按章节划分，按顺序每个章节对应Data-Juicer的一个sample，放到“text”关键字下。如下json格式：</p>
