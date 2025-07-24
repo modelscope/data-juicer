@@ -228,7 +228,7 @@ class PartitionSizeOptimizer:
             "avg_images_per_sample": avg_images_per_sample,
             "avg_audio_per_sample": avg_audio_per_sample,
             "avg_video_per_sample": avg_video_per_sample,
-            "total_samples": len(dataset),
+            "total_samples": total_samples,
             "sample_size_analyzed": sample_size,
         }
 
