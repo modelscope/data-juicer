@@ -6,6 +6,7 @@ from .average_line_length_filter import AverageLineLengthFilter
 from .character_repetition_filter import CharacterRepetitionFilter
 from .flagged_words_filter import FlaggedWordFilter
 from .general_field_filter import GeneralFieldFilter
+from .group_diversity_filter import GroupDiversityFilter
 from .image_aesthetics_filter import ImageAestheticsFilter
 from .image_aspect_ratio_filter import ImageAspectRatioFilter
 from .image_face_count_filter import ImageFaceCountFilter
@@ -63,6 +64,8 @@ __all__ = [
     "AverageLineLengthFilter",
     "CharacterRepetitionFilter",
     "FlaggedWordFilter",
+    "GeneralFieldFilter",
+    "GroupDiversityFilter",
     "ImageAestheticsFilter",
     "ImageAspectRatioFilter",
     "ImageFaceCountFilter",
@@ -109,7 +112,6 @@ __all__ = [
     "VideoWatermarkFilter",
     "WordRepetitionFilter",
     "WordsNumFilter",
-    "GeneralFieldFilter",
 ]
 
 NON_STATS_FILTERS = [
