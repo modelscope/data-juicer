@@ -166,6 +166,9 @@ class OP:
         # extra mm bytes keys
         self.image_bytes_key = kwargs.get("image_bytes_key", "image_bytes")
 
+        self.system_key = kwargs.get("system_key", "system")
+        self.instruction_key = kwargs.get("instruction_key", "instruction")
+        self.prompt_key = kwargs.get("prompt_key", "prompt")
         self.query_key = kwargs.get("query_key", "query")
         self.response_key = kwargs.get("response_key", "response")
         self.history_key = kwargs.get("history_key", "history")
