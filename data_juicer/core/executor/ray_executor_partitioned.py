@@ -16,6 +16,7 @@ import hashlib
 import json
 import os
 import shutil
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
@@ -30,6 +31,9 @@ from data_juicer.core.adapter import Adapter
 from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.executor.event_logging_mixin import EventLoggingMixin
+from data_juicer.core.executor.partition_size_optimizer import (
+    auto_configure_partition_size,
+)
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -115,16 +119,66 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
     def __init__(self, cfg: Optional[Namespace] = None):
         """Initialize the partitioned Ray executor."""
         super().__init__(cfg)
+
         self.executor_type = "ray_partitioned"
         self.work_dir = self.cfg.work_dir
         self.adapter = Adapter(self.cfg)
 
+        # Initialize EventLoggingMixin for job management and event logging
+        # Do this after work_dir is set
+        EventLoggingMixin.__init__(self, cfg)
+
         # Partitioning configuration
-        self.partition_size = getattr(self.cfg, "partition_size", 10000)  # samples per partition
-        self.max_partition_size_mb = getattr(self.cfg, "max_partition_size_mb", 128)
-        self.enable_fault_tolerance = getattr(self.cfg, "enable_fault_tolerance", True)
-        self.max_retries = getattr(self.cfg, "max_retries", 3)
-        self.preserve_intermediate_data = getattr(self.cfg, "preserve_intermediate_data", False)
+        # Support both flat and nested partition configuration
+        partition_config = getattr(self.cfg, "partition", {})
+
+        # Check if auto-configuration is enabled
+        self.auto_configure_partitions = partition_config.get("auto_configure", False)
+
+        if self.auto_configure_partitions:
+            logger.info("Auto-configuration enabled - will analyze dataset and optimize partition size")
+            # We'll configure this after loading the dataset
+            self.partition_size = None
+            self.max_partition_size_mb = None
+        else:
+            # Read from nested partition config first, fall back to flat config
+            self.partition_size = partition_config.get("size") or getattr(self.cfg, "partition_size", 10000)
+            self.max_partition_size_mb = partition_config.get("max_size_mb") or getattr(
+                self.cfg, "max_partition_size_mb", 128
+            )
+
+        # Fault tolerance configuration (now under partition section)
+        partition_config = getattr(self.cfg, "partition", {})
+        self.enable_fault_tolerance = partition_config.get("enable_fault_tolerance") or getattr(
+            self.cfg, "enable_fault_tolerance", True
+        )
+        self.max_retries = partition_config.get("max_retries") or getattr(self.cfg, "max_retries", 3)
+        self.retry_backoff = partition_config.get("retry_backoff", "exponential")
+
+        # Intermediate storage configuration (includes file lifecycle management)
+        intermediate_storage_config = getattr(self.cfg, "intermediate_storage", {})
+        self.storage_format = intermediate_storage_config.get("format") or getattr(
+            self.cfg, "storage_format", "parquet"
+        )  # parquet, arrow, jsonl - for disk storage
+        self.storage_compression = intermediate_storage_config.get("compression", "snappy")
+        self.use_arrow_batches = intermediate_storage_config.get("use_arrow_batches") or getattr(
+            self.cfg, "use_arrow_batches", True
+        )  # Use Arrow batch format for processing (recommended)
+        self.arrow_batch_size = intermediate_storage_config.get("arrow_batch_size") or getattr(
+            self.cfg, "arrow_batch_size", 1000
+        )  # Arrow batch size for processing
+        self.arrow_memory_mapping = intermediate_storage_config.get("arrow_memory_mapping") or getattr(
+            self.cfg, "arrow_memory_mapping", False
+        )
+
+        # File lifecycle management (now part of intermediate_storage config)
+        self.preserve_intermediate_data = intermediate_storage_config.get("preserve_intermediate_data") or getattr(
+            self.cfg, "preserve_intermediate_data", False
+        )
+        self.cleanup_temp_files = intermediate_storage_config.get("cleanup_temp_files", True)
+        self.cleanup_on_success = intermediate_storage_config.get("cleanup_on_success", False)
+        self.retention_policy = intermediate_storage_config.get("retention_policy", "keep_all")
+        self.max_retention_days = intermediate_storage_config.get("max_retention_days", 7)
 
         # Checkpoint configuration
         checkpoint_cfg = getattr(self.cfg, "checkpoint", {})
@@ -144,13 +198,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         self.checkpoint_n_ops = checkpoint_cfg.get("n_ops", 1)
         self.checkpoint_op_names = checkpoint_cfg.get("op_names", [])
-
-        # Data format configuration for performance
-        self.storage_format = getattr(self.cfg, "storage_format", "parquet")  # parquet, arrow, jsonl - for disk storage
-        self.use_arrow_batches = getattr(
-            self.cfg, "use_arrow_batches", True
-        )  # Use Arrow batch format for processing (recommended)
-        self.arrow_batch_size = getattr(self.cfg, "arrow_batch_size", 1000)  # Arrow batch size for processing
 
         # Initialize Ray
         logger.info("Initializing Ray for partitioned execution...")
@@ -196,6 +243,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             "total_processing_time": 0,
             "errors": [],
         }
+
+        # Initialize processing events tracking
+        self.processing_events = []
+        self.event_lock = threading.Lock()
 
         # Dataset mapping
         self.dataset_mapping: Optional[DatasetMapping] = None
@@ -269,30 +320,14 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             logger.warning(f"Unknown checkpoint strategy: {self.checkpoint_strategy}, defaulting to every_op")
             return True
 
-    def _log_event(self, event: ProcessingEvent):
+    def _log_processing_event(self, event: ProcessingEvent):
         """Log a processing event."""
-        # Write to JSONL file
-        with open(self.events_file, "a") as f:
-            f.write(json.dumps(asdict(event)) + "\n")
-
-        # Update summary
-        if event.event_type == "partition_start":
-            self.event_summary["total_partitions"] += 1
-        elif event.event_type == "partition_complete":
-            self.event_summary["completed_partitions"] += 1
-        elif event.event_type == "partition_failed":
-            self.event_summary["failed_partitions"] += 1
-        elif event.event_type == "operation_checkpoint":
-            self.event_summary["checkpoints_created"] += 1
-        elif event.event_type == "error":
-            self.event_summary["errors"].append(
-                {
-                    "timestamp": event.timestamp,
-                    "message": event.message,
-                    "partition_id": event.partition_id,
-                    "operation_name": event.operation_name,
-                }
-            )
+        with self.event_lock:
+            self.processing_events.append(event)
+            # Also log to file if available
+            if hasattr(self, "events_file"):
+                with open(self.events_file, "a") as f:
+                    f.write(json.dumps(event.__dict__) + "\n")
 
     def _finalize_event_summary(self):
         """Finalize and save the processing summary."""
@@ -389,27 +424,30 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         # Save partitions to disk with metadata
         partition_paths = []
-        for i in range(partition_count):
-            partition_path = os.path.join(self.partitions_dir, f"partition_{i:06d}.jsonl")
+        all_data = list(partitioned_dataset.iter_rows())  # Convert to list for slicing
 
-            # Get partition data
-            partition_data = list(partitioned_dataset.take_partition(i))
+        for i in range(partition_count):
+            # Start with base path, will be updated based on storage format
+            partition_path = os.path.join(self.partitions_dir, f"partition_{i:06d}")
+
+            # Get partition data using list slicing
+            start_idx = i * self.partition_size
+            end_idx = min(start_idx + self.partition_size, total_samples)
+            partition_data = all_data[start_idx:end_idx]
 
             # Calculate metadata
             sample_count = len(partition_data)
-            start_idx = i * self.partition_size
-            end_idx = min(start_idx + sample_count, total_samples)
             checksum = self._calculate_checksum(partition_data)
 
             # Save partition to disk using configurable format
             if self.storage_format == "parquet":
                 # Use Parquet for best performance and compression
-                partition_path = partition_path.replace(".jsonl", ".parquet")
+                partition_path = partition_path + ".parquet"
                 partition_dataset = ray.data.from_items(partition_data)
                 partition_dataset.write_parquet(partition_path)
             elif self.storage_format == "arrow":
                 # Use Arrow (Feather) for memory mapping and zero-copy reads
-                partition_path = partition_path.replace(".jsonl", ".arrow")
+                partition_path = partition_path + ".arrow"
                 partition_dataset = ray.data.from_items(partition_data)
                 # Convert to Arrow table and save as Feather format
                 import pyarrow as pa
@@ -420,6 +458,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 feather.write_feather(table, partition_path)
             else:
                 # Fallback to JSONL for compatibility
+                partition_path = partition_path + ".jsonl"
                 with open(partition_path, "w") as f:
                     for sample in partition_data:
                         f.write(json.dumps(sample) + "\n")
@@ -541,105 +580,56 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         # Apply operations with intermediate data preservation
         try:
-            current_dataset = partition_dataset
+            # Convert Ray Dataset to pandas for processing to avoid PyArrow schema conflicts
+            import pandas as pd
 
-            for op_idx, op in enumerate(ops):
-                logger.debug(f"Applying op {op_idx+1}/{len(ops)}: {op._name} to partition {partition_id}")
+            # Convert to pandas DataFrame
+            df = partition_dataset.to_pandas()
 
-                # Save intermediate state if enabled (using configurable format)
-                if self._should_checkpoint(op_idx, op._name, partition_id):
-                    if self.storage_format == "parquet":
-                        intermediate_path = os.path.join(
-                            partition_intermediate_dir, f"after_op_{op_idx:03d}_{op._name}.parquet"
-                        )
-                        current_dataset.write_parquet(intermediate_path)
-                    elif self.storage_format == "arrow":
-                        intermediate_path = os.path.join(
-                            partition_intermediate_dir, f"after_op_{op_idx:03d}_{op._name}.arrow"
-                        )
-                        # Convert to Arrow table and save as Feather format with compression
-                        import pyarrow.feather as feather
+            # Create a simple dataset wrapper for processing
+            from data_juicer.core.data import NestedDataset
 
-                        # Use Arrow batch format for better performance
-                        if hasattr(current_dataset, "to_arrow_refs"):
-                            # Use Arrow batch format directly if available
-                            arrow_refs = current_dataset.to_arrow_refs()
-                            tables = ray.get(arrow_refs)
-                            if tables:
-                                table = tables[0] if len(tables) == 1 else pa.concat_tables(tables)
-                            else:
-                                # Fallback to pandas conversion
-                                df = current_dataset.to_pandas()
-                                table = pa.Table.from_pandas(df)
-                        else:
-                            # Fallback to pandas conversion
-                            df = current_dataset.to_pandas()
-                            table = pa.Table.from_pandas(df)
+            current_dataset = NestedDataset.from_list(df.to_dict("records"))
 
-                        # Save with compression for better storage efficiency
-                        feather.write_feather(table, intermediate_path, compression="lz4")
-                    else:
-                        intermediate_path = os.path.join(
-                            partition_intermediate_dir, f"after_op_{op_idx:03d}_{op._name}.jsonl"
-                        )
-                        current_dataset.write_json(intermediate_path, force_ascii=False)
-                    logger.debug(f"Saved intermediate state to {intermediate_path}")
+            # Process all operations using the standard DataJuicer processing
+            current_dataset.process(ops)
 
-                    # Log checkpoint event for intermediate state
-                    self._log_event(
-                        ProcessingEvent(
-                            event_id=f"op_checkpoint_{partition_id}_{op_idx}_{int(time.time())}",
-                            event_type="operation_checkpoint",
-                            timestamp=time.time(),
-                            partition_id=partition_id,
-                            operation_name=op._name,
-                            operation_idx=op_idx,
-                            message=f"Created checkpoint for {op._name} on partition {partition_id}",
-                            metadata={"checkpoint_path": intermediate_path},
-                        )
-                    )
+            # Get the processed data from the MaterializedDataset
+            processed_data = current_dataset.to_list()
 
-                # Apply operation
-                if hasattr(op, "compute_stats_batched"):
-                    current_dataset = op.compute_stats_batched(current_dataset)
-
-                if hasattr(op, "process_batched"):
-                    result = list(op.process_batched(current_dataset))
-                    # Filter based on result
-                    if result and isinstance(result[0], bool):
-                        current_dataset = current_dataset.filter(lambda x, i: result[i])
+            # Convert back to Ray Dataset
+            processed_df = pd.DataFrame(processed_data)
+            current_dataset = ray.data.from_pandas(processed_df)
 
             # Save final processed partition using configurable format
+            output_path = os.path.join(self.results_dir, f"partition_{partition_id:06d}.{self.storage_format}")
+
             if self.storage_format == "parquet":
-                output_path = os.path.join(self.results_dir, f"partition_{partition_id:06d}_processed.parquet")
                 current_dataset.write_parquet(output_path)
             elif self.storage_format == "arrow":
-                output_path = os.path.join(self.results_dir, f"partition_{partition_id:06d}_processed.arrow")
-                # Convert to Arrow table and save as Feather format with compression
-                import pyarrow as pa
-                import pyarrow.feather as feather
-
-                # Use Arrow batch format for better performance
+                # For Arrow format, we need to handle it differently
                 if hasattr(current_dataset, "to_arrow_refs"):
-                    # Use Arrow batch format directly if available
-                    arrow_refs = current_dataset.to_arrow_refs()
-                    tables = ray.get(arrow_refs)
-                    if tables:
-                        table = tables[0] if len(tables) == 1 else pa.concat_tables(tables)
-                    else:
-                        # Fallback to pandas conversion
-                        df = current_dataset.to_pandas()
-                        table = pa.Table.from_pandas(df)
+                    # Use Arrow references if available
+                    _ = current_dataset.to_arrow_refs()
+                    # Convert to pandas and then to arrow
+                    df = current_dataset.to_pandas()
                 else:
                     # Fallback to pandas conversion
                     df = current_dataset.to_pandas()
-                    table = pa.Table.from_pandas(df)
 
-                # Save with compression for better storage efficiency
-                feather.write_feather(table, output_path, compression="lz4")
-            else:
-                output_path = os.path.join(self.results_dir, f"partition_{partition_id:06d}_processed.jsonl")
+                table = pa.Table.from_pandas(df)
+                with pa.OSFile(output_path, "wb") as sink:
+                    with pa.RecordBatchFileWriter(sink, table.schema) as writer:
+                        writer.write_table(table)
+            else:  # jsonl
                 current_dataset.write_json(output_path, force_ascii=False)
+
+            # Save partition checkpoint if enabled
+            if self.checkpoint_strategy == CheckpointStrategy.EVERY_PARTITION:
+                partition_checkpoint_path = os.path.join(
+                    self.checkpoint_dir, f"partition_{partition_id:06d}_checkpoint.{self.storage_format}"
+                )
+                current_dataset.write_parquet(partition_checkpoint_path)
 
             # Create checkpoint at partition completion if strategy is "every_partition"
             if self.checkpoint_strategy == CheckpointStrategy.EVERY_PARTITION and self.checkpoint_enabled:
@@ -649,7 +639,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 current_dataset.write_parquet(partition_checkpoint_path)
 
                 # Log checkpoint event
-                self._log_event(
+                self._log_processing_event(
                     ProcessingEvent(
                         event_id=f"partition_checkpoint_{partition_id}_{int(time.time())}",
                         event_type="partition_checkpoint",
@@ -699,7 +689,17 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             except Exception as e:
                 if attempt < self.max_retries:
                     logger.warning(f"Attempt {attempt + 1} failed for partition {partition_id}: {e}")
-                    time.sleep(2**attempt)  # Exponential backoff
+
+                    # Calculate backoff delay based on strategy
+                    if self.retry_backoff == "exponential":
+                        delay = 2**attempt
+                    elif self.retry_backoff == "linear":
+                        delay = attempt + 1
+                    else:  # fixed
+                        delay = 1
+
+                    logger.info(f"Retrying partition {partition_id} in {delay} seconds...")
+                    time.sleep(delay)
                 else:
                     logger.error(f"All attempts failed for partition {partition_id}: {e}")
                     return {
@@ -732,17 +732,59 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         successful_results.sort(key=lambda x: x["partition_id"])
 
         # Merge successful partitions
-        with open(self.cfg.export_path, "w") as output_file:
+        # Ensure the export path is treated as a file, not a directory
+        export_path = self.cfg.export_path
+        if os.path.isdir(export_path):
+            # If it's a directory, create a file inside it
+            export_path = os.path.join(export_path, "processed.jsonl")
+
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(export_path), exist_ok=True)
+
+        def convert_datetime_to_str(obj):
+            """Recursively convert datetime objects to ISO format strings."""
+            if hasattr(obj, "isoformat"):  # Handle datetime objects
+                return obj.isoformat()
+            elif isinstance(obj, dict):
+                return {key: convert_datetime_to_str(value) for key, value in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_datetime_to_str(item) for item in obj]
+            else:
+                return obj
+
+        with open(export_path, "w") as output_file:
             for result in successful_results:
                 if result["output_path"] and os.path.exists(result["output_path"]):
-                    with open(result["output_path"], "r") as input_file:
-                        shutil.copyfileobj(input_file, output_file)
+                    # Handle different file formats
+                    if result["output_path"].endswith(".parquet"):
+                        # For parquet files, we need to read and convert to JSONL
+                        import pandas as pd
+
+                        df = pd.read_parquet(result["output_path"])
+                        for _, row in df.iterrows():
+                            # Convert datetime objects to strings for JSON serialization
+                            row_dict = convert_datetime_to_str(row.to_dict())
+                            output_file.write(json.dumps(row_dict) + "\n")
+                    elif result["output_path"].endswith(".arrow"):
+                        # For arrow files, convert to JSONL
+                        import pyarrow as pa
+
+                        table = pa.ipc.open_file(result["output_path"]).read_all()
+                        df = table.to_pandas()
+                        for _, row in df.iterrows():
+                            # Convert datetime objects to strings for JSON serialization
+                            row_dict = convert_datetime_to_str(row.to_dict())
+                            output_file.write(json.dumps(row_dict) + "\n")
+                    else:
+                        # For JSONL files, copy directly
+                        with open(result["output_path"], "r") as input_file:
+                            shutil.copyfileobj(input_file, output_file)
 
         # Create final mapping report
         self._create_final_mapping_report(partition_results)
 
-        logger.info(f"Merged {len(successful_results)} partitions into {self.cfg.export_path}")
-        return self.cfg.export_path
+        logger.info(f"Merged {len(successful_results)} partitions into {export_path}")
+        return export_path
 
     def _create_final_mapping_report(self, partition_results: List[Dict[str, Any]]):
         """Create a final mapping report showing the relationship between original and processed data."""
@@ -817,7 +859,23 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         checkpoint_path = os.path.join(self.checkpoint_dir, latest_checkpoint)
 
         with open(checkpoint_path, "r") as f:
-            return json.load(f)
+            checkpoint_data = json.load(f)
+
+            # Reconstruct the DatasetMapping object if it exists
+            if checkpoint_data.get("dataset_mapping"):
+                mapping_data = checkpoint_data["dataset_mapping"]
+                # Reconstruct partitions as PartitionMetadata objects
+                if mapping_data.get("partitions"):
+                    partitions = []
+                    for partition_data in mapping_data["partitions"]:
+                        partition = PartitionMetadata(**partition_data)
+                        partitions.append(partition)
+                    mapping_data["partitions"] = partitions
+
+                # Reconstruct the DatasetMapping object
+                checkpoint_data["dataset_mapping"] = DatasetMapping(**mapping_data)
+
+            return checkpoint_data
 
     def run(self, load_data_np: Optional[PositiveInt] = None, skip_return=False):
         """
@@ -833,6 +891,21 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         # 1. Load dataset
         logger.info("Loading dataset with Ray...")
         dataset = self.datasetbuilder.load_dataset(num_proc=load_data_np)
+
+        # Auto-configure partition size if enabled
+        if self.auto_configure_partitions:
+            logger.info("Running auto-configuration for partition size...")
+            try:
+                recommendations = auto_configure_partition_size(self.cfg, dataset, self.cfg.process)
+                self.partition_size = recommendations["recommended_partition_size"]
+                self.max_partition_size_mb = recommendations["recommended_max_size_mb"]
+                logger.info(
+                    f"Auto-configured partition size: {self.partition_size} samples, {self.max_partition_size_mb} MB max"
+                )
+            except Exception as e:
+                logger.warning(f"Auto-configuration failed: {e}, using default values")
+                self.partition_size = 200
+                self.max_partition_size_mb = 32
 
         # Update directories for job-specific paths if event logging is enabled
         self._update_directories_for_job()
@@ -850,38 +923,36 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             logger.info(f"Start OP fusion and reordering with strategy [{self.cfg.fusion_strategy}]...")
             ops = fuse_operators(ops, probe_res)
 
-        # 3. Check for existing checkpoint and dataset mapping
-        checkpoint_data = None
-        if self.enable_fault_tolerance:
-            checkpoint_data = self._load_checkpoint()
-            if checkpoint_data:
-                logger.info("Found existing checkpoint, resuming from previous state...")
-                # Restore dataset mapping from checkpoint
-                if checkpoint_data.get("dataset_mapping"):
-                    self.dataset_mapping = DatasetMapping(**checkpoint_data["dataset_mapping"])
+        # 3. Check for existing checkpoint
+        checkpoint_data = self._load_checkpoint()
+        completed_partitions = set()
+        if checkpoint_data:
+            logger.info("Found existing checkpoint, resuming from previous state...")
+            # The checkpoint data already contains reconstructed objects from _load_checkpoint
+            self.dataset_mapping = checkpoint_data.get("dataset_mapping")
+            completed_partitions = {r["partition_id"] for r in checkpoint_data["partition_results"] if r["success"]}
 
         # 4. Create partitions or load existing mapping
-        if checkpoint_data and self.dataset_mapping:
-            # Resume from checkpoint
+        if not self.dataset_mapping:
+            self.dataset_mapping = self._load_dataset_mapping()
+
+        if self.dataset_mapping:
+            logger.info("Found existing dataset mapping, using existing partitions...")
+            # Use correct file extension based on storage format
+            if self.storage_format == "parquet":
+                extension = ".parquet"
+            elif self.storage_format == "arrow":
+                extension = ".arrow"
+            else:
+                extension = ".jsonl"
+
             partition_paths = [
-                os.path.join(self.partitions_dir, f"partition_{i:06d}.jsonl")
+                os.path.join(self.partitions_dir, f"partition_{i:06d}{extension}")
                 for i in range(self.dataset_mapping.partition_count)
             ]
-            completed_partitions = {r["partition_id"] for r in checkpoint_data["partition_results"] if r["success"]}
         else:
-            # Load or create dataset mapping
-            self.dataset_mapping = self._load_dataset_mapping()
-            if self.dataset_mapping:
-                logger.info("Found existing dataset mapping, using existing partitions...")
-                partition_paths = [
-                    os.path.join(self.partitions_dir, f"partition_{i:06d}.jsonl")
-                    for i in range(self.dataset_mapping.partition_count)
-                ]
-                completed_partitions = set()
-            else:
-                # Create new partitions
-                partition_paths, self.dataset_mapping = self._create_partitions_with_mapping(dataset)
-                completed_partitions = set()
+            # Create new partitions
+            partition_paths, self.dataset_mapping = self._create_partitions_with_mapping(dataset)
 
         # 5. Process partitions with fault tolerance
         logger.info(f"Processing {len(partition_paths)} partitions...")
@@ -939,13 +1010,21 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         if self.enable_fault_tolerance:
             self._save_checkpoint(partition_results, ops)
 
-        # 8. Cleanup temporary files (if not preserving intermediate data)
-        if getattr(self.cfg, "cleanup_temp_files", True) and not self.preserve_intermediate_data:
-            logger.info("Cleaning up temporary files...")
-            shutil.rmtree(self.partitions_dir, ignore_errors=True)
-            shutil.rmtree(self.results_dir, ignore_errors=True)
-            if not self.preserve_intermediate_data:
-                shutil.rmtree(self.intermediate_dir, ignore_errors=True)
+        # 8. Cleanup temporary files based on intermediate storage configuration
+        if self.cleanup_temp_files:
+            if self.retention_policy == "cleanup_all" or (
+                self.retention_policy == "keep_failed_only"
+                and all(result.get("success", False) for result in partition_results)
+            ):
+                logger.info("Cleaning up temporary files...")
+                shutil.rmtree(self.partitions_dir, ignore_errors=True)
+                shutil.rmtree(self.results_dir, ignore_errors=True)
+                if not self.preserve_intermediate_data:
+                    shutil.rmtree(self.intermediate_dir, ignore_errors=True)
+            elif self.retention_policy == "keep_all":
+                logger.info("Keeping all intermediate files as per retention policy")
+            else:
+                logger.info(f"Keeping intermediate files due to retention policy: {self.retention_policy}")
 
         logger.info(f"Partitioned processing completed. Output: {final_output_path}")
 
