@@ -9,18 +9,25 @@
 # 5. Real DataJuicer operations
 # =============================================================================
 
-# Global parameters
-work_dir: "./outputs/demo-checkpoint-strategies"
-
-# Separate storage configuration (optional)
-# Event logs: Fast storage (SSD, local disk) - small files, frequent writes
-event_log_dir: "/tmp/fast_event_logs"  # Optional: separate fast storage for event logs
-
-# Checkpoints: Large storage (HDD, network storage) - large files, infrequent writes
-checkpoint_dir: "/tmp/large_checkpoints"  # Optional: separate large storage for checkpoints
+# Data location configuration (Mandatory)
+dataset_path: './demos/data/demo-dataset.jsonl'
+work_dir: "./outputs/partition-checkpoint-eventlog/{job_id}"
+export_path: '{work_dir}/processed.jsonl'
 
 # Executor configuration
 executor_type: "ray_partitioned"  # Use our enhanced partitioned executor
+ray_address: "auto"
+np: 2  # Number of Ray workers
+
+# Separate storage configuration
+# Partition directory (Optional) is used to store the partitions of the dataset if using ray_partitioned executor
+partition_dir: "{work_dir}/partitions"
+
+# Event logs: Fast storage (SSD, local disk) - small files, frequent writes (Optional)
+event_log_dir: "{work_dir}/event_logs"  # Optional: separate fast storage for event logs
+
+# Checkpoints: Large storage (HDD, network storage) - large files, infrequent writes (Optional)
+checkpoint_dir: "{work_dir}/checkpoints"  # Optional: separate large storage for checkpoints
 
 
 # Intermediate storage configuration for partition and checkpoint data (format, compression, and lifecycle management)
@@ -62,7 +69,7 @@ partition:
 # Checkpoint configuration
 checkpoint:
   enabled: true
-  strategy: "every_op"  # every_op, every_partition, every_n_ops, manual, disabled
+  strategy: "manual"  # every_op, every_partition, every_n_ops, manual, disabled
   n_ops: 2  # For every_n_ops strategy
   op_names: ["clean_links_mapper", "whitespace_normalization_mapper"]  # For manual strategy
 
@@ -72,13 +79,6 @@ event_logging:
   max_log_size_mb: 100
   backup_count: 5
 
-# Ray configuration
-ray_address: "auto"
-np: 2  # Number of Ray workers
-
-# Dataset configuration
-dataset_path: './demos/data/demo-dataset.jsonl'
-export_path: './outputs/demo-checkpoint-strategies/processed.jsonl'
 
 # Process pipeline with real DataJuicer operations
 process:
