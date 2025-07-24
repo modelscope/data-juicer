@@ -102,6 +102,8 @@ def init_sandbox_configs(args=None):
         "'any': any satisfied target is OK. ",
     )
 
+    parser.add_argument("--iter_updater", type=dict, default={}, help="The updater for iterative running. ")
+
     try:
         cfg = parser.parse_args(args=args)
 

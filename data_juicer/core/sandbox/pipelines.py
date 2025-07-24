@@ -334,6 +334,9 @@ class SandBoxExecutor:
 
         self.iter_targets_mode = self.cfg.get("iter_targets_mode", "all")
 
+        # iterative updater for config arguments
+        self.iter_updater = self.cfg.get("iter_updater", {})
+
     def parse_pipelines(self, cfg):
         """
         Parse the pipeline configs.
@@ -363,6 +366,44 @@ class SandBoxExecutor:
             pipeline = SandboxPipeline(pipeline_cfg=self.specify_jobs_configs(cfg), watcher=self.watcher)
             pipelines.append(pipeline)
         return pipelines
+
+    def iterative_update_pipelines(self, current_pipelines: List[SandboxPipeline], last_context_infos: ContextInfos):
+        if current_pipelines is None:
+            return None
+        if last_context_infos is None or len(last_context_infos) == 0:
+            return current_pipelines
+
+        # get the pipeline configs
+        for from_key, target_key in self.iter_updater.items():
+            from_value = last_context_infos[from_key]
+            if from_value is not None:
+                cfg_levels = target_key.split(".")
+                if len(cfg_levels) < 4:
+                    logger.error(
+                        f"The target key [{target_key}] must be in the format of "
+                        f"<pipeline_name>.<hook_meta_name>.[extra_configs|dj_configs].<hook_cfg_key1>[.<hook_cfg_keyn>]."
+                    )
+                    return current_pipelines
+                tgt_pipeline_name = cfg_levels[0]
+                tgt_hook_meta_name = cfg_levels[1]
+                tgt_local_key = ".".join(cfg_levels[2:])
+                for i in range(len(current_pipelines)):
+                    current_pipeline = current_pipelines[i]
+                    if current_pipeline.name == tgt_pipeline_name:
+                        all_hooks = (
+                            current_pipeline.probe_jobs
+                            + current_pipeline.refine_recipe_jobs
+                            + current_pipeline.execution_jobs
+                            + current_pipeline.evaluation_jobs
+                        )
+                        for hook in all_hooks:
+                            if hook.meta_name == tgt_hook_meta_name:
+                                # put the updated configs key/values into the local settings
+                                hook.local_settings[tgt_local_key] = from_value
+                    current_pipeline[i] = current_pipeline
+            else:
+                logger.warning(f"The iter_updater [{from_key}] is not found in the last context infos.")
+        return current_pipelines
 
     def specify_job_configs(self, ori_config):
         config = prepare_side_configs(ori_config)
@@ -442,6 +483,7 @@ class SandBoxExecutor:
             current_iter = 0
 
         try:
+            current_pipelines = self.pipelines
             while True:
                 current_iter += 1
                 logger.info(f"Starting the iter {current_iter}...")
@@ -449,7 +491,7 @@ class SandBoxExecutor:
                     context_infos = last_context_infos
                 else:
                     context_infos = ContextInfos(iter=current_iter)
-                for pipeline in self.pipelines:
+                for pipeline in current_pipelines:
                     if num_pipeline_skip > 0:
                         num_pipeline_skip -= 1
                         continue
@@ -474,6 +516,10 @@ class SandBoxExecutor:
                             satisfied_targets = [str(self.iter_targets[idx]) for idx in satisfied_idxes]
                             logger.info(f"Targets {satisfied_targets} are satisfied.")
                             break
+
+                # check if there are any arguments to be updated from the last iteration
+                if len(self.iter_updater) > 0:
+                    current_pipelines = self.iterative_update_pipelines(current_pipelines, context_infos)
         finally:
             # export context infos
             with open(context_infos_path, "w") as fout:
