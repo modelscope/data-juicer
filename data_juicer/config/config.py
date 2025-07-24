@@ -6,8 +6,10 @@ import shutil
 import sys
 import tempfile
 import time
+import uuid
 from argparse import ArgumentError
 from contextlib import contextmanager
+from datetime import datetime
 from typing import Dict, List, Optional, Union
 
 import yaml
@@ -672,6 +674,13 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 help="Use memory mapping for Arrow files (legacy flat config)",
             )
 
+            parser.add_argument(
+                "--partition_dir",
+                type=str,
+                default=None,
+                help="Directory to store partition files. Supports {work_dir} placeholder. If not set, defaults to {work_dir}/partitions.",
+            )
+
             parser.add_argument("--debug", action="store_true", help="Whether to run in debug mode.")
 
             # Filter out non-essential arguments for initial parsing
@@ -783,10 +792,55 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
     cfg.export_path = os.path.abspath(cfg.export_path)
     if cfg.work_dir is None:
         cfg.work_dir = os.path.dirname(cfg.export_path)
+
+    # 1. job_id logic
+    job_id = getattr(cfg, "job_id", None)
+    if not job_id:
+        # Only auto-generate if {job_id} is in work_dir or any relevant path
+        needs_job_id = False
+        for key in ["work_dir", "export_path", "event_log_dir", "checkpoint_dir", "partition_dir"]:
+            val = getattr(cfg, key, None)
+            if isinstance(val, str) and "{job_id}" in val:
+                needs_job_id = True
+        if needs_job_id:
+            timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+            short_hash = uuid.uuid4().hex[:6]
+            job_id = f"{timestamp}_{short_hash}"
+            setattr(cfg, "job_id", job_id)
+    # 2. placeholder map
+    placeholder_map = {"work_dir": cfg.work_dir, "job_id": getattr(cfg, "job_id", "")}
+    # 3. substitute placeholders in all relevant paths (change-detection loop)
+    max_passes = 10
+    for _ in range(max_passes):
+        changed = False
+        for key in ["work_dir", "event_log_dir", "checkpoint_dir", "export_path", "dataset_path", "partition_dir"]:
+            val = getattr(cfg, key, None)
+            if isinstance(val, str):
+                new_val = val.format(**placeholder_map)
+                if new_val != val:
+                    setattr(cfg, key, new_val)
+                    changed = True
+        # update placeholder_map in case work_dir or job_id changed
+        placeholder_map = {"work_dir": cfg.work_dir, "job_id": getattr(cfg, "job_id", "")}
+        if not changed:
+            break
+    else:
+        raise RuntimeError("Too many placeholder substitution passes (possible recursive placeholders?)")
+
     timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))
     if not load_configs_only:
         export_rel_path = os.path.relpath(cfg.export_path, start=cfg.work_dir)
         log_dir = os.path.join(cfg.work_dir, "log")
+
+        print(f"work_dir: {cfg.work_dir}")
+        print(f"event_log_dir: {cfg.event_log_dir}")
+        print(f"checkpoint_dir: {cfg.checkpoint_dir}")
+        print(f"export_path: {cfg.export_path}")
+        print(f"dataset_path: {cfg.dataset_path}")
+        print(f"partition_dir: {cfg.partition_dir}")
+        print(f"log_dir: {log_dir}")
+        print(f"export_rel_path: {export_rel_path}")
+
         if not os.path.exists(log_dir):
             os.makedirs(log_dir, exist_ok=True)
         logfile_name = f"export_{export_rel_path}_time_{timestamp}.txt"
