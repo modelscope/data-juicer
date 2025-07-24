@@ -1,4 +1,3 @@
-from copy import deepcopy
 from typing import Any, List
 
 
@@ -156,8 +155,8 @@ class GlobalContextInfos:
 
     def __getitem__(self, item):
         if isinstance(item, slice):
-            new_obj = deepcopy(self)
-            new_obj.context_infos = new_obj.context_infos[item]
+            self.context_infos = self.context_infos[item]
+            return self
         else:
             return self.context_infos[item]
 

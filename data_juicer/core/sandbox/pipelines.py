@@ -404,6 +404,7 @@ class SandBoxExecutor:
     def run(self):
         context_infos_path = os.path.join(self.cfg.work_dir, "context_infos.json")
         num_pipeline_skip = 0
+        last_context_infos = ContextInfos(iter=0)
         if self.resume and os.path.exists(context_infos_path):
             # load context infos from the existing one
             context_infos_list = json.load(open(context_infos_path, "r"))
@@ -445,8 +446,7 @@ class SandBoxExecutor:
                 current_iter += 1
                 logger.info(f"Starting the iter {current_iter}...")
                 if num_pipeline_skip > 0:
-                    context_infos = context_infos_list[-1]
-                    context_infos_list = context_infos_list[:-1]
+                    context_infos = last_context_infos
                 else:
                     context_infos = ContextInfos(iter=current_iter)
                 for pipeline in self.pipelines:
