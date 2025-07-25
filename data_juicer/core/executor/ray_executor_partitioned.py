@@ -207,29 +207,17 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         # Initialize dataset builder
         self.datasetbuilder = DatasetBuilder(self.cfg, executor_type="ray")
 
-        # Remove all legacy directory and log file assignments and creation
-        self.partitions_dir = getattr(self.cfg, "partition_dir", None)
-        if not self.partitions_dir:
-            self.partitions_dir = os.path.join(self.work_dir, "partitions")
-        self.intermediate_dir = getattr(self.cfg, "intermediate_dir", None)
-        if not self.intermediate_dir:
-            self.intermediate_dir = os.path.join(self.work_dir, "intermediate")
-        self.checkpoint_dir = getattr(self.cfg, "checkpoint_dir", None)
-        if not self.checkpoint_dir:
-            self.checkpoint_dir = os.path.join(self.work_dir, "checkpoints")
-        self.results_dir = getattr(self.cfg, "results_dir", None)
-        if not self.results_dir:
-            self.results_dir = os.path.join(self.work_dir, "results")
-        self.metadata_dir = getattr(self.cfg, "metadata_dir", None)
-        if not self.metadata_dir:
-            self.metadata_dir = os.path.join(self.work_dir, "metadata")
-        self.logs_dir = getattr(self.cfg, "event_log_dir", None)
-        if not self.logs_dir:
-            self.logs_dir = os.path.join(self.work_dir, "logs")
-        self.events_file = os.path.join(self.logs_dir, "processing_events.jsonl")
+        # Use resolved directory paths from config (already handled by config.py)
+        self.partitions_dir = self.cfg.partition_dir
+        self.intermediate_dir = self.cfg.intermediate_dir
+        self.checkpoint_dir = self.cfg.checkpoint_dir
+        self.results_dir = self.cfg.results_dir
+        self.metadata_dir = self.cfg.metadata_dir
+        self.logs_dir = self.cfg.event_log_dir
+        self.events_file = self.cfg.event_log_file
         self.summary_file = os.path.join(self.logs_dir, "processing_summary.json")
 
-        # Create directories
+        # Create directories (already created by config.py, but ensure they exist)
         for dir_path in [
             self.partitions_dir,
             self.intermediate_dir,
@@ -260,17 +248,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         # Dataset mapping
         self.dataset_mapping: Optional[DatasetMapping] = None
-
-    def _get_job_specific_paths(self):
-        """Return resolved job-specific directory paths from cfg."""
-        return {
-            "checkpoint_dir": self.cfg.checkpoint_dir,
-            "metadata_dir": self.cfg.metadata_dir,
-            "partitions_dir": self.cfg.partition_dir,
-            "intermediate_dir": self.cfg.intermediate_dir,
-            "results_dir": self.cfg.results_dir,
-            "event_log_dir": self.cfg.event_log_dir,
-        }
 
     def _should_checkpoint(self, op_idx: int, op_name: str, partition_id: int) -> bool:
         """Determine if checkpoint should be created based on configuration strategy."""
@@ -850,9 +827,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
     def _create_job_summary(self, job_id: str, job_dir: str):
         """Create and display job summary for easy resumption."""
-        event_log_dir = os.path.join(job_dir, "event_logs")
-        checkpoint_dir = os.path.join(job_dir, "checkpoints")
-        metadata_dir = os.path.join(job_dir, "metadata")
+        # Use already-resolved paths from config
         job_summary = {
             "job_id": job_id,
             "start_time": time.time(),
@@ -862,17 +837,16 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             "executor_type": getattr(self, "executor_type", "unknown"),
             "status": "running",
             "resumption_command": f"dj-process --config {getattr(self.cfg, 'config', 'config.yaml')} --job_id {job_id}",
-            "event_log_file": os.path.join(event_log_dir, "events.jsonl"),
-            "event_log_dir": event_log_dir,
-            "checkpoint_dir": checkpoint_dir,
-            "metadata_dir": metadata_dir,
+            "event_log_file": self.cfg.event_log_file,
+            "event_log_dir": self.cfg.event_log_dir,
+            "checkpoint_dir": self.cfg.checkpoint_dir,
+            "metadata_dir": self.cfg.metadata_dir,
         }
-        os.makedirs(event_log_dir, exist_ok=True)
-        os.makedirs(checkpoint_dir, exist_ok=True)
-        os.makedirs(metadata_dir, exist_ok=True)
-        summary_file = os.path.join(job_dir, "job_summary.json")
-        with open(summary_file, "w") as f:
+
+        # Write job summary to the already-resolved job_summary_file path
+        with open(self.cfg.job_summary_file, "w") as f:
             json.dump(job_summary, f, indent=2, default=str)
+
         logger.info("=" * 60)
         logger.info("DataJuicer Job Started")
         logger.info("=" * 60)
@@ -880,9 +854,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         logger.info(f"Job Directory: {job_dir}")
         logger.info(f"Work Directory: {self.work_dir}")
         logger.info(f"Event Logs: {job_summary['event_log_file']}")
-        logger.info(f"Checkpoints: {checkpoint_dir}")
-        logger.info(f"Event Log Storage: {event_log_dir}")
-        logger.info(f"Checkpoint Storage: {checkpoint_dir}")
+        logger.info(f"Checkpoints: {self.cfg.checkpoint_dir}")
+        logger.info(f"Event Log Storage: {self.cfg.event_log_dir}")
+        logger.info(f"Checkpoint Storage: {self.cfg.checkpoint_dir}")
         logger.info("=" * 60)
         logger.info("To resume this job later, use:")
         logger.info(f"  {job_summary['resumption_command']}")
@@ -899,6 +873,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         Returns:
             Processed dataset
         """
+        # Create job summary at the start of the run
+        self._create_job_summary(self.cfg.job_id, self.cfg.job_dir)
+
         # 1. Load dataset
         logger.info("Loading dataset with Ray...")
         dataset = self.datasetbuilder.load_dataset(num_proc=load_data_np)
