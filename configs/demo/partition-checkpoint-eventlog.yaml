@@ -69,9 +69,7 @@ partition:
 # Checkpoint configuration
 checkpoint:
   enabled: true
-  strategy: "manual"  # every_op, every_partition, every_n_ops, manual, disabled
-  n_ops: 2  # For every_n_ops strategy
-  op_names: ["clean_links_mapper", "whitespace_normalization_mapper"]  # For manual strategy
+  strategy: "every_op"  # every_op, every_partition, every_n_ops, manual, disabled
 
 # Event logging configuration
 event_logging:
