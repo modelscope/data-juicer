@@ -40,9 +40,14 @@ class DefaultExecutor(ExecutorBase):
         """
         super().__init__(cfg)
         self.executor_type = "default"
+        # If work_dir contains job_id, all outputs go under it
         self.work_dir = self.cfg.work_dir
+        # Checkpoint directory
+        self.ckpt_dir = os.path.join(self.work_dir, "ckpt")
+        # Tracer directory
+        if self.open_tracer:
+            self.tracer = Tracer(self.work_dir, show_num=self.cfg.trace_num)
 
-        self.tracer = None
         self.ckpt_manager = None
 
         self.adapter = Adapter(self.cfg)
@@ -62,7 +67,6 @@ class DefaultExecutor(ExecutorBase):
         # have been processed will be skipped.
         if self.cfg.use_checkpoint:
             logger.info("Preparing checkpoint manager...")
-            self.ckpt_dir = os.path.join(self.work_dir, "ckpt")
             self.ckpt_manager = CheckpointManager(self.ckpt_dir, self.cfg.process, self.cfg.np)
             if self.ckpt_manager.ckpt_available:
                 logger.info("Found existed dataset checkpoint.")

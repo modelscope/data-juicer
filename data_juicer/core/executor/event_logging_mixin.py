@@ -396,8 +396,10 @@ class EventLoggingMixin:
         job_id = getattr(self.cfg, "job_id", None)
 
         # Create job-specific directory structure
-        if job_id:
-            # Use provided job_id
+        if job_id and (self.work_dir.endswith(job_id) or os.path.basename(self.work_dir) == job_id):
+            # work_dir already includes job_id
+            job_dir = self.work_dir
+        elif job_id:
             job_dir = os.path.join(self.work_dir, job_id)
         else:
             # Auto-generate job_id with timestamp and config name
@@ -410,108 +412,31 @@ class EventLoggingMixin:
         # Create job directory and subdirectories
         os.makedirs(job_dir, exist_ok=True)
 
-        # Determine event log directory - use configured path if available
-        event_log_dir = getattr(self.cfg, "event_log_dir", None)
-        if event_log_dir:
-            # Use configured event log directory with job subdirectory
-            event_logs_dir = os.path.join(event_log_dir, job_id, "event_logs")
-        else:
-            # Use job-specific directory
-            event_logs_dir = os.path.join(job_dir, "event_logs")
-
-        os.makedirs(event_logs_dir, exist_ok=True)
-
-        # Setup event logger in the determined directory
+        # Use resolved event log directory from config
+        event_log_dir = self.cfg.event_log_dir
+        os.makedirs(event_log_dir, exist_ok=True)
         max_log_size = event_config.get("max_log_size_mb", 100)
         backup_count = event_config.get("backup_count", 5)
-
-        self.event_logger = EventLogger(event_logs_dir, max_log_size, backup_count, job_id=job_id)
+        self.event_logger = EventLogger(event_log_dir, max_log_size, backup_count, job_id=job_id)
 
         # If job_id is provided, validate resumption
         if getattr(self.cfg, "job_id", None):
             if not self._validate_job_resumption(job_id):
                 logger.warning("Job resumption validation failed, continuing with new job")
 
-        # Create and display job summary
-        self._create_job_summary(job_id, job_dir)
-
         # Log initialization
         self._log_event(EventType.INFO, f"Event logging initialized for {self.executor_type} executor")
 
-    def _create_job_summary(self, job_id: str, job_dir: str):
-        """Create and display job summary for easy resumption."""
-        # Get separate storage paths if configured
-        event_log_dir = getattr(self.cfg, "event_log_dir", None)
-        checkpoint_dir = getattr(self.cfg, "checkpoint_dir", None)
-
-        # Use configured paths or fall back to job-specific directories
-        if event_log_dir:
-            # Use configured event log directory with job subdirectory
-            job_event_log_dir = os.path.join(event_log_dir, job_id, "event_logs")
-        else:
-            # Use job-specific directory
-            job_event_log_dir = os.path.join(job_dir, "event_logs")
-
-        if checkpoint_dir:
-            # Use configured checkpoint directory with job subdirectory
-            job_checkpoint_dir = os.path.join(checkpoint_dir, job_id)
-        else:
-            # Use job-specific directory
-            job_checkpoint_dir = os.path.join(job_dir, "checkpoints")
-
-        job_metadata_dir = os.path.join(job_dir, "metadata")
-
-        job_summary = {
-            "job_id": job_id,
-            "start_time": time.time(),
-            "work_dir": self.work_dir,
-            "job_dir": job_dir,
-            "config_file": getattr(self.cfg, "config", None),
-            "executor_type": getattr(self, "executor_type", "unknown"),
-            "status": "running",
-            "resumption_command": f"dj-process --config {getattr(self.cfg, 'config', 'config.yaml')} --job_id {job_id}",
-            "event_log_file": os.path.join(job_event_log_dir, "events.jsonl"),
-            "event_log_dir": job_event_log_dir,
-            "checkpoint_dir": job_checkpoint_dir,
-            "metadata_dir": job_metadata_dir,
-            "storage_config": {
-                "event_log_dir": event_log_dir,
-                "checkpoint_dir": checkpoint_dir,
-            },
-        }
-
-        # Create directories
-        os.makedirs(job_event_log_dir, exist_ok=True)
-        os.makedirs(job_checkpoint_dir, exist_ok=True)
-        os.makedirs(job_metadata_dir, exist_ok=True)
-
-        # Save job summary in job-specific directory
-        summary_file = os.path.join(job_dir, "job_summary.json")
-        with open(summary_file, "w") as f:
-            json.dump(job_summary, f, indent=2, default=str)
-
-        # Display job info to user
-        logger.info("=" * 60)
-        logger.info("DataJuicer Job Started")
-        logger.info("=" * 60)
-        logger.info(f"Job ID: {job_id}")
-        logger.info(f"Job Directory: {job_dir}")
-        logger.info(f"Work Directory: {self.work_dir}")
-        logger.info(f"Event Logs: {job_summary['event_log_file']}")
-        logger.info(f"Checkpoints: {job_checkpoint_dir}")
-        if event_log_dir:
-            logger.info(f"Event Log Storage: {event_log_dir} (configured)")
-        if checkpoint_dir:
-            logger.info(f"Checkpoint Storage: {checkpoint_dir} (configured)")
-        logger.info("=" * 60)
-        logger.info("To resume this job later, use:")
-        logger.info(f"  {job_summary['resumption_command']}")
-        logger.info("=" * 60)
+    # Remove _create_job_summary and all calls to it from EventLoggingMixin
 
     def _update_job_summary(self, status: str, end_time: Optional[float] = None, error_message: Optional[str] = None):
         """Update job summary with completion status."""
         job_id = self.event_logger.job_id
-        job_dir = os.path.join(self.work_dir, job_id)
+        job_dir = (
+            self.work_dir
+            if self.work_dir.endswith(job_id) or os.path.basename(self.work_dir) == job_id
+            else os.path.join(self.work_dir, job_id)
+        )
         summary_file = os.path.join(job_dir, "job_summary.json")
 
         if not os.path.exists(summary_file):
@@ -554,7 +479,11 @@ class EventLoggingMixin:
         if not job_id:
             return None
 
-        job_dir = os.path.join(self.work_dir, job_id)
+        job_dir = (
+            self.work_dir
+            if self.work_dir.endswith(job_id) or os.path.basename(self.work_dir) == job_id
+            else os.path.join(self.work_dir, job_id)
+        )
         summary_file = os.path.join(job_dir, "job_summary.json")
 
         if os.path.exists(summary_file):

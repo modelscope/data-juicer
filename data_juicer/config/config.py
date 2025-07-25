@@ -793,44 +793,14 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
     if cfg.work_dir is None:
         cfg.work_dir = os.path.dirname(cfg.export_path)
 
-    # 1. job_id logic
-    job_id = getattr(cfg, "job_id", None)
-    if not job_id:
-        # Only auto-generate if {job_id} is in work_dir or any relevant path
-        needs_job_id = False
-        for key in ["work_dir", "export_path", "event_log_dir", "checkpoint_dir", "partition_dir"]:
-            val = getattr(cfg, key, None)
-            if isinstance(val, str) and "{job_id}" in val:
-                needs_job_id = True
-        if needs_job_id:
-            timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-            short_hash = uuid.uuid4().hex[:6]
-            job_id = f"{timestamp}_{short_hash}"
-            setattr(cfg, "job_id", job_id)
-    # 2. placeholder map
-    placeholder_map = {"work_dir": cfg.work_dir, "job_id": getattr(cfg, "job_id", "")}
-    # 3. substitute placeholders in all relevant paths (change-detection loop)
-    max_passes = 10
-    for _ in range(max_passes):
-        changed = False
-        for key in ["work_dir", "event_log_dir", "checkpoint_dir", "export_path", "dataset_path", "partition_dir"]:
-            val = getattr(cfg, key, None)
-            if isinstance(val, str):
-                new_val = val.format(**placeholder_map)
-                if new_val != val:
-                    setattr(cfg, key, new_val)
-                    changed = True
-        # update placeholder_map in case work_dir or job_id changed
-        placeholder_map = {"work_dir": cfg.work_dir, "job_id": getattr(cfg, "job_id", "")}
-        if not changed:
-            break
-    else:
-        raise RuntimeError("Too many placeholder substitution passes (possible recursive placeholders?)")
+    # Call resolve_job_directories to finalize all job-related paths
+    cfg = resolve_job_id(cfg)
+    cfg = resolve_job_directories(cfg)
 
     timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))
     if not load_configs_only:
         export_rel_path = os.path.relpath(cfg.export_path, start=cfg.work_dir)
-        log_dir = os.path.join(cfg.work_dir, "log")
+        # log_dir = os.path.join(cfg.work_dir, "log")  # Remove legacy log_dir
 
         print(f"work_dir: {cfg.work_dir}")
         print(f"event_log_dir: {cfg.event_log_dir}")
@@ -838,14 +808,14 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         print(f"export_path: {cfg.export_path}")
         print(f"dataset_path: {cfg.dataset_path}")
         print(f"partition_dir: {cfg.partition_dir}")
-        print(f"log_dir: {log_dir}")
+        # print(f"log_dir: {log_dir}")  # Remove legacy log_dir print
         print(f"export_rel_path: {export_rel_path}")
 
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir, exist_ok=True)
+        if not os.path.exists(cfg.event_log_dir):
+            os.makedirs(cfg.event_log_dir, exist_ok=True)
         logfile_name = f"export_{export_rel_path}_time_{timestamp}.txt"
         setup_logger(
-            save_dir=log_dir,
+            save_dir=cfg.event_log_dir,
             filename=logfile_name,
             level="DEBUG" if cfg.debug else "INFO",
             redirect=cfg.executor_type == "default",
@@ -1369,4 +1339,68 @@ def prepare_cfgs_for_export(cfg):
     for op in OPERATORS.modules.keys():
         if op in cfg:
             _ = cfg.pop(op)
+    return cfg
+
+
+def resolve_job_id(cfg):
+    """Resolve or auto-generate job_id and set it on cfg."""
+    job_id = getattr(cfg, "job_id", None)
+    # Only auto-generate if {job_id} is in work_dir or any relevant path
+    needs_job_id = False
+    for key in ["work_dir", "export_path", "event_log_dir", "checkpoint_dir", "partition_dir"]:
+        val = getattr(cfg, key, None)
+        if isinstance(val, str) and "{job_id}" in val:
+            needs_job_id = True
+    if not job_id and needs_job_id:
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        short_hash = uuid.uuid4().hex[:6]
+        job_id = f"{timestamp}_{short_hash}"
+        setattr(cfg, "job_id", job_id)
+    elif not job_id:
+        # fallback: use timestamp+hash always if not set
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        short_hash = uuid.uuid4().hex[:6]
+        job_id = f"{timestamp}_{short_hash}"
+        setattr(cfg, "job_id", job_id)
+    return cfg
+
+
+def resolve_job_directories(cfg):
+    """Centralize directory resolution and placeholder substitution. Assumes job_id is already set."""
+    # 1. placeholder map
+    placeholder_map = {"work_dir": cfg.work_dir, "job_id": getattr(cfg, "job_id", "")}
+    # 2. substitute placeholders in all relevant paths (change-detection loop)
+    max_passes = 10
+    for _ in range(max_passes):
+        changed = False
+        for key in ["work_dir", "event_log_dir", "checkpoint_dir", "export_path", "dataset_path", "partition_dir"]:
+            val = getattr(cfg, key, None)
+            if isinstance(val, str):
+                new_val = val.format(**placeholder_map)
+                if new_val != val:
+                    setattr(cfg, key, new_val)
+                    changed = True
+        # update placeholder_map in case work_dir or job_id changed
+        placeholder_map = {"work_dir": cfg.work_dir, "job_id": getattr(cfg, "job_id", "")}
+        if not changed:
+            break
+    else:
+        raise RuntimeError("Too many placeholder substitution passes (possible recursive placeholders?)")
+    # 3. directory resolution
+    job_id = getattr(cfg, "job_id", None)
+    if not job_id:
+        raise ValueError("job_id must be set before resolving job directories.")
+    if cfg.work_dir.endswith(job_id) or os.path.basename(cfg.work_dir) == job_id:
+        job_dir = cfg.work_dir
+    else:
+        job_dir = os.path.join(cfg.work_dir, job_id)
+    cfg.job_dir = job_dir
+    cfg.event_log_dir = os.path.join(job_dir, "event_logs")
+    cfg.checkpoint_dir = os.path.join(job_dir, "checkpoints")
+    cfg.partition_dir = os.path.join(job_dir, "partitions")
+    cfg.metadata_dir = os.path.join(job_dir, "metadata")
+    cfg.intermediate_dir = os.path.join(job_dir, "intermediate")
+    cfg.results_dir = os.path.join(job_dir, "results")
+    cfg.event_log_file = os.path.join(cfg.event_log_dir, "events.jsonl")
+    cfg.job_summary_file = os.path.join(job_dir, "job_summary.json")
     return cfg

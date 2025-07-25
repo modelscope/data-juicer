@@ -207,12 +207,27 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         # Initialize dataset builder
         self.datasetbuilder = DatasetBuilder(self.cfg, executor_type="ray")
 
-        # Partition management directories
-        self.partitions_dir = os.path.join(self.work_dir, "partitions")
-        self.intermediate_dir = os.path.join(self.work_dir, "intermediate")
-        self.checkpoint_dir = os.path.join(self.work_dir, "checkpoints")
-        self.results_dir = os.path.join(self.work_dir, "results")
-        self.metadata_dir = os.path.join(self.work_dir, "metadata")
+        # Remove all legacy directory and log file assignments and creation
+        self.partitions_dir = getattr(self.cfg, "partition_dir", None)
+        if not self.partitions_dir:
+            self.partitions_dir = os.path.join(self.work_dir, "partitions")
+        self.intermediate_dir = getattr(self.cfg, "intermediate_dir", None)
+        if not self.intermediate_dir:
+            self.intermediate_dir = os.path.join(self.work_dir, "intermediate")
+        self.checkpoint_dir = getattr(self.cfg, "checkpoint_dir", None)
+        if not self.checkpoint_dir:
+            self.checkpoint_dir = os.path.join(self.work_dir, "checkpoints")
+        self.results_dir = getattr(self.cfg, "results_dir", None)
+        if not self.results_dir:
+            self.results_dir = os.path.join(self.work_dir, "results")
+        self.metadata_dir = getattr(self.cfg, "metadata_dir", None)
+        if not self.metadata_dir:
+            self.metadata_dir = os.path.join(self.work_dir, "metadata")
+        self.logs_dir = getattr(self.cfg, "event_log_dir", None)
+        if not self.logs_dir:
+            self.logs_dir = os.path.join(self.work_dir, "logs")
+        self.events_file = os.path.join(self.logs_dir, "processing_events.jsonl")
+        self.summary_file = os.path.join(self.logs_dir, "processing_summary.json")
 
         # Create directories
         for dir_path in [
@@ -221,14 +236,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             self.checkpoint_dir,
             self.results_dir,
             self.metadata_dir,
+            self.logs_dir,
         ]:
             os.makedirs(dir_path, exist_ok=True)
-
-        # Event logging directory
-        self.logs_dir = os.path.join(self.work_dir, "logs")
-        os.makedirs(self.logs_dir, exist_ok=True)
-        self.events_file = os.path.join(self.logs_dir, "processing_events.jsonl")
-        self.summary_file = os.path.join(self.logs_dir, "processing_summary.json")
 
         # Initialize event logging summary
         self.event_summary = {
@@ -252,54 +262,15 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         self.dataset_mapping: Optional[DatasetMapping] = None
 
     def _get_job_specific_paths(self):
-        """Get job-specific directory paths if event logging is enabled."""
-        if hasattr(self, "event_logger") and self.event_logger:
-            # Use job-specific directories
-            job_id = self.event_logger.job_id
-            job_dir = os.path.join(self.work_dir, job_id)
-
-            # Use configured checkpoint directory if available
-            checkpoint_dir = getattr(self.cfg, "checkpoint_dir", None)
-            if checkpoint_dir:
-                job_checkpoint_dir = os.path.join(checkpoint_dir, job_id)
-            else:
-                job_checkpoint_dir = os.path.join(job_dir, "checkpoints")
-
-            return {
-                "checkpoint_dir": job_checkpoint_dir,
-                "metadata_dir": os.path.join(job_dir, "metadata"),
-                "partitions_dir": os.path.join(job_dir, "partitions"),
-                "intermediate_dir": os.path.join(job_dir, "intermediate"),
-                "results_dir": os.path.join(job_dir, "results"),
-            }
-        else:
-            # Use shared directories (backward compatibility)
-            return {
-                "checkpoint_dir": os.path.join(self.work_dir, "checkpoints"),
-                "metadata_dir": os.path.join(self.work_dir, "metadata"),
-                "partitions_dir": os.path.join(self.work_dir, "partitions"),
-                "intermediate_dir": os.path.join(self.work_dir, "intermediate"),
-                "results_dir": os.path.join(self.work_dir, "results"),
-            }
-
-    def _update_directories_for_job(self):
-        """Update directory paths to use job-specific directories if available."""
-        job_paths = self._get_job_specific_paths()
-        self.checkpoint_dir = job_paths["checkpoint_dir"]
-        self.metadata_dir = job_paths["metadata_dir"]
-        self.partitions_dir = job_paths["partitions_dir"]
-        self.intermediate_dir = job_paths["intermediate_dir"]
-        self.results_dir = job_paths["results_dir"]
-
-        # Create job-specific directories
-        for dir_path in [
-            self.checkpoint_dir,
-            self.metadata_dir,
-            self.partitions_dir,
-            self.intermediate_dir,
-            self.results_dir,
-        ]:
-            os.makedirs(dir_path, exist_ok=True)
+        """Return resolved job-specific directory paths from cfg."""
+        return {
+            "checkpoint_dir": self.cfg.checkpoint_dir,
+            "metadata_dir": self.cfg.metadata_dir,
+            "partitions_dir": self.cfg.partition_dir,
+            "intermediate_dir": self.cfg.intermediate_dir,
+            "results_dir": self.cfg.results_dir,
+            "event_log_dir": self.cfg.event_log_dir,
+        }
 
     def _should_checkpoint(self, op_idx: int, op_name: str, partition_id: int) -> bool:
         """Determine if checkpoint should be created based on configuration strategy."""
@@ -877,6 +848,46 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
             return checkpoint_data
 
+    def _create_job_summary(self, job_id: str, job_dir: str):
+        """Create and display job summary for easy resumption."""
+        event_log_dir = os.path.join(job_dir, "event_logs")
+        checkpoint_dir = os.path.join(job_dir, "checkpoints")
+        metadata_dir = os.path.join(job_dir, "metadata")
+        job_summary = {
+            "job_id": job_id,
+            "start_time": time.time(),
+            "work_dir": self.work_dir,
+            "job_dir": job_dir,
+            "config_file": getattr(self.cfg, "config", None),
+            "executor_type": getattr(self, "executor_type", "unknown"),
+            "status": "running",
+            "resumption_command": f"dj-process --config {getattr(self.cfg, 'config', 'config.yaml')} --job_id {job_id}",
+            "event_log_file": os.path.join(event_log_dir, "events.jsonl"),
+            "event_log_dir": event_log_dir,
+            "checkpoint_dir": checkpoint_dir,
+            "metadata_dir": metadata_dir,
+        }
+        os.makedirs(event_log_dir, exist_ok=True)
+        os.makedirs(checkpoint_dir, exist_ok=True)
+        os.makedirs(metadata_dir, exist_ok=True)
+        summary_file = os.path.join(job_dir, "job_summary.json")
+        with open(summary_file, "w") as f:
+            json.dump(job_summary, f, indent=2, default=str)
+        logger.info("=" * 60)
+        logger.info("DataJuicer Job Started")
+        logger.info("=" * 60)
+        logger.info(f"Job ID: {job_id}")
+        logger.info(f"Job Directory: {job_dir}")
+        logger.info(f"Work Directory: {self.work_dir}")
+        logger.info(f"Event Logs: {job_summary['event_log_file']}")
+        logger.info(f"Checkpoints: {checkpoint_dir}")
+        logger.info(f"Event Log Storage: {event_log_dir}")
+        logger.info(f"Checkpoint Storage: {checkpoint_dir}")
+        logger.info("=" * 60)
+        logger.info("To resume this job later, use:")
+        logger.info(f"  {job_summary['resumption_command']}")
+        logger.info("=" * 60)
+
     def run(self, load_data_np: Optional[PositiveInt] = None, skip_return=False):
         """
         Run the partitioned dataset processing pipeline.
@@ -906,9 +917,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 logger.warning(f"Auto-configuration failed: {e}, using default values")
                 self.partition_size = 200
                 self.max_partition_size_mb = 32
-
-        # Update directories for job-specific paths if event logging is enabled
-        self._update_directories_for_job()
 
         # 2. Extract and prepare operations
         logger.info("Preparing process operators...")
