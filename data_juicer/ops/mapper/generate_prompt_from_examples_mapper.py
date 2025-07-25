@@ -43,7 +43,7 @@ class GeneratePromptFromExamplesMapper(Mapper):
         "1. 生成的【提示词】不能与输入的【提示词】完全一致，但是需要保持格式类似。\n"
         "2. 生成的【提示词】相比于输入的【提示词】不能有很大的变化，更多应该是关键词、核心参数等方面的微调。\n"
         "3. 【提示词】后可能会有一个0到1之间的评分用于表示人类对于该【提示词】在目标任务上的评分，如有的话请参考该评分生成可以获得更高评分的【提示词】；评分为-1表示该【提示词】的人类评分缺失，忽略该评分即可。\n"
-        "4. 生成时只需生成【提示词】，不需生成其他任何额外信息（如【人类评分】等）。\n"
+        "4. 生成时只需生成带有【提示词】前缀的提示词，不需生成其他任何额外信息（如【人类评分】等）。\n"
     )
 
     DEFAULT_INPUT_TEMPLATE = "{}"
@@ -60,7 +60,7 @@ class GeneratePromptFromExamplesMapper(Mapper):
         seed_file: str = "",
         example_num: PositiveInt = 3,
         example_score_key: str = None,
-        similarity_threshold: float = 0.8,
+        similarity_threshold: float = 0.9,
         *,
         api_endpoint: Optional[str] = None,
         response_path: Optional[str] = None,
