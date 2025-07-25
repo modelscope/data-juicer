@@ -223,7 +223,10 @@ class GeneratePromptFromExamplesMapper(Mapper):
         return output_prompt
 
     def process_single(self, sample, rank=None):
-        model, _ = get_model(self.model_key, rank, self.use_cuda())
+        if self.enable_vllm or self.is_hf_model:
+            model, _ = get_model(self.model_key, rank, self.use_cuda())
+        else:
+            model = get_model(self.model_key, rank, self.use_cuda())
 
         random_prompt_samples = random.sample(self.seed_prompt_samples, self.example_num)
         input_prompt = self.build_input(random_prompt_samples)

@@ -12,13 +12,14 @@ class GeneratePromptFromExamplesMapperTest(DataJuicerTestCaseBase):
     prompt_key = 'prompt'
     root_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', '..')
 
-    def _run_op(self, model="Qwen/Qwen2.5-7B-Instruct", enable_vllm=False, sampling_params=None, num_proc=1):
+    def _run_op(self, model="Qwen/Qwen2.5-7B-Instruct", enable_vllm=False, is_hf_model=True, sampling_params=None, num_proc=1):
         op = GeneratePromptFromExamplesMapper(
             api_or_hf_model=model,
             seed_file=os.path.join(self.root_path, 'demos/data/demo-dataset-prompts.jsonl'),
             example_num=3,
             example_score_key="score",
             enable_vllm=enable_vllm,
+            is_hf_model=is_hf_model,
             sampling_params=sampling_params,
         )
 
@@ -37,7 +38,7 @@ class GeneratePromptFromExamplesMapperTest(DataJuicerTestCaseBase):
 
     def test_api_model(self):
         sampling_params = {'max_new_tokens': 200}
-        self._run_op(model="qwen2.5-72b-instruct", sampling_params=sampling_params)
+        self._run_op(model="qwen2.5-72b-instruct", is_hf_model=False, sampling_params=sampling_params)
 
 
 if __name__ == '__main__':
