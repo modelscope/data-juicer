@@ -28,7 +28,7 @@ dependencies = [
     "zstandard",  # compression
     "lz4",  # compression
     "multiprocess==0.70.12",  # parallel processing
-    "dill==0.3.4",  # serialization
+    "dill==0.3.8",  # serialization
     "psutil",  # system monitoring
     "pydantic>=2.0",  # data validation
     "uv",
