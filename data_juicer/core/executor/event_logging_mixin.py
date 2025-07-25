@@ -81,6 +81,13 @@ class Event:
     metadata: Optional[Dict[str, Any]] = None
     resource_usage: Optional[Dict[str, Any]] = None
     performance_metrics: Optional[Dict[str, Any]] = None
+    total_partitions: Optional[int] = None
+    successful_partitions: Optional[int] = None
+    failed_partitions: Optional[int] = None
+    job_duration: Optional[float] = None
+    completion_time: Optional[float] = None
+    failure_time: Optional[float] = None
+    error_type: Optional[str] = None
 
 
 class EventLogger:
@@ -165,7 +172,7 @@ class EventLogger:
                 self.resource_usage[event.operation_name or "unknown"].append(event.resource_usage)
 
     def _format_event_for_logging(self, event: Event) -> str:
-        """Format event for logging."""
+        """Format event for logging with enhanced details."""
         parts = [f"EVENT[{event.event_type.value}]", f"TIME[{datetime.fromtimestamp(event.timestamp).isoformat()}]"]
 
         if event.partition_id is not None:
@@ -173,17 +180,41 @@ class EventLogger:
 
         if event.operation_name:
             parts.append(f"OP[{event.operation_name}]")
+            if event.operation_idx is not None:
+                parts.append(f"OP_IDX[{event.operation_idx}]")
 
         if event.duration is not None:
             parts.append(f"DURATION[{event.duration:.3f}s]")
+
+        # Add performance metrics if available
+        if event.performance_metrics:
+            metrics = event.performance_metrics
+            if "throughput" in metrics and metrics["throughput"] > 0:
+                parts.append(f"THROUGHPUT[{metrics['throughput']:.1f} rows/s]")
+            if "input_rows" in metrics and "output_rows" in metrics:
+                parts.append(f"ROWS[{metrics['input_rows']}→{metrics['output_rows']}]")
+            if "reduction_ratio" in metrics:
+                parts.append(f"REDUCTION[{metrics['reduction_ratio']:.2%}]")
 
         parts.append(f"MSG[{event.message}]")
 
         if event.error_message:
             parts.append(f"ERROR[{event.error_message}]")
 
+        if event.checkpoint_path:
+            parts.append(f"CHECKPOINT[{os.path.basename(event.checkpoint_path)}]")
+
+        if event.output_path:
+            parts.append(f"OUTPUT[{os.path.basename(event.output_path)}]")
+
         if event.metadata:
-            parts.append(f"META[{json.dumps(event.metadata)}]")
+            # Include key metadata in the log message
+            key_metadata = {}
+            for key in ["status", "retry_count", "error_type", "operation_class"]:
+                if key in event.metadata:
+                    key_metadata[key] = event.metadata[key]
+            if key_metadata:
+                parts.append(f"META[{json.dumps(key_metadata)}]")
 
         return " | ".join(parts)
 
@@ -540,62 +571,153 @@ class EventLoggingMixin:
 
     # Add new logging methods for job, partition, and op events
     def log_job_start(self, config, total_partitions):
-        self._log_event(EventType.JOB_START, "Job started", config=config, total_partitions=total_partitions)
+        """Log job start with detailed configuration."""
+        metadata = {
+            "total_partitions": total_partitions,
+            "config_summary": {
+                "dataset_path": config.get("dataset_path"),
+                "executor_type": config.get("executor_type"),
+                "partition_size": config.get("partition_size"),
+                "checkpoint_strategy": config.get("checkpoint_strategy"),
+                "storage_format": config.get("storage_format"),
+                "compression": config.get("compression"),
+                "fault_tolerance": config.get("enable_fault_tolerance"),
+                "max_retries": config.get("max_retries"),
+            },
+        }
+        self._log_event(
+            EventType.JOB_START, "Job started", config=config, metadata=metadata, total_partitions=total_partitions
+        )
 
     def log_job_complete(self, status, duration):
-        self._log_event(EventType.JOB_COMPLETE, "Job completed", status=status, duration=duration)
+        """Log job completion with performance metrics."""
+        metadata = {"status": status, "duration_seconds": duration, "completion_time": time.time()}
+        self._log_event(
+            EventType.JOB_COMPLETE,
+            f"Job completed with status: {status}",
+            status=status,
+            duration=duration,
+            metadata=metadata,
+        )
         self._update_job_summary("completed", error_message=None)
 
     def log_job_failed(self, error_message, duration):
+        """Log job failure with error details."""
+        metadata = {
+            "status": "failed",
+            "duration_seconds": duration,
+            "failure_time": time.time(),
+            "error_type": type(error_message).__name__ if error_message else "Unknown",
+        }
         self._log_event(
-            EventType.JOB_FAILED, "Job failed", status="failed", error_message=error_message, duration=duration
+            EventType.JOB_FAILED,
+            f"Job failed: {error_message}",
+            status="failed",
+            error_message=error_message,
+            duration=duration,
+            metadata=metadata,
         )
         self._update_job_summary("failed", error_message=error_message)
 
     def log_partition_start(self, partition_id, partition_meta):
+        """Log partition start with detailed metadata."""
+        metadata = {
+            "partition_path": partition_meta.get("partition_path"),
+            "start_time": partition_meta.get("start_time"),
+            "partition_size_bytes": partition_meta.get("file_size_bytes"),
+            "sample_count": partition_meta.get("sample_count"),
+        }
         self._log_event(
             EventType.PARTITION_START,
-            f"Partition {partition_id} started",
+            f"Partition {partition_id} started processing",
             partition_id=partition_id,
             partition_meta=partition_meta,
+            metadata=metadata,
         )
 
     def log_partition_complete(self, partition_id, duration, output_path):
+        """Log partition completion with performance metrics."""
+        metadata = {
+            "output_path": output_path,
+            "duration_seconds": duration,
+            "completion_time": time.time(),
+            "throughput_samples_per_second": None,  # Will be calculated if sample_count is available
+        }
         self._log_event(
             EventType.PARTITION_COMPLETE,
-            f"Partition {partition_id} completed",
+            f"Partition {partition_id} completed successfully",
             partition_id=partition_id,
             duration=duration,
             output_path=output_path,
             status="success",
+            metadata=metadata,
         )
 
     def log_partition_failed(self, partition_id, error_message, retry_count):
+        """Log partition failure with retry information."""
+        metadata = {
+            "retry_count": retry_count,
+            "failure_time": time.time(),
+            "error_type": type(error_message).__name__ if error_message else "Unknown",
+        }
         self._log_event(
             EventType.PARTITION_FAILED,
-            f"Partition {partition_id} failed",
+            f"Partition {partition_id} failed after {retry_count} retries: {error_message}",
             partition_id=partition_id,
             error_message=error_message,
             retry_count=retry_count,
             status="failed",
+            metadata=metadata,
         )
 
     def log_op_start(self, partition_id, operation_name, operation_idx, op_args):
+        """Log operation start with detailed arguments."""
+        metadata = {
+            "operation_idx": operation_idx,
+            "operation_args": op_args,
+            "start_time": time.time(),
+            "operation_class": operation_name,
+        }
         self._log_event(
             EventType.OP_START,
-            f"Op {operation_name} (idx {operation_idx}) started on partition {partition_id}",
+            f"Operation {operation_name} (idx {operation_idx}) started on partition {partition_id}",
             partition_id=partition_id,
             operation_name=operation_name,
             operation_idx=operation_idx,
             op_args=op_args,
+            metadata=metadata,
         )
 
     def log_op_complete(
         self, partition_id, operation_name, operation_idx, duration, checkpoint_path, input_rows, output_rows
     ):
+        """Log operation completion with detailed performance metrics."""
+        # Calculate performance metrics
+        throughput = input_rows / duration if duration > 0 and input_rows else 0
+        reduction_ratio = (input_rows - output_rows) / input_rows if input_rows > 0 else 0
+
+        metadata = {
+            "duration_seconds": duration,
+            "input_rows": input_rows,
+            "output_rows": output_rows,
+            "throughput_rows_per_second": throughput,
+            "reduction_ratio": reduction_ratio,
+            "checkpoint_path": checkpoint_path,
+            "completion_time": time.time(),
+            "operation_class": operation_name,
+        }
+
+        performance_metrics = {
+            "duration": duration,
+            "throughput": throughput,
+            "input_rows": input_rows,
+            "output_rows": output_rows,
+            "reduction_ratio": reduction_ratio,
+        }
+
         self._log_event(
             EventType.OP_COMPLETE,
-            f"Op {operation_name} (idx {operation_idx}) completed on partition {partition_id}",
+            f"Operation {operation_name} (idx {operation_idx}) completed on partition {partition_id} - {input_rows}→{output_rows} rows in {duration:.3f}s",
             partition_id=partition_id,
             operation_name=operation_name,
             operation_idx=operation_idx,
@@ -604,38 +726,64 @@ class EventLoggingMixin:
             input_rows=input_rows,
             output_rows=output_rows,
             status="success",
+            metadata=metadata,
+            performance_metrics=performance_metrics,
         )
 
     def log_op_failed(self, partition_id, operation_name, operation_idx, error_message, retry_count):
+        """Log operation failure with error details."""
+        metadata = {
+            "retry_count": retry_count,
+            "failure_time": time.time(),
+            "error_type": type(error_message).__name__ if error_message else "Unknown",
+            "operation_class": operation_name,
+        }
         self._log_event(
             EventType.OP_FAILED,
-            f"Op {operation_name} (idx {operation_idx}) failed on partition {partition_id}",
+            f"Operation {operation_name} (idx {operation_idx}) failed on partition {partition_id}: {error_message}",
             partition_id=partition_id,
             operation_name=operation_name,
             operation_idx=operation_idx,
             error_message=error_message,
             retry_count=retry_count,
             status="failed",
+            metadata=metadata,
         )
 
     def log_checkpoint_save(self, partition_id, operation_name, operation_idx, checkpoint_path):
+        """Log checkpoint save with file information."""
+        metadata = {
+            "checkpoint_path": checkpoint_path,
+            "operation_idx": operation_idx,
+            "operation_class": operation_name,
+            "save_time": time.time(),
+        }
         self._log_event(
             EventType.CHECKPOINT_SAVE,
-            f"Checkpoint saved for op {operation_name} (idx {operation_idx}) on partition {partition_id}",
+            f"Checkpoint saved for operation {operation_name} (idx {operation_idx}) on partition {partition_id}",
             partition_id=partition_id,
             operation_name=operation_name,
             operation_idx=operation_idx,
             checkpoint_path=checkpoint_path,
+            metadata=metadata,
         )
 
     def log_checkpoint_load(self, partition_id, operation_name, operation_idx, checkpoint_path):
+        """Log checkpoint load with file information."""
+        metadata = {
+            "checkpoint_path": checkpoint_path,
+            "operation_idx": operation_idx,
+            "operation_class": operation_name,
+            "load_time": time.time(),
+        }
         self._log_event(
             EventType.CHECKPOINT_LOAD,
-            f"Checkpoint loaded for op {operation_name} (idx {operation_idx}) on partition {partition_id}",
+            f"Checkpoint loaded for operation {operation_name} (idx {operation_idx}) on partition {partition_id}",
             partition_id=partition_id,
             operation_name=operation_name,
             operation_idx=operation_idx,
             checkpoint_path=checkpoint_path,
+            metadata=metadata,
         )
 
     def get_events(self, **kwargs) -> List[Event]:

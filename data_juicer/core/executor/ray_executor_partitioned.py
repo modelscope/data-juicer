@@ -468,6 +468,15 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         """Process a single partition with fault tolerance and intermediate data preservation."""
         logger.info(f"Processing partition {partition_id}: {partition_path}")
 
+        # Log partition start event
+        partition_start_time = time.time()
+        partition_meta = {
+            "partition_path": partition_path,
+            "partition_id": partition_id,
+            "start_time": partition_start_time,
+        }
+        self.log_partition_start(partition_id, partition_meta)
+
         # Update partition status
         if (
             self.dataset_mapping
@@ -533,6 +542,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
             # Convert to pandas DataFrame
             df = partition_dataset.to_pandas()
+            initial_row_count = len(df)
 
             # Create a simple dataset wrapper for processing
             from data_juicer.core.data import NestedDataset
@@ -540,7 +550,59 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             current_dataset = NestedDataset.from_list(df.to_dict("records"))
 
             # Process all operations using the standard DataJuicer processing
-            current_dataset.process(ops)
+            # Log each operation start and completion
+            for op_idx, op in enumerate(ops):
+                op_name = op.__class__.__name__
+                op_args = getattr(op, "args", {})
+
+                # Log operation start
+                self.log_op_start(partition_id, op_name, op_idx, op_args)
+                op_start_time = time.time()
+
+                try:
+                    # Process the operation
+                    current_dataset.process([op])
+
+                    # Get current data for row count
+                    current_data = current_dataset.to_list()
+                    output_row_count = len(current_data)
+
+                    # Check if checkpoint should be created
+                    checkpoint_path = None
+                    if self._should_checkpoint(op_idx, op_name, partition_id):
+                        checkpoint_path = os.path.join(
+                            partition_intermediate_dir, f"op_{op_idx:03d}_{op_name}.{self.storage_format}"
+                        )
+
+                        # Save checkpoint based on format
+                        if self.storage_format == "parquet":
+                            temp_df = pd.DataFrame(current_data)
+                            temp_df.to_parquet(checkpoint_path, index=False)
+                        elif self.storage_format == "arrow":
+                            temp_df = pd.DataFrame(current_data)
+                            temp_df.to_feather(checkpoint_path)
+                        else:  # jsonl
+                            with open(checkpoint_path, "w") as f:
+                                for item in current_data:
+                                    f.write(json.dumps(item, ensure_ascii=False) + "\n")
+
+                        # Log checkpoint save event
+                        self.log_checkpoint_save(partition_id, op_name, op_idx, checkpoint_path)
+
+                    # Log operation completion
+                    op_duration = time.time() - op_start_time
+                    self.log_op_complete(
+                        partition_id, op_name, op_idx, op_duration, checkpoint_path, initial_row_count, output_row_count
+                    )
+
+                    # Update row count for next operation
+                    initial_row_count = output_row_count
+
+                except Exception as e:
+                    # Log operation failure
+                    op_duration = time.time() - op_start_time
+                    self.log_op_failed(partition_id, op_name, op_idx, str(e), 0)
+                    raise
 
             # Get the processed data from the MaterializedDataset
             processed_data = current_dataset.to_list()
@@ -606,6 +668,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 self.dataset_mapping.partitions[partition_id].processing_end_time = time.time()
                 self._save_dataset_mapping()
 
+            # Log partition completion
+            partition_duration = time.time() - partition_start_time
+            self.log_partition_complete(partition_id, partition_duration, output_path)
+
             return {
                 "partition_id": partition_id,
                 "input_path": partition_path,
@@ -626,6 +692,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 self.dataset_mapping.partitions[partition_id].error_message = str(e)
                 self.dataset_mapping.partitions[partition_id].retry_count += 1
                 self._save_dataset_mapping()
+
+            # Log partition failure
+            partition_duration = time.time() - partition_start_time
+            self.log_partition_failed(partition_id, str(e), 0)
 
             raise
 
@@ -873,8 +943,26 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         Returns:
             Processed dataset
         """
+        job_start_time = time.time()
+
         # Create job summary at the start of the run
         self._create_job_summary(self.cfg.job_id, self.cfg.job_dir)
+
+        # Log job start event
+        job_config = {
+            "dataset_path": self.cfg.dataset_path,
+            "work_dir": self.cfg.work_dir,
+            "executor_type": self.cfg.executor_type,
+            "partition_size": self.partition_size,
+            "max_partition_size_mb": self.max_partition_size_mb,
+            "checkpoint_enabled": self.checkpoint_enabled,
+            "checkpoint_strategy": self.checkpoint_strategy.value if self.checkpoint_strategy else None,
+            "storage_format": self.storage_format,
+            "compression": self.storage_compression,  # Corrected from self.compression to self.storage_compression
+            "enable_fault_tolerance": self.enable_fault_tolerance,
+            "max_retries": self.max_retries,
+            "retry_backoff": self.retry_backoff,
+        }
 
         # 1. Load dataset
         logger.info("Loading dataset with Ray...")
@@ -938,6 +1026,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         else:
             # Create new partitions
             partition_paths, self.dataset_mapping = self._create_partitions_with_mapping(dataset)
+
+        # Log job start with total partitions
+        total_partitions = len(partition_paths)
+        self.log_job_start(job_config, total_partitions)
 
         # 5. Process partitions with fault tolerance
         logger.info(f"Processing {len(partition_paths)} partitions...")
@@ -1012,6 +1104,17 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 logger.info(f"Keeping intermediate files due to retention policy: {self.retention_policy}")
 
         logger.info(f"Partitioned processing completed. Output: {final_output_path}")
+
+        # Log job completion
+        job_duration = time.time() - job_start_time
+        successful_partitions = sum(1 for result in partition_results if result.get("success", False))
+        failed_partitions = len(partition_results) - successful_partitions
+
+        if failed_partitions == 0:
+            self.log_job_complete("success", job_duration)
+        else:
+            error_message = f"Job completed with {failed_partitions} failed partitions out of {total_partitions}"
+            self.log_job_failed(error_message, job_duration)
 
         if not skip_return:
             # Return the processed dataset
