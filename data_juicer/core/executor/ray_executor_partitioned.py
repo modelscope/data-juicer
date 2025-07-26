@@ -342,7 +342,12 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         """Estimate the number of partitions based on dataset size."""
         try:
             total_samples = dataset.data.count()
-            return max(1, total_samples // self.partition_size)
+            # Use ceiling division to ensure we have enough partitions for all data
+            # Formula: (total_samples + partition_size - 1) // partition_size
+            # This ensures that partial partitions are included
+            # Example: 356317 samples with 50000 partition size = 8 partitions
+            # (356317 + 50000 - 1) // 50000 = 406316 // 50000 = 8
+            return max(1, (total_samples + self.partition_size - 1) // self.partition_size)
         except Exception:
             # Fallback to file-based estimation
             return max(1, int(ray.cluster_resources().get("CPU", 1) * 2))
