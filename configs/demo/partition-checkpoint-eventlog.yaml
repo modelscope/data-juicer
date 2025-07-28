@@ -35,9 +35,13 @@ intermediate_storage:
   # File format and compression
   format: "parquet"  # parquet, arrow, jsonl
   compression: "snappy"  # snappy, gzip, none
-  use_arrow_batches: true
-  arrow_batch_size: 500
-  arrow_memory_mapping: false
+
+  # Parquet-specific configuration
+  # Recommended values:
+  # - 10K-25K: Small files, better fault tolerance, slower I/O
+  # - 25K-100K: Balanced performance (recommended)
+  # - 100K+: Large files, maximum performance, higher memory usage
+  parquet_batch_size: 50000  # Number of rows per parquet file (50K for ~30MB files)
 
   # File lifecycle management
   preserve_intermediate_data: true  # Keep temporary files for debugging/resumption
@@ -53,11 +57,6 @@ partition:
   auto_configure: false  # Disable auto-configuration to use manual settings
 
   # Manual partitioning settings (used when auto_configure: false)
-  # Recommended partition sizes:
-  # - 50-100: For debugging, quick iterations, small datasets
-  # - 100-300: For production, good balance of fault tolerance and efficiency
-  # - 300-500: For large datasets with stable processing
-  # - 500+: Only for very large datasets with minimal failure risk
   size: 50000  # Number of samples per partition (smaller for better fault tolerance)
   max_size_mb: 128  # Maximum partition size in MB (reduced for faster processing)
 

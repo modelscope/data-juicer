@@ -646,32 +646,11 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 default=False,
                 help="Use memory mapping for Arrow files (nested intermediate_storage config)",
             )
-
-            # Data format configuration (legacy flat config)
             parser.add_argument(
-                "--storage_format",
-                type=str,
-                default="parquet",
-                choices=["parquet", "arrow", "jsonl"],
-                help="Storage format for checkpoints and intermediate data (legacy flat config)",
-            )
-            parser.add_argument(
-                "--use_arrow_batches",
-                type=bool,
-                default=True,
-                help="Use Arrow batch format for processing (legacy flat config)",
-            )
-            parser.add_argument(
-                "--arrow_batch_size",
+                "--intermediate_storage.parquet_batch_size",
                 type=int,
-                default=1000,
-                help="Arrow batch size for processing (legacy flat config)",
-            )
-            parser.add_argument(
-                "--arrow_memory_mapping",
-                type=bool,
-                default=False,
-                help="Use memory mapping for Arrow files (legacy flat config)",
+                default=10000,
+                help="Number of rows per parquet file for optimal file sizes (nested intermediate_storage config)",
             )
 
             parser.add_argument(

@@ -157,19 +157,21 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         # Intermediate storage configuration (includes file lifecycle management)
         intermediate_storage_config = getattr(self.cfg, "intermediate_storage", {})
-        self.storage_format = intermediate_storage_config.get("format") or getattr(
-            self.cfg, "storage_format", "parquet"
+        self.storage_format = intermediate_storage_config.get(
+            "format", "parquet"
         )  # parquet, arrow, jsonl - for disk storage
         self.storage_compression = intermediate_storage_config.get("compression", "snappy")
-        self.use_arrow_batches = intermediate_storage_config.get("use_arrow_batches") or getattr(
-            self.cfg, "use_arrow_batches", True
+        self.use_arrow_batches = intermediate_storage_config.get(
+            "use_arrow_batches", True
         )  # Use Arrow batch format for processing (recommended)
-        self.arrow_batch_size = intermediate_storage_config.get("arrow_batch_size") or getattr(
-            self.cfg, "arrow_batch_size", 1000
+        self.arrow_batch_size = intermediate_storage_config.get(
+            "arrow_batch_size", 1000
         )  # Arrow batch size for processing
-        self.arrow_memory_mapping = intermediate_storage_config.get("arrow_memory_mapping") or getattr(
-            self.cfg, "arrow_memory_mapping", False
-        )
+        self.arrow_memory_mapping = intermediate_storage_config.get("arrow_memory_mapping", False)
+        self.parquet_batch_size = intermediate_storage_config.get(
+            "parquet_batch_size", 10000
+        )  # Number of rows per parquet file
+        logger.info(f"Using parquet batch size: {self.parquet_batch_size} rows per file")
 
         # File lifecycle management (now part of intermediate_storage config)
         self.preserve_intermediate_data = intermediate_storage_config.get("preserve_intermediate_data") or getattr(
@@ -395,7 +397,8 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         if format_type == "parquet":
             # For parquet, Ray creates a directory with the .parquet extension
             # and puts the actual parquet files inside that directory
-            dataset.write_parquet(abs_file_path)
+            # Use configurable batch size for optimal file sizes
+            dataset.write_parquet(abs_file_path, num_rows_per_file=self.parquet_batch_size)
         elif format_type == "arrow":
             # Convert to pandas and then to Arrow format
             import pyarrow as pa
@@ -456,7 +459,8 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         for i, block_ref in enumerate(block_refs):
             # Start with base path, will be updated based on storage format
-            partition_path = os.path.join(self.partitions_dir, f"partition_{i:06d}")
+            # Add .parquet suffix for consistency with other parquet directories
+            partition_path = os.path.join(self.partitions_dir, f"partition_{i:06d}.parquet")
 
             # Get the actual partition data from the block reference
             partition_data = ray.get(block_ref)
@@ -513,12 +517,12 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             # Save partition to disk using configurable format
             if self.storage_format == "parquet":
                 # Use Parquet for best performance and compression
-                # Don't append .parquet - Ray's write_parquet() will handle it
                 # Use absolute path to avoid Ray worker file system issues
                 partition_path_abs = os.path.abspath(partition_path)
                 os.makedirs(partition_path_abs, exist_ok=True)
                 partition_dataset = ray.data.from_items(partition_data)
-                partition_dataset.write_parquet(partition_path_abs)
+                # Use configurable batch size for optimal file sizes
+                partition_dataset.write_parquet(partition_path_abs, num_rows_per_file=self.parquet_batch_size)
                 partition_path = partition_path_abs
             elif self.storage_format == "arrow":
                 # Use Arrow (Feather) for memory mapping and zero-copy reads
