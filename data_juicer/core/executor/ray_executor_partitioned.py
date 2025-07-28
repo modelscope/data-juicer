@@ -397,9 +397,16 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             # and puts the actual parquet files inside that directory
             dataset.write_parquet(abs_file_path)
         elif format_type == "arrow":
-            # Convert to pandas and save as arrow
+            # Convert to pandas and then to Arrow format
+            import pyarrow as pa
+            import pyarrow.feather as feather
+
+            # Convert to pandas DataFrame first, then to Arrow table
             df = dataset.to_pandas()
-            df.to_feather(abs_file_path)
+            table = pa.Table.from_pandas(df)
+
+            # Write as Feather format
+            feather.write_feather(table, abs_file_path)
         else:  # jsonl
             dataset.write_json(abs_file_path, force_ascii=False)
 
@@ -454,16 +461,45 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             # Get the actual partition data from the block reference
             partition_data = ray.get(block_ref)
 
+            # Debug: log the type and structure of partition_data
+            logger.debug(f"Partition {i}: partition_data type = {type(partition_data)}")
+            if hasattr(partition_data, "shape"):
+                logger.debug(f"Partition {i}: partition_data shape = {partition_data.shape}")
+            elif hasattr(partition_data, "num_rows"):
+                logger.debug(f"Partition {i}: partition_data num_rows = {partition_data.num_rows}")
+            elif isinstance(partition_data, list):
+                logger.debug(f"Partition {i}: partition_data length = {len(partition_data)}")
+                if partition_data:
+                    logger.debug(f"Partition {i}: first item type = {type(partition_data[0])}")
+                    logger.debug(f"Partition {i}: first item = {partition_data[0]}")
+
             # Convert PyArrow table to list of dictionaries for processing
             if hasattr(partition_data, "to_pandas"):
                 # If it's a PyArrow table, convert to pandas then to dict
-                partition_data = partition_data.to_pandas().to_dict("records")
+                df = partition_data.to_pandas()
+                partition_data = df.to_dict("records")
+                # Validate that we have proper dictionaries
+                if partition_data and not isinstance(partition_data[0], dict):
+                    logger.error(f"Invalid data structure: expected dict, got {type(partition_data[0])}")
+                    # Try alternative conversion
+                    partition_data = [row.to_dict() for _, row in df.iterrows()]
             elif isinstance(partition_data, list):
-                # If it's already a list, use as is
-                pass
+                # If it's already a list, validate it contains dictionaries
+                if partition_data and not isinstance(partition_data[0], dict):
+                    logger.error(f"Invalid data structure in list: expected dict, got {type(partition_data[0])}")
+                    # Try to convert to proper format
+                    partition_data = [
+                        item if isinstance(item, dict) else {"text": str(item)} for item in partition_data
+                    ]
             else:
                 # Fallback: try to convert to list
                 partition_data = list(partition_data)
+                # Validate the converted data
+                if partition_data and not isinstance(partition_data[0], dict):
+                    logger.error(
+                        f"Invalid data structure after list conversion: expected dict, got {type(partition_data[0])}"
+                    )
+                    partition_data = [{"text": str(item)} for item in partition_data]
 
             # Calculate metadata
             sample_count = len(partition_data)
@@ -486,14 +522,16 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 partition_path = partition_path_abs
             elif self.storage_format == "arrow":
                 # Use Arrow (Feather) for memory mapping and zero-copy reads
-                # Don't append .arrow - let the feather writer handle it
+                # Append .arrow extension for proper file identification
+                partition_path = partition_path + ".arrow"
                 # Ensure directory exists before writing
                 os.makedirs(os.path.dirname(partition_path), exist_ok=True)
-                partition_dataset = ray.data.from_items(partition_data)
-                # Convert to Arrow table and save as Feather format
+
+                # Convert to pandas and then to Arrow format
                 import pyarrow as pa
                 import pyarrow.feather as feather
 
+                partition_dataset = ray.data.from_items(partition_data)
                 df = partition_dataset.to_pandas()
                 table = pa.Table.from_pandas(df)
                 feather.write_feather(table, partition_path)
@@ -585,43 +623,28 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             # For parquet format, Ray creates a directory with parquet files inside
             partition_dataset = ray.data.read_parquet(partition_path)
         elif self.storage_format == "arrow":
-            # Load Arrow (Feather) format with optional memory mapping support
+            # Load Arrow (Feather) format with pandas conversion
             import pyarrow as pa
             import pyarrow.feather as feather
 
-            # Check if memory mapping is enabled for Arrow files
-            use_memory_mapping = getattr(self.cfg, "arrow_memory_mapping", False)
-
             try:
-                if use_memory_mapping:
-                    # Use memory mapping for better performance with large files
-                    import mmap
+                # Standard Arrow reading
+                table = feather.read_feather(partition_path)
+                logger.debug(f"Loaded Arrow file: {partition_path}")
 
-                    with open(partition_path, "rb") as f:
-                        mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
-                        table = feather.read_table(mm)
-                        mm.close()
-                    logger.debug(f"Loaded Arrow file with memory mapping: {partition_path}")
+                # Handle both PyArrow Table and pandas DataFrame
+                if hasattr(table, "to_pandas"):
+                    # PyArrow Table - convert to pandas
+                    df = table.to_pandas()
                 else:
-                    # Standard Arrow reading
-                    table = feather.read_feather(partition_path)
-                    logger.debug(f"Loaded Arrow file: {partition_path}")
+                    # Already a pandas DataFrame
+                    df = table
 
-                # Validate table before converting to Ray dataset
-                if table.num_rows == 0:
-                    logger.warning(f"Empty Arrow table loaded from: {partition_path}")
-
-                partition_dataset = ray.data.from_arrow(table)
+                partition_dataset = ray.data.from_pandas(df)
 
             except Exception as e:
                 logger.error(f"Failed to load Arrow file {partition_path}: {e}")
-                # Fallback to standard reading if memory mapping fails
-                if use_memory_mapping:
-                    logger.info("Falling back to standard Arrow reading")
-                    table = feather.read_feather(partition_path)
-                    partition_dataset = ray.data.from_arrow(table)
-                else:
-                    raise
+                raise
         else:
             # Fallback to JSONL
             partition_dataset = ray.data.read_json(partition_path)
@@ -868,11 +891,17 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                             row_dict = convert_datetime_to_str(row.to_dict())
                             output_file.write(json.dumps(row_dict) + "\n")
                     elif result["output_path"].endswith(".arrow"):
-                        # For arrow files, convert to JSONL
-                        import pyarrow as pa
+                        import pyarrow.feather as feather
 
-                        table = pa.ipc.open_file(result["output_path"]).read_all()
-                        df = table.to_pandas()
+                        table = feather.read_feather(result["output_path"])
+                        # Handle both PyArrow Table and pandas DataFrame
+                        if hasattr(table, "to_pandas"):
+                            # PyArrow Table - convert to pandas
+                            df = table.to_pandas()
+                        else:
+                            # Already a pandas DataFrame
+                            df = table
+
                         for _, row in df.iterrows():
                             # Convert datetime objects to strings for JSON serialization
                             row_dict = convert_datetime_to_str(row.to_dict())
