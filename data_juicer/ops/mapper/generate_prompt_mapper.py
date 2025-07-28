@@ -1,6 +1,6 @@
-import json
 import random
 import re
+from copy import deepcopy
 from typing import Dict, Optional
 
 from loguru import logger
@@ -17,24 +17,16 @@ from ..base_op import OPERATORS, Mapper
 
 torch = LazyLoader("torch")
 vllm = LazyLoader("vllm")
-rouge = LazyLoader("rouge")
 
-OP_NAME = "generate_prompt_from_examples_mapper"
+OP_NAME = "generate_prompt_mapper"
 
 
 @OPERATORS.register_module(OP_NAME)
-class GeneratePromptFromExamplesMapper(Mapper):
+class GeneratePromptMapper(Mapper):
     """
-    Mapper to generate prompts from examples.
-    You should configure an empty dataset in your yaml config file:
-    ```
-    generated_dataset_config:
-      type: 'EmptyFormatter'  # use `RayEmptyFormatter` when enable ray
-      length: ${The number of generated samples}
-      feature_keys: ${text key}
-    ```
-    The number of samples generated is determined by
-    the length of the empty dataset.
+    Mapper to generate prompts based on the existing ones.
+    This OP will use the existing prompts in the same batch and newly generated prompts as the examples to generate
+    the next ones.
     """
 
     DEFAULT_SYSTEM_PROMPT = (
@@ -42,14 +34,13 @@ class GeneratePromptFromExamplesMapper(Mapper):
         "注意，新生成的【提示词】需要满足如下要求：\n"
         "1. 生成的【提示词】不能与输入的【提示词】完全一致，但是需要保持格式类似。\n"
         "2. 生成的【提示词】相比于输入的【提示词】不能有很大的变化，更多应该是关键词、核心参数等方面的微调。\n"
-        "3. 【提示词】后可能会有一个0到1之间的评分用于表示人类对于该【提示词】在目标任务上的评分，如有的话请参考该评分生成可以获得更高评分的【提示词】；评分为-1表示该【提示词】的人类评分缺失，忽略该评分即可。\n"
-        "4. 生成时只需生成带有【提示词】前缀的提示词，不需生成其他任何额外信息（如【人类评分】等）。\n"
+        "3. 生成时只需生成带有【提示词】前缀的提示词，不需生成其他任何额外信息。\n"
     )
 
     DEFAULT_INPUT_TEMPLATE = "{}"
     DEFAULT_EXAMPLE_TEMPLATE = "\n如下是一条示例数据：\n{}"
-    DEFAULT_PROMPT_TEMPLATE = "【提示词】\n{}\n【人类评分】\n{}\n"
-    DEFAULT_OUTPUT_PATTERN = r"【提示词】(.*?)(?=【人类评分】|$)"
+    DEFAULT_PROMPT_TEMPLATE = "【提示词】\n{}\n"
+    DEFAULT_OUTPUT_PATTERN = r"【提示词】(.*?)(?=【|$)"
 
     _batched_op = True
     _accelerator = "cuda"
@@ -57,10 +48,10 @@ class GeneratePromptFromExamplesMapper(Mapper):
     def __init__(
         self,
         api_or_hf_model: str = "Qwen/Qwen2.5-7B-Instruct",
-        seed_file: str = "",
-        example_num: PositiveInt = 3,
-        example_score_key: str = None,
-        similarity_threshold: float = 0.9,
+        gen_num: PositiveInt = 3,
+        max_example_num: PositiveInt = 3,
+        keep_original_sample: bool = True,
+        retry_num: int = 3,
         *,
         api_endpoint: Optional[str] = None,
         response_path: Optional[str] = None,
@@ -79,14 +70,13 @@ class GeneratePromptFromExamplesMapper(Mapper):
         Initialization method.
 
         :param api_or_hf_model: API or huggingface model name.
-        :param seed_file: Path to the seed file in chatml format.
-        :param example_num: The number of selected examples.
-            Randomly select N examples from "seed_file" and
-            put them into prompt as prompt examples.
-        :param similarity_threshold: The similarity score threshold
-            between the generated samples and the seed examples.
-            Range from 0 to 1. Samples with similarity score less than
-            this threshold will be kept.
+        :param gen_num: The number of new prompts to generate.
+        :param keep_original_sample: whether to keep the original sample. If
+            it's set to False, there will be only generated texts in the final
+            datasets and the original texts will be removed. It's True in
+            default.
+        :param retry_num: how many times to retry to generate the prompt if the
+            parsed generated prompt is empty. It's 3 in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -112,17 +102,10 @@ class GeneratePromptFromExamplesMapper(Mapper):
         """
         super().__init__(**kwargs)
 
-        if not seed_file:
-            raise ValueError(
-                "Please provide `seed_file` in chatml format."
-                "Example: data-juicer/demos/data/demo-dataset-chatml.jsonl"
-            )
-
-        self.seed_file = seed_file
-        self.example_num = example_num
-        self.example_score_key = example_score_key
-        self.similarity_threshold = similarity_threshold
-        self.similarity_type = "rouge_l"
+        self.gen_num = gen_num
+        self.max_example_num = max_example_num
+        self.keep_original_sample = keep_original_sample
+        self.retry_num = retry_num
 
         self.system_prompt = system_prompt or self.DEFAULT_SYSTEM_PROMPT
         self.input_template = input_template or self.DEFAULT_INPUT_TEMPLATE
@@ -171,43 +154,9 @@ class GeneratePromptFromExamplesMapper(Mapper):
                 **model_params,
             )
 
-        self.seed_prompt_samples = self._load_seed_samples()
-        if len(self.seed_prompt_samples) == 0:
-            raise ValueError("No prompt data was parsed from the seed file!")
-
-    def _load_seed_samples(self):
-        """Load prompts from jsonl format file."""
-        prompt_samples = []
-        with open(self.seed_file, encoding="utf-8") as f:
-            lines = f.readlines()
-            for line in lines:
-                line = line.strip()
-                prompt, score = self._parse_prompt_str(line)
-                if prompt:
-                    prompt_samples.append((prompt, score))
-        return prompt_samples
-
-    def _max_rouge_l_score(self, hypothesis, references):
-        r = rouge.Rouge()
-        max_score = 0.0
-        for reference in references:
-            scores = r.get_scores(hypothesis, reference)
-            rouge_l_score = scores[0]["rouge-l"]["f"]
-            if rouge_l_score > max_score:
-                max_score = rouge_l_score
-        return max_score
-
-    def _parse_prompt_str(self, sample_str):
-        data = json.loads(sample_str)
-        if self.prompt_key in data:
-            score = data.get(self.example_score_key, -1)
-            return data[self.prompt_key], score
-        else:
-            return None, None
-
     def build_input(self, prompt_examples):
         formatted_examples = "".join(
-            [self.example_template.format(self.prompt_template.format(p, s)) for p, s in prompt_examples]
+            [self.example_template.format(self.prompt_template.format(p)) for p in prompt_examples]
         )
         input_prompt = self.input_template.format(formatted_examples)
         return input_prompt
@@ -220,41 +169,74 @@ class GeneratePromptFromExamplesMapper(Mapper):
             output_prompt = matches[0].strip()
         return output_prompt
 
-    def process_single(self, sample, rank=None):
+    def generate_one_prompt(self, model, input_prompt_samples):
+        input_prompt = self.build_input(input_prompt_samples)
+        messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": input_prompt}]
+
+        cnt = 0
+        while True:
+            if self.enable_vllm:
+                response = model.chat(messages, self.sampling_params)
+                output = response[0].outputs[0].text
+            elif self.is_hf_model:
+                # model is pipe
+                response = model(messages, return_full_text=False, **self.sampling_params)
+                output = response[0]["generated_text"]
+            else:
+                output = model(messages, **self.sampling_params)
+
+            output_prompt = self.parse_output(output)
+            if output_prompt == "":
+                cnt += 1
+                if cnt >= self.retry_num:
+                    logger.warning("Retry to generate the prompt failed!")
+                    break
+                logger.warning(
+                    f"Parse model response error! No data generated " f"for the current example! Retry for {cnt} time."
+                )
+            else:
+                break
+
+        return output_prompt
+
+    def process_batched(self, samples, rank=None, *args, **kwargs):
+        # init model
         if self.enable_vllm or self.is_hf_model:
             model, _ = get_model(self.model_key, rank, self.use_cuda())
         else:
             model = get_model(self.model_key, rank, self.use_cuda())
 
-        random_prompt_samples = random.sample(self.seed_prompt_samples, self.example_num)
-        input_prompt = self.build_input(random_prompt_samples)
+        # get the existing prompts and use the existing prompts as the examples
+        if self.prompt_key not in samples:
+            return samples
+        prompt_batch = samples[self.prompt_key]
+        batch_size = len(prompt_batch)
+        max_example_num = min(self.max_example_num, batch_size)
+        input_prompt_samples = random.sample(prompt_batch, max_example_num)
 
-        messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": input_prompt}]
+        output_prompts = []
+        for _ in range(self.gen_num):
+            output_prompt = self.generate_one_prompt(model, input_prompt_samples)
+            if output_prompt:
+                output_prompts.append(output_prompt)
+                input_prompt_samples.append(output_prompt)
+                if len(input_prompt_samples) > self.max_example_num:
+                    input_prompt_samples.pop(0)
 
-        if self.enable_vllm:
-            response = model.chat(messages, self.sampling_params)
-            output = response[0].outputs[0].text
-        elif self.is_hf_model:
-            # model is pipe
-            response = model(messages, return_full_text=False, **self.sampling_params)
-            output = response[0]["generated_text"]
+        # add the generated prompts to the samples
+        res_samples = deepcopy(samples)
+        if self.keep_original_sample:
+            res_samples[self.prompt_key] += output_prompts
         else:
-            output = model(messages, **self.sampling_params)
+            res_samples[self.prompt_key] = output_prompts
 
-        output_prompt = self.parse_output(output)
-        if output_prompt == "":
-            logger.warning("Parse model response error! " "No data generated for the current example!")
-            sample.update({self.prompt_key: ""})
-            return sample
-
-        if self.similarity_type == "rouge_l":
-            sim_score = self._max_rouge_l_score(output_prompt, [s[0] for s in random_prompt_samples])
-        else:
-            raise ValueError(f'Not support similarity type "{self.similarity_type}"!')
-
-        if sim_score > self.similarity_threshold:
-            output_prompt = ""
-            logger.info("Filter this generated sample due to similarity.")
-
-        sample.update({self.prompt_key: output_prompt})
-        return sample
+        # add other replicate fields
+        for key in res_samples:
+            if key != self.prompt_key:
+                new_values = [res_samples[key][0]] * len(output_prompts)
+                if self.keep_original_sample:
+                    # take the first original sample as the reference
+                    res_samples[key] += new_values
+                else:
+                    res_samples[key] = new_values
+        return res_samples

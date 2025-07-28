@@ -41,7 +41,7 @@ repos:
         language: python
         require_serial: true
         additional_dependencies:
-          - translators==5.9.3
+          - translators==6.0.1
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
     hooks:
