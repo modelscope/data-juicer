@@ -41,7 +41,7 @@ intermediate_storage:
   # - 10K-25K: Small files, better fault tolerance, slower I/O
   # - 25K-100K: Balanced performance (recommended)
   # - 100K+: Large files, maximum performance, higher memory usage
-  parquet_batch_size: 50000  # Number of rows per parquet file (50K for ~30MB files)
+  parquet_batch_size: 10000  # Number of rows per parquet file (10K for ~6MB files)
 
   # File lifecycle management
   preserve_intermediate_data: true  # Keep temporary files for debugging/resumption
