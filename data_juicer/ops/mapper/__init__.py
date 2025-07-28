@@ -26,6 +26,7 @@ from .extract_nickname_mapper import ExtractNicknameMapper
 from .extract_support_text_mapper import ExtractSupportTextMapper
 from .extract_tables_from_html_mapper import ExtractTablesFromHtmlMapper
 from .fix_unicode_mapper import FixUnicodeMapper
+from .generate_challenging_qa_mapper import GenerateChallengingQAMapper
 from .generate_qa_from_examples_mapper import GenerateQAFromExamplesMapper
 from .generate_qa_from_text_mapper import GenerateQAFromTextMapper
 from .image_blur_mapper import ImageBlurMapper
@@ -115,6 +116,7 @@ __all__ = [
     "ExtractSupportTextMapper",
     "ExtractTablesFromHtmlMapper",
     "FixUnicodeMapper",
+    "GenerateChallengingQAMapper",
     "GenerateQAFromExamplesMapper",
     "GenerateQAFromTextMapper",
     "HumanPreferenceAnnotationMapper",
