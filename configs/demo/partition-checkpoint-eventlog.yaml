@@ -100,23 +100,23 @@ process:
   # Text filtering operations
   - text_length_filter:
       text_key: "text"
-      min_len: 10
+      min_len: 5
       max_len: 10000
 
   - alphanumeric_filter:
       text_key: "text"
-      min_ratio: 0.3
+      min_ratio: 0.1
 
   # Quality filtering
   - character_repetition_filter:
       text_key: "text"
       min_ratio: 0.0
-      max_ratio: 0.3
+      max_ratio: 0.5
 
   - word_repetition_filter:
       text_key: "text"
       min_ratio: 0.0
-      max_ratio: 0.3
+      max_ratio: 0.5
 
 # Export configuration
 export_in_parallel: true

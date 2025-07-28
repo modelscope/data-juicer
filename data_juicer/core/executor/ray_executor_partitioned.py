@@ -201,6 +201,8 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         # Initialize Ray
         logger.info("Initializing Ray for partitioned execution...")
+        # Suppress macOS malloc stack logging warnings
+        os.environ["MALLOC_NANOZONE"] = "0"
         ray.init(getattr(self.cfg, "ray_address", "auto"))
         self.tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
 
@@ -338,6 +340,69 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         content = json.dumps(data, sort_keys=True, default=str)
         return hashlib.md5(content.encode()).hexdigest()
 
+    def _ensure_directory_exists(self, file_path: str):
+        """Ensure the directory for a file path exists before writing."""
+        # For Ray's write_parquet(), we need to create the entire path structure
+        # because Ray creates a directory with the .parquet extension and puts files inside
+        if file_path.endswith(".parquet"):
+            # For parquet files, create the entire path as a directory
+            # Also ensure all parent directories exist
+            os.makedirs(file_path, exist_ok=True)
+            # Create parent directories as well to ensure full path exists
+            parent_dir = os.path.dirname(file_path)
+            if parent_dir:
+                os.makedirs(parent_dir, exist_ok=True)
+        else:
+            # For other formats, just create the parent directory
+            directory = os.path.dirname(file_path)
+            if directory:  # Only create if there's a directory component
+                os.makedirs(directory, exist_ok=True)
+
+    @staticmethod
+    @ray.remote
+    def _ensure_directory_on_worker(file_path: str):
+        """Remote function to ensure directory exists on Ray worker."""
+        import os
+
+        if file_path.endswith(".parquet"):
+            # For parquet files, create the entire path as a directory
+            os.makedirs(file_path, exist_ok=True)
+            # Create parent directories as well
+            parent_dir = os.path.dirname(file_path)
+            if parent_dir:
+                os.makedirs(parent_dir, exist_ok=True)
+        else:
+            # For other formats, just create the parent directory
+            directory = os.path.dirname(file_path)
+            if directory:
+                os.makedirs(directory, exist_ok=True)
+        return True
+
+    def _write_dataset_with_directory_creation(self, dataset, file_path: str, format_type: str = "parquet"):
+        """Write dataset to file with automatic directory creation."""
+        # Use absolute path for consistency
+        abs_file_path = os.path.abspath(file_path)
+
+        # Ensure directory exists both locally and on Ray workers
+        self._ensure_directory_exists(abs_file_path)
+
+        # Also ensure directory exists on Ray workers using remote function
+        try:
+            ray.get(self._ensure_directory_on_worker.remote(abs_file_path))
+        except Exception as e:
+            logger.warning(f"Failed to ensure directory on Ray worker: {e}")
+
+        if format_type == "parquet":
+            # For parquet, Ray creates a directory with the .parquet extension
+            # and puts the actual parquet files inside that directory
+            dataset.write_parquet(abs_file_path)
+        elif format_type == "arrow":
+            # Convert to pandas and save as arrow
+            df = dataset.to_pandas()
+            df.to_feather(abs_file_path)
+        else:  # jsonl
+            dataset.write_json(abs_file_path, force_ascii=False)
+
     def _estimate_partition_count(self, dataset) -> int:
         """Estimate the number of partitions based on dataset size."""
         try:
@@ -377,30 +442,53 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         # Save partitions to disk with metadata
         partition_paths = []
-        all_data = list(partitioned_dataset.iter_rows())  # Convert to list for slicing
 
-        for i in range(partition_count):
+        # Get partitions from Ray's repartitioned dataset
+        # Use get_internal_block_refs() to get the actual partitions
+        block_refs = partitioned_dataset.get_internal_block_refs()
+
+        for i, block_ref in enumerate(block_refs):
             # Start with base path, will be updated based on storage format
             partition_path = os.path.join(self.partitions_dir, f"partition_{i:06d}")
 
-            # Get partition data using list slicing
-            start_idx = i * self.partition_size
-            end_idx = min(start_idx + self.partition_size, total_samples)
-            partition_data = all_data[start_idx:end_idx]
+            # Get the actual partition data from the block reference
+            partition_data = ray.get(block_ref)
+
+            # Convert PyArrow table to list of dictionaries for processing
+            if hasattr(partition_data, "to_pandas"):
+                # If it's a PyArrow table, convert to pandas then to dict
+                partition_data = partition_data.to_pandas().to_dict("records")
+            elif isinstance(partition_data, list):
+                # If it's already a list, use as is
+                pass
+            else:
+                # Fallback: try to convert to list
+                partition_data = list(partition_data)
 
             # Calculate metadata
             sample_count = len(partition_data)
             checksum = self._calculate_checksum(partition_data)
 
+            # Calculate approximate start/end indices for metadata
+            # Since we're using Ray's repartition, we can only approximate
+            start_idx = i * (total_samples // partition_count)
+            end_idx = min(start_idx + sample_count, total_samples)
+
             # Save partition to disk using configurable format
             if self.storage_format == "parquet":
                 # Use Parquet for best performance and compression
-                partition_path = partition_path + ".parquet"
+                # Don't append .parquet - Ray's write_parquet() will handle it
+                # Use absolute path to avoid Ray worker file system issues
+                partition_path_abs = os.path.abspath(partition_path)
+                os.makedirs(partition_path_abs, exist_ok=True)
                 partition_dataset = ray.data.from_items(partition_data)
-                partition_dataset.write_parquet(partition_path)
+                partition_dataset.write_parquet(partition_path_abs)
+                partition_path = partition_path_abs
             elif self.storage_format == "arrow":
                 # Use Arrow (Feather) for memory mapping and zero-copy reads
-                partition_path = partition_path + ".arrow"
+                # Don't append .arrow - let the feather writer handle it
+                # Ensure directory exists before writing
+                os.makedirs(os.path.dirname(partition_path), exist_ok=True)
                 partition_dataset = ray.data.from_items(partition_data)
                 # Convert to Arrow table and save as Feather format
                 import pyarrow as pa
@@ -493,9 +581,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             self._save_dataset_mapping()
 
         # Load partition dataset using appropriate format
-        if partition_path.endswith(".parquet"):
+        if self.storage_format == "parquet":
+            # For parquet format, Ray creates a directory with parquet files inside
             partition_dataset = ray.data.read_parquet(partition_path)
-        elif partition_path.endswith(".arrow"):
+        elif self.storage_format == "arrow":
             # Load Arrow (Feather) format with optional memory mapping support
             import pyarrow as pa
             import pyarrow.feather as feather
@@ -534,6 +623,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 else:
                     raise
         else:
+            # Fallback to JSONL
             partition_dataset = ray.data.read_json(partition_path)
 
         # Create intermediate data directory for this partition
@@ -542,17 +632,12 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         # Apply operations with intermediate data preservation
         try:
-            # Convert Ray Dataset to pandas for processing to avoid PyArrow schema conflicts
-            import pandas as pd
+            # Create a RayDataset wrapper around the partition data (same as standard Ray executor)
+            from data_juicer.core.data.ray_dataset import RayDataset
 
-            # Convert to pandas DataFrame
-            df = partition_dataset.to_pandas()
-            initial_row_count = len(df)
-
-            # Create a simple dataset wrapper for processing
-            from data_juicer.core.data import NestedDataset
-
-            current_dataset = NestedDataset.from_list(df.to_dict("records"))
+            # Create RayDataset wrapper with the partition data
+            partition_dataset_wrapper = RayDataset(partition_dataset, cfg=self.cfg)
+            initial_row_count = partition_dataset_wrapper.data.count()
 
             # Process all operations using the standard DataJuicer processing
             # Log each operation start and completion
@@ -565,12 +650,11 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 op_start_time = time.time()
 
                 try:
-                    # Process the operation
-                    current_dataset.process([op])
+                    # Process the operation using the RayDataset wrapper (same as standard Ray executor)
+                    partition_dataset_wrapper.process([op])
 
                     # Get current data for row count
-                    current_data = current_dataset.to_list()
-                    output_row_count = len(current_data)
+                    output_row_count = partition_dataset_wrapper.data.count()
 
                     # Check if checkpoint should be created
                     checkpoint_path = None
@@ -580,16 +664,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                         )
 
                         # Save checkpoint based on format
-                        if self.storage_format == "parquet":
-                            temp_df = pd.DataFrame(current_data)
-                            temp_df.to_parquet(checkpoint_path, index=False)
-                        elif self.storage_format == "arrow":
-                            temp_df = pd.DataFrame(current_data)
-                            temp_df.to_feather(checkpoint_path)
-                        else:  # jsonl
-                            with open(checkpoint_path, "w") as f:
-                                for item in current_data:
-                                    f.write(json.dumps(item, ensure_ascii=False) + "\n")
+                        self._write_dataset_with_directory_creation(
+                            partition_dataset_wrapper.data, checkpoint_path, self.storage_format
+                        )
 
                         # Log checkpoint save event
                         self.log_checkpoint_save(partition_id, op_name, op_idx, checkpoint_path)
@@ -609,19 +686,14 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                     self.log_op_failed(partition_id, op_name, op_idx, str(e), 0)
                     raise
 
-            # Get the processed data from the MaterializedDataset
-            processed_data = current_dataset.to_list()
-
-            # Convert back to Ray Dataset
-            processed_df = pd.DataFrame(processed_data)
-            current_dataset = ray.data.from_pandas(processed_df)
+            # The partition_dataset_wrapper.data contains the processed data
+            current_dataset = partition_dataset_wrapper.data
 
             # Save final processed partition using configurable format
             output_path = os.path.join(self.results_dir, f"partition_{partition_id:06d}.{self.storage_format}")
 
-            if self.storage_format == "parquet":
-                current_dataset.write_parquet(output_path)
-            elif self.storage_format == "arrow":
+            # Use the helper method for automatic directory creation
+            if self.storage_format == "arrow":
                 # For Arrow format, we need to handle it differently
                 if hasattr(current_dataset, "to_arrow_refs"):
                     # Use Arrow references if available
@@ -632,26 +704,33 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                     # Fallback to pandas conversion
                     df = current_dataset.to_pandas()
 
+                # Ensure directory exists and write
+                self._ensure_directory_exists(output_path)
                 table = pa.Table.from_pandas(df)
                 with pa.OSFile(output_path, "wb") as sink:
                     with pa.RecordBatchFileWriter(sink, table.schema) as writer:
                         writer.write_table(table)
-            else:  # jsonl
-                current_dataset.write_json(output_path, force_ascii=False)
+            else:
+                # Use helper method for parquet and jsonl
+                self._write_dataset_with_directory_creation(current_dataset, output_path, self.storage_format)
 
             # Save partition checkpoint if enabled
             if self.checkpoint_strategy == CheckpointStrategy.EVERY_PARTITION:
                 partition_checkpoint_path = os.path.join(
                     self.checkpoint_dir, f"partition_{partition_id:06d}_checkpoint.{self.storage_format}"
                 )
-                current_dataset.write_parquet(partition_checkpoint_path)
+                self._write_dataset_with_directory_creation(
+                    current_dataset, partition_checkpoint_path, self.storage_format
+                )
 
             # Create checkpoint at partition completion if strategy is "every_partition"
             if self.checkpoint_strategy == CheckpointStrategy.EVERY_PARTITION and self.checkpoint_enabled:
                 partition_checkpoint_path = os.path.join(
                     self.checkpoint_dir, f"partition_{partition_id:06d}_final.parquet"
                 )
-                current_dataset.write_parquet(partition_checkpoint_path)
+                self._write_dataset_with_directory_creation(
+                    current_dataset, partition_checkpoint_path, "parquet"  # Always use parquet for final checkpoints
+                )
 
                 # Log checkpoint event
                 self._log_processing_event(
