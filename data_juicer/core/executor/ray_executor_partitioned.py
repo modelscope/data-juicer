@@ -161,13 +161,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             "format", "parquet"
         )  # parquet, arrow, jsonl - for disk storage
         self.storage_compression = intermediate_storage_config.get("compression", "snappy")
-        self.use_arrow_batches = intermediate_storage_config.get(
-            "use_arrow_batches", True
-        )  # Use Arrow batch format for processing (recommended)
-        self.arrow_batch_size = intermediate_storage_config.get(
-            "arrow_batch_size", 1000
-        )  # Arrow batch size for processing
-        self.arrow_memory_mapping = intermediate_storage_config.get("arrow_memory_mapping", False)
         self.parquet_batch_size = intermediate_storage_config.get(
             "parquet_batch_size", 10000
         )  # Number of rows per parquet file
@@ -398,7 +391,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             # For parquet, Ray creates a directory with the .parquet extension
             # and puts the actual parquet files inside that directory
             # Use configurable batch size for optimal file sizes
-            dataset.write_parquet(abs_file_path, num_rows_per_file=self.parquet_batch_size)
+            dataset.write_parquet(
+                abs_file_path, num_rows_per_file=self.parquet_batch_size, compression=self.storage_compression
+            )
         elif format_type == "arrow":
             # Convert to pandas and then to Arrow format
             import pyarrow as pa
@@ -522,7 +517,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 os.makedirs(partition_path_abs, exist_ok=True)
                 partition_dataset = ray.data.from_items(partition_data)
                 # Use configurable batch size for optimal file sizes
-                partition_dataset.write_parquet(partition_path_abs, num_rows_per_file=self.parquet_batch_size)
+                partition_dataset.write_parquet(
+                    partition_path_abs, num_rows_per_file=self.parquet_batch_size, compression=self.storage_compression
+                )
                 partition_path = partition_path_abs
             elif self.storage_format == "arrow":
                 # Use Arrow (Feather) for memory mapping and zero-copy reads

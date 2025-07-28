@@ -629,24 +629,6 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 help="Compression format for storage files (nested intermediate_storage config)",
             )
             parser.add_argument(
-                "--intermediate_storage.use_arrow_batches",
-                type=bool,
-                default=True,
-                help="Use Arrow batch format for processing (nested intermediate_storage config)",
-            )
-            parser.add_argument(
-                "--intermediate_storage.arrow_batch_size",
-                type=int,
-                default=1000,
-                help="Arrow batch size for processing (nested intermediate_storage config)",
-            )
-            parser.add_argument(
-                "--intermediate_storage.arrow_memory_mapping",
-                type=bool,
-                default=False,
-                help="Use memory mapping for Arrow files (nested intermediate_storage config)",
-            )
-            parser.add_argument(
                 "--intermediate_storage.parquet_batch_size",
                 type=int,
                 default=10000,
