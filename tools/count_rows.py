@@ -141,31 +141,23 @@ def count_directory(directory_path, show_info=False):
 
 def main():
     parser = argparse.ArgumentParser(description="Count rows in data files using the most appropriate method")
-    parser.add_argument("--file", "-f", help="Path to a single data file")
-    parser.add_argument("--directory", "-d", help="Path to a directory containing data files")
+    parser.add_argument("path", help="Path to a data file or directory containing data files")
     parser.add_argument("--info", "-i", action="store_true", help="Show detailed file information (for parquet files)")
 
     args = parser.parse_args()
 
-    # Check if either file or directory is provided
-    if not args.file and not args.directory:
-        parser.error("Either --file or --directory must be specified")
+    path = Path(args.path)
 
-    if args.file and args.directory:
-        parser.error("Cannot specify both --file and --directory")
+    if not path.exists():
+        print(f"Error: Path not found: {args.path}")
+        return 1
 
-    if args.file:
+    if path.is_file():
         # Single file mode
-        file_path = args.file
-
-        if not Path(file_path).exists():
-            print(f"Error: File not found: {file_path}")
-            return 1
-
-        print(f"Counting rows in: {file_path}")
+        print(f"Counting rows in: {args.path}")
         print("=" * 60)
 
-        row_count, method_used = count_rows_auto(file_path)
+        row_count, method_used = count_rows_auto(args.path)
 
         if row_count is not None:
             print(f"Row count: {row_count:,}")
@@ -174,22 +166,16 @@ def main():
             return 1
 
         # Show detailed info for parquet files if requested
-        if args.info and Path(file_path).suffix.lower() == ".parquet":
-            get_parquet_info(file_path)
+        if args.info and path.suffix.lower() == ".parquet":
+            get_parquet_info(args.path)
 
-    elif args.directory:
+    elif path.is_dir():
         # Directory mode
-        directory_path = args.directory
+        count_directory(args.path, show_info=args.info)
 
-        if not Path(directory_path).exists():
-            print(f"Error: Directory not found: {directory_path}")
-            return 1
-
-        if not Path(directory_path).is_dir():
-            print(f"Error: Path is not a directory: {directory_path}")
-            return 1
-
-        count_directory(directory_path, show_info=args.info)
+    else:
+        print(f"Error: Path is neither a file nor a directory: {args.path}")
+        return 1
 
     return 0
 
