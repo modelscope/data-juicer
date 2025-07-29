@@ -88,6 +88,12 @@ class Event:
     completion_time: Optional[float] = None
     failure_time: Optional[float] = None
     error_type: Optional[str] = None
+    # Process and thread tracking
+    process_id: Optional[int] = None
+    thread_id: Optional[int] = None
+    # Ray task tracking
+    ray_task_id: Optional[str] = None
+    ray_job_id: Optional[str] = None
 
 
 class EventLogger:
@@ -450,11 +456,6 @@ class EventLoggingMixin:
         backup_count = event_config.get("backup_count", 5)
         self.event_logger = EventLogger(event_log_dir, max_log_size, backup_count, job_id=job_id)
 
-        # If job_id is provided, validate resumption
-        if getattr(self.cfg, "job_id", None):
-            if not self._validate_job_resumption(job_id):
-                logger.warning("Job resumption validation failed, continuing with new job")
-
         # Log initialization
         self._log_event(EventType.INFO, f"Event logging initialized for {self.executor_type} executor")
 
@@ -564,10 +565,25 @@ class EventLoggingMixin:
     def _log_event(self, event_type: EventType, message: str, **kwargs):
         """Log an event if event logging is enabled."""
         if self.event_logger is None:
+            logger.warning(f"Event logger is None, cannot log event: {event_type.value}")
             return
 
-        event = Event(event_type=event_type, timestamp=time.time(), message=message, **kwargs)
+        # Automatically capture process and thread IDs
+        process_id = os.getpid()
+        thread_id = threading.get_ident()
+
+        logger.debug(f"Creating event: {event_type.value} - {message}")
+        event = Event(
+            event_type=event_type,
+            timestamp=time.time(),
+            message=message,
+            process_id=process_id,
+            thread_id=thread_id,
+            **kwargs,
+        )
+        logger.debug(f"Logging event to event logger: {event_type.value}")
         self.event_logger.log_event(event)
+        logger.debug(f"Successfully logged event: {event_type.value}")
 
     # Add new logging methods for job, partition, and op events
     def log_job_start(self, config, total_partitions):
@@ -635,23 +651,32 @@ class EventLoggingMixin:
             metadata=metadata,
         )
 
-    def log_partition_complete(self, partition_id, duration, output_path):
+    def log_partition_complete(self, partition_id, duration, output_path, success=True, error=None):
         """Log partition completion with performance metrics."""
         metadata = {
             "output_path": output_path,
             "duration_seconds": duration,
             "completion_time": time.time(),
+            "success": success,
             "throughput_samples_per_second": None,  # Will be calculated if sample_count is available
         }
-        self._log_event(
-            EventType.PARTITION_COMPLETE,
-            f"Partition {partition_id} completed successfully",
-            partition_id=partition_id,
-            duration=duration,
-            output_path=output_path,
-            status="success",
-            metadata=metadata,
-        )
+
+        if not success and error:
+            metadata["error"] = error
+            message = f"Partition {partition_id} completed with failure after {duration:.2f}s: {error}"
+        else:
+            message = f"Partition {partition_id} completed successfully after {duration:.2f}s"
+
+        # Add debug logging to help diagnose issues
+        logger.debug(f"Creating partition_complete event for partition {partition_id}")
+        logger.debug(f"  Duration: {duration:.2f}s")
+        logger.debug(f"  Success: {success}")
+        logger.debug(f"  Output path: {output_path}")
+        if error:
+            logger.debug(f"  Error: {error}")
+
+        # Use the _log_event method to ensure proper logging
+        self._log_event(EventType.PARTITION_COMPLETE, message, partition_id=partition_id, metadata=metadata)
 
     def log_partition_failed(self, partition_id, error_message, retry_count):
         """Log partition failure with retry information."""
@@ -809,3 +834,238 @@ class EventLoggingMixin:
         if self.event_logger is None:
             return
         yield from self.event_logger.monitor_events(event_type)
+
+    def analyze_resumption_state(self, job_id: str) -> Dict[str, Any]:
+        """
+        Analyze event history to determine resumption state and generate resumption plan.
+
+        Args:
+            job_id: The job ID to analyze
+
+        Returns:
+            Dictionary containing resumption analysis and plan
+        """
+        if not self.event_logger:
+            return {"error": "Event logger not available"}
+
+        events_file = self.event_logger.jsonl_file
+        if not os.path.exists(events_file):
+            return {"error": f"Events file not found: {events_file}"}
+
+        # Parse all events
+        events = []
+        with open(events_file, "r") as f:
+            for line in f:
+                try:
+                    event = json.loads(line.strip())
+                    events.append(event)
+                except json.JSONDecodeError:
+                    continue
+
+        # Analyze events by type
+        partition_starts = [e for e in events if e.get("event_type") == "partition_start"]
+        partition_completes = [e for e in events if e.get("event_type") == "partition_complete"]
+        partition_failures = [e for e in events if e.get("event_type") == "partition_failed"]
+        op_starts = [e for e in events if e.get("event_type") == "op_start"]
+        op_completes = [e for e in events if e.get("event_type") == "op_complete"]
+        checkpoints = [e for e in events if e.get("event_type") == "checkpoint_saved"]
+
+        # Determine job status
+        job_status = self._determine_job_status(events, partition_completes, partition_failures)
+
+        # Analyze partition states
+        partition_states = self._analyze_partition_states(
+            partition_starts, partition_completes, partition_failures, op_starts, op_completes
+        )
+
+        # Generate resumption plan
+        resumption_plan = self._generate_resumption_plan(partition_states, checkpoints)
+
+        # Calculate progress metrics
+        progress_metrics = self._calculate_progress_metrics(partition_states, events)
+
+        return {
+            "job_id": job_id,
+            "job_status": job_status,
+            "total_events": len(events),
+            "partition_states": partition_states,
+            "resumption_plan": resumption_plan,
+            "progress_metrics": progress_metrics,
+            "analysis_timestamp": time.time(),
+            "can_resume": resumption_plan["can_resume"],
+            "resume_from_checkpoint": resumption_plan.get("resume_from_checkpoint"),
+            "partitions_to_retry": resumption_plan.get("partitions_to_retry", []),
+            "partitions_to_skip": resumption_plan.get("partitions_to_skip", []),
+        }
+
+    def _determine_job_status(
+        self, events: List[Dict], partition_completes: List[Dict], partition_failures: List[Dict]
+    ) -> str:
+        """Determine the current job status based on events."""
+        # Check if job has any completion events
+        job_completes = [e for e in events if e.get("event_type") == "job_complete"]
+        job_failures = [e for e in events if e.get("event_type") == "job_failed"]
+
+        if job_completes:
+            return "completed"
+        elif job_failures:
+            return "failed"
+        elif partition_completes:
+            # Check if all partitions are completed (success or failure)
+            all_partitions_completed = all(
+                pc.get("metadata", {}).get("success", False) or pc.get("metadata", {}).get("error") is not None
+                for pc in partition_completes
+            )
+            if all_partitions_completed:
+                return "completed_with_failures"
+            else:
+                return "running"
+        else:
+            return "not_started"
+
+    def _analyze_partition_states(
+        self,
+        partition_starts: List[Dict],
+        partition_completes: List[Dict],
+        partition_failures: List[Dict],
+        op_starts: List[Dict],
+        op_completes: List[Dict],
+    ) -> Dict[int, Dict]:
+        """Analyze the state of each partition based on events."""
+        partition_states = {}
+
+        # Group events by partition ID
+        for start_event in partition_starts:
+            partition_id = start_event.get("partition_id")
+            if partition_id is None:
+                continue
+
+            # Find the latest start event for this partition
+            partition_starts_for_id = [e for e in partition_starts if e.get("partition_id") == partition_id]
+            latest_start = max(partition_starts_for_id, key=lambda x: x.get("timestamp", 0))
+
+            # Find completion events for this partition
+            partition_completes_for_id = [e for e in partition_completes if e.get("partition_id") == partition_id]
+            partition_failures_for_id = [e for e in partition_failures if e.get("partition_id") == partition_id]
+
+            # Find operation events for this partition
+            ops_for_partition = [e for e in op_starts if e.get("partition_id") == partition_id]
+            op_completes_for_partition = [e for e in op_completes if e.get("partition_id") == partition_id]
+
+            # Determine partition state
+            state = self._determine_partition_state(
+                partition_id,
+                latest_start,
+                partition_completes_for_id,
+                partition_failures_for_id,
+                ops_for_partition,
+                op_completes_for_partition,
+            )
+
+            partition_states[partition_id] = state
+
+        return partition_states
+
+    def _determine_partition_state(
+        self,
+        partition_id: int,
+        start_event: Dict,
+        completes: List[Dict],
+        failures: List[Dict],
+        op_starts: List[Dict],
+        op_completes: List[Dict],
+    ) -> Dict:
+        """Determine the detailed state of a specific partition."""
+        # Find the latest completion event
+        latest_complete = max(completes, key=lambda x: x.get("timestamp", 0)) if completes else None
+
+        # Determine if partition is completed successfully
+        is_completed = latest_complete and latest_complete.get("metadata", {}).get("success", False)
+        is_failed = latest_complete and not latest_complete.get("metadata", {}).get("success", False)
+
+        # Find the last operation that was started
+        last_op_start = max(op_starts, key=lambda x: x.get("timestamp", 0)) if op_starts else None
+        last_op_complete = max(op_completes, key=lambda x: x.get("timestamp", 0)) if op_completes else None
+
+        # Determine current operation
+        current_operation = None
+        if last_op_start:
+            current_operation = {
+                "name": last_op_start.get("operation_name"),
+                "idx": last_op_start.get("operation_idx"),
+                "started_at": last_op_start.get("timestamp"),
+                "completed": last_op_complete is not None
+                and last_op_complete.get("timestamp", 0) > last_op_start.get("timestamp", 0),
+            }
+
+        return {
+            "partition_id": partition_id,
+            "status": "completed" if is_completed else "failed" if is_failed else "running",
+            "start_time": start_event.get("timestamp"),
+            "completion_time": latest_complete.get("timestamp") if latest_complete else None,
+            "duration": latest_complete.get("metadata", {}).get("duration_seconds") if latest_complete else None,
+            "success": is_completed,
+            "error": latest_complete.get("metadata", {}).get("error") if latest_complete and not is_completed else None,
+            "current_operation": current_operation,
+            "retry_count": len([f for f in failures if f.get("partition_id") == partition_id]),
+            "output_path": latest_complete.get("metadata", {}).get("output_path") if latest_complete else None,
+        }
+
+    def _generate_resumption_plan(self, partition_states: Dict[int, Dict], checkpoints: List[Dict]) -> Dict:
+        """Generate a resumption plan based on partition states and checkpoints."""
+        # Find partitions that need to be retried
+        partitions_to_retry = []
+        partitions_to_skip = []
+
+        for partition_id, state in partition_states.items():
+            if state["status"] == "failed":
+                partitions_to_retry.append(partition_id)
+            elif state["status"] == "completed":
+                partitions_to_skip.append(partition_id)
+
+        # Find the latest checkpoint
+        latest_checkpoint = max(checkpoints, key=lambda x: x.get("timestamp", 0)) if checkpoints else None
+
+        # Determine if we can resume
+        can_resume = len(partitions_to_retry) > 0 or latest_checkpoint is not None
+
+        return {
+            "can_resume": can_resume,
+            "resume_from_checkpoint": (
+                latest_checkpoint.get("metadata", {}).get("checkpoint_path") if latest_checkpoint else None
+            ),
+            "partitions_to_retry": partitions_to_retry,
+            "partitions_to_skip": partitions_to_skip,
+            "total_partitions_to_process": len(partitions_to_retry),
+            "estimated_remaining_work": len(partitions_to_retry) / len(partition_states) if partition_states else 0,
+        }
+
+    def _calculate_progress_metrics(self, partition_states: Dict[int, Dict], events: List[Dict]) -> Dict:
+        """Calculate progress metrics based on partition states."""
+        total_partitions = len(partition_states)
+        completed_partitions = len([s for s in partition_states.values() if s["status"] == "completed"])
+        failed_partitions = len([s for s in partition_states.values() if s["status"] == "failed"])
+        running_partitions = len([s for s in partition_states.values() if s["status"] == "running"])
+
+        # Calculate overall progress
+        if total_partitions == 0:
+            progress_percentage = 0
+        else:
+            progress_percentage = (completed_partitions / total_partitions) * 100
+
+        # Calculate timing metrics
+        job_start_events = [e for e in events if e.get("event_type") == "job_start"]
+        start_time = job_start_events[0].get("timestamp") if job_start_events else None
+        current_time = time.time()
+        elapsed_time = current_time - start_time if start_time else 0
+
+        return {
+            "total_partitions": total_partitions,
+            "completed_partitions": completed_partitions,
+            "failed_partitions": failed_partitions,
+            "running_partitions": running_partitions,
+            "progress_percentage": progress_percentage,
+            "elapsed_time_seconds": elapsed_time,
+            "start_time": start_time,
+            "current_time": current_time,
+        }
