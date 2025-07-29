@@ -261,6 +261,185 @@ ls -la /tmp/fast_event_logs/
 ls -la /tmp/large_checkpoints/
 ```
 
+## 📈 Job Progress Monitor
+
+A comprehensive utility to monitor and display progress information for DataJuicer jobs. Shows partition status, operation progress, checkpoints, and overall job metrics.
+
+### Features
+
+- **Real-time Progress Tracking**: Monitor job progress with partition-level details
+- **Operation Performance**: View detailed operation metrics including throughput and data reduction
+- **Checkpoint Monitoring**: Track checkpoint saves and recovery points
+- **Watch Mode**: Continuously monitor jobs with automatic updates
+- **Programmatic Access**: Use as a Python function for integration into other tools
+
+### Command Line Usage
+
+#### Basic Usage
+```bash
+# Show basic progress for a job
+python tools/job_progress_monitor.py 20250728_233517_510abf
+
+# Show detailed progress with operation metrics
+python tools/job_progress_monitor.py 20250728_233517_510abf --detailed
+
+# Watch mode - continuously update progress every 10 seconds
+python tools/job_progress_monitor.py 20250728_233517_510abf --watch
+
+# Watch mode with custom update interval (30 seconds)
+python tools/job_progress_monitor.py 20250728_233517_510abf --watch --interval 30
+
+# Use custom base directory
+python tools/job_progress_monitor.py 20250728_233517_510abf --base-dir /custom/path
+```
+
+#### Command Line Options
+- `job_id`: The job ID to monitor (required)
+- `--base-dir`: Base directory containing job outputs (default: `outputs/partition-checkpoint-eventlog`)
+- `--detailed`: Show detailed operation information
+- `--watch`: Watch mode - continuously update progress
+- `--interval`: Update interval in seconds for watch mode (default: 10)
+
+### Python API
+
+#### Basic Function Usage
+```python
+from tools.job_progress_monitor import show_job_progress
+
+# Show progress and get data
+data = show_job_progress("20250728_233517_510abf")
+
+# Show detailed progress
+data = show_job_progress("20250728_233517_510abf", detailed=True)
+
+# Use custom base directory
+data = show_job_progress("20250728_233517_510abf", base_dir="/custom/path")
+```
+
+#### Class-based Usage
+```python
+from tools.job_progress_monitor import JobProgressMonitor
+
+# Create monitor instance
+monitor = JobProgressMonitor("20250728_233517_510abf")
+
+# Display progress
+monitor.display_progress(detailed=True)
+
+# Get progress data as dictionary
+data = monitor.get_progress_data()
+
+# Access specific information
+job_status = data['overall_progress']['job_status']
+progress_percentage = data['overall_progress']['progress_percentage']
+partition_status = data['partition_status']
+```
+
+### Output Information
+
+#### Job Overview
+- Job status (completed, processing, failed, etc.)
+- Dataset path and size
+- Partition configuration
+- Start time and duration
+
+#### Overall Progress
+- Progress percentage
+- Partition completion status
+- Sample processing counts
+- Estimated time remaining (for running jobs)
+
+#### Partition Status
+- Individual partition status with visual indicators
+- Sample counts per partition
+- Current operation (if processing)
+- Number of completed operations
+- Number of saved checkpoints
+
+#### Operation Details (with --detailed flag)
+- Per-partition operation performance
+- Duration, throughput, and data reduction metrics
+- Operation completion order
+
+#### Checkpoint Summary
+- Total number of checkpoints saved
+- Checkpoint details by partition and operation
+- Timestamp information
+
+### Example Output
+
+```
+================================================================================
+DataJuicer Job Progress Monitor
+Job ID: 20250728_233517_510abf
+================================================================================
+
+📊 JOB OVERVIEW
+   Status: COMPLETED
+   Dataset: /Users/yilei.z/Downloads/c4-train.00000-of-01024.jsonl
+   Total Samples: 356,317
+   Partition Size: 50,000 samples
+   Start Time: 2025-07-28 16:35:18
+   Duration: 441.1 seconds
+
+🎯 OVERALL PROGRESS
+   Progress: 100.0% (8/8 partitions)
+   Status: 8 completed, 0 processing, 0 failed
+   Samples: 356,317/356,317
+
+📦 PARTITION STATUS
+   Partition  0: ✅ COMPLETED
+              Samples: 44,539
+              Completed: 8 operations
+              Checkpoints: 2 saved
+   Partition  1: ✅ COMPLETED
+              Samples: 44,540
+              Completed: 8 operations
+              Checkpoints: 2 saved
+   ...
+
+💾 CHECKPOINT SUMMARY
+   Total Checkpoints: 16
+```
+
+### Integration Examples
+
+#### Monitoring Multiple Jobs
+```python
+from tools.job_progress_monitor import show_job_progress
+
+job_ids = ["job1", "job2", "job3"]
+for job_id in job_ids:
+    try:
+        data = show_job_progress(job_id)
+        print(f"Job {job_id}: {data['overall_progress']['progress_percentage']:.1f}%")
+    except FileNotFoundError:
+        print(f"Job {job_id}: Not found")
+```
+
+#### Custom Monitoring Script
+```python
+from tools.job_progress_monitor import JobProgressMonitor
+import time
+
+def monitor_job_until_completion(job_id, check_interval=30):
+    monitor = JobProgressMonitor(job_id)
+    
+    while True:
+        data = monitor.get_progress_data()
+        status = data['overall_progress']['job_status']
+        
+        if status == 'completed':
+            print(f"Job {job_id} completed!")
+            break
+        elif status == 'failed':
+            print(f"Job {job_id} failed!")
+            break
+        
+        print(f"Job {job_id} still running... {data['overall_progress']['progress_percentage']:.1f}%")
+        time.sleep(check_interval)
+```
+
 ## 🤖 Auto-Configuration System
 
 ### **Smart Partition Sizing by Modality**
