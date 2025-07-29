@@ -49,7 +49,14 @@ class BaseHook:
         # extra config for some other specific jobs
         self.extra_cfg = job_cfg.get(JobRequiredKeys.extra_configs.value, None)
 
+        # the current iteration number
+        self.curr_iter = None
+
     def run(self, context_infos: ContextInfos):
+        # record the current iteration number
+        self.curr_iter = context_infos.iter
+
+        # update the args of this hook with input mappings and local settings
         self._input_updating_hook(context_infos)
 
         outputs = self.hook()

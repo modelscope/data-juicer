@@ -223,8 +223,20 @@ class ModelInferExecutorFactory(object):
             )
 
             return EasyAnimateInferExecutor(generate_cfg, **kwargs)
+        elif generate_cfg.type == "huggingface":
+            from data_juicer.core.sandbox.model_executors import (
+                HFTransformersInferExecutor,
+            )
 
-        # add more data generation here freely
+            return HFTransformersInferExecutor(generate_cfg, **kwargs)
+        elif generate_cfg.type == "vllm":
+            from data_juicer.core.sandbox.model_executors import VLLMInferExecutor
+
+            return VLLMInferExecutor(generate_cfg, **kwargs)
+        elif generate_cfg.type == "api":
+            from data_juicer.core.sandbox.model_executors import APIModelInferExecutor
+
+            return APIModelInferExecutor(generate_cfg, **kwargs)
 
 
 model_infer_executor_factory = ModelInferExecutorFactory()

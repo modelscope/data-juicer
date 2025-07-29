@@ -5,9 +5,18 @@ import subprocess
 import sys
 import time
 
+import jsonlines as jl
 from jsonargparse import namespace_to_dict
+from loguru import logger
 
+from data_juicer.core.sandbox.helper_funcs import ALL_FUNCS
 from data_juicer.utils.file_utils import follow_read
+from data_juicer.utils.lazy_loader import LazyLoader
+from data_juicer.utils.model_utils import (
+    get_model,
+    prepare_model,
+    update_sampling_params,
+)
 
 
 class BaseModelExecutor(object):
@@ -190,6 +199,203 @@ class ModelscopeTrainExecutor(ModelScopeExecutor):
         self.build_executor(**builder_kwargs)
         self.executor.train()
         return self.work_dir
+
+
+class LLMInferExecutor(BaseModelExecutor):
+    """
+    A inference executor for LLM inference.
+    The model preparation method should be implemented by the subclass for specific type of model.
+
+    The config file for this type of executor should at least include the following items:
+    1. `type`: model type.
+    2. `build_messages_func`: the path to the HF model.
+    3. `system_prompt_func`: extra parameters for the model.
+    4. `parse_output_func`: extra sampling parameters for the model.
+    5. `dataset_path`: the input dataset use to construct the input messages for LLM inference.
+        Only support jsonl files for now.
+    6. `export_path`: the output dataset path to store the inference results.
+    7. `infer_res_key`: the key name to store the inference results. It's "response" in default.
+    """
+
+    def __init__(self, model_config: dict, watcher=None):
+        super().__init__(model_config, watcher)
+        # model related params
+        self.executor, self.sampling_params = self.prepare_executor()
+
+        # inference format related params
+        self.build_messages_func = model_config.get("build_messages_func", "build_input")
+        self.parse_output_func = model_config.get("parse_output_func", "parse_output")
+
+        self.build_messages_func = ALL_FUNCS.get(self.build_messages_func)
+        self.parse_output_func = ALL_FUNCS.get(self.parse_output_func)
+
+        # inference dataset related
+        self.dataset_path = model_config.get("dataset_path", None)
+        self.export_path = model_config.get("export_path", None)
+        self.infer_res_key = model_config.get("infer_res_key", "response")
+
+    def prepare_executor(self):
+        raise NotImplementedError
+
+    def executor_infer(self, messages):
+        raise NotImplementedError
+
+    async def _run(self, run_type, run_obj=None, **kwargs):
+        with jl.open(self.export_path, "w") as writer:
+            with jl.open(self.export_path) as reader:
+                for item in reader:
+                    non_batch = False
+                    messages_list = self.build_messages_func(item)
+                    if len(messages_list) > 0 and not isinstance(messages_list[0], list):
+                        messages_list = [messages_list]
+                        non_batch = True
+                    results = []
+                    for messages in messages_list:
+                        output = self.executor_infer(messages)
+                        results.append(self.parse_output_func(output, item))
+                    if non_batch:
+                        item[self.infer_res_key] = results[0]
+                    else:
+                        item[self.infer_res_key] = results
+                    writer.write(item)
+        return self.export_path
+
+
+class HFTransformersInferExecutor(LLMInferExecutor):
+    """
+    A inference executor for model inference with Huggingface Transformers.
+
+    The config file for this executor should at least include the following items:
+    1. `type`: must be "huggingface".
+    2. `model_path`: the path to the HF model.
+    3. `model_params`: extra parameters for the model.
+    4. `sampling_params`: extra sampling parameters for the model.
+    """
+
+    def __init__(self, model_config: dict, watcher=None):
+        super().__init__(model_config, watcher)
+
+    def prepare_executor(self):
+        model = self.model_config.get("model", None)
+        model_params = self.model_config.get("model_params", {})
+        sampling_params = self.model_config.get("sampling_params", {})
+        executor, _ = get_model(
+            prepare_model(
+                model_type="huggingface",
+                pretrained_model_name_or_path=model,
+                return_pipe=True,
+                **model_params,
+            ),
+            use_cuda=True,
+        )
+        sampling_params = update_sampling_params(sampling_params, model, False)
+        return executor, sampling_params
+
+    def executor_infer(self, messages):
+        response = self.executor(messages, return_full_text=False, **self.sampling_params)
+        output = response[0]["generated_text"]
+        return output
+
+
+class VLLMInferExecutor(LLMInferExecutor):
+    """
+    A inference executor for model inference with vLLM.
+
+    The config file for this executor should at least include the following items:
+    1. `type`: must be "vllm".
+    2. `model_path`: the path to the vLLM model.
+    3. `model_params`: extra parameters for the model.
+    4. `sampling_params`: extra sampling parameters for the model.
+    5. other parameters can be referred to the class LLMInferExecutor
+    """
+
+    def __init__(self, model_config: dict, watcher=None):
+        super().__init__(model_config, watcher)
+
+    def prepare_executor(self):
+        # model related params
+        torch = LazyLoader("torch")
+        vllm = LazyLoader("vllm")
+        model = self.model_config.get("model", None)
+        model_params = self.model_config.get("model_params", {})
+        sampling_params = self.model_config.get("sampling_params", {})
+        if model_params.get("tensor_parallel_size") is None:
+            tensor_parallel_size = torch.cuda.device_count()
+            logger.info(
+                f"Set tensor_parallel_size to \
+                        {tensor_parallel_size} for vllm."
+            )
+            model_params["tensor_parallel_size"] = tensor_parallel_size
+        executor, _ = get_model(
+            prepare_model(
+                model_type="vllm",
+                pretrained_model_name_or_path=model,
+                **model_params,
+            ),
+            use_cuda=True,
+        )
+        sampling_params = vllm.SamplingParams(**update_sampling_params(sampling_params, model, False))
+        return executor, sampling_params
+
+    def executor_infer(self, messages):
+        response = self.executor.chat(messages, self.sampling_params)
+        output = response[0].outputs[0].text
+        return output
+
+
+class APIModelInferExecutor(LLMInferExecutor):
+    """
+    A inference executor for model inference with OpenAI API.
+
+    The config file for this executor should at least include the following items:
+    1. `type`: must be "api".
+    2. `model`: the API model used to inference.
+    3. `model_params`: extra parameters for the model.
+    4. `sampling_params`: extra sampling parameters for the model.
+    5. `api_endpoint`: URL endpoint for the API.
+    6. `response_path`: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+    7. `max_retry_num`: the max number of retries when the API request fails.
+    8. other parameters can be referred to the class LLMInferExecutor
+    """
+
+    def __init__(self, model_config: dict, watcher=None):
+        super().__init__(model_config, watcher)
+        # model related params
+        self.max_retry_num = self.model_config.get("max_retry_num", 5)
+
+    def prepare_executor(self):
+        # model related params
+        api_endpoint = self.model_config.get("api_endpoint", None)
+        response_path = self.model_config.get("response_path", None)
+        model = self.model_config.get("model", None)
+        model_params = self.model_config.get("model_params", {})
+        sampling_params = self.model_config.get("sampling_params", {})
+        executor = get_model(
+            prepare_model(
+                model_type="api",
+                model=model,
+                endpoint=api_endpoint,
+                response_path=response_path,
+                **model_params,
+            ),
+            use_cuda=True,
+        )
+        sampling_params = sampling_params
+        return executor, sampling_params
+
+    def executor_infer(self, messages):
+        try_count = 0
+        while try_count <= self.max_retry_num:
+            try:
+                output = self.executor(messages, **self.sampling_params)
+                return output
+            except Exception as e:
+                logger.warning(f"error: {e} -- retries: {try_count}")
+                try_count += 1
+                if try_count > self.max_retry_num:
+                    logger.error("Retried too many times. Abort!")
+                    raise
+                time.sleep(try_count * 1)
 
 
 class LLaVAExecutor(BaseModelExecutor):

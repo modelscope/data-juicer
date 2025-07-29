@@ -13,9 +13,11 @@ class GeneratePromptFromExamplesMapperTest(DataJuicerTestCaseBase):
     test_data_path = os.path.join(root_path, 'demos/data/demo-dataset-prompts.jsonl')
 
     def _run_op(self, model="Qwen/Qwen2.5-7B-Instruct", enable_vllm=False, is_hf_model=True, sampling_params=None, num_proc=1):
+        gen_num = 3
+        batch_size = 2
         op = GeneratePromptMapper(
             api_or_hf_model=model,
-            gen_num=3,
+            gen_num=gen_num,
             max_example_num=3,
             enable_vllm=enable_vllm,
             is_hf_model=is_hf_model,
@@ -24,11 +26,10 @@ class GeneratePromptFromExamplesMapperTest(DataJuicerTestCaseBase):
 
         dataset = NestedDataset(load_dataset("json", data_files=self.test_data_path, split='train'))
 
-        results = dataset.map(op.process, num_proc=num_proc, with_rank=True, batched=True, batch_size=2)
+        results = dataset.map(op.process, num_proc=num_proc, with_rank=True, batched=True, batch_size=batch_size)
 
-        num_batches = len(dataset) // 2
-        self.assertEqual(len(results), len(dataset) + num_batches * 3)
-        print(results.to_list())
+        num_batches = len(dataset) // batch_size
+        self.assertEqual(len(results), len(dataset) + num_batches * gen_num)
 
     def test(self):
         sampling_params = {'max_new_tokens': 200}
