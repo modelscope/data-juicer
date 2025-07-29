@@ -261,11 +261,15 @@ ls -la /tmp/fast_event_logs/
 ls -la /tmp/large_checkpoints/
 ```
 
-## 📈 作业进度监控器
+## 📈 作业管理工具
+
+DataJuicer 提供全面的作业管理工具，用于监控进度和停止正在运行的作业。这些工具位于 `data_juicer/utils/job/` 中，提供命令行和程序化接口。
+
+### 📊 作业进度监控器
 
 一个全面的工具，用于监控和显示 DataJuicer 作业的进度信息。显示分区状态、操作进度、检查点和整体作业指标。
 
-### 功能特性
+#### 功能特性
 
 - **实时进度跟踪**: 监控具有分区级详细信息的作业进度
 - **操作性能**: 查看详细的操作指标，包括吞吐量和数据减少
@@ -273,38 +277,38 @@ ls -la /tmp/large_checkpoints/
 - **监视模式**: 连续监控作业，自动更新
 - **程序化访问**: 作为 Python 函数使用，集成到其他工具中
 
-### 命令行用法
+#### 命令行用法
 
-#### 基本用法
+##### 基本用法
 ```bash
 # 显示作业的基本进度
-python tools/job_progress_monitor.py 20250728_233517_510abf
+python -m data_juicer.utils.job.monitor 20250728_233517_510abf
 
 # 显示详细进度和操作指标
-python tools/job_progress_monitor.py 20250728_233517_510abf --detailed
+python -m data_juicer.utils.job.monitor 20250728_233517_510abf --detailed
 
 # 监视模式 - 每 10 秒连续更新进度
-python tools/job_progress_monitor.py 20250728_233517_510abf --watch
+python -m data_juicer.utils.job.monitor 20250728_233517_510abf --watch
 
 # 监视模式，自定义更新间隔（30 秒）
-python tools/job_progress_monitor.py 20250728_233517_510abf --watch --interval 30
+python -m data_juicer.utils.job.monitor 20250728_233517_510abf --watch --interval 30
 
 # 使用自定义基础目录
-python tools/job_progress_monitor.py 20250728_233517_510abf --base-dir /custom/path
+python -m data_juicer.utils.job.monitor 20250728_233517_510abf --base-dir /custom/path
 ```
 
-#### 命令行选项
+##### 命令行选项
 - `job_id`: 要监控的作业 ID（必需）
 - `--base-dir`: 包含作业输出的基础目录（默认：`outputs/partition-checkpoint-eventlog`）
 - `--detailed`: 显示详细的操作信息
 - `--watch`: 监视模式 - 连续更新进度
 - `--interval`: 监视模式的更新间隔（秒）（默认：10）
 
-### Python API
+#### Python API
 
-#### 基本函数用法
+##### 基本函数用法
 ```python
-from tools.job_progress_monitor import show_job_progress
+from data_juicer.utils.job.monitor import show_job_progress
 
 # 显示进度并获取数据
 data = show_job_progress("20250728_233517_510abf")
@@ -316,9 +320,9 @@ data = show_job_progress("20250728_233517_510abf", detailed=True)
 data = show_job_progress("20250728_233517_510abf", base_dir="/custom/path")
 ```
 
-#### 基于类的用法
+##### 基于类的用法
 ```python
-from tools.job_progress_monitor import JobProgressMonitor
+from data_juicer.utils.job.monitor import JobProgressMonitor
 
 # 创建监控器实例
 monitor = JobProgressMonitor("20250728_233517_510abf")
@@ -333,6 +337,104 @@ data = monitor.get_progress_data()
 job_status = data['overall_progress']['job_status']
 progress_percentage = data['overall_progress']['progress_percentage']
 partition_status = data['partition_status']
+```
+
+### 🛑 作业停止器
+
+一个工具，通过读取事件日志来查找进程和线程 ID，然后终止这些特定的进程和线程来停止正在运行的 DataJuicer 作业。
+
+#### 功能特性
+
+- **精确进程终止**: 使用事件日志识别要终止的确切进程和线程
+- **优雅关闭**: 首先发送 SIGTERM 进行优雅关闭，然后在需要时发送 SIGKILL
+- **安全检查**: 在停止前验证作业存在性和运行状态
+- **全面日志记录**: 终止过程的详细日志记录
+- **程序化访问**: 可以作为 Python 函数或命令行工具使用
+
+#### 命令行用法
+
+##### 基本用法
+```bash
+# 优雅地停止作业（SIGTERM）
+python -m data_juicer.utils.job.stopper 20250728_233517_510abf
+
+# 强制停止作业（SIGKILL）
+python -m data_juicer.utils.job.stopper 20250728_233517_510abf --force
+
+# 使用自定义超时停止（60 秒）
+python -m data_juicer.utils.job.stopper 20250728_233517_510abf --timeout 60
+
+# 使用自定义基础目录
+python -m data_juicer.utils.job.stopper 20250728_233517_510abf --base-dir /custom/path
+
+# 列出所有正在运行的作业
+python -m data_juicer.utils.job.stopper --list
+```
+
+##### 命令行选项
+- `job_id`: 要停止的作业 ID（必需，除非使用 --list）
+- `--base-dir`: 包含作业输出的基础目录（默认：`outputs/partition-checkpoint-eventlog`）
+- `--force`: 使用 SIGKILL 强制杀死而不是优雅的 SIGTERM
+- `--timeout`: 优雅关闭的超时时间（秒）（默认：30）
+- `--list`: 列出所有正在运行的作业而不是停止一个
+
+#### Python API
+
+##### 基本函数用法
+```python
+from data_juicer.utils.job.stopper import stop_job
+
+# 优雅地停止作业
+result = stop_job("20250728_233517_510abf")
+
+# 强制停止作业
+result = stop_job("20250728_233517_510abf", force=True)
+
+# 使用自定义超时停止
+result = stop_job("20250728_233517_510abf", timeout=60)
+
+# 使用自定义基础目录
+result = stop_job("20250728_233517_510abf", base_dir="/custom/path")
+```
+
+##### 基于类的用法
+```python
+from data_juicer.utils.job.stopper import JobStopper
+
+# 创建停止器实例
+stopper = JobStopper("20250728_233517_510abf")
+
+# 停止作业
+result = stopper.stop_job(force=False, timeout=30)
+
+# 检查作业是否正在运行
+is_running = stopper.is_job_running()
+
+# 获取作业摘要
+summary = stopper.get_job_summary()
+```
+
+### 🔧 通用工具
+
+监控器和停止器工具都通过 `data_juicer.utils.job.common` 共享通用功能：
+
+```python
+from data_juicer.utils.job.common import JobUtils, list_running_jobs
+
+# 列出所有正在运行的作业
+running_jobs = list_running_jobs()
+
+# 创建作业工具实例
+job_utils = JobUtils("20250728_233517_510abf")
+
+# 加载作业摘要
+summary = job_utils.load_job_summary()
+
+# 加载事件日志
+events = job_utils.load_event_logs()
+
+# 获取分区状态
+partition_status = job_utils.get_partition_status()
 ```
 
 ### 输出信息
@@ -406,7 +508,7 @@ DataJuicer 作业进度监控器
 
 #### 监控多个作业
 ```python
-from tools.job_progress_monitor import show_job_progress
+from data_juicer.utils.job.monitor import show_job_progress
 
 job_ids = ["job1", "job2", "job3"]
 for job_id in job_ids:
@@ -419,7 +521,7 @@ for job_id in job_ids:
 
 #### 自定义监控脚本
 ```python
-from tools.job_progress_monitor import JobProgressMonitor
+from data_juicer.utils.job.monitor import JobProgressMonitor
 import time
 
 def monitor_job_until_completion(job_id, check_interval=30):
@@ -438,6 +540,36 @@ def monitor_job_until_completion(job_id, check_interval=30):
         
         print(f"作业 {job_id} 仍在运行... {data['overall_progress']['progress_percentage']:.1f}%")
         time.sleep(check_interval)
+```
+
+#### 作业管理工作流
+```python
+from data_juicer.utils.job.monitor import show_job_progress
+from data_juicer.utils.job.stopper import stop_job
+from data_juicer.utils.job.common import list_running_jobs
+
+# 列出所有正在运行的作业
+running_jobs = list_running_jobs()
+print(f"发现 {len(running_jobs)} 个正在运行的作业")
+
+# 监控并可能停止作业
+for job_info in running_jobs:
+    job_id = job_info['job_id']
+    
+    # 检查进度
+    try:
+        data = show_job_progress(job_id)
+        progress = data['overall_progress']['progress_percentage']
+        
+        # 停止卡住的作业（1小时后进度仍少于10%）
+        if progress < 10 and data['overall_progress']['elapsed_time_seconds'] > 3600:
+            print(f"停止卡住的作业 {job_id}（进度: {progress:.1f}%）")
+            stop_job(job_id, force=True)
+        else:
+            print(f"作业 {job_id}: {progress:.1f}% 完成")
+            
+    except Exception as e:
+        print(f"监控作业 {job_id} 时出错: {e}")
 ```
 
 ## 🤖 自动配置系统

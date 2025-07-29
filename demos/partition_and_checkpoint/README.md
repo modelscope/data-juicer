@@ -261,11 +261,15 @@ ls -la /tmp/fast_event_logs/
 ls -la /tmp/large_checkpoints/
 ```
 
-## 📈 Job Progress Monitor
+## 📈 Job Management Utilities
+
+DataJuicer provides comprehensive job management utilities for monitoring progress and stopping running jobs. These utilities are located in `data_juicer/utils/job/` and provide both command-line and programmatic interfaces.
+
+### 📊 Job Progress Monitor
 
 A comprehensive utility to monitor and display progress information for DataJuicer jobs. Shows partition status, operation progress, checkpoints, and overall job metrics.
 
-### Features
+#### Features
 
 - **Real-time Progress Tracking**: Monitor job progress with partition-level details
 - **Operation Performance**: View detailed operation metrics including throughput and data reduction
@@ -273,38 +277,38 @@ A comprehensive utility to monitor and display progress information for DataJuic
 - **Watch Mode**: Continuously monitor jobs with automatic updates
 - **Programmatic Access**: Use as a Python function for integration into other tools
 
-### Command Line Usage
+#### Command Line Usage
 
-#### Basic Usage
+##### Basic Usage
 ```bash
 # Show basic progress for a job
-python tools/job_progress_monitor.py 20250728_233517_510abf
+python -m data_juicer.utils.job.monitor 20250728_233517_510abf
 
 # Show detailed progress with operation metrics
-python tools/job_progress_monitor.py 20250728_233517_510abf --detailed
+python -m data_juicer.utils.job.monitor 20250728_233517_510abf --detailed
 
 # Watch mode - continuously update progress every 10 seconds
-python tools/job_progress_monitor.py 20250728_233517_510abf --watch
+python -m data_juicer.utils.job.monitor 20250728_233517_510abf --watch
 
 # Watch mode with custom update interval (30 seconds)
-python tools/job_progress_monitor.py 20250728_233517_510abf --watch --interval 30
+python -m data_juicer.utils.job.monitor 20250728_233517_510abf --watch --interval 30
 
 # Use custom base directory
-python tools/job_progress_monitor.py 20250728_233517_510abf --base-dir /custom/path
+python -m data_juicer.utils.job.monitor 20250728_233517_510abf --base-dir /custom/path
 ```
 
-#### Command Line Options
+##### Command Line Options
 - `job_id`: The job ID to monitor (required)
 - `--base-dir`: Base directory containing job outputs (default: `outputs/partition-checkpoint-eventlog`)
 - `--detailed`: Show detailed operation information
 - `--watch`: Watch mode - continuously update progress
 - `--interval`: Update interval in seconds for watch mode (default: 10)
 
-### Python API
+#### Python API
 
-#### Basic Function Usage
+##### Basic Function Usage
 ```python
-from tools.job_progress_monitor import show_job_progress
+from data_juicer.utils.job.monitor import show_job_progress
 
 # Show progress and get data
 data = show_job_progress("20250728_233517_510abf")
@@ -316,9 +320,9 @@ data = show_job_progress("20250728_233517_510abf", detailed=True)
 data = show_job_progress("20250728_233517_510abf", base_dir="/custom/path")
 ```
 
-#### Class-based Usage
+##### Class-based Usage
 ```python
-from tools.job_progress_monitor import JobProgressMonitor
+from data_juicer.utils.job.monitor import JobProgressMonitor
 
 # Create monitor instance
 monitor = JobProgressMonitor("20250728_233517_510abf")
@@ -333,6 +337,104 @@ data = monitor.get_progress_data()
 job_status = data['overall_progress']['job_status']
 progress_percentage = data['overall_progress']['progress_percentage']
 partition_status = data['partition_status']
+```
+
+### 🛑 Job Stopper
+
+A utility to stop running DataJuicer jobs by reading event logs to find process and thread IDs, then terminating those specific processes and threads.
+
+#### Features
+
+- **Precise Process Termination**: Uses event logs to identify exact processes and threads to terminate
+- **Graceful Shutdown**: Sends SIGTERM first for graceful shutdown, then SIGKILL if needed
+- **Safety Checks**: Validates job existence and running status before stopping
+- **Comprehensive Logging**: Detailed logging of termination process
+- **Programmatic Access**: Can be used as a Python function or command-line tool
+
+#### Command Line Usage
+
+##### Basic Usage
+```bash
+# Stop a job gracefully (SIGTERM)
+python -m data_juicer.utils.job.stopper 20250728_233517_510abf
+
+# Force stop a job (SIGKILL)
+python -m data_juicer.utils.job.stopper 20250728_233517_510abf --force
+
+# Stop with custom timeout (60 seconds)
+python -m data_juicer.utils.job.stopper 20250728_233517_510abf --timeout 60
+
+# Use custom base directory
+python -m data_juicer.utils.job.stopper 20250728_233517_510abf --base-dir /custom/path
+
+# List all running jobs
+python -m data_juicer.utils.job.stopper --list
+```
+
+##### Command Line Options
+- `job_id`: The job ID to stop (required, unless using --list)
+- `--base-dir`: Base directory containing job outputs (default: `outputs/partition-checkpoint-eventlog`)
+- `--force`: Force kill with SIGKILL instead of graceful SIGTERM
+- `--timeout`: Timeout in seconds for graceful shutdown (default: 30)
+- `--list`: List all running jobs instead of stopping one
+
+#### Python API
+
+##### Basic Function Usage
+```python
+from data_juicer.utils.job.stopper import stop_job
+
+# Stop a job gracefully
+result = stop_job("20250728_233517_510abf")
+
+# Force stop a job
+result = stop_job("20250728_233517_510abf", force=True)
+
+# Stop with custom timeout
+result = stop_job("20250728_233517_510abf", timeout=60)
+
+# Use custom base directory
+result = stop_job("20250728_233517_510abf", base_dir="/custom/path")
+```
+
+##### Class-based Usage
+```python
+from data_juicer.utils.job.stopper import JobStopper
+
+# Create stopper instance
+stopper = JobStopper("20250728_233517_510abf")
+
+# Stop the job
+result = stopper.stop_job(force=False, timeout=30)
+
+# Check if job is running
+is_running = stopper.is_job_running()
+
+# Get job summary
+summary = stopper.get_job_summary()
+```
+
+### 🔧 Common Utilities
+
+Both the monitor and stopper utilities share common functionality through `data_juicer.utils.job.common`:
+
+```python
+from data_juicer.utils.job.common import JobUtils, list_running_jobs
+
+# List all running jobs
+running_jobs = list_running_jobs()
+
+# Create job utilities instance
+job_utils = JobUtils("20250728_233517_510abf")
+
+# Load job summary
+summary = job_utils.load_job_summary()
+
+# Load event logs
+events = job_utils.load_event_logs()
+
+# Get partition status
+partition_status = job_utils.get_partition_status()
 ```
 
 ### Output Information
@@ -406,7 +508,7 @@ Job ID: 20250728_233517_510abf
 
 #### Monitoring Multiple Jobs
 ```python
-from tools.job_progress_monitor import show_job_progress
+from data_juicer.utils.job.monitor import show_job_progress
 
 job_ids = ["job1", "job2", "job3"]
 for job_id in job_ids:
@@ -419,7 +521,7 @@ for job_id in job_ids:
 
 #### Custom Monitoring Script
 ```python
-from tools.job_progress_monitor import JobProgressMonitor
+from data_juicer.utils.job.monitor import JobProgressMonitor
 import time
 
 def monitor_job_until_completion(job_id, check_interval=30):
@@ -438,6 +540,36 @@ def monitor_job_until_completion(job_id, check_interval=30):
         
         print(f"Job {job_id} still running... {data['overall_progress']['progress_percentage']:.1f}%")
         time.sleep(check_interval)
+```
+
+#### Job Management Workflow
+```python
+from data_juicer.utils.job.monitor import show_job_progress
+from data_juicer.utils.job.stopper import stop_job
+from data_juicer.utils.job.common import list_running_jobs
+
+# List all running jobs
+running_jobs = list_running_jobs()
+print(f"Found {len(running_jobs)} running jobs")
+
+# Monitor and potentially stop jobs
+for job_info in running_jobs:
+    job_id = job_info['job_id']
+    
+    # Check progress
+    try:
+        data = show_job_progress(job_id)
+        progress = data['overall_progress']['progress_percentage']
+        
+        # Stop jobs that are stuck (less than 10% progress after 1 hour)
+        if progress < 10 and data['overall_progress']['elapsed_time_seconds'] > 3600:
+            print(f"Stopping stuck job {job_id} (progress: {progress:.1f}%)")
+            stop_job(job_id, force=True)
+        else:
+            print(f"Job {job_id}: {progress:.1f}% complete")
+            
+    except Exception as e:
+        print(f"Error monitoring job {job_id}: {e}")
 ```
 
 ## 🤖 Auto-Configuration System
