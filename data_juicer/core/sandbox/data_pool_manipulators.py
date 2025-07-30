@@ -91,13 +91,20 @@ class DataPoolConstruction(BaseDataPoolManipulator):
             - an analyzed dataset.
             - an output path.
             - (optional) split_ratios. It's [1/3, 2/3] in default, Support fraction in string format.
+            - (optional) split_num. It's not activated in default. Support specifying the number of samples in one data
+                pool. Use split_num first if both of split_ratios and split_num are specified.
+            - (optional) ignore_stats. It's False in default. Whether to split the data pool according to the stats
+                ranking.
         Output: MxN data pools, where N is the number of types of analyzed stats and M means the number of split parts.
+            If ignore_stats is True, N is 1 and the result data pools are stored in the export_path directly.
             They are named following the rule "<stats_key_name>/<original_name>_<part_idx>.jsonl"
         """
         # read inputs
         input_dataset_paths = self.data_pool_cfg.get("dataset_path", [])
         export_path = self.data_pool_cfg.get("export_path", None)
         split_ratios = self.data_pool_cfg.get("split_ratios", [1.0 / 3.0, 2.0 / 3.0])
+        split_num = self.data_pool_cfg.get("split_num", None)
+        ignore_stats = self.data_pool_cfg.get("ignore_stats", False)
 
         # check I/O paths
         existing_input_paths, export_path = check_io_paths(input_dataset_paths, export_path)
@@ -110,16 +117,16 @@ class DataPoolConstruction(BaseDataPoolManipulator):
         logger.info(f"Constructing data pools with split ratios {split_ratios}...")
         output_paths = []
         for ds_path in existing_input_paths:
-            output_paths.extend(self._construct_data_pool(ds_path, export_path, split_ratios))
+            output_paths.extend(self._construct_data_pool(ds_path, export_path, split_ratios, split_num, ignore_stats))
 
         return output_paths
 
-    def _construct_data_pool(self, ds_path, export_path, split_ratios):
+    def _construct_data_pool(self, ds_path, export_path, split_ratios, split_num, ignore_stats=False):
         logger.info(f"Constructing data pool for {ds_path}...")
         ds_basename = os.path.splitext(os.path.basename(ds_path))[0]
         ds = load_data_pool(ds_path)
         ds_schema = ds.schema()
-        if Fields.stats not in ds_schema.columns:
+        if not ignore_stats and Fields.stats not in ds_schema.columns:
             logger.warning(f"Dataset {ds_path} does not contain stats. Skipped!")
             return
         ds = ds.to_list()
@@ -127,9 +134,28 @@ class DataPoolConstruction(BaseDataPoolManipulator):
         if total_num == 0:
             logger.warning(f"Dataset {ds_path} is empty. Skipped!")
             return
-        split_points = [int(total_num * r + 0.5) for r in split_ratios]
+        if split_num is not None:
+            split_points = list(range(split_num, total_num, split_num))
+        else:
+            split_points = [int(total_num * r + 0.5) for r in split_ratios]
         split_points = [0] + split_points + [total_num]
         logger.info(f"Split points: {split_points}")
+
+        # do not consider the stats information
+        if ignore_stats:
+            logger.info("Ignore stats and split the dataset with the current dataset state.")
+            output_paths = []
+            os.makedirs(export_path, exist_ok=True)
+            for i in range(len(split_points) - 1):
+                start_idx = split_points[i]
+                end_idx = split_points[i + 1]
+                part_ds = ds[start_idx:end_idx]
+                curr_export_name = add_suffix_to_filename(ds_basename, f"_ignore_stats_{i}.jsonl")
+                output_path = os.path.join(export_path, curr_export_name)
+                with jl.open(output_path, "w") as writer:
+                    writer.write_all(part_ds)
+                output_paths.append(output_path)
+            return output_paths
 
         stats_schema = ds_schema.column_types[Fields.stats]
         if not isinstance(stats_schema, Schema):
