@@ -57,6 +57,7 @@ class Event:
     event_type: EventType
     timestamp: float
     message: str
+    event_id: Optional[str] = None
     job_id: Optional[str] = None
     partition_id: Optional[int] = None
     operation_name: Optional[str] = None
@@ -445,11 +446,18 @@ class EventLoggingMixin:
         process_id = os.getpid()
         thread_id = threading.get_ident()
 
+        # Generate event ID if not provided
+        event_id = kwargs.get("event_id")
+        if event_id is None:
+            timestamp = int(time.time())
+            event_id = f"{event_type.value}_{timestamp}_{uuid4().hex[:8]}"
+
         logger.debug(f"Creating event: {event_type.value} - {message}")
         event = Event(
             event_type=event_type,
             timestamp=time.time(),
             message=message,
+            event_id=event_id,
             process_id=process_id,
             thread_id=thread_id,
             **kwargs,
@@ -474,16 +482,24 @@ class EventLoggingMixin:
                 "max_retries": config.get("max_retries"),
             },
         }
+        event_id = f"job_start_{int(time.time())}"
         self._log_event(
-            EventType.JOB_START, "Job started", config=config, metadata=metadata, total_partitions=total_partitions
+            EventType.JOB_START,
+            "Job started",
+            event_id=event_id,
+            config=config,
+            metadata=metadata,
+            total_partitions=total_partitions,
         )
 
     def log_job_complete(self, status, duration):
         """Log job completion with performance metrics."""
         metadata = {"status": status, "duration_seconds": duration, "completion_time": time.time()}
+        event_id = f"job_complete_{int(time.time())}"
         self._log_event(
             EventType.JOB_COMPLETE,
             f"Job completed with status: {status}",
+            event_id=event_id,
             status=status,
             duration=duration,
             metadata=metadata,
@@ -498,9 +514,11 @@ class EventLoggingMixin:
             "failure_time": time.time(),
             "error_type": type(error_message).__name__ if error_message else "Unknown",
         }
+        event_id = f"job_failed_{int(time.time())}"
         self._log_event(
             EventType.JOB_FAILED,
             f"Job failed: {error_message}",
+            event_id=event_id,
             status="failed",
             error_message=error_message,
             duration=duration,
@@ -516,9 +534,11 @@ class EventLoggingMixin:
             "partition_size_bytes": partition_meta.get("file_size_bytes"),
             "sample_count": partition_meta.get("sample_count"),
         }
+        event_id = f"partition_start_{partition_id}_{int(time.time())}"
         self._log_event(
             EventType.PARTITION_START,
             f"Partition {partition_id} started processing",
+            event_id=event_id,
             partition_id=partition_id,
             partition_meta=partition_meta,
             metadata=metadata,
@@ -549,7 +569,10 @@ class EventLoggingMixin:
             logger.debug(f"  Error: {error}")
 
         # Use the _log_event method to ensure proper logging
-        self._log_event(EventType.PARTITION_COMPLETE, message, partition_id=partition_id, metadata=metadata)
+        event_id = f"partition_complete_{partition_id}_{int(time.time())}"
+        self._log_event(
+            EventType.PARTITION_COMPLETE, message, event_id=event_id, partition_id=partition_id, metadata=metadata
+        )
 
     def log_partition_failed(self, partition_id, error_message, retry_count):
         """Log partition failure with retry information."""
@@ -558,9 +581,11 @@ class EventLoggingMixin:
             "failure_time": time.time(),
             "error_type": type(error_message).__name__ if error_message else "Unknown",
         }
+        event_id = f"partition_failed_{partition_id}_{int(time.time())}"
         self._log_event(
             EventType.PARTITION_FAILED,
             f"Partition {partition_id} failed after {retry_count} retries: {error_message}",
+            event_id=event_id,
             partition_id=partition_id,
             error_message=error_message,
             retry_count=retry_count,
@@ -576,9 +601,11 @@ class EventLoggingMixin:
             "start_time": time.time(),
             "operation_class": operation_name,
         }
+        event_id = f"op_start_{partition_id}_{operation_idx}_{int(time.time())}"
         self._log_event(
             EventType.OP_START,
             f"Operation {operation_name} (idx {operation_idx}) started on partition {partition_id}",
+            event_id=event_id,
             partition_id=partition_id,
             operation_name=operation_name,
             operation_idx=operation_idx,
@@ -605,9 +632,11 @@ class EventLoggingMixin:
             "operation_class": operation_name,
         }
 
+        event_id = f"op_complete_{partition_id}_{operation_idx}_{int(time.time())}"
         self._log_event(
             EventType.OP_COMPLETE,
             f"Operation {operation_name} (idx {operation_idx}) completed on partition {partition_id} - {input_rows}→{output_rows} rows in {duration:.3f}s",
+            event_id=event_id,
             partition_id=partition_id,
             operation_name=operation_name,
             operation_idx=operation_idx,
@@ -627,9 +656,11 @@ class EventLoggingMixin:
             "error_type": type(error_message).__name__ if error_message else "Unknown",
             "operation_class": operation_name,
         }
+        event_id = f"op_failed_{partition_id}_{operation_idx}_{int(time.time())}"
         self._log_event(
             EventType.OP_FAILED,
             f"Operation {operation_name} (idx {operation_idx}) failed on partition {partition_id}: {error_message}",
+            event_id=event_id,
             partition_id=partition_id,
             operation_name=operation_name,
             operation_idx=operation_idx,
@@ -647,9 +678,11 @@ class EventLoggingMixin:
             "operation_class": operation_name,
             "save_time": time.time(),
         }
+        event_id = f"checkpoint_save_{partition_id}_{operation_idx}_{int(time.time())}"
         self._log_event(
             EventType.CHECKPOINT_SAVE,
             f"Checkpoint saved for operation {operation_name} (idx {operation_idx}) on partition {partition_id}",
+            event_id=event_id,
             partition_id=partition_id,
             operation_name=operation_name,
             operation_idx=operation_idx,
@@ -665,9 +698,11 @@ class EventLoggingMixin:
             "operation_class": operation_name,
             "load_time": time.time(),
         }
+        event_id = f"checkpoint_load_{partition_id}_{operation_idx}_{int(time.time())}"
         self._log_event(
             EventType.CHECKPOINT_LOAD,
             f"Checkpoint loaded for operation {operation_name} (idx {operation_idx}) on partition {partition_id}",
+            event_id=event_id,
             partition_id=partition_id,
             operation_name=operation_name,
             operation_idx=operation_idx,

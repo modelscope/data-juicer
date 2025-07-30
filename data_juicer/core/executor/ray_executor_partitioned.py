@@ -464,6 +464,23 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             # Add .parquet suffix for consistency with other parquet directories
             partition_path = os.path.join(self.partitions_dir, f"partition_{i:06d}.parquet")
 
+            # Log individual partition creation start
+            partition_creation_start = time.time()
+            self._log_processing_event(
+                ProcessingEvent(
+                    event_id=f"partition_creation_start_{i}_{int(partition_creation_start)}",
+                    event_type="partition_creation_start",
+                    timestamp=partition_creation_start,
+                    partition_id=i,
+                    message=f"Starting creation of partition {i}",
+                    metadata={
+                        "partition_id": i,
+                        "partition_path": partition_path,
+                        "total_partitions": len(block_refs),
+                    },
+                )
+            )
+
             # Get the actual partition data from the block reference
             partition_data = ray.get(block_ref)
 
@@ -571,6 +588,29 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             logger.info(
                 f"Created partition {i+1}/{partition_count}: {partition_path} "
                 f"({sample_count} samples, {file_size} bytes)"
+            )
+
+            # Log individual partition creation complete
+            partition_creation_complete = time.time()
+            partition_creation_duration = partition_creation_complete - partition_creation_start
+            self._log_processing_event(
+                ProcessingEvent(
+                    event_id=f"partition_creation_complete_{i}_{int(partition_creation_complete)}",
+                    event_type="partition_creation_complete",
+                    timestamp=partition_creation_complete,
+                    partition_id=i,
+                    message=f"Partition {i} creation completed - {sample_count} samples in {partition_creation_duration:.2f}s",
+                    metadata={
+                        "partition_id": i,
+                        "partition_path": partition_path,
+                        "sample_count": sample_count,
+                        "file_size_bytes": file_size,
+                        "checksum": checksum,
+                        "duration_seconds": partition_creation_duration,
+                        "original_start_idx": start_idx,
+                        "original_end_idx": end_idx,
+                    },
+                )
             )
 
         # Save dataset mapping
@@ -1254,7 +1294,53 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         # Create partitions
         logger.info("Creating new partitions...")
+
+        # Log repartition start event
+        repartition_start_time = time.time()
+        self._log_processing_event(
+            ProcessingEvent(
+                event_id=f"repartition_start_{int(repartition_start_time)}",
+                event_type="repartition_start",
+                timestamp=repartition_start_time,
+                message="Starting dataset repartitioning phase",
+                metadata={
+                    "original_dataset_path": self.cfg.dataset_path,
+                    "partition_size": getattr(self.cfg, "partition_size", None),
+                    "max_partition_size_mb": getattr(self.cfg, "max_partition_size_mb", None),
+                    "storage_format": (
+                        getattr(self.cfg.intermediate_storage, "format", "parquet")
+                        if hasattr(self.cfg, "intermediate_storage")
+                        else "parquet"
+                    ),
+                    "compression": (
+                        getattr(self.cfg.intermediate_storage, "compression", "snappy")
+                        if hasattr(self.cfg, "intermediate_storage")
+                        else "snappy"
+                    ),
+                },
+            )
+        )
+
         partition_paths, self.dataset_mapping = self._create_partitions_with_mapping(dataset)
+
+        # Log repartition complete event
+        repartition_complete_time = time.time()
+        repartition_duration = repartition_complete_time - repartition_start_time
+        self._log_processing_event(
+            ProcessingEvent(
+                event_id=f"repartition_complete_{int(repartition_complete_time)}",
+                event_type="repartition_complete",
+                timestamp=repartition_complete_time,
+                message=f"Dataset repartitioning completed - {len(partition_paths)} partitions created in {repartition_duration:.2f}s",
+                metadata={
+                    "partition_count": len(partition_paths),
+                    "total_samples": self.dataset_mapping.original_dataset_size,
+                    "partition_paths": partition_paths,
+                    "duration_seconds": repartition_duration,
+                    "partitions_dir": self.partitions_dir,
+                },
+            )
+        )
 
         # Log job start event
         job_config = {
