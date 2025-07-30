@@ -85,12 +85,14 @@ process:
       min_amplitude: 0.001                                    # Default: 0.001. Minimum noise amplification factor.
       max_amplitude: 0.015                                    # Default: 0.015. Maximum noise amplification factor.
       p: 0.5                                                  # Default: 0.5.(range: [ 0.0, 1.0 ].) The probability of applying this transform.
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - audio_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg audio filters
       filter_name: null                                       # ffmpeg audio filter name. e.g. 'atrim'.
       filter_kwargs: null                                     # keyword-arguments passed to ffmpeg filter. e.g. {'end': 6}.
       global_args: null                                       # list-arguments passed to ffmpeg command-line. e.g. ['-progress'].
       capture_stderr: true                                    # whether to capture stderr.
       overwrite_output: true                                  # whether to overwrite the output file.
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - calibrate_qa_mapper:                                    # calibrate question-answer pairs based on reference text.
       api_model: 'gpt-4o'                                     # API model name.
       api_endpoint: null                                      # URL endpoint for the API.
@@ -312,6 +314,7 @@ process:
       p: 0.2                                                  # probability of the image being blurred
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - image_captioning_from_gpt4v_mapper:                     # generate samples whose texts are generated based on gpt-4-vision and the image
       mode: 'description'                                     # mode of text generated from images, can be one of ['reasoning', 'description', 'conversation', 'custom']
       api_key: ''                                             # the API key to authenticate the request
@@ -340,17 +343,20 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated images in the final datasets and the original images will be removed. It's True in default.
       caption_key: null                                       # the key name of fields in samples to store captions for each images, the caption guide the diffusion model to produce what the image is
       hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # model name on huggingface to generate caption if caption_key is null
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
       mem_required: '8GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrain the maximum number of processes that can be launched
   - image_face_blur_mapper:                                 # blur faces detected in images
       cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - image_remove_background_mapper:                         # remove background from images
       alpha_matting: false                                    # Flag indicating whether to use alpha matting. Defaults to False.
       alpha_matting_foreground_threshold: 240                 # Foreground threshold for alpha matting. Defaults to 240.
       alpha_matting_background_threshold: 10                  # Background threshold for alpha matting. Defaults to 10.
       alpha_matting_erode_size: 10                            # Erosion size for alpha matting. Defaults to 10.
       bgcolor: None                                           # Background color for the cutout image. Defaults to None.
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - image_segment_mapper:                                   # perform segment-anything on images and return the bounding boxes.
       imgsz: 1024                                             # image resolution after image resizing
       conf: 0.05                                              # confidence score threshold
@@ -570,12 +576,14 @@ process:
       cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg video filters
       filter_name: null                                       # ffmpeg audio filter name. e.g. 'scale'.
       filter_kwargs: null                                     # keyword-arguments passed to ffmpeg filter. e.g. {'width': 224, 'height': 224}.
       global_args: null                                       # list-arguments passed to ffmpeg command-line. e.g. ['-progress'].
       capture_stderr: true                                    # whether to capture stderr.
       overwrite_output: true                                  # whether to overwrite the output file.
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_remove_watermark_mapper:                          # Remove the watermarks in videos given regions
       roi_strings: ['0,0,0.1,0.1']                            # a given list of regions the watermarks locate. The format of each can be "x1, y1, x2, y2", "(x1, y1, x2, y2)", or "[x1, y1, x2, y2]".
       roi_type: ratio                                         # the roi string type. When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels in the top left corner and the bottom right corner respectively. If the roi_type is 'ratio', the coordinates are normalized by widths and heights.
@@ -583,10 +591,12 @@ process:
       frame_num: 10                                           # the number of frames to be extracted uniformly from the video to detect the pixels of watermark.
       min_frame_threshold: 7                                  # a coordination is considered as the location of a watermark pixel when it is a watermark pixel in no less min_frame_threshold frames.
       detection_method: pixel_value                           # the method to detect the pixels of watermark. If it is 'pixel_value', we consider the distribution of pixel value in each frame. If it is 'pixel_diversity', we will consider the pixel diversity in different frames.
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_resize_aspect_ratio_mapper:                       # resize videos aspect ratios of videos (a fraction of width by height, r=w/h) to a specified range
       min_ratio: 9/21                                         # the minimum aspect ratio to enforce videos with an aspect ratio below `min_ratio` will be resized to match this minimum ratio. The ratio should be provided as a string in the format "9:21" or "9/21".
       max_ratio: 21/9                                         # the maximum aspect ratio to enforce videos with an aspect ratio above `max_ratio` will be resized to match this maximum ratio. The ratio should be provided as a string in the format "21:9" or "21/9".
       strategy:  increase                                     # the resizing strategy to apply when adjusting the video dimensions. It can be either 'decrease' to reduce the dimension or 'increase' to enlarge it. Accepted values are ['decrease', 'increase'].
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_resize_resolution_mapper:                         # map videos to ones with given resolution range
       min_width: 640                                          # the min horizontal resolution (unit p), videos with width less than 'min_width' will be mapped to videos with equal or bigger width
       max_width: 1280                                         # the max horizontal resolution (unit p), videos with width more than 'max_width' will be mapped to videos with equal of smaller width
@@ -594,17 +604,21 @@ process:
       max_height: 1080                                        # the max vertical resolution (unit p), videos with height more than 'max_height' will be mapped to videos with equal or smaller height
       force_original_aspect_ratio: 'increase'                 # Enable decreasing or increasing output video width or height if necessary to keep the original aspect ratio
       force_divisible_by: 4                                   # Ensures that both the output dimensions, width and height, are divisible by the given integer when used together with force_original_aspect_ratio
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_split_by_duration_mapper:                         # Mapper to split video by duration.
       split_duration: 10                                      # duration of each video split in seconds.
       min_last_split_duration: 0.1                            # the minimum allowable duration in seconds for the last video split. If the duration of the last split is less than this value, it will be discarded.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_split_by_key_frame_mapper:                        # Mapper to split video by key frame.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_split_by_scene_mapper:                            # split videos into scene clips
       detector: 'ContentDetector'                             # PySceneDetect scene detector. Should be one of ['ContentDetector', 'ThresholdDetector', 'AdaptiveDetector`]
       threshold: 27.0                                         # threshold passed to the detector
       min_scene_len: 15                                       # minimum length of any scene
       show_progress: false                                    # whether to show progress from scenedetect
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_tagging_from_audio_mapper:                        # Mapper to generate video tags from audio streams extracted from the video.
       hf_ast: 'MIT/ast-finetuned-audioset-10-10-0.4593'       # Huggingface model name for the audio classification model.
       tag_field_name: 'video_audio_tags'                    # the field name to store the tags. It's "video_audio_tags" in default.

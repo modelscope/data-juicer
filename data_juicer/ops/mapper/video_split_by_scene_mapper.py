@@ -49,6 +49,7 @@ class VideoSplitBySceneMapper(Mapper):
         threshold: NonNegativeFloat = 27.0,
         min_scene_len: NonNegativeInt = 15,
         show_progress: bool = False,
+        save_dir: str = None,
         *args,
         **kwargs,
     ):
@@ -60,6 +61,9 @@ class VideoSplitBySceneMapper(Mapper):
         :param threshold: Threshold passed to the detector.
         :param min_scene_len: Minimum length of any scene.
         :param show_progress: Whether to show progress from scenedetect.
+        :param save_dir: The directory where generated video files will be stored.
+            If not specified, outputs will be saved in the same directory as their corresponding input files.
+            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -76,6 +80,7 @@ class VideoSplitBySceneMapper(Mapper):
         self.threshold = threshold
         self.min_scene_len = min_scene_len
         self.show_progress = show_progress
+        self.save_dir = save_dir
 
         # prepare detector args
         avaliable_kwargs = self.avaliable_detectors[self.detector]
@@ -98,7 +103,7 @@ class VideoSplitBySceneMapper(Mapper):
             if video_key in output_video_keys:
                 continue
 
-            redirected_video_key = transfer_filename(video_key, OP_NAME, **self._init_parameters)
+            redirected_video_key = transfer_filename(video_key, OP_NAME, self.save_dir, **self._init_parameters)
             output_template = add_suffix_to_filename(redirected_video_key, "_$SCENE_NUMBER")
 
             # detect scenes

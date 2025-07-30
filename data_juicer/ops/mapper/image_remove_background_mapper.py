@@ -29,6 +29,7 @@ class ImageRemoveBackgroundMapper(Mapper):
         alpha_matting_background_threshold: int = 10,
         alpha_matting_erode_size: int = 10,
         bgcolor: Optional[Tuple[int, int, int, int]] = None,
+        save_dir: str = None,
         *args,
         **kwargs,
     ):
@@ -45,6 +46,9 @@ class ImageRemoveBackgroundMapper(Mapper):
             Erosion size for alpha matting. Defaults to 10.
         bgcolor (Optional[Tuple[int, int, int, int]], optional):
             Background color for the cutout image. Defaults to None.
+        save_dir: The directory where generated image files will be stored.
+            If not specified, outputs will be saved in the same directory as their corresponding input files.
+            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         *args (Optional[Any]): Additional positional arguments.
         **kwargs (Optional[Any]): Additional keyword arguments.
 
@@ -58,6 +62,7 @@ class ImageRemoveBackgroundMapper(Mapper):
         self.alpha_matting_background_threshold = alpha_matting_background_threshold
         self.alpha_matting_erode_size = alpha_matting_erode_size
         self.bgcolor = bgcolor
+        self.save_dir = save_dir
 
     def process_single(self, sample, context=False):
         # there is no image in this sample
@@ -78,7 +83,7 @@ class ImageRemoveBackgroundMapper(Mapper):
             if image_key in processed:
                 continue
 
-            remove_image_key = transfer_filename(image_key, OP_NAME, **self._init_parameters)
+            remove_image_key = transfer_filename(image_key, OP_NAME, self.save_dir, **self._init_parameters)
             if remove_image_key != image_key:
                 name, _ = os.path.splitext(remove_image_key)
                 remove_image_key = f"{name}.png"
