@@ -48,8 +48,6 @@ class EventType(Enum):
     PROCESSING_START = "processing_start"
     PROCESSING_COMPLETE = "processing_complete"
     PROCESSING_ERROR = "processing_error"
-    RESOURCE_USAGE = "resource_usage"
-    PERFORMANCE_METRIC = "performance_metric"
 
 
 @dataclass
@@ -76,8 +74,6 @@ class Event:
     partition_meta: Optional[Dict[str, Any]] = None
     config: Optional[Dict[str, Any]] = None
     metadata: Optional[Dict[str, Any]] = None
-    resource_usage: Optional[Dict[str, Any]] = None
-    performance_metrics: Optional[Dict[str, Any]] = None
     total_partitions: Optional[int] = None
     successful_partitions: Optional[int] = None
     failed_partitions: Optional[int] = None
@@ -102,8 +98,6 @@ class EventLogger:
         self.job_id = job_id or f"{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}-{uuid4().hex[:6]}"
         self.events: deque = deque(maxlen=10000)
         self.event_lock = threading.Lock()
-        self.performance_metrics = defaultdict(list)
-        self.resource_usage = defaultdict(list)
         self._setup_file_logging()
         self._start_cleanup_thread()
         # Use simpler filename since we're in job-specific directory
@@ -165,11 +159,6 @@ class EventLogger:
                     )
                     + "\n"
                 )
-            # Track performance metrics
-            if event.performance_metrics:
-                self.performance_metrics[event.operation_name or "unknown"].append(event.performance_metrics)
-            if event.resource_usage:
-                self.resource_usage[event.operation_name or "unknown"].append(event.resource_usage)
 
     def _format_event_for_logging(self, event: Event) -> str:
         """Format event for logging with enhanced details."""
@@ -185,16 +174,6 @@ class EventLogger:
 
         if event.duration is not None:
             parts.append(f"DURATION[{event.duration:.3f}s]")
-
-        # Add performance metrics if available
-        if event.performance_metrics:
-            metrics = event.performance_metrics
-            if "throughput" in metrics and metrics["throughput"] > 0:
-                parts.append(f"THROUGHPUT[{metrics['throughput']:.1f} rows/s]")
-            if "input_rows" in metrics and "output_rows" in metrics:
-                parts.append(f"ROWS[{metrics['input_rows']}→{metrics['output_rows']}]")
-            if "reduction_ratio" in metrics:
-                parts.append(f"REDUCTION[{metrics['reduction_ratio']:.2%}]")
 
         parts.append(f"MSG[{event.message}]")
 
@@ -252,54 +231,6 @@ class EventLogger:
 
             return filtered_events
 
-    def get_performance_summary(self, operation_name: Optional[str] = None) -> Dict[str, Any]:
-        """Get performance summary for operations."""
-        with self.event_lock:
-            if operation_name:
-                metrics = self.performance_metrics.get(operation_name, [])
-            else:
-                # Combine all metrics
-                metrics = []
-                for op_metrics in self.performance_metrics.values():
-                    metrics.extend(op_metrics)
-
-            if not metrics:
-                return {}
-
-            # Calculate statistics
-            durations = [m.get("duration", 0) for m in metrics]
-            throughputs = [m.get("throughput", 0) for m in metrics]
-
-            return {
-                "total_operations": len(metrics),
-                "avg_duration": sum(durations) / len(durations) if durations else 0,
-                "min_duration": min(durations) if durations else 0,
-                "max_duration": max(durations) if durations else 0,
-                "avg_throughput": sum(throughputs) / len(throughputs) if throughputs else 0,
-                "total_throughput": sum(throughputs) if throughputs else 0,
-            }
-
-    def get_resource_summary(self) -> Dict[str, Any]:
-        """Get resource usage summary."""
-        with self.event_lock:
-            all_usage = []
-            for op_usage in self.resource_usage.values():
-                all_usage.extend(op_usage)
-
-            if not all_usage:
-                return {}
-
-            # Calculate statistics
-            cpu_usage = [u.get("cpu_percent", 0) for u in all_usage]
-            memory_usage = [u.get("memory_mb", 0) for u in all_usage]
-
-            return {
-                "avg_cpu_percent": sum(cpu_usage) / len(cpu_usage) if cpu_usage else 0,
-                "max_cpu_percent": max(cpu_usage) if cpu_usage else 0,
-                "avg_memory_mb": sum(memory_usage) / len(memory_usage) if memory_usage else 0,
-                "max_memory_mb": max(memory_usage) if memory_usage else 0,
-            }
-
     def generate_status_report(self) -> str:
         """Generate a comprehensive status report."""
         with self.event_lock:
@@ -315,10 +246,6 @@ class EventLogger:
             for event in self.events:
                 event_counts[event.event_type.value] += 1
 
-            # Get performance summary
-            perf_summary = self.get_performance_summary()
-            resource_summary = self.get_resource_summary()
-
             # Generate report
             report_lines = [
                 "=== EVENT LOGGING STATUS REPORT ===",
@@ -332,29 +259,6 @@ class EventLogger:
             for event_type, count in sorted(event_counts.items()):
                 percentage = (count / total_events) * 100
                 report_lines.append(f"  {event_type}: {count} ({percentage:.1f}%)")
-
-            if perf_summary:
-                report_lines.extend(
-                    [
-                        "",
-                        "Performance Summary:",
-                        f"  Total Operations: {perf_summary.get('total_operations', 0)}",
-                        f"  Average Duration: {perf_summary.get('avg_duration', 0):.3f}s",
-                        f"  Average Throughput: {perf_summary.get('avg_throughput', 0):.1f} samples/s",
-                    ]
-                )
-
-            if resource_summary:
-                report_lines.extend(
-                    [
-                        "",
-                        "Resource Usage Summary:",
-                        f"  Average CPU: {resource_summary.get('avg_cpu_percent', 0):.1f}%",
-                        f"  Max CPU: {resource_summary.get('max_cpu_percent', 0):.1f}%",
-                        f"  Average Memory: {resource_summary.get('avg_memory_mb', 0):.1f} MB",
-                        f"  Max Memory: {resource_summary.get('max_memory_mb', 0):.1f} MB",
-                    ]
-                )
 
             return "\n".join(report_lines)
 
@@ -509,24 +413,6 @@ class EventLoggingMixin:
             with open(summary_file, "r") as f:
                 return json.load(f)
         return None
-
-    def _validate_job_resumption(self, job_id: str) -> bool:
-        """Validate that the provided job_id matches existing work directory."""
-        job_summary = self._load_job_summary()
-        if not job_summary:
-            logger.warning(f"No job summary found for job_id: {job_id}")
-            return False
-
-        if job_summary.get("job_id") != job_id:
-            logger.error(f"Job ID mismatch: provided '{job_id}' but found '{job_summary.get('job_id')}'")
-            return False
-
-        logger.info(f"Resuming job: {job_id}")
-        logger.info(f"Job directory: {job_summary.get('job_dir', 'unknown')}")
-        logger.info(f"Previous status: {job_summary.get('status', 'unknown')}")
-        if job_summary.get("error_message"):
-            logger.warning(f"Previous error: {job_summary['error_message']}")
-        return True
 
     def _get_config_name(self) -> str:
         """Extract a meaningful name from config file or project name."""
@@ -719,14 +605,6 @@ class EventLoggingMixin:
             "operation_class": operation_name,
         }
 
-        performance_metrics = {
-            "duration": duration,
-            "throughput": throughput,
-            "input_rows": input_rows,
-            "output_rows": output_rows,
-            "reduction_ratio": reduction_ratio,
-        }
-
         self._log_event(
             EventType.OP_COMPLETE,
             f"Operation {operation_name} (idx {operation_idx}) completed on partition {partition_id} - {input_rows}→{output_rows} rows in {duration:.3f}s",
@@ -739,7 +617,6 @@ class EventLoggingMixin:
             output_rows=output_rows,
             status="success",
             metadata=metadata,
-            performance_metrics=performance_metrics,
         )
 
     def log_op_failed(self, partition_id, operation_name, operation_idx, error_message, retry_count):
@@ -803,12 +680,6 @@ class EventLoggingMixin:
         if self.event_logger is None:
             return []
         return self.event_logger.get_events(**kwargs)
-
-    def get_performance_summary(self, operation_name: Optional[str] = None) -> Dict[str, Any]:
-        """Get performance summary."""
-        if self.event_logger is None:
-            return {}
-        return self.event_logger.get_performance_summary(operation_name)
 
     def generate_status_report(self) -> str:
         """Generate status report."""
