@@ -210,7 +210,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         # Use resolved directory paths from config (already handled by config.py)
         self.partitions_dir = self.cfg.partition_dir
-        self.intermediate_dir = self.cfg.intermediate_dir
         self.checkpoint_dir = self.cfg.checkpoint_dir
         self.results_dir = self.cfg.results_dir
         self.metadata_dir = self.cfg.metadata_dir
@@ -221,7 +220,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         # Create directories (already created by config.py, but ensure they exist)
         for dir_path in [
             self.partitions_dir,
-            self.intermediate_dir,
             self.checkpoint_dir,
             self.results_dir,
             self.metadata_dir,
@@ -612,15 +610,15 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         Returns:
             Tuple of (latest_op_idx, checkpoint_path) or (None, None) if no checkpoint found
         """
-        partition_intermediate_dir = os.path.join(self.intermediate_dir, f"partition_{partition_id:06d}")
+        partition_checkpoint_dir = os.path.join(self.checkpoint_dir, f"partition_{partition_id:06d}")
 
-        if not os.path.exists(partition_intermediate_dir):
+        if not os.path.exists(partition_checkpoint_dir):
             return None, None
 
         # Find all operation checkpoint directories (Ray creates directories, not files)
         checkpoint_dirs = []
-        for item in os.listdir(partition_intermediate_dir):
-            item_path = os.path.join(partition_intermediate_dir, item)
+        for item in os.listdir(partition_checkpoint_dir):
+            item_path = os.path.join(partition_checkpoint_dir, item)
             if os.path.isdir(item_path) and item.startswith("op_") and item.endswith(f".{self.storage_format}"):
                 try:
                     # Extract operation index from directory name: op_XXX_OpName.parquet
@@ -634,7 +632,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         # Return the latest operation checkpoint
         latest_op_idx, latest_dir = max(checkpoint_dirs, key=lambda x: x[0])
-        checkpoint_path = os.path.join(partition_intermediate_dir, latest_dir)
+        checkpoint_path = os.path.join(partition_checkpoint_dir, latest_dir)
 
         logger.info(f"Found operation checkpoint for partition {partition_id}: op_{latest_op_idx} at {checkpoint_path}")
         return latest_op_idx, checkpoint_path
@@ -658,7 +656,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
     def _process_partition(self, partition_path: str, ops: List, partition_id: int) -> Dict[str, Any]:
         """Process a single partition with all operations."""
         partition_start_time = time.time()
-        partition_intermediate_dir = None
 
         try:
             # Log partition start
@@ -700,10 +697,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 current_dataset = RayDataset(raw_dataset, dataset_path=partition_path, cfg=self.cfg)
                 ops_to_process = ops
 
-            # Create intermediate directory if preserving intermediate data
-            if self.preserve_intermediate_data:
-                partition_intermediate_dir = os.path.join(self.intermediate_dir, f"partition_{partition_id:06d}")
-                os.makedirs(partition_intermediate_dir, exist_ok=True)
+            # Create checkpoint directory for operation checkpoints
+            partition_checkpoint_dir = os.path.join(self.checkpoint_dir, f"partition_{partition_id:06d}")
+            os.makedirs(partition_checkpoint_dir, exist_ok=True)
 
             # Process operations using RayDataset.process method
             op_start_time = time.time()
@@ -728,15 +724,15 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 # Determine checkpoint path
                 checkpoint_path = None
                 if self._should_checkpoint(actual_op_idx, op.__class__.__name__, partition_id):
-                    if self.preserve_intermediate_data:
-                        checkpoint_path = os.path.join(
-                            partition_intermediate_dir, f"op_{actual_op_idx:03d}_{op.__class__.__name__}.parquet"
-                        )
-                        self._write_dataset_with_directory_creation(current_dataset, checkpoint_path, "parquet")
+                    # Always save operation checkpoints to checkpoint directory
+                    checkpoint_path = os.path.join(
+                        partition_checkpoint_dir, f"op_{actual_op_idx:03d}_{op.__class__.__name__}.parquet"
+                    )
+                    self._write_dataset_with_directory_creation(current_dataset, checkpoint_path, "parquet")
 
-                        # Log checkpoint save
-                        self.log_checkpoint_save(partition_id, op.__class__.__name__, actual_op_idx, checkpoint_path)
-                        logger.debug(f"Saved checkpoint for partition {partition_id}, operation {actual_op_idx}")
+                    # Log checkpoint save
+                    self.log_checkpoint_save(partition_id, op.__class__.__name__, actual_op_idx, checkpoint_path)
+                    logger.debug(f"Saved checkpoint for partition {partition_id}, operation {actual_op_idx}")
 
                 # Log operation completion
                 self.log_op_complete(
@@ -793,7 +789,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 "partition_id": partition_id,
                 "input_path": partition_path,
                 "output_path": output_path,
-                "intermediate_dir": partition_intermediate_dir,
+                "checkpoint_dir": partition_checkpoint_dir,
                 "success": True,
                 "sample_count": current_dataset.data.count(),
                 "processing_time": time.time()
@@ -859,7 +855,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                         "partition_id": partition_id,
                         "input_path": partition_path,
                         "output_path": None,
-                        "intermediate_dir": None,
                         "success": False,
                         "error": str(e),
                         "retry_count": attempt + 1,
@@ -1225,7 +1220,11 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         job_start_time = time.time()
 
         # Check if this is a resumption attempt
-        if hasattr(self.cfg, "job_id") and self.cfg.job_id:
+        # Only attempt resumption if job_id was explicitly provided by user (not auto-generated)
+        # We can detect this by checking if the job_id was set before the config was processed
+        user_provided_job_id = getattr(self.cfg, "_user_provided_job_id", False)
+
+        if user_provided_job_id and hasattr(self.cfg, "job_id") and self.cfg.job_id:
             logger.info(f"🔍 Checking for job resumption: {self.cfg.job_id}")
 
             # Validate resumption using event analysis
@@ -1239,6 +1238,8 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 logger.error(f"   Cannot resume job {self.cfg.job_id} with the same job_id")
                 logger.error(f"   Please use a different job_id or fix the validation issues")
                 raise RuntimeError(f"Job resumption failed: {resumption_validation.get('reason', 'Unknown')}")
+        else:
+            logger.info(f"🚀 Starting new job with job_id: {getattr(self.cfg, 'job_id', 'auto-generated')}")
 
         # Create job summary at the start of the run
         self._create_job_summary(self.cfg.job_id, self.cfg.job_dir)
@@ -1318,7 +1319,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                             "partition_id": partition_id,
                             "input_path": partition_paths[partition_id],
                             "output_path": None,
-                            "intermediate_dir": None,
                             "success": False,
                             "error": str(e),
                         }
@@ -1419,7 +1419,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                                 "partition_id": partition_id,
                                 "input_path": partition_paths[partition_id],
                                 "output_path": None,
-                                "intermediate_dir": None,
                                 "success": False,
                                 "error": str(e),
                             }

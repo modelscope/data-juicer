@@ -1316,6 +1316,15 @@ def prepare_cfgs_for_export(cfg):
 def resolve_job_id(cfg):
     """Resolve or auto-generate job_id and set it on cfg."""
     job_id = getattr(cfg, "job_id", None)
+
+    # Track whether job_id was user-provided
+    if job_id is not None:
+        # User explicitly provided a job_id
+        setattr(cfg, "_user_provided_job_id", True)
+    else:
+        # No job_id provided by user
+        setattr(cfg, "_user_provided_job_id", False)
+
     # Only auto-generate if {job_id} is in work_dir or any relevant path
     needs_job_id = False
     for key in ["work_dir", "export_path", "event_log_dir", "checkpoint_dir", "partition_dir"]:
@@ -1370,7 +1379,6 @@ def resolve_job_directories(cfg):
     cfg.checkpoint_dir = os.path.join(job_dir, "checkpoints")
     cfg.partition_dir = os.path.join(job_dir, "partitions")
     cfg.metadata_dir = os.path.join(job_dir, "metadata")
-    cfg.intermediate_dir = os.path.join(job_dir, "intermediate")
     cfg.results_dir = os.path.join(job_dir, "results")
     cfg.event_log_file = os.path.join(cfg.event_log_dir, "events.jsonl")
     cfg.job_summary_file = os.path.join(job_dir, "job_summary.json")
