@@ -6,8 +6,10 @@ import shutil
 import sys
 import tempfile
 import time
+import uuid
 from argparse import ArgumentError
 from contextlib import contextmanager
+from datetime import datetime
 from typing import Dict, List, Optional, Union
 
 import yaml
@@ -118,8 +120,8 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 "--executor_type",
                 type=str,
                 default="default",
-                choices=["default", "ray"],
-                help='Type of executor, support "default" or "ray" for now.',
+                choices=["default", "ray", "ray_partitioned"],
+                help='Type of executor, support "default", "ray", or "ray_partitioned".',
             )
             parser.add_argument(
                 "--dataset_path",
@@ -354,6 +356,71 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 "checkpoint are changed, all ops will be rerun from the "
                 "beginning.",
             )
+            # Enhanced checkpoint configuration for PartitionedRayExecutor
+            parser.add_argument(
+                "--checkpoint.enabled",
+                type=bool,
+                default=True,
+                help="Enable enhanced checkpointing for PartitionedRayExecutor",
+            )
+            parser.add_argument(
+                "--checkpoint.strategy",
+                type=str,
+                default="every_op",
+                choices=["every_op", "every_partition", "every_n_ops", "manual", "disabled"],
+                help="Checkpoint strategy: every_op, every_partition, every_n_ops, manual, disabled",
+            )
+            parser.add_argument(
+                "--checkpoint.n_ops",
+                type=int,
+                default=1,
+                help="Number of operations between checkpoints for every_n_ops strategy",
+            )
+            parser.add_argument(
+                "--checkpoint.op_names",
+                type=List[str],
+                default=[],
+                help="List of operation names to checkpoint for manual strategy",
+            )
+            # Event logging configuration
+            parser.add_argument(
+                "--event_logging.enabled",
+                type=bool,
+                default=True,
+                help="Enable event logging for job tracking and resumption",
+            )
+            parser.add_argument(
+                "--event_logging.max_log_size_mb",
+                type=int,
+                default=100,
+                help="Maximum log file size in MB before rotation",
+            )
+            parser.add_argument(
+                "--event_logging.backup_count",
+                type=int,
+                default=5,
+                help="Number of backup log files to keep",
+            )
+            # Storage configuration
+            parser.add_argument(
+                "--event_log_dir",
+                type=str,
+                default=None,
+                help="Separate directory for event logs (fast storage)",
+            )
+            parser.add_argument(
+                "--checkpoint_dir",
+                type=str,
+                default=None,
+                help="Separate directory for checkpoints (large storage)",
+            )
+            # Job management
+            parser.add_argument(
+                "--job_id",
+                type=str,
+                default=None,
+                help="Custom job ID for resumption and tracking. If not provided, a unique ID will be auto-generated.",
+            )
             parser.add_argument(
                 "--temp_dir",
                 type=str,
@@ -459,6 +526,142 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 help="Whether to save all stats to only one file. Only used in " "Analysis.",
             )
             parser.add_argument("--ray_address", type=str, default="auto", help="The address of the Ray cluster.")
+
+            # Partitioning configuration for PartitionedRayExecutor
+            # Support both flat and nested partition configuration
+            parser.add_argument(
+                "--partition_size",
+                type=int,
+                default=10000,
+                help="Number of samples per partition for PartitionedRayExecutor (legacy flat config)",
+            )
+            parser.add_argument(
+                "--max_partition_size_mb",
+                type=int,
+                default=128,
+                help="Maximum partition size in MB for PartitionedRayExecutor (legacy flat config)",
+            )
+            parser.add_argument(
+                "--enable_fault_tolerance",
+                type=bool,
+                default=True,
+                help="Enable fault tolerance for PartitionedRayExecutor (legacy flat config)",
+            )
+            parser.add_argument(
+                "--max_retries",
+                type=int,
+                default=3,
+                help="Maximum number of retries for failed partitions (legacy flat config)",
+            )
+            parser.add_argument(
+                "--preserve_intermediate_data",
+                type=bool,
+                default=False,
+                help="Preserve intermediate data for debugging (legacy flat config)",
+            )
+
+            # Nested partition configuration (new structure)
+            parser.add_argument(
+                "--partition.auto_configure",
+                type=bool,
+                default=False,
+                help="Automatically determine optimal partition size based on data modality (nested partition config)",
+            )
+            parser.add_argument(
+                "--partition.size",
+                type=int,
+                default=10000,
+                help="Number of samples per partition (nested partition config, used when auto_configure=false)",
+            )
+            parser.add_argument(
+                "--partition.max_size_mb",
+                type=int,
+                default=128,
+                help="Maximum partition size in MB (nested partition config)",
+            )
+
+            # Fault tolerance configuration (nested under partition)
+            parser.add_argument(
+                "--partition.enable_fault_tolerance",
+                type=bool,
+                default=True,
+                help="Enable fault tolerance for partitions (nested partition config)",
+            )
+            parser.add_argument(
+                "--partition.max_retries",
+                type=int,
+                default=3,
+                help="Maximum number of retries for failed partitions (nested partition config)",
+            )
+            parser.add_argument(
+                "--partition.retry_backoff",
+                type=str,
+                default="exponential",
+                choices=["exponential", "linear", "fixed"],
+                help="Retry backoff strategy for partitions (nested partition config)",
+            )
+
+            # Intermediate storage configuration (new structure) - includes file lifecycle management
+            parser.add_argument(
+                "--intermediate_storage.preserve_intermediate_data",
+                type=bool,
+                default=False,
+                help="Preserve intermediate data for debugging (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.cleanup_temp_files",
+                type=bool,
+                default=True,
+                help="Clean up temporary files after processing (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.cleanup_on_success",
+                type=bool,
+                default=False,
+                help="Clean up intermediate files even on successful completion (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.retention_policy",
+                type=str,
+                default="keep_all",
+                choices=["keep_all", "keep_failed_only", "cleanup_all"],
+                help="File retention policy (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.max_retention_days",
+                type=int,
+                default=7,
+                help="Maximum retention days for files (nested intermediate_storage config)",
+            )
+
+            # Intermediate storage format configuration
+            parser.add_argument(
+                "--intermediate_storage.format",
+                type=str,
+                default="parquet",
+                choices=["parquet", "arrow", "jsonl"],
+                help="Storage format for checkpoints and intermediate data (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.compression",
+                type=str,
+                default="snappy",
+                choices=["snappy", "gzip", "none"],
+                help="Compression format for storage files (nested intermediate_storage config)",
+            )
+            parser.add_argument(
+                "--intermediate_storage.parquet_batch_size",
+                type=int,
+                default=10000,
+                help="Number of rows per parquet file for optimal file sizes (nested intermediate_storage config)",
+            )
+
+            parser.add_argument(
+                "--partition_dir",
+                type=str,
+                default=None,
+                help="Directory to store partition files. Supports {work_dir} placeholder. If not set, defaults to {work_dir}/partitions.",
+            )
 
             parser.add_argument("--debug", action="store_true", help="Whether to run in debug mode.")
 
@@ -572,15 +775,30 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
     cfg.export_path = os.path.abspath(cfg.export_path)
     if cfg.work_dir is None:
         cfg.work_dir = os.path.dirname(cfg.export_path)
+
+    # Call resolve_job_directories to finalize all job-related paths
+    cfg = resolve_job_id(cfg)
+    cfg = resolve_job_directories(cfg)
+
     timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))
     if not load_configs_only:
         export_rel_path = os.path.relpath(cfg.export_path, start=cfg.work_dir)
-        log_dir = os.path.join(cfg.work_dir, "log")
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir, exist_ok=True)
+        # log_dir = os.path.join(cfg.work_dir, "log")  # Remove legacy log_dir
+
+        print(f"work_dir: {cfg.work_dir}")
+        print(f"event_log_dir: {cfg.event_log_dir}")
+        print(f"checkpoint_dir: {cfg.checkpoint_dir}")
+        print(f"export_path: {cfg.export_path}")
+        print(f"dataset_path: {cfg.dataset_path}")
+        print(f"partition_dir: {cfg.partition_dir}")
+        # print(f"log_dir: {log_dir}")  # Remove legacy log_dir print
+        print(f"export_rel_path: {export_rel_path}")
+
+        if not os.path.exists(cfg.event_log_dir):
+            os.makedirs(cfg.event_log_dir, exist_ok=True)
         logfile_name = f"export_{export_rel_path}_time_{timestamp}.txt"
         setup_logger(
-            save_dir=log_dir,
+            save_dir=cfg.event_log_dir,
             filename=logfile_name,
             level="DEBUG" if cfg.get("debug", False) else "INFO",
             redirect=cfg.get("executor_type", "default") == "default",
@@ -1108,4 +1326,68 @@ def prepare_cfgs_for_export(cfg):
     for op in OPERATORS.modules.keys():
         if op in cfg:
             _ = cfg.pop(op)
+    return cfg
+
+
+def resolve_job_id(cfg):
+    """Resolve or auto-generate job_id and set it on cfg."""
+    job_id = getattr(cfg, "job_id", None)
+    # Only auto-generate if {job_id} is in work_dir or any relevant path
+    needs_job_id = False
+    for key in ["work_dir", "export_path", "event_log_dir", "checkpoint_dir", "partition_dir"]:
+        val = getattr(cfg, key, None)
+        if isinstance(val, str) and "{job_id}" in val:
+            needs_job_id = True
+    if not job_id and needs_job_id:
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        short_hash = uuid.uuid4().hex[:6]
+        job_id = f"{timestamp}_{short_hash}"
+        setattr(cfg, "job_id", job_id)
+    elif not job_id:
+        # fallback: use timestamp+hash always if not set
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        short_hash = uuid.uuid4().hex[:6]
+        job_id = f"{timestamp}_{short_hash}"
+        setattr(cfg, "job_id", job_id)
+    return cfg
+
+
+def resolve_job_directories(cfg):
+    """Centralize directory resolution and placeholder substitution. Assumes job_id is already set."""
+    # 1. placeholder map
+    placeholder_map = {"work_dir": cfg.work_dir, "job_id": getattr(cfg, "job_id", "")}
+    # 2. substitute placeholders in all relevant paths (change-detection loop)
+    max_passes = 10
+    for _ in range(max_passes):
+        changed = False
+        for key in ["work_dir", "event_log_dir", "checkpoint_dir", "export_path", "dataset_path", "partition_dir"]:
+            val = getattr(cfg, key, None)
+            if isinstance(val, str):
+                new_val = val.format(**placeholder_map)
+                if new_val != val:
+                    setattr(cfg, key, new_val)
+                    changed = True
+        # update placeholder_map in case work_dir or job_id changed
+        placeholder_map = {"work_dir": cfg.work_dir, "job_id": getattr(cfg, "job_id", "")}
+        if not changed:
+            break
+    else:
+        raise RuntimeError("Too many placeholder substitution passes (possible recursive placeholders?)")
+    # 3. directory resolution
+    job_id = getattr(cfg, "job_id", None)
+    if not job_id:
+        raise ValueError("job_id must be set before resolving job directories.")
+    if cfg.work_dir.endswith(job_id) or os.path.basename(cfg.work_dir) == job_id:
+        job_dir = cfg.work_dir
+    else:
+        job_dir = os.path.join(cfg.work_dir, job_id)
+    cfg.job_dir = job_dir
+    cfg.event_log_dir = os.path.join(job_dir, "event_logs")
+    cfg.checkpoint_dir = os.path.join(job_dir, "checkpoints")
+    cfg.partition_dir = os.path.join(job_dir, "partitions")
+    cfg.metadata_dir = os.path.join(job_dir, "metadata")
+    cfg.intermediate_dir = os.path.join(job_dir, "intermediate")
+    cfg.results_dir = os.path.join(job_dir, "results")
+    cfg.event_log_file = os.path.join(cfg.event_log_dir, "events.jsonl")
+    cfg.job_summary_file = os.path.join(job_dir, "job_summary.json")
     return cfg
