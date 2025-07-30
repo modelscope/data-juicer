@@ -50,9 +50,6 @@ class EventType(Enum):
     PROCESSING_ERROR = "processing_error"
     RESOURCE_USAGE = "resource_usage"
     PERFORMANCE_METRIC = "performance_metric"
-    WARNING = "warning"
-    INFO = "info"
-    DEBUG = "debug"
 
 
 @dataclass
@@ -91,9 +88,6 @@ class Event:
     # Process and thread tracking
     process_id: Optional[int] = None
     thread_id: Optional[int] = None
-    # Ray task tracking
-    ray_task_id: Optional[str] = None
-    ray_job_id: Optional[str] = None
 
 
 class EventLogger:
@@ -320,10 +314,6 @@ class EventLogger:
 
             for event in self.events:
                 event_counts[event.event_type.value] += 1
-                if event.event_type == EventType.OPERATION_ERROR:
-                    error_count += 1
-                elif event.event_type == EventType.WARNING:
-                    warning_count += 1
 
             # Get performance summary
             perf_summary = self.get_performance_summary()
@@ -456,10 +446,7 @@ class EventLoggingMixin:
         backup_count = event_config.get("backup_count", 5)
         self.event_logger = EventLogger(event_log_dir, max_log_size, backup_count, job_id=job_id)
 
-        # Log initialization
-        self._log_event(EventType.INFO, f"Event logging initialized for {self.executor_type} executor")
-
-    # Remove _create_job_summary and all calls to it from EventLoggingMixin
+        logger.info(f"Event logging initialized for {self.executor_type} executor")
 
     def _update_job_summary(self, status: str, end_time: Optional[float] = None, error_message: Optional[str] = None):
         """Update job summary with completion status."""
