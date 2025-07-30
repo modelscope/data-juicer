@@ -1062,6 +1062,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             "work_dir": self.work_dir,
             "job_dir": job_dir,
             "config_file": getattr(self.cfg, "config", None),
+            "backed_up_config_path": getattr(self.cfg, "backed_up_config_path", None),
             "executor_type": getattr(self, "executor_type", "unknown"),
             "status": "running",
             "resumption_command": f"dj-process --config {getattr(self.cfg, 'config', 'config.yaml')} --job_id {job_id}",
@@ -1090,9 +1091,30 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         logger.info(f"  {job_summary['resumption_command']}")
         logger.info("=" * 60)
 
+    def _get_config_content(self, config_path) -> Optional[str]:
+        """Get config file content, handling different path types."""
+        try:
+            if isinstance(config_path, list) and config_path:
+                config_path = config_path[0]
+            path_str = str(config_path)
+            if os.path.exists(path_str):
+                with open(path_str, "r") as f:
+                    return f.read()
+        except Exception:
+            pass
+        return None
+
+    def _compare_config_contents(self, current_content: str, saved_content: str) -> Dict[str, Any]:
+        """Compare config file contents."""
+        return {
+            "configs_match": current_content == saved_content,
+            "can_resume": current_content == saved_content,
+            "reason": None if current_content == saved_content else "Config contents differ",
+        }
+
     def _validate_job_resumption(self, job_id: str) -> Dict[str, Any]:
         """
-        Enhanced job resumption validation using event analysis.
+        Enhanced job resumption validation using event analysis and config file comparison.
 
         Args:
             job_id: The job ID to validate for resumption
@@ -1122,6 +1144,36 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             logger.error(f"Failed to load job summary: {e}")
             return {"can_resume": False, "reason": f"Failed to load job summary: {e}"}
 
+        # Validate config file compatibility
+        current_config = getattr(self.cfg, "config", None)
+        backed_up_config_path = getattr(self.cfg, "backed_up_config_path", None)
+
+        if current_config and backed_up_config_path and os.path.exists(backed_up_config_path):
+            # Get the actual config content for comparison
+            current_content = self._get_config_content(current_config)
+            saved_content = self._get_config_content(backed_up_config_path)
+
+            if current_content and saved_content:
+                config_validation = self._compare_config_contents(current_content, saved_content)
+                if not config_validation["can_resume"]:
+                    logger.error(f"❌ Config validation failed: {config_validation['reason']}")
+                    return {
+                        "can_resume": False,
+                        "reason": config_validation["reason"],
+                        "config_validation": config_validation,
+                        "job_id": job_id,
+                        "job_dir": str(job_dir),
+                        "validation_timestamp": time.time(),
+                    }
+            else:
+                config_validation = {
+                    "configs_match": True,
+                    "can_resume": True,
+                    "reason": "Config content not available",
+                }
+        else:
+            config_validation = {"configs_match": True, "can_resume": True, "reason": "Config comparison skipped"}
+
         # Analyze resumption state using events
         resumption_analysis = self.analyze_resumption_state(job_id)
 
@@ -1129,28 +1181,33 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             logger.warning(f"Resumption analysis failed: {resumption_analysis['error']}")
             return {"can_resume": False, "reason": resumption_analysis["error"]}
 
-        # Combine job summary with resumption analysis
+        # Combine job summary with resumption analysis and config validation
         validation_result = {
-            "can_resume": resumption_analysis["can_resume"],
+            "can_resume": resumption_analysis["can_resume"] and config_validation["can_resume"],
             "job_id": job_id,
             "job_dir": str(job_dir),
             "job_summary": job_summary,
             "resumption_analysis": resumption_analysis,
+            "config_validation": config_validation,
             "validation_timestamp": time.time(),
         }
 
-        if resumption_analysis["can_resume"]:
+        if validation_result["can_resume"]:
             logger.info(f"✅ Job resumption validated successfully")
             logger.info(f"   Job status: {resumption_analysis['job_status']}")
             logger.info(f"   Partitions to retry: {resumption_analysis['partitions_to_retry']}")
             logger.info(f"   Partitions to skip: {resumption_analysis['partitions_to_skip']}")
             logger.info(f"   Progress: {resumption_analysis['progress_metrics']['progress_percentage']:.1f}%")
+            logger.info(f"   Config compatibility: ✅ Valid")
 
             if resumption_analysis.get("resume_from_checkpoint"):
                 logger.info(f"   Resume from checkpoint: {resumption_analysis['resume_from_checkpoint']}")
         else:
             logger.warning(f"❌ Job resumption validation failed")
-            logger.warning(f"   Reason: {resumption_analysis.get('reason', 'Unknown')}")
+            if not config_validation["can_resume"]:
+                logger.warning(f"   Config reason: {config_validation.get('reason', 'Unknown')}")
+            if not resumption_analysis["can_resume"]:
+                logger.warning(f"   Resumption reason: {resumption_analysis.get('reason', 'Unknown')}")
 
         return validation_result
 
@@ -1178,9 +1235,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 logger.info(f"🔄 Resuming job: {self.cfg.job_id}")
                 return self._resume_job(resumption_validation)
             else:
-                logger.info(
-                    f"🆕 Starting new job (resumption not possible): {resumption_validation.get('reason', 'Unknown')}"
-                )
+                logger.error(f"❌ Job resumption failed: {resumption_validation.get('reason', 'Unknown')}")
+                logger.error(f"   Cannot resume job {self.cfg.job_id} with the same job_id")
+                logger.error(f"   Please use a different job_id or fix the validation issues")
+                raise RuntimeError(f"Job resumption failed: {resumption_validation.get('reason', 'Unknown')}")
 
         # Create job summary at the start of the run
         self._create_job_summary(self.cfg.job_id, self.cfg.job_dir)

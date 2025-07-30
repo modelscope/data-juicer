@@ -1093,11 +1093,21 @@ def config_backup(cfg: Namespace):
     if not cfg.config:
         return
     cfg_path = os.path.abspath(cfg.config[0])
-    work_dir = cfg.work_dir
-    target_path = os.path.join(work_dir, os.path.basename(cfg_path))
-    logger.info(f"Back up the input config file [{cfg_path}] into the " f"work_dir [{work_dir}]")
+
+    # Use the backed_up_config_path which should be set by resolve_job_directories
+    if hasattr(cfg, "backed_up_config_path"):
+        target_path = cfg.backed_up_config_path
+    else:
+        # Fallback: use work_dir with original filename
+        work_dir = cfg.work_dir
+        original_config_name = os.path.basename(cfg_path)
+        target_path = os.path.join(work_dir, original_config_name)
+
     if not os.path.exists(target_path):
+        logger.info(f"Back up the input config file [{cfg_path}] to [{target_path}]")
         shutil.copyfile(cfg_path, target_path)
+    else:
+        logger.info(f"Config file [{cfg_path}] already exists at [{target_path}]")
 
 
 def display_config(cfg: Namespace):
@@ -1364,4 +1374,11 @@ def resolve_job_directories(cfg):
     cfg.results_dir = os.path.join(job_dir, "results")
     cfg.event_log_file = os.path.join(cfg.event_log_dir, "events.jsonl")
     cfg.job_summary_file = os.path.join(job_dir, "job_summary.json")
+    # Set backed_up_config_path using original config filename
+    if hasattr(cfg, "config") and cfg.config:
+        original_config_name = os.path.basename(cfg.config[0])
+        cfg.backed_up_config_path = os.path.join(job_dir, original_config_name)
+    else:
+        cfg.backed_up_config_path = os.path.join(job_dir, "config.yaml")
+
     return cfg
