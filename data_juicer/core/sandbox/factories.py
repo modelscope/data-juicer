@@ -66,6 +66,10 @@ class DataEvaluatorFactory(object):
             evaluator = InceptionEvaluator(eval_cfg)
         elif eval_cfg.type == "dj_text_quality_classifier":
             evaluator = Gpt3QualityEvaluator(eval_cfg)
+        elif eval_cfg.type == "accuracy":
+            from data_juicer.core.sandbox.evaluators import AccuracyEvaluator
+
+            evaluator = AccuracyEvaluator(eval_cfg)
 
         return evaluator
 
@@ -176,7 +180,7 @@ class ModelInferEvaluatorFactory(object):
         # add more model inference here freely
 
 
-mode_infer_evaluator_factory = ModelInferEvaluatorFactory()
+model_infer_evaluator_factory = ModelInferEvaluatorFactory()
 
 
 class ModelTrainExecutorFactory(object):

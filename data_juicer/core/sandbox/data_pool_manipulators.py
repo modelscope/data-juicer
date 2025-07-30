@@ -64,16 +64,16 @@ def check_io_paths(input_paths, export_path):
     return existing_input_paths, export_path
 
 
+def load_data_pool(ds_path) -> NestedDataset:
+    """Load dataset. Can only return NestedDataset."""
+    db = DatasetBuilder(dict_to_namespace({"dataset_path": ds_path}))
+    ds = db.load_dataset()
+    return ds
+
+
 class BaseDataPoolManipulator(object):
     def __init__(self, data_pool_cfg: dict):
         self.data_pool_cfg = data_pool_cfg
-
-    @staticmethod
-    def _load_ds(ds_path) -> NestedDataset:
-        """Load dataset. Can only return NestedDataset."""
-        db = DatasetBuilder(dict_to_namespace({"dataset_path": ds_path}))
-        ds = db.load_dataset()
-        return ds
 
     def run(self):
         """
@@ -117,7 +117,7 @@ class DataPoolConstruction(BaseDataPoolManipulator):
     def _construct_data_pool(self, ds_path, export_path, split_ratios):
         logger.info(f"Constructing data pool for {ds_path}...")
         ds_basename = os.path.splitext(os.path.basename(ds_path))[0]
-        ds = self._load_ds(ds_path)
+        ds = load_data_pool(ds_path)
         ds_schema = ds.schema()
         if Fields.stats not in ds_schema.columns:
             logger.warning(f"Dataset {ds_path} does not contain stats. Skipped!")
@@ -238,7 +238,7 @@ class DataPoolCombination(BaseDataPoolManipulator):
         while True:
             # 1. read a new rank ds
             logger.info(f"Reading dataset of rank [{curr_rank}]...")
-            ds = self._load_ds(ordered_data_pool_paths[curr_rank]).to_list()
+            ds = load_data_pool(ordered_data_pool_paths[curr_rank]).to_list()
             ds_dict = {make_hashable(s): s for s in ds}
             dataset_records.update(ds_dict)
 
@@ -302,7 +302,7 @@ class DataPoolDuplication(BaseDataPoolManipulator):
     def _duplicate_dataset(self, dataset_path, export_path, dup_times, shuffle=False, seed=42):
         logger.info(f"Duplicating dataset for {dataset_path}...")
         ds_basename = os.path.splitext(os.path.basename(dataset_path))[0]
-        ds = self._load_ds(dataset_path)
+        ds = load_data_pool(dataset_path)
         output_paths = []
         for t in dup_times:
             res_ds = concatenate_datasets([ds] * t)
@@ -404,7 +404,7 @@ class DataPoolDownsampling(BaseDataPoolManipulator):
         existing_input_paths, export_path = check_io_paths(input_dataset_paths, export_path)
 
         # load all datasets
-        all_datasets = [self._load_ds(path) for path in existing_input_paths]
+        all_datasets = [load_data_pool(path) for path in existing_input_paths]
         all_lengths = [len(ds) for ds in all_datasets]
         if target_num is None:
             target_num = min(all_lengths)

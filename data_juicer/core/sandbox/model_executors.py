@@ -9,6 +9,7 @@ import jsonlines as jl
 from jsonargparse import namespace_to_dict
 from loguru import logger
 
+from data_juicer.core.sandbox.data_pool_manipulators import check_io_paths
 from data_juicer.core.sandbox.helper_funcs import ALL_FUNCS
 from data_juicer.utils.file_utils import follow_read
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -208,13 +209,12 @@ class LLMInferExecutor(BaseModelExecutor):
 
     The config file for this type of executor should at least include the following items:
     1. `type`: model type.
-    2. `build_messages_func`: the path to the HF model.
-    3. `system_prompt_func`: extra parameters for the model.
-    4. `parse_output_func`: extra sampling parameters for the model.
-    5. `dataset_path`: the input dataset use to construct the input messages for LLM inference.
+    2. `build_messages_func`: the helper func to build the messages.
+    3. `parse_output_func`: the helper func to build the messages.
+    4. `dataset_path`: the input datasets or data pools use to construct the input messages for LLM inference.
         Only support jsonl files for now.
-    6. `export_path`: the output dataset path to store the inference results.
-    7. `infer_res_key`: the key name to store the inference results. It's "response" in default.
+    5. `export_path`: the output dir to store the inference results.
+    6. `infer_res_key`: the key name to store the inference results. It's "response" in default.
     """
 
     def __init__(self, model_config: dict, watcher=None):
@@ -230,9 +230,11 @@ class LLMInferExecutor(BaseModelExecutor):
         self.parse_output_func = ALL_FUNCS.get(self.parse_output_func)
 
         # inference dataset related
-        self.dataset_path = model_config.get("dataset_path", None)
+        self.dataset_path = model_config.get("dataset_path", [])
         self.export_path = model_config.get("export_path", None)
         self.infer_res_key = model_config.get("infer_res_key", "response")
+        if isinstance(self.dataset_path, str):
+            self.dataset_path = [self.dataset_path]
 
     def prepare_executor(self):
         raise NotImplementedError
@@ -241,24 +243,31 @@ class LLMInferExecutor(BaseModelExecutor):
         raise NotImplementedError
 
     async def _run(self, run_type, run_obj=None, **kwargs):
-        with jl.open(self.export_path, "w") as writer:
-            with jl.open(self.export_path) as reader:
-                for item in reader:
-                    non_batch = False
-                    messages_list = self.build_messages_func(item)
-                    if len(messages_list) > 0 and not isinstance(messages_list[0], list):
-                        messages_list = [messages_list]
-                        non_batch = True
-                    results = []
-                    for messages in messages_list:
-                        output = self.executor_infer(messages)
-                        results.append(self.parse_output_func(output, item))
-                    if non_batch:
-                        item[self.infer_res_key] = results[0]
-                    else:
-                        item[self.infer_res_key] = results
-                    writer.write(item)
-        return self.export_path
+        # check I/O paths
+        existing_input_paths, export_path = check_io_paths(self.dataset_path, self.export_path)
+        output_paths = []
+        for input_path in existing_input_paths:
+            input_basename = os.path.splitext(os.path.basename(input_path))[0]
+            output_path = os.path.join(export_path, f"{input_basename}_inference.jsonl")
+            with jl.open(output_path, "w") as writer:
+                with jl.open(input_path) as reader:
+                    for item in reader:
+                        non_batch = False
+                        messages_list = self.build_messages_func(item)
+                        if len(messages_list) > 0 and not isinstance(messages_list[0], list):
+                            messages_list = [messages_list]
+                            non_batch = True
+                        results = []
+                        for messages in messages_list:
+                            output = self.executor_infer(messages)
+                            results.append(self.parse_output_func(output, item))
+                        if non_batch:
+                            item[self.infer_res_key] = results[0]
+                        else:
+                            item[self.infer_res_key] = results
+                        writer.write(item)
+            output_paths.append(output_path)
+        return output_paths
 
 
 class HFTransformersInferExecutor(LLMInferExecutor):

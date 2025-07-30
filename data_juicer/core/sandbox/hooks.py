@@ -15,8 +15,8 @@ from data_juicer.core.sandbox.factories import (
     data_pool_manipulator_factory,
     general_data_executor_factory,
     general_probe_factory,
-    mode_infer_evaluator_factory,
     model_evaluator_factory,
+    model_infer_evaluator_factory,
     model_infer_executor_factory,
     model_train_executor_factory,
 )
@@ -242,7 +242,7 @@ class ProbeViaModelInferHook(BaseHook):
 
     def hook(self, **kwargs):
         data_executor = data_executor_factory(self.inited_dj_cfg)
-        model_infer_executor = mode_infer_evaluator_factory(self.extra_cfg)
+        model_infer_executor = model_infer_evaluator_factory(self.extra_cfg)
         # TODO
         # probe the model (calling inference sub-pipeline) based on
         # original data, such that we know what is the "hard" data for
