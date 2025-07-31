@@ -32,6 +32,7 @@ from data_juicer.core.adapter import Adapter
 from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.executor.event_logging_mixin import EventLoggingMixin
+from data_juicer.core.ray_exporter import RayExporter
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -207,6 +208,14 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
         # Initialize dataset builder
         self.datasetbuilder = DatasetBuilder(self.cfg, executor_type="ray")
+
+        # Initialize RayExporter for final output
+        logger.info("Preparing exporter...")
+        self.exporter = RayExporter(
+            self.cfg.export_path,
+            keep_stats_in_res_ds=getattr(self.cfg, "keep_stats_in_res_ds", True),
+            keep_hashes_in_res_ds=getattr(self.cfg, "keep_hashes_in_res_ds", False),
+        )
 
         # Use resolved directory paths from config (already handled by config.py)
         self.partitions_dir = self.cfg.partition_dir
@@ -679,6 +688,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
     def _load_operation_checkpoint(self, checkpoint_path: str) -> ray.data.Dataset:
         """Load dataset from operation checkpoint."""
+        # Convert relative path to absolute path to avoid Ray path resolution issues
+        checkpoint_path = os.path.abspath(checkpoint_path)
+
         if self.storage_format == "parquet":
             return ray.data.read_parquet(checkpoint_path)
         elif self.storage_format == "arrow":
@@ -724,6 +736,8 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 ops_to_process = ops[latest_op_idx + 1 :]
             else:
                 # Load partition data
+                # Convert relative path to absolute path to avoid Ray path resolution issues
+                partition_path = os.path.abspath(partition_path)
                 logger.debug(f"Loading partition {partition_id} from {partition_path}")
                 if partition_path.endswith(".parquet"):
                     raw_dataset = ray.data.read_parquet(partition_path)
@@ -901,8 +915,8 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                     }
 
     def _merge_partitions_with_mapping(self, partition_results: List[Dict[str, Any]]) -> str:
-        """Merge processed partitions into final output with mapping preservation."""
-        logger.info("Merging processed partitions...")
+        """Write processed partitions directly to final output directory (no merging)."""
+        logger.info("Writing partitions directly to final output directory...")
 
         # Filter successful partitions
         successful_results = [r for r in partition_results if r["success"]]
@@ -919,66 +933,136 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         # Sort partitions by ID to maintain original order
         successful_results.sort(key=lambda x: x["partition_id"])
 
-        # Merge successful partitions
-        # Ensure the export path is treated as a file, not a directory
-        export_path = self.cfg.export_path
-        if os.path.isdir(export_path):
-            # If it's a directory, create a file inside it
-            export_path = os.path.join(export_path, "processed.jsonl")
+        # Ensure the output directory exists
+        os.makedirs(os.path.dirname(self.cfg.export_path), exist_ok=True)
 
-        # Ensure the directory exists
-        os.makedirs(os.path.dirname(export_path), exist_ok=True)
+        # Create a combined dataset from all partitions and write it directly
+        # This will create fragmented output as Ray's default behavior
+        logger.info("Creating combined dataset from all partitions...")
 
-        def convert_datetime_to_str(obj):
-            """Recursively convert datetime objects to ISO format strings."""
-            if hasattr(obj, "isoformat"):  # Handle datetime objects
-                return obj.isoformat()
-            elif isinstance(obj, dict):
-                return {key: convert_datetime_to_str(value) for key, value in obj.items()}
-            elif isinstance(obj, list):
-                return [convert_datetime_to_str(item) for item in obj]
-            else:
-                return obj
+        # Load all partition datasets
+        partition_datasets = []
+        total_samples = 0
 
-        with open(export_path, "w") as output_file:
-            for result in successful_results:
-                if result["output_path"] and os.path.exists(result["output_path"]):
-                    # Handle different file formats
-                    if result["output_path"].endswith(".parquet"):
-                        # For parquet files, we need to read and convert to JSONL
-                        import pandas as pd
+        for result in successful_results:
+            if result["output_path"] and os.path.exists(result["output_path"]):
+                try:
+                    # Convert relative path to absolute path to avoid Ray path resolution issues
+                    output_path = os.path.abspath(result["output_path"])
+                    partition_id = result["partition_id"]
 
-                        df = pd.read_parquet(result["output_path"])
-                        for _, row in df.iterrows():
-                            # Convert datetime objects to strings for JSON serialization
-                            row_dict = convert_datetime_to_str(row.to_dict())
-                            output_file.write(json.dumps(row_dict) + "\n")
-                    elif result["output_path"].endswith(".arrow"):
-                        import pyarrow.feather as feather
+                    logger.info(f"Loading partition {partition_id} from {output_path}")
 
-                        table = feather.read_feather(result["output_path"])
-                        # Handle both PyArrow Table and pandas DataFrame
-                        if hasattr(table, "to_pandas"):
-                            # PyArrow Table - convert to pandas
-                            df = table.to_pandas()
-                        else:
-                            # Already a pandas DataFrame
-                            df = table
-
-                        for _, row in df.iterrows():
-                            # Convert datetime objects to strings for JSON serialization
-                            row_dict = convert_datetime_to_str(row.to_dict())
-                            output_file.write(json.dumps(row_dict) + "\n")
+                    # Load the partition dataset
+                    if os.path.isdir(output_path):
+                        logger.info(f"Partition {partition_id} is a directory, reading as parquet dataset")
+                        partition_dataset = ray.data.read_parquet(output_path)
+                    elif output_path.endswith(".parquet"):
+                        logger.info(f"Partition {partition_id} is a parquet file")
+                        partition_dataset = ray.data.read_parquet(output_path)
+                    elif output_path.endswith(".arrow"):
+                        logger.info(f"Partition {partition_id} is an arrow file")
+                        partition_dataset = ray.data.read_arrow(output_path)
                     else:
-                        # For JSONL files, copy directly
-                        with open(result["output_path"], "r") as input_file:
-                            shutil.copyfileobj(input_file, output_file)
+                        logger.info(f"Partition {partition_id} is assumed to be JSONL")
+                        partition_dataset = ray.data.read_json(output_path)
+
+                    # Get sample count
+                    sample_count = partition_dataset.count()
+                    total_samples += sample_count
+                    logger.info(f"Partition {partition_id} has {sample_count} samples")
+                    partition_datasets.append(partition_dataset)
+
+                except Exception as e:
+                    logger.error(f"Failed to load partition {result['partition_id']}: {e}")
+                    continue
+
+        if not partition_datasets:
+            raise RuntimeError("No partition datasets could be loaded successfully")
+
+        # Combine all partitions into one dataset (this doesn't merge, just combines)
+        logger.info(f"Combining {len(partition_datasets)} partitions...")
+        combined_dataset = partition_datasets[0]
+        for i, partition_dataset in enumerate(partition_datasets[1:], 1):
+            logger.info(f"Combining partition {i+1}/{len(partition_datasets)}...")
+            combined_dataset = combined_dataset.union(partition_dataset)
+
+        # Write the combined dataset directly - this will create fragmented output
+        logger.info("Writing combined dataset to final output (will create fragmented files)...")
+        self.exporter.export(combined_dataset, columns=None)
+        logger.info(f"Successfully exported combined dataset with {total_samples} total samples")
 
         # Create final mapping report
         self._create_final_mapping_report(partition_results)
 
-        logger.info(f"Merged {len(successful_results)} partitions into {export_path}")
-        return export_path
+        logger.info(f"Successfully wrote {len(successful_results)} partitions with {total_samples} total samples")
+        return self.cfg.export_path
+
+    def _fallback_merge_partitions(self, successful_results: List[Dict[str, Any]]):
+        """Fallback method to merge partitions using direct file operations."""
+        logger.info("Using fallback merge method...")
+
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(self.cfg.export_path), exist_ok=True)
+
+        # For JSONL output, use direct concatenation
+        if self.exporter.export_format in ["json", "jsonl"]:
+            with open(self.cfg.export_path, "w") as output_file:
+                for result in successful_results:
+                    if result["output_path"] and os.path.exists(result["output_path"]):
+                        try:
+                            # Convert relative path to absolute path to avoid path resolution issues
+                            output_path = os.path.abspath(result["output_path"])
+                            if os.path.isdir(output_path):
+                                # Directory of parquet files - convert to JSONL
+                                self._convert_parquet_dir_to_jsonl(output_path, output_file)
+                            elif output_path.endswith(".parquet"):
+                                # Single parquet file - convert to JSONL
+                                self._convert_parquet_file_to_jsonl(output_path, output_file)
+                            else:
+                                # Assume JSONL - copy directly
+                                with open(output_path, "r") as input_file:
+                                    shutil.copyfileobj(input_file, output_file)
+                        except Exception as e:
+                            logger.error(f"Failed to process partition {result['partition_id']} in fallback: {e}")
+                            continue
+        else:
+            # For other formats, we'll need to implement conversion
+            logger.error(f"Fallback merge not implemented for format: {self.exporter.export_format}")
+            raise NotImplementedError(f"Fallback merge not implemented for format: {self.exporter.export_format}")
+
+    def _convert_parquet_dir_to_jsonl(self, parquet_dir: str, output_file):
+        """Convert a directory of parquet files to JSONL."""
+        import pandas as pd
+
+        # Find all parquet files in the directory
+        parquet_files = []
+        for root, dirs, files in os.walk(parquet_dir):
+            for file in files:
+                if file.endswith(".parquet"):
+                    parquet_files.append(os.path.join(root, file))
+
+        # Convert each parquet file to JSONL
+        for parquet_file in parquet_files:
+            try:
+                df = pd.read_parquet(parquet_file)
+                for _, row in df.iterrows():
+                    output_file.write(json.dumps(row.to_dict()) + "\n")
+            except Exception as e:
+                logger.error(f"Failed to convert parquet file {parquet_file}: {e}")
+                continue
+
+    def _convert_parquet_file_to_jsonl(self, parquet_file: str, output_file):
+        """Convert a single parquet file to JSONL."""
+        import pandas as pd
+
+        try:
+            df = pd.read_parquet(parquet_file)
+            for _, row in df.iterrows():
+                output_file.write(json.dumps(row.to_dict()) + "\n")
+        except Exception as e:
+            logger.error(f"Failed to convert parquet file {parquet_file}: {e}")
+            raise
 
     def _create_final_mapping_report(self, partition_results: List[Dict[str, Any]]):
         """Create a final mapping report showing the relationship between original and processed data."""
@@ -1552,9 +1636,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             return []
 
         # Use correct file extension based on storage format
-        if self.cfg.storage_format == "parquet":
+        if self.storage_format == "parquet":
             extension = ".parquet"
-        elif self.cfg.storage_format == "arrow":
+        elif self.storage_format == "arrow":
             extension = ".arrow"
         else:
             extension = ".jsonl"
@@ -1580,9 +1664,18 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
     def _load_processed_dataset(self, output_path: str):
         """Load the final processed dataset."""
-        if self.cfg.storage_format == "parquet":
+        # Convert relative path to absolute path to avoid Ray path resolution issues
+        output_path = os.path.abspath(output_path)
+
+        # Use the RayExporter's format detection logic
+        export_format = self.exporter.export_format
+
+        if export_format == "parquet":
             return ray.data.read_parquet(output_path)
-        elif self.cfg.storage_format == "arrow":
+        elif export_format == "arrow":
             return ray.data.read_arrow(output_path)
+        elif export_format in ["json", "jsonl"]:
+            return ray.data.read_json(output_path)
         else:
+            # Fallback to JSONL for unknown formats
             return ray.data.read_json(output_path)
