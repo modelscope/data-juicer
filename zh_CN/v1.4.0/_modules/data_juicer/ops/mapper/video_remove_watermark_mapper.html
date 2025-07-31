@@ -405,6 +405,7 @@
         <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">min_frame_threshold</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span>
         <span class="n">detection_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pixel_value&quot;</span><span class="p">,</span>
+        <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
@@ -433,11 +434,15 @@
 <span class="sd">            the pixel diversity in different frames. The min_frame_threshold</span>
 <span class="sd">            is useless and frame_num must be greater than 1 in</span>
 <span class="sd">            &#39;pixel_diversity&#39; mode.</span>
+<span class="sd">        :param save_dir: The directory where generated video files will be stored.</span>
+<span class="sd">            If not specified, outputs will be saved in the same directory as their corresponding input files.</span>
+<span class="sd">            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.</span>
 <span class="sd">        :param args: extra args</span>
 <span class="sd">        :param kwargs: extra args</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;save_dir&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">roi_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ratio&quot;</span><span class="p">,</span> <span class="s2">&quot;pixel&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;roi_type [</span><span class="si">{</span><span class="n">roi_type</span><span class="si">}</span><span class="s2">]&quot;</span> <span class="sa">f</span><span class="s2">&quot; is not supported. &quot;</span> <span class="sa">f</span><span class="s2">&quot;Can only be one of [&#39;ratio&#39;, &#39;pixel&#39;]. &quot;</span><span class="p">)</span>
@@ -469,7 +474,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">roi_key</span> <span class="o">=</span> <span class="n">roi_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">frame_num</span> <span class="o">=</span> <span class="n">frame_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_frame_threshold</span> <span class="o">=</span> <span class="n">min_frame_threshold</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">detection_method</span> <span class="o">=</span> <span class="n">detection_method</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detection_method</span> <span class="o">=</span> <span class="n">detection_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_detect_watermark_via_pixel_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frames</span><span class="p">,</span> <span class="n">rois</span><span class="p">):</span>
@@ -573,7 +579,7 @@
 
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loaded_video_keys</span><span class="p">):</span>
             <span class="n">video</span> <span class="o">=</span> <span class="n">videos</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span>
-            <span class="n">cleaned_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+            <span class="n">cleaned_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cleaned_video_key</span><span class="p">)</span> <span class="ow">or</span> <span class="n">cleaned_video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">:</span>
                 <span class="n">watermark_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_watermark_mask</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>

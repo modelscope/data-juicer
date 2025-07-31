@@ -369,7 +369,9 @@
 
 <div class="viewcode-block" id="ImageBlurMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_blur_mapper.ImageBlurMapper.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">blur_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">blur_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -377,11 +379,15 @@
 <span class="sd">        :param blur_type: Type of blur kernel, including</span>
 <span class="sd">            [&#39;mean&#39;, &#39;box&#39;, &#39;gaussian&#39;].</span>
 <span class="sd">        :param radius: Radius of blur kernel.</span>
+<span class="sd">        :param save_dir: The directory where generated image files will be stored.</span>
+<span class="sd">            If not specified, outputs will be saved in the same directory as their corresponding input files.</span>
+<span class="sd">            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.</span>
 <span class="sd">        :param args: extra args</span>
 <span class="sd">        :param kwargs: extra args</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;save_dir&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">blur_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;box&quot;</span><span class="p">,</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Blur_type [</span><span class="si">{</span><span class="n">blur_type</span><span class="si">}</span><span class="s2">] is not supported. &quot;</span> <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;mean&quot;, &quot;box&quot;, &quot;gaussian&quot;]. &#39;</span>
@@ -398,7 +404,8 @@
         <span class="k">elif</span> <span class="n">blur_type</span> <span class="o">==</span> <span class="s2">&quot;box&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">blur</span> <span class="o">=</span> <span class="n">ImageFilter</span><span class="o">.</span><span class="n">BoxBlur</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">blur</span> <span class="o">=</span> <span class="n">ImageFilter</span><span class="o">.</span><span class="n">GaussianBlur</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blur</span> <span class="o">=</span> <span class="n">ImageFilter</span><span class="o">.</span><span class="n">GaussianBlur</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span></div>
 
 
 <div class="viewcode-block" id="ImageBlurMapper.process_single">
@@ -425,7 +432,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">():</span>
                 <span class="n">processed</span><span class="p">[</span><span class="n">image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">image_key</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">blured_image_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">image_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+                <span class="n">blured_image_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">image_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">blured_image_key</span> <span class="o">!=</span> <span class="n">image_key</span><span class="p">:</span>
                     <span class="c1"># the image_key is a valid local path, we can update it</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">blured_image_key</span><span class="p">)</span> <span class="ow">or</span> <span class="n">blured_image_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>

@@ -1684,12 +1684,22 @@ generated multimodal data. The pattern is
 
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.file_utils.transfer_filename">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">transfer_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">op_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#transfer_filename"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.transfer_filename" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">transfer_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">op_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#transfer_filename"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.transfer_filename" title="Link to this definition">¶</a></dt>
 <dd><p>According to the op and hashing its parameters 'op_kwargs' addition
 to the process id and current time as the 'hash_val', map the
 original_filepath to another unique file path. E.g.</p>
-<blockquote>
-<div><ol class="arabic simple">
+<dl class="simple">
+<dt>When <cite>save_dir</cite> is provided: '/save_dir/path/to/data/'</dt><dd><dl class="simple">
+<dt>/path/to/abc.jpg --&gt;</dt><dd><p>/save_dir/path/to/data/abc__dj_hash_#{hash_val}#.jpg</p>
+</dd>
+</dl>
+</dd>
+<dt>When environment variable <cite>DJ_PRODUCED_DATA_DIR</cite> is provided: '/environment/path/to/data/'</dt><dd><dl class="simple">
+<dt>/path/to/abc.jpg --&gt;</dt><dd><p>/environment/path/to/data/{op_name}/abc__dj_hash_#{hash_val}#.jpg</p>
+</dd>
+</dl>
+</dd>
+<dt>When neither <cite>save_dir</cite> nor <cite>DJ_PRODUCED_DATA_DIR</cite> is provided:</dt><dd><ol class="arabic simple">
 <li><dl class="simple">
 <dt>abc.jpg --&gt;</dt><dd><p>__dj__produced_data__/{op_name}/
 abc__dj_hash_#{hash_val}#.jpg</p>
@@ -1716,7 +1726,9 @@ abc__dj_hash_#{hash_val2}#.jpg</p>
 </dl>
 </li>
 </ol>
-</div></blockquote>
+</dd>
+</dl>
+<p>Priority: <cite>save_dir</cite> &gt; <cite>DJ_PRODUCED_DATA_DIR</cite> &gt; original data directory (default)</p>
 </dd></dl>
 
 <dl class="py function">

@@ -386,7 +386,15 @@
 
 <div class="viewcode-block" id="AudioAddGaussianNoiseMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.audio_add_gaussian_noise_mapper.AudioAddGaussianNoiseMapper.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_amplitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">max_amplitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.015</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">min_amplitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span>
+        <span class="n">max_amplitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.015</span><span class="p">,</span>
+        <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Initialization method.</span>
@@ -397,10 +405,14 @@
 <span class="sd">            Default: 0.015. Maximum noise amplification factor.</span>
 <span class="sd">        p: float range: [0.0, 1.0].  Default: 0.5.</span>
 <span class="sd">            The probability of applying this transform.</span>
-
+<span class="sd">        save_dir: str. Default: None.</span>
+<span class="sd">            The directory where generated audio files will be stored.</span>
+<span class="sd">            If not specified, outputs will be saved in the same directory as their corresponding input files.</span>
+<span class="sd">            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;save_dir&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">min_amplitude</span> <span class="o">&gt;=</span> <span class="n">max_amplitude</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;min_amplitude must be &lt; max_amplitude&quot;</span><span class="p">)</span>
@@ -411,7 +423,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">audio_transform</span> <span class="o">=</span> <span class="n">audiomentations</span><span class="o">.</span><span class="n">AddGaussianNoise</span><span class="p">(</span>
             <span class="n">min_amplitude</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_amplitude</span><span class="p">,</span> <span class="n">max_amplitude</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_amplitude</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span></div>
 
 
 <div class="viewcode-block" id="AudioAddGaussianNoiseMapper.process_single">
@@ -433,7 +446,7 @@
             <span class="k">if</span> <span class="n">audio_key</span> <span class="ow">in</span> <span class="n">processed</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="n">new_audio_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">audio_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+            <span class="n">new_audio_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">audio_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">new_audio_key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.ogg&quot;</span><span class="p">):</span>
                 <span class="n">new_audio_key</span> <span class="o">=</span> <span class="n">new_audio_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.ogg&quot;</span><span class="p">,</span> <span class="s2">&quot;.wav&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">new_audio_key</span><span class="p">)</span> <span class="ow">or</span> <span class="n">new_audio_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">audios</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>

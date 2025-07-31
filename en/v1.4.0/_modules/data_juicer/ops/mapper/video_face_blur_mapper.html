@@ -397,7 +397,15 @@
 
 <div class="viewcode-block" id="VideoFaceBlurMapper.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_face_blur_mapper.VideoFaceBlurMapper.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cv_classifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">blur_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cv_classifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">blur_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+        <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -406,11 +414,15 @@
 <span class="sd">        :param blur_type: Type of blur kernel, including</span>
 <span class="sd">            [&#39;mean&#39;, &#39;box&#39;, &#39;gaussian&#39;].</span>
 <span class="sd">        :param radius: Radius of blur kernel.</span>
+<span class="sd">        :param save_dir: The directory where generated video files will be stored.</span>
+<span class="sd">            If not specified, outputs will be saved in the same directory as their corresponding input files.</span>
+<span class="sd">            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.</span>
 <span class="sd">        :param args: extra args</span>
 <span class="sd">        :param kwargs: extra args</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;save_dir&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">cv_classifier</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
             <span class="n">cv_classifier</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">haarcascades</span><span class="p">,</span> <span class="s2">&quot;haarcascade_frontalface_alt.xml&quot;</span><span class="p">)</span>
@@ -436,7 +448,8 @@
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;opencv_classifier&quot;</span><span class="p">,</span> <span class="n">model_path</span><span class="o">=</span><span class="n">cv_classifier</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;opencv_classifier&quot;</span><span class="p">,</span> <span class="n">model_path</span><span class="o">=</span><span class="n">cv_classifier</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span></div>
 
 
 <div class="viewcode-block" id="VideoFaceBlurMapper.process_single">
@@ -473,7 +486,7 @@
                 <span class="k">continue</span>
 
             <span class="n">video</span> <span class="o">=</span> <span class="n">videos</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span>
-            <span class="n">blured_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+            <span class="n">blured_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
             <span class="n">output_video_key</span> <span class="o">=</span> <span class="n">process_each_frame</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="n">blured_video_key</span><span class="p">,</span> <span class="n">_blur_func</span><span class="p">)</span>
             <span class="n">processed_video_keys</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_video_key</span>
 

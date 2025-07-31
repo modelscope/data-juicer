@@ -634,7 +634,7 @@ and ② execute <code class="docutils literal notranslate"><span class="pre">pre
 </pre></div>
 </div>
 </li>
-<li><p>(<img alt="stable" src="https://img.shields.io/badge/stable-green?style=plastic" />) In a mapper operator, to avoid process conflicts and data coverage, we offer an interface to make a saving path for produced extra data. The format of the saving path is <code class="docutils literal notranslate"><span class="pre">{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}</span></code>, where the <code class="docutils literal notranslate"><span class="pre">HASH_VALUE</span></code> is hashed from the init parameters of the operator, the related parameters in each sample, the process ID, and the timestamp. For convenience, we can call <code class="docutils literal notranslate"><span class="pre">self.remove_extra_parameters(locals())</span></code> at the beginning of the initiation to get the init parameters. At the same time, we can call <code class="docutils literal notranslate"><span class="pre">self.add_parameters</span></code> to add related parameters with the produced extra data from each sample. Take the operator which enhances the images with diffusion models as example:</p>
+<li><p>(<img alt="stable" src="https://img.shields.io/badge/stable-green?style=plastic" />) In a mapper operator, to avoid process conflicts and data coverage, we offer an interface to make a saving path for produced extra data. The format of the saving path is <code class="docutils literal notranslate"><span class="pre">{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}</span></code>, where the <code class="docutils literal notranslate"><span class="pre">HASH_VALUE</span></code> is hashed from the init parameters of the operator, the related parameters in each sample, the process ID, and the timestamp. You can also specify the save path (for example, save_dir) or set the storage path through the environment variable <code class="docutils literal notranslate"><span class="pre">DJ_PRODUCED_DATA_DIR</span></code>. For convenience, we can call <code class="docutils literal notranslate"><span class="pre">self.remove_extra_parameters(locals())</span></code> at the beginning of the initiation to get the init parameters. At the same time, we can call <code class="docutils literal notranslate"><span class="pre">self.add_parameters</span></code> to add related parameters with the produced extra data from each sample. Take the operator which enhances the images with diffusion models as example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">transfer_filename</span>
 <span class="c1"># ... (import some other libraries)</span>
 <span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;image_diffusion_mapper&#39;</span>
@@ -643,10 +643,12 @@ and ② execute <code class="docutils literal notranslate"><span class="pre">pre
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageDiffusionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
              <span class="c1"># ... (OP parameters)</span>
+             <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
              <span class="o">*</span><span class="n">args</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="c1"># ... (some codes)</span>
@@ -654,7 +656,7 @@ and ② execute <code class="docutils literal notranslate"><span class="pre">pre
         <span class="n">related_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">,</span> <span class="n">caption</span><span class="o">=</span><span class="n">captions</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
         <span class="n">new_image_path</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span>
-                <span class="n">origin_image_path</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="n">related_parameters</span><span class="p">)</span>
+                <span class="n">origin_image_path</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">related_parameters</span><span class="p">)</span>
         <span class="c1"># ... (some codes)</span>
 </pre></div>
 </div>
@@ -667,15 +669,17 @@ and ② execute <code class="docutils literal notranslate"><span class="pre">pre
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoSplitByKeyFrameMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
              <span class="c1"># ... (OP parameters)</span>
+             <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
              <span class="o">*</span><span class="n">args</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="c1"># ... (some codes)</span>
         <span class="n">split_video_path</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span>
-                    <span class="n">original_video_path</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+                    <span class="n">original_video_path</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
         <span class="n">split_video_path</span> <span class="o">=</span> <span class="n">add_suffix_to_filename</span><span class="p">(</span><span class="n">split_video_path</span><span class="p">,</span>  <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="c1"># ... (some codes)</span>
 </pre></div>

@@ -383,6 +383,7 @@
         <span class="n">alpha_matting_background_threshold</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">alpha_matting_erode_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">bgcolor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
@@ -399,6 +400,9 @@
 <span class="sd">            Erosion size for alpha matting. Defaults to 10.</span>
 <span class="sd">        bgcolor (Optional[Tuple[int, int, int, int]], optional):</span>
 <span class="sd">            Background color for the cutout image. Defaults to None.</span>
+<span class="sd">        save_dir: The directory where generated image files will be stored.</span>
+<span class="sd">            If not specified, outputs will be saved in the same directory as their corresponding input files.</span>
+<span class="sd">            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.</span>
 <span class="sd">        *args (Optional[Any]): Additional positional arguments.</span>
 <span class="sd">        **kwargs (Optional[Any]): Additional keyword arguments.</span>
 
@@ -406,12 +410,14 @@
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;save_dir&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha_matting</span> <span class="o">=</span> <span class="n">alpha_matting</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha_matting_foreground_threshold</span> <span class="o">=</span> <span class="n">alpha_matting_foreground_threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha_matting_background_threshold</span> <span class="o">=</span> <span class="n">alpha_matting_background_threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha_matting_erode_size</span> <span class="o">=</span> <span class="n">alpha_matting_erode_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bgcolor</span> <span class="o">=</span> <span class="n">bgcolor</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bgcolor</span> <span class="o">=</span> <span class="n">bgcolor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span></div>
 
 
 <div class="viewcode-block" id="ImageRemoveBackgroundMapper.process_single">
@@ -435,7 +441,7 @@
             <span class="k">if</span> <span class="n">image_key</span> <span class="ow">in</span> <span class="n">processed</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="n">remove_image_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">image_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+            <span class="n">remove_image_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">image_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">remove_image_key</span> <span class="o">!=</span> <span class="n">image_key</span><span class="p">:</span>
                 <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">remove_image_key</span><span class="p">)</span>
                 <span class="n">remove_image_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.png&quot;</span>

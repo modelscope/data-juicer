@@ -542,12 +542,19 @@
 
 <div class="viewcode-block" id="transfer_filename">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.file_utils.transfer_filename">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">transfer_filename</span><span class="p">(</span><span class="n">original_filepath</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">op_name</span><span class="p">,</span> <span class="o">**</span><span class="n">op_kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">transfer_filename</span><span class="p">(</span><span class="n">original_filepath</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">op_kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    According to the op and hashing its parameters &#39;op_kwargs&#39; addition</span>
 <span class="sd">    to the process id and current time as the &#39;hash_val&#39;, map the</span>
 <span class="sd">    original_filepath to another unique file path. E.g.</span>
 
+<span class="sd">    When `save_dir` is provided: &#39;/save_dir/path/to/data/&#39;</span>
+<span class="sd">        /path/to/abc.jpg --&gt;</span>
+<span class="sd">            /save_dir/path/to/data/abc__dj_hash_#{hash_val}#.jpg</span>
+<span class="sd">    When environment variable `DJ_PRODUCED_DATA_DIR` is provided: &#39;/environment/path/to/data/&#39;</span>
+<span class="sd">        /path/to/abc.jpg --&gt;</span>
+<span class="sd">            /environment/path/to/data/{op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
+<span class="sd">    When neither `save_dir` nor `DJ_PRODUCED_DATA_DIR` is provided:</span>
 <span class="sd">        1. abc.jpg --&gt;</span>
 <span class="sd">            __dj__produced_data__/{op_name}/</span>
 <span class="sd">            abc__dj_hash_#{hash_val}#.jpg</span>
@@ -562,16 +569,25 @@
 <span class="sd">            /path/to/__dj__produced_data__/{op_name}/</span>
 <span class="sd">            abc__dj_hash_#{hash_val2}#.jpg</span>
 
+<span class="sd">    Priority: `save_dir` &gt; `DJ_PRODUCED_DATA_DIR` &gt; original data directory (default)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># check if it&#39;s valid local path, if it&#39;s not, regard it as a remote path/url and return None</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">original_filepath</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">original_filepath</span>
-    <span class="c1"># produce the directory</span>
-    <span class="n">original_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">original_filepath</span><span class="p">)</span>
-    <span class="n">dir_token</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">Fields</span><span class="o">.</span><span class="n">multimodal_data_output_dir</span><span class="si">}</span><span class="s2">/&quot;</span>
-    <span class="k">if</span> <span class="n">dir_token</span> <span class="ow">in</span> <span class="n">original_dir</span><span class="p">:</span>
-        <span class="n">original_dir</span> <span class="o">=</span> <span class="n">original_dir</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">dir_token</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">new_dir</span> <span class="o">=</span> <span class="n">transfer_data_dir</span><span class="p">(</span><span class="n">original_dir</span><span class="p">,</span> <span class="n">op_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">save_dir</span><span class="p">:</span>
+        <span class="n">new_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">produced_data_dir</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DJ_PRODUCED_DATA_DIR&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">new_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">produced_data_dir</span><span class="p">),</span> <span class="n">op_name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># produce the directory</span>
+        <span class="n">original_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">original_filepath</span><span class="p">)</span>
+        <span class="n">dir_token</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">Fields</span><span class="o">.</span><span class="n">multimodal_data_output_dir</span><span class="si">}</span><span class="s2">/&quot;</span>
+        <span class="k">if</span> <span class="n">dir_token</span> <span class="ow">in</span> <span class="n">original_dir</span><span class="p">:</span>
+            <span class="n">original_dir</span> <span class="o">=</span> <span class="n">original_dir</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">dir_token</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">new_dir</span> <span class="o">=</span> <span class="n">transfer_data_dir</span><span class="p">(</span><span class="n">original_dir</span><span class="p">,</span> <span class="n">op_name</span><span class="p">)</span>
+
+    <span class="n">create_directory_if_not_exists</span><span class="p">(</span><span class="n">new_dir</span><span class="p">)</span>
 
     <span class="c1"># produce the unique hash code</span>
     <span class="n">unique_parameters</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">op_kwargs</span><span class="p">)</span>

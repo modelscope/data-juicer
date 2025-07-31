@@ -631,7 +631,7 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 </pre></div>
 </div>
 </li>
-<li><p>(<img alt="stable" src="https://img.shields.io/badge/stable-green?style=plastic" />) 在mapper算子中，我们提供了产生额外数据的存储路径生成接口，避免出现进程冲突和数据覆盖的情况。生成的存储路径格式为<code class="docutils literal notranslate"><span class="pre">{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}</span></code>，其中<code class="docutils literal notranslate"><span class="pre">HASH_VALUE</span></code>是算子初始化参数、每个样本中相关参数、进程ID和时间戳的哈希值。为了方便，可以在OP类初始化开头调用<code class="docutils literal notranslate"><span class="pre">self.remove_extra_parameters(locals())</span></code>获取算子初始化参数，同时可以调用<code class="docutils literal notranslate"><span class="pre">self.add_parameters</span></code>添加每个样本与生成额外数据相关的参数。例如，利用diffusion模型对图像进行增强的算子：</p>
+<li><p>(<img alt="stable" src="https://img.shields.io/badge/stable-green?style=plastic" />) 在mapper算子中，我们提供了产生额外数据的存储路径生成接口，避免出现进程冲突和数据覆盖的情况。生成的存储路径格式默认为<code class="docutils literal notranslate"><span class="pre">{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}</span></code>，其中<code class="docutils literal notranslate"><span class="pre">HASH_VALUE</span></code>是算子初始化参数、每个样本中相关参数、进程ID和时间戳的哈希值。也可以指定保存路径（例如<code class="docutils literal notranslate"><span class="pre">save_dir</span></code>）或者通过环境变量（<code class="docutils literal notranslate"><span class="pre">DJ_PRODUCED_DATA_DIR</span></code>）设置额外数据的存储路径。为了方便，可以在OP类初始化开头调用<code class="docutils literal notranslate"><span class="pre">self.remove_extra_parameters(locals())</span></code>获取算子初始化参数，同时可以调用<code class="docutils literal notranslate"><span class="pre">self.add_parameters</span></code>添加每个样本与生成额外数据相关的参数。例如，利用diffusion模型对图像进行增强的算子：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ... (import some library)</span>
 <span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;image_diffusion_mapper&#39;</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
@@ -639,10 +639,12 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageDiffusionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
              <span class="c1"># ... (OP parameters)</span>
+             <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
              <span class="o">*</span><span class="n">args</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="c1"># ... (some codes)</span>
@@ -650,7 +652,7 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
         <span class="n">related_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">,</span> <span class="n">caption</span><span class="o">=</span><span class="n">captions</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
         <span class="n">new_image_path</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span>
-                <span class="n">origin_image_path</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="n">related_parameters</span><span class="p">)</span>
+                <span class="n">origin_image_path</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">related_parameters</span><span class="p">)</span>
         <span class="c1"># ... (some codes)</span>
 </pre></div>
 </div>
@@ -662,15 +664,17 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoSplitByKeyFrameMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
              <span class="c1"># ... (OP parameters)</span>
+             <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
              <span class="o">*</span><span class="n">args</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="c1"># ... (some codes)</span>
         <span class="n">split_video_path</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span>
-                    <span class="n">original_video_path</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+                    <span class="n">original_video_path</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
         <span class="n">split_video_path</span> <span class="o">=</span> <span class="n">add_suffix_to_filename</span><span class="p">(</span><span class="n">split_video_path</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="c1"># ... (some codes)</span>
 </pre></div>

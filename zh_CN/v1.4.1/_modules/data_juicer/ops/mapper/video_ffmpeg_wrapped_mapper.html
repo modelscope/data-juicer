@@ -375,6 +375,7 @@
         <span class="n">global_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">capture_stderr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">overwrite_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
@@ -386,17 +387,22 @@
 <span class="sd">        :param global_args: list-arguments passed to ffmpeg command-line.</span>
 <span class="sd">        :param capture_stderr: whether to capture stderr.</span>
 <span class="sd">        :param overwrite_output: whether to overwrite output file.</span>
+<span class="sd">        :param save_dir: The directory where generated video files will be stored.</span>
+<span class="sd">            If not specified, outputs will be saved in the same directory as their corresponding input files.</span>
+<span class="sd">            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.</span>
 <span class="sd">        :param args: extra args</span>
 <span class="sd">        :param kwargs: extra args</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;save_dir&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span> <span class="o">=</span> <span class="n">filter_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filter_kwargs</span> <span class="o">=</span> <span class="n">filter_kwargs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">global_args</span> <span class="o">=</span> <span class="n">global_args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">capture_stderr</span> <span class="o">=</span> <span class="n">capture_stderr</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">overwrite_output</span> <span class="o">=</span> <span class="n">overwrite_output</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">overwrite_output</span> <span class="o">=</span> <span class="n">overwrite_output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span></div>
 
 
 <div class="viewcode-block" id="VideoFFmpegWrappedMapper.process_single">
@@ -419,7 +425,7 @@
             <span class="k">if</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="n">processed</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="n">output_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+            <span class="n">output_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
             <span class="n">stream</span> <span class="o">=</span> <span class="n">ffmpeg</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">video_key</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">output_key</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">global_args</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">global_args</span><span class="p">)</span>
