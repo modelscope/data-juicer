@@ -36,7 +36,15 @@ class VideoFaceBlurMapper(Mapper):
         "maxSize": None,
     }
 
-    def __init__(self, cv_classifier: str = "", blur_type: str = "gaussian", radius: float = 2, *args, **kwargs):
+    def __init__(
+        self,
+        cv_classifier: str = "",
+        blur_type: str = "gaussian",
+        radius: float = 2,
+        save_dir: str = None,
+        *args,
+        **kwargs,
+    ):
         """
         Initialization method.
 
@@ -45,11 +53,15 @@ class VideoFaceBlurMapper(Mapper):
         :param blur_type: Type of blur kernel, including
             ['mean', 'box', 'gaussian'].
         :param radius: Radius of blur kernel.
+        :param save_dir: The directory where generated video files will be stored.
+            If not specified, outputs will be saved in the same directory as their corresponding input files.
+            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         if cv_classifier == "":
             cv_classifier = os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_alt.xml")
@@ -76,6 +88,7 @@ class VideoFaceBlurMapper(Mapper):
                 self.extra_kwargs[key] = kwargs[key]
 
         self.model_key = prepare_model(model_type="opencv_classifier", model_path=cv_classifier)
+        self.save_dir = save_dir
 
     def process_single(self, sample, context=False):
         # there is no video in this sample
@@ -109,7 +122,7 @@ class VideoFaceBlurMapper(Mapper):
                 continue
 
             video = videos[video_key]
-            blured_video_key = transfer_filename(video_key, OP_NAME, **self._init_parameters)
+            blured_video_key = transfer_filename(video_key, OP_NAME, self.save_dir, **self._init_parameters)
             output_video_key = process_each_frame(video, blured_video_key, _blur_func)
             processed_video_keys[video_key] = output_video_key
 

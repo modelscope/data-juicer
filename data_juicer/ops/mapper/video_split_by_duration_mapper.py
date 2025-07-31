@@ -39,6 +39,7 @@ class VideoSplitByDurationMapper(Mapper):
         split_duration: float = 10,
         min_last_split_duration: float = 0,
         keep_original_sample: bool = True,
+        save_dir: str = None,
         *args,
         **kwargs,
     ):
@@ -53,23 +54,28 @@ class VideoSplitByDurationMapper(Mapper):
             it's set to False, there will be only cut sample in the
             final datasets and the original sample will be removed. It's True
             in default.
+        :param save_dir: The directory where generated video files will be stored.
+            If not specified, outputs will be saved in the same directory as their corresponding input files.
+            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         self.split_duration = split_duration
         self.min_last_split_duration = min_last_split_duration
         self.keep_original_sample = keep_original_sample
         self.extra_args = kwargs
+        self.save_dir = save_dir
 
     def split_videos_by_duration(self, video_key, container):
         video_duration = get_video_duration(container)
         timestamps = np.arange(0, video_duration, self.split_duration).tolist()
         count = 0
         split_video_keys = []
-        unique_video_key = transfer_filename(video_key, OP_NAME, **self._init_parameters)
+        unique_video_key = transfer_filename(video_key, OP_NAME, self.save_dir, **self._init_parameters)
         for i in range(1, len(timestamps)):
             split_video_key = add_suffix_to_filename(unique_video_key, f"_{count}")
             if cut_video_by_seconds(container, split_video_key, timestamps[i - 1], timestamps[i]):
