@@ -45,7 +45,7 @@ class DefaultExecutor(ExecutorBase):
         # Checkpoint directory
         self.ckpt_dir = os.path.join(self.work_dir, "ckpt")
         # Tracer directory
-        if self.open_tracer:
+        if self.cfg.open_tracer:
             self.tracer = Tracer(self.work_dir, show_num=self.cfg.trace_num)
 
         self.ckpt_manager = None
@@ -154,7 +154,7 @@ class DefaultExecutor(ExecutorBase):
             work_dir=self.work_dir,
             exporter=self.exporter,
             checkpointer=self.ckpt_manager,
-            tracer=self.tracer,
+            tracer=self.tracer if self.cfg.open_tracer else None,
             adapter=self.adapter,
             open_monitor=self.cfg.open_monitor,
         )
