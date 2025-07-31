@@ -62,6 +62,7 @@ class VideoSplitByDurationMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         self.split_duration = split_duration
         self.min_last_split_duration = min_last_split_duration

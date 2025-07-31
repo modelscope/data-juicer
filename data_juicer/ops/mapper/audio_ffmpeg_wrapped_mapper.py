@@ -42,6 +42,7 @@ class AudioFFmpegWrappedMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         self.filter_name = filter_name
         self.filter_kwargs = filter_kwargs

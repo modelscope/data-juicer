@@ -66,6 +66,7 @@ class VideoResizeResolutionMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         force_original_aspect_ratio = force_original_aspect_ratio.lower()
 

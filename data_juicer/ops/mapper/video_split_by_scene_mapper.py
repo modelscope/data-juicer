@@ -69,6 +69,7 @@ class VideoSplitBySceneMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         if detector not in self.avaliable_detectors:
             raise ValueError(

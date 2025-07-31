@@ -89,6 +89,7 @@ class VideoResizeAspectRatioMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         strategy = strategy.lower()
         if strategy not in self.STRATEGY:

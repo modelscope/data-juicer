@@ -104,6 +104,7 @@ class ImageDiffusionMapper(Mapper):
         kwargs.setdefault("mem_required", "8GB")
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
         self.strength = strength
         self.guidance_scale = guidance_scale
         self.aug_num = aug_num

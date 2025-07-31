@@ -51,6 +51,7 @@ class AudioAddGaussianNoiseMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         if min_amplitude >= max_amplitude:
             raise ValueError("min_amplitude must be < max_amplitude")

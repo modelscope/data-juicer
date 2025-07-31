@@ -79,6 +79,7 @@ class VideoRemoveWatermarkMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         if roi_type not in ["ratio", "pixel"]:
             raise ValueError(f"roi_type [{roi_type}]" f" is not supported. " f"Can only be one of ['ratio', 'pixel']. ")

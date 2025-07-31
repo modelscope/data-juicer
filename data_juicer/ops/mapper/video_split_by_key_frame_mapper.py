@@ -48,7 +48,7 @@ class VideoSplitByKeyFrameMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
-
+        self._init_parameters.pop("save_dir", None)
         self.keep_original_sample = keep_original_sample
         self.extra_args = kwargs
         self.save_dir = save_dir

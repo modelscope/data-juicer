@@ -35,6 +35,7 @@ class ImageBlurMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
         if blur_type not in ["mean", "box", "gaussian"]:
             raise ValueError(
                 f"Blur_type [{blur_type}] is not supported. " f'Can only be one of ["mean", "box", "gaussian"]. '
