@@ -197,8 +197,8 @@ def transfer_filename(original_filepath: Union[str, Path], op_name, save_dir: st
 
     if save_dir:
         new_dir = os.path.abspath(save_dir)
-    elif os.environ.get("DJ_PRODUCED_DATA_DIR", None):
-        new_dir = os.path.join(os.path.abspath(os.environ.get("DJ_PRODUCED_DATA_DIR")), op_name)
+    elif produced_data_dir := os.environ.get("DJ_PRODUCED_DATA_DIR", None):
+        new_dir = os.path.join(os.path.abspath(produced_data_dir), op_name)
     else:
         # produce the directory
         original_dir = os.path.dirname(original_filepath)
