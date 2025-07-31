@@ -160,7 +160,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
             trust_remote_code=trust_remote_code
         )
 
-    def _process_single_sample(self, ori_sample, rank=None, context=False):
+    def _process_single_sample(self, ori_sample, model, processor, rank=None, context=False):
 
         # there is no videos in this sample
         if self.video_key not in ori_sample or not ori_sample[self.video_key]:
@@ -181,7 +181,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
 
         text = sample[self.text_key]
         offset = 0
-        model, processor = get_model(self.model_key, rank, self.use_cuda())
+        # model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         for chunk in text.split(SpecialTokens.eoc):
 
@@ -331,7 +331,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
                 generated_text_candidates_single_chunk[max_index])
         return generated_text_per_chunk
 
-    def process_batched(self, samples, rank=None, context=False):
+    def process_batched(self, samples, model, processor, rank=None, context=False):
         """
         :param samples:
         :return:
@@ -356,6 +356,8 @@ class VideoCaptioningFromFramesMapper(Mapper):
             if self.keep_original_sample:
                 samples_after_generation.append(ori_sample)
             generated_samples = self._process_single_sample(ori_sample,
+                                                            model,
+                                                            processor,
                                                             rank=rank,
                                                             context=context)
             if len(generated_samples) != 0:

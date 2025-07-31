@@ -116,11 +116,10 @@ class VideoAestheticsFilter(Filter):
             "" if frame_sampling_method == "all_keyframes" else f"-{frame_num}"
         )
 
-    def compute_stats_single(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, model, processor, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_frames_aesthetics_score in sample[Fields.stats]:
             return sample
-
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.stats][StatsKeys.video_frames_aesthetics_score] = np.array([], dtype=np.float64)
@@ -154,7 +153,7 @@ class VideoAestheticsFilter(Filter):
 
             if len(frame_images) > 0:
                 # compute aesthetics_scores
-                model, processor = get_model(self.model_key, rank=rank, use_cuda=self.use_cuda())
+                # model, processor = get_model(self.model_key, rank=rank, use_cuda=self.use_cuda())
                 inputs = processor(images=frame_images, return_tensors="pt").to(model.device)
                 with torch.no_grad():
                     outputs = model(**inputs)
