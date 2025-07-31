@@ -1358,10 +1358,15 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 logger.info(f"🔄 Resuming job: {self.cfg.job_id}")
                 return self._resume_job(resumption_validation)
             else:
-                logger.error(f"❌ Job resumption failed: {resumption_validation.get('reason', 'Unknown')}")
+                # Extract reason from the nested resumption_analysis -> resumption_plan
+                resumption_analysis = resumption_validation.get("resumption_analysis", {})
+                resumption_plan = resumption_analysis.get("resumption_plan", {})
+                reason = resumption_plan.get("reason", "Unknown")
+
+                logger.error(f"❌ Job resumption failed: {reason}")
                 logger.error(f"   Cannot resume job {self.cfg.job_id} with the same job_id")
                 logger.error(f"   Please use a different job_id or fix the validation issues")
-                raise RuntimeError(f"Job resumption failed: {resumption_validation.get('reason', 'Unknown')}")
+                raise RuntimeError(f"Job resumption failed: {reason}")
         else:
             logger.info(f"🚀 Starting new job with job_id: {getattr(self.cfg, 'job_id', 'auto-generated')}")
 

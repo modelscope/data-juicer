@@ -782,7 +782,7 @@ class EventLoggingMixin:
         )
 
         # Generate resumption plan
-        resumption_plan = self._generate_resumption_plan(partition_states, checkpoints)
+        resumption_plan = self._generate_resumption_plan(partition_states, checkpoints, job_status)
 
         # Calculate progress metrics
         progress_metrics = self._calculate_progress_metrics(partition_states, events)
@@ -914,7 +914,9 @@ class EventLoggingMixin:
             "output_path": latest_complete.get("metadata", {}).get("output_path") if latest_complete else None,
         }
 
-    def _generate_resumption_plan(self, partition_states: Dict[int, Dict], checkpoints: List[Dict]) -> Dict:
+    def _generate_resumption_plan(
+        self, partition_states: Dict[int, Dict], checkpoints: List[Dict], job_status: str
+    ) -> Dict:
         """Generate a resumption plan based on partition states and checkpoints."""
         # Find partitions that need to be retried
         partitions_to_retry = []
@@ -929,11 +931,26 @@ class EventLoggingMixin:
         # Find the latest checkpoint
         latest_checkpoint = max(checkpoints, key=lambda x: x.get("timestamp", 0)) if checkpoints else None
 
-        # Determine if we can resume
-        can_resume = len(partitions_to_retry) > 0 or latest_checkpoint is not None
+        # Determine if we can resume based on job status and partition states
+        if job_status == "completed":
+            can_resume = False
+            reason = "Job already completed successfully"
+        elif job_status == "failed":
+            can_resume = True
+            reason = "Job failed, can resume from checkpoint or retry failed partitions"
+        elif len(partitions_to_retry) > 0:
+            can_resume = True
+            reason = f"Found {len(partitions_to_retry)} failed partitions to retry"
+        elif latest_checkpoint is not None:
+            can_resume = True
+            reason = "Found checkpoint to resume from"
+        else:
+            can_resume = False
+            reason = "No failed partitions or checkpoints found"
 
         return {
             "can_resume": can_resume,
+            "reason": reason,
             "resume_from_checkpoint": (
                 latest_checkpoint.get("metadata", {}).get("checkpoint_path") if latest_checkpoint else None
             ),
