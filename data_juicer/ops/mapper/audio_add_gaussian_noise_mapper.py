@@ -25,7 +25,15 @@ class AudioAddGaussianNoiseMapper(Mapper):
 
     """
 
-    def __init__(self, min_amplitude: float = 0.001, max_amplitude: float = 0.015, p: float = 0.5, *args, **kwargs):
+    def __init__(
+        self,
+        min_amplitude: float = 0.001,
+        max_amplitude: float = 0.015,
+        p: float = 0.5,
+        save_dir: str = None,
+        *args,
+        **kwargs,
+    ):
         """
 
         Initialization method.
@@ -36,10 +44,14 @@ class AudioAddGaussianNoiseMapper(Mapper):
             Default: 0.015. Maximum noise amplification factor.
         p: float range: [0.0, 1.0].  Default: 0.5.
             The probability of applying this transform.
-
+        save_dir: str. Default: None.
+            The directory where generated audio files will be stored.
+            If not specified, outputs will be saved in the same directory as their corresponding input files.
+            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         if min_amplitude >= max_amplitude:
             raise ValueError("min_amplitude must be < max_amplitude")
@@ -51,6 +63,7 @@ class AudioAddGaussianNoiseMapper(Mapper):
         self.audio_transform = audiomentations.AddGaussianNoise(
             min_amplitude=self.min_amplitude, max_amplitude=self.max_amplitude, p=self.p
         )
+        self.save_dir = save_dir
 
     def process_single(self, sample, context=False):
         # there is no audio in this sample
@@ -69,7 +82,7 @@ class AudioAddGaussianNoiseMapper(Mapper):
             if audio_key in processed:
                 continue
 
-            new_audio_key = transfer_filename(audio_key, OP_NAME, **self._init_parameters)
+            new_audio_key = transfer_filename(audio_key, OP_NAME, self.save_dir, **self._init_parameters)
             if new_audio_key.endswith(".ogg"):
                 new_audio_key = new_audio_key.replace(".ogg", ".wav")
             if not os.path.exists(new_audio_key) or new_audio_key not in audios.keys():

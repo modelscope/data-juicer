@@ -87,8 +87,15 @@ def check_model(model_name, force=False):
     if not force and os.path.exists(model_name):
         return model_name
 
-    if not force and DJEMH and os.path.exists(os.path.join(DJEMH, model_name)):
-        return os.path.join(DJEMH, model_name)
+    if not force and DJEMH:
+        external_paths = DJEMH.split(os.pathsep)
+        for path in external_paths:
+            clean_path = path.strip()
+            if not clean_path:
+                continue
+            model_path = os.path.join(clean_path, model_name)
+            if os.path.exists(model_path):
+                return model_path
 
     if not os.path.exists(DJMC):
         os.makedirs(DJMC)

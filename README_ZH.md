@@ -32,7 +32,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 [Demo Video] DataJuicer-Agent:数据处理，即刻启程！
 
-https://github.com/user-attachments/assets/58aea900-e51f-4ec2-b1c0-eead97967893
+https://github.com/user-attachments/assets/6eb726b7-6054-4b0c-905e-506b2b9c7927
 
 [Demo Video] DataJuicer-Sandbox: 降本增效，优化数据-模型协同开发！
 
