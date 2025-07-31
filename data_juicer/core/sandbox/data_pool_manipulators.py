@@ -244,6 +244,8 @@ class DataPoolCombination(BaseDataPoolManipulator):
         longest_common_prefix = get_longest_common_prefix(
             [os.path.splitext(os.path.basename(p))[0] for p in existing_input_paths]
         )
+        if longest_common_prefix == "":
+            longest_common_prefix = "default_prefix"
         output_paths = []
         output_path_pattern = os.path.join(export_path, f"{longest_common_prefix}_top_%s_num_%d.jsonl")
         for pools in combined_hierarchies:
@@ -444,3 +446,34 @@ class DataPoolDownsampling(BaseDataPoolManipulator):
             ds.to_json(output_path)
             output_paths.append(output_path)
         return output_paths
+
+
+class DataPoolMerging(BaseDataPoolManipulator):
+    def run(self):
+        """
+        merge data pools into one dataset or data pool.
+
+        Input:
+            - N split data pools.
+        Output: 1 merged dataset/data pool, which is named following the rule "<longest_common_prefix>_merged.jsonl"
+        """
+        # read inputs
+        ordered_data_pool_paths = self.data_pool_cfg.get("dataset_path", [])
+        export_path = self.data_pool_cfg.get("export_path", None)
+
+        # check I/O paths
+        existing_input_paths, output_path = check_io_paths(ordered_data_pool_paths, export_path)
+
+        # start to combine these data pools
+        logger.info("Merging data pools...")
+        # export hierarchies
+        longest_common_prefix = get_longest_common_prefix(
+            [os.path.splitext(os.path.basename(p))[0] for p in existing_input_paths]
+        )
+        if longest_common_prefix == "":
+            longest_common_prefix = "default_prefix"
+        output_path = os.path.join(export_path, f"{longest_common_prefix}_merged.jsonl")
+        data_pools = [load_data_pool(path) for path in existing_input_paths]
+        merged_dataset = concatenate_datasets(data_pools)
+        merged_dataset.to_json(output_path, force_ascii=False)
+        return output_path

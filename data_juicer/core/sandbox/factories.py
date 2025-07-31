@@ -5,6 +5,7 @@ from data_juicer.core.sandbox.data_pool_manipulators import (
     DataPoolConstruction,
     DataPoolDownsampling,
     DataPoolDuplication,
+    DataPoolMerging,
     DataPoolRanking,
 )
 from data_juicer.core.sandbox.evaluators import Gpt3QualityEvaluator, InceptionEvaluator
@@ -106,6 +107,8 @@ class DataPoolManipulatorFactory(object):
             manipulator = DataPoolDuplication(data_pool_cfg)
         elif data_pool_cfg.type == "data_pool_downsampling":
             manipulator = DataPoolDownsampling(data_pool_cfg)
+        elif data_pool_cfg.type == "data_pool_merging":
+            manipulator = DataPoolMerging(data_pool_cfg)
 
         return manipulator
 
