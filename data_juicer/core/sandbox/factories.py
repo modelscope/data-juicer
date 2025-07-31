@@ -1,6 +1,7 @@
 from data_juicer.core import Analyzer as DJAnalyzer
 from data_juicer.core.executor import DefaultExecutor as DJExecutor
 from data_juicer.core.sandbox.data_pool_manipulators import (
+    DataPoolCartesianJoin,
     DataPoolCombination,
     DataPoolConstruction,
     DataPoolDownsampling,
@@ -109,6 +110,8 @@ class DataPoolManipulatorFactory(object):
             manipulator = DataPoolDownsampling(data_pool_cfg)
         elif data_pool_cfg.type == "data_pool_merging":
             manipulator = DataPoolMerging(data_pool_cfg)
+        elif data_pool_cfg.type == "data_pool_cartesian_join":
+            manipulator = DataPoolCartesianJoin(data_pool_cfg)
 
         return manipulator
 

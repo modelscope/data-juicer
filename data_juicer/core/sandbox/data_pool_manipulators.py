@@ -466,7 +466,7 @@ class DataPoolMerging(BaseDataPoolManipulator):
 
         # start to combine these data pools
         logger.info("Merging data pools...")
-        # export hierarchies
+        # try to get the longest_common_prefix
         longest_common_prefix = get_longest_common_prefix(
             [os.path.splitext(os.path.basename(p))[0] for p in existing_input_paths]
         )
@@ -477,3 +477,72 @@ class DataPoolMerging(BaseDataPoolManipulator):
         merged_dataset = concatenate_datasets(data_pools)
         merged_dataset.to_json(output_path, force_ascii=False)
         return output_path
+
+
+class DataPoolCartesianJoin(BaseDataPoolManipulator):
+    def run(self):
+        """
+        join two sets of data pools with Cartesian Join.
+
+        Example: Given two sets of data pools M and N, where M = {DP(A, B, C), DP(E, F), DP(G, H, I, J)} and
+            N = {DP(1), DP(2, 3)}. After this hook, they are Cartesian joined to:
+            {
+                DP(A1, B1, C1),
+                DP(A2, A3, B2, B3, C2, C3),
+                DP(E1, F1),
+                DP(E2, E3, F2, F3),
+                DP(G1, H1, I1, J1),
+                DP(G2, G3, H2, H3, I2, I3, J2, J3),
+            }
+
+        Input:
+            - M data pools.
+            - N data pools.
+        Output: M x N joined data pools MN, where MN(i, j) = M(i) x N(j).
+            They are named following the rule "<longest_common_prefix>_cartesian_join_{i}_{j}.jsonl"
+        """
+        # read inputs
+        first_data_pool_paths = self.data_pool_cfg.get("dataset_path_1", [])
+        second_data_pool_paths = self.data_pool_cfg.get("dataset_path_2", [])
+        export_path = self.data_pool_cfg.get("export_path", None)
+
+        # check I/O paths
+        first_existing_input_paths, output_path = check_io_paths(first_data_pool_paths, export_path)
+        second_existing_input_paths, output_path = check_io_paths(second_data_pool_paths, output_path)
+        first_num_data_pools = len(first_existing_input_paths)
+        second_num_data_pools = len(second_existing_input_paths)
+
+        # start to combine these data pools
+        logger.info(
+            f"Cartesian join two sets of data pools with "
+            f"{first_num_data_pools} and {second_num_data_pools} data pools..."
+        )
+        # try to get the longest_common_prefix
+        first_longest_common_prefix = get_longest_common_prefix(
+            [os.path.splitext(os.path.basename(p))[0] for p in first_existing_input_paths]
+        )
+        second_longest_common_prefix = get_longest_common_prefix(
+            [os.path.splitext(os.path.basename(p))[0] for p in second_existing_input_paths]
+        )
+        longest_common_prefix = f"{first_longest_common_prefix}_{second_longest_common_prefix}"
+        if longest_common_prefix == "_":
+            longest_common_prefix = "default_prefix"
+        output_path_pattern = os.path.join(export_path, f"{longest_common_prefix}_cartesian_join_%d_%d.jsonl")
+        output_paths = []
+        for i, first_path in enumerate(first_existing_input_paths):
+            for j, second_path in enumerate(second_existing_input_paths):
+                output_path = output_path_pattern % (i, j)
+                first_dataset = load_data_pool(first_path)
+                second_dataset = load_data_pool(second_path)
+                joined_dataset = self._cartesian_join_two_dataset(first_dataset, second_dataset)
+                joined_dataset.to_json(output_path, force_ascii=False)
+                output_paths.append(output_path)
+        return output_paths
+
+    def _cartesian_join_two_dataset(self, first_dataset: NestedDataset, second_dataset: NestedDataset):
+        len1 = len(first_dataset)
+        len2 = len(second_dataset)
+        first_dataset_len2 = concatenate_datasets([first_dataset] * len2)
+        second_dataset_len1 = concatenate_datasets([second_dataset] * len1)
+        res_dataset = concatenate_datasets([first_dataset_len2, second_dataset_len1], axis=1)
+        return res_dataset
