@@ -5,7 +5,7 @@ import os
 from contextlib import redirect_stderr
 from functools import partial
 from pickle import UnpicklingError
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import httpx
 import multiprocess as mp
@@ -39,6 +39,8 @@ openai = LazyLoader("openai")
 ultralytics = LazyLoader("ultralytics")
 tiktoken = LazyLoader("tiktoken")
 dashscope = LazyLoader("dashscope")
+mmdeploy = LazyLoader("mmdeploy")
+mmdet3d = LazyLoader("mmdet3d")
 
 MODEL_ZOO = {}
 
@@ -990,6 +992,97 @@ def update_sampling_params(sampling_params, pretrained_model_name_or_path, enabl
     return sampling_params
 
 
+class MMLabModel(object):
+    """
+    A wrapper for mmdeploy model.
+    It is used to load a mmdeploy model and run inference on given images.
+    """
+
+    def __init__(self, model_cfg_path, deploy_cfg_path, backend_files, device):
+        self.model_cfg_path = model_cfg_path
+        self.deploy_cfg_path = deploy_cfg_path
+        self.backend_files = backend_files
+        self.device = device
+
+        from mmdeploy.apis.utils import build_task_processor
+        from mmdeploy.utils import get_input_shape, load_config
+
+        deploy_cfg, model_cfg = load_config(self.deploy_cfg_path, self.model_cfg_path)
+        self.task_processor = build_task_processor(model_cfg, deploy_cfg, self.device)
+
+        self.model = self.task_processor.build_backend_model(
+            self.backend_files, data_preprocessor_updater=self.task_processor.update_data_preprocessor
+        )
+
+        self.input_shape = get_input_shape(deploy_cfg)
+
+    def __call__(self, image):
+        model_inputs, _ = self.task_processor.create_input(image, self.input_shape)
+
+        with torch.no_grad():
+            result = self.model.test_step(model_inputs)
+
+        return result
+
+
+class MMLabInferencer(object):
+    """
+    A wrapper for mmdet3d Inferencer.
+    It is used to load a mmdet3d Inferencer and run inference on given images.
+    """
+
+    def __init__(self, model_cfg_path, model_path, device):
+        self.model_cfg_path = model_cfg_path
+        self.model_path = model_path
+        self.device = device
+
+        from mmdet3d.apis import LidarSeg3DInferencer
+
+        self.model = LidarSeg3DInferencer(model=self.model_cfg_path, weights=self.model_path, device=self.device)
+
+    def __call__(self, lidar_bin_files):
+        result = self.model(lidar_bin_files, show=False)["predictions"]
+
+        return result
+
+
+def prepare_mmlab_model(
+    model_cfg: str,
+    deploy_cfg: str = "",
+    backend_files: List[str] = [],
+    model_path: str = "",
+    device: str = "cpu",
+    task: str = "LiDARDetection",
+):
+    """Prepare and load a model using mmdeploy.
+
+    :param model_cfg: Path to the model config.
+    :param deploy_cfg: Path to the deployment config.
+    :param backend_files: Path to the backend model files.
+    :param device: Device to use.
+    :param task: Current task. Only support ["LiDARDetection", "LiDARSegmentation"] for now.
+    """
+
+    if task == "LiDARDetection":
+        model = MMLabModel(
+            check_model(model_cfg),
+            check_model(deploy_cfg),
+            [check_model(backend_file) for backend_file in backend_files],
+            device,
+        )
+    elif task == "LiDARSegmentation":
+        model = MMLabInferencer(
+            model_cfg,
+            model_path,
+            device,
+        )
+
+    else:
+        NotImplementedError(f'Only support task name ["LiDARDetection", "LiDARSegmentation"] for now, but got {task}')
+
+    return model
+
+
 MODEL_FUNCTION_MAPPING = {
     "api": prepare_api_model,
     "diffusion": prepare_diffusion_model,
@@ -1008,6 +1101,7 @@ MODEL_FUNCTION_MAPPING = {
     "video_blip": prepare_video_blip_model,
     "vllm": prepare_vllm_model,
     "embedding": prepare_embedding_model,
+    "mmlab": prepare_mmlab_model,
 }
 
 _MODELS_WITHOUT_FILE_LOCK = {"fasttext", "fastsam", "kenlm", "nltk", "recognizeAnything", "sentencepiece", "spacy"}
