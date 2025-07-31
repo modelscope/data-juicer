@@ -47,13 +47,21 @@ def count_rows_auto(file_path):
         row_count = len(df)
         method_used = "pandas read_csv"
     elif extension in [".json", ".jsonl"]:
-        # For JSON files, use pandas
-        if extension == ".jsonl":
-            df = pd.read_json(file_path, lines=True)
-        else:
+        # For JSON files, try to detect if it's JSONL content
+        try:
+            # First try to read as regular JSON
             df = pd.read_json(file_path)
-        row_count = len(df)
-        method_used = "pandas read_json"
+            row_count = len(df)
+            method_used = "pandas read_json"
+        except Exception as e:
+            # If that fails, try reading as JSONL (one JSON object per line)
+            if "Trailing data" in str(e) or "Extra data" in str(e):
+                df = pd.read_json(file_path, lines=True)
+                row_count = len(df)
+                method_used = "pandas read_json (lines=True) - detected JSONL content"
+            else:
+                # Re-raise the original error if it's not a trailing data issue
+                raise e
     elif extension in [".arrow", ".feather"]:
         # For Arrow files, use pyarrow
         table = pa.ipc.open_file(file_path).read_all()
