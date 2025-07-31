@@ -18,14 +18,14 @@ from ..base_op import OPERATORS, Mapper
 torch = LazyLoader("torch")
 vllm = LazyLoader("vllm")
 
-OP_NAME = "generate_prompt_mapper"
+OP_NAME = "optimize_prompt_mapper"
 
 
 @OPERATORS.register_module(OP_NAME)
-class GeneratePromptMapper(Mapper):
+class OptimizePromptMapper(Mapper):
     """
-    Mapper to generate prompts based on the existing ones.
-    This OP will use the existing prompts in the same batch and newly generated prompts as the examples to generate
+    Mapper to optimize prompts based on the existing ones.
+    This OP will use the existing prompts in the same batch and newly optimized prompts as the examples to optimize
     the next ones.
     """
 

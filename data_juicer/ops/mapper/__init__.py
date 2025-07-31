@@ -26,7 +26,6 @@ from .extract_nickname_mapper import ExtractNicknameMapper
 from .extract_support_text_mapper import ExtractSupportTextMapper
 from .extract_tables_from_html_mapper import ExtractTablesFromHtmlMapper
 from .fix_unicode_mapper import FixUnicodeMapper
-from .generate_prompt_mapper import GeneratePromptMapper
 from .generate_qa_from_examples_mapper import GenerateQAFromExamplesMapper
 from .generate_qa_from_text_mapper import GenerateQAFromTextMapper
 from .image_blur_mapper import ImageBlurMapper
@@ -44,6 +43,7 @@ from .imgdiff_difference_caption_generator_mapper import (
 from .mllm_mapper import MllmMapper
 from .nlpaug_en_mapper import NlpaugEnMapper
 from .nlpcda_zh_mapper import NlpcdaZhMapper
+from .optimize_prompt_mapper import OptimizePromptMapper
 from .optimize_qa_mapper import OptimizeQAMapper
 from .optimize_query_mapper import OptimizeQueryMapper
 from .optimize_response_mapper import OptimizeResponseMapper
@@ -116,7 +116,6 @@ __all__ = [
     "ExtractSupportTextMapper",
     "ExtractTablesFromHtmlMapper",
     "FixUnicodeMapper",
-    "GeneratePromptMapper",
     "GenerateQAFromExamplesMapper",
     "GenerateQAFromTextMapper",
     "HumanPreferenceAnnotationMapper",
@@ -131,6 +130,7 @@ __all__ = [
     "MllmMapper",
     "NlpaugEnMapper",
     "NlpcdaZhMapper",
+    "OptimizePromptMapper",
     "OptimizeQAMapper",
     "OptimizeQueryMapper",
     "OptimizeResponseMapper",

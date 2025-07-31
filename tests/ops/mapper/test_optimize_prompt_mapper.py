@@ -3,11 +3,11 @@ import unittest
 
 from datasets import load_dataset
 from data_juicer.core.data import NestedDataset
-from data_juicer.ops.mapper.generate_prompt_mapper import GeneratePromptMapper
+from data_juicer.ops.mapper.optimize_prompt_mapper import OptimizePromptMapper
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, FROM_FORK
 
 @unittest.skipIf(FROM_FORK, "Skipping API-based test because running from a fork repo")
-class GeneratePromptFromExamplesMapperTest(DataJuicerTestCaseBase):
+class OptimizePromptMapperTest(DataJuicerTestCaseBase):
     prompt_key = 'prompt'
     root_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', '..')
     test_data_path = os.path.join(root_path, 'demos/data/demo-dataset-prompts.jsonl')
@@ -15,7 +15,7 @@ class GeneratePromptFromExamplesMapperTest(DataJuicerTestCaseBase):
     def _run_op(self, model="Qwen/Qwen2.5-7B-Instruct", enable_vllm=False, is_hf_model=True, sampling_params=None, num_proc=1):
         gen_num = 3
         batch_size = 2
-        op = GeneratePromptMapper(
+        op = OptimizePromptMapper(
             api_or_hf_model=model,
             gen_num=gen_num,
             max_example_num=3,
