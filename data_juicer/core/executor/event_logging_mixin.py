@@ -174,7 +174,14 @@ class EventLogger:
                 parts.append(f"OP_IDX[{event.operation_idx}]")
 
         if event.duration is not None:
-            parts.append(f"DURATION[{event.duration:.3f}s]")
+            # Handle case where duration might be a string (due to parameter order issues)
+            try:
+                if isinstance(event.duration, (int, float)):
+                    parts.append(f"DURATION[{event.duration:.3f}s]")
+                else:
+                    parts.append(f"DURATION[{event.duration}]")
+            except (ValueError, TypeError):
+                parts.append(f"DURATION[{event.duration}]")
 
         parts.append(f"MSG[{event.message}]")
 
@@ -447,7 +454,7 @@ class EventLoggingMixin:
         thread_id = threading.get_ident()
 
         # Generate event ID if not provided
-        event_id = kwargs.get("event_id")
+        event_id = kwargs.pop("event_id", None)
         if event_id is None:
             timestamp = int(time.time())
             event_id = f"{event_type.value}_{timestamp}_{uuid4().hex[:8]}"
@@ -492,15 +499,18 @@ class EventLoggingMixin:
             total_partitions=total_partitions,
         )
 
-    def log_job_complete(self, status, duration):
+    def log_job_complete(self, duration, output_path=None):
         """Log job completion with performance metrics."""
-        metadata = {"status": status, "duration_seconds": duration, "completion_time": time.time()}
+        metadata = {"status": "completed", "duration_seconds": duration, "completion_time": time.time()}
+        if output_path:
+            metadata["output_path"] = output_path
+
         event_id = f"job_complete_{int(time.time())}"
         self._log_event(
             EventType.JOB_COMPLETE,
-            f"Job completed with status: {status}",
+            f"Job completed successfully in {duration:.2f}s",
             event_id=event_id,
-            status=status,
+            status="completed",
             duration=duration,
             metadata=metadata,
         )
