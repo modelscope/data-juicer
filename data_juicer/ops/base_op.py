@@ -7,7 +7,7 @@ from loguru import logger
 
 from data_juicer import is_cuda_available
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.mm_utils import size_to_bytes
+from data_juicer.utils.mm_utils import SpecialTokens, size_to_bytes
 from data_juicer.utils.model_utils import free_models
 from data_juicer.utils.process_utils import calculate_np
 from data_juicer.utils.registry import Registry
@@ -195,6 +195,11 @@ class OP:
             self.mem_required = size_to_bytes(self.mem_required) / 1024**3
 
         self.turbo = kwargs.get("turbo", False)
+        # update special tokens
+        SpecialTokens.image = kwargs.get("image_special_token", SpecialTokens.image)
+        SpecialTokens.audio = kwargs.get("audio_special_token", SpecialTokens.audio)
+        SpecialTokens.video = kwargs.get("video_special_token", SpecialTokens.video)
+        SpecialTokens.eoc = kwargs.get("eoc_special_token", SpecialTokens.eoc)
 
         # nested wrappers
         from data_juicer.core.data import wrap_func_with_nested_access
