@@ -770,25 +770,25 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 actual_op_idx = latest_op_idx + 1 + op_idx if latest_op_idx is not None else op_idx
 
                 # Log operation start
-                self.log_op_start(partition_id, op.__class__.__name__, actual_op_idx, {})
+                self.log_op_start(partition_id, op._name, actual_op_idx, {})
 
                 # Determine checkpoint path
                 checkpoint_path = None
-                if self._should_checkpoint(actual_op_idx, op.__class__.__name__, partition_id):
+                if self._should_checkpoint(actual_op_idx, op._name, partition_id):
                     # Always save operation checkpoints to checkpoint directory
                     checkpoint_path = os.path.join(
-                        partition_checkpoint_dir, f"op_{actual_op_idx:03d}_{op.__class__.__name__}.parquet"
+                        partition_checkpoint_dir, f"op_{actual_op_idx:03d}_{op._name}.parquet"
                     )
                     self._write_dataset_with_directory_creation(current_dataset, checkpoint_path, "parquet")
 
                     # Log checkpoint save
-                    self.log_checkpoint_save(partition_id, op.__class__.__name__, actual_op_idx, checkpoint_path)
+                    self.log_checkpoint_save(partition_id, op._name, actual_op_idx, checkpoint_path)
                     logger.debug(f"Saved checkpoint for partition {partition_id}, operation {actual_op_idx}")
 
                 # Log operation completion
                 self.log_op_complete(
                     partition_id,
-                    op.__class__.__name__,
+                    op._name,
                     actual_op_idx,
                     op_duration,
                     checkpoint_path,
