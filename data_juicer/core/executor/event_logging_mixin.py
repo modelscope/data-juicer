@@ -48,6 +48,17 @@ class EventType(Enum):
     PROCESSING_START = "processing_start"
     PROCESSING_COMPLETE = "processing_complete"
     PROCESSING_ERROR = "processing_error"
+    # DAG-specific events
+    DAG_BUILD_START = "dag_build_start"
+    DAG_BUILD_COMPLETE = "dag_build_complete"
+    DAG_NODE_READY = "dag_node_ready"
+    DAG_NODE_START = "dag_node_start"
+    DAG_NODE_COMPLETE = "dag_node_complete"
+    DAG_NODE_FAILED = "dag_node_failed"
+    DAG_PARALLEL_GROUP_START = "dag_parallel_group_start"
+    DAG_PARALLEL_GROUP_COMPLETE = "dag_parallel_group_complete"
+    DAG_EXECUTION_PLAN_SAVED = "dag_execution_plan_saved"
+    DAG_EXECUTION_PLAN_LOADED = "dag_execution_plan_loaded"
 
 
 @dataclass
@@ -603,7 +614,7 @@ class EventLoggingMixin:
             metadata=metadata,
         )
 
-    def log_op_start(self, partition_id, operation_name, operation_idx, op_args):
+    def log_op_start(self, partition_id, operation_name, operation_idx, op_args, **kwargs):
         """Log operation start with detailed arguments."""
         metadata = {
             "operation_idx": operation_idx,
@@ -611,6 +622,10 @@ class EventLoggingMixin:
             "start_time": time.time(),
             "operation_class": operation_name,
         }
+        # Merge any additional metadata from kwargs
+        if "metadata" in kwargs:
+            metadata.update(kwargs["metadata"])
+
         event_id = f"op_start_{partition_id}_{operation_idx}_{int(time.time())}"
         self._log_event(
             EventType.OP_START,
@@ -624,7 +639,7 @@ class EventLoggingMixin:
         )
 
     def log_op_complete(
-        self, partition_id, operation_name, operation_idx, duration, checkpoint_path, input_rows, output_rows
+        self, partition_id, operation_name, operation_idx, duration, checkpoint_path, input_rows, output_rows, **kwargs
     ):
         """Log operation completion with detailed performance metrics."""
         # Calculate performance metrics
@@ -641,6 +656,9 @@ class EventLoggingMixin:
             "completion_time": time.time(),
             "operation_class": operation_name,
         }
+        # Merge any additional metadata from kwargs
+        if "metadata" in kwargs:
+            metadata.update(kwargs["metadata"])
 
         event_id = f"op_complete_{partition_id}_{operation_idx}_{int(time.time())}"
         self._log_event(
@@ -658,7 +676,7 @@ class EventLoggingMixin:
             metadata=metadata,
         )
 
-    def log_op_failed(self, partition_id, operation_name, operation_idx, error_message, retry_count):
+    def log_op_failed(self, partition_id, operation_name, operation_idx, error_message, retry_count, **kwargs):
         """Log operation failure with error details."""
         metadata = {
             "retry_count": retry_count,
@@ -666,6 +684,10 @@ class EventLoggingMixin:
             "error_type": type(error_message).__name__ if error_message else "Unknown",
             "operation_class": operation_name,
         }
+        # Merge any additional metadata from kwargs
+        if "metadata" in kwargs:
+            metadata.update(kwargs["metadata"])
+
         event_id = f"op_failed_{partition_id}_{operation_idx}_{int(time.time())}"
         self._log_event(
             EventType.OP_FAILED,
@@ -717,6 +739,183 @@ class EventLoggingMixin:
             operation_name=operation_name,
             operation_idx=operation_idx,
             checkpoint_path=checkpoint_path,
+            metadata=metadata,
+        )
+
+    # DAG-specific event logging methods
+    def log_dag_build_start(self, ast_info: Dict[str, Any]):
+        """Log DAG build start with AST information."""
+        metadata = {
+            "ast_node_count": ast_info.get("node_count", 0),
+            "ast_depth": ast_info.get("depth", 0),
+            "ast_operation_types": ast_info.get("operation_types", []),
+            "build_start_time": time.time(),
+        }
+        event_id = f"dag_build_start_{int(time.time())}"
+        self._log_event(
+            EventType.DAG_BUILD_START,
+            "DAG build started from pipeline AST",
+            event_id=event_id,
+            metadata=metadata,
+        )
+
+    def log_dag_build_complete(self, dag_info: Dict[str, Any]):
+        """Log DAG build completion with execution plan information."""
+        metadata = {
+            "dag_node_count": dag_info.get("node_count", 0),
+            "dag_edge_count": dag_info.get("edge_count", 0),
+            "parallel_groups_count": dag_info.get("parallel_groups_count", 0),
+            "execution_plan_length": dag_info.get("execution_plan_length", 0),
+            "build_duration": dag_info.get("build_duration", 0),
+            "build_complete_time": time.time(),
+        }
+        event_id = f"dag_build_complete_{int(time.time())}"
+        self._log_event(
+            EventType.DAG_BUILD_COMPLETE,
+            f"DAG build completed: {dag_info.get('node_count', 0)} nodes, {dag_info.get('edge_count', 0)} edges",
+            event_id=event_id,
+            metadata=metadata,
+        )
+
+    def log_dag_node_ready(self, node_id: str, node_info: Dict[str, Any]):
+        """Log when a DAG node becomes ready for execution."""
+        metadata = {
+            "node_id": node_id,
+            "op_name": node_info.get("op_name"),
+            "op_type": node_info.get("op_type"),
+            "dependencies_count": node_info.get("dependencies_count", 0),
+            "dependents_count": node_info.get("dependents_count", 0),
+            "execution_order": node_info.get("execution_order", -1),
+            "ready_time": time.time(),
+        }
+        event_id = f"dag_node_ready_{node_id}_{int(time.time())}"
+        self._log_event(
+            EventType.DAG_NODE_READY,
+            f"DAG node {node_id} ({node_info.get('op_name')}) ready for execution",
+            event_id=event_id,
+            metadata=metadata,
+        )
+
+    def log_dag_node_start(self, node_id: str, node_info: Dict[str, Any]):
+        """Log when a DAG node starts execution."""
+        metadata = {
+            "node_id": node_id,
+            "op_name": node_info.get("op_name"),
+            "op_type": node_info.get("op_type"),
+            "execution_order": node_info.get("execution_order", -1),
+            "start_time": time.time(),
+        }
+        event_id = f"dag_node_start_{node_id}_{int(time.time())}"
+        self._log_event(
+            EventType.DAG_NODE_START,
+            f"DAG node {node_id} ({node_info.get('op_name')}) started execution",
+            event_id=event_id,
+            metadata=metadata,
+        )
+
+    def log_dag_node_complete(self, node_id: str, node_info: Dict[str, Any], duration: float):
+        """Log when a DAG node completes execution."""
+        metadata = {
+            "node_id": node_id,
+            "op_name": node_info.get("op_name"),
+            "op_type": node_info.get("op_type"),
+            "execution_order": node_info.get("execution_order", -1),
+            "duration_seconds": duration,
+            "completion_time": time.time(),
+        }
+        event_id = f"dag_node_complete_{node_id}_{int(time.time())}"
+        self._log_event(
+            EventType.DAG_NODE_COMPLETE,
+            f"DAG node {node_id} ({node_info.get('op_name')}) completed in {duration:.3f}s",
+            event_id=event_id,
+            metadata=metadata,
+        )
+
+    def log_dag_node_failed(self, node_id: str, node_info: Dict[str, Any], error_message: str, duration: float = 0):
+        """Log when a DAG node fails execution."""
+        metadata = {
+            "node_id": node_id,
+            "op_name": node_info.get("op_name"),
+            "op_type": node_info.get("op_type"),
+            "execution_order": node_info.get("execution_order", -1),
+            "duration_seconds": duration,
+            "error_message": error_message,
+            "failure_time": time.time(),
+        }
+        event_id = f"dag_node_failed_{node_id}_{int(time.time())}"
+        self._log_event(
+            EventType.DAG_NODE_FAILED,
+            f"DAG node {node_id} ({node_info.get('op_name')}) failed: {error_message}",
+            event_id=event_id,
+            metadata=metadata,
+        )
+
+    def log_dag_parallel_group_start(self, group_id: str, group_info: Dict[str, Any]):
+        """Log when a parallel group starts execution."""
+        metadata = {
+            "group_id": group_id,
+            "node_count": group_info.get("node_count", 0),
+            "node_ids": group_info.get("node_ids", []),
+            "op_types": group_info.get("op_types", []),
+            "start_time": time.time(),
+        }
+        event_id = f"dag_parallel_group_start_{group_id}_{int(time.time())}"
+        self._log_event(
+            EventType.DAG_PARALLEL_GROUP_START,
+            f"Parallel group {group_id} started with {group_info.get('node_count', 0)} nodes",
+            event_id=event_id,
+            metadata=metadata,
+        )
+
+    def log_dag_parallel_group_complete(self, group_id: str, group_info: Dict[str, Any], duration: float):
+        """Log when a parallel group completes execution."""
+        metadata = {
+            "group_id": group_id,
+            "node_count": group_info.get("node_count", 0),
+            "completed_nodes": group_info.get("completed_nodes", 0),
+            "failed_nodes": group_info.get("failed_nodes", 0),
+            "duration_seconds": duration,
+            "completion_time": time.time(),
+        }
+        event_id = f"dag_parallel_group_complete_{group_id}_{int(time.time())}"
+        self._log_event(
+            EventType.DAG_PARALLEL_GROUP_COMPLETE,
+            f"Parallel group {group_id} completed: {group_info.get('completed_nodes', 0)}/{group_info.get('node_count', 0)} nodes in {duration:.3f}s",
+            event_id=event_id,
+            metadata=metadata,
+        )
+
+    def log_dag_execution_plan_saved(self, plan_path: str, plan_info: Dict[str, Any]):
+        """Log when DAG execution plan is saved."""
+        metadata = {
+            "plan_path": plan_path,
+            "node_count": plan_info.get("node_count", 0),
+            "edge_count": plan_info.get("edge_count", 0),
+            "parallel_groups_count": plan_info.get("parallel_groups_count", 0),
+            "save_time": time.time(),
+        }
+        event_id = f"dag_execution_plan_saved_{int(time.time())}"
+        self._log_event(
+            EventType.DAG_EXECUTION_PLAN_SAVED,
+            f"DAG execution plan saved to {plan_path}",
+            event_id=event_id,
+            metadata=metadata,
+        )
+
+    def log_dag_execution_plan_loaded(self, plan_path: str, plan_info: Dict[str, Any]):
+        """Log when DAG execution plan is loaded."""
+        metadata = {
+            "plan_path": plan_path,
+            "node_count": plan_info.get("node_count", 0),
+            "edge_count": plan_info.get("edge_count", 0),
+            "parallel_groups_count": plan_info.get("parallel_groups_count", 0),
+            "load_time": time.time(),
+        }
+        event_id = f"dag_execution_plan_loaded_{int(time.time())}"
+        self._log_event(
+            EventType.DAG_EXECUTION_PLAN_LOADED,
+            f"DAG execution plan loaded from {plan_path}",
+            event_id=event_id,
             metadata=metadata,
         )
 
