@@ -11,6 +11,17 @@
 
 # Data location configuration (Mandatory)
 dataset_path: './demos/data/demo-dataset.jsonl'
+
+# Work directory configuration
+# IMPORTANT: If using {job_id} placeholder, it MUST be the last part of the path
+# Examples:
+#   ✅ work_dir: "./outputs/my_project/{job_id}"     # Valid
+#   ✅ work_dir: "/data/experiments/{job_id}"        # Valid
+#   ❌ work_dir: "./outputs/{job_id}/results"        # Invalid - {job_id} not at end
+#   ❌ work_dir: "./{job_id}/outputs/data"           # Invalid - {job_id} not at end
+#
+# If no {job_id} is specified, job_id will be automatically appended:
+#   work_dir: "./outputs/my_project" → job_dir: "./outputs/my_project/20250804_143022_abc123"
 work_dir: "./outputs/partition-checkpoint-eventlog/{job_id}"
 export_path: '{work_dir}/processed.jsonl'
 
@@ -68,7 +79,11 @@ partition:
 # Checkpoint configuration
 checkpoint:
   enabled: true
-  strategy: "every_op"  # every_op, every_partition, every_n_ops, manual, disabled
+  strategy: "manual"  # every_op, every_partition, every_n_ops, manual, disabled
+  op_names:           # List of operation names to checkpoint (for manual strategy)
+    - whitespace_normalization_mapper
+    - text_length_filter
+
 
 # Event logging configuration
 event_logging:
