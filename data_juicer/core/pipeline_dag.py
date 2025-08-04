@@ -108,7 +108,12 @@ class PipelineDAG:
             work_dir: Working directory for storing DAG execution plans and logs
         """
         self.work_dir = Path(work_dir)
-        self.dag_dir = self.work_dir / "dag_execution"
+        # Remove the separate dag_execution subdirectory - save directly in work_dir
+        # self.dag_dir = self.work_dir / "dag_execution"
+        # self.dag_dir.mkdir(parents=True, exist_ok=True)
+        self.dag_dir = self.work_dir  # Use work_dir directly
+
+        # Ensure the work directory exists
         self.dag_dir.mkdir(parents=True, exist_ok=True)
 
         # DAG structure - support both DAGNode objects and dict nodes from strategies

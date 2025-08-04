@@ -9,6 +9,7 @@ pipeline analysis and execution monitoring.
 import json
 import os
 import time
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from loguru import logger
@@ -464,8 +465,12 @@ class DAGExecutionMixin:
     def get_dag_execution_plan_path(self) -> str:
         """Get the path to the saved DAG execution plan."""
         if not self.pipeline_dag:
+            # If pipeline_dag is not initialized, try to construct the path from work_dir
+            if hasattr(self, "cfg") and hasattr(self.cfg, "work_dir"):
+                return str(Path(self.cfg.work_dir) / "dag_execution_plan.json")
             return ""
 
+        # DAG execution plan is now saved directly in the work directory
         return str(self.pipeline_dag.dag_dir / "dag_execution_plan.json")
 
     def reconstruct_dag_state_from_events(self, job_id: str) -> Optional[Dict[str, Any]]:
