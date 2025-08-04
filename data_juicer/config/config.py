@@ -1345,11 +1345,50 @@ def resolve_job_id(cfg):
     return cfg
 
 
+def validate_work_dir_config(work_dir: str) -> None:
+    """
+    Validate work_dir configuration to ensure {job_id} placement rules are followed.
+
+    Args:
+        work_dir: The work_dir string to validate
+
+    Raises:
+        ValueError: If {job_id} is not at the end of the path
+    """
+    if "{job_id}" in work_dir:
+        # Check if {job_id} is at the end of the path
+        if not work_dir.rstrip("/").endswith("{job_id}"):
+            raise ValueError(
+                f"Invalid work_dir configuration: '{{job_id}}' must be the last part of the path. "
+                f"Current: '{work_dir}'. "
+                f"Expected format: 'path/to/directory/{{job_id}}'"
+            )
+
+
 def resolve_job_directories(cfg):
-    """Centralize directory resolution and placeholder substitution. Assumes job_id is already set."""
+    """
+    Centralize directory resolution and placeholder substitution. Assumes job_id is already set.
+
+    Job Directory Rules:
+    - If work_dir contains '{job_id}' placeholder, it MUST be the last part of the path
+    - Examples:
+      ✅ work_dir: "./outputs/my_project/{job_id}"     # Valid
+      ✅ work_dir: "/data/experiments/{job_id}"        # Valid
+      ❌ work_dir: "./outputs/{job_id}/results"        # Invalid - {job_id} not at end
+      ❌ work_dir: "./{job_id}/outputs/data"           # Invalid - {job_id} not at end
+
+    - If work_dir does NOT contain '{job_id}', job_id will be appended automatically
+    - Examples:
+      work_dir: "./outputs/my_project" → job_dir: "./outputs/my_project/20250804_143022_abc123"
+    """
     # 1. placeholder map
     placeholder_map = {"work_dir": cfg.work_dir, "job_id": getattr(cfg, "job_id", "")}
-    # 2. substitute placeholders in all relevant paths (change-detection loop)
+
+    # 2. Validate {job_id} placement in work_dir before substitution
+    original_work_dir = cfg.work_dir
+    validate_work_dir_config(original_work_dir)
+
+    # 3. substitute placeholders in all relevant paths (change-detection loop)
     max_passes = 10
     for _ in range(max_passes):
         changed = False
@@ -1366,14 +1405,18 @@ def resolve_job_directories(cfg):
             break
     else:
         raise RuntimeError("Too many placeholder substitution passes (possible recursive placeholders?)")
-    # 3. directory resolution
+
+    # 4. directory resolution
     job_id = getattr(cfg, "job_id", None)
     if not job_id:
         raise ValueError("job_id must be set before resolving job directories.")
+
+    # Since we validated {job_id} is at the end, we can safely check if work_dir ends with job_id
     if cfg.work_dir.endswith(job_id) or os.path.basename(cfg.work_dir) == job_id:
         job_dir = cfg.work_dir
     else:
         job_dir = os.path.join(cfg.work_dir, job_id)
+
     cfg.job_dir = job_dir
     cfg.event_log_dir = os.path.join(job_dir, "event_logs")
     cfg.checkpoint_dir = os.path.join(job_dir, "checkpoints")
