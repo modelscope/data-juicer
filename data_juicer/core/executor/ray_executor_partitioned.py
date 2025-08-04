@@ -31,6 +31,7 @@ from pydantic import PositiveInt
 from data_juicer.core.adapter import Adapter
 from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.executor import ExecutorBase
+from data_juicer.core.executor.dag_execution_mixin import DAGExecutionMixin
 from data_juicer.core.executor.event_logging_mixin import EventLoggingMixin
 from data_juicer.core.ray_exporter import RayExporter
 from data_juicer.ops import load_ops
@@ -102,7 +103,7 @@ class DatasetMapping:
             self.partitions = []
 
 
-class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
+class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin):
     """
     Fault-tolerant Ray executor with partitioning optimization.
 
@@ -126,6 +127,12 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         # Initialize EventLoggingMixin for job management and event logging
         # Do this after work_dir is set
         EventLoggingMixin.__init__(self, cfg)
+
+        # Initialize DAGExecutionMixin for AST/DAG functionality
+        DAGExecutionMixin.__init__(self)
+
+        # Override strategy methods for partitioned execution
+        self._override_strategy_methods()
 
         # Partitioning configuration
         # Support both flat and nested partition configuration
@@ -203,7 +210,13 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         logger.info("Initializing Ray for partitioned execution...")
         # Suppress macOS malloc stack logging warnings
         os.environ["MALLOC_NANOZONE"] = "0"
-        ray.init(getattr(self.cfg, "ray_address", "auto"))
+        try:
+            ray.init(getattr(self.cfg, "ray_address", "auto"))
+        except RuntimeError as e:
+            if "called ray.init twice" in str(e):
+                logger.info("Ray already initialized, continuing...")
+            else:
+                raise
         self.tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
 
         # Initialize dataset builder
@@ -428,12 +441,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         """Estimate the number of partitions based on dataset size."""
         try:
             total_samples = dataset.data.count()
-            # Use ceiling division to ensure we have enough partitions for all data
-            # Formula: (total_samples + partition_size - 1) // partition_size
-            # This ensures that partial partitions are included
-            # Example: 356317 samples with 50000 partition size = 8 partitions
-            # (356317 + 50000 - 1) // 50000 = 406316 // 50000 = 8
-            return max(1, (total_samples + self.partition_size - 1) // self.partition_size)
+            # Use the same logic as _calculate_partition_sizes for consistency
+            partition_count, _ = self._calculate_partition_sizes(total_samples)
+            return partition_count
         except Exception:
             # Fallback to file-based estimation
             return max(1, int(ray.cluster_resources().get("CPU", 1) * 2))
@@ -446,12 +456,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         original_dataset_path = self.cfg.dataset_path
         total_samples = dataset.data.count()
 
-        # Estimate partition count
-        partition_count = self._estimate_partition_count(dataset)
+        # Calculate partition count and sizes
+        partition_count, partition_sizes = self._calculate_partition_sizes(total_samples)
         logger.info(f"Creating {partition_count} partitions from {total_samples} samples...")
-
-        # Create partitions using Ray's repartition
-        partitioned_dataset = dataset.data.repartition(partition_count)
+        logger.info(f"Partition sizes: {partition_sizes}")
 
         # Initialize dataset mapping
         self.dataset_mapping = DatasetMapping(
@@ -464,13 +472,19 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         # Save partitions to disk with metadata
         partition_paths = []
 
-        # Get partitions from Ray's repartitioned dataset
-        # Use get_internal_block_refs() to get the actual partitions
-        block_refs = partitioned_dataset.get_internal_block_refs()
+        # Convert dataset to list for custom partitioning
+        all_data = dataset.data.to_pandas().to_dict("records")
 
-        for i, block_ref in enumerate(block_refs):
-            # Start with base path, will be updated based on storage format
-            # Add .parquet suffix for consistency with other parquet directories
+        # Create partitions with exact sizes
+        start_idx = 0
+        for i in range(partition_count):
+            partition_size = partition_sizes[i]
+            end_idx = start_idx + partition_size
+
+            # Extract partition data
+            partition_data = all_data[start_idx:end_idx]
+
+            # Create partition path
             partition_path = os.path.join(self.partitions_dir, f"partition_{i:06d}.parquet")
 
             # Log individual partition creation start
@@ -485,62 +499,11 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                     metadata={
                         "partition_id": i,
                         "partition_path": partition_path,
-                        "total_partitions": len(block_refs),
+                        "total_partitions": partition_count,
+                        "expected_size": partition_size,
                     },
                 )
             )
-
-            # Get the actual partition data from the block reference
-            partition_data = ray.get(block_ref)
-
-            # Debug: log the type and structure of partition_data
-            logger.debug(f"Partition {i}: partition_data type = {type(partition_data)}")
-            if hasattr(partition_data, "shape"):
-                logger.debug(f"Partition {i}: partition_data shape = {partition_data.shape}")
-            elif hasattr(partition_data, "num_rows"):
-                logger.debug(f"Partition {i}: partition_data num_rows = {partition_data.num_rows}")
-            elif isinstance(partition_data, list):
-                logger.debug(f"Partition {i}: partition_data length = {len(partition_data)}")
-                if partition_data:
-                    logger.debug(f"Partition {i}: first item type = {type(partition_data[0])}")
-                    logger.debug(f"Partition {i}: first item = {partition_data[0]}")
-
-            # Convert PyArrow table to list of dictionaries for processing
-            if hasattr(partition_data, "to_pandas"):
-                # If it's a PyArrow table, convert to pandas then to dict
-                df = partition_data.to_pandas()
-                partition_data = df.to_dict("records")
-                # Validate that we have proper dictionaries
-                if partition_data and not isinstance(partition_data[0], dict):
-                    logger.error(f"Invalid data structure: expected dict, got {type(partition_data[0])}")
-                    # Try alternative conversion
-                    partition_data = [row.to_dict() for _, row in df.iterrows()]
-            elif isinstance(partition_data, list):
-                # If it's already a list, validate it contains dictionaries
-                if partition_data and not isinstance(partition_data[0], dict):
-                    logger.error(f"Invalid data structure in list: expected dict, got {type(partition_data[0])}")
-                    # Try to convert to proper format
-                    partition_data = [
-                        item if isinstance(item, dict) else {"text": str(item)} for item in partition_data
-                    ]
-            else:
-                # Fallback: try to convert to list
-                partition_data = list(partition_data)
-                # Validate the converted data
-                if partition_data and not isinstance(partition_data[0], dict):
-                    logger.error(
-                        f"Invalid data structure after list conversion: expected dict, got {type(partition_data[0])}"
-                    )
-                    partition_data = [{"text": str(item)} for item in partition_data]
-
-            # Calculate metadata
-            sample_count = len(partition_data)
-            checksum = self._calculate_checksum(partition_data)
-
-            # Calculate approximate start/end indices for metadata
-            # Since we're using Ray's repartition, we can only approximate
-            start_idx = i * (total_samples // partition_count)
-            end_idx = min(start_idx + sample_count, total_samples)
 
             # Save partition to disk using configurable format
             if self.storage_format == "parquet":
@@ -579,12 +542,15 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             # Get file size
             file_size = os.path.getsize(partition_path)
 
+            # Calculate checksum
+            checksum = self._calculate_checksum(partition_data)
+
             # Create partition metadata
             partition_metadata = PartitionMetadata(
                 partition_id=i,
                 original_start_idx=start_idx,
                 original_end_idx=end_idx,
-                sample_count=sample_count,
+                sample_count=len(partition_data),
                 file_size_bytes=file_size,
                 checksum=checksum,
                 created_timestamp=time.time(),
@@ -596,7 +562,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
 
             logger.info(
                 f"Created partition {i+1}/{partition_count}: {partition_path} "
-                f"({sample_count} samples, {file_size} bytes)"
+                f"({len(partition_data)} samples, {file_size} bytes)"
             )
 
             # Log individual partition creation complete
@@ -608,11 +574,11 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                     event_type="partition_creation_complete",
                     timestamp=partition_creation_complete,
                     partition_id=i,
-                    message=f"Partition {i} creation completed - {sample_count} samples in {partition_creation_duration:.2f}s",
+                    message=f"Partition {i} creation completed - {len(partition_data)} samples in {partition_creation_duration:.2f}s",
                     metadata={
                         "partition_id": i,
                         "partition_path": partition_path,
-                        "sample_count": sample_count,
+                        "sample_count": len(partition_data),
                         "file_size_bytes": file_size,
                         "checksum": checksum,
                         "duration_seconds": partition_creation_duration,
@@ -622,10 +588,41 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
                 )
             )
 
+            # Update start index for next partition
+            start_idx = end_idx
+
         # Save dataset mapping
         self._save_dataset_mapping()
 
         return partition_paths, self.dataset_mapping
+
+    def _calculate_partition_sizes(self, total_samples: int) -> Tuple[int, List[int]]:
+        """Calculate partition count and sizes ensuring each partition (except last) has exactly partition_size samples."""
+        if total_samples <= 0:
+            return 1, [0]
+
+        # Calculate how many full partitions we can have
+        full_partitions = total_samples // self.partition_size
+
+        # Calculate remaining samples
+        remaining_samples = total_samples % self.partition_size
+
+        # Determine partition count
+        if remaining_samples == 0:
+            # Perfect division - all partitions are full
+            partition_count = full_partitions
+            partition_sizes = [self.partition_size] * partition_count
+        else:
+            # We need one more partition for the remaining samples
+            partition_count = full_partitions + 1
+            partition_sizes = [self.partition_size] * full_partitions + [remaining_samples]
+
+        logger.info(f"Partition calculation: {total_samples} samples, {self.partition_size} per partition")
+        logger.info(f"Full partitions: {full_partitions}, remaining: {remaining_samples}")
+        logger.info(f"Total partitions: {partition_count}")
+        logger.info(f"Partition sizes: {partition_sizes}")
+
+        return partition_count, partition_sizes
 
     def _save_dataset_mapping(self):
         """Save dataset mapping to disk."""
@@ -1381,7 +1378,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         logger.info("Preparing process operators...")
         ops = self._prepare_operators()
 
-        # Create partitions
+        # Create partitions FIRST to determine actual partition count
         logger.info("Creating new partitions...")
 
         # Log repartition start event
@@ -1431,41 +1428,20 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
             )
         )
 
-        # Log job start event
+        # Initialize DAG execution planning AFTER partitioning to use actual partition count
+        logger.info(f"Initializing DAG execution planning with {len(partition_paths)} actual partitions...")
+        self._initialize_dag_execution(self.cfg)
+
+        # Log job start with DAG context
         job_config = {
             "dataset_path": self.cfg.dataset_path,
-            "work_dir": self.cfg.work_dir,
-            "executor_type": self.cfg.executor_type,
-            "partition_size": getattr(self.cfg, "partition_size", None),
-            "max_partition_size_mb": getattr(self.cfg, "max_partition_size_mb", None),
-            "checkpoint_enabled": (
-                getattr(self.cfg.checkpoint, "enabled", False) if hasattr(self.cfg, "checkpoint") else False
-            ),
-            "checkpoint_strategy": (
-                getattr(self.cfg.checkpoint, "strategy", None) if hasattr(self.cfg, "checkpoint") else None
-            ),
-            "storage_format": (
-                getattr(self.cfg.intermediate_storage, "format", "parquet")
-                if hasattr(self.cfg, "intermediate_storage")
-                else "parquet"
-            ),
-            "compression": (
-                getattr(self.cfg.intermediate_storage, "compression", "snappy")
-                if hasattr(self.cfg, "intermediate_storage")
-                else "snappy"
-            ),
-            "enable_fault_tolerance": (
-                getattr(self.cfg.partition, "enable_fault_tolerance", True) if hasattr(self.cfg, "partition") else True
-            ),
-            "max_retries": getattr(self.cfg.partition, "max_retries", 3) if hasattr(self.cfg, "partition") else 3,
-            "retry_backoff": (
-                getattr(self.cfg.partition, "retry_backoff", "exponential")
-                if hasattr(self.cfg, "partition")
-                else "exponential"
-            ),
+            "work_dir": self.work_dir,
+            "executor_type": self.executor_type,
+            "dag_node_count": len(self.pipeline_dag.nodes) if self.pipeline_dag else 0,
+            "dag_edge_count": len(self.pipeline_dag.edges) if self.pipeline_dag else 0,
+            "parallel_groups_count": len(self.pipeline_dag.parallel_groups) if self.pipeline_dag else 0,
         }
-
-        self.log_job_start(job_config, len(partition_paths))
+        self.log_job_start(job_config, len(ops))
 
         # Process partitions with fault tolerance in parallel using threads
         logger.info(f"Processing {len(partition_paths)} partitions with fault tolerance in parallel using threads...")
@@ -1548,6 +1524,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         # Prepare operators
         logger.info("Preparing process operators...")
         ops = self._prepare_operators()
+
+        # Initialize DAG execution planning for resumption
+        self._initialize_dag_execution(self.cfg)
 
         # Load existing partitions
         partition_paths = self._load_existing_partitions()
@@ -1684,3 +1663,81 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin):
         else:
             # Fallback to JSONL for unknown formats
             return ray.data.read_json(output_path)
+
+    def _override_strategy_methods(self):
+        """Override strategy methods for partitioned execution."""
+        # Override partition count determination
+        self._determine_partition_count = self._determine_partition_count_partitioned
+        self._analyze_dataset_size = self._analyze_dataset_size_partitioned
+        self._detect_convergence_points = self._detect_convergence_points_partitioned
+        self._get_dag_node_for_operation = self._get_dag_node_for_operation_partitioned
+
+    def _determine_partition_count_partitioned(self, cfg) -> int:
+        """Determine partition count for partitioned execution."""
+        # If we already have dataset_mapping (from actual partitioning), use that
+        if hasattr(self, "dataset_mapping") and self.dataset_mapping:
+            logger.info(f"Using actual partition count from dataset mapping: {self.dataset_mapping.partition_count}")
+            return self.dataset_mapping.partition_count
+
+        if self.auto_configure_partitions:
+            # Will be determined after dataset loading
+            return 1  # Placeholder
+        else:
+            # Use configured partition size
+            dataset_size = self._analyze_dataset_size_partitioned(cfg.dataset_path)
+            estimated_count = max(1, dataset_size // self.partition_size)
+            logger.info(
+                f"Estimated partition count: {estimated_count} (dataset_size={dataset_size}, partition_size={self.partition_size})"
+            )
+            return estimated_count
+
+    def _analyze_dataset_size_partitioned(self, dataset_path: str) -> int:
+        """Analyze dataset size for partition count determination."""
+        try:
+            import os
+
+            file_size = os.path.getsize(dataset_path)
+            # More accurate estimate for partitioned execution
+            estimated_lines = file_size // 512  # Assume 512 bytes per line
+            return estimated_lines
+        except Exception as e:
+            logger.error(f"Error analyzing dataset size: {e}")
+            # Fallback to default
+            return 100000
+
+    def _detect_convergence_points_partitioned(self, cfg) -> List[int]:
+        """Detect convergence points for partitioned execution."""
+        operations = self._get_operations_from_config(cfg)
+        convergence_points = []
+
+        for op_idx, op in enumerate(operations):
+            # Detect global operations (deduplicators, etc.)
+            if self._is_global_operation_partitioned(op):
+                convergence_points.append(op_idx)
+
+            # Detect manual convergence points
+            if hasattr(op, "converge_after") and op.converge_after:
+                convergence_points.append(op_idx)
+
+        return convergence_points
+
+    def _is_global_operation_partitioned(self, operation) -> bool:
+        """Check if an operation is a global operation for partitioned execution."""
+        # Deduplicators are typically global operations
+        if hasattr(operation, "_name") and "deduplicator" in operation._name:
+            return True
+
+        # Check for explicit global operation flag
+        if hasattr(operation, "is_global_operation") and operation.is_global_operation:
+            return True
+
+        return False
+
+    def _get_dag_node_for_operation_partitioned(
+        self, op_name: str, op_idx: int, partition_id: int, **kwargs
+    ) -> Optional[str]:
+        """Get DAG node ID for partitioned operation."""
+        if not self.dag_execution_strategy:
+            return None
+
+        return self.dag_execution_strategy.get_dag_node_id(op_name, op_idx, partition_id=partition_id, **kwargs)
