@@ -3997,17 +3997,20 @@ wheels = [
 
 [[package]]
 name = "multiprocess"
-version = "0.70.12"
+version = "0.70.16"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dill" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/ff/d85f76f7fb62745664924414cb58340725b61a61f9226db10bec16de01c9/multiprocess-0.70.12.zip", hash = "sha256:853d02581a03b3bf7872f5e997d2e2b62e177c22a9d05158dc96a675854f2b60", size = 3303024, upload-time = "2021-06-14T02:32:27.513Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b5/ae/04f39c5d0d0def03247c2893d6f2b83c136bf3320a2154d7b8858f2ba72d/multiprocess-0.70.16.tar.gz", hash = "sha256:161af703d4652a0e1410be6abccecde4a7ddffd19341be0a7011b94aeb171ac1", size = 1772603, upload-time = "2024-01-28T18:52:34.85Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/dd/bf/995e61e96aa7fcf67bd981d51d7ee73be64ddd34fb5dccb0a032f7f5b898/multiprocess-0.70.12-py36-none-any.whl", hash = "sha256:56220afc52254e25d2698149e267247f4b39bc43e036306db138db080bfb2476", size = 106934, upload-time = "2021-06-14T02:32:16.374Z" },
-    { url = "https://files.pythonhosted.org/packages/35/be/a428bdf9a76cb7c60e516f7849dc8457a942ea7ae6ce3dfa0afad1e566be/multiprocess-0.70.12-py37-none-any.whl", hash = "sha256:48f464a28546830584255f34e35efa6bd7abafe1bcbe82f5c2ed7b9a52cb817b", size = 112083, upload-time = "2021-06-14T02:32:18.002Z" },
-    { url = "https://files.pythonhosted.org/packages/66/7c/85a5f8463afeb7f80ba749d07561a963233ddf7f63bddffbdb520865307f/multiprocess-0.70.12-py38-none-any.whl", hash = "sha256:2b7d63c9efd959d288c4651261e04499d6431347797bce9dfae50a2781aa6aeb", size = 128292, upload-time = "2021-06-14T02:32:19.604Z" },
-    { url = "https://files.pythonhosted.org/packages/78/ee/ef4f551b823cecc5354748ac4d797347b831a338b268d17ab8a1bea0adef/multiprocess-0.70.12-py39-none-any.whl", hash = "sha256:c0fa97754295874627876b5195a04c338b2aff58dcb788decdc71c1a710144d0", size = 128660, upload-time = "2021-06-14T02:32:21.453Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/76/6e712a2623d146d314f17598df5de7224c85c0060ef63fd95cc15a25b3fa/multiprocess-0.70.16-pp310-pypy310_pp73-macosx_10_13_x86_64.whl", hash = "sha256:476887be10e2f59ff183c006af746cb6f1fd0eadcfd4ef49e605cbe2659920ee", size = 134980, upload-time = "2024-01-28T18:52:15.731Z" },
+    { url = "https://files.pythonhosted.org/packages/0f/ab/1e6e8009e380e22254ff539ebe117861e5bdb3bff1fc977920972237c6c7/multiprocess-0.70.16-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:d951bed82c8f73929ac82c61f01a7b5ce8f3e5ef40f5b52553b4f547ce2b08ec", size = 134982, upload-time = "2024-01-28T18:52:17.783Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/f7/7ec7fddc92e50714ea3745631f79bd9c96424cb2702632521028e57d3a36/multiprocess-0.70.16-py310-none-any.whl", hash = "sha256:c4a9944c67bd49f823687463660a2d6daae94c289adff97e0f9d696ba6371d02", size = 134824, upload-time = "2024-01-28T18:52:26.062Z" },
+    { url = "https://files.pythonhosted.org/packages/50/15/b56e50e8debaf439f44befec5b2af11db85f6e0f344c3113ae0be0593a91/multiprocess-0.70.16-py311-none-any.whl", hash = "sha256:af4cabb0dac72abfb1e794fa7855c325fd2b55a10a44628a3c1ad3311c04127a", size = 143519, upload-time = "2024-01-28T18:52:28.115Z" },
+    { url = "https://files.pythonhosted.org/packages/0a/7d/a988f258104dcd2ccf1ed40fdc97e26c4ac351eeaf81d76e266c52d84e2f/multiprocess-0.70.16-py312-none-any.whl", hash = "sha256:fc0544c531920dde3b00c29863377f87e1632601092ea2daca74e4beb40faa2e", size = 146741, upload-time = "2024-01-28T18:52:29.395Z" },
+    { url = "https://files.pythonhosted.org/packages/ea/89/38df130f2c799090c978b366cfdf5b96d08de5b29a4a293df7f7429fa50b/multiprocess-0.70.16-py38-none-any.whl", hash = "sha256:a71d82033454891091a226dfc319d0cfa8019a4e888ef9ca910372a446de4435", size = 132628, upload-time = "2024-01-28T18:52:30.853Z" },
+    { url = "https://files.pythonhosted.org/packages/da/d9/f7f9379981e39b8c2511c9e0326d212accacb82f12fbfdc1aa2ce2a7b2b6/multiprocess-0.70.16-py39-none-any.whl", hash = "sha256:a0bafd3ae1b732eac64be2e72038231c1ba97724b60b09400d68f229fcc2fbf3", size = 133351, upload-time = "2024-01-28T18:52:31.981Z" },
 ]
 
 [[package]]
@@ -5640,7 +5643,7 @@ requires-dist = [
     { name = "lz4" },
     { name = "matplotlib" },
     { name = "mcp", extras = ["cli"], specifier = ">=1.7.0" },
-    { name = "multiprocess", specifier = "==0.70.12" },
+    { name = "multiprocess", specifier = "==0.70.16" },
     { name = "mwparserfromhell" },
     { name = "myst-parser", marker = "extra == 'all'" },
     { name = "myst-parser", marker = "extra == 'dev'" },
