@@ -237,9 +237,9 @@ class DAGExecutionMixin:
         # Log DAG node start
         if hasattr(self, "log_dag_node_start"):
             node_info = {
-                "op_name": node.op_name,
-                "op_type": node.op_type.value,
-                "execution_order": node.execution_order,
+                "op_name": node.get("op_name") or node.get("operation_name", ""),
+                "op_type": node.get("op_type") or node.get("node_type", "operation"),
+                "execution_order": node.get("execution_order", 0),
             }
             self.log_dag_node_start(node_id, node_info)
 
@@ -254,9 +254,9 @@ class DAGExecutionMixin:
         # Log DAG node completion
         if hasattr(self, "log_dag_node_complete"):
             node_info = {
-                "op_name": node.op_name,
-                "op_type": node.op_type.value,
-                "execution_order": node.execution_order,
+                "op_name": node.get("op_name") or node.get("operation_name", ""),
+                "op_type": node.get("op_type") or node.get("node_type", "operation"),
+                "execution_order": node.get("execution_order", 0),
             }
             self.log_dag_node_complete(node_id, node_info, duration or 0)
 
@@ -273,9 +273,9 @@ class DAGExecutionMixin:
         # Log DAG node failure
         if hasattr(self, "log_dag_node_failed"):
             node_info = {
-                "op_name": node.op_name,
-                "op_type": node.op_type.value,
-                "execution_order": node.execution_order,
+                "op_name": node.get("op_name") or node.get("operation_name", ""),
+                "op_type": node.get("op_type") or node.get("node_type", "operation"),
+                "execution_order": node.get("execution_order", 0),
             }
             self.log_dag_node_failed(node_id, node_info, error_message, duration)
 

@@ -113,9 +113,6 @@ class PipelineDAG:
         # self.dag_dir.mkdir(parents=True, exist_ok=True)
         self.dag_dir = self.work_dir  # Use work_dir directly
 
-        # Ensure the work directory exists
-        self.dag_dir.mkdir(parents=True, exist_ok=True)
-
         # DAG structure - support both DAGNode objects and dict nodes from strategies
         self.nodes: Dict[str, Any] = {}
         self.edges: List[DAGEdge] = []
