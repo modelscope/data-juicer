@@ -245,7 +245,7 @@ if __name__ == '__main__':
             # ... (some codes)
     ```
 
-- (![stable](https://img.shields.io/badge/stable-green?style=plastic)) 在mapper算子中，我们提供了产生额外数据的存储路径生成接口，避免出现进程冲突和数据覆盖的情况。生成的存储路径格式为`{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`，其中`HASH_VALUE`是算子初始化参数、每个样本中相关参数、进程ID和时间戳的哈希值。为了方便，可以在OP类初始化开头调用`self.remove_extra_parameters(locals())`获取算子初始化参数，同时可以调用`self.add_parameters`添加每个样本与生成额外数据相关的参数。例如，利用diffusion模型对图像进行增强的算子：
+- (![stable](https://img.shields.io/badge/stable-green?style=plastic)) 在mapper算子中，我们提供了产生额外数据的存储路径生成接口，避免出现进程冲突和数据覆盖的情况。生成的存储路径格式默认为`{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`，其中`HASH_VALUE`是算子初始化参数、每个样本中相关参数、进程ID和时间戳的哈希值。也可以指定保存路径（例如`save_dir`）或者通过环境变量（`DJ_PRODUCED_DATA_DIR`）设置额外数据的存储路径。为了方便，可以在OP类初始化开头调用`self.remove_extra_parameters(locals())`获取算子初始化参数，同时可以调用`self.add_parameters`添加每个样本与生成额外数据相关的参数。例如，利用diffusion模型对图像进行增强的算子：
     ```python
     # ... (import some library)
     OP_NAME = 'image_diffusion_mapper'
@@ -254,10 +254,12 @@ if __name__ == '__main__':
     class ImageDiffusionMapper(Mapper):
         def __init__(self,
                  # ... (OP parameters)
+                 save_dir: str = None,
                  *args,
                  **kwargs):
             super().__init__(*args, **kwargs)
             self._init_parameters = self.remove_extra_parameters(locals())
+            self.save_dir = save_dir
 
         def process_single(self, sample):
             # ... (some codes)
@@ -265,7 +267,7 @@ if __name__ == '__main__':
             related_parameters = self.add_parameters(
                     self._init_parameters, caption=captions[index])
             new_image_path = transfer_filename(
-                    origin_image_path, OP_NAME, **related_parameters)
+                    origin_image_path, OP_NAME, self.save_dir, **related_parameters)
             # ... (some codes)
     ```
     针对一个数据源衍生出多个额外数据的情况，我们允许在生成的存储路径后面再加后缀。比如，根据关键帧将视频拆分成多个视频：
@@ -277,15 +279,17 @@ if __name__ == '__main__':
     class VideoSplitByKeyFrameMapper(Mapper):
         def __init__(self,
                  # ... (OP parameters)
+                 save_dir: str = None,
                  *args,
                  **kwargs):
             super().__init__(*args, **kwargs)
             self._init_parameters = self.remove_extra_parameters(locals())
+            self.save_dir = save_dir
 
         def process_single(self, sample):
             # ... (some codes)
             split_video_path = transfer_filename(
-                        original_video_path, OP_NAME, **self._init_parameters)
+                        original_video_path, OP_NAME, self.save_dir, **self._init_parameters)
             split_video_path = add_suffix_to_filename(split_video_path, f'_{count}')
             # ... (some codes)
     ```

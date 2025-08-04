@@ -250,7 +250,7 @@ if __name__ == '__main__':
             # ... (some codes)
     ```
 
-- (![stable](https://img.shields.io/badge/stable-green?style=plastic)) In a mapper operator, to avoid process conflicts and data coverage, we offer an interface to make a saving path for produced extra data. The format of the saving path is `{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`, where the `HASH_VALUE` is hashed from the init parameters of the operator, the related parameters in each sample, the process ID, and the timestamp. For convenience, we can call `self.remove_extra_parameters(locals())` at the beginning of the initiation to get the init parameters. At the same time, we can call `self.add_parameters` to add related parameters with the produced extra data from each sample. Take the operator which enhances the images with diffusion models as example:
+- (![stable](https://img.shields.io/badge/stable-green?style=plastic)) In a mapper operator, to avoid process conflicts and data coverage, we offer an interface to make a saving path for produced extra data. The format of the saving path is `{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`, where the `HASH_VALUE` is hashed from the init parameters of the operator, the related parameters in each sample, the process ID, and the timestamp. You can also specify the save path (for example, save_dir) or set the storage path through the environment variable `DJ_PRODUCED_DATA_DIR`. For convenience, we can call `self.remove_extra_parameters(locals())` at the beginning of the initiation to get the init parameters. At the same time, we can call `self.add_parameters` to add related parameters with the produced extra data from each sample. Take the operator which enhances the images with diffusion models as example:
     ```python
     from data_juicer.utils.file_utils import transfer_filename
     # ... (import some other libraries)
@@ -260,10 +260,12 @@ if __name__ == '__main__':
     class ImageDiffusionMapper(Mapper):
         def __init__(self,
                  # ... (OP parameters)
+                 save_dir: str = None,
                  *args,
                  **kwargs):
             super().__init__(*args, **kwargs)
             self._init_parameters = self.remove_extra_parameters(locals())
+            self.save_dir = save_dir
 
         def process_single(self, sample):
             # ... (some codes)
@@ -271,7 +273,7 @@ if __name__ == '__main__':
             related_parameters = self.add_parameters(
                     self._init_parameters, caption=captions[index])
             new_image_path = transfer_filename(
-                    origin_image_path, OP_NAME, **related_parameters)
+                    origin_image_path, OP_NAME, self.save_dir, **related_parameters)
             # ... (some codes)
     ```
     For the mapper to produce multi extra data base on one origin data, we can add suffix at the saving path. Take the operator which splits videos according to their key frames as example:
@@ -284,15 +286,17 @@ if __name__ == '__main__':
     class VideoSplitByKeyFrameMapper(Mapper):
         def __init__(self,
                  # ... (OP parameters)
+                 save_dir: str = None,
                  *args,
                  **kwargs):
             super().__init__(*args, **kwargs)
             self._init_parameters = self.remove_extra_parameters(locals())
+            self.save_dir = save_dir
 
         def process_single(self, sample):
             # ... (some codes)
             split_video_path = transfer_filename(
-                        original_video_path, OP_NAME, **self._init_parameters)
+                        original_video_path, OP_NAME, self.save_dir, **self._init_parameters)
             split_video_path = add_suffix_to_filename(split_video_path,  f'_{count}')
             # ... (some codes)
     ```

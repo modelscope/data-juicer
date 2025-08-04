@@ -22,6 +22,7 @@ class AudioFFmpegWrappedMapper(Mapper):
         global_args: Optional[List[str]] = None,
         capture_stderr: bool = True,
         overwrite_output: bool = True,
+        save_dir: str = None,
         *args,
         **kwargs,
     ):
@@ -33,17 +34,22 @@ class AudioFFmpegWrappedMapper(Mapper):
         :param global_args: list-arguments passed to ffmpeg command-line.
         :param capture_stderr: whether to capture stderr.
         :param overwrite_output: whether to overwrite output file.
+        :param save_dir: The directory where generated audio files will be stored.
+            If not specified, outputs will be saved in the same directory as their corresponding input files.
+            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         self.filter_name = filter_name
         self.filter_kwargs = filter_kwargs
         self.global_args = global_args
         self.capture_stderr = capture_stderr
         self.overwrite_output = overwrite_output
+        self.save_dir = save_dir
 
     def process_single(self, sample):
         # there is no audio in this sample
@@ -63,7 +69,7 @@ class AudioFFmpegWrappedMapper(Mapper):
             if audio_key in processed:
                 continue
 
-            output_key = transfer_filename(audio_key, OP_NAME, **self._init_parameters)
+            output_key = transfer_filename(audio_key, OP_NAME, self.save_dir, **self._init_parameters)
             stream = ffmpeg.input(audio_key).filter(self.filter_name, **self.filter_kwargs).output(output_key)
             if self.global_args is not None:
                 stream = stream.global_args(*self.global_args)

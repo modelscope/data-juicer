@@ -85,12 +85,14 @@ process:
       min_amplitude: 0.001                                    # Default: 0.001. Minimum noise amplification factor.
       max_amplitude: 0.015                                    # Default: 0.015. Maximum noise amplification factor.
       p: 0.5                                                  # Default: 0.5.(range: [ 0.0, 1.0 ].) The probability of applying this transform.
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - audio_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg audio filters
       filter_name: null                                       # ffmpeg audio filter name. e.g. 'atrim'.
       filter_kwargs: null                                     # keyword-arguments passed to ffmpeg filter. e.g. {'end': 6}.
       global_args: null                                       # list-arguments passed to ffmpeg command-line. e.g. ['-progress'].
       capture_stderr: true                                    # whether to capture stderr.
       overwrite_output: true                                  # whether to overwrite the output file.
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - calibrate_qa_mapper:                                    # calibrate question-answer pairs based on reference text.
       api_model: 'gpt-4o'                                     # API model name.
       api_endpoint: null                                      # URL endpoint for the API.
@@ -312,6 +314,7 @@ process:
       p: 0.2                                                  # probability of the image being blurred
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - image_captioning_from_gpt4v_mapper:                     # generate samples whose texts are generated based on gpt-4-vision and the image
       mode: 'description'                                     # mode of text generated from images, can be one of ['reasoning', 'description', 'conversation', 'custom']
       api_key: ''                                             # the API key to authenticate the request
@@ -340,17 +343,20 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated images in the final datasets and the original images will be removed. It's True in default.
       caption_key: null                                       # the key name of fields in samples to store captions for each images, the caption guide the diffusion model to produce what the image is
       hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # model name on huggingface to generate caption if caption_key is null
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
       mem_required: '8GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrain the maximum number of processes that can be launched
   - image_face_blur_mapper:                                 # blur faces detected in images
       cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - image_remove_background_mapper:                         # remove background from images
       alpha_matting: false                                    # Flag indicating whether to use alpha matting. Defaults to False.
       alpha_matting_foreground_threshold: 240                 # Foreground threshold for alpha matting. Defaults to 240.
       alpha_matting_background_threshold: 10                  # Background threshold for alpha matting. Defaults to 10.
       alpha_matting_erode_size: 10                            # Erosion size for alpha matting. Defaults to 10.
       bgcolor: None                                           # Background color for the cutout image. Defaults to None.
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - image_segment_mapper:                                   # perform segment-anything on images and return the bounding boxes.
       imgsz: 1024                                             # image resolution after image resizing
       conf: 0.05                                              # confidence score threshold
@@ -570,12 +576,14 @@ process:
       cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg video filters
       filter_name: null                                       # ffmpeg audio filter name. e.g. 'scale'.
       filter_kwargs: null                                     # keyword-arguments passed to ffmpeg filter. e.g. {'width': 224, 'height': 224}.
       global_args: null                                       # list-arguments passed to ffmpeg command-line. e.g. ['-progress'].
       capture_stderr: true                                    # whether to capture stderr.
       overwrite_output: true                                  # whether to overwrite the output file.
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_remove_watermark_mapper:                          # Remove the watermarks in videos given regions
       roi_strings: ['0,0,0.1,0.1']                            # a given list of regions the watermarks locate. The format of each can be "x1, y1, x2, y2", "(x1, y1, x2, y2)", or "[x1, y1, x2, y2]".
       roi_type: ratio                                         # the roi string type. When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels in the top left corner and the bottom right corner respectively. If the roi_type is 'ratio', the coordinates are normalized by widths and heights.
@@ -583,10 +591,12 @@ process:
       frame_num: 10                                           # the number of frames to be extracted uniformly from the video to detect the pixels of watermark.
       min_frame_threshold: 7                                  # a coordination is considered as the location of a watermark pixel when it is a watermark pixel in no less min_frame_threshold frames.
       detection_method: pixel_value                           # the method to detect the pixels of watermark. If it is 'pixel_value', we consider the distribution of pixel value in each frame. If it is 'pixel_diversity', we will consider the pixel diversity in different frames.
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_resize_aspect_ratio_mapper:                       # resize videos aspect ratios of videos (a fraction of width by height, r=w/h) to a specified range
       min_ratio: 9/21                                         # the minimum aspect ratio to enforce videos with an aspect ratio below `min_ratio` will be resized to match this minimum ratio. The ratio should be provided as a string in the format "9:21" or "9/21".
       max_ratio: 21/9                                         # the maximum aspect ratio to enforce videos with an aspect ratio above `max_ratio` will be resized to match this maximum ratio. The ratio should be provided as a string in the format "21:9" or "21/9".
       strategy:  increase                                     # the resizing strategy to apply when adjusting the video dimensions. It can be either 'decrease' to reduce the dimension or 'increase' to enlarge it. Accepted values are ['decrease', 'increase'].
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_resize_resolution_mapper:                         # map videos to ones with given resolution range
       min_width: 640                                          # the min horizontal resolution (unit p), videos with width less than 'min_width' will be mapped to videos with equal or bigger width
       max_width: 1280                                         # the max horizontal resolution (unit p), videos with width more than 'max_width' will be mapped to videos with equal of smaller width
@@ -594,17 +604,21 @@ process:
       max_height: 1080                                        # the max vertical resolution (unit p), videos with height more than 'max_height' will be mapped to videos with equal or smaller height
       force_original_aspect_ratio: 'increase'                 # Enable decreasing or increasing output video width or height if necessary to keep the original aspect ratio
       force_divisible_by: 4                                   # Ensures that both the output dimensions, width and height, are divisible by the given integer when used together with force_original_aspect_ratio
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_split_by_duration_mapper:                         # Mapper to split video by duration.
       split_duration: 10                                      # duration of each video split in seconds.
       min_last_split_duration: 0.1                            # the minimum allowable duration in seconds for the last video split. If the duration of the last split is less than this value, it will be discarded.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_split_by_key_frame_mapper:                        # Mapper to split video by key frame.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_split_by_scene_mapper:                            # split videos into scene clips
       detector: 'ContentDetector'                             # PySceneDetect scene detector. Should be one of ['ContentDetector', 'ThresholdDetector', 'AdaptiveDetector`]
       threshold: 27.0                                         # threshold passed to the detector
       min_scene_len: 15                                       # minimum length of any scene
       show_progress: false                                    # whether to show progress from scenedetect
+      save_dir: null                                          # The directory where generated files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
   - video_tagging_from_audio_mapper:                        # Mapper to generate video tags from audio streams extracted from the video.
       hf_ast: 'MIT/ast-finetuned-audioset-10-10-0.4593'       # Huggingface model name for the audio classification model.
       tag_field_name: 'video_audio_tags'                    # the field name to store the tags. It's "video_audio_tags" in default.
@@ -712,6 +726,24 @@ process:
       prob_threshold: 0.8                                     # the predicted watermark probability threshold for samples, range from 0 to 1. Samples with watermark probability less than this threshold will be kept.
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
       mem_required: '500MB'                                   # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrain the maximum number of processes that can be launched
+  - in_context_influence_filter:                            # filter to keep texts whose in-context influence upon validation set within a specific range.
+      hf_model: 'Qwen/Qwen2.5-0.5B'                           # Huggingface embedding model name.
+      model_params: null                                      # Parameters for initializing the API model.
+      min_score: 1.0                                          # Minimum perplexity score.
+      max_score: 100.0                                        # Maximum perplexity score.
+      query_template: null                                    # Template for building the query string.
+      response_template: mull                                 # Template for building the response string.
+      valid_dataset: null                                     # The dataset to use for validation
+      task_desc: null                                         # The description of the validation task.
+      valid_as_demo: True                                     # If true, score =  L(A|Q) / L(A|task_desc, Q_v, A_v, Q); If false, score = L(A_v|Q) L(A_v|task_desc, Q, A, Q_v) .
+      n_shot: null                                           # The number of shots in validation.
+  - instruction_following_difficulty_filter:                 # filter to keep texts whose instruction follows difficulty (IFD, https://arxiv.org/abs/2308.12032) falls within a specific range."
+      hf_model: 'Qwen/Qwen2.5-0.5B'                           # Huggingface embedding model name.
+      model_params: null                                      # Parameters for initializing the API model.
+      min_score: 1.0                                          # Minimum perplexity score.
+      max_score: 100.0                                        # Maximum perplexity score.
+      query_template: null                                    # Template for building the query string.
+      response_template: mull                                 # Template for building the response string.
   - language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
       lang: en                                                # keep text in what language
       min_score: 0.8                                          # the min language scores to filter text
@@ -730,6 +762,13 @@ process:
       enable_vllm: false                                      # If true, use VLLM for loading hugging face or local llm. Otherwise, use API for reference.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - llm_perplexity_filter:                                  # filter to keep samples with perplexity score, computed using a specified llm, within a specific range.
+      hf_model: 'Qwen/Qwen2.5-0.5B'                           # Huggingface embedding model name.
+      model_params: null                                      # Parameters for initializing the API model.
+      min_score: 1.0                                          # Minimum perplexity score.
+      max_score: 100.0                                        # Maximum perplexity score.
+      query_template: null                                    # Template for building the query string.
+      response_template: null                                 # Template for building the response string.
   - llm_quality_score_filter:                               # filter to keep sample with high quality score estimated by LLM.
       api_or_hf_model: 'gpt-4o'                               # API or huggingface model name.
       min_score: 0.5                                          # The lowest quality score threshold to keep the sample.
@@ -745,6 +784,23 @@ process:
       enable_vllm: false                                      # If true, use VLLM for loading hugging face or local llm. Otherwise, use API for reference.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - llm_task_relevance_filter:                              # filter to keep sample with high relevance score to validation tasks estimated by LLM.
+      api_or_hf_model: 'gpt-4o'                               # API or huggingface model name.
+      min_score: 0.5                                          # The lowest quality score threshold to keep the sample.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      input_keys: ['text']                                    # Sub set of keys in the sample. Support data with multi fields such as 'query', 'analysis' and 'answer' in RFT data.
+      field_names: ['text']                                   # Corresponding field names for input keys.
+      system_prompt: null                                     # System prompt for the task.
+      input_template: null                                    # The input template.
+      field_template: null                                    # Template for each field in the prompt.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or outputs parsing error.
+      enable_vllm: false                                      # If true, use VLLM for loading hugging face or local llm. Otherwise, use API for reference.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+      valid_dataset: null                                     # The dataset to use for validation
+      task_desc: null                                         # The description of the validation task.
+      n_shot: null                                           # The number of shots in validation.
   - maximum_line_length_filter:                             # filter text with the maximum length of lines out of specific range
       min_len: 10                                             # the min length of filter range
       max_len: 10000                                          # the max length of filter range
@@ -786,6 +842,18 @@ process:
   - text_action_filter:                                     # filter text according the number of action verb
       lang: en                                                # consider the words in what language
       min_action_num: 1                                       # text will be filtered whose verbs less the min action number
+  - text_embd_similarity_filter:                            # Filter to keep texts whose average embedding similarity to a set of given validation texts falls within a specific range.
+      api_or_hf_model: text-embedding-v4                      # API or huggingface embedding model name
+      is_hf_model: false                                      # indicates if the model is from HuggingFace
+      api_endpoint: embeddings                                # embedding URL endpoint for the API
+      response_path: data.0.embedding                         # path to extract content from the API response
+      model_params: null                                      # parameters for initializing the API model
+      min_score: 0.1                                          # the min average similarity to keep samples
+      max_score: 1.0                                          # the max average similarity to keep samples
+      valid_dataset: null                                     # the dataset to use for validation
+      ebd_dim: 1024                                           # the embedding's dimension via API
+      pooling: null                                           # strategy to extract embedding from the hidden states
+      input_template: null                                    # template for building the model input.
   - text_entity_dependency_filter:                          # filter text without non-independent entity nouns
       lang: en                                                # consider the words in what language
       min_dependency_num: 1                                   # the min number of adjacent edges of a non-independent noun in dependency tree

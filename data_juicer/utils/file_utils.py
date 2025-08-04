@@ -162,12 +162,19 @@ def transfer_data_dir(original_dir, op_name):
     return new_dir
 
 
-def transfer_filename(original_filepath: Union[str, Path], op_name, **op_kwargs):
+def transfer_filename(original_filepath: Union[str, Path], op_name, save_dir: str = None, **op_kwargs):
     """
     According to the op and hashing its parameters 'op_kwargs' addition
     to the process id and current time as the 'hash_val', map the
     original_filepath to another unique file path. E.g.
 
+    When `save_dir` is provided: '/save_dir/path/to/data/'
+        /path/to/abc.jpg -->
+            /save_dir/path/to/data/abc__dj_hash_#{hash_val}#.jpg
+    When environment variable `DJ_PRODUCED_DATA_DIR` is provided: '/environment/path/to/data/'
+        /path/to/abc.jpg -->
+            /environment/path/to/data/{op_name}/abc__dj_hash_#{hash_val}#.jpg
+    When neither `save_dir` nor `DJ_PRODUCED_DATA_DIR` is provided:
         1. abc.jpg -->
             __dj__produced_data__/{op_name}/
             abc__dj_hash_#{hash_val}#.jpg
@@ -182,16 +189,25 @@ def transfer_filename(original_filepath: Union[str, Path], op_name, **op_kwargs)
             /path/to/__dj__produced_data__/{op_name}/
             abc__dj_hash_#{hash_val2}#.jpg
 
+    Priority: `save_dir` > `DJ_PRODUCED_DATA_DIR` > original data directory (default)
     """
     # check if it's valid local path, if it's not, regard it as a remote path/url and return None
     if not os.path.exists(original_filepath):
         return original_filepath
-    # produce the directory
-    original_dir = os.path.dirname(original_filepath)
-    dir_token = f"/{Fields.multimodal_data_output_dir}/"
-    if dir_token in original_dir:
-        original_dir = original_dir.split(dir_token)[0]
-    new_dir = transfer_data_dir(original_dir, op_name)
+
+    if save_dir:
+        new_dir = os.path.abspath(save_dir)
+    elif produced_data_dir := os.environ.get("DJ_PRODUCED_DATA_DIR", None):
+        new_dir = os.path.join(os.path.abspath(produced_data_dir), op_name)
+    else:
+        # produce the directory
+        original_dir = os.path.dirname(original_filepath)
+        dir_token = f"/{Fields.multimodal_data_output_dir}/"
+        if dir_token in original_dir:
+            original_dir = original_dir.split(dir_token)[0]
+        new_dir = transfer_data_dir(original_dir, op_name)
+
+    create_directory_if_not_exists(new_dir)
 
     # produce the unique hash code
     unique_parameters = copy.deepcopy(op_kwargs)

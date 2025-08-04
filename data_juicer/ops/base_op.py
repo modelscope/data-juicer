@@ -15,6 +15,7 @@ OPERATORS = Registry("Operators")
 UNFORKABLE = Registry("Unforkable")
 NON_STATS_FILTERS = Registry("Non-stats Filters")
 TAGGING_OPS = Registry("Tagging Operators")
+ATTRIBUTION_FILTERS = Registry("Attribution Filters")
 
 
 def convert_list_dict_to_dict_list(samples):
