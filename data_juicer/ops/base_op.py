@@ -196,6 +196,7 @@ class OP:
         self.num_proc = kwargs.get("num_proc", None)
         self.cpu_required = kwargs.get("cpu_required", 1)
         self.mem_required = kwargs.get("mem_required", 0)
+        self.gpu_required = kwargs.get("gpu_required", 1)
         if isinstance(self.mem_required, str):
             self.mem_required = size_to_bytes(self.mem_required) / 1024**3
 

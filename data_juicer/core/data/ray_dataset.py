@@ -200,35 +200,34 @@ class RayDataset(DJDataset):
 
         # 创建所有operator的actors（保持原有逻辑不变）
         actors = {}
-        cpu_allocate = 1
 
         for idx, op in enumerate(operators):
-            op_proc = calculate_np(op._name, op.mem_required, op.cpu_required, self.num_proc, op.use_cuda())
             if op.use_cuda():
                 op_proc = 1
+            else:
+                op_proc = calculate_np(op._name, op.mem_required, op.cpu_required, self.num_proc, op.use_cuda())
+            
             actors[op._name] = []
 
             actor_num = min(op_proc, self.data.count())
 
             if op.use_cuda():
-                num_gpus = 1
-                print(f"{op._name} allocate {num_gpus} GPUs.")
+                print(f"{op._name} allocate {op.gpu_required} GPUs.")
                 for _ in range(actor_num):
                     actor = Actor.options(
                         name=f"actor_{op._name}_{uuid.uuid4().hex[:4]}",
-                        num_gpus=num_gpus,
-                        num_cpus=cpu_allocate,
+                        num_gpus=op.gpu_required,
+                        num_cpus=op.cpu_required,
                     ).remote(op)
                     actor.load_model.remote()
                     actors[op._name].append(actor)
             else:
-                num_gpus = 0
                 print(f"{op._name} allocate in CPU.")
                 for _ in range(actor_num):
                     actor = Actor.options(
                         name=f"actor_{op._name}_{uuid.uuid4().hex[:4]}",
-                        num_gpus=num_gpus,
-                        num_cpus=cpu_allocate,
+                        num_gpus=0,
+                        num_cpus=op.cpu_required,
                     ).remote(op)
                     actors[op._name].append(actor)
 

@@ -9,7 +9,7 @@ dataset:
   configs:
     - type: local
       path: './demos/process_video_on_ray/data/demo-dataset.jsonl'  # path to your dataset directory or file
-export_path: './outputs/demo/process_video_on_ray/my-dataset'
+export_path: './outputs/demo/process_video_on_ray/demo-dataset'
 
 
 # process schedule
