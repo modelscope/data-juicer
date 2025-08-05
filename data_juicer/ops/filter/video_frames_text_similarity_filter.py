@@ -203,7 +203,9 @@ class VideoFramesTextSimilarityFilter(Filter):
         if len(similarity) <= 0:
             return True
 
-        keep_bools = np.array([self.min_score <= sim_value <= self.max_score for sim_value in similarity])
+        keep_bools = np.array(
+            [self.get_keep_boolean(sim_value, self.min_score, self.max_score) for sim_value in similarity]
+        )
 
         # different strategies
         if self.any:

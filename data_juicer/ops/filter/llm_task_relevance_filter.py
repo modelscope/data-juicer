@@ -180,4 +180,4 @@ json
         if itm_score is None:
             return True
 
-        return itm_score >= self.min_score
+        return self.get_keep_boolean(itm_score, self.min_score, None)

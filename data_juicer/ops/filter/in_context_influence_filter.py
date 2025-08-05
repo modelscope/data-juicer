@@ -106,4 +106,4 @@ class InContextInfluenceFilter(LLMPerplexityFilter):
         if score is None:
             return True
 
-        return self.min_score <= score <= self.max_score
+        return self.get_keep_boolean(score, self.min_score, self.max_score)

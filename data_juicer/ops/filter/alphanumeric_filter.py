@@ -75,11 +75,7 @@ class AlphanumericFilter(Filter):
 
     def process_batched(self, samples):
         ratio_key = StatsKeys.alpha_token_ratio if self.tokenization else StatsKeys.alnum_ratio
-        if isinstance(samples[Fields.stats], list):
-            return map(lambda stat: self.min_ratio <= stat[ratio_key] <= self.max_ratio, samples[Fields.stats])
-        else:
-            # single sample for ray filter
-            if self.min_ratio <= samples[Fields.stats][ratio_key] <= self.max_ratio:
-                return True
-            else:
-                return False
+        assert isinstance(samples[Fields.stats], list)
+        return map(
+            lambda stat: self.get_keep_boolean(stat[ratio_key], self.min_ratio, self.max_ratio), samples[Fields.stats]
+        )

@@ -105,6 +105,8 @@ class VideoTaggingFromFramesFilter(Filter):
             else:
                 keep_bools.append(self.tags.issubset(words))
         keep_bools = np.array(keep_bools)
+        if self.reversed_range:
+            keep_bools = np.logical_not(keep_bools)
 
         # different strategies
         if self.any:

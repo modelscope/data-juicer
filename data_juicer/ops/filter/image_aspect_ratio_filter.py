@@ -64,7 +64,7 @@ class ImageAspectRatioFilter(Filter):
 
     def process_batched(self, samples):
         def process_single(values):
-            keep_bools = np.array([self.min_ratio <= value <= self.max_ratio for value in values])
+            keep_bools = np.array([self.get_keep_boolean(value, self.min_ratio, self.max_ratio) for value in values])
             if len(keep_bools) <= 0:
                 return True
 

@@ -68,7 +68,10 @@ class VideoAspectRatioFilter(Filter):
         video_aspect_ratios = sample[Fields.stats][StatsKeys.video_aspect_ratios]
 
         keep_bools = np.array(
-            [self.min_ratio <= Fraction(aspect_ratio) <= self.max_ratio for aspect_ratio in video_aspect_ratios]
+            [
+                self.get_keep_boolean(aspect_ratio, self.min_ratio, self.max_ratio)
+                for aspect_ratio in video_aspect_ratios
+            ]
         )
         if len(keep_bools) <= 0:
             return True

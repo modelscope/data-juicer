@@ -57,9 +57,8 @@ class LanguageIDScoreFilter(Filter):
 
     def process_single(self, sample):
         if self.lang:
-            return (
-                sample[Fields.stats][StatsKeys.lang] in self.lang
-                and sample[Fields.stats][StatsKeys.lang_score] >= self.min_score
+            return sample[Fields.stats][StatsKeys.lang] in self.lang and self.get_keep_boolean(
+                sample[Fields.stats][StatsKeys.lang_score], self.min_score
             )
         else:
-            return sample[Fields.stats][StatsKeys.lang_score] >= self.min_score
+            return self.get_keep_boolean(sample[Fields.stats][StatsKeys.lang_score], self.min_score)

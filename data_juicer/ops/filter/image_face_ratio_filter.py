@@ -109,7 +109,9 @@ class ImageFaceRatioFilter(Filter):
         if len(face_ratios) <= 0:
             return True
 
-        keep_bools = np.array([self.min_ratio <= face_ratio <= self.max_ratio for face_ratio in face_ratios])
+        keep_bools = np.array(
+            [self.get_keep_boolean(face_ratio, self.min_ratio, self.max_ratio) for face_ratio in face_ratios]
+        )
 
         # different strategies
         if self.any:

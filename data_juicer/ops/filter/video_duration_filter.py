@@ -70,7 +70,9 @@ class VideoDurationFilter(Filter):
 
     def process_single(self, sample):
         video_durations = sample[Fields.stats][StatsKeys.video_duration]
-        keep_bools = np.array([self.min_duration <= duration <= self.max_duration for duration in video_durations])
+        keep_bools = np.array(
+            [self.get_keep_boolean(duration, self.min_duration, self.max_duration) for duration in video_durations]
+        )
         if len(keep_bools) <= 0:
             return True
 

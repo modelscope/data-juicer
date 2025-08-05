@@ -20,8 +20,7 @@ OP_NAME = "flagged_words_filter"
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)
 class FlaggedWordFilter(Filter):
-    """Filter to keep samples with flagged-word ratio less than a specific max
-    value."""
+    """Filter to keep samples with flagged-word ratio in a specified range."""
 
     _batched_op = True
 
@@ -29,6 +28,7 @@ class FlaggedWordFilter(Filter):
         self,
         lang: str = "en",
         tokenization: bool = False,
+        min_ratio: float = 0.0,
         max_ratio: float = 0.045,
         flagged_words_dir: str = ASSET_DIR,
         use_words_aug: bool = False,
@@ -44,6 +44,7 @@ class FlaggedWordFilter(Filter):
             "all", we will adopt the one merged from all the available
             languages
         :param tokenization: Whether to use model to tokenize documents
+        :param min_ratio: The min filter ratio in this op.
         :param max_ratio: The max filter ratio in this op.
         :param flagged_words_dir: The directory storing the
             flagged_words file(s) whose name includes "flagged_words"
@@ -58,6 +59,7 @@ class FlaggedWordFilter(Filter):
         """
         super().__init__(*args, **kwargs)
         self.lang = lang
+        self.min_ratio = min_ratio
         self.max_ratio = max_ratio
         self.use_words_aug = use_words_aug
         self.words_aug_group_sizes = words_aug_group_sizes
@@ -126,7 +128,7 @@ class FlaggedWordFilter(Filter):
     def process_batched(self, samples):
         return list(
             map(
-                lambda stat: stat[StatsKeys.flagged_words_ratio] <= self.max_ratio,
+                lambda stat: self.get_keep_boolean(stat[StatsKeys.flagged_words_ratio], self.min_ratio, self.max_ratio),
                 samples[Fields.stats],
             )
         )

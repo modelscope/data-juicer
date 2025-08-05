@@ -107,7 +107,9 @@ class ImageFaceCountFilter(Filter):
         if len(face_counts) <= 0:
             return True
 
-        keep_bools = np.array([self.min_face_count <= face_count <= self.max_face_count for face_count in face_counts])
+        keep_bools = np.array(
+            [self.get_keep_boolean(face_count, self.min_face_count, self.max_face_count) for face_count in face_counts]
+        )
 
         # different strategies
         if self.any:

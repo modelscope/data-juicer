@@ -54,7 +54,4 @@ class TokenNumFilter(Filter):
         return sample
 
     def process_single(self, sample):
-        if self.min_num <= sample[Fields.stats][StatsKeys.num_token] <= self.max_num:
-            return True
-        else:
-            return False
+        return self.get_keep_boolean(sample[Fields.stats][StatsKeys.num_token], self.min_num, self.max_num)

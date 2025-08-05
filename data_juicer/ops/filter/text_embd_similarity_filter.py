@@ -196,4 +196,4 @@ class TextEmbdSimilarityFilter(Filter):
         similarity = sample[Fields.stats][StatsKeys.text_embd_similarity]
         if similarity is None:
             return True
-        return self.min_score <= similarity <= self.max_score
+        return self.get_keep_boolean(similarity, self.min_score, self.max_score)
