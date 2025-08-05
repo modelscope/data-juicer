@@ -7,18 +7,7 @@ from collections import OrderedDict
 import numpy as np
 from loguru import logger
 
-
-def construct_op_dict(json_path="./configs/op_dict.json"):
-    op_dict = {}
-    with open(json_path, 'r') as json_file:
-        ops = json.load(json_file)
-    for op in ops:
-        op_dict[op['class_name']] = op
-    return op_dict
-
-
-OP_DICT = construct_op_dict()
-
+from get_op_info import TYPE_MAPPING
 
 def construct_dj_stats_dict(json_path="./configs/dj_stats_dict.json"):
     dj_stats_dict = {}
@@ -28,7 +17,6 @@ def construct_dj_stats_dict(json_path="./configs/dj_stats_dict.json"):
 
 
 DJ_STATS_DICT = construct_dj_stats_dict()
-
 
 class OperatorArg:
     name = None
@@ -50,7 +38,7 @@ class OperatorArg:
         self.type = state.get('type', None)
         if self.type is None:
             raise ValueError("OperatorArg __init__: state['type'] is required.")
-        if self.type not in ['str', 'int', 'float', 'bool', 'list_str']:
+        if self.type not in TYPE_MAPPING:
             raise ValueError(f"OperatorArg __init__: state['type'] = {self.type} is invalid.")
         self.v_default = state.get('default', None)
         if self.v_default is None:
@@ -83,51 +71,27 @@ class OperatorArg:
 
     @property
     def v_type(self):
-        if self.type.startswith('list_'):
-            t = self.type[5:]
-        else:
-            t = self.type
-        return {'str': str, 'int': int, 'float': float, 'bool': bool}[t]
+        return TYPE_MAPPING[self.type]
 
     def v_check(self, v, type_only=False, element_check=False):
-        if self.type.startswith('list_') and not element_check:
-            if not isinstance(v, list):
-                raise ValueError("OperatorArg __init__: v must be a list.")
-            for vv in v:
-                self.v_check(vv, type_only=type_only, element_check=True)
-            return v
         error = ValueError(
             f"OperatorArg v_check: type mismatch when check {self.name}={v}, \
             expected {self.v_type} but got {type(v)}."
         )
-        if self.v_type == float:
-            if not isinstance(v, (int, float)):
-                try:
-                    v = float(v)
-                except:
-                    raise error
-            v = float(v)
-        elif self.v_type == int:
-            if isinstance(v, float):
-                if not v.is_integer():
-                    raise error
-                v = int(v)
-            elif not isinstance(v, int):
-                try:
-                    v = int(float(v))
-                except:
-                    raise error
-        else:
-            if not isinstance(v, self.v_type):
-                raise error 
+        try:
+            v = self.v_type(v)
+        except:
+            raise error
         if type_only:
             return v
         if self.v_options is not None and v not in self.v_options:
             raise ValueError(f"OperatorArg v_check: {self.name}={v} is not in options {self.v_options}.")
         if self.v_min is not None and v < self.v_min:
-            raise ValueError(f"OperatorArg v_check: {self.name}={v} is less than v_min={self.v_min}.")
+            logger.warning(f"OperatorArg v_check: {self.name}={v} is less than v_min={self.v_min}.")
+            return self.v_min
         if self.v_max is not None and v > self.v_max:
-            raise ValueError(f"OperatorArg v_check: {self.name}={v} is larger than v_max={self.v_max}.")
+            logger.warning(f"OperatorArg v_check: {self.name}={v} is larger than v_max={self.v_max}.")
+            return self.v_max
         # TODO: silence cross arg value check temporarily, active it with better implementation
         # if self.name.startswith('min_'):
         #     query_key = f'max_{self.name[4:]}'
@@ -218,23 +182,13 @@ class Operator:
     def __init__(self, pool, state: dict = None):
         self.pool = pool
         self.name = state.get('name', None)
-        if self.name not in OP_DICT:
-            raise ValueError(f"Operator: __init__: {self.name} is not a valid operator.")
-        self.desc = OP_DICT[self.name].get('class_desc', "no description")
+        self.desc = state.get('desc', "no description")
         args = state.get('args', {})
         logger.info(f"Operator: __init__: {self.name} args: {args}")
-        arg_descriptions = OP_DICT[self.name]['arguments'].split('\n')
-        arg_desc_dict = {}
-        for line in arg_descriptions:
-            m = re.match(r'^([^\(]+)\s*\(.+\):', line.strip())
-            if m:
-                arg_desc_dict[m.group(1).strip()] = line.strip()
         self.enabled = state.get('enabled', True)
         self.args = OrderedDict()
         for arg_name, arg_state in args.items():
-            desc = arg_desc_dict.get(arg_name, None)
-            assert desc is not None, f"Operator: __init__: desc mismatch: op_name={self.name}, arg_name={arg_name}"
-            arg_state.update(name=arg_name, desc=desc)
+            arg_state.update(name=arg_name)
             self.args[arg_name] = OperatorArg(self, state=arg_state)
         self.stats = state.get('stats', {})
 
@@ -287,7 +241,7 @@ class OperatorPool:
 
     def __init__(self, config_path=None, default_ops=None):
         if config_path is None and default_ops is None:
-            config_path = os.path.join(os.path.dirname(__file__), "./configs/default_ops.yaml")
+            config_path = os.path.join(os.path.dirname(__file__), "./configs/all_op_info.yaml")
         if default_ops is None:
             with open(config_path, "r") as f:
                 self.default_ops = yaml.safe_load(f)

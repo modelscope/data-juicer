@@ -1,71 +1,76 @@
 # Filter ops
-image_watermark_filter:                                 # Filter to keep samples whose images have no watermark with high probability.
-    args:
-        hf_watermark_model:                                 # watermark detection model name on huggingface.
-            type: str
-            default: xxx
-        trust_remote_code:
-            type: bool
-            default: false
-        prob_threshold:                                     # the predicted watermark probability threshold for samples. range from 0 to 1. Samples with watermark probability less than this threshold will be kept.
-            type: float
-            default: 1.0
-            min: 0.0
-            max: 1.0
-        any_or_all:                                         # keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition.
-            type: str
-            default: any
-            options:
-                - any
-                - all
+image_watermark_filter:
+  desc: Filter to keep samples whose images have no watermark with high probability.
+  args:
+    hf_watermark_model:
+      desc: watermark detection model name on huggingface.
+      type: str
+      default: amrul-hzz/watermark_detector
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    prob_threshold:
+      desc: the predicted watermark probability threshold for samples. range from
+        0 to 1. Samples with watermark probability less than this threshold will be
+        kept.
+      type: float
+      default: 0.8
+      min: 0.0
+      max: 1.0
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+          - any
+          - all
 #llm_quality_score_filter:
 #    args:
 #        api_or_hf_model:
 #
 #        min_score: float = 0.5,
-language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
-    args:
-        lang:                                                   # keep text in what language
-            type: list_str
-            default:
-                - en
-            options:
-                - en
-                - zh
-        min_score:                                              # the min language scores to filter text
-            type: float
-            default: 0.8
-            min: 0.0
-            max: 1.0
+language_id_score_filter:
+  desc: Filter to keep samples in a specific language with confidence score larger
+    than a specific min value.
+  args:
+    lang:
+      desc: Samples in which languages to keep.
+      type: Union[str, List[str]]
+      default: ''
+    min_score:
+      desc: The min language identification confidence scores of samples to keep.
+      type: float
+      default: 0.8
+      min: -1000000.0
+      max: 1000000.0
 
-alphanumeric_filter:                                    # filter text with alphabet/numeric ratio out of specific range.
-    args:
-        tokenization:                                           # Whether to count the ratio of alphanumeric to the total number of tokens.
-            type: bool
-            default: false
-        min_ratio:                                              # the min ratio of filter range
-            type: float
-            default: 0.0
-            min: 0.0
-            max: 1.0
-        max_ratio:                                              # the max ratio of filter range
-            type: float
-            default: 1.0
-            min: 0.0
-            max: 1.0
+alphanumeric_filter:
+  desc: Filter to keep samples with alphabet/numeric ratio within a specific range.
+  args:
+    tokenization:
+      desc: Whether to count the ratio of alphanumeric to the total number of tokens.
+        if tokenization=False, it will count the ratio of alphanumeric to the total
+        number of characters.
+      type: bool
+      default: false
+    min_ratio:
+      desc: The min filter ratio in alphanumeric op, samples will be filtered if their
+        alphabet/numeric ratio is below this parameter.
+      type: float
+      default: 0.25
+      min: -1000000.0
+      max: 1000000.0
+    max_ratio:
+      desc: The max filter ratio in alphanumeric op, samples will be filtered if their
+        alphabet/numeric ratio exceeds this parameter.
+      type: float
+      default: 1000000.0
+      min: -1000000.0
+      max: 1000000.0
 
-average_line_length_filter:                             # filter text with the average length of lines out of specific range.
-    args:
-        min_len:                                                # the min length of filter range
-            type: int
-            default: 1
-            min: 1
-            max: 10000
-        max_len:                                                # the max length of filter range
-            type: int
-            default: 10000
-            min: 1
-            max: 10000
 #character_repetition_filter:                            # filter text with the character repetition ratio out of specific range
 #    rep_len: 10                                             # repetition length for char-level n-gram
 #    min_ratio: 0.0                                          # the min ratio of filter range

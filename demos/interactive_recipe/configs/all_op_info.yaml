@@ -1,0 +1,4906 @@
+nested_aggregator:
+  desc: Considering the limitation of input length, nested aggregate contents for
+    each given number of samples.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    input_key:
+      desc: The input key in the meta field of the samples. It is "event_description"
+        in default.
+      type: str
+      default: event_description
+    output_key:
+      desc: The output key in the aggregation field in the samples. It is same as
+        the input_key in default.
+      type: str
+      default: ''
+    max_token_num:
+      desc: The max token num of the total tokens of the sub documents. Without limitation
+        if it is None.
+      type: Optional[int]
+      default: 0
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: The system prompt.
+      type: Optional[str]
+      default: ''
+    sub_doc_template:
+      desc: The template for input text in each sample.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: The input template.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+entity_attribute_aggregator:
+  desc: Return conclusion of the given entity's attribute from some docs.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    entity:
+      desc: The given entity.
+      type: str
+      default: ''
+    attribute:
+      desc: The given attribute.
+      type: str
+      default: ''
+    input_key:
+      desc: The input key in the meta field of the samples. It is "event_description"
+        in default.
+      type: str
+      default: event_description
+    output_key:
+      desc: The output key in the aggregation field of the samples. It is "entity_attribute"
+        in default.
+      type: str
+      default: entity_attribute
+    word_limit:
+      desc: Prompt the output length.
+      type: int
+      default: 100
+      min: 1
+      max: 1000000
+    max_token_num:
+      desc: The max token num of the total tokens of the sub documents. Without limitation
+        if it is None.
+      type: Optional[int]
+      default: 0
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt_template:
+      desc: The system prompt template.
+      type: Optional[str]
+      default: ''
+    example_prompt:
+      desc: The example part in the system prompt.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: The input template.
+      type: Optional[str]
+      default: ''
+    output_pattern_template:
+      desc: The output template.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+meta_tags_aggregator:
+  desc: Merge similar meta tags to one tag.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    meta_tag_key:
+      desc: The key of the meta tag to be mapped.
+      type: str
+      default: dialog_sentiment_labels
+    target_tags:
+      desc: The tags that is supposed to be mapped to.
+      type: Optional[List[str]]
+      default: []
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: The system prompt.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: The input template.
+      type: Optional[str]
+      default: ''
+    target_tag_template:
+      desc: The tap template for target tags.
+      type: Optional[str]
+      default: ''
+    tag_template:
+      desc: The tap template for target tags.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: The output pattern.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+most_relevant_entities_aggregator:
+  desc: Extract entities closely related to a given entity from some texts, and sort
+    them in descending order of importance.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    entity:
+      desc: The given entity.
+      type: str
+      default: ''
+    query_entity_type:
+      desc: The type of queried relevant entities.
+      type: str
+      default: ''
+    input_key:
+      desc: The input key in the meta field of the samples. It is "event_description"
+        in default.
+      type: str
+      default: event_description
+    output_key:
+      desc: The output key in the aggregation field of the samples. It is "most_relevant_entities"
+        in default.
+      type: str
+      default: most_relevant_entities
+    max_token_num:
+      desc: The max token num of the total tokens of the sub documents. Without limitation
+        if it is None.
+      type: Optional[int]
+      default: 0
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt_template:
+      desc: The system prompt template.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: The input template.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: The output pattern.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+document_deduplicator:
+  desc: Deduplicator to deduplicate samples at document-level using exact matching.
+    Using md5 hash to deduplicate samples.
+  args:
+    lowercase:
+      desc: Whether to convert sample text to lower case
+      type: bool
+      default: false
+    ignore_non_character:
+      desc: Whether to ignore non-alphabet characters, including whitespaces, digits,
+        and punctuations
+      type: bool
+      default: false
+document_minhash_deduplicator:
+  desc: Deduplicator to deduplicate samples at document-level using MinHashLSH. Different
+    from simhash, minhash is stored as bytes, so they won't be kept in the final dataset.
+  args:
+    tokenization:
+      desc: tokenization method for sample texts. It should be one of [space, punctuation,
+        character, sentencepiece]. For English-like languages, we recommend to use
+        'space', for Chinese-like languages, we recommend to use 'character', and
+        for multiple languages, we recommend to use 'sentencepiece'. If using 'sentencepiece',
+        please provided the model path in the 'tokenizer_model' field.
+      type: str
+      default: space
+    window_size:
+      desc: window size of shingling
+      type: int
+      default: 5
+      min: 1
+      max: 1000000
+    lowercase:
+      desc: whether to convert text to lower case first
+      type: bool
+      default: true
+    ignore_pattern:
+      desc: whether to ignore sub-strings with specific pattern when computing minhash
+      type: Optional[str]
+      default: ''
+    num_permutations:
+      desc: number of permutations in minhash computing
+      type: int
+      default: 256
+      min: 1
+      max: 1000000
+    jaccard_threshold:
+      desc: the min jaccard similarity threshold in near-duplicate detection. When
+        the jaccard similarity of two sample texts is >= this threshold, they are
+        regarded as similar samples and this op will only keep one of them after deduplication
+      type: float
+      default: 0.7
+      min: 0
+      max: 1
+    num_bands:
+      desc: number of bands in LSH. Default it's None, and it will be determined by
+        an optimal params computation algorithm by minimize the weighted sum of probs
+        of False Positives and False Negatives
+      type: Optional[int]
+      default: 0
+    num_rows_per_band:
+      desc: number of rows in each band in LSH. Default it's None, and it will be
+        determined by an optimal params computation algorithm
+      type: Optional[int]
+      default: 0
+    tokenizer_model:
+      desc: path for the sentencepiece model, used for sentencepiece tokenization.
+      type: Optional[str]
+      default: ''
+document_simhash_deduplicator:
+  desc: Deduplicator to deduplicate samples at document-level using SimHash.
+  args:
+    tokenization:
+      desc: tokenization method for sample texts. It should be one of [space, punctuation,
+        character]. For English-like languages, we recommend to use 'space'. And for
+        Chinese-like languages, we recommend to use 'character'
+      type: str
+      default: space
+    window_size:
+      desc: window size of shingling
+      type: int
+      default: 6
+      min: 1
+      max: 1000000
+    lowercase:
+      desc: whether to convert text to lower case first
+      type: bool
+      default: true
+    ignore_pattern:
+      desc: whether to ignore sub-strings with specific pattern when computing simhash
+      type: Optional[str]
+      default: ''
+    num_blocks:
+      desc: number of blocks in simhash computing
+      type: int
+      default: 6
+      min: 1
+      max: 1000000
+    hamming_distance:
+      desc: the max hamming distance threshold in near-duplicate detection. When the
+        hamming distance of two sample texts is <= this threshold, they are regarded
+        as similar samples and this op will only keep one of them after deduplication.
+        This threshold should be always less than num_blocks
+      type: int
+      default: 4
+      min: 1
+      max: 1000000
+general_fused_op:
+  desc: An explicitly fused operator designed to execute multiple sequential operations
+    (OPs) on the same batch, enabling fine-grained control over data processing.
+  args:
+    batch_size:
+      desc: Parameter batch_size
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
+    fused_op_list:
+      desc: Parameter fused_op_list
+      type: List
+      default: []
+image_deduplicator:
+  desc: Deduplicator to deduplicate samples at document-level using exact matching
+    of images between documents.
+  args:
+    method:
+      desc: hash method for image
+      type: str
+      default: phash
+    consider_text:
+      desc: whether to consider text hash together with image hash when applying deduplication.
+      type: bool
+      default: false
+ray_bts_minhash_deduplicator:
+  desc: A MinhashLSH deduplicator based on RAY.
+  args:
+    tokenization:
+      desc: tokenization method for sample texts. It should be one of [space, punctuation,
+        character, sentencepiece]. For English-like languages, we recommend to use
+        'space', for Chinese-like languages, we recommend to use 'character', and
+        for multiple languages, we recommend to use 'sentencepiece'. If using 'sentencepiece',
+        please provided the model path in the 'tokenizer_model' field.
+      type: str
+      default: space
+    window_size:
+      desc: window size of shingling
+      type: int
+      default: 5
+      min: 1
+      max: 1000000
+    lowercase:
+      desc: whether to convert text to lower case first
+      type: bool
+      default: true
+    ignore_pattern:
+      desc: whether to ignore sub-strings with specific pattern when computing minhash
+      type: Optional[str]
+      default: ''
+    num_permutations:
+      desc: number of permutations in minhash computing
+      type: int
+      default: 256
+      min: 1
+      max: 1000000
+    jaccard_threshold:
+      desc: the min jaccard similarity threshold in near-duplicate detection. When
+        the jaccard similarity of two sample texts is >= this threshold, they are
+        regarded as similar samples and this op will only keep one of them after deduplication
+      type: float
+      default: 0.7
+      min: 0
+      max: 1
+    num_bands:
+      desc: number of bands in LSH. Default it's None, and it will be determined by
+        an optimal params computation algorithm by minimize the weighted sum of probs
+        of False Positives and False Negatives
+      type: Optional[int]
+      default: 0
+    num_rows_per_band:
+      desc: number of rows in each band in LSH. Default it's None, and it will be
+        determined by an optimal params computation algorithm
+      type: Optional[int]
+      default: 0
+    tokenizer_model:
+      desc: path for the sentencepiece model, used for sentencepiece tokenization.
+      type: Optional[str]
+      default: ''
+    union_find_parallel_num:
+      desc: number of parallel workers for union-find algorithm. Default it's 'auto',
+        and it will be determined by half of the number of CPUs.
+      type: Union[int, str]
+      default: auto
+    union_threshold:
+      desc: threshold for minhash values group to perform union-find algorithm. Default
+        it's 256.
+      type: Optional[int]
+      default: 256
+    max_pending_edge_buffer_task:
+      desc: max number of pending edge buffer ray tasks. Default it's 20.
+      type: Optional[int]
+      default: 20
+    num_edge_buffer_task_returns:
+      desc: number of edge buffer tasks for `ray.wait` to return. Default it's 10.
+      type: Optional[int]
+      default: 10
+    max_pending_filter_tasks:
+      desc: max number of pending filter ray tasks. Default it's 20.
+      type: Optional[int]
+      default: 20
+    num_filter_task_returns:
+      desc: number of filter tasks for `ray.wait` to return. Default it's 10.
+      type: Optional[int]
+      default: 10
+    merge_batch_size:
+      desc: batch size for BTS operations. Default it's 1000.
+      type: Optional[int]
+      default: 1000
+    minhash_batch_size:
+      desc: batch size for MinHash computation. If "auto", it will be set to default
+        value on CPU(1024), or auto calculated per available GPU memory and memory_per_sample
+        setting for GPU.
+      type: Union[str, int, None]
+      default: auto
+    memory_per_sample:
+      desc: estimated memory needed per sample in MB. Used to calculate batch size
+        based on available GPU memory. Default is 0.1 MB per sample.
+      type: Optional[float]
+      default: 0.1
+ray_document_deduplicator:
+  desc: Deduplicator to deduplicate samples at document-level using exact matching.
+  args:
+    backend:
+      desc: the backend for dedup, either 'ray_actor' or 'redis'
+      type: str
+      default: ray_actor
+    redis_address:
+      desc: the address of redis server
+      type: str
+      default: redis://localhost:6379
+    lowercase:
+      desc: Whether to convert sample text to lower case
+      type: bool
+      default: false
+    ignore_non_character:
+      desc: Whether to ignore non-alphabet characters, including whitespaces, digits,
+        and punctuations
+      type: bool
+      default: false
+ray_image_deduplicator:
+  desc: Deduplicator to deduplicate samples at document-level using exact matching
+    of images between documents.
+  args:
+    backend:
+      desc: the backend for dedup, either 'ray_actor' or 'redis'
+      type: str
+      default: ray_actor
+    redis_address:
+      desc: the address of redis server
+      type: str
+      default: redis://localhost:6379
+    method:
+      desc: Parameter method
+      type: str
+      default: phash
+ray_video_deduplicator:
+  desc: Deduplicator to deduplicate samples at document-level using exact matching
+    of videos between documents.
+  args:
+    backend:
+      desc: the backend for dedup, either 'ray_actor' or 'redis'
+      type: str
+      default: ray_actor
+    redis_address:
+      desc: the address of redis server
+      type: str
+      default: redis://localhost:6379
+video_deduplicator:
+  desc: Deduplicator to deduplicate samples at document-level using exact matching
+    of videos between documents.
+  args:
+    consider_text:
+      desc: whether to consider text hash together with video hash when applying deduplication.
+      type: bool
+      default: false
+alphanumeric_filter:
+  desc: Filter to keep samples with alphabet/numeric ratio within a specific range.
+  args:
+    tokenization:
+      desc: Whether to count the ratio of alphanumeric to the total number of tokens.
+        if tokenization=False, it will count the ratio of alphanumeric to the total
+        number of characters.
+      type: bool
+      default: false
+    min_ratio:
+      desc: The min filter ratio in alphanumeric op, samples will be filtered if their
+        alphabet/numeric ratio is below this parameter.
+      type: float
+      default: 0.25
+      min: -1000000.0
+      max: 1000000.0
+    max_ratio:
+      desc: The max filter ratio in alphanumeric op, samples will be filtered if their
+        alphabet/numeric ratio exceeds this parameter.
+      type: float
+      default: 1000000.0
+      min: -1000000.0
+      max: 1000000.0
+audio_duration_filter:
+  desc: Keep data samples whose audios' durations are within a specified range.
+  args:
+    min_duration:
+      desc: The min audio duration to keep samples in seconds. It's 0 by default.
+      type: int
+      default: 0
+      min: -1000000
+      max: 1000000
+    max_duration:
+      desc: The max audio duration to keep samples in seconds. It's sys.maxsize by
+        default.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all audios. ''any'':
+        keep this sample if any audios meet the condition. ''all'': keep this sample
+        only if all audios meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+audio_nmf_snr_filter:
+  desc: Keep data samples whose audios' SNRs (computed based on NMF) are within a
+    specified range.
+  args:
+    min_snr:
+      desc: The min audio SNR to keep samples in dB. It's 0 by default.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
+    max_snr:
+      desc: The max audio SNR to keep samples in dB. It's sys.maxsize by default.
+      type: float
+      default: 1000000.0
+      min: -1000000.0
+      max: 1000000.0
+    nmf_iter_num:
+      desc: The max number of iterations to run NMF. It's 500 in default.
+      type: int
+      default: 500
+      min: 1
+      max: 1000000
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all audios. ''any'':
+        keep this sample if any audios meet the condition. ''all'': keep this sample
+        only if all audios meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+audio_size_filter:
+  desc: Keep data samples whose audio size (in bytes/kb/MB/...) within a specific
+    range.
+  args:
+    min_size:
+      desc: The min audio size to keep samples. set to be "0" by default for no size
+        constraint
+      type: str
+      default: '0'
+    max_size:
+      desc: The max audio size to keep samples. set to be "1Tb" by default, an approximate
+        for un-limited case
+      type: str
+      default: 1TB
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all audios. ''any'':
+        keep this sample if any audios meet the condition. ''all'': keep this sample
+        only if all audios meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+average_line_length_filter:
+  desc: Filter to keep samples with average line length within a specific range.
+  args:
+    min_len:
+      desc: The min filter length in this op, samples will be filtered if their average
+        line length is below this parameter.
+      type: int
+      default: 10
+      min: -1000000
+      max: 1000000
+    max_len:
+      desc: The max filter length in this op, samples will be filtered if their average
+        line length exceeds this parameter.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+character_repetition_filter:
+  desc: Filter to keep samples with char-level n-gram repetition ratio within a specific
+    range.
+  args:
+    rep_len:
+      desc: Repetition length for char-level n-gram.
+      type: int
+      default: 10
+      min: 1
+      max: 1000000
+    min_ratio:
+      desc: The min filter ratio in this op, samples will be filtered if their char-level
+        n-gram repetition ratio is below this parameter.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
+    max_ratio:
+      desc: The max filter ratio in this op, samples will be filtered if their char-level
+        n-gram repetition ratio exceeds this parameter.
+      type: float
+      default: 0.5
+      min: -1000000.0
+      max: 1000000.0
+flagged_words_filter:
+  desc: Filter to keep samples with flagged-word ratio less than a specific max value.
+  args:
+    lang:
+      desc: Consider flagged words in what language. If lang == "all", we will adopt
+        the one merged from all the available languages
+      type: str
+      default: en
+    tokenization:
+      desc: Whether to use model to tokenize documents
+      type: bool
+      default: false
+    max_ratio:
+      desc: The max filter ratio in this op.
+      type: float
+      default: 0.045
+      min: -1000000.0
+      max: 1000000.0
+    flagged_words_dir:
+      desc: The directory storing the flagged_words file(s) whose name includes "flagged_words"
+        and in json format
+      type: str
+      default: /home/cmgzn/.cache/data_juicer/assets
+    use_words_aug:
+      desc: Whether to augment words, especially for Chinese and Vietnamese
+      type: bool
+      default: false
+    words_aug_group_sizes:
+      desc: The group size of words to augment
+      type: List[int]
+      default:
+      - 2
+    words_aug_join_char:
+      desc: The join char between words to augment
+      type: str
+      default: ''
+general_field_filter:
+  desc: Filter to keep samples based on a general field filter condition. The filter
+    condition is a string that can include logical operators and chain comparisons.
+  args:
+    filter_condition:
+      desc: 'The filter condition as a string. It can include logical operators (and/or)
+        and chain comparisons. For example: "10 < num <= 30 and text != ''nothing
+        here'' and __dj__meta__.a == 3".'
+      type: str
+      default: ''
+image_aesthetics_filter:
+  desc: Filter to keep samples with aesthetics scores within a specific range.
+  args:
+    hf_scorer_model:
+      desc: Huggingface model name for the aesthetics predictor. By default, we will
+        use 'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE', refer
+        to pypi.org/project/simple-aesthetics-predictor
+      type: str
+      default: ''
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    min_score:
+      desc: Min score for the predicted aesthetics in an image.
+      type: float
+      default: 0.5
+      min: -1000000.0
+      max: 1000000.0
+    max_score:
+      desc: Max score for the predicted aesthetics in an image.
+      type: float
+      default: 1.0
+      min: -1000000.0
+      max: 1000000.0
+    any_or_all:
+      desc: 'Keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+image_aspect_ratio_filter:
+  desc: Filter to keep samples with image aspect ratio within a specific range. AspectRatio
+    = W / H.
+  args:
+    min_ratio:
+      desc: The min aspect ratio to keep samples.
+      type: float
+      default: 0.333
+      min: -1000000.0
+      max: 1000000.0
+    max_ratio:
+      desc: The max aspect ratio to keep samples.
+      type: float
+      default: 3.0
+      min: -1000000.0
+      max: 1000000.0
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+image_face_count_filter:
+  desc: Filter to keep samples with the number of faces within a specific range.
+  args:
+    cv_classifier:
+      desc: OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
+      type: str
+      default: ''
+    min_face_count:
+      desc: Minimum number of faces required for samples.
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
+    max_face_count:
+      desc: Maximum number of faces required for samples.
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
+    any_or_all:
+      desc: 'Keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+image_face_ratio_filter:
+  desc: Filter to keep samples with face area ratios within a specific range.
+  args:
+    cv_classifier:
+      desc: OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
+      type: str
+      default: ''
+    min_ratio:
+      desc: Min ratio for the largest face area in an image.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
+    max_ratio:
+      desc: Max ratio for the largest face area in an image.
+      type: float
+      default: 0.4
+      min: -1000000.0
+      max: 1000000.0
+    any_or_all:
+      desc: 'Keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+image_nsfw_filter:
+  desc: Filter to keep samples whose images have low nsfw scores.
+  args:
+    hf_nsfw_model:
+      desc: nsfw detection model name on huggingface.
+      type: str
+      default: Falconsai/nsfw_image_detection
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    max_score:
+      desc: the nsfw score threshold for samples. range from 0 to 1. Samples with
+        nsfw score less than this threshold will be kept.
+      type: float
+      default: 0.5
+      min: -1000000.0
+      max: 1000000.0
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+image_pair_similarity_filter:
+  desc: Filter to keep image pairs with similarities between images within a specific
+    range.
+  args:
+    hf_clip:
+      desc: clip model name on huggingface to compute the similarity between image
+        and text.
+      type: str
+      default: openai/clip-vit-base-patch32
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    min_score:
+      desc: The min similarity to keep samples.
+      type: float
+      default: 0.1
+      min: 0.0
+      max: 1.0
+    max_score:
+      desc: The max similarity to keep samples.
+      type: float
+      default: 1.0
+      min: 0.0
+      max: 1.0
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+image_shape_filter:
+  desc: Filter to keep samples with image shape (w, h) within specific ranges.
+  args:
+    min_width:
+      desc: The min width to keep samples.
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
+    max_width:
+      desc: The max width to keep samples.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+    min_height:
+      desc: The min height to keep samples.
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
+    max_height:
+      desc: The max height to keep samples.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+image_size_filter:
+  desc: Keep data samples whose image size (in Bytes/KB/MB/...) within a specific
+    range.
+  args:
+    min_size:
+      desc: The min image size to keep samples. set to be "0" by default for no size
+        constraint
+      type: str
+      default: '0'
+    max_size:
+      desc: The max image size to keep samples. set to be "1TB" by default, an approximate
+        for un-limited case
+      type: str
+      default: 1TB
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+image_text_matching_filter:
+  desc: Filter to keep samples those matching score between image and text within
+    a specific range.
+  args:
+    hf_blip:
+      desc: blip model name on huggingface to compute the matching score between image
+        and text.
+      type: str
+      default: Salesforce/blip-itm-base-coco
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    min_score:
+      desc: The min matching score to keep samples.
+      type: float
+      default: 0.003
+      min: -1000000.0
+      max: 1000000.0
+    max_score:
+      desc: The max matching score to keep samples.
+      type: float
+      default: 1.0
+      min: -1000000.0
+      max: 1000000.0
+    horizontal_flip:
+      desc: Flip image horizontally (left to right).
+      type: bool
+      default: false
+    vertical_flip:
+      desc: Flip image vertically (top to bottom).
+      type: bool
+      default: false
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+    reduce_mode:
+      desc: 'reduce mode when one text corresponds to multiple images in a chunk.
+        ''avg'': Take the average of multiple values ''max'': Take the max of multiple
+        values ''min'': Take the min of multiple values'
+      type: str
+      default: avg
+image_text_similarity_filter:
+  desc: Filter to keep samples those similarities between image and text within a
+    specific range.
+  args:
+    hf_clip:
+      desc: clip model name on huggingface to compute the similarity between image
+        and text.
+      type: str
+      default: openai/clip-vit-base-patch32
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    min_score:
+      desc: The min similarity to keep samples.
+      type: float
+      default: 0.1
+      min: -1000000.0
+      max: 1000000.0
+    max_score:
+      desc: The max similarity to keep samples.
+      type: float
+      default: 1.0
+      min: -1000000.0
+      max: 1000000.0
+    horizontal_flip:
+      desc: Flip image horizontally (left to right).
+      type: bool
+      default: false
+    vertical_flip:
+      desc: Flip image vertically (top to bottom).
+      type: bool
+      default: false
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+    reduce_mode:
+      desc: 'reduce mode when one text corresponds to multiple images in a chunk.
+        ''avg'': Take the average of multiple values ''max'': Take the max of multiple
+        values ''min'': Take the min of multiple values'
+      type: str
+      default: avg
+image_watermark_filter:
+  desc: Filter to keep samples whose images have no watermark with high probability.
+  args:
+    hf_watermark_model:
+      desc: watermark detection model name on huggingface.
+      type: str
+      default: amrul-hzz/watermark_detector
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    prob_threshold:
+      desc: the predicted watermark probability threshold for samples. range from
+        0 to 1. Samples with watermark probability less than this threshold will be
+        kept.
+      type: float
+      default: 0.8
+      min: -1000000.0
+      max: 1000000.0
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+language_id_score_filter:
+  desc: Filter to keep samples in a specific language with confidence score larger
+    than a specific min value.
+  args:
+    lang:
+      desc: Samples in which languages to keep.
+      type: Union[str, List[str]]
+      default: ''
+    min_score:
+      desc: The min language identification confidence scores of samples to keep.
+      type: float
+      default: 0.8
+      min: -1000000.0
+      max: 1000000.0
+llm_analysis_filter: &id001
+  desc: Base filter class for leveraging LLMs to filter various samples. Provides
+    foundational functionality for dimensional scoring (0~5) and tagging.
+  args:
+    api_or_hf_model:
+      desc: API or huggingface model name.
+      type: str
+      default: gpt-4o
+    min_score:
+      desc: The lowest score threshold to keep the sample.
+      type: float
+      default: 0.5
+      min: -1000000.0
+      max: 1000000.0
+    is_hf_model:
+      desc: Parameter is_hf_model
+      type: bool
+      default: false
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    input_keys:
+      desc: Sub set of keys in the sample. Support data with multi fields such as
+        'query', 'analysis' and 'answer' in RFT data.
+      type: List[str]
+      default:
+      - text
+    field_names:
+      desc: Corresponding field names for input keys.
+      type: List[str]
+      default:
+      - Text
+    system_prompt:
+      desc: System prompt for the task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the model input.
+      type: Optional[str]
+      default: ''
+    field_template:
+      desc: Template for each field in the prompt.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    enable_vllm:
+      desc: If true, use VLLM for loading hugging face or local llm. Otherwise, use
+        API for reference.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+    dim_required_keys:
+      desc: A list of keys used to calculate the average dimension score, only the
+        dimension scores associated with these keys are used in the average calculation.
+      type: Optional[List[str]]
+      default: []
+llm_difficulty_score_filter: *id001
+llm_quality_score_filter: *id001
+maximum_line_length_filter:
+  desc: Filter to keep samples with maximum line length within a specific range.
+  args:
+    min_len:
+      desc: The min filter length in this op, samples will be filtered if their maximum
+        line length is below this parameter.
+      type: int
+      default: 10
+      min: -1000000
+      max: 1000000
+    max_len:
+      desc: The max filter length in this op, samples will be filtered if their maximum
+        line length exceeds this parameter.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+perplexity_filter:
+  desc: Filter to keep samples with perplexity score less than a specific max value.
+  args:
+    lang:
+      desc: Compute perplexity for samples in which language.
+      type: str
+      default: en
+    max_ppl:
+      desc: The max filter perplexity in this op, samples will be filtered if their
+        perplexity exceeds this parameter.
+      type: float
+      default: 1500.0
+      min: -1000000.0
+      max: 1000000.0
+phrase_grounding_recall_filter:
+  desc: Filter to keep samples whose locating recalls of phrases extracted from text
+    in the images are within a specified range.
+  args:
+    hf_owlvit:
+      desc: Owl-ViT model name on huggingface to locate the phrases extracted from
+        the text.
+      type: str
+      default: google/owlvit-base-patch32
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    min_recall:
+      desc: The min phrase grounding recall to keep samples.
+      type: float
+      default: 0.1
+      min: -1000000.0
+      max: 1000000.0
+    max_recall:
+      desc: The max phrase grounding recall to keep samples.
+      type: float
+      default: 1.0
+      min: -1000000.0
+      max: 1000000.0
+    horizontal_flip:
+      desc: Flip image horizontally (left to right).
+      type: bool
+      default: false
+    vertical_flip:
+      desc: Flip image vertically (top to bottom).
+      type: bool
+      default: false
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+    reduce_mode:
+      desc: 'reduce mode when one text corresponds to multiple images in a chunk.
+        ''avg'': Take the average of multiple values ''max'': Take the max of multiple
+        values ''min'': Take the min of multiple values'
+      type: str
+      default: avg
+    iou_thr:
+      desc: 'the IoU threshold for NMS-like post-process. If two predicted bboxes
+        are overlap with an IoU larger than this threshold, the bbox with less confidence
+        will be removed. Default: 0.5.'
+      type: float
+      default: 0.5
+      min: -1000000.0
+      max: 1000000.0
+    large_area_ratio_thr:
+      desc: 'the area ratio threshold for filtering out those large predicted bboxes.
+        If the area of a predicted bbox accounts for more than this ratio threshold
+        of the whole image area, this bbox will be removed. Default: 0.95.'
+      type: float
+      default: 0.95
+      min: -1000000.0
+      max: 1000000.0
+    conf_thr:
+      desc: 'the confidence score threshold for removing low-confidence bboxes. If
+        the confidence score of a predicted bbox is lower than the threshold, this
+        bbox will be removed. Default: 0.'
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
+special_characters_filter:
+  desc: Filter to keep samples with special-char ratio within a specific range.
+  args:
+    min_ratio:
+      desc: The min filter ratio in this op, samples will be filtered if their special-char
+        ratio is below this parameter.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
+    max_ratio:
+      desc: The max filter ratio in this op, samples will be filtered if their special-char
+        ratio exceeds this parameter.
+      type: float
+      default: 0.25
+      min: -1000000.0
+      max: 1000000.0
+specified_field_filter:
+  desc: Filter based on specified field information. If the specified field information
+    in the sample is not within the specified target value, the sample will be filtered.
+  args:
+    field_key:
+      desc: Filter based on the specified value corresponding to the target key. The
+        target key corresponding to multi-level field information need to be separated
+        by '.'.
+      type: str
+      default: ''
+    target_value:
+      desc: The range of specified field information corresponding to the samples
+        that need to be retained.
+      type: List
+      default: []
+specified_numeric_field_filter:
+  desc: Filter based on specified numeric field information. If the specified numeric
+    information in the sample is not within the specified range, the sample will be
+    filtered.
+  args:
+    field_key:
+      desc: Filter based on the specified numeric value corresponding to the target
+        key. The target key corresponding to multi-level field information need to
+        be separated by '.'.
+      type: str
+      default: ''
+    min_value:
+      desc: The min filter value in SpecifiedNumericField op, samples will be filtered
+        if their specified numeric field value is below this parameter.
+      type: float
+      default: -9.223372036854776e+18
+      min: -1000000.0
+      max: 1000000.0
+    max_value:
+      desc: The max filter value in SpecifiedNumericField op, samples will be filtered
+        if their specified numeric field value exceeds this parameter.
+      type: float
+      default: 1000000.0
+      min: -1000000.0
+      max: 1000000.0
+stopwords_filter:
+  desc: Filter to keep samples with stopword ratio larger than a specific min value.
+  args:
+    lang:
+      desc: Consider stopwords in what language. If lang == "all", we will adopt the
+        one merged from all the available languages
+      type: str
+      default: en
+    tokenization:
+      desc: whether to use model to tokenize documents
+      type: bool
+      default: false
+    min_ratio:
+      desc: The min filter ratio in this op.
+      type: float
+      default: 0.3
+      min: -1000000.0
+      max: 1000000.0
+    stopwords_dir:
+      desc: The directory storing the stopwords file(s) whose name includes "stopwords"
+        and in json format
+      type: str
+      default: /home/cmgzn/.cache/data_juicer/assets
+    use_words_aug:
+      desc: Whether to augment words, especially for Chinese and Vietnamese
+      type: bool
+      default: false
+    words_aug_group_sizes:
+      desc: The group size of words to augment
+      type: List[int]
+      default:
+      - 2
+    words_aug_join_char:
+      desc: The join char between words to augment
+      type: str
+      default: ''
+suffix_filter:
+  desc: Filter to keep samples with specified suffix.
+  args:
+    suffixes:
+      desc: 'the suffix of text that will be keep. For example: ''.txt'', ''txt''
+        or [''txt'', ''.pdf'', ''docx'']'
+      type: Union[str, List[str]]
+      default: []
+text_action_filter:
+  desc: Filter to keep texts those contain actions in the text.
+  args:
+    lang:
+      desc: language of the text in the samples. 'en' for detection of actions in
+        English and 'zh' for detection of actions in Chinese.
+      type: str
+      default: en
+    min_action_num:
+      desc: Parameter min_action_num
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
+text_entity_dependency_filter:
+  desc: Identify the entities in the text which are independent with other token,
+    and filter them. The text containing no entities will be omitted.
+  args:
+    lang:
+      desc: language of the text in the samples. 'en' for detection of entities in
+        English and 'zh' for detection of entities in Chinese.
+      type: str
+      default: en
+    min_dependency_num:
+      desc: Parameter min_dependency_num
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy. ''any'': keep this
+        sample if any object is dependent. ''all'': keep this sample only if all images
+        are dependent.'
+      type: str
+      default: all
+      options:
+      - any
+      - all
+text_length_filter:
+  desc: Filter to keep samples with total text length within a specific range.
+  args:
+    min_len:
+      desc: The min text length in the filtering. samples will be filtered if their
+        text length is below this parameter.
+      type: int
+      default: 10
+      min: -1000000
+      max: 1000000
+    max_len:
+      desc: The max text length in the filtering. samples will be filtered if their
+        text length exceeds this parameter.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+text_pair_similarity_filter:
+  desc: Filter to keep text pairs with similarities between texts within a specific
+    range.
+  args:
+    hf_clip:
+      desc: clip model name on huggingface to compute the similarity between image
+        and text.
+      type: str
+      default: openai/clip-vit-base-patch32
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    min_score:
+      desc: The min similarity to keep samples.
+      type: float
+      default: 0.1
+      min: 0.0
+      max: 1.0
+    max_score:
+      desc: The max similarity to keep samples.
+      type: float
+      default: 1.0
+      min: 0.0
+      max: 1.0
+    text_key_second:
+      desc: used to store the other sentence in the text pair.
+      type: str
+      default: ''
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+token_num_filter:
+  desc: Filter to keep samples with total token number within a specific range.
+  args:
+    hf_tokenizer:
+      desc: the tokenizer name of Hugging Face tokenizers.
+      type: str
+      default: EleutherAI/pythia-6.9b-deduped
+    min_num:
+      desc: The min filter token number in this op, samples will be filtered if their
+        token number is below this parameter.
+      type: int
+      default: 10
+      min: -1000000
+      max: 1000000
+    max_num:
+      desc: The max filter token number in this op, samples will be filtered if their
+        token number exceeds this parameter.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+video_aesthetics_filter:
+  desc: Filter to keep data samples with aesthetics scores for specified frames in
+    the videos within a specific range.
+  args:
+    hf_scorer_model:
+      desc: Huggingface model name for the aesthetics predictor. By default, we will
+        use 'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE', refer
+        to pypi.org/project/simple-aesthetics-predictor
+      type: str
+      default: ''
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    min_score:
+      desc: Min score for the predicted aesthetics in a video.
+      type: float
+      default: 0.4
+      min: -1000000.0
+      max: 1000000.0
+    max_score:
+      desc: Max score for the predicted aesthetics in a video.
+      type: float
+      default: 1.0
+      min: -1000000.0
+      max: 1000000.0
+    frame_sampling_method:
+      desc: 'sampling method of extracting frame images from the videos. Should be
+        one of ["all_keyframes", "uniform"]. The former one extracts all key frames
+        and the latter one extract specified number of frames uniformly from the video.
+        Default: "uniform" with frame_num=3, considering that the number of keyframes
+        can be large while their difference is usually small in terms of their aesthetics.'
+      type: str
+      default: uniform
+    frame_num:
+      desc: the number of frames to be extracted uniformly from the video. Only works
+        when frame_sampling_method is "uniform". If it's 1, only the middle frame
+        will be extracted. If it's 2, only the first and the last frames will be extracted.
+        If it's larger than 2, in addition to the first and the last frames, other
+        frames will be extracted uniformly within the video duration.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    any_or_all:
+      desc: 'Keep this sample with ''any'' or ''all'' strategy of all videos. ''any'':
+        keep this sample if any videos meet the condition. ''all'': keep this sample
+        only if all videos meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+    reduce_mode:
+      desc: 'reduce mode when one sample corresponds to multiple frames, must be one
+        of [''avg'',''max'', ''min'']. ''avg'': Take the average of multiple values
+        ''max'': Take the max of multiple values ''min'': Take the min of multiple
+        values'
+      type: str
+      default: avg
+video_aspect_ratio_filter:
+  desc: Filter to keep samples with video aspect ratio within a specific range. AspectRatio
+    = W / H.
+  args:
+    min_ratio:
+      desc: The minimum aspect ratio to keep samples, supported format is a string,
+        such as "9:21" or "9/21".
+      type: str
+      default: 9/21
+    max_ratio:
+      desc: The maximum aspect ratio to keep samples, supported format is a string,
+        such as "21:9" or "21/9".
+      type: str
+      default: 21/9
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all videos. ''any'':
+        keep this sample if any videos meet the condition. ''all'': keep this sample
+        only if all videos meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+video_duration_filter:
+  desc: Keep data samples whose videos' durations are within a specified range.
+  args:
+    min_duration:
+      desc: The min video duration to keep samples in seconds. It's 0 by default.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
+    max_duration:
+      desc: The max video duration to keep samples in seconds. It's sys.maxsize by
+        default.
+      type: float
+      default: 1000000.0
+      min: -1000000.0
+      max: 1000000.0
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all videos. ''any'':
+        keep this sample if any videos meet the condition. ''all'': keep this sample
+        only if all videos meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+video_frames_text_similarity_filter:
+  desc: Filter to keep samples those similarities between sampled video frame images
+    and text within a specific range.
+  args:
+    hf_clip:
+      desc: clip model name on huggingface to compute the similarity between frame
+        image and text. It's kind of language-related. For example, for Chinese datasets,
+        ChineseCLIP might be a better choice.
+      type: str
+      default: openai/clip-vit-base-patch32
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    min_score:
+      desc: the min similarity to keep samples.
+      type: float
+      default: 0.1
+      min: -1000000.0
+      max: 1000000.0
+    max_score:
+      desc: the max similarity to keep samples.
+      type: float
+      default: 1.0
+      min: -1000000.0
+      max: 1000000.0
+    frame_sampling_method:
+      desc: 'sampling method of extracting frame images from the videos. Should be
+        one of ["all_keyframes", "uniform"]. The former one extracts all key frames
+        (the number of which depends on the duration of the video) and the latter
+        one extract specified number of frames uniformly from the video. Default:
+        "all_keyframes".'
+      type: str
+      default: all_keyframes
+    frame_num:
+      desc: the number of frames to be extracted uniformly from the video. Only works
+        when frame_sampling_method is "uniform". If it's 1, only the middle frame
+        will be extracted. If it's 2, only the first and the last frames will be extracted.
+        If it's larger than 2, in addition to the first and the last frames, other
+        frames will be extracted uniformly within the video duration.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    horizontal_flip:
+      desc: flip frame image horizontally (left to right).
+      type: bool
+      default: false
+    vertical_flip:
+      desc: flip frame image vertically (top to bottom).
+      type: bool
+      default: false
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all videos. ''any'':
+        keep this sample if any videos meet the condition. ''all'': keep this sample
+        only if all videos meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+    reduce_mode:
+      desc: 'reduce mode when one text corresponds to multiple video frame images
+        in a chunk. ''avg'': Take the average of multiple values ''max'': Take the
+        max of multiple values ''min'': Take the min of multiple values'
+      type: str
+      default: avg
+video_motion_score_filter:
+  desc: Filter to keep samples with video motion scores within a specific range. The
+    Farneback's algorithm from OpenCV is used to compute dense optical flow.
+  args: &id002
+    min_score:
+      desc: The minimum motion score to keep samples.
+      type: float
+      default: 0.25
+      min: -1000000.0
+      max: 1000000.0
+    max_score:
+      desc: The maximum motion score to keep samples.
+      type: float
+      default: 1000000.0
+      min: -1000000.0
+      max: 1000000.0
+    sampling_fps:
+      desc: The sampling rate in frames_per_second for optical flow calculations.
+      type: float
+      default: 2.0
+      min: 1.0e-06
+      max: 1000000.0
+    size:
+      desc: Resize frames before computing optical flow. If size is a sequence like
+        (h, w), frame size will be matched to this. If size is an int, smaller edge
+        of frames will be matched to this number. i.e, if height > width, then frame
+        will be rescaled to (size * height / width, size). Default `None` to keep
+        the original size.
+      type: Union[int, Tuple[int], Tuple[int, int], None]
+      default: 0
+    max_size:
+      desc: The maximum allowed for the longer edge of resized frames. If the longer
+        edge of frames is greater than max_size after being resized according to size,
+        size will be overruled so that the longer edge is equal to max_size. As a
+        result, the smaller edge may be shorter than size. This is only supported
+        if size is an int.
+      type: Optional[int]
+      default: 0
+    divisible:
+      desc: The number that the dimensions must be divisible by.
+      type: int
+      default: 1
+      min: 1
+      max: 1000000
+    relative:
+      desc: If `True`, the optical flow magnitude is normalized to a [0, 1] range,
+        relative to the frame's diagonal length.
+      type: bool
+      default: false
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all videos. ''any'':
+        keep this sample if any videos meet the condition. ''all'': keep this sample
+        only if all videos meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+video_motion_score_raft_filter:
+  desc: 'Filter to keep samples with video motion scores within a specified range.
+    This operator utilizes the RAFT (Recurrent All-Pairs Field Transforms) model from
+    torchvision to predict optical flow between video frames. For further details,
+    refer to the official torchvision documentation: https://pytorch.org/vision/main/models/raft.html
+    The original paper on RAFT is available here: https://arxiv.org/abs/2003.12039'
+  args: *id002
+video_nsfw_filter:
+  desc: Filter to keep samples whose videos have low nsfw scores.
+  args:
+    hf_nsfw_model:
+      desc: nsfw detection model name on huggingface.
+      type: str
+      default: Falconsai/nsfw_image_detection
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    max_score:
+      desc: the nsfw score threshold for samples. range from 0 to 1. Samples with
+        nsfw score less than this threshold will be kept.
+      type: float
+      default: 0.5
+      min: -1000000.0
+      max: 1000000.0
+    frame_sampling_method:
+      desc: 'sampling method of extracting frame images from the videos. Should be
+        one of ["all_keyframes", "uniform"]. The former one extracts all key frames
+        (the number of which depends on the duration of the video) and the latter
+        one extract specified number of frames uniformly from the video. Default:
+        "all_keyframes".'
+      type: str
+      default: all_keyframes
+    frame_num:
+      desc: the number of frames to be extracted uniformly from the video. Only works
+        when frame_sampling_method is "uniform". If it's 1, only the middle frame
+        will be extracted. If it's 2, only the first and the last frames will be extracted.
+        If it's larger than 2, in addition to the first and the last frames, other
+        frames will be extracted uniformly within the video duration.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    reduce_mode:
+      desc: 'reduce mode for multiple sampled video frames. ''avg'': Take the average
+        of multiple values ''max'': Take the max of multiple values ''min'': Take
+        the min of multiple values'
+      type: str
+      default: avg
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all videos. ''any'':
+        keep this sample if any videos meet the condition. ''all'': keep this sample
+        only if all videos meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+video_ocr_area_ratio_filter:
+  desc: Keep data samples whose detected text area ratios for specified frames in
+    the video are within a specified range.
+  args:
+    min_area_ratio:
+      desc: The min ocr area ratio to keep samples. It's 0 by default.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
+    max_area_ratio:
+      desc: The max ocr area ratio to keep samples. It's 1.0 by default.
+      type: float
+      default: 1.0
+      min: -1000000.0
+      max: 1000000.0
+    frame_sample_num:
+      desc: The number of sampled frames to calculate the ocr area ratio. If it's
+        1, only middle frame will be selected. If it's 2, only the first and the last
+        frames will be selected. If it's larger than 2, in addition to the first and
+        the last frames, other frames will be sampled evenly within the video duration.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    languages_to_detect:
+      desc: 'texts in which languages should be detected. Default: [''ch_sim'', ''en''].
+        Full language list can be found here: https://www.jaided.ai/easyocr/.'
+      type: Union[str, List[str]]
+      default:
+      - ch_sim
+      - en
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all videos. ''any'':
+        keep this sample if any videos meet the condition. ''all'': keep this sample
+        only if all videos meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+video_resolution_filter:
+  desc: Keep data samples whose videos' resolutions are within a specified range.
+  args:
+    min_width:
+      desc: The min horizontal resolution.
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
+    max_width:
+      desc: The max horizontal resolution.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+    min_height:
+      desc: The min vertical resolution.
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
+    max_height:
+      desc: The max vertical resolution.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all videos. ''any'':
+        keep this sample if any videos meet the condition. ''all'': keep this sample
+        only if all videos meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+human_preference_annotation_mapper:
+  desc: Operator for human preference annotation using Label Studio.
+  args:
+    label_config_file:
+      desc: Parameter label_config_file
+      type: str
+      default: ''
+    answer1_key:
+      desc: Parameter answer1_key
+      type: str
+      default: answer1
+    answer2_key:
+      desc: Parameter answer2_key
+      type: str
+      default: answer2
+    prompt_key:
+      desc: Parameter prompt_key
+      type: str
+      default: prompt
+    chosen_key:
+      desc: Parameter chosen_key
+      type: str
+      default: chosen
+    rejected_key:
+      desc: Parameter rejected_key
+      type: str
+      default: rejected
+audio_add_gaussian_noise_mapper:
+  desc: Mapper to add gaussian noise to audio.
+  args:
+    min_amplitude:
+      desc: Parameter min_amplitude
+      type: float
+      default: 0.001
+      min: -1000000.0
+      max: 1000000.0
+    max_amplitude:
+      desc: Parameter max_amplitude
+      type: float
+      default: 0.015
+      min: -1000000.0
+      max: 1000000.0
+    p:
+      desc: Parameter p
+      type: float
+      default: 0.5
+      min: -1000000.0
+      max: 1000000.0
+audio_ffmpeg_wrapped_mapper:
+  desc: Simple wrapper for FFmpeg audio filters.
+  args:
+    filter_name:
+      desc: ffmpeg audio filter name.
+      type: Optional[str]
+      default: ''
+    filter_kwargs:
+      desc: keyword-arguments passed to ffmpeg filter.
+      type: Optional[Dict]
+      default: {}
+    global_args:
+      desc: list-arguments passed to ffmpeg command-line.
+      type: Optional[List[str]]
+      default: []
+    capture_stderr:
+      desc: whether to capture stderr.
+      type: bool
+      default: true
+    overwrite_output:
+      desc: whether to overwrite output file.
+      type: bool
+      default: true
+calibrate_qa_mapper:
+  desc: Mapper to calibrate question-answer pairs based on reference text.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: System prompt for the calibration task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the model input.
+      type: Optional[str]
+      default: ''
+    reference_template:
+      desc: Template for formatting the reference text.
+      type: Optional[str]
+      default: ''
+    qa_pair_template:
+      desc: Template for formatting question-answer pairs.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: Regular expression for parsing model output.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+calibrate_query_mapper:
+  desc: Mapper to calibrate query in question-answer pairs based on reference text.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: System prompt for the calibration task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the model input.
+      type: Optional[str]
+      default: ''
+    reference_template:
+      desc: Template for formatting the reference text.
+      type: Optional[str]
+      default: ''
+    qa_pair_template:
+      desc: Template for formatting question-answer pairs.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: Regular expression for parsing model output.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+calibrate_response_mapper:
+  desc: Mapper to calibrate response in question-answer pairs based on reference text.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: System prompt for the calibration task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the model input.
+      type: Optional[str]
+      default: ''
+    reference_template:
+      desc: Template for formatting the reference text.
+      type: Optional[str]
+      default: ''
+    qa_pair_template:
+      desc: Template for formatting question-answer pairs.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: Regular expression for parsing model output.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+chinese_convert_mapper:
+  desc: Mapper to convert Chinese between Traditional Chinese, Simplified Chinese
+    and Japanese Kanji.
+  args:
+    mode:
+      desc: "Choose the mode to convert Chinese: s2t: Simplified Chinese to Traditional\
+        \ Chinese, t2s: Traditional Chinese to Simplified Chinese, s2tw: Simplified\
+        \ Chinese to Traditional Chinese (Taiwan Standard), tw2s: Traditional Chinese\
+        \ (Taiwan Standard) to Simplified Chinese, s2hk: Simplified Chinese to Traditional\
+        \ Chinese (Hong Kong variant), hk2s: Traditional Chinese (Hong Kong variant)\
+        \ to Simplified Chinese, s2twp: Simplified Chinese to Traditional Chinese\
+        \ (Taiwan Standard) with Taiwanese idiom, tw2sp: Traditional Chinese (Taiwan\
+        \ Standard) to Simplified Chinese with Mainland Chinese idiom, t2tw: Traditional\
+        \ Chinese to Traditional Chinese (Taiwan Standard), tw2t: Traditional Chinese\
+        \ (Taiwan standard) to Traditional Chinese, hk2t: Traditional Chinese (Hong\
+        \ Kong variant) to Traditional Chinese, t2hk: Traditional Chinese to Traditional\
+        \ Chinese (Hong Kong variant), t2jp: Traditional Chinese Characters (Ky\u016B\
+        jitai) to New Japanese Kanji, jp2t: New Japanese Kanji (Shinjitai) to Traditional\
+        \ Chinese Characters,"
+      type: str
+      default: s2t
+clean_copyright_mapper:
+  desc: Mapper to clean copyright comments at the beginning of the text samples.
+  args: {}
+clean_email_mapper:
+  desc: Mapper to clean email in text samples.
+  args:
+    pattern:
+      desc: regular expression pattern to search for within text.
+      type: Optional[str]
+      default: ''
+    repl:
+      desc: replacement string, default is empty string.
+      type: str
+      default: ''
+clean_html_mapper:
+  desc: Mapper to clean html code in text samples.
+  args: {}
+clean_ip_mapper:
+  desc: Mapper to clean ipv4 and ipv6 address in text samples.
+  args:
+    pattern:
+      desc: regular expression pattern to search for within text.
+      type: Optional[str]
+      default: ''
+    repl:
+      desc: replacement string, default is empty string.
+      type: str
+      default: ''
+clean_links_mapper:
+  desc: Mapper to clean links like http/https/ftp in text samples.
+  args:
+    pattern:
+      desc: regular expression pattern to search for within text.
+      type: Optional[str]
+      default: ''
+    repl:
+      desc: replacement string, default is empty string.
+      type: str
+      default: ''
+dialog_intent_detection_mapper:
+  desc: Mapper to generate user's intent labels in dialog. Input from history_key,
+    query_key and response_key. Output lists of labels and analysis for queries in
+    the dialog.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    intent_candidates:
+      desc: The output intent candidates. Use the intent labels of the open domain
+        if it is None.
+      type: Optional[List[str]]
+      default: []
+    max_round:
+      desc: The max num of round in the dialog to build the prompt.
+      type: int
+      default: 10
+      min: 0
+      max: 1000000
+    labels_key:
+      desc: The key name in the meta field to store the output labels. It is 'dialog_intent_labels'
+        in default.
+      type: str
+      default: dialog_intent_labels
+    analysis_key:
+      desc: The key name in the meta field to store the corresponding analysis. It
+        is 'dialog_intent_labels_analysis' in default.
+      type: str
+      default: dialog_intent_labels_analysis
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: System prompt for the task.
+      type: Optional[str]
+      default: ''
+    query_template:
+      desc: Template for query part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    response_template:
+      desc: Template for response part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    candidate_template:
+      desc: Template for intent candidates to build the input prompt.
+      type: Optional[str]
+      default: ''
+    analysis_template:
+      desc: Template for analysis part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    labels_template:
+      desc: Template for labels to build the input prompt.
+      type: Optional[str]
+      default: ''
+    analysis_pattern:
+      desc: Pattern to parse the return intent analysis.
+      type: Optional[str]
+      default: ''
+    labels_pattern:
+      desc: Pattern to parse the return intent labels.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+dialog_sentiment_detection_mapper:
+  desc: Mapper to generate user's sentiment labels in dialog. Input from history_key,
+    query_key and response_key. Output lists of labels and analysis for queries in
+    the dialog.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    sentiment_candidates:
+      desc: The output sentiment candidates. Use open-domain sentiment labels if it
+        is None.
+      type: Optional[List[str]]
+      default: []
+    max_round:
+      desc: The max num of round in the dialog to build the prompt.
+      type: int
+      default: 10
+      min: 0
+      max: 1000000
+    labels_key:
+      desc: The key name in the meta field to store the output labels. It is 'dialog_sentiment_labels'
+        in default.
+      type: str
+      default: dialog_sentiment_labels
+    analysis_key:
+      desc: The key name in the meta field to store the corresponding analysis. It
+        is 'dialog_sentiment_labels_analysis' in default.
+      type: str
+      default: dialog_sentiment_labels_analysis
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: System prompt for the task.
+      type: Optional[str]
+      default: ''
+    query_template:
+      desc: Template for query part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    response_template:
+      desc: Template for response part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    candidate_template:
+      desc: Template for sentiment candidates to build the input prompt.
+      type: Optional[str]
+      default: ''
+    analysis_template:
+      desc: Template for analysis part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    labels_template:
+      desc: Template for labels part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    analysis_pattern:
+      desc: Pattern to parse the return sentiment analysis.
+      type: Optional[str]
+      default: ''
+    labels_pattern:
+      desc: Pattern to parse the return sentiment labels.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+dialog_sentiment_intensity_mapper:
+  desc: Mapper to predict user's sentiment intensity (from -5 to 5 in default prompt)
+    in dialog. Input from history_key, query_key and response_key. Output lists of
+    intensities and analysis for queries in the dialog.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    max_round:
+      desc: The max num of round in the dialog to build the prompt.
+      type: int
+      default: 10
+      min: 0
+      max: 1000000
+    intensities_key:
+      desc: The key name in the meta field to store the output sentiment intensities.
+        It is 'dialog_sentiment_intensity' in default.
+      type: str
+      default: dialog_sentiment_intensity
+    analysis_key:
+      desc: The key name in the meta field to store the corresponding analysis. It
+        is 'dialog_sentiment_intensity_analysis' in default.
+      type: str
+      default: dialog_sentiment_intensity_analysis
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: System prompt for the task.
+      type: Optional[str]
+      default: ''
+    query_template:
+      desc: Template for query part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    response_template:
+      desc: Template for response part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    analysis_template:
+      desc: Template for analysis part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    intensity_template:
+      desc: Template for intensity part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    analysis_pattern:
+      desc: Pattern to parse the return sentiment analysis.
+      type: Optional[str]
+      default: ''
+    intensity_pattern:
+      desc: Pattern to parse the return sentiment intensity.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+dialog_topic_detection_mapper:
+  desc: Mapper to generate user's topic labels in dialog. Input from history_key,
+    query_key and response_key. Output lists of labels and analysis for queries in
+    the dialog.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    topic_candidates:
+      desc: The output topic candidates. Use open-domain topic labels if it is None.
+      type: Optional[List[str]]
+      default: []
+    max_round:
+      desc: The max num of round in the dialog to build the prompt.
+      type: int
+      default: 10
+      min: 0
+      max: 1000000
+    labels_key:
+      desc: The key name in the meta field to store the output labels. It is 'dialog_topic_labels'
+        in default.
+      type: str
+      default: dialog_topic_labels
+    analysis_key:
+      desc: The key name in the meta field to store the corresponding analysis. It
+        is 'dialog_topic_labels_analysis' in default.
+      type: str
+      default: dialog_topic_labels_analysis
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: System prompt for the task.
+      type: Optional[str]
+      default: ''
+    query_template:
+      desc: Template for query part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    response_template:
+      desc: Template for response part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    candidate_template:
+      desc: Template for topic candidates to build the input prompt.
+      type: Optional[str]
+      default: ''
+    analysis_template:
+      desc: Template for analysis part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    labels_template:
+      desc: Template for labels part to build the input prompt.
+      type: Optional[str]
+      default: ''
+    analysis_pattern:
+      desc: Pattern to parse the return topic analysis.
+      type: Optional[str]
+      default: ''
+    labels_pattern:
+      desc: Pattern to parse the return topic labels.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+download_file_mapper:
+  desc: Mapper to download url files to local files or load them into memory.
+  args:
+    download_field:
+      desc: The filed name to get the url to download.
+      type: str
+      default: ''
+    save_dir:
+      desc: The directory to save downloaded files.
+      type: str
+      default: ''
+    save_field:
+      desc: The filed name to save the downloaded file content.
+      type: str
+      default: ''
+    resume_download:
+      desc: Whether to resume download. if True, skip the sample if it exists.
+      type: bool
+      default: false
+    timeout:
+      desc: Parameter timeout
+      type: int
+      default: 30
+      min: -1000000
+      max: 1000000
+    max_concurrent:
+      desc: Maximum concurrent downloads.
+      type: int
+      default: 10
+      min: -1000000
+      max: 1000000
+expand_macro_mapper:
+  desc: Mapper to expand macro definitions in the document body of Latex samples.
+  args: {}
+extract_entity_attribute_mapper:
+  desc: Extract attributes for given entities from the text
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    query_entities:
+      desc: Entity list to be queried.
+      type: List[str]
+      default: []
+    query_attributes:
+      desc: Attribute list to be queried.
+      type: List[str]
+      default: []
+    entity_key:
+      desc: The key name in the meta field to store the given main entity for attribute
+        extraction. It's "entity" in default.
+      type: str
+      default: main_entities
+    attribute_key:
+      desc: The key name in the meta field to store the given attribute to be extracted.
+        It's "attribute" in default.
+      type: str
+      default: attributes
+    attribute_desc_key:
+      desc: The key name in the meta field to store the extracted attribute description.
+        It's "attribute_description" in default.
+      type: str
+      default: attribute_descriptions
+    support_text_key:
+      desc: The key name in the meta field to store the attribute support text extracted
+        from the raw text. It's "support_text" in default.
+      type: str
+      default: attribute_support_texts
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt_template:
+      desc: System prompt template for the task. Need to be specified by given entity
+        and attribute.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the model input.
+      type: Optional[str]
+      default: ''
+    attr_pattern_template:
+      desc: Pattern for parsing the attribute from output. Need to be specified by
+        given attribute.
+      type: Optional[str]
+      default: ''
+    demo_pattern:
+      desc: Pattern for parsing the demonstration from output to support the attribute.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    drop_text:
+      desc: If drop the text in the output.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+extract_entity_relation_mapper:
+  desc: Extract entities and relations in the text for knowledge graph.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    entity_types:
+      desc: Pre-defined entity types for knowledge graph.
+      type: List[str]
+      default: []
+    entity_key:
+      desc: The key name to store the entities in the meta field. It's "entity" in
+        default.
+      type: str
+      default: entity
+    relation_key:
+      desc: The field name to store the relations between entities. It's "relation"
+        in default.
+      type: str
+      default: relation
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    prompt_template:
+      desc: The template of input prompt.
+      type: Optional[str]
+      default: ''
+    tuple_delimiter:
+      desc: Delimiter to separate items in outputs.
+      type: Optional[str]
+      default: ''
+    record_delimiter:
+      desc: Delimiter to separate records in outputs.
+      type: Optional[str]
+      default: ''
+    completion_delimiter:
+      desc: To mark the end of the output.
+      type: Optional[str]
+      default: ''
+    max_gleaning:
+      desc: the extra max num to call LLM to glean entities and relations.
+      type: int
+      default: 1
+      min: 0
+      max: 1000000
+    continue_prompt:
+      desc: the prompt for gleaning entities and relations.
+      type: Optional[str]
+      default: ''
+    if_loop_prompt:
+      desc: the prompt to determine whether to stop gleaning.
+      type: Optional[str]
+      default: ''
+    entity_pattern:
+      desc: Regular expression for parsing entity record.
+      type: Optional[str]
+      default: ''
+    relation_pattern:
+      desc: Regular expression for parsing relation record.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    drop_text:
+      desc: If drop the text in the output.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+extract_event_mapper:
+  desc: Extract events and relevant characters in the text
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    event_desc_key:
+      desc: The key name to store the event descriptions in the meta field. It's "event_description"
+        in default.
+      type: str
+      default: event_description
+    relevant_char_key:
+      desc: The field name to store the relevant characters to the events in the meta
+        field. It's "relevant_characters" in default.
+      type: str
+      default: relevant_characters
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: System prompt for the task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the model input.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: Regular expression for parsing model output.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    drop_text:
+      desc: If drop the text in the output.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+extract_keyword_mapper:
+  desc: Generate keywords for the text
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    keyword_key:
+      desc: The key name to store the keywords in the meta field. It's "keyword" in
+        default.
+      type: str
+      default: keyword
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    prompt_template:
+      desc: The template of input prompt.
+      type: Optional[str]
+      default: ''
+    completion_delimiter:
+      desc: To mark the end of the output.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: Regular expression for parsing keywords.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    drop_text:
+      desc: If drop the text in the output.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+extract_nickname_mapper:
+  desc: Extract nickname relationship in the text.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    nickname_key:
+      desc: The key name to store the nickname relationship in the meta field. It's
+        "nickname" in default.
+      type: str
+      default: nickname
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: System prompt for the task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the model input.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: Regular expression for parsing model output.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    drop_text:
+      desc: If drop the text in the output.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+extract_support_text_mapper:
+  desc: Extract support sub text for a summary.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    summary_key:
+      desc: The key name to store the input summary in the meta field. It's "event_description"
+        in default.
+      type: str
+      default: event_description
+    support_text_key:
+      desc: The key name to store the output support text for the summary in the meta
+        field. It's "support_text" in default.
+      type: str
+      default: support_text
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: System prompt for the task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the model input.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    drop_text:
+      desc: If drop the text in the output.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+extract_tables_from_html_mapper:
+  desc: Mapper to extract tables from HTML content.
+  args:
+    tables_field_name:
+      desc: Field name to store the extracted tables.
+      type: str
+      default: html_tables
+    retain_html_tags:
+      desc: If True, retains HTML tags in the tables; otherwise, removes them.
+      type: bool
+      default: false
+    include_header:
+      desc: If True, includes the table header; otherwise, excludes it. This parameter
+        is effective only when `retain_html_tags` is False and applies solely to the
+        extracted table content.
+      type: bool
+      default: true
+fix_unicode_mapper:
+  desc: Mapper to fix unicode errors in text samples.
+  args:
+    normalization:
+      desc: the specified form of Unicode normalization mode, which can be one of
+        ['NFC', 'NFKC', 'NFD', and 'NFKD'], default 'NFC'.
+      type: str
+      default: ''
+generate_qa_from_examples_mapper:
+  desc: 'Mapper to generate question and answer pairs from examples. You should configure
+    an empty dataset in your yaml config file: ``` generated_dataset_config: type:
+    ''EmptyFormatter'' # use `RayEmptyFormatter` when enable ray length: ${The number
+    of generated samples} feature_keys: ${text key} ``` The number of samples generated
+    is determined by the length of the empty dataset.'
+  args:
+    hf_model:
+      desc: Huggingface model ID.
+      type: str
+      default: Qwen/Qwen2.5-7B-Instruct
+    seed_file:
+      desc: Path to the seed file in chatml format.
+      type: str
+      default: ''
+    example_num:
+      desc: The number of selected examples. Randomly select N examples from "seed_file"
+        and put them into prompt as QA examples.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    similarity_threshold:
+      desc: The similarity score threshold between the generated samples and the seed
+        examples. Range from 0 to 1. Samples with similarity score less than this
+        threshold will be kept.
+      type: float
+      default: 0.7
+      min: -1000000.0
+      max: 1000000.0
+    system_prompt:
+      desc: System prompt for guiding the generation task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the input prompt. It must include one placeholder
+        '{}', which will be replaced by `example_num` formatted examples defined by
+        `example_template`.
+      type: Optional[str]
+      default: ''
+    example_template:
+      desc: Template for formatting one QA example. It must include one placeholder
+        '{}', which will be replaced by one formatted qa_pair.
+      type: Optional[str]
+      default: ''
+    qa_pair_template:
+      desc: Template for formatting a single QA pair within each example. Must include
+        two placeholders '{}' for the question and answer.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: Regular expression pattern to extract questions and answers from model
+        response.
+      type: Optional[str]
+      default: ''
+    enable_vllm:
+      desc: Whether to use vllm for inference acceleration.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the model.
+      type: Optional[Dict]
+      default: {}
+    sampling_params:
+      desc: 'Sampling parameters for text generation. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Optional[Dict]
+      default: {}
+generate_qa_from_text_mapper:
+  desc: 'Mapper to generate question and answer pairs from text. Recommended model
+    list: [ ''alibaba-pai/pai-llama3-8b-doc2qa'', ''alibaba-pai/pai-baichuan2-7b-doc2qa'',
+    ''alibaba-pai/pai-qwen1_5-4b-doc2qa'', ''alibaba-pai/pai-qwen1_5-7b-doc2qa'',
+    ''alibaba-pai/pai-qwen1_5-1b8-doc2qa'', ''alibaba-pai/pai-qwen1_5-0b5-doc2qa''
+    ] These recommended models are all trained with Chinese data and are suitable
+    for Chinese.'
+  args:
+    hf_model:
+      desc: Huggingface model ID.
+      type: str
+      default: alibaba-pai/pai-qwen1_5-7b-doc2qa
+    max_num:
+      desc: The max num of returned QA sample for each text. Not limit if it is None.
+      type: Optional[int]
+      default: 0
+    output_pattern:
+      desc: Regular expression pattern to extract questions and answers from model
+        response.
+      type: Optional[str]
+      default: ''
+    enable_vllm:
+      desc: Whether to use vllm for inference acceleration.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the model.
+      type: Optional[Dict]
+      default: {}
+    sampling_params:
+      desc: 'Sampling parameters for text generation, e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Optional[Dict]
+      default: {}
+image_blur_mapper:
+  desc: Mapper to blur images.
+  args:
+    p:
+      desc: Probability of the image being blurred.
+      type: float
+      default: 0.2
+      min: -1000000.0
+      max: 1000000.0
+    blur_type:
+      desc: Type of blur kernel, including ['mean', 'box', 'gaussian'].
+      type: str
+      default: gaussian
+    radius:
+      desc: Radius of blur kernel.
+      type: float
+      default: 2.0
+      min: -1000000.0
+      max: 1000000.0
+image_captioning_from_gpt4v_mapper:
+  desc: Mapper to generate samples whose texts are generated based on gpt-4-vision
+    and the image.
+  args:
+    mode:
+      desc: mode of text generated from images, can be one of ['reasoning', 'description',
+        'conversation', 'custom']
+      type: str
+      default: description
+    api_key:
+      desc: the API key to authenticate the request.
+      type: str
+      default: ''
+    max_token:
+      desc: the maximum number of tokens to generate. Default is 500.
+      type: int
+      default: 500
+      min: -1000000
+      max: 1000000
+    temperature:
+      desc: controls the randomness of the output (range from 0 to 1). Default is
+        0.
+      type: float
+      default: 1.0
+      min: 0
+      max: 1
+    system_prompt:
+      desc: a string prompt used to set the context of a conversation and provide
+        global guidance or rules for the gpt4-vision so that it can generate responses
+        in the expected way. If `mode` set to `custom`, the parameter will be used.
+      type: str
+      default: ''
+    user_prompt:
+      desc: a string prompt to guide the generation of gpt4-vision for each samples.
+        It's "" in default, which means no prompt provided.
+      type: str
+      default: ''
+    user_prompt_key:
+      desc: the key name of fields in samples to store prompts for each sample. It's
+        used for set different prompts for different samples. If it's none, use prompt
+        in parameter "prompt". It's None in default.
+      type: Optional[str]
+      default: ''
+    keep_original_sample:
+      desc: whether to keep the original sample. If it's set to False, there will
+        be only generated text in the final datasets and the original text will be
+        removed. It's True in default.
+      type: bool
+      default: true
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all images. ''any'':
+        keep this sample if any images meet the condition. ''all'': keep this sample
+        only if all images meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+image_captioning_mapper:
+  desc: Mapper to generate samples whose captions are generated based on another model
+    and the figure.
+  args:
+    hf_img2seq:
+      desc: model name on huggingface to generate caption
+      type: str
+      default: Salesforce/blip2-opt-2.7b
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    caption_num:
+      desc: how many candidate captions to generate for each image
+      type: int
+      default: 1
+      min: 1
+      max: 1000000
+    keep_candidate_mode:
+      desc: 'retain strategy for the generated $caption_num$ candidates. ''random_any'':
+        Retain the random one from generated captions ''similar_one_simhash'': Retain
+        the generated one that is most similar to the original caption ''all'': Retain
+        all generated captions by concatenation Note: This is a batched_OP, whose
+        input and output type are both list. Suppose there are $N$ list of input samples,
+        whose batch size is $b$, and denote caption_num as $M$. The number of total
+        samples after generation is $2Nb$ when keep_original_sample is True and $Nb$
+        when keep_original_sample is False. For ''random_any'' and ''similar_one_simhash''
+        mode, it''s $(1+M)Nb$ for ''all'' mode when keep_original_sample is True and
+        $MNb$ when keep_original_sample is False.'
+      type: str
+      default: random_any
+    keep_original_sample:
+      desc: whether to keep the original sample. If it's set to False, there will
+        be only generated captions in the final datasets and the original captions
+        will be removed. It's True in default.
+      type: bool
+      default: true
+    prompt:
+      desc: a string prompt to guide the generation of blip2 model for all samples
+        globally. It's None in default, which means no prompt provided.
+      type: Optional[str]
+      default: ''
+    prompt_key:
+      desc: the key name of fields in samples to store prompts for each sample. It's
+        used for set different prompts for different samples. If it's none, use prompt
+        in parameter "prompt". It's None in default.
+      type: Optional[str]
+      default: ''
+image_diffusion_mapper:
+  desc: Generate image by diffusion model
+  args:
+    hf_diffusion:
+      desc: diffusion model name on huggingface to generate the image.
+      type: str
+      default: CompVis/stable-diffusion-v1-4
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    torch_dtype:
+      desc: the floating point type used to load the diffusion model. Can be one of
+        ['fp32', 'fp16', 'bf16']
+      type: str
+      default: fp32
+    revision:
+      desc: The specific model version to use. It can be a branch name, a tag name,
+        a commit id, or any identifier allowed by Git.
+      type: str
+      default: main
+    strength:
+      desc: Indicates extent to transform the reference image. Must be between 0 and
+        1. image is used as a starting point and more noise is added the higher the
+        strength. The number of denoising steps depends on the amount of noise initially
+        added. When strength is 1, added noise is maximum and the denoising process
+        runs for the full number of iterations specified in num_inference_steps. A
+        value of 1 essentially ignores image.
+      type: float
+      default: 0.8
+      min: 0
+      max: 1
+    guidance_scale:
+      desc: A higher guidance scale value encourages the model to generate images
+        closely linked to the text prompt at the expense of lower image quality. Guidance
+        scale is enabled when guidance_scale > 1.
+      type: float
+      default: 7.5
+      min: -1000000.0
+      max: 1000000.0
+    aug_num:
+      desc: The image number to be produced by stable-diffusion model.
+      type: int
+      default: 1
+      min: 1
+      max: 1000000
+    keep_original_sample:
+      desc: Parameter keep_original_sample
+      type: bool
+      default: true
+    caption_key:
+      desc: the key name of fields in samples to store captions for each images. It
+        can be a string if there is only one image in each sample. Otherwise, it should
+        be a list. If it's none, ImageDiffusionMapper will produce captions for each
+        images.
+      type: Optional[str]
+      default: ''
+    hf_img2seq:
+      desc: model name on huggingface to generate caption if caption_key is None.
+      type: str
+      default: Salesforce/blip2-opt-2.7b
+image_face_blur_mapper:
+  desc: Mapper to blur faces detected in images.
+  args:
+    cv_classifier:
+      desc: OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
+      type: str
+      default: ''
+    blur_type:
+      desc: Type of blur kernel, including ['mean', 'box', 'gaussian'].
+      type: str
+      default: gaussian
+    radius:
+      desc: Radius of blur kernel.
+      type: float
+      default: 2.0
+      min: 0
+      max: 1000000.0
+image_remove_background_mapper:
+  desc: Mapper to remove background of images
+  args:
+    alpha_matting:
+      desc: Parameter alpha_matting
+      type: bool
+      default: false
+    alpha_matting_foreground_threshold:
+      desc: Parameter alpha_matting_foreground_threshold
+      type: int
+      default: 240
+      min: -1000000
+      max: 1000000
+    alpha_matting_background_threshold:
+      desc: Parameter alpha_matting_background_threshold
+      type: int
+      default: 10
+      min: -1000000
+      max: 1000000
+    alpha_matting_erode_size:
+      desc: Parameter alpha_matting_erode_size
+      type: int
+      default: 10
+      min: -1000000
+      max: 1000000
+    bgcolor:
+      desc: Parameter bgcolor
+      type: Optional[Tuple[int, int, int, int]]
+      default: (0,0,0,0)
+image_segment_mapper:
+  desc: Perform segment-anything on images and return the bounding boxes.
+  args:
+    imgsz:
+      desc: resolution for image resizing
+      type: str
+      default: '1024'
+    conf:
+      desc: confidence score threshold
+      type: str
+      default: '0.05'
+    iou:
+      desc: IoU (Intersection over Union) score threshold
+      type: str
+      default: '0.5'
+    model_path:
+      desc: the path to the FastSAM model. Model name should be one of ['FastSAM-x.pt',
+        'FastSAM-s.pt'].
+      type: str
+      default: FastSAM-x.pt
+image_tagging_mapper:
+  desc: Mapper to generate image tags.
+  args:
+    tag_field_name:
+      desc: the field name to store the tags. It's "image_tags" in default.
+      type: str
+      default: image_tags
+imgdiff_difference_area_generator_mapper:
+  desc: A fused operator for OPs that is used to run sequential OPs on the same batch
+    to allow fine-grained control on data processing.
+  args:
+    image_pair_similarity_filter_args:
+      desc: Parameter image_pair_similarity_filter_args
+      type: Optional[Dict]
+      default: {}
+    image_segment_mapper_args:
+      desc: Parameter image_segment_mapper_args
+      type: Optional[Dict]
+      default: {}
+    image_text_matching_filter_args:
+      desc: Parameter image_text_matching_filter_args
+      type: Optional[Dict]
+      default: {}
+imgdiff_difference_caption_generator_mapper:
+  desc: A fused operator for OPs that is used to run sequential OPs on the same batch
+    to allow fine-grained control on data processing.
+  args:
+    mllm_mapper_args:
+      desc: Parameter mllm_mapper_args
+      type: Optional[Dict]
+      default: {}
+    image_text_matching_filter_args:
+      desc: Parameter image_text_matching_filter_args
+      type: Optional[Dict]
+      default: {}
+    text_pair_similarity_filter_args:
+      desc: Parameter text_pair_similarity_filter_args
+      type: Optional[Dict]
+      default: {}
+mllm_mapper:
+  desc: 'Mapper to use MLLMs for visual question answering tasks. Recommended model
+    list: [ llava-hf/llava-v1.6-vicuna-7b-hf, Qwen/Qwen2-VL-7B-Instruct, ]'
+  args:
+    hf_model:
+      desc: hugginface model id.
+      type: str
+      default: llava-hf/llava-v1.6-vicuna-7b-hf
+    max_new_tokens:
+      desc: the maximum number of new tokens generated by the model.
+      type: str
+      default: '256'
+    temperature:
+      desc: used to control the randomness of generated text. The higher the temperature,
+        the more random and creative the generated text will be.
+      type: str
+      default: '0.2'
+    top_p:
+      desc: randomly select the next word from the group of words whose cumulative
+        probability reaches p.
+      type: str
+      default: ''
+    num_beams:
+      desc: the larger the beam search size, the higher the quality of the generated
+        text.
+      type: str
+      default: '1'
+nlpaug_en_mapper:
+  desc: Mapper to simply augment samples in English based on nlpaug library.
+  args:
+    sequential:
+      desc: whether combine all augmentation methods to a sequence. If it's True,
+        a sample will be augmented by all opened augmentation methods sequentially.
+        If it's False, each opened augmentation method would generate its augmented
+        samples independently.
+      type: bool
+      default: false
+    aug_num:
+      desc: 'number of augmented samples to be generated. If `sequential` is True,
+        there will be total aug_num augmented samples generated. If it''s False, there
+        will be (aug_num * #opened_aug_method) augmented samples generated.'
+      type: int
+      default: 1
+      min: 1
+      max: 1000000
+    keep_original_sample:
+      desc: whether to keep the original sample. If it's set to False, there will
+        be only generated texts in the final datasets and the original texts will
+        be removed. It's True in default.
+      type: bool
+      default: true
+    delete_random_word:
+      desc: whether to open the augmentation method of deleting random words from
+        the original texts. e.g. "I love LLM" --> "I LLM"
+      type: bool
+      default: false
+    swap_random_word:
+      desc: whether to open the augmentation method of swapping random contiguous
+        words in the original texts. e.g. "I love LLM" --> "Love I LLM"
+      type: bool
+      default: false
+    spelling_error_word:
+      desc: whether to open the augmentation method of simulating the spelling error
+        for words in the original texts. e.g. "I love LLM" --> "Ai love LLM"
+      type: bool
+      default: false
+    split_random_word:
+      desc: whether to open the augmentation method of splitting words randomly with
+        whitespaces in the original texts. e.g. "I love LLM" --> "I love LL M"
+      type: bool
+      default: false
+    keyboard_error_char:
+      desc: whether to open the augmentation method of simulating the keyboard error
+        for characters in the original texts. e.g. "I love LLM" --> "I ;ov4 LLM"
+      type: bool
+      default: false
+    ocr_error_char:
+      desc: whether to open the augmentation method of simulating the OCR error for
+        characters in the original texts. e.g. "I love LLM" --> "I 10ve LLM"
+      type: bool
+      default: false
+    delete_random_char:
+      desc: whether to open the augmentation method of deleting random characters
+        from the original texts. e.g. "I love LLM" --> "I oe LLM"
+      type: bool
+      default: false
+    swap_random_char:
+      desc: whether to open the augmentation method of swapping random contiguous
+        characters in the original texts. e.g. "I love LLM" --> "I ovle LLM"
+      type: bool
+      default: false
+    insert_random_char:
+      desc: whether to open the augmentation method of inserting random characters
+        into the original texts. e.g. "I love LLM" --> "I ^lKove LLM"
+      type: bool
+      default: false
+nlpcda_zh_mapper:
+  desc: Mapper to simply augment samples in Chinese based on nlpcda library.
+  args:
+    sequential:
+      desc: whether combine all augmentation methods to a sequence. If it's True,
+        a sample will be augmented by all opened augmentation methods sequentially.
+        If it's False, each opened augmentation method would generate its augmented
+        samples independently.
+      type: bool
+      default: false
+    aug_num:
+      desc: 'number of augmented samples to be generated. If `sequential` is True,
+        there will be total aug_num augmented samples generated. If it''s False, there
+        will be (aug_num * #opened_aug_method) augmented samples generated.'
+      type: int
+      default: 1
+      min: 1
+      max: 1000000
+    keep_original_sample:
+      desc: whether to keep the original sample. If it's set to False, there will
+        be only generated texts in the final datasets and the original texts will
+        be removed. It's True in default.
+      type: bool
+      default: true
+    replace_similar_word:
+      desc: "whether to open the augmentation method of replacing random words with\
+        \ their similar words in the original texts. e.g. \"\u8FD9\u91CC\u4E00\u5171\
+        \u67095\u79CD\u4E0D\u540C\u7684\u6570\u636E\u589E\u5F3A\u65B9\u6CD5\" -->\
+        \ \"\u8FD9\u8FB9\u4E00\u5171\u67095\u79CD\u4E0D\u540C\u7684\u6570\u636E\u589E\
+        \u5F3A\u65B9\u6CD5\""
+      type: bool
+      default: false
+    replace_homophone_char:
+      desc: "whether to open the augmentation method of replacing random characters\
+        \ with their homophones in the original texts. e.g. \"\u8FD9\u91CC\u4E00\u5171\
+        \u67095\u79CD\u4E0D\u540C\u7684\u6570\u636E\u589E\u5F3A\u65B9\u6CD5\" -->\
+        \ \"\u8FD9\u91CC\u4E00\u5171\u67095\u79CD\u4E0D\u540C\u7684\u6FD6\u636E\u589E\
+        \u5F3A\u65B9\u6CD5\""
+      type: bool
+      default: false
+    delete_random_char:
+      desc: "whether to open the augmentation method of deleting random characters\
+        \ from the original texts. e.g. \"\u8FD9\u91CC\u4E00\u5171\u67095\u79CD\u4E0D\
+        \u540C\u7684\u6570\u636E\u589E\u5F3A\u65B9\u6CD5\" --> \"\u8FD9\u91CC\u4E00\
+        \u5171\u67095\u79CD\u4E0D\u540C\u7684\u6570\u636E\u589E\u5F3A\""
+      type: bool
+      default: false
+    swap_random_char:
+      desc: "whether to open the augmentation method of swapping random contiguous\
+        \ characters in the original texts. e.g. \"\u8FD9\u91CC\u4E00\u5171\u6709\
+        5\u79CD\u4E0D\u540C\u7684\u6570\u636E\u589E\u5F3A\u65B9\u6CD5\" --> \"\u8FD9\
+        \u91CC\u4E00\u5171\u67095\u79CD\u4E0D\u540C\u7684\u6570\u636E\u5F3A\u589E\u65B9\
+        \u6CD5\""
+      type: bool
+      default: false
+    replace_equivalent_num:
+      desc: "whether to open the augmentation method of replacing random numbers with\
+        \ their equivalent representations in the original texts. **Notice**: Only\
+        \ for numbers for now. e.g. \"\u8FD9\u91CC\u4E00\u5171\u67095\u79CD\u4E0D\u540C\
+        \u7684\u6570\u636E\u589E\u5F3A\u65B9\u6CD5\" --> \"\u8FD9\u91CC\u4E00\u5171\
+        \u6709\u4F0D\u79CD\u4E0D\u540C\u7684\u6570\u636E\u589E\u5F3A\u65B9\u6CD5\""
+      type: bool
+      default: false
+optimize_qa_mapper:
+  desc: Mapper to optimize question-answer pairs.
+  args:
+    hf_model:
+      desc: Hugging Face model ID.
+      type: str
+      default: Qwen/Qwen2.5-7B-Instruct
+    system_prompt:
+      desc: System prompt for guiding the optimization task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the input for the model. Please make sure the template
+        contains one placeholder '{}', which corresponds to the question and answer
+        pair generated by param `qa_pair_template`.
+      type: Optional[str]
+      default: ''
+    qa_pair_template:
+      desc: Template for formatting the question and answer pair. Please make sure
+        the template contains two '{}' to format question and answer.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: Regular expression pattern to extract question and answer from model response.
+      type: Optional[str]
+      default: ''
+    enable_vllm:
+      desc: Whether to use VLLM for inference acceleration.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the model.
+      type: Optional[Dict]
+      default: {}
+    sampling_params:
+      desc: 'Sampling parameters for text generation (e.g., {''temperature'': 0.9,
+        ''top_p'': 0.95}).'
+      type: Optional[Dict]
+      default: {}
+optimize_query_mapper:
+  desc: Mapper to optimize query in question-answer pairs.
+  args:
+    hf_model:
+      desc: Hugging Face model ID.
+      type: str
+      default: Qwen/Qwen2.5-7B-Instruct
+    system_prompt:
+      desc: System prompt for guiding the optimization task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the input for the model. Please make sure the template
+        contains one placeholder '{}', which corresponds to the question and answer
+        pair generated by param `qa_pair_template`.
+      type: Optional[str]
+      default: ''
+    qa_pair_template:
+      desc: Template for formatting the question and answer pair. Please make sure
+        the template contains two '{}' to format question and answer.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: Regular expression pattern to extract question and answer from model response.
+      type: Optional[str]
+      default: ''
+    enable_vllm:
+      desc: Whether to use VLLM for inference acceleration.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the model.
+      type: Optional[Dict]
+      default: {}
+    sampling_params:
+      desc: 'Sampling parameters for text generation (e.g., {''temperature'': 0.9,
+        ''top_p'': 0.95}).'
+      type: Optional[Dict]
+      default: {}
+optimize_response_mapper:
+  desc: Mapper to optimize response in question-answer pairs.
+  args:
+    hf_model:
+      desc: Hugging Face model ID.
+      type: str
+      default: Qwen/Qwen2.5-7B-Instruct
+    system_prompt:
+      desc: System prompt for guiding the optimization task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the input for the model. Please make sure the template
+        contains one placeholder '{}', which corresponds to the question and answer
+        pair generated by param `qa_pair_template`.
+      type: Optional[str]
+      default: ''
+    qa_pair_template:
+      desc: Template for formatting the question and answer pair. Please make sure
+        the template contains two '{}' to format question and answer.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: Regular expression pattern to extract question and answer from model response.
+      type: Optional[str]
+      default: ''
+    enable_vllm:
+      desc: Whether to use VLLM for inference acceleration.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the model.
+      type: Optional[Dict]
+      default: {}
+    sampling_params:
+      desc: 'Sampling parameters for text generation (e.g., {''temperature'': 0.9,
+        ''top_p'': 0.95}).'
+      type: Optional[Dict]
+      default: {}
+pair_preference_mapper:
+  desc: Mapper to construct paired preference samples.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt:
+      desc: System prompt for guiding the generation task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the model input. It must contain placeholders '{query}'
+        and '{response}', and can optionally include '{reference}'.
+      type: Optional[str]
+      default: ''
+    output_pattern:
+      desc: Regular expression for parsing model output.
+      type: Optional[str]
+      default: ''
+    rejected_key:
+      desc: The field name in the sample to store the generated rejected response.
+        Defaults to 'rejected_response'.
+      type: str
+      default: rejected_response
+    reason_key:
+      desc: The field name in the sample to store the reason for generating the response.
+        Defaults to 'reason'.
+      type: str
+      default: reason
+    try_num:
+      desc: The number of retries for the API call in case of response parsing failure.
+        Defaults to 3.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+punctuation_normalization_mapper:
+  desc: Mapper to normalize unicode punctuations to English punctuations in text samples.
+  args: {}
+python_file_mapper:
+  desc: Mapper for executing Python function defined in a file.
+  args:
+    file_path:
+      desc: The path to the Python file containing the function to be executed.
+      type: str
+      default: ''
+    function_name:
+      desc: The name of the function defined in the file to be executed.
+      type: str
+      default: process_single
+    batched:
+      desc: A boolean indicating whether to process input data in batches.
+      type: bool
+      default: false
+python_lambda_mapper:
+  desc: Mapper for executing Python lambda function on data samples.
+  args:
+    lambda_str:
+      desc: A string representation of the lambda function to be executed on data
+        samples. If empty, the identity function is used.
+      type: str
+      default: ''
+    batched:
+      desc: A boolean indicating whether to process input data in batches.
+      type: bool
+      default: false
+query_intent_detection_mapper:
+  desc: Mapper to predict user's Intent label in query. Input from query_key. Output
+    intent label and corresponding score for the query.
+  args:
+    hf_model:
+      desc: Huggingface model ID to predict intent label.
+      type: str
+      default: bespin-global/klue-roberta-small-3i4k-intent-classification
+    zh_to_en_hf_model:
+      desc: Translation model from Chinese to English. If not None, translate the
+        query from Chinese to English.
+      type: Optional[str]
+      default: Helsinki-NLP/opus-mt-zh-en
+    model_params:
+      desc: model param for hf_model.
+      type: Dict
+      default: {}
+    zh_to_en_model_params:
+      desc: model param for zh_to_hf_model.
+      type: Dict
+      default: {}
+    label_key:
+      desc: The key name in the meta field to store the output label. It is 'query_intent_label'
+        in default.
+      type: str
+      default: query_intent_label
+    score_key:
+      desc: The key name in the meta field to store the corresponding label score.
+        It is 'query_intent_label_score' in default.
+      type: str
+      default: query_intent_label_score
+query_sentiment_detection_mapper:
+  desc: Mapper to predict user's sentiment label ('negative', 'neutral' and 'positive')
+    in query. Input from query_key. Output label and corresponding score for the query,
+    which is store in 'query_sentiment_label' and 'query_sentiment_label_score' in
+    Data-Juicer meta field.
+  args:
+    hf_model:
+      desc: Huggingface model ID to predict sentiment label.
+      type: str
+      default: mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis
+    zh_to_en_hf_model:
+      desc: Translation model from Chinese to English. If not None, translate the
+        query from Chinese to English.
+      type: Optional[str]
+      default: Helsinki-NLP/opus-mt-zh-en
+    model_params:
+      desc: model param for hf_model.
+      type: Dict
+      default: {}
+    zh_to_en_model_params:
+      desc: model param for zh_to_hf_model.
+      type: Dict
+      default: {}
+    label_key:
+      desc: The key name in the meta field to store the output label. It is 'query_sentiment_label'
+        in default.
+      type: str
+      default: query_sentiment_label
+    score_key:
+      desc: The key name in the meta field to store the corresponding label score.
+        It is 'query_sentiment_label_score' in default.
+      type: str
+      default: query_sentiment_label_score
+query_topic_detection_mapper:
+  desc: Mapper to predict user's topic label in query. Input from query_key. Output
+    topic label and corresponding score for the query, which is store in 'query_topic_label'
+    and 'query_topic_label_score' in Data-Juicer meta field.
+  args:
+    hf_model:
+      desc: Huggingface model ID to predict topic label.
+      type: str
+      default: dstefa/roberta-base_topic_classification_nyt_news
+    zh_to_en_hf_model:
+      desc: Translation model from Chinese to English. If not None, translate the
+        query from Chinese to English.
+      type: Optional[str]
+      default: Helsinki-NLP/opus-mt-zh-en
+    model_params:
+      desc: model param for hf_model.
+      type: Dict
+      default: {}
+    zh_to_en_model_params:
+      desc: model param for zh_to_hf_model.
+      type: Dict
+      default: {}
+    label_key:
+      desc: The key name in the meta field to store the output label. It is 'query_topic_label'
+        in default.
+      type: str
+      default: query_topic_label
+    score_key:
+      desc: The key name in the meta field to store the corresponding label score.
+        It is 'query_topic_label_score' in default.
+      type: str
+      default: query_topic_label_score
+relation_identity_mapper:
+  desc: identify relation between two entity in the text.
+  args:
+    api_model:
+      desc: API model name.
+      type: str
+      default: gpt-4o
+    source_entity:
+      desc: The source entity of the relation to be identified.
+      type: str
+      default: ''
+    target_entity:
+      desc: The target entity of the relation to be identified.
+      type: str
+      default: ''
+    output_key:
+      desc: The output key in the meta field in the samples. It is 'role_relation'
+        in default.
+      type: str
+      default: role_relation
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: ''
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: ''
+    system_prompt_template:
+      desc: System prompt template for the task.
+      type: Optional[str]
+      default: ''
+    input_template:
+      desc: Template for building the model input.
+      type: Optional[str]
+      default: ''
+    output_pattern_template:
+      desc: Regular expression template for parsing model output.
+      type: Optional[str]
+      default: ''
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    drop_text:
+      desc: If drop the text in the output.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Dict
+      default: {}
+    sampling_params:
+      desc: 'Extra parameters passed to the API call. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Dict
+      default: {}
+remove_bibliography_mapper:
+  desc: Mapper to remove bibliography at the end of documents in Latex samples.
+  args: {}
+remove_comments_mapper:
+  desc: Mapper to remove comments in different kinds of documents. Only support 'tex'
+    for now.
+  args:
+    doc_type:
+      desc: Type of document to remove comments.
+      type: Union[str, List[str]]
+      default: tex
+    inline:
+      desc: Whether to remove inline comments.
+      type: bool
+      default: true
+    multiline:
+      desc: Whether to remove multiline comments.
+      type: bool
+      default: true
+remove_header_mapper:
+  desc: Mapper to remove headers at the beginning of documents in Latex samples.
+  args:
+    drop_no_head:
+      desc: whether to drop sample texts without headers.
+      type: bool
+      default: true
+remove_long_words_mapper:
+  desc: Mapper to remove long words within a specific range.
+  args:
+    min_len:
+      desc: The min mapper word length in this op, words will be filtered if their
+        length is below this parameter.
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
+    max_len:
+      desc: The max mapper word length in this op, words will be filtered if their
+        length exceeds this parameter.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+remove_non_chinese_character_mapper:
+  desc: Mapper to remove non chinese Character in text samples.
+  args:
+    keep_alphabet:
+      desc: whether to keep alphabet
+      type: bool
+      default: true
+    keep_number:
+      desc: whether to keep number
+      type: bool
+      default: true
+    keep_punc:
+      desc: whether to keep punctuation
+      type: bool
+      default: true
+remove_repeat_sentences_mapper:
+  desc: Mapper to remove repeat sentences in text samples.
+  args:
+    lowercase:
+      desc: Whether to convert sample text to lower case
+      type: bool
+      default: false
+    ignore_special_character:
+      desc: Whether to ignore special characters when judging repeated sentences.
+        Special characters are all characters except Chinese characters, letters and
+        numbers.
+      type: bool
+      default: true
+    min_repeat_sentence_length:
+      desc: Sentences shorter than this length will not be deduplicated. If ignore_special_character
+        is set to True, then special characters are not included in this length.
+      type: int
+      default: 2
+      min: -1000000
+      max: 1000000
+remove_specific_chars_mapper:
+  desc: Mapper to clean specific chars in text samples.
+  args:
+    chars_to_remove:
+      desc: a list or a string including all characters that need to be removed from
+        text.
+      type: Union[str, List[str]]
+      default: "\u25C6\u25CF\u25A0\u25BA\u25BC\u25B2\u25B4\u2206\u25BB\u25B7\u2756\
+        \u2661\u25A1"
+remove_table_text_mapper:
+  desc: Mapper to remove table texts from text samples. Regular expression is used
+    to remove tables in the range of column number of tables.
+  args:
+    min_col:
+      desc: The min number of columns of table to remove.
+      type: int
+      default: 2
+      min: 2
+      max: 20
+    max_col:
+      desc: The max number of columns of table to remove.
+      type: int
+      default: 20
+      min: 2
+      max: 20
+remove_words_with_incorrect_substrings_mapper:
+  desc: Mapper to remove words with incorrect substrings.
+  args:
+    lang:
+      desc: sample in which language
+      type: str
+      default: en
+    tokenization:
+      desc: whether to use model to tokenize documents
+      type: bool
+      default: false
+    substrings:
+      desc: The incorrect substrings in words.
+      type: Optional[List[str]]
+      default: []
+replace_content_mapper:
+  desc: Mapper to replace all content in the text that matches a specific regular
+    expression pattern with a designated replacement string.
+  args:
+    pattern:
+      desc: regular expression pattern(s) to search for within text
+      type: Union[str, List[str], None]
+      default: []
+    repl:
+      desc: replacement string(s), default is empty string
+      type: Union[str, List[str]]
+      default: ''
+sdxl_prompt2prompt_mapper:
+  desc: Generate pairs of similar images by the SDXL model
+  args:
+    hf_diffusion:
+      desc: diffusion model name on huggingface to generate the image.
+      type: str
+      default: stabilityai/stable-diffusion-xl-base-1.0
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    torch_dtype:
+      desc: the floating point type used to load the diffusion model.
+      type: str
+      default: fp32
+    num_inference_steps:
+      desc: The larger the value, the better the image generation quality; however,
+        this also increases the time required for generation.
+      type: float
+      default: 50.0
+      min: -1000000.0
+      max: 1000000.0
+    guidance_scale:
+      desc: A higher guidance scale value encourages the model to generate images
+        closely linked to the text prompt at the expense of lower image quality. Guidance
+        scale is enabled when
+      type: float
+      default: 7.5
+      min: -1000000.0
+      max: 1000000.0
+    text_key:
+      desc: the key name used to store the first caption in the caption pair.
+      type: str
+      default: ''
+    text_key_second:
+      desc: the key name used to store the second caption in the caption pair.
+      type: str
+      default: ''
+    output_dir:
+      desc: the storage location of the generated images.
+      type: str
+      default: /home/cmgzn/.cache/data_juicer/assets
+sentence_augmentation_mapper:
+  desc: 'Mapper to augment sentences. The purpose of this operation is to enhance
+    sentences. If the input text is at the document level, the enhancement effect
+    may not be optimal. Therefore, please consider the length of the input text carefully.
+    Recommended model list: [ lmsys/vicuna-13b-v1.5 Qwen/Qwen2-7B-Instruct ]'
+  args:
+    hf_model:
+      desc: Huggingface model id.
+      type: str
+      default: Qwen/Qwen2-7B-Instruct
+    system_prompt:
+      desc: System prompt.
+      type: str
+      default: ''
+    task_sentence:
+      desc: The instruction for the current task.
+      type: str
+      default: ''
+    max_new_tokens:
+      desc: the maximum number of new tokens generated by the model.
+      type: str
+      default: '256'
+    temperature:
+      desc: used to control the randomness of generated text. The higher the temperature,
+        the more random and creative the generated text will be.
+      type: str
+      default: '0.2'
+    top_p:
+      desc: randomly select the next word from the group of words whose cumulative
+        probability reaches p.
+      type: str
+      default: ''
+    num_beams:
+      desc: the larger the beam search size, the higher the quality of the generated
+        text.
+      type: str
+      default: '1'
+    text_key:
+      desc: the key name used to store the first sentence in the text pair. (optional,
+        defalut='text')
+      type: str
+      default: ''
+    text_key_second:
+      desc: the key name used to store the second sentence in the text pair.
+      type: str
+      default: ''
+sentence_split_mapper:
+  desc: Mapper to split text samples to sentences.
+  args:
+    lang:
+      desc: split sentence of text in which language.
+      type: str
+      default: en
+text_chunk_mapper:
+  desc: Split input text to chunks.
+  args:
+    max_len:
+      desc: Split text into multi texts with this max len if not None.
+      type: Optional[int]
+      default: 0
+    split_pattern:
+      desc: Make sure split in this pattern if it is not None and force cut if the
+        length exceeds max_len.
+      type: Optional[str]
+      default: \n\n
+    overlap_len:
+      desc: Overlap length of the split texts if not split in the split pattern.
+      type: int
+      default: 0
+      min: 0
+      max: 1000000
+    tokenizer:
+      desc: 'The tokenizer name of Hugging Face tokenizers. The text length will be
+        calculate as the token num if it is offered. Otherwise, the text length equals
+        to string length. Support tiktoken tokenizer (such as gpt-4o), dashscope tokenizer
+        ( such as qwen2.5-72b-instruct) and huggingface tokenizer. :trust_remote_code:
+        for loading huggingface model'
+      type: Optional[str]
+      default: ''
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+video_captioning_from_audio_mapper:
+  desc: Mapper to caption a video according to its audio streams based on Qwen-Audio
+    model.
+  args:
+    keep_original_sample:
+      desc: whether to keep the original sample. If it's set to False, there will
+        be only captioned sample in the final datasets and the original sample will
+        be removed. It's True in default.
+      type: bool
+      default: true
+video_captioning_from_frames_mapper:
+  desc: Mapper to generate samples whose captions are generated based on an image-to-text
+    model and sampled video frames. Captions from different frames will be concatenated
+    to a single string.
+  args:
+    hf_img2seq:
+      desc: model name on huggingface to generate caption
+      type: str
+      default: Salesforce/blip2-opt-2.7b
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    caption_num:
+      desc: how many candidate captions to generate for each video
+      type: int
+      default: 1
+      min: 1
+      max: 1000000
+    keep_candidate_mode:
+      desc: 'retain strategy for the generated $caption_num$ candidates. ''random_any'':
+        Retain the random one from generated captions ''similar_one_simhash'': Retain
+        the generated one that is most similar to the original caption ''all'': Retain
+        all generated captions by concatenation Note: This is a batched_OP, whose
+        input and output type are both list. Suppose there are $N$ list of input samples,
+        whose batch size is $b$, and denote caption_num as $M$. The number of total
+        samples after generation is $2Nb$ when keep_original_sample is True and $Nb$
+        when keep_original_sample is False. For ''random_any'' and ''similar_one_simhash''
+        mode, it''s $(1+M)Nb$ for ''all'' mode when keep_original_sample is True and
+        $MNb$ when keep_original_sample is False.'
+      type: str
+      default: random_any
+    keep_original_sample:
+      desc: whether to keep the original sample. If it's set to False, there will
+        be only generated captions in the final datasets and the original captions
+        will be removed. It's True in default.
+      type: bool
+      default: true
+    prompt:
+      desc: a string prompt to guide the generation of image-to-text model for all
+        samples globally. It's None in default, which means no prompt provided.
+      type: Optional[str]
+      default: ''
+    prompt_key:
+      desc: the key name of fields in samples to store prompts for each sample. It's
+        used for set different prompts for different samples. If it's none, use prompt
+        in parameter "prompt". It's None in default.
+      type: Optional[str]
+      default: ''
+    frame_sampling_method:
+      desc: 'sampling method of extracting frame videos from the videos. Should be
+        one of ["all_keyframes", "uniform"]. The former one extracts all key frames
+        (the number of which depends on the duration of the video) and the latter
+        one extract specified number of frames uniformly from the video. Default:
+        "all_keyframes".'
+      type: str
+      default: all_keyframes
+    frame_num:
+      desc: the number of frames to be extracted uniformly from the video. Only works
+        when frame_sampling_method is "uniform". If it's 1, only the middle frame
+        will be extracted. If it's 2, only the first and the last frames will be extracted.
+        If it's larger than 2, in addition to the first and the last frames, other
+        frames will be extracted uniformly within the video duration.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    horizontal_flip:
+      desc: flip frame video horizontally (left to right).
+      type: bool
+      default: false
+    vertical_flip:
+      desc: flip frame video vertically (top to bottom).
+      type: bool
+      default: false
+video_captioning_from_summarizer_mapper:
+  desc: Mapper to generate video captions by summarizing several kinds of generated
+    texts (captions from video/audio/frames, tags from audio/frames, ...)
+  args:
+    hf_summarizer:
+      desc: the summarizer model used to summarize texts generated by other methods.
+      type: str
+      default: ''
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    consider_video_caption_from_video:
+      desc: 'whether to consider the video caption generated from video directly in
+        the summarization process. Default: True.'
+      type: bool
+      default: true
+    consider_video_caption_from_audio:
+      desc: 'whether to consider the video caption generated from audio streams in
+        the video in the summarization process. Default: True.'
+      type: bool
+      default: true
+    consider_video_caption_from_frames:
+      desc: 'whether to consider the video caption generated from sampled frames from
+        the video in the summarization process. Default: True.'
+      type: bool
+      default: true
+    consider_video_tags_from_audio:
+      desc: 'whether to consider the video tags generated from audio streams in the
+        video in the summarization process. Default: True.'
+      type: bool
+      default: true
+    consider_video_tags_from_frames:
+      desc: 'whether to consider the video tags generated from sampled frames from
+        the video in the summarization process. Default: True.'
+      type: bool
+      default: true
+    vid_cap_from_vid_args:
+      desc: 'the arg dict for video captioning from video directly with keys are the
+        arg names and values are the arg values. Default: None.'
+      type: Optional[Dict]
+      default: {}
+    vid_cap_from_frm_args:
+      desc: 'the arg dict for video captioning from sampled frames from the video
+        with keys are the arg names and values are the arg values. Default: None.'
+      type: Optional[Dict]
+      default: {}
+    vid_tag_from_aud_args:
+      desc: 'the arg dict for video tagging from audio streams in the video with keys
+        are the arg names and values are the arg values. Default: None.'
+      type: Optional[Dict]
+      default: {}
+    vid_tag_from_frm_args:
+      desc: 'the arg dict for video tagging from sampled frames from the video with
+        keys are the arg names and values are the arg values. Default: None.'
+      type: Optional[Dict]
+      default: {}
+    keep_tag_num:
+      desc: 'max number N of tags from sampled frames to keep. Too many tags might
+        bring negative influence to summarized text, so we consider to only keep the
+        N most frequent tags. Default: 5.'
+      type: int
+      default: 5
+      min: 1
+      max: 1000000
+    keep_original_sample:
+      desc: whether to keep the original sample. If it's set to False, there will
+        be only summarized captions in the final datasets and the original captions
+        will be removed. It's True in default.
+      type: bool
+      default: true
+video_captioning_from_video_mapper:
+  desc: Mapper to generate samples whose captions are generated based on a video-to-text
+    model and sampled video frame.
+  args:
+    hf_video_blip:
+      desc: video-blip model name on huggingface to generate caption
+      type: str
+      default: kpyu/video-blip-opt-2.7b-ego4d
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    caption_num:
+      desc: how many candidate captions to generate for each video
+      type: int
+      default: 1
+      min: 1
+      max: 1000000
+    keep_candidate_mode:
+      desc: 'retain strategy for the generated $caption_num$ candidates. ''random_any'':
+        Retain the random one from generated captions ''similar_one_simhash'': Retain
+        the generated one that is most similar to the original caption ''all'': Retain
+        all generated captions by concatenation Note: This is a batched_OP, whose
+        input and output type are both list. Suppose there are $N$ list of input samples,
+        whose batch size is $b$, and denote caption_num as $M$. The number of total
+        samples after generation is $2Nb$ when keep_original_sample is True and $Nb$
+        when keep_original_sample is False. For ''random_any'' and ''similar_one_simhash''
+        mode, it''s $(1+M)Nb$ for ''all'' mode when keep_original_sample is True and
+        $MNb$ when keep_original_sample is False.'
+      type: str
+      default: random_any
+    keep_original_sample:
+      desc: whether to keep the original sample. If it's set to False, there will
+        be only generated captions in the final datasets and the original captions
+        will be removed. It's True in default.
+      type: bool
+      default: true
+    prompt:
+      desc: a string prompt to guide the generation of video-blip model for all samples
+        globally. It's None in default, which means no prompt provided.
+      type: Optional[str]
+      default: ''
+    prompt_key:
+      desc: the key name of fields in samples to store prompts for each sample. It's
+        used for set different prompts for different samples. If it's none, use prompt
+        in parameter "prompt". It's None in default.
+      type: Optional[str]
+      default: ''
+    frame_sampling_method:
+      desc: 'sampling method of extracting frame videos from the videos. Should be
+        one of ["all_keyframes", "uniform"]. The former one extracts all key frames
+        (the number of which depends on the duration of the video) and the latter
+        one extract specified number of frames uniformly from the video. Default:
+        "all_keyframes".'
+      type: str
+      default: all_keyframes
+    frame_num:
+      desc: the number of frames to be extracted uniformly from the video. Only works
+        when frame_sampling_method is "uniform". If it's 1, only the middle frame
+        will be extracted. If it's 2, only the first and the last frames will be extracted.
+        If it's larger than 2, in addition to the first and the last frames, other
+        frames will be extracted uniformly within the video duration.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    horizontal_flip:
+      desc: flip frame video horizontally (left to right).
+      type: bool
+      default: false
+    vertical_flip:
+      desc: flip frame video vertically (top to bottom).
+      type: bool
+      default: false
+video_extract_frames_mapper:
+  desc: 'Mapper to extract frames from video files according to specified methods.
+    Extracted Frames Data Format: The data format for the extracted frames is a dictionary
+    mapping video key to extracted frames directory where the extracted frames are
+    saved. The dictionary follows the structure: { "video_key_1": "/${frame_dir}/video_key_1_filename/",
+    "video_key_2": "/${frame_dir}/video_key_2_filename/", ... }'
+  args:
+    frame_sampling_method:
+      desc: 'sampling method of extracting frame videos from the videos. Should be
+        one of ["all_keyframes", "uniform"]. The former one extracts all key frames
+        (the number of which depends on the duration of the video) and the latter
+        one extract specified number of frames uniformly from the video. If "duration"
+        > 0, frame_sampling_method acts on every segment. Default: "all_keyframes".'
+      type: str
+      default: all_keyframes
+    frame_num:
+      desc: the number of frames to be extracted uniformly from the video. Only works
+        when frame_sampling_method is "uniform". If it's 1, only the middle frame
+        will be extracted. If it's 2, only the first and the last frames will be extracted.
+        If it's larger than 2, in addition to the first and the last frames, other
+        frames will be extracted uniformly within the video duration. If "duration"
+        > 0, frame_num is the number of frames per segment.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    duration:
+      desc: The duration of each segment in seconds. If 0, frames are extracted from
+        the entire video. If duration > 0, the video is segmented into multiple segments
+        based on duration, and frames are extracted from each segment.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
+    frame_dir:
+      desc: Output directory to save extracted frames. If None, a default directory
+        based on the video file path is used.
+      type: str
+      default: ''
+    frame_key:
+      desc: The name of field to save generated frames info.
+      type: str
+      default: video_frames
+video_face_blur_mapper:
+  desc: Mapper to blur faces detected in videos.
+  args:
+    cv_classifier:
+      desc: OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
+      type: str
+      default: ''
+    blur_type:
+      desc: Type of blur kernel, including ['mean', 'box', 'gaussian'].
+      type: str
+      default: gaussian
+    radius:
+      desc: Radius of blur kernel.
+      type: float
+      default: 2.0
+      min: -1000000.0
+      max: 1000000.0
+video_ffmpeg_wrapped_mapper:
+  desc: Simple wrapper for FFmpeg video filters.
+  args:
+    filter_name:
+      desc: ffmpeg video filter name.
+      type: Optional[str]
+      default: ''
+    filter_kwargs:
+      desc: keyword-arguments passed to ffmpeg filter.
+      type: Optional[Dict]
+      default: {}
+    global_args:
+      desc: list-arguments passed to ffmpeg command-line.
+      type: Optional[List[str]]
+      default: []
+    capture_stderr:
+      desc: whether to capture stderr.
+      type: bool
+      default: true
+    overwrite_output:
+      desc: whether to overwrite output file.
+      type: bool
+      default: true
+video_remove_watermark_mapper:
+  desc: Remove the watermarks in videos given regions.
+  args:
+    roi_strings:
+      desc: a given list of regions the watermarks locate. The format of each can
+        be "x1, y1, x2, y2", "(x1, y1, x2, y2)", or "[x1, y1, x2, y2]".
+      type: List[str]
+      default:
+      - 0,0,0.1,0.1
+    roi_type:
+      desc: the roi string type. When the type is 'pixel', (x1, y1), (x2, y2) are
+        the locations of pixels in the top left corner and the bottom right corner
+        respectively. If the roi_type is 'ratio', the coordinates are normalized by
+        widths and heights.
+      type: str
+      default: ratio
+    roi_key:
+      desc: the key name of fields in samples to store roi_strings for each sample.
+        It's used for set different rois for different samples. If it's none, use
+        rois in parameter "roi_strings". It's None in default.
+      type: Optional[str]
+      default: ''
+    frame_num:
+      desc: the number of frames to be extracted uniformly from the video to detect
+        the pixels of watermark.
+      type: int
+      default: 10
+      min: 1
+      max: 1000000
+    min_frame_threshold:
+      desc: a coordination is considered as the location of a watermark pixel when
+        it is that in no less min_frame_threshold frames.
+      type: int
+      default: 7
+      min: 1
+      max: 1000000
+    detection_method:
+      desc: the method to detect the pixels of watermark. If it is 'pixel_value',
+        we consider the distribution of pixel value in each frame. If it is 'pixel_diversity',
+        we will consider the pixel diversity in different frames. The min_frame_threshold
+        is useless and frame_num must be greater than 1 in 'pixel_diversity' mode.
+      type: str
+      default: pixel_value
+video_resize_aspect_ratio_mapper:
+  desc: Mapper to resize videos by aspect ratio. AspectRatio = W / H.
+  args:
+    min_ratio:
+      desc: The minimum aspect ratio to enforce videos with an aspect ratio below
+        `min_ratio` will be resized to match this minimum ratio. The ratio should
+        be provided as a string in the format "9:21" or "9/21".
+      type: str
+      default: 9/21
+    max_ratio:
+      desc: The maximum aspect ratio to enforce videos with an aspect ratio above
+        `max_ratio` will be resized to match this maximum ratio. The ratio should
+        be provided as a string in the format "21:9" or "21/9".
+      type: str
+      default: 21/9
+    strategy:
+      desc: The resizing strategy to apply when adjusting the video dimensions. It
+        can be either 'decrease' to reduce the dimension or 'increase' to enlarge
+        it. Accepted values are ['decrease', 'increase'].
+      type: str
+      default: increase
+video_resize_resolution_mapper:
+  desc: Mapper to resize videos resolution. We leave the super resolution with deep
+    learning for future works.
+  args:
+    min_width:
+      desc: Videos with width less than 'min_width' will be mapped to videos with
+        equal or bigger width.
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
+    max_width:
+      desc: Videos with width more than 'max_width' will be mapped to videos with
+        equal of smaller width.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+    min_height:
+      desc: Videos with height less than 'min_height' will be mapped to videos with
+        equal or bigger height.
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
+    max_height:
+      desc: Videos with height more than 'max_height' will be mapped to videos with
+        equal or smaller height.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+    force_original_aspect_ratio:
+      desc: Enable decreasing or increasing output video width or height if necessary
+        to keep the original aspect ratio, including ['disable', 'decrease', 'increase'].
+      type: str
+      default: disable
+    force_divisible_by:
+      desc: Ensures that both the output dimensions, width and height, are divisible
+        by the given integer when used together with force_original_aspect_ratio,
+        must be a positive even number.
+      type: int
+      default: 2
+      min: 1
+      max: 1000000
+video_split_by_duration_mapper:
+  desc: Mapper to split video by duration.
+  args:
+    split_duration:
+      desc: duration of each video split in seconds.
+      type: float
+      default: 10.0
+      min: -1000000.0
+      max: 1000000.0
+    min_last_split_duration:
+      desc: The minimum allowable duration in seconds for the last video split. If
+        the duration of the last split is less than this value, it will be discarded.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
+    keep_original_sample:
+      desc: whether to keep the original sample. If it's set to False, there will
+        be only cut sample in the final datasets and the original sample will be removed.
+        It's True in default.
+      type: bool
+      default: true
+video_split_by_key_frame_mapper:
+  desc: Mapper to split video by key frame.
+  args:
+    keep_original_sample:
+      desc: whether to keep the original sample. If it's set to False, there will
+        be only split sample in the final datasets and the original sample will be
+        removed. It's True in default.
+      type: bool
+      default: true
+video_split_by_scene_mapper:
+  desc: Mapper to cut videos into scene clips.
+  args:
+    detector:
+      desc: Algorithm from `scenedetect.detectors`. Should be one of ['ContentDetector',
+        'ThresholdDetector', 'AdaptiveDetector`].
+      type: str
+      default: ContentDetector
+    threshold:
+      desc: Threshold passed to the detector.
+      type: float
+      default: 27.0
+      min: 0
+      max: 1000000.0
+    min_scene_len:
+      desc: Minimum length of any scene.
+      type: int
+      default: 15
+      min: 0
+      max: 1000000
+    show_progress:
+      desc: Whether to show progress from scenedetect.
+      type: bool
+      default: false
+video_tagging_from_audio_mapper:
+  desc: Mapper to generate video tags from audio streams extracted by video using
+    the Audio Spectrogram Transformer.
+  args:
+    hf_ast:
+      desc: path to the HF model to tag from audios.
+      type: str
+      default: MIT/ast-finetuned-audioset-10-10-0.4593
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    tag_field_name:
+      desc: the field name to store the tags. It's "video_audio_tags" in default.
+      type: str
+      default: video_audio_tags
+video_tagging_from_frames_mapper:
+  desc: Mapper to generate video tags from frames extract by video.
+  args:
+    frame_sampling_method:
+      desc: 'sampling method of extracting frame images from the videos. Should be
+        one of ["all_keyframes", "uniform"]. The former one extracts all key frames
+        (the number of which depends on the duration of the video) and the latter
+        one extract specified number of frames uniformly from the video. Default:
+        "all_keyframes".'
+      type: str
+      default: all_keyframes
+    frame_num:
+      desc: the number of frames to be extracted uniformly from the video. Only works
+        when frame_sampling_method is "uniform". If it's 1, only the middle frame
+        will be extracted. If it's 2, only the first and the last frames will be extracted.
+        If it's larger than 2, in addition to the first and the last frames, other
+        frames will be extracted uniformly within the video duration.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    tag_field_name:
+      desc: the field name to store the tags. It's "video_frame_tags" in default.
+      type: str
+      default: video_frame_tags
+whitespace_normalization_mapper:
+  desc: 'Mapper to normalize different kinds of whitespaces to whitespace '' '' (0x20)
+    in text samples. Different kinds of whitespaces can be found here: https://en.wikipedia.org/wiki/Whitespace_character'
+  args: {}
+video_tagging_from_frames_filter:
+  desc: Filter to keep samples whose videos contain the given tags.
+  args:
+    tags:
+      desc: 'a tag list to shift the videos, total tags can be found in https://github.com/xinyu1205/recognize-anything/blob/main/ram/data/ram_tag_list.txt
+        # noqa: E501'
+      type: List[str]
+      default:
+      - people
+    contain:
+      desc: require the videos containing 'any' or 'all' tags. When tags equal to
+        [], 'all' keeps all samples, 'any' keeps no sample.
+      type: str
+      default: any
+    frame_sampling_method:
+      desc: 'sampling method of extracting frame images from the videos. Should be
+        one of ["all_keyframes", "uniform"]. The former one extracts all key frames
+        (the number of which depends on the duration of the video) and the latter
+        one extract specified number of frames uniformly from the video. Default:
+        "all_keyframes".'
+      type: str
+      default: all_keyframes
+    frame_num:
+      desc: the number of frames to be extracted uniformly from the video. Only works
+        when frame_sampling_method is "uniform". If it's 1, only the middle frame
+        will be extracted. If it's 2, only the first and the last frames will be extracted.
+        If it's larger than 2, in addition to the first and the last frames, other
+        frames will be extracted uniformly within the video duration.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    tag_field_name:
+      desc: the key name to store the tags in the meta field. It's "video_frame_tags"
+        in default.
+      type: str
+      default: video_frame_tags
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all videos. ''any'':
+        keep this sample if any videos meet the condition. ''all'': keep this sample
+        only if all videos meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+video_watermark_filter:
+  desc: Filter to keep samples whose videos have no watermark with high probability.
+  args:
+    hf_watermark_model:
+      desc: watermark detection model name on huggingface.
+      type: str
+      default: amrul-hzz/watermark_detector
+    trust_remote_code:
+      desc: Whether to trust the remote code for loading huggingface model.
+      type: bool
+      default: false
+    prob_threshold:
+      desc: the predicted watermark probability threshold for samples. range from
+        0 to 1. Samples with watermark probability less than this threshold will be
+        kept.
+      type: float
+      default: 0.8
+      min: -1000000.0
+      max: 1000000.0
+    frame_sampling_method:
+      desc: 'sampling method of extracting frame images from the videos. Should be
+        one of ["all_keyframes", "uniform"]. The former one extracts all key frames
+        (the number of which depends on the duration of the video) and the latter
+        one extract specified number of frames uniformly from the video. Default:
+        "all_keyframes".'
+      type: str
+      default: all_keyframes
+    frame_num:
+      desc: the number of frames to be extracted uniformly from the video. Only works
+        when frame_sampling_method is "uniform". If it's 1, only the middle frame
+        will be extracted. If it's 2, only the first and the last frames will be extracted.
+        If it's larger than 2, in addition to the first and the last frames, other
+        frames will be extracted uniformly within the video duration.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    reduce_mode:
+      desc: 'reduce mode for multiple sampled video frames. ''avg'': Take the average
+        of multiple values ''max'': Take the max of multiple values ''min'': Take
+        the min of multiple values'
+      type: str
+      default: avg
+    any_or_all:
+      desc: 'keep this sample with ''any'' or ''all'' strategy of all videos. ''any'':
+        keep this sample if any videos meet the condition. ''all'': keep this sample
+        only if all videos meet the condition.'
+      type: str
+      default: any
+      options:
+      - any
+      - all
+word_repetition_filter:
+  desc: Filter to keep samples with word-level n-gram repetition ratio within a specific
+    range.
+  args:
+    lang:
+      desc: sample in which language.
+      type: str
+      default: en
+    tokenization:
+      desc: whether to use model to tokenize documents
+      type: bool
+      default: false
+    rep_len:
+      desc: Repetition length for word-level n-gram.
+      type: int
+      default: 10
+      min: 1
+      max: 1000000
+    min_ratio:
+      desc: The min filter ratio in this op, samples will be filtered if their word-level
+        n-gram repetition ratio is below this parameter.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
+    max_ratio:
+      desc: The max filter ratio in this op, samples will be filtered if their word-level
+        n-gram repetition ratio exceeds this parameter.
+      type: float
+      default: 0.5
+      min: -1000000.0
+      max: 1000000.0
+words_num_filter:
+  desc: Filter to keep samples with total words number within a specific range.
+  args:
+    lang:
+      desc: sample in which language.
+      type: str
+      default: en
+    tokenization:
+      desc: whether to use model to tokenize documents
+      type: bool
+      default: false
+    min_num:
+      desc: The min filter word number in this op, samples will be filtered if their
+        word number is below this parameter.
+      type: int
+      default: 10
+      min: -1000000
+      max: 1000000
+    max_num:
+      desc: The max filter word number in this op, samples will be filtered if their
+        word number exceeds this parameter.
+      type: int
+      default: 1000000
+      min: -1000000
+      max: 1000000
+naive_grouper:
+  desc: Group all samples to one batched sample.
+  args: {}
+key_value_grouper:
+  desc: Group samples to batched samples according values in given keys.
+  args:
+    group_by_keys:
+      desc: group samples according values in the keys. Support for nested keys such
+        as "__dj__stats__.text_len". It is [self.text_key] in default.
+      type: Optional[List[str]]
+      default: []
+naive_reverse_grouper:
+  desc: Split batched samples to samples.
+  args:
+    batch_meta_export_path:
+      desc: the path to export the batch meta. Just drop the batch meta if it is None.
+      type: str
+      default: ''
+frequency_specified_field_selector:
+  desc: Selector to select samples based on the sorted frequency of specified field.
+  args:
+    field_key:
+      desc: Selector based on the specified value corresponding to the target key.
+        The target key corresponding to multi-level field information need to be separated
+        by '.'.
+      type: str
+      default: ''
+    top_ratio:
+      desc: Ratio of selected top specified field value, samples will be selected
+        if their specified field values are within this parameter. When both topk
+        and top_ratio are set, the value corresponding to the smaller number of samples
+        will be applied.
+      type: Optional[float]
+      default: 0.0
+    topk:
+      desc: Number of selected top specified field value, samples will be selected
+        if their specified field values are within this parameter. When both topk
+        and top_ratio are set, the value corresponding to the smaller number of samples
+        will be applied.
+      type: Optional[int]
+      default: 0
+    reverse:
+      desc: Determine the sorting rule, if reverse=True, then sort in descending order.
+      type: bool
+      default: true
+random_selector:
+  desc: Selector to random select samples.
+  args:
+    select_ratio:
+      desc: The ratio to select. When both select_ratio and select_num are set, the
+        value corresponding to the smaller number of samples will be applied.
+      type: Optional[float]
+      default: 0.0
+    select_num:
+      desc: The number of samples to select. When both select_ratio and select_num
+        are set, the value corresponding to the smaller number of samples will be
+        applied.
+      type: int
+      default: 0
+      min: 1
+      max: 1000000
+range_specified_field_selector:
+  desc: Selector to select a range of samples based on the sorted specified field
+    value from smallest to largest.
+  args:
+    field_key:
+      desc: Selector based on the specified value corresponding to the target key.
+        The target key corresponding to multi-level field information need to be separated
+        by '.'.
+      type: str
+      default: ''
+    lower_percentile:
+      desc: The lower bound of the percentile to be sample, samples will be selected
+        if their specified field values are greater than this lower bound. When both
+        lower_percentile and lower_rank are set, the value corresponding to the larger
+        number of samples will be applied.
+      type: Optional[float]
+      default: 0.0
+    upper_percentile:
+      desc: The upper bound of the percentile to be sample, samples will be selected
+        if their specified field values are less or equal to the upper bound. When
+        both upper_percentile and upper_rank are set, the value corresponding to the
+        smaller number of samples will be applied.
+      type: Optional[float]
+      default: 0.0
+    lower_rank:
+      desc: The lower bound of the rank to be sample, samples will be selected if
+        their specified field values are greater than this lower bound. When both
+        lower_percentile and lower_rank are set, the value corresponding to the larger
+        number of samples will be applied.
+      type: Optional[int]
+      default: 0
+    upper_rank:
+      desc: The upper bound of the rank to be sample, samples will be selected if
+        their specified field values are less or equal to the upper bound. When both
+        upper_percentile and upper_rank are set, the value corresponding to the smaller
+        number of samples will be applied.
+      type: Optional[int]
+      default: 0
+tags_specified_field_selector:
+  desc: Selector to select samples based on the tags of specified field.
+  args:
+    field_key:
+      desc: Selector based on the specified value corresponding to the target key.
+        The target key corresponding to multi-level field information need to be separated
+        by '.'.
+      type: str
+      default: ''
+    target_tags:
+      desc: Target tags to be select.
+      type: List[str]
+      default: []
+topk_specified_field_selector:
+  desc: Selector to select top samples based on the sorted specified field value.
+  args:
+    field_key:
+      desc: Selector based on the specified value corresponding to the target key.
+        The target key corresponding to multi-level field information need to be separated
+        by '.'.
+      type: str
+      default: ''
+    top_ratio:
+      desc: Ratio of selected top samples, samples will be selected if their specified
+        field values are within this parameter. When both topk and top_ratio are set,
+        the value corresponding to the smaller number of samples will be applied.
+      type: Optional[float]
+      default: 0.0
+    topk:
+      desc: Number of selected top sample, samples will be selected if their specified
+        field values are within this parameter. When both topk and top_ratio are set,
+        the value corresponding to the smaller number of samples will be applied.
+      type: Optional[int]
+      default: 0
+    reverse:
+      desc: Determine the sorting rule, if reverse=True, then sort in descending order.
+      type: bool
+      default: true

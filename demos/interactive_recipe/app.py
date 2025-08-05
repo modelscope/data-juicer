@@ -34,21 +34,6 @@ def call_service_in_thread(chat_history, q):
     finally:
         q.put(None)
 
-def construct_op_dict(json_path="./configs/op_dict.json"):
-    import json
-    op_dict = {}
-    with open(json_path, 'r') as json_file:
-        ops = json.load(json_file)
-    for op in ops:
-        op_dict[op['class_name']] = op
-    return op_dict
-
-
-with open("./configs/default_ops.yaml", "r") as f:
-    DEFAULT_OPS = yaml.safe_load(f)
-
-OP_DICT = construct_op_dict()
-
 
 def downsample(data_path, n=100, seed=0):
     data = []
@@ -210,15 +195,6 @@ def get_dataset_snapshots(n=5, key='text'):
         raise ValueError('dataset path must end in .jsonl')
 
 
-def get_enabled_op_info():
-    op_info = {}
-    global DEFAULT_OPS
-    global OP_DICT
-    for op_name, _ in DEFAULT_OPS.items():
-        if st.session_state.get(f"{op_name}_enabled", False):
-            op_info[op_name] = {"op_desc": OP_DICT[op_name]['class_desc']}
-    return op_info
-
 class Visualize:
     op_pool = None
 
@@ -227,7 +203,6 @@ class Visualize:
         save_path = "./save/op_pool_state.yaml"
         if first_time:
             self.op_pool = StOperatorPool(config_path="./configs/default_ops.yaml")
-            # self.op_pool = StOperatorPool(default_ops=default_ops)
             self.op_pool.st_sync()
             st.session_state.op_pool = self.op_pool
             st.session_state.first_time = False
