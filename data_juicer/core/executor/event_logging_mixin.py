@@ -37,9 +37,11 @@ class EventType(Enum):
     JOB_START = "job_start"
     JOB_COMPLETE = "job_complete"
     JOB_FAILED = "job_failed"
+    JOB_RESTART = "job_restart"  # New: Job restart event
     PARTITION_START = "partition_start"
     PARTITION_COMPLETE = "partition_complete"
     PARTITION_FAILED = "partition_failed"
+    PARTITION_RESUME = "partition_resume"  # New: Partition resume event
     OP_START = "op_start"
     OP_COMPLETE = "op_complete"
     OP_FAILED = "op_failed"
@@ -916,6 +918,47 @@ class EventLoggingMixin:
             EventType.DAG_EXECUTION_PLAN_LOADED,
             f"DAG execution plan loaded from {plan_path}",
             event_id=event_id,
+            metadata=metadata,
+        )
+
+    def log_job_restart(
+        self,
+        restart_reason: str,
+        original_start_time: float,
+        resume_partitions: List[int],
+        resume_from_operation: int,
+        checkpoint_paths: List[str],
+    ):
+        """Log when a job is restarted after interruption."""
+        metadata = {
+            "restart_reason": restart_reason,
+            "original_start_time": original_start_time,
+            "restart_time": time.time(),
+            "resume_partitions": resume_partitions,
+            "resume_from_operation": resume_from_operation,
+            "checkpoint_paths": checkpoint_paths,
+        }
+        event_id = f"job_restart_{int(time.time())}"
+        self._log_event(
+            EventType.JOB_RESTART,
+            f"Job restarted after {restart_reason} interruption",
+            event_id=event_id,
+            metadata=metadata,
+        )
+
+    def log_partition_resume(self, partition_id: int, resume_operation: int, checkpoint_path: str, resume_reason: str):
+        """Log when a partition is resumed from a checkpoint."""
+        metadata = {
+            "resume_operation": resume_operation,
+            "checkpoint_path": checkpoint_path,
+            "resume_reason": resume_reason,
+        }
+        event_id = f"partition_resume_{partition_id}_{int(time.time())}"
+        self._log_event(
+            EventType.PARTITION_RESUME,
+            f"Partition {partition_id} resumed from operation {resume_operation} checkpoint",
+            event_id=event_id,
+            partition_id=partition_id,
             metadata=metadata,
         )
 
