@@ -248,18 +248,81 @@ class RayDataset(DJDataset):
             for i, actor in enumerate(actor_list):
                 logger.info(f"  Actor {i}: {actor._ray_actor_id.hex()[:6]}")
 
-        input_data = self.data.take_all()
-        op_buckets = {op._name: queue.Queue() for op in operators}
+        # 如果只有一个operator，直接处理
+        if len(operators) == 1:
+            return self._process_single_operator(operators[0], actors[operators[0]._name])
 
-        # 初始数据放入第一个operator的队列
-        for data_item in input_data:
-            op_buckets[operators[0]._name].put(data_item)
+        # 创建operator队列（从第二个operator开始）
+        op_buckets = {op._name: queue.Queue(maxsize=100) for op in operators[1:]}  # 添加maxsize防止内存爆炸
 
-        # 添加结束标记，数量等于第一个operator的actor数量
-        for _ in range(len(actors[operators[0]._name])):
-            op_buckets[operators[0]._name].put(None)
+        # 存储最终结果
+        final_results = []
+        result_lock = threading.Lock()
 
-        # 存储每个操作的处理结果
+        # 启动后续operator的处理线程（先启动消费者）
+        threads = []
+        for idx, op in enumerate(operators[1:], start=1):
+            for actor in actors[op._name]:
+                thread = threading.Thread(
+                    target=self._process_operator,
+                    args=(idx, op, actor, op_buckets, actors, operators, final_results, result_lock),
+                    name=f"processor_{op._name}_{actor._ray_actor_id.hex()[:6]}",
+                    daemon=True
+                )
+                thread.start()
+                threads.append(thread)
+
+        # 动态调整batch_size以控制内存使用
+        # estimated_row_count = self.data.count()
+        # batch_size = max(1, min(1000, estimated_row_count // (len(actors[operators[0]._name]) * 10)))
+        batch_size = len(actors[operators[0]._name])
+        print("\nBatchsize:", batch_size)
+        # 使用iter_batches并行处理第一个operator的数据
+        first_op = operators[0]
+        first_op_actors = actors[first_op._name]
+        actor_index = 0
+        
+        try:
+            for batch in self.data.iter_batches(batch_size=batch_size, batch_format="pyarrow"):
+                futures = []
+                rows = []
+
+                for row_idx in range(len(batch)):
+                    row_data = {col: batch[col][row_idx].as_py() for col in batch.column_names}
+                    actor = first_op_actors[actor_index % len(first_op_actors)]
+                    actor_index += 1
+                    futures.append(self._submit_to_actor(first_op, actor, row_data))
+                    rows.append(row_data)
+
+                results = ray.get(futures)
+
+                for result in results:
+                    if len(operators) > 1:
+                        op_buckets[operators[1]._name].put(result)
+                    else:
+                        with result_lock:
+                            if isinstance(result, list):
+                                final_results.extend(result)
+                            elif result is not None:
+                                final_results.append(result)
+        except Exception as e:
+            logger.error(f"Error processing data: {e}")
+            raise
+
+        # 通知下一个 op 队列终止
+        if len(operators) > 1:
+            for _ in range(len(actors[operators[1]._name])):
+                op_buckets[operators[1]._name].put(None)
+
+            for thread in threads:
+                thread.join()
+
+        if final_results:
+            self.data = from_items(final_results)
+        return self
+
+    def _process_single_operator(self, op, op_actors):
+        """处理只有一个operator的情况"""
         final_results = []
         # 为每个操作创建事件
         events = {op._name: threading.Event() for op in operators}
