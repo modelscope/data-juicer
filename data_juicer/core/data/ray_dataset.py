@@ -7,7 +7,7 @@ import threading
 import time
 from typing import Any, Dict, List, Literal, Optional, Union
 import uuid
-
+import numpy
 from data_juicer.core.ray_actor import Actor
 import pyarrow
 from jsonargparse import Namespace
@@ -103,8 +103,8 @@ class RayDataset(DJDataset):
     def __init__(self, dataset: ray.data.Dataset, dataset_path: str = None, cfg: Optional[Namespace] = None) -> None:
         self.data = preprocess_dataset(dataset, dataset_path, cfg)
         self.num_proc = getattr(cfg, "np", getattr(cfg, "num_proc", None)) if cfg else None
-        self.gpu_pg = placement_group([{"CPU": 16, "GPU": 2}], strategy="STRICT_SPREAD")
-        ray.get(self.gpu_pg.ready())
+        # self.gpu_pg = placement_group([{"CPU": 16, "GPU": 2}], strategy="STRICT_SPREAD")
+        # ray.get(self.gpu_pg.ready())
 
     def schema(self) -> Schema:
         """Get dataset schema.
@@ -155,21 +155,23 @@ class RayDataset(DJDataset):
 
         return [row[column] for row in self.data.take()]
 
-    def process2(self, operators, *, exporter=None, checkpointer=None, tracer=None) -> DJDataset:
+    def process1(self, operators, *, exporter=None, checkpointer=None, tracer=None) -> DJDataset:
         if operators is None:
             return self
         if not isinstance(operators, list):
             operators = [operators]
         for op in operators:
             self._run_single_op(op)
+            self.data = self.data.materialize()
         return self
     
     def process(self, operators, *, exporter=None, checkpointer=None, tracer=None) -> DJDataset:
-        print("test start")
         if operators is None:
             return self
         if not isinstance(operators, list):
             operators = [operators]
+
+        # 添加meta和stats列（如果需要）
         add_meta = False
         add_stats = False
         for op in operators:
@@ -179,72 +181,60 @@ class RayDataset(DJDataset):
             if isinstance(op, Filter):
                 if Fields.stats not in columns:
                     add_stats = True
+
         if add_meta:
             def process_batch_arrow(table: pyarrow.Table):
-                    new_column_data = [{} for _ in range(len(table))]
-                    new_table = table.append_column(Fields.meta, [new_column_data])
-                    return new_table
+                new_column_data = [{} for _ in range(len(table))]
+                new_table = table.append_column(Fields.meta, [new_column_data])
+                return new_table
 
             self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow")
+
         if add_stats:
             def process_batch_arrow(table: pyarrow.Table):
-                        new_column_data = [{} for _ in range(len(table))]
-                        new_table = table.append_column(Fields.stats, [new_column_data])
-                        return new_table
+                new_column_data = [{} for _ in range(len(table))]
+                new_table = table.append_column(Fields.stats, [new_column_data])
+                return new_table
 
             self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow")
 
+        # 创建所有operator的actors（保持原有逻辑不变）
         actors = {}
-        # 资源分配
-        gpu_allocate = [0,1,1]
-        actor_allocate = [0,1,1]
         cpu_allocate = 1
-        bundle_allocate = [0, 0, 0]
+
         for idx, op in enumerate(operators):
             op_proc = calculate_np(op._name, op.mem_required, op.cpu_required, self.num_proc, op.use_cuda())
-            actors[op._name] = []
-            
-            if  actor_allocate[idx] > 0 :
-                actor_num = actor_allocate[idx] 
-            else:
-                actor_num = min(op_proc, self.data.count())
             if op.use_cuda():
-                num_gpus = gpu_allocate[idx]
-                print(f"{op._name} allocate {num_gpus} GPUs.")
+                op_proc = 1
+            actors[op._name] = []
 
-                for _ in range(actor_num):  # 启动多个actor
+            actor_num = min(op_proc, self.data.count())
+
+            if op.use_cuda():
+                num_gpus = 1
+                print(f"{op._name} allocate {num_gpus} GPUs.")
+                for _ in range(actor_num):
                     actor = Actor.options(
                         name=f"actor_{op._name}_{uuid.uuid4().hex[:4]}",
                         num_gpus=num_gpus,
                         num_cpus=cpu_allocate,
-                        scheduling_strategy=PlacementGroupSchedulingStrategy(
-                            placement_group=self.gpu_pg,
-                            placement_group_capture_child_tasks=True
-                        ),
-                        placement_group_bundle_index=bundle_allocate[idx],
                     ).remote(op)
-                    
                     actor.load_model.remote()
                     actors[op._name].append(actor)
             else:
                 num_gpus = 0
                 print(f"{op._name} allocate in CPU.")
-                for _ in range(actor_num):  # 启动多个actor
+                for _ in range(actor_num):
                     actor = Actor.options(
                         name=f"actor_{op._name}_{uuid.uuid4().hex[:4]}",
                         num_gpus=num_gpus,
                         num_cpus=cpu_allocate,
-                        scheduling_strategy=PlacementGroupSchedulingStrategy(
-                            placement_group=self.gpu_pg,
-                            placement_group_capture_child_tasks=True
-                        ),
-                        placement_group_bundle_index=bundle_allocate[idx],
                     ).remote(op)
                     actors[op._name].append(actor)
 
         # 打印所有actor信息
         for op_name, actor_list in actors.items():
-            logger.info(f"Operator {op_name} 有以下actors:")
+            logger.info(f"Operator {op_name} has the following actors:")
             for i, actor in enumerate(actor_list):
                 logger.info(f"  Actor {i}: {actor._ray_actor_id.hex()[:6]}")
 
@@ -273,211 +263,214 @@ class RayDataset(DJDataset):
                 threads.append(thread)
 
         # 动态调整batch_size以控制内存使用
-        # estimated_row_count = self.data.count()
-        # batch_size = max(1, min(1000, estimated_row_count // (len(actors[operators[0]._name]) * 10)))
-        batch_size = len(actors[operators[0]._name])
-        print("\nBatchsize:", batch_size)
+        estimated_row_count = self.data.count()
+
+        # 为每个operator设置batch_size为其actor数量
+        batch_sizes = {
+            op._name: max(1, estimated_row_count // len(actors[op._name]))
+            for op in operators
+        }
+
         # 使用iter_batches并行处理第一个operator的数据
         first_op = operators[0]
         first_op_actors = actors[first_op._name]
         actor_index = 0
         
         try:
-            for batch in self.data.iter_batches(batch_size=batch_size, batch_format="pyarrow"):
-                futures = []
-                rows = []
-
+            for batch in self.data.iter_batches(
+                batch_size=batch_sizes[first_op._name],
+                batch_format="pyarrow"
+            ):
+                # 将batch转换为行数据进行处理
                 for row_idx in range(len(batch)):
-                    row_data = {col: batch[col][row_idx].as_py() for col in batch.column_names}
+                    # 提取单行数据
+                    row_data = {}
+                    for col_name in batch.column_names:
+                        col_data = batch.column(col_name)
+                        row_data[col_name] = col_data[row_idx].as_py()
+                    
+                    # 选择actor进行负载均衡
                     actor = first_op_actors[actor_index % len(first_op_actors)]
                     actor_index += 1
-                    futures.append(self._submit_to_actor(first_op, actor, row_data))
-                    rows.append(row_data)
-
-                results = ray.get(futures)
-
-                for result in results:
+                    
+                    # 异步处理数据
+                    future = self._submit_to_actor(first_op, actor, row_data)
+                    result = ray.get(future)
+                    
+                    # 将结果放入第二个operator的队列
                     if len(operators) > 1:
                         op_buckets[operators[1]._name].put(result)
                     else:
                         with result_lock:
                             if isinstance(result, list):
                                 final_results.extend(result)
-                            elif result is not None:
+                            else:
                                 final_results.append(result)
+
         except Exception as e:
             logger.error(f"Error processing data: {e}")
             raise
 
-        # 通知下一个 op 队列终止
+        # 添加结束标记到第二个operator的队列
         if len(operators) > 1:
             for _ in range(len(actors[operators[1]._name])):
                 op_buckets[operators[1]._name].put(None)
 
+            # 等待所有线程完成
             for thread in threads:
                 thread.join()
 
+        # 返回最终结果
+        if final_results:
+            self.data = from_items(final_results)
+        return self
+    
+    def _process_single_operator(self, op, op_actors):
+        """处理只有一个operator的情况"""
+        final_results = []
+        actor_index = 0
+        
+        # 动态调整batch_size
+        estimated_row_count = self.data.count()
+        batch_size = max(1, min(1000, estimated_row_count // (len(op_actors) * 10)))
+        
+        for batch in self.data.iter_batches(
+            batch_size=batch_size,
+            batch_format="pyarrow"
+        ):
+            # 将batch转换为行数据进行处理
+            for row_idx in range(len(batch)):
+                # 提取单行数据
+                row_data = {}
+                for col_name in batch.column_names:
+                    col_data = batch.column(col_name)
+                    row_data[col_name] = col_data[row_idx].as_py()
+                
+                # 选择actor进行负载均衡
+                actor = op_actors[actor_index % len(op_actors)]
+                actor_index += 1
+                
+                # 处理数据
+                future = self._submit_to_actor(op, actor, row_data)
+                result = ray.get(future)
+                
+                if isinstance(result, list):
+                    final_results.extend(result)
+                elif result is not None:
+                    final_results.append(result)
+        
         if final_results:
             self.data = from_items(final_results)
         return self
 
-    def _process_single_operator(self, op, op_actors):
-        """处理只有一个operator的情况"""
-        final_results = []
-        # 为每个操作创建事件
-        events = {op._name: threading.Event() for op in operators}
-        # 将第一个操作的事件标记为已触发
-        events[operators[0]._name].set()
-
-        # 用于跟踪每个operator的完成情况
-        op_completion_count = {op._name: 0 for op in operators}
-        # 用于同步同一operator的多个actor
-        op_actor_locks = {op._name: threading.Lock() for op in operators}
-
-        def process_operator(op_idx, op, actor):
-            op_name = op._name
-            input_queue = op_buckets[op_name]
-            
-            # 确定输出队列
-            if op_idx + 1 < len(operators):
-                output_queue = op_buckets[operators[op_idx + 1]._name]
+    def _submit_to_actor(self, op, actor, data_item):
+        """提交数据到actor进行处理"""
+        if isinstance(op, Mapper):
+            if op.use_cuda():
+                if op.is_batched_op():
+                    data_item = self.transform_to_2d_format(data_item)
+                    return actor.mapper_cuda_batched.remote(data_item)
+                else:
+                    return actor.mapper_cuda.remote(data_item)
             else:
-                output_queue = None  # 最后一个operator
-            
-            logger.info(f"Starting processor for {op_name} actor {actor._ray_actor_id.hex()[:6]}")
+                return actor.mapper_cpu.remote(data_item)
+        
+        elif isinstance(op, Filter):
+            if op.use_cuda():
+                if op.is_batched_op():
+                    return actor.filter_cuda_batched.remote(data_item)
+                else:
+                    return actor.filter_cuda_single.remote(data_item)
+            else:
+                if op.is_batched_op():
+                    return actor.filter_cpu_batched.remote(data_item)
+                else:
+                    return actor.filter_cpu_single.remote(data_item)
 
-            start_time = time.time()
+    def _process_operator(self, op_idx, op, actor, op_buckets, actors, operators, final_results, result_lock):
+        op_name = op._name
+        input_queue = op_buckets[op_name]
+        
+        # 确定输出队列
+        if op_idx + 1 < len(operators):
+            output_queue = op_buckets[operators[op_idx + 1]._name]
+        else:
+            output_queue = None
+        
+        logger.info(f"Starting processor for {op_name} actor {actor._ray_actor_id.hex()[:6]}")
 
-            while True:
-                try:
-                    # 等待前一个操作完成，才能开始处理当前操作
-                    events[op_name].wait()
+        start_time = time.time()
+        processed_count = 0
 
-                    # 从输入队列获取数据，设置超时避免无限等待
-                    data_item = input_queue.get(timeout=10.0)
-                    
-                    # 检查结束标记
-                    if data_item is None:
-                        with op_actor_locks[op_name]:
-                            op_completion_count[op_name] += 1
-                            # 当所有actor都收到结束标记后，才传递到下一个队列
-                            if op_completion_count[op_name] == len(actors[op_name]) and output_queue:
-                                # 向下一个operator传递与下一个operator的actor数量相同的结束标记
-                                next_op_name = operators[op_idx + 1]._name if op_idx + 1 < len(operators) else None
-                                if next_op_name:
-                                    for _ in range(len(actors[next_op_name])):
-                                        output_queue.put(None)
-                        break
-                    
-                    # 处理数据
-                    future = None
-                    if isinstance(op, Mapper):
-                        if op.use_cuda():
-                            if op.is_batched_op == True:
-                                future = actor.mapper_cuda_batched.remote(self.transform_to_2d_format(data_item))
+        while True:
+            try:
+                # 从输入队列获取数据
+                data_item = input_queue.get(timeout=30.0)  # 增加timeout
+                
+                # 检查结束标记
+                if data_item is None:
+                    if output_queue:
+                        # 向下一个operator传递结束标记
+                        for _ in range(len(actors[operators[op_idx + 1]._name])):
+                            output_queue.put(None)
+                    break
+                
+                # 处理数据
+                future = self._submit_to_actor(op, actor, data_item)
+                results = ray.get(future)
+                processed_count += 1
+
+                if isinstance(op, Mapper):
+                    if output_queue:
+                        output_queue.put(results)
+                    else:
+                        with result_lock:
+                            if isinstance(results, list):
+                                final_results.extend(results)
                             else:
-                                future = actor.mapper_cuda.remote(data_item)  
-                        else:
-                            future = actor.mapper_cpu.remote(data_item)  
-                        
-                        result = ray.get(future)
-                        # print("res:", result)
-                        # 将结果发送到下一个队列
+                                final_results.append(results)
+                
+                elif isinstance(op, Filter):
+                    if results:
                         if output_queue:
-                            output_queue.put(result)
-                        else:
-                            final_results.append(result)
-                    
-                    elif isinstance(op, Filter):
-                        if op.use_cuda():
-                            if op.is_batched_op == True:
-                                future = actor.filter_cuda_batched.remote(data_item)
-                            else:
-                                future = actor.filter_cuda_single.remote(data_item)  
-                        else:
-                            if op.is_batched_op == True:
-                                future = actor.filter_cpu_batched.remote(data_item)  
-                            else:
-                                future = actor.filter_cpu_single.remote(data_item)  
-                        
-                        results = ray.get(future)
-
-                        if results:
                             if isinstance(results, list):
                                 for result in results:
-                                    if output_queue:
-                                        output_queue.put(result)
-                                    else:
-                                        final_results.append(result)
+                                    output_queue.put(result)
                             else:
-                                if output_queue:
-                                    output_queue.put(results)
+                                output_queue.put(results)
+                        else:
+                            with result_lock:
+                                if isinstance(results, list):
+                                    final_results.extend(results)
                                 else:
                                     final_results.append(results)
-                        
-                        if op.stats_export_path is not None:
-                            actor.export_stats(results, op.stats_export_path)
 
-                    # 标记任务完成
-                    input_queue.task_done()
+                # 标记任务完成
+                input_queue.task_done()
 
-                    # 处理完成后，设置当前操作的事件，允许下一个操作开始
-                    if op_idx + 1 < len(operators):
-                        events[operators[op_idx + 1]._name].set()
+            except queue.Empty:
+                logger.warning(f"{op_name} actor {actor._ray_actor_id.hex()[:6]} queue timeout, processed {processed_count} items")
+                continue
+            except Exception as e:
+                logger.error(f"Error in {op_name} actor {actor._ray_actor_id.hex()[:6]}: {e}")
+                input_queue.task_done()
+                break
 
-                except queue.Empty:
-                    logger.info(f"{op_name} actor {actor._ray_actor_id.hex()[:6]} queue timeout, checking if pipeline is complete")
-                    continue
-                except Exception as e:
-                    logger.error(f"Error in {op_name} actor {actor._ray_actor_id.hex()[:6]}: {e}")
-                    input_queue.task_done()
-                    break
-
-            end_time = time.time()
-            logger.info(f"Processor for {op_name} actor {actor._ray_actor_id.hex()[:6]} completed in {end_time - start_time:.2f} seconds")
-
-        # 为每个operator的每个actor启动处理线程
-        threads = []
-        for idx, op in enumerate(operators):
-            for actor in actors[op._name]:
-                thread = threading.Thread(
-                    target=process_operator, 
-                    args=(idx, op, actor),
-                    name=f"processor_{op._name}_{actor._ray_actor_id.hex()[:6]}"
-                )
-                thread.daemon = True
-                thread.start()
-                threads.append(thread)
-
-        # 等待所有线程完成
-        for thread in threads:
-            thread.join()
-        print("\nfinal res:", final_results)
-        # 合并最终结果
-        # flattened_data = list(chain.from_iterable(final_results))
-        # print("\nfinal res:", flattened_data)
-        # self.data = from_items(flattened_data)
-        self.data = from_items(final_results)
-        return self.data
-    
+        end_time = time.time()
+        logger.info(f"Processor for {op_name} actor {actor._ray_actor_id.hex()[:6]} completed in {end_time - start_time:.2f} seconds, processed {processed_count} items")
     def transform_to_2d_format(self, data):
         """
         将第二种格式的数据转换为第一种嵌套格式
         根据 __dj__source_file__ 的唯一值来分组所有字段
         """
-        print("data before trans", data)
+        # print("data before trans", data)
         if '__dj__source_file__' not in data:
             raise ValueError("数据中必须包含 '__dj__source_file__' 字段")
         
         source_files = data['__dj__source_file__']
         
         # 获取唯一的源文件并保持顺序
-        unique_sources = []
-        seen = set()
-        for source in source_files:
-            if source not in seen:
-                unique_sources.append(source)
-                seen.add(source)
+        unique_sources = list(dict.fromkeys(source_files))
         
         # 为每个唯一源文件创建索引映射
         source_to_indices = {}
@@ -529,7 +522,7 @@ class RayDataset(DJDataset):
                     indices = source_to_indices[source]
                     # 为每个组重复该值
                     transformed_data[field_name].append(field_value)
-        print("data after trans", transformed_data)
+        # print("data after trans", transformed_data)
         return transformed_data
 
     
