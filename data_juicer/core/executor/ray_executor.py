@@ -73,6 +73,8 @@ class RayExecutor(ExecutorBase):
             keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
             **self.cfg.export_extra_args,
         )
+        self.op_enable_parallel = True
+        # self.op_enable_parallel = False
 
     def run(self, load_data_np: Optional[PositiveInt] = None, skip_return=False):
         """
@@ -99,7 +101,10 @@ class RayExecutor(ExecutorBase):
             # 3. data process
             logger.info("Processing data...")
             tstart = time.time()
-            dataset.process(ops)
+            if self.op_enable_parallel:
+                dataset.process_parallel(ops)
+            else:
+                dataset.process(ops)
 
             # 4. data export
             logger.info("Exporting dataset to disk...")
