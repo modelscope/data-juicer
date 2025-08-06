@@ -30,11 +30,28 @@ class FileUtilsTest(DataJuicerTestCaseBase):
 
         self.assertEqual(find_files_with_suffix(os.path.join(self.temp_output_path, 'test1.txt')),
                          {'.txt': [os.path.join(self.temp_output_path, 'test1.txt')]})
-        self.assertEqual(find_files_with_suffix(self.temp_output_path),
-                         {'.txt': [os.path.join(self.temp_output_path, 'test1.txt'), os.path.join(self.temp_output_path, 'test2.txt')],
-                          '.md': [os.path.join(self.temp_output_path, 'test3.md')]})
-        self.assertEqual(find_files_with_suffix(self.temp_output_path, 'txt'),
-                         {'.txt': [os.path.join(self.temp_output_path, 'test1.txt'), os.path.join(self.temp_output_path, 'test2.txt')]})
+        result = find_files_with_suffix(self.temp_output_path)
+        expected = {
+            '.txt': sorted([
+                os.path.join(self.temp_output_path, 'test1.txt'),
+                os.path.join(self.temp_output_path, 'test2.txt')
+            ]),
+            '.md': [os.path.join(self.temp_output_path, 'test3.md')]
+        }
+        for suffix in result:
+            result[suffix] = sorted(result[suffix])
+        self.assertEqual(result, expected)
+
+        result_txt = find_files_with_suffix(self.temp_output_path, 'txt')
+        expected_txt = {
+            '.txt': sorted([
+                os.path.join(self.temp_output_path, 'test1.txt'),
+                os.path.join(self.temp_output_path, 'test2.txt')
+            ])
+        }
+        for suffix in result_txt:
+            result_txt[suffix] = sorted(result_txt[suffix])
+        self.assertEqual(result_txt, expected_txt)
 
     def test_is_absolute_path(self):
         self.assertFalse(is_absolute_path(self.temp_output_path))
