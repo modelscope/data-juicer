@@ -23,7 +23,7 @@ class TextEntityDependencyFilter(Filter):
 
         :param lang: language of the text in the samples. 'en' for detection of
             entities in English and 'zh' for detection of entities in Chinese.
-        :param mini_dependency_num: The min token number in the filtering.
+        :param min_dependency_num: The min token number in the filtering.
             Objects is independent if their number of edges in the dependency
             tree is below this parameter.
         :param any_or_all: keep this sample with 'any' or 'all' strategy.
