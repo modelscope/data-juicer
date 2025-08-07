@@ -14,33 +14,35 @@ nested_aggregator:
     output_key:
       desc: The output key in the aggregation field in the samples. It is same as
         the input_key in default.
-      type: str
-      default: ''
+      type: Optional[str]
+      default: null
     max_token_num:
       desc: The max token num of the total tokens of the sub documents. Without limitation
         if it is None.
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: The system prompt.
       type: Optional[str]
-      default: ''
+      default: null
     sub_doc_template:
       desc: The template for input text in each sample.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: The input template.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -92,31 +94,33 @@ entity_attribute_aggregator:
       desc: The max token num of the total tokens of the sub documents. Without limitation
         if it is None.
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt_template:
       desc: The system prompt template.
       type: Optional[str]
-      default: ''
+      default: null
     example_prompt:
       desc: The example part in the system prompt.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: The input template.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern_template:
       desc: The output template.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -147,35 +151,35 @@ meta_tags_aggregator:
     target_tags:
       desc: The tags that is supposed to be mapped to.
       type: Optional[List[str]]
-      default: []
+      default: null
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: The system prompt.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: The input template.
       type: Optional[str]
-      default: ''
+      default: null
     target_tag_template:
       desc: The tap template for target tags.
       type: Optional[str]
-      default: ''
+      default: null
     tag_template:
       desc: The tap template for target tags.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: The output pattern.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -222,27 +226,29 @@ most_relevant_entities_aggregator:
       desc: The max token num of the total tokens of the sub documents. Without limitation
         if it is None.
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt_template:
       desc: The system prompt template.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: The input template.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: The output pattern.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -297,7 +303,7 @@ document_minhash_deduplicator:
     ignore_pattern:
       desc: whether to ignore sub-strings with specific pattern when computing minhash
       type: Optional[str]
-      default: ''
+      default: null
     num_permutations:
       desc: number of permutations in minhash computing
       type: int
@@ -317,16 +323,20 @@ document_minhash_deduplicator:
         an optimal params computation algorithm by minimize the weighted sum of probs
         of False Positives and False Negatives
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     num_rows_per_band:
       desc: number of rows in each band in LSH. Default it's None, and it will be
         determined by an optimal params computation algorithm
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     tokenizer_model:
       desc: path for the sentencepiece model, used for sentencepiece tokenization.
       type: Optional[str]
-      default: ''
+      default: null
 document_simhash_deduplicator:
   desc: Deduplicator to deduplicate samples at document-level using SimHash.
   args:
@@ -349,7 +359,7 @@ document_simhash_deduplicator:
     ignore_pattern:
       desc: whether to ignore sub-strings with specific pattern when computing simhash
       type: Optional[str]
-      default: ''
+      default: null
     num_blocks:
       desc: number of blocks in simhash computing
       type: int
@@ -370,15 +380,15 @@ general_fused_op:
     (OPs) on the same batch, enabling fine-grained control over data processing.
   args:
     batch_size:
-      desc: Parameter batch_size
+      desc: the batch size of the input samples.
       type: int
       default: 1
       min: -1000000
       max: 1000000
     fused_op_list:
-      desc: Parameter fused_op_list
-      type: List
-      default: []
+      desc: a list of OPs to be fused.
+      type: Optional[List]
+      default: null
 image_deduplicator:
   desc: Deduplicator to deduplicate samples at document-level using exact matching
     of images between documents.
@@ -415,7 +425,7 @@ ray_bts_minhash_deduplicator:
     ignore_pattern:
       desc: whether to ignore sub-strings with specific pattern when computing minhash
       type: Optional[str]
-      default: ''
+      default: null
     num_permutations:
       desc: number of permutations in minhash computing
       type: int
@@ -435,16 +445,20 @@ ray_bts_minhash_deduplicator:
         an optimal params computation algorithm by minimize the weighted sum of probs
         of False Positives and False Negatives
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     num_rows_per_band:
       desc: number of rows in each band in LSH. Default it's None, and it will be
         determined by an optimal params computation algorithm
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     tokenizer_model:
       desc: path for the sentencepiece model, used for sentencepiece tokenization.
       type: Optional[str]
-      default: ''
+      default: null
     union_find_parallel_num:
       desc: number of parallel workers for union-find algorithm. Default it's 'auto',
         and it will be determined by half of the number of CPUs.
@@ -455,37 +469,51 @@ ray_bts_minhash_deduplicator:
         it's 256.
       type: Optional[int]
       default: 256
+      min: -1000000
+      max: 1000000
     max_pending_edge_buffer_task:
       desc: max number of pending edge buffer ray tasks. Default it's 20.
       type: Optional[int]
       default: 20
+      min: -1000000
+      max: 1000000
     num_edge_buffer_task_returns:
       desc: number of edge buffer tasks for `ray.wait` to return. Default it's 10.
       type: Optional[int]
       default: 10
+      min: -1000000
+      max: 1000000
     max_pending_filter_tasks:
       desc: max number of pending filter ray tasks. Default it's 20.
       type: Optional[int]
       default: 20
+      min: -1000000
+      max: 1000000
     num_filter_task_returns:
       desc: number of filter tasks for `ray.wait` to return. Default it's 10.
       type: Optional[int]
       default: 10
+      min: -1000000
+      max: 1000000
     merge_batch_size:
       desc: batch size for BTS operations. Default it's 1000.
       type: Optional[int]
       default: 1000
+      min: -1000000
+      max: 1000000
     minhash_batch_size:
       desc: batch size for MinHash computation. If "auto", it will be set to default
         value on CPU(1024), or auto calculated per available GPU memory and memory_per_sample
         setting for GPU.
-      type: Union[str, int, None]
+      type: Union[int, str, None]
       default: auto
     memory_per_sample:
       desc: estimated memory needed per sample in MB. Used to calculate batch size
         based on available GPU memory. Default is 0.1 MB per sample.
       type: Optional[float]
       default: 0.1
+      min: -1000000.0
+      max: 1000000.0
 ray_document_deduplicator:
   desc: Deduplicator to deduplicate samples at document-level using exact matching.
   args:
@@ -519,7 +547,7 @@ ray_image_deduplicator:
       type: str
       default: redis://localhost:6379
     method:
-      desc: Parameter method
+      desc: the hash method to use
       type: str
       default: phash
 ray_video_deduplicator:
@@ -1119,17 +1147,17 @@ llm_analysis_filter: &id001
       min: -1000000.0
       max: 1000000.0
     is_hf_model:
-      desc: Parameter is_hf_model
+      desc: If true, use huggingface model. Otherwise, use API.
       type: bool
       default: false
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     input_keys:
       desc: Sub set of keys in the sample. Support data with multi fields such as
         'query', 'analysis' and 'answer' in RFT data.
@@ -1144,15 +1172,15 @@ llm_analysis_filter: &id001
     system_prompt:
       desc: System prompt for the task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the model input.
       type: Optional[str]
-      default: ''
+      default: null
     field_template:
       desc: Template for each field in the prompt.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -1178,7 +1206,7 @@ llm_analysis_filter: &id001
       desc: A list of keys used to calculate the average dimension score, only the
         dimension scores associated with these keys are used in the average calculation.
       type: Optional[List[str]]
-      default: []
+      default: null
 llm_difficulty_score_filter: *id001
 llm_quality_score_filter: *id001
 maximum_line_length_filter:
@@ -1384,7 +1412,7 @@ suffix_filter:
       desc: 'the suffix of text that will be keep. For example: ''.txt'', ''txt''
         or [''txt'', ''.pdf'', ''docx'']'
       type: Union[str, List[str]]
-      default: []
+      default: '[]'
 text_action_filter:
   desc: Filter to keep texts those contain actions in the text.
   args:
@@ -1394,7 +1422,8 @@ text_action_filter:
       type: str
       default: en
     min_action_num:
-      desc: Parameter min_action_num
+      desc: The min action number in the filtering. samples will be filtered if their
+        action number in the text is below this parameter.
       type: int
       default: 1
       min: -1000000
@@ -1409,7 +1438,8 @@ text_entity_dependency_filter:
       type: str
       default: en
     min_dependency_num:
-      desc: Parameter min_dependency_num
+      desc: The min token number in the filtering. Objects is independent if their
+        number of edges in the dependency tree is below this parameter.
       type: int
       default: 1
       min: -1000000
@@ -1703,7 +1733,7 @@ video_motion_score_filter:
         will be rescaled to (size * height / width, size). Default `None` to keep
         the original size.
       type: Union[int, Tuple[int], Tuple[int, int], None]
-      default: 0
+      default: null
     max_size:
       desc: The maximum allowed for the longer edge of resized frames. If the longer
         edge of frames is greater than max_size after being resized according to size,
@@ -1711,7 +1741,9 @@ video_motion_score_filter:
         result, the smaller edge may be shorter than size. This is only supported
         if size is an int.
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     divisible:
       desc: The number that the dimensions must be divisible by.
       type: int
@@ -1819,9 +1851,7 @@ video_ocr_area_ratio_filter:
       desc: 'texts in which languages should be detected. Default: [''ch_sim'', ''en''].
         Full language list can be found here: https://www.jaided.ai/easyocr/.'
       type: Union[str, List[str]]
-      default:
-      - ch_sim
-      - en
+      default: '[''ch_sim'', ''en'']'
     any_or_all:
       desc: 'keep this sample with ''any'' or ''all'' strategy of all videos. ''any'':
         keep this sample if any videos meet the condition. ''all'': keep this sample
@@ -1871,46 +1901,49 @@ human_preference_annotation_mapper:
   desc: Operator for human preference annotation using Label Studio.
   args:
     label_config_file:
-      desc: Parameter label_config_file
+      desc: Path to the label config file
       type: str
       default: ''
     answer1_key:
-      desc: Parameter answer1_key
+      desc: Key for the first answer
       type: str
       default: answer1
     answer2_key:
-      desc: Parameter answer2_key
+      desc: Key for the second answer
       type: str
       default: answer2
     prompt_key:
-      desc: Parameter prompt_key
+      desc: Key for the prompt/question
       type: str
       default: prompt
     chosen_key:
-      desc: Parameter chosen_key
+      desc: Key for the chosen answer
       type: str
       default: chosen
     rejected_key:
-      desc: Parameter rejected_key
+      desc: Key for the rejected answer
       type: str
       default: rejected
 audio_add_gaussian_noise_mapper:
   desc: Mapper to add gaussian noise to audio.
   args:
     min_amplitude:
-      desc: Parameter min_amplitude
+      desc: 'float unit: linear amplitude. Default: 0.001. Minimum noise amplification
+        factor.'
       type: float
       default: 0.001
       min: -1000000.0
       max: 1000000.0
     max_amplitude:
-      desc: Parameter max_amplitude
+      desc: 'float unit: linear amplitude. Default: 0.015. Maximum noise amplification
+        factor.'
       type: float
       default: 0.015
       min: -1000000.0
       max: 1000000.0
     p:
-      desc: Parameter p
+      desc: 'float range: [0.0, 1.0]. Default: 0.5. The probability of applying this
+        transform.'
       type: float
       default: 0.5
       min: -1000000.0
@@ -1921,15 +1954,15 @@ audio_ffmpeg_wrapped_mapper:
     filter_name:
       desc: ffmpeg audio filter name.
       type: Optional[str]
-      default: ''
+      default: null
     filter_kwargs:
       desc: keyword-arguments passed to ffmpeg filter.
       type: Optional[Dict]
-      default: {}
+      default: null
     global_args:
       desc: list-arguments passed to ffmpeg command-line.
       type: Optional[List[str]]
-      default: []
+      default: null
     capture_stderr:
       desc: whether to capture stderr.
       type: bool
@@ -1948,31 +1981,31 @@ calibrate_qa_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: System prompt for the calibration task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the model input.
       type: Optional[str]
-      default: ''
+      default: null
     reference_template:
       desc: Template for formatting the reference text.
       type: Optional[str]
-      default: ''
+      default: null
     qa_pair_template:
       desc: Template for formatting question-answer pairs.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: Regular expression for parsing model output.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -1999,31 +2032,31 @@ calibrate_query_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: System prompt for the calibration task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the model input.
       type: Optional[str]
-      default: ''
+      default: null
     reference_template:
       desc: Template for formatting the reference text.
       type: Optional[str]
-      default: ''
+      default: null
     qa_pair_template:
       desc: Template for formatting question-answer pairs.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: Regular expression for parsing model output.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -2050,31 +2083,31 @@ calibrate_response_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: System prompt for the calibration task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the model input.
       type: Optional[str]
-      default: ''
+      default: null
     reference_template:
       desc: Template for formatting the reference text.
       type: Optional[str]
-      default: ''
+      default: null
     qa_pair_template:
       desc: Template for formatting question-answer pairs.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: Regular expression for parsing model output.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -2121,7 +2154,7 @@ clean_email_mapper:
     pattern:
       desc: regular expression pattern to search for within text.
       type: Optional[str]
-      default: ''
+      default: null
     repl:
       desc: replacement string, default is empty string.
       type: str
@@ -2135,7 +2168,7 @@ clean_ip_mapper:
     pattern:
       desc: regular expression pattern to search for within text.
       type: Optional[str]
-      default: ''
+      default: null
     repl:
       desc: replacement string, default is empty string.
       type: str
@@ -2146,7 +2179,7 @@ clean_links_mapper:
     pattern:
       desc: regular expression pattern to search for within text.
       type: Optional[str]
-      default: ''
+      default: null
     repl:
       desc: replacement string, default is empty string.
       type: str
@@ -2164,7 +2197,7 @@ dialog_intent_detection_mapper:
       desc: The output intent candidates. Use the intent labels of the open domain
         if it is None.
       type: Optional[List[str]]
-      default: []
+      default: null
     max_round:
       desc: The max num of round in the dialog to build the prompt.
       type: int
@@ -2184,43 +2217,43 @@ dialog_intent_detection_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: System prompt for the task.
       type: Optional[str]
-      default: ''
+      default: null
     query_template:
       desc: Template for query part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     response_template:
       desc: Template for response part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     candidate_template:
       desc: Template for intent candidates to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     analysis_template:
       desc: Template for analysis part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     labels_template:
       desc: Template for labels to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     analysis_pattern:
       desc: Pattern to parse the return intent analysis.
       type: Optional[str]
-      default: ''
+      default: null
     labels_pattern:
       desc: Pattern to parse the return intent labels.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -2250,7 +2283,7 @@ dialog_sentiment_detection_mapper:
       desc: The output sentiment candidates. Use open-domain sentiment labels if it
         is None.
       type: Optional[List[str]]
-      default: []
+      default: null
     max_round:
       desc: The max num of round in the dialog to build the prompt.
       type: int
@@ -2270,43 +2303,43 @@ dialog_sentiment_detection_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: System prompt for the task.
       type: Optional[str]
-      default: ''
+      default: null
     query_template:
       desc: Template for query part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     response_template:
       desc: Template for response part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     candidate_template:
       desc: Template for sentiment candidates to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     analysis_template:
       desc: Template for analysis part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     labels_template:
       desc: Template for labels part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     analysis_pattern:
       desc: Pattern to parse the return sentiment analysis.
       type: Optional[str]
-      default: ''
+      default: null
     labels_pattern:
       desc: Pattern to parse the return sentiment labels.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -2351,39 +2384,39 @@ dialog_sentiment_intensity_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: System prompt for the task.
       type: Optional[str]
-      default: ''
+      default: null
     query_template:
       desc: Template for query part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     response_template:
       desc: Template for response part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     analysis_template:
       desc: Template for analysis part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     intensity_template:
       desc: Template for intensity part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     analysis_pattern:
       desc: Pattern to parse the return sentiment analysis.
       type: Optional[str]
-      default: ''
+      default: null
     intensity_pattern:
       desc: Pattern to parse the return sentiment intensity.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -2412,7 +2445,7 @@ dialog_topic_detection_mapper:
     topic_candidates:
       desc: The output topic candidates. Use open-domain topic labels if it is None.
       type: Optional[List[str]]
-      default: []
+      default: null
     max_round:
       desc: The max num of round in the dialog to build the prompt.
       type: int
@@ -2432,43 +2465,43 @@ dialog_topic_detection_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: System prompt for the task.
       type: Optional[str]
-      default: ''
+      default: null
     query_template:
       desc: Template for query part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     response_template:
       desc: Template for response part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     candidate_template:
       desc: Template for topic candidates to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     analysis_template:
       desc: Template for analysis part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     labels_template:
       desc: Template for labels part to build the input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     analysis_pattern:
       desc: Pattern to parse the return topic analysis.
       type: Optional[str]
-      default: ''
+      default: null
     labels_pattern:
       desc: Pattern to parse the return topic labels.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -2505,7 +2538,7 @@ download_file_mapper:
       type: bool
       default: false
     timeout:
-      desc: Parameter timeout
+      desc: Timeout for download.
       type: int
       default: 30
       min: -1000000
@@ -2557,29 +2590,29 @@ extract_entity_attribute_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt_template:
       desc: System prompt template for the task. Need to be specified by given entity
         and attribute.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the model input.
       type: Optional[str]
-      default: ''
+      default: null
     attr_pattern_template:
       desc: Pattern for parsing the attribute from output. Need to be specified by
         given attribute.
       type: Optional[str]
-      default: ''
+      default: null
     demo_pattern:
       desc: Pattern for parsing the demonstration from output to support the attribute.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -2624,27 +2657,27 @@ extract_entity_relation_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     prompt_template:
       desc: The template of input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     tuple_delimiter:
       desc: Delimiter to separate items in outputs.
       type: Optional[str]
-      default: ''
+      default: null
     record_delimiter:
       desc: Delimiter to separate records in outputs.
       type: Optional[str]
-      default: ''
+      default: null
     completion_delimiter:
       desc: To mark the end of the output.
       type: Optional[str]
-      default: ''
+      default: null
     max_gleaning:
       desc: the extra max num to call LLM to glean entities and relations.
       type: int
@@ -2654,19 +2687,19 @@ extract_entity_relation_mapper:
     continue_prompt:
       desc: the prompt for gleaning entities and relations.
       type: Optional[str]
-      default: ''
+      default: null
     if_loop_prompt:
       desc: the prompt to determine whether to stop gleaning.
       type: Optional[str]
-      default: ''
+      default: null
     entity_pattern:
       desc: Regular expression for parsing entity record.
       type: Optional[str]
-      default: ''
+      default: null
     relation_pattern:
       desc: Regular expression for parsing relation record.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -2707,23 +2740,23 @@ extract_event_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: System prompt for the task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the model input.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: Regular expression for parsing model output.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -2759,23 +2792,23 @@ extract_keyword_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     prompt_template:
       desc: The template of input prompt.
       type: Optional[str]
-      default: ''
+      default: null
     completion_delimiter:
       desc: To mark the end of the output.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: Regular expression for parsing keywords.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -2811,23 +2844,23 @@ extract_nickname_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: System prompt for the task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the model input.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: Regular expression for parsing model output.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -2868,19 +2901,19 @@ extract_support_text_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: System prompt for the task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the model input.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -2959,28 +2992,28 @@ generate_qa_from_examples_mapper:
     system_prompt:
       desc: System prompt for guiding the generation task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the input prompt. It must include one placeholder
         '{}', which will be replaced by `example_num` formatted examples defined by
         `example_template`.
       type: Optional[str]
-      default: ''
+      default: null
     example_template:
       desc: Template for formatting one QA example. It must include one placeholder
         '{}', which will be replaced by one formatted qa_pair.
       type: Optional[str]
-      default: ''
+      default: null
     qa_pair_template:
       desc: Template for formatting a single QA pair within each example. Must include
         two placeholders '{}' for the question and answer.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: Regular expression pattern to extract questions and answers from model
         response.
       type: Optional[str]
-      default: ''
+      default: null
     enable_vllm:
       desc: Whether to use vllm for inference acceleration.
       type: bool
@@ -2988,12 +3021,12 @@ generate_qa_from_examples_mapper:
     model_params:
       desc: Parameters for initializing the model.
       type: Optional[Dict]
-      default: {}
+      default: null
     sampling_params:
       desc: 'Sampling parameters for text generation. e.g {''temperature'': 0.9, ''top_p'':
         0.95}'
       type: Optional[Dict]
-      default: {}
+      default: null
 generate_qa_from_text_mapper:
   desc: 'Mapper to generate question and answer pairs from text. Recommended model
     list: [ ''alibaba-pai/pai-llama3-8b-doc2qa'', ''alibaba-pai/pai-baichuan2-7b-doc2qa'',
@@ -3009,12 +3042,14 @@ generate_qa_from_text_mapper:
     max_num:
       desc: The max num of returned QA sample for each text. Not limit if it is None.
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     output_pattern:
       desc: Regular expression pattern to extract questions and answers from model
         response.
       type: Optional[str]
-      default: ''
+      default: null
     enable_vllm:
       desc: Whether to use vllm for inference acceleration.
       type: bool
@@ -3022,12 +3057,12 @@ generate_qa_from_text_mapper:
     model_params:
       desc: Parameters for initializing the model.
       type: Optional[Dict]
-      default: {}
+      default: null
     sampling_params:
       desc: 'Sampling parameters for text generation, e.g {''temperature'': 0.9, ''top_p'':
         0.95}'
       type: Optional[Dict]
-      default: {}
+      default: null
 image_blur_mapper:
   desc: Mapper to blur images.
   args:
@@ -3089,7 +3124,7 @@ image_captioning_from_gpt4v_mapper:
         used for set different prompts for different samples. If it's none, use prompt
         in parameter "prompt". It's None in default.
       type: Optional[str]
-      default: ''
+      default: null
     keep_original_sample:
       desc: whether to keep the original sample. If it's set to False, there will
         be only generated text in the final datasets and the original text will be
@@ -3146,13 +3181,13 @@ image_captioning_mapper:
       desc: a string prompt to guide the generation of blip2 model for all samples
         globally. It's None in default, which means no prompt provided.
       type: Optional[str]
-      default: ''
+      default: null
     prompt_key:
       desc: the key name of fields in samples to store prompts for each sample. It's
         used for set different prompts for different samples. If it's none, use prompt
         in parameter "prompt". It's None in default.
       type: Optional[str]
-      default: ''
+      default: null
 image_diffusion_mapper:
   desc: Generate image by diffusion model
   args:
@@ -3200,7 +3235,9 @@ image_diffusion_mapper:
       min: 1
       max: 1000000
     keep_original_sample:
-      desc: Parameter keep_original_sample
+      desc: whether to keep the original sample. If it's set to False, there will
+        be only generated captions in the final datasets and the original captions
+        will be removed. It's True in default.
       type: bool
       default: true
     caption_key:
@@ -3209,7 +3246,7 @@ image_diffusion_mapper:
         be a list. If it's none, ImageDiffusionMapper will produce captions for each
         images.
       type: Optional[str]
-      default: ''
+      default: null
     hf_img2seq:
       desc: model name on huggingface to generate caption if caption_key is None.
       type: str
@@ -3235,46 +3272,54 @@ image_remove_background_mapper:
   desc: Mapper to remove background of images
   args:
     alpha_matting:
-      desc: Parameter alpha_matting
+      desc: (bool, optional) Flag indicating whether to use alpha matting. Defaults
+        to False.
       type: bool
       default: false
     alpha_matting_foreground_threshold:
-      desc: Parameter alpha_matting_foreground_threshold
+      desc: (int, optional) Foreground threshold for alpha matting. Defaults to 240.
       type: int
       default: 240
       min: -1000000
       max: 1000000
     alpha_matting_background_threshold:
-      desc: Parameter alpha_matting_background_threshold
+      desc: (int, optional) Background threshold for alpha matting. Defaults to 10.
       type: int
       default: 10
       min: -1000000
       max: 1000000
     alpha_matting_erode_size:
-      desc: Parameter alpha_matting_erode_size
+      desc: (int, optional) Erosion size for alpha matting. Defaults to 10.
       type: int
       default: 10
       min: -1000000
       max: 1000000
     bgcolor:
-      desc: Parameter bgcolor
+      desc: (Optional[Tuple[int, int, int, int]], optional) Background color for the
+        cutout image. Defaults to None.
       type: Optional[Tuple[int, int, int, int]]
-      default: (0,0,0,0)
+      default: null
 image_segment_mapper:
   desc: Perform segment-anything on images and return the bounding boxes.
   args:
     imgsz:
       desc: resolution for image resizing
-      type: str
-      default: '1024'
+      type: int
+      default: 1024
+      min: -1000000
+      max: 1000000
     conf:
       desc: confidence score threshold
-      type: str
-      default: '0.05'
+      type: float
+      default: 0.05
+      min: -1000000.0
+      max: 1000000.0
     iou:
       desc: IoU (Intersection over Union) score threshold
-      type: str
-      default: '0.5'
+      type: float
+      default: 0.5
+      min: -1000000.0
+      max: 1000000.0
     model_path:
       desc: the path to the FastSAM model. Model name should be one of ['FastSAM-x.pt',
         'FastSAM-s.pt'].
@@ -3292,15 +3337,23 @@ imgdiff_difference_area_generator_mapper:
     to allow fine-grained control on data processing.
   args:
     image_pair_similarity_filter_args:
-      desc: Parameter image_pair_similarity_filter_args
+      desc: 'Arguments for image pair similarity filter. Controls the similarity filtering
+        between image pairs. Default empty dict will use fixed values: min_score_1=0.1,
+        max_score_1=1.0, min_score_2=0.1, max_score_2=1.0, hf_clip="openai/clip-vit-base-patch32",
+        num_proc=1.'
       type: Optional[Dict]
       default: {}
     image_segment_mapper_args:
-      desc: Parameter image_segment_mapper_args
+      desc: 'Arguments for image segmentation mapper. Controls the image segmentation
+        process. Default empty dict will use fixed values: imgsz=1024, conf=0.05,
+        iou=0.5, model_path="FastSAM-x.pt".'
       type: Optional[Dict]
       default: {}
     image_text_matching_filter_args:
-      desc: Parameter image_text_matching_filter_args
+      desc: 'Arguments for image-text matching filter. Controls the matching between
+        cropped image regions and text descriptions. Default empty dict will use fixed
+        values: min_score=0.1, max_score=1.0, hf_blip="Salesforce/blip-itm-base-coco",
+        num_proc=1.'
       type: Optional[Dict]
       default: {}
 imgdiff_difference_caption_generator_mapper:
@@ -3308,15 +3361,23 @@ imgdiff_difference_caption_generator_mapper:
     to allow fine-grained control on data processing.
   args:
     mllm_mapper_args:
-      desc: Parameter mllm_mapper_args
+      desc: 'Arguments for multimodal language model mapper. Controls the generation
+        of captions for bounding box regions. Default empty dict will use fixed values:
+        max_new_tokens=256, temperature=0.2, top_p=None, num_beams=1, hf_model="llava-hf/llava-v1.6-vicuna-7b-hf".'
       type: Optional[Dict]
       default: {}
     image_text_matching_filter_args:
-      desc: Parameter image_text_matching_filter_args
+      desc: 'Arguments for image-text matching filter. Controls the matching between
+        cropped regions and generated captions. Default empty dict will use fixed
+        values: min_score=0.1, max_score=1.0, hf_blip="Salesforce/blip-itm-base-coco",
+        num_proc=1.'
       type: Optional[Dict]
       default: {}
     text_pair_similarity_filter_args:
-      desc: Parameter text_pair_similarity_filter_args
+      desc: 'Arguments for text pair similarity filter. Controls the similarity comparison
+        between caption pairs. Default empty dict will use fixed values: min_score=0.1,
+        max_score=1.0, hf_clip="openai/clip-vit-base-patch32", text_key_second="target_text",
+        num_proc=1.'
       type: Optional[Dict]
       default: {}
 mllm_mapper:
@@ -3329,13 +3390,17 @@ mllm_mapper:
       default: llava-hf/llava-v1.6-vicuna-7b-hf
     max_new_tokens:
       desc: the maximum number of new tokens generated by the model.
-      type: str
-      default: '256'
+      type: int
+      default: 256
+      min: -1000000
+      max: 1000000
     temperature:
       desc: used to control the randomness of generated text. The higher the temperature,
         the more random and creative the generated text will be.
-      type: str
-      default: '0.2'
+      type: float
+      default: 0.2
+      min: -1000000.0
+      max: 1000000.0
     top_p:
       desc: randomly select the next word from the group of words whose cumulative
         probability reaches p.
@@ -3344,8 +3409,10 @@ mllm_mapper:
     num_beams:
       desc: the larger the beam search size, the higher the quality of the generated
         text.
-      type: str
-      default: '1'
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
 nlpaug_en_mapper:
   desc: Mapper to simply augment samples in English based on nlpaug library.
   args:
@@ -3488,22 +3555,22 @@ optimize_qa_mapper:
     system_prompt:
       desc: System prompt for guiding the optimization task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the input for the model. Please make sure the template
         contains one placeholder '{}', which corresponds to the question and answer
         pair generated by param `qa_pair_template`.
       type: Optional[str]
-      default: ''
+      default: null
     qa_pair_template:
       desc: Template for formatting the question and answer pair. Please make sure
         the template contains two '{}' to format question and answer.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: Regular expression pattern to extract question and answer from model response.
       type: Optional[str]
-      default: ''
+      default: null
     enable_vllm:
       desc: Whether to use VLLM for inference acceleration.
       type: bool
@@ -3511,12 +3578,12 @@ optimize_qa_mapper:
     model_params:
       desc: Parameters for initializing the model.
       type: Optional[Dict]
-      default: {}
+      default: null
     sampling_params:
       desc: 'Sampling parameters for text generation (e.g., {''temperature'': 0.9,
         ''top_p'': 0.95}).'
       type: Optional[Dict]
-      default: {}
+      default: null
 optimize_query_mapper:
   desc: Mapper to optimize query in question-answer pairs.
   args:
@@ -3527,22 +3594,22 @@ optimize_query_mapper:
     system_prompt:
       desc: System prompt for guiding the optimization task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the input for the model. Please make sure the template
         contains one placeholder '{}', which corresponds to the question and answer
         pair generated by param `qa_pair_template`.
       type: Optional[str]
-      default: ''
+      default: null
     qa_pair_template:
       desc: Template for formatting the question and answer pair. Please make sure
         the template contains two '{}' to format question and answer.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: Regular expression pattern to extract question and answer from model response.
       type: Optional[str]
-      default: ''
+      default: null
     enable_vllm:
       desc: Whether to use VLLM for inference acceleration.
       type: bool
@@ -3550,12 +3617,12 @@ optimize_query_mapper:
     model_params:
       desc: Parameters for initializing the model.
       type: Optional[Dict]
-      default: {}
+      default: null
     sampling_params:
       desc: 'Sampling parameters for text generation (e.g., {''temperature'': 0.9,
         ''top_p'': 0.95}).'
       type: Optional[Dict]
-      default: {}
+      default: null
 optimize_response_mapper:
   desc: Mapper to optimize response in question-answer pairs.
   args:
@@ -3566,22 +3633,22 @@ optimize_response_mapper:
     system_prompt:
       desc: System prompt for guiding the optimization task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the input for the model. Please make sure the template
         contains one placeholder '{}', which corresponds to the question and answer
         pair generated by param `qa_pair_template`.
       type: Optional[str]
-      default: ''
+      default: null
     qa_pair_template:
       desc: Template for formatting the question and answer pair. Please make sure
         the template contains two '{}' to format question and answer.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: Regular expression pattern to extract question and answer from model response.
       type: Optional[str]
-      default: ''
+      default: null
     enable_vllm:
       desc: Whether to use VLLM for inference acceleration.
       type: bool
@@ -3589,12 +3656,12 @@ optimize_response_mapper:
     model_params:
       desc: Parameters for initializing the model.
       type: Optional[Dict]
-      default: {}
+      default: null
     sampling_params:
       desc: 'Sampling parameters for text generation (e.g., {''temperature'': 0.9,
         ''top_p'': 0.95}).'
       type: Optional[Dict]
-      default: {}
+      default: null
 pair_preference_mapper:
   desc: Mapper to construct paired preference samples.
   args:
@@ -3605,24 +3672,24 @@ pair_preference_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt:
       desc: System prompt for guiding the generation task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the model input. It must contain placeholders '{query}'
         and '{response}', and can optionally include '{reference}'.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern:
       desc: Regular expression for parsing model output.
       type: Optional[str]
-      default: ''
+      default: null
     rejected_key:
       desc: The field name in the sample to store the generated rejected response.
         Defaults to 'rejected_response'.
@@ -3798,23 +3865,23 @@ relation_identity_mapper:
     api_endpoint:
       desc: URL endpoint for the API.
       type: Optional[str]
-      default: ''
+      default: null
     response_path:
       desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       type: Optional[str]
-      default: ''
+      default: null
     system_prompt_template:
       desc: System prompt template for the task.
       type: Optional[str]
-      default: ''
+      default: null
     input_template:
       desc: Template for building the model input.
       type: Optional[str]
-      default: ''
+      default: null
     output_pattern_template:
       desc: Regular expression template for parsing model output.
       type: Optional[str]
-      default: ''
+      default: null
     try_num:
       desc: The number of retry attempts when there is an API call error or output
         parsing error.
@@ -3952,7 +4019,7 @@ remove_words_with_incorrect_substrings_mapper:
     substrings:
       desc: The incorrect substrings in words.
       type: Optional[List[str]]
-      default: []
+      default: null
 replace_content_mapper:
   desc: Mapper to replace all content in the text that matches a specific regular
     expression pattern with a designated replacement string.
@@ -3960,7 +4027,7 @@ replace_content_mapper:
     pattern:
       desc: regular expression pattern(s) to search for within text
       type: Union[str, List[str], None]
-      default: []
+      default: null
     repl:
       desc: replacement string(s), default is empty string
       type: Union[str, List[str]]
@@ -4027,13 +4094,17 @@ sentence_augmentation_mapper:
       default: ''
     max_new_tokens:
       desc: the maximum number of new tokens generated by the model.
-      type: str
-      default: '256'
+      type: int
+      default: 256
+      min: -1000000
+      max: 1000000
     temperature:
       desc: used to control the randomness of generated text. The higher the temperature,
         the more random and creative the generated text will be.
-      type: str
-      default: '0.2'
+      type: float
+      default: 0.2
+      min: -1000000.0
+      max: 1000000.0
     top_p:
       desc: randomly select the next word from the group of words whose cumulative
         probability reaches p.
@@ -4042,8 +4113,10 @@ sentence_augmentation_mapper:
     num_beams:
       desc: the larger the beam search size, the higher the quality of the generated
         text.
-      type: str
-      default: '1'
+      type: int
+      default: 1
+      min: -1000000
+      max: 1000000
     text_key:
       desc: the key name used to store the first sentence in the text pair. (optional,
         defalut='text')
@@ -4066,7 +4139,9 @@ text_chunk_mapper:
     max_len:
       desc: Split text into multi texts with this max len if not None.
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     split_pattern:
       desc: Make sure split in this pattern if it is not None and force cut if the
         length exceeds max_len.
@@ -4085,7 +4160,7 @@ text_chunk_mapper:
         ( such as qwen2.5-72b-instruct) and huggingface tokenizer. :trust_remote_code:
         for loading huggingface model'
       type: Optional[str]
-      default: ''
+      default: null
     trust_remote_code:
       desc: Whether to trust the remote code for loading huggingface model.
       type: bool
@@ -4142,13 +4217,13 @@ video_captioning_from_frames_mapper:
       desc: a string prompt to guide the generation of image-to-text model for all
         samples globally. It's None in default, which means no prompt provided.
       type: Optional[str]
-      default: ''
+      default: null
     prompt_key:
       desc: the key name of fields in samples to store prompts for each sample. It's
         used for set different prompts for different samples. If it's none, use prompt
         in parameter "prompt". It's None in default.
       type: Optional[str]
-      default: ''
+      default: null
     frame_sampling_method:
       desc: 'sampling method of extracting frame videos from the videos. Should be
         one of ["all_keyframes", "uniform"]. The former one extracts all key frames
@@ -4216,22 +4291,22 @@ video_captioning_from_summarizer_mapper:
       desc: 'the arg dict for video captioning from video directly with keys are the
         arg names and values are the arg values. Default: None.'
       type: Optional[Dict]
-      default: {}
+      default: null
     vid_cap_from_frm_args:
       desc: 'the arg dict for video captioning from sampled frames from the video
         with keys are the arg names and values are the arg values. Default: None.'
       type: Optional[Dict]
-      default: {}
+      default: null
     vid_tag_from_aud_args:
       desc: 'the arg dict for video tagging from audio streams in the video with keys
         are the arg names and values are the arg values. Default: None.'
       type: Optional[Dict]
-      default: {}
+      default: null
     vid_tag_from_frm_args:
       desc: 'the arg dict for video tagging from sampled frames from the video with
         keys are the arg names and values are the arg values. Default: None.'
       type: Optional[Dict]
-      default: {}
+      default: null
     keep_tag_num:
       desc: 'max number N of tags from sampled frames to keep. Too many tags might
         bring negative influence to summarized text, so we consider to only keep the
@@ -4287,13 +4362,13 @@ video_captioning_from_video_mapper:
       desc: a string prompt to guide the generation of video-blip model for all samples
         globally. It's None in default, which means no prompt provided.
       type: Optional[str]
-      default: ''
+      default: null
     prompt_key:
       desc: the key name of fields in samples to store prompts for each sample. It's
         used for set different prompts for different samples. If it's none, use prompt
         in parameter "prompt". It's None in default.
       type: Optional[str]
-      default: ''
+      default: null
     frame_sampling_method:
       desc: 'sampling method of extracting frame videos from the videos. Should be
         one of ["all_keyframes", "uniform"]. The former one extracts all key frames
@@ -4386,15 +4461,15 @@ video_ffmpeg_wrapped_mapper:
     filter_name:
       desc: ffmpeg video filter name.
       type: Optional[str]
-      default: ''
+      default: null
     filter_kwargs:
       desc: keyword-arguments passed to ffmpeg filter.
       type: Optional[Dict]
-      default: {}
+      default: null
     global_args:
       desc: list-arguments passed to ffmpeg command-line.
       type: Optional[List[str]]
-      default: []
+      default: null
     capture_stderr:
       desc: whether to capture stderr.
       type: bool
@@ -4424,7 +4499,7 @@ video_remove_watermark_mapper:
         It's used for set different rois for different samples. If it's none, use
         rois in parameter "roi_strings". It's None in default.
       type: Optional[str]
-      default: ''
+      default: null
     frame_num:
       desc: the number of frames to be extracted uniformly from the video to detect
         the pixels of watermark.
@@ -4777,7 +4852,7 @@ key_value_grouper:
       desc: group samples according values in the keys. Support for nested keys such
         as "__dj__stats__.text_len". It is [self.text_key] in default.
       type: Optional[List[str]]
-      default: []
+      default: null
 naive_reverse_grouper:
   desc: Split batched samples to samples.
   args:
@@ -4800,14 +4875,18 @@ frequency_specified_field_selector:
         and top_ratio are set, the value corresponding to the smaller number of samples
         will be applied.
       type: Optional[float]
-      default: 0.0
+      default: null
+      min: 0
+      max: 1
     topk:
       desc: Number of selected top specified field value, samples will be selected
         if their specified field values are within this parameter. When both topk
         and top_ratio are set, the value corresponding to the smaller number of samples
         will be applied.
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     reverse:
       desc: Determine the sorting rule, if reverse=True, then sort in descending order.
       type: bool
@@ -4819,13 +4898,15 @@ random_selector:
       desc: The ratio to select. When both select_ratio and select_num are set, the
         value corresponding to the smaller number of samples will be applied.
       type: Optional[float]
-      default: 0.0
+      default: null
+      min: 0
+      max: 1
     select_num:
       desc: The number of samples to select. When both select_ratio and select_num
         are set, the value corresponding to the smaller number of samples will be
         applied.
-      type: int
-      default: 0
+      type: Optional[int]
+      default: null
       min: 1
       max: 1000000
 range_specified_field_selector:
@@ -4844,28 +4925,36 @@ range_specified_field_selector:
         lower_percentile and lower_rank are set, the value corresponding to the larger
         number of samples will be applied.
       type: Optional[float]
-      default: 0.0
+      default: null
+      min: 0
+      max: 1
     upper_percentile:
       desc: The upper bound of the percentile to be sample, samples will be selected
         if their specified field values are less or equal to the upper bound. When
         both upper_percentile and upper_rank are set, the value corresponding to the
         smaller number of samples will be applied.
       type: Optional[float]
-      default: 0.0
+      default: null
+      min: 0
+      max: 1
     lower_rank:
       desc: The lower bound of the rank to be sample, samples will be selected if
         their specified field values are greater than this lower bound. When both
         lower_percentile and lower_rank are set, the value corresponding to the larger
         number of samples will be applied.
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     upper_rank:
       desc: The upper bound of the rank to be sample, samples will be selected if
         their specified field values are less or equal to the upper bound. When both
         upper_percentile and upper_rank are set, the value corresponding to the smaller
         number of samples will be applied.
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
 tags_specified_field_selector:
   desc: Selector to select samples based on the tags of specified field.
   args:
@@ -4893,13 +4982,17 @@ topk_specified_field_selector:
         field values are within this parameter. When both topk and top_ratio are set,
         the value corresponding to the smaller number of samples will be applied.
       type: Optional[float]
-      default: 0.0
+      default: null
+      min: 0
+      max: 1
     topk:
       desc: Number of selected top sample, samples will be selected if their specified
         field values are within this parameter. When both topk and top_ratio are set,
         the value corresponding to the smaller number of samples will be applied.
       type: Optional[int]
-      default: 0
+      default: null
+      min: 1
+      max: 1000000
     reverse:
       desc: Determine the sorting rule, if reverse=True, then sort in descending order.
       type: bool

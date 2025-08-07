@@ -7,7 +7,7 @@ from collections import OrderedDict
 import numpy as np
 from loguru import logger
 
-from get_op_info import TYPE_MAPPING
+from get_op_info import TypeAnnotationParser
 
 def construct_dj_stats_dict(json_path="./configs/dj_stats_dict.json"):
     dj_stats_dict = {}
@@ -38,11 +38,10 @@ class OperatorArg:
         self.type = state.get('type', None)
         if self.type is None:
             raise ValueError("OperatorArg __init__: state['type'] is required.")
-        if self.type not in TYPE_MAPPING:
-            raise ValueError(f"OperatorArg __init__: state['type'] = {self.type} is invalid.")
-        self.v_default = state.get('default', None)
-        if self.v_default is None:
-            raise ValueError("OperatorArg __init__: state['default'] is required.")
+        self.typ_cat = TypeAnnotationParser().get_type_category(self.type)
+        self.v_default = state.get('default')
+        if self.v_default is None and not self.typ_cat.is_optional:
+            raise ValueError(f"OperatorArg __init__: state['default'] is required.\nparameter: {self.name}, op: {self.op.name}")
         self.v_options = state.get('options', None)
         if self.v_type == bool:
             self.v_options = [True, False]
@@ -71,25 +70,25 @@ class OperatorArg:
 
     @property
     def v_type(self):
-        return TYPE_MAPPING[self.type]
+        return self.typ_cat.type_obj
+    
+    def v_converter(self, v):
+        return self.typ_cat.converter(v)
 
-    def v_check(self, v, type_only=False, element_check=False):
+    def v_check(self, v, type_only=False):
         error = ValueError(
             f"OperatorArg v_check: type mismatch when check {self.name}={v}, \
             expected {self.v_type} but got {type(v)}."
         )
-        try:
-            v = self.v_type(v)
-        except:
-            raise error
+        v = self.v_converter(v)
         if type_only:
             return v
         if self.v_options is not None and v not in self.v_options:
             raise ValueError(f"OperatorArg v_check: {self.name}={v} is not in options {self.v_options}.")
-        if self.v_min is not None and v < self.v_min:
+        if self.v_min is not None and not self.typ_cat.is_optional and v < self.v_min:
             logger.warning(f"OperatorArg v_check: {self.name}={v} is less than v_min={self.v_min}.")
             return self.v_min
-        if self.v_max is not None and v > self.v_max:
+        if self.v_max is not None and not self.typ_cat.is_optional and v > self.v_max:
             logger.warning(f"OperatorArg v_check: {self.name}={v} is larger than v_max={self.v_max}.")
             return self.v_max
         # TODO: silence cross arg value check temporarily, active it with better implementation
@@ -117,8 +116,8 @@ class OperatorArg:
     def update_with_stats(self, stats):
         if not self.stats_apply:
             return
-        self.v_min = self.v_type(stats['min'])
-        self.v_max = self.v_type(stats['max'])
+        self.v_min = self.v_converter(stats['min'])
+        self.v_max = self.v_converter(stats['max'])
         if self.v < self.v_min:
             self.v = self.v_min
         elif self.v > self.v_max:
@@ -128,7 +127,7 @@ class OperatorArg:
         # percentage to value
         if self.quantiles is None:
             raise ValueError("OperatorArg _p2v: quantiles is required.")
-        return self.v_type(self.quantiles[int(p)])
+        return self.v_converter(self.quantiles[int(p)])
 
     def _v2p(self, v):
         # value to percentage
@@ -145,8 +144,7 @@ class OperatorArg:
         return l
 
     def set_v(self, v):
-        v = self.v_check(v)
-        self.v = v
+        self.v = self.v_check(v)
         self.save()
 
     def set_p(self, p):
@@ -164,9 +162,9 @@ class OperatorArg:
         if mean is None or std is None:
             raise ValueError("OperatorArg set_k: mean and std are required. Please run update_with_stats first.")
         if self.name.startswith('min_'):
-            self.set_v(max(self.v_min, self.v_type(mean - k * std)))
+            self.set_v(max(self.v_min, self.v_converter(mean - k * std)))
         elif self.name.startswith('max_'):
-            self.set_v(min(self.v_max, self.v_type(mean + k * std)))
+            self.set_v(min(self.v_max, self.v_converter(mean + k * std)))
 
     def save(self):
         self.op.save()

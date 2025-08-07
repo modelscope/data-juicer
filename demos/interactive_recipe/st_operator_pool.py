@@ -13,12 +13,13 @@ import ast
 
 from matplotlib import pyplot as plt
 from wordcloud import WordCloud
+from typing import Union, Optional, get_origin, get_args, Dict, List, Tuple
 
 from data_juicer.utils.constant import Fields, StatsKeys
 
 from operator_pool import OperatorArg, Operator, OperatorPool
-from recipe_utils import RecipeManager
-
+from utils.recipe_utils import RecipeManager
+from utils.param_type_utils import TypeCategory
 
 all_ops_config_path = os.path.join(os.path.dirname(__file__), "./configs/all_op_info.yaml") or os.path.join(
     os.path.dirname(__file__), "./configs/default_ops.yaml"
@@ -28,151 +29,111 @@ with open(all_ops_config_path, "r") as f:
     all_ops = yaml.safe_load(f)
 
 
-class StOperatorArg(OperatorArg):
+class StTypeCategory(TypeCategory):
 
-    _TYPE_HANDLERS = {
-        "list_types": frozenset(
-            [
-                "List[str]",
-                "Optional[List[str]]",
-                "List[int]",
-                "Optional[List[int]]",
-                "List[float]",
-                "Optional[List[float]]",
-                "List",
-                "Union[str, List[str]]",
-            ]
-        ),
-        "numeric_types": frozenset(["int", "float", "Optional[int]", "Optional[float]"]),
-        "string_types": frozenset(["str", "Optional[str]"]),
-        "bool_types": frozenset(["bool"]),
-        "dict_types": frozenset(["Dict", "Optional[Dict]"]),
-        "tuple_types": frozenset(["Tuple", "Optional[Tuple[int, int, int, int]]"]),
-        "complex_types": frozenset(
-            [
-                "Union[str, int, None]",
-                "Union[int, str]",
-                "Union[str, int]",
-                "Union[int, Tuple[int], Tuple[int, int], None]",
-            ]
-        ),
-    }
-
-    _COMPLEX_TYPE_CONFIGS = {
-        "Union[str, List[str]]": {
-            "placeholder": "Single value or multiple values (one per line)",
-            "help": "Enter a single value or multiple values (one per line)",
-            "component": "text_area",
-        },
-        "Union[str, int, None]": {
-            "placeholder": "Text or number",
-            "help": "Can be text or number",
-            "component": "text_input",
-        },
-        "Union[int, str]": {
-            "placeholder": "Text or number",
-            "help": "Can be text or number",
-            "component": "text_input",
-        },
-        "Union[str, int]": {
-            "placeholder": "Text or number",
-            "help": "Can be text or number",
-            "component": "text_input",
-        },
-        "Union[int, Tuple[int], Tuple[int, int], None]": {
-            "placeholder": "Examples: 5 | (5,) | (5, 10) | None",
-            "help": "Examples:\n- Single number: 5\n- Tuple (1 value): (5,)\n- Tuple (2 values): (5, 10)\n- None: None or empty",
-            "component": "text_input",
-        },
-    }
-
-    _TYPE_TO_HANDLER = {}
-
-    @classmethod
-    def _initialize_type_mapping(cls):
-        if cls._TYPE_TO_HANDLER:
-            return
-
-        for handler_name, type_set in cls._TYPE_HANDLERS.items():
-            for type_name in type_set:
-                cls._TYPE_TO_HANDLER[type_name] = handler_name
+    PRIORITY = ["dict", "list", "tuple", "number", "str", "bool"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._initialize_type_mapping()
+        self.st_type_str = self._resolve_st_type(self.type_obj)
+
+    def _resolve_st_type(self, typ):
+        bases = self._flatten_union_optional(typ)
+        best = None
+        best_idx = 100
+        for base in bases:
+            t = self._base_type_category(base)
+            idx = self.PRIORITY.index(t) if t in self.PRIORITY else 999
+            if idx < best_idx:
+                best = t
+                best_idx = idx
+        return best
+
+    def _flatten_union_optional(self, typ):
+        origin = get_origin(typ)
+        args = get_args(typ)
+        out = []
+        if origin is Union:
+            out.extend(self._flatten_union_optional(args[0]))
+            out.extend(self._flatten_union_optional(args[1]))
+        elif origin is Optional:
+            out.extend(self._flatten_union_optional(args[0]))
+        else:
+            out.append(typ)
+        return out
+
+    def _base_type_category(self, typ):
+        origin = get_origin(typ)
+        if origin in (dict, Dict):
+            return "dict"
+        if origin in (list, List):
+            return "list"
+        if origin in (tuple, Tuple):
+            return "tuple"
+        if typ in [int, float]:
+            return "number"
+        if typ == str:
+            return "str"
+        if typ == bool:
+            return "bool"
+        return "str"
+
+    @property
+    def is_list_like(self):
+        return self.st_type_str in ["list", "tuple"]
+
+
+class StOperatorArg(OperatorArg):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.st_v_cat = StTypeCategory(
+            type_obj=self.typ_cat.type_obj,
+            type_str=self.typ_cat.type_str,
+            converter=self.typ_cat.converter,
+            default=self.typ_cat.default,
+        )
 
     def _get_session_key(self, suffix=""):
         return f"{self.op.name}_{self.name}{suffix}"
 
-    def _parse_list_value(self, value):
-        if isinstance(value, list):
-            return value
+    def _parse_list_like_value(self, value):
 
         if not value:
-            return []
+            return self.v_default
 
         value_str = str(value).strip()
         if not value_str:
-            return []
+            return self.v_default
 
-        if value_str.startswith("[") and value_str.endswith("]"):
+        try:
             parsed_value = ast.literal_eval(value_str)
-            if isinstance(parsed_value, list):
-                return parsed_value
+            conv_value = self.v_converter(parsed_value)
+            if isinstance(conv_value, self.v_type):
+                return conv_value
             else:
                 st.warning(f"Expected list format, actually is {type(parsed_value).__name__}")
-                return []
+        except Exception:
+            pass
 
         lines = [line.strip() for line in value_str.split("\n") if line.strip()]
 
-        if "int" in self.type:
-            try:
-                converted_lines = []
-                for line in lines:
-                    converted_lines.append(int(line))
-                lines = converted_lines
-            except ValueError as e:
-                st.warning(f"Integer conversion error: {str(e)}")
-                return []
-        elif "float" in self.type:
-            try:
-                converted_lines = []
-                for line in lines:
-                    converted_lines.append(float(line))
-                lines = converted_lines
-            except ValueError as e:
-                st.warning(f"floating-point conversion error: {str(e)}")
-                return []
-
-        if self.type == "Union[str, List[str]]" and len(lines) == 1 and isinstance(lines[0], str):
-            return lines[0]
-
-        return lines
+        return self.v_converter(lines)
 
     def _on_v_change(self):
         new_v = st.session_state.get(self._get_session_key())
 
-        handler_type = self._TYPE_TO_HANDLER.get(self.type)
-
-        if handler_type in ("list_types"):
-            new_v = self._parse_list_value(new_v)
-
-        if handler_type == "dict_types":
+        if len(str(new_v)) == 0:
+            if self.st_v_cat.is_optional:
+                new_v = None
+        elif self.st_v_cat.is_list_like:
+            new_v = self._parse_list_like_value(new_v)
+        elif self.st_v_cat.st_type_str == "dict":
             try:
                 new_v = json.loads(new_v)
             except Exception:
                 st.warning("The dictionary format entered is incorrect. Please check the JSON format.")
                 new_v = {}
-
-        if handler_type == "tuple_types":
-            try:
-                new_v = ast.literal_eval(new_v)
-                if not isinstance(new_v, tuple):
-                    st.warning(f"Expected tuple format, actually is {type(new_v).__name__}")
-                    new_v = ()
-            except Exception:
-                st.warning("The tuple format entered is incorrect. Please check the tuple format.")
-                new_v = ()
 
         try:
             self.set_v(new_v)
@@ -204,7 +165,7 @@ class StOperatorArg(OperatorArg):
         )
 
     def _render_numeric_input(self):
-        step = 1 if self.v_type == int else 0.01
+        step = 1 if self.v_type in [int, Optional[int]] else 0.01
 
         if self.stats_apply and self.quantiles is not None:
             col1, col2 = st.columns(2)
@@ -293,65 +254,40 @@ class StOperatorArg(OperatorArg):
             on_change=self._on_v_change,
         )
 
-    def _render_complex_type_input(self):
-        config = self._COMPLEX_TYPE_CONFIGS.get(self.type)
-        if not config:
-            st.warning(f"Type '{self.type}' not fully supported, using text input")
-            return st.text_input(
-                f"{self.name} ({self.type})",
-                key=self._get_session_key(),
-                help=f"{self.desc}\n\nType: {self.type}",
-                on_change=self._on_v_change,
-            )
-
-        component_func = st.text_area if config["component"] == "text_area" else st.text_input
-        return component_func(
-            self.name,
-            placeholder=config["placeholder"],
-            key=self._get_session_key(),
-            help=f"{self.desc}\n\n{config['help']}",
-            on_change=self._on_v_change,
-        )
-
     def render(self):
-        handler_type = self._TYPE_TO_HANDLER.get(self.type)
-
-        if handler_type == "bool_types":
+        if self.st_v_cat.st_type_str == "bool" and not self.st_v_cat.is_optional:
             self._render_bool_input()
-
-        elif handler_type == "numeric_types":
+        elif self.st_v_cat.st_type_str == "number" and not self.st_v_cat.is_optional:
             self._render_numeric_input()
-
-        elif handler_type == "string_types":
+        elif self.st_v_cat.st_type_str in ["number", "bool"] and self.st_v_cat.is_optional:
             self._render_string_input()
 
-        elif handler_type == "list_types":
+        elif self.st_v_cat.st_type_str == "str":
+            self._render_string_input()
+
+        elif self.st_v_cat.st_type_str == "list":
+            help_text = "Enter one item per line or []"
             if "str" in self.type:
                 placeholder = "Enter one item per line"
-                help_text = "Enter one item per line"
             elif "int" in self.type:
                 placeholder = "Enter one number per line\ne.g.:\n10\n20\n30"
-                help_text = "Enter one number per line"
             elif "float" in self.type:
                 placeholder = "Enter one number per line\ne.g.:\n1.5\n2.0\n3.14"
-                help_text = "Enter one number per line"
             else:
                 placeholder = "Enter one item per line"
-                help_text = "Enter one item per line"
 
             self._render_list_input(placeholder, help_text)
 
-        elif handler_type == "dict_types":
+        elif self.st_v_cat.st_type_str == "dict":
             self._render_dict_input(placeholder_text="Enter dictionary in JSON format", help_suffix="")
-        elif handler_type == "tuple_types":
+        elif self.st_v_cat.st_type_str == "tuple":
             self._render_tuple_input()
 
         else:
-            self._render_complex_type_input()
+            raise ValueError(f"Unsupported type: {self.type}")
 
     def st_sync(self):
-        handler_type = self._TYPE_TO_HANDLER.get(self.type)
-
+        
         if isinstance(self.v, list):
             if all(isinstance(item, str) for item in self.v):
                 st_v = json.dumps(self.v, ensure_ascii=False)
@@ -359,7 +295,9 @@ class StOperatorArg(OperatorArg):
                 st_v = json.dumps(self.v)
             else:
                 st_v = "\n".join(str(v) for v in self.v)
-        elif handler_type == "numeric_types":
+        elif self.v is None and self.st_v_cat.is_optional:
+            st_v = None
+        elif self.st_v_cat.st_type_str == "number":
             st_v = self.v
         else:
             st_v = str(self.v)
@@ -380,6 +318,7 @@ class StOperator(Operator):
         return self.dj_stats_key is not None
 
     def render(self):
+        logger.info(f"render op: {self.name}")
         show_enabled_only = st.session_state.get("show_enabled_only")
         if show_enabled_only and not self.enabled:
             # Don't render op if show_enabled_only option is on and op is not enabled
