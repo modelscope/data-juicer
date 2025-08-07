@@ -69,6 +69,7 @@ class RayExecutor(ExecutorBase):
         self.exporter = RayExporter(
             self.cfg.export_path,
             self.cfg.export_type,
+            self.cfg.export_shard_size,
             keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
             keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
             **self.cfg.export_extra_args,
