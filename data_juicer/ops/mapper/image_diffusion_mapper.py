@@ -74,7 +74,7 @@ class ImageDiffusionMapper(Mapper):
         :param keep_original_sample: whether to keep the original sample. If
             it's set to False, there will be only generated captions in the
             final datasets and the original captions will be removed. It's True
-            in default.
+            by default.
         :param caption_key: the key name of fields in samples to store captions
             for each images. It can be a string if there is only one image in
             each sample. Otherwise, it should be a list. If it's none,
