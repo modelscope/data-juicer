@@ -520,12 +520,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 default=128,
                 help="Maximum partition size in MB for PartitionedRayExecutor (legacy flat config)",
             )
-            parser.add_argument(
-                "--enable_fault_tolerance",
-                type=bool,
-                default=True,
-                help="Enable fault tolerance for PartitionedRayExecutor (legacy flat config)",
-            )
+
             parser.add_argument(
                 "--max_retries",
                 type=int,
@@ -559,13 +554,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 help="Maximum partition size in MB (nested partition config)",
             )
 
-            # Fault tolerance configuration (nested under partition)
-            parser.add_argument(
-                "--partition.enable_fault_tolerance",
-                type=bool,
-                default=True,
-                help="Enable fault tolerance for partitions (nested partition config)",
-            )
+            # Retry configuration (nested under partition)
             parser.add_argument(
                 "--partition.max_retries",
                 type=int,

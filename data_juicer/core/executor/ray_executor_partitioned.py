@@ -153,11 +153,8 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 self.cfg, "max_partition_size_mb", 128
             )
 
-        # Fault tolerance configuration (now under partition section)
+        # Retry configuration (now under partition section)
         partition_config = getattr(self.cfg, "partition", {})
-        self.enable_fault_tolerance = partition_config.get("enable_fault_tolerance") or getattr(
-            self.cfg, "enable_fault_tolerance", True
-        )
         self.max_retries = partition_config.get("max_retries") or getattr(self.cfg, "max_retries", 3)
         self.retry_backoff = partition_config.get("retry_backoff", "exponential")
 

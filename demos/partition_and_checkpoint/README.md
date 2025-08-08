@@ -65,9 +65,8 @@ partition:
   size: 1000  # Number of samples per partition
   max_size_mb: 64  # Maximum partition size in MB
 
-# Fault tolerance configuration
-fault_tolerance:
-  enabled: true
+# Retry configuration
+retry:
   max_retries: 3
   retry_backoff: "exponential"  # exponential, linear, fixed
 
@@ -93,7 +92,6 @@ intermediate_storage:
 # Legacy flat configuration (still works)
 partition_size: 1000
 max_partition_size_mb: 64
-enable_fault_tolerance: true
 max_retries: 3
 preserve_intermediate_data: true
 storage_format: "parquet"
@@ -117,8 +115,7 @@ Controls how the dataset is split and how failures are handled:
     - **300-500**: Large datasets with stable processing
     - **500+**: Only for very large datasets with minimal failure risk
   - `max_size_mb`: Maximum partition size in MB
-- **Fault Tolerance**:
-  - `enable_fault_tolerance`: Enable/disable retry logic
+- **Retry Logic**:
   - `max_retries`: Maximum retry attempts per partition
   - `retry_backoff`: Retry strategy (`exponential`, `linear`, `fixed`)
 
@@ -175,8 +172,7 @@ partition:
   size: 200  # Number of samples per partition (smaller for better fault tolerance)
   max_size_mb: 32  # Maximum partition size in MB (reduced for faster processing)
   
-  # Fault tolerance settings
-  enable_fault_tolerance: true
+  # Retry settings
   max_retries: 3
   retry_backoff: "exponential"  # exponential, linear, fixed
 

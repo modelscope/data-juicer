@@ -65,9 +65,8 @@ partition:
   size: 1000  # 每个分区的样本数
   max_size_mb: 64  # 分区最大大小（MB）
 
-# 容错配置
-fault_tolerance:
-  enabled: true
+# 重试配置
+retry:
   max_retries: 3
   retry_backoff: "exponential"  # exponential, linear, fixed
 
@@ -93,7 +92,6 @@ intermediate_storage:
 # 传统扁平配置（仍有效）
 partition_size: 1000
 max_partition_size_mb: 64
-enable_fault_tolerance: true
 max_retries: 3
 preserve_intermediate_data: true
 storage_format: "parquet"
@@ -117,8 +115,7 @@ arrow_memory_mapping: false
     - **300-500**: 具有稳定处理的大数据集
     - **500+**: 仅适用于故障风险最小的大数据集
   - `max_size_mb`: 分区最大大小（MB）
-- **容错**：
-  - `enable_fault_tolerance`: 启用/禁用重试逻辑
+- **重试逻辑**：
   - `max_retries`: 每个分区的最大重试次数
   - `retry_backoff`: 重试策略（`exponential`、`linear`、`fixed`）
 
@@ -175,8 +172,7 @@ partition:
   size: 200  # 每个分区的样本数（较小以获得更好的容错性）
   max_size_mb: 32  # 分区最大大小（MB）（减少以加快处理速度）
   
-  # 容错设置
-  enable_fault_tolerance: true
+  # 重试设置
   max_retries: 3
   retry_backoff: "exponential"  # exponential, linear, fixed
 
