@@ -20,7 +20,6 @@ torch = LazyLoader("torch")
 
 OP_NAME = "video_aesthetics_filter"
 
-
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 @INTER_SAMPLED_FRAMES.register_module(OP_NAME)

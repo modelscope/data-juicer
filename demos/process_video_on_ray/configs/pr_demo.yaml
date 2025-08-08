@@ -8,21 +8,19 @@ ray_address: 'auto'                     # change to your ray cluster address, e.
 dataset:
   configs:
     - type: local
-      # path: './demos/process_video_on_ray/data/my-dataset_4.jsonl'  # path to your dataset directory or file
-      # path: './demos/process_video_on_ray/data/demo-dataset.jsonl'  # path to your dataset directory or file
-      path: './demos/process_video_on_ray/data/video_metadata.jsonl' 
-export_path: './outputs/demo/process_video_on_ray/video_metadata'
+      path: './demos/process_video_on_ray/data/demo-dataset.jsonl'  # path to your dataset directory or file
+export_path: './outputs/demo/process_video_on_ray/demo-dataset'
 
 
 # process schedule
 # a list of several process operators with their arguments
 process:
   # Mapper ops
-  # - video_split_by_scene_mapper:                            # split videos into scene clips
-  #     detector: 'ContentDetector'                             # PySceneDetect scene detector. Should be one of ['ContentDetector', 'ThresholdDetector', 'AdaptiveDetector`]
-  #     threshold: 27.0                                         # threshold passed to the detector
-  #     min_scene_len: 10                                       # minimum length of any scene
-  #     show_progress: false                                     # whether to show progress from scenedetect
+  - video_split_by_scene_mapper:                            # split videos into scene clips
+      detector: 'ContentDetector'                             # PySceneDetect scene detector. Should be one of ['ContentDetector', 'ThresholdDetector', 'AdaptiveDetector`]
+      threshold: 27.0                                         # threshold passed to the detector
+      min_scene_len: 10                                       # minimum length of any scene
+      show_progress: false                                     # whether to show progress from scenedetect
   # # Filter ops
   - video_aesthetics_filter:                                # filter samples according to the aesthetics score of frame images extracted from videos.
       hf_scorer_model: shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE # Huggingface model name for the aesthetics predictor
@@ -55,4 +53,4 @@ process:
       horizontal_flip: false                                  # flip frame image horizontally (left to right).
       vertical_flip: false                                    # flip frame image vertically (top to bottom).
       mem_required: '20GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrain the maximum number of processes that can be launched
-                              
+      gpu_required: 1                           

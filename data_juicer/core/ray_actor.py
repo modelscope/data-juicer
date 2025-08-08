@@ -50,6 +50,7 @@ class Actor:
             self.load_model()
         data = self.op.compute_stats_single_actor(data, self.model, self.processor)
         keep = self.op.process_single(data)
+
         if keep:
             return data
         else:

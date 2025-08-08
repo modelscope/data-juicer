@@ -84,74 +84,59 @@ class VideoSplitBySceneMapper(Mapper):
         self.detector_kwargs = {key: kwargs[key] for key in avaliable_kwargs if key in kwargs}
 
     def process_single(self, sample, context=False):
-        # 打开log.txt文件进行写入日志
-        with open("log.txt", "a") as log_file:
-            # 记录开始时间
-            start_time = time.time()
-
-            # there is no video in this sample
-            if self.video_key not in sample or not sample[self.video_key]:
-                sample[Fields.source_file] = []
-                log_file.write(f"[{time.ctime()}] No video found in sample.\n")
-                return sample
-
-            # load videos
-            loaded_video_keys = sample[self.video_key]
-            output_video_keys = {}
-            scene_counts = {}
-
-            for video_key in loaded_video_keys:
-                # skip duplicate
-                if video_key in output_video_keys:
-                    continue
-
-                redirected_video_key = transfer_filename(video_key, OP_NAME, **self._init_parameters)
-                output_template = add_suffix_to_filename(redirected_video_key, "_$SCENE_NUMBER")
-
-                # detect scenes
-                detector = self.detector_class(self.threshold, self.min_scene_len, **self.detector_kwargs)
-                scene_list = scenedetect.detect(video_key, detector, show_progress=self.show_progress, start_in_scene=True)
-                scene_counts[video_key] = len(scene_list)
-
-                # 记录视频处理的起始时间和结束时间
-                if len(scene_list) > 1:
-                    scene_num_format = f"%0{max(3, math.floor(math.log(len(scene_list), 10)) + 1)}d"
-                    output_video_keys[video_key] = [
-                        output_template.replace("$SCENE_NUMBER", scene_num_format % (i + 1)) for i in range(len(scene_list))
-                    ]
-                    # split video into clips
-                    scenedetect.split_video_ffmpeg(
-                        input_video_path=video_key,
-                        scene_list=scene_list,
-                        output_file_template=output_template,
-                        show_progress=self.show_progress,
-                    )
-
-                    log_file.write(f"[{time.ctime()}] Video '{video_key}' processed, {len(scene_list)} scenes detected.\n")
-                else:
-                    output_video_keys[video_key] = [video_key]
-                    log_file.write(f"[{time.ctime()}] Video '{video_key}' processed, 1 scene detected.\n")
-
-            # replace split video tokens
-            if self.text_key in sample:
-                scene_counts_iter = iter([scene_counts[key] for key in loaded_video_keys])
-                updated_text = re.sub(
-                    re.escape(SpecialTokens.video),
-                    lambda match: replace_func(match, scene_counts_iter),
-                    sample[self.text_key],
-                )
-                sample[self.text_key] = updated_text
-
-            # when the file is modified, its source file needs to be updated.
+        # there is no video in this sample
+        if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []
-            for value in loaded_video_keys:
-                sample[Fields.source_file].extend([value] * len(output_video_keys[value]))
+            return sample
 
-            sample[self.video_key] = list(chain.from_iterable([output_video_keys[key] for key in loaded_video_keys]))
+        # load videos
+        loaded_video_keys = sample[self.video_key]
+        output_video_keys = {}
+        scene_counts = {}
 
-            # 记录处理结束时间和耗时
-            end_time = time.time()
-            elapsed_time = end_time - start_time
-            log_file.write(f"[{time.ctime()}] Video processing for {', '.join(loaded_video_keys)} completed. Time taken: {elapsed_time:.2f} seconds.\n\n")
+        for video_key in loaded_video_keys:
+            # skip duplicate
+            if video_key in output_video_keys:
+                continue
 
+            redirected_video_key = transfer_filename(video_key, OP_NAME, self.save_dir, **self._init_parameters)
+            output_template = add_suffix_to_filename(redirected_video_key, "_$SCENE_NUMBER")
+
+            # detect scenes
+            detector = self.detector_class(self.threshold, self.min_scene_len, **self.detector_kwargs)
+            scene_list = scenedetect.detect(video_key, detector, show_progress=self.show_progress, start_in_scene=True)
+            scene_counts[video_key] = len(scene_list)
+
+            if len(scene_list) > 1:
+                # sync with split_video_ffmpeg internal
+                scene_num_format = f"%0{max(3, math.floor(math.log(len(scene_list), 10)) + 1)}d"  # noqa: E501
+                output_video_keys[video_key] = [
+                    output_template.replace("$SCENE_NUMBER", scene_num_format % (i + 1)) for i in range(len(scene_list))
+                ]
+                # split video into clips
+                scenedetect.split_video_ffmpeg(
+                    input_video_path=video_key,
+                    scene_list=scene_list,
+                    output_file_template=output_template,
+                    show_progress=self.show_progress,
+                )
+            else:
+                output_video_keys[video_key] = [video_key]
+
+        # replace split video tokens
+        if self.text_key in sample:
+            scene_counts_iter = iter([scene_counts[key] for key in loaded_video_keys])
+            updated_text = re.sub(
+                re.escape(SpecialTokens.video),
+                lambda match: replace_func(match, scene_counts_iter),
+                sample[self.text_key],
+            )
+            sample[self.text_key] = updated_text
+
+        # when the file is modified, its source file needs to be updated.
+        sample[Fields.source_file] = []
+        for value in loaded_video_keys:
+            sample[Fields.source_file].extend([value] * len(output_video_keys[value]))
+
+        sample[self.video_key] = list(chain.from_iterable([output_video_keys[key] for key in loaded_video_keys]))
         return sample

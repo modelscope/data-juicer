@@ -292,6 +292,7 @@ class OP:
         return np.empty((0, 0), dtype=str)
 
     def load_model(self, rank=None):
+        
         start = time.time()
         start_time = datetime.fromtimestamp(start, pytz.utc).astimezone(beijing_tz)
         model, processor = get_model(self.model_key, rank=rank, use_cuda=self.use_cuda())

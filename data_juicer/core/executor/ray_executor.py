@@ -57,7 +57,9 @@ class RayExecutor(ExecutorBase):
 
         # init ray
         logger.info("Initializing Ray ...")
+ 
         ray.init(self.cfg.ray_address, ignore_reinit_error=True)
+        
         self.tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
 
         # absolute path resolution logic
@@ -86,7 +88,9 @@ class RayExecutor(ExecutorBase):
         """
         # 1. load data
         logger.info("Loading dataset with Ray...")
+        dstart = time.time()
         dataset = self.datasetbuilder.load_dataset(num_proc=load_data_np)
+        logger.info(f"Data loading in {time.time() - dstart:.3f}")
         columns = dataset.schema().columns
 
         # 2. extract processes
