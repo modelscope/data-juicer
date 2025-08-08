@@ -65,10 +65,7 @@ partition:
   size: 1000  # Number of samples per partition
   max_size_mb: 64  # Maximum partition size in MB
 
-# Retry configuration
-retry:
-  max_retries: 3
-  retry_backoff: "exponential"  # exponential, linear, fixed
+
 
 # Intermediate storage configuration for partition and checkpoint data (format, compression, and lifecycle management)
 intermediate_storage:
@@ -92,7 +89,6 @@ intermediate_storage:
 # Legacy flat configuration (still works)
 partition_size: 1000
 max_partition_size_mb: 64
-max_retries: 3
 preserve_intermediate_data: true
 storage_format: "parquet"
 use_arrow_batches: true
@@ -115,9 +111,7 @@ Controls how the dataset is split and how failures are handled:
     - **300-500**: Large datasets with stable processing
     - **500+**: Only for very large datasets with minimal failure risk
   - `max_size_mb`: Maximum partition size in MB
-- **Retry Logic**:
-  - `max_retries`: Maximum retry attempts per partition
-  - `retry_backoff`: Retry strategy (`exponential`, `linear`, `fixed`)
+
 
 #### `intermediate_storage` - Intermediate Data Management
 Controls file formats, compression, and lifecycle management for intermediate data:
@@ -172,9 +166,7 @@ partition:
   size: 200  # Number of samples per partition (smaller for better fault tolerance)
   max_size_mb: 32  # Maximum partition size in MB (reduced for faster processing)
   
-  # Retry settings
-  max_retries: 3
-  retry_backoff: "exponential"  # exponential, linear, fixed
+
 
 # Intermediate storage configuration for partition and checkpoint data (format, compression, and lifecycle management)
 intermediate_storage:

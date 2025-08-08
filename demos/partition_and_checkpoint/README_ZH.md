@@ -65,10 +65,7 @@ partition:
   size: 1000  # 每个分区的样本数
   max_size_mb: 64  # 分区最大大小（MB）
 
-# 重试配置
-retry:
-  max_retries: 3
-  retry_backoff: "exponential"  # exponential, linear, fixed
+
 
 # 中间存储配置（格式、压缩和生命周期管理）
 intermediate_storage:
@@ -92,7 +89,6 @@ intermediate_storage:
 # 传统扁平配置（仍有效）
 partition_size: 1000
 max_partition_size_mb: 64
-max_retries: 3
 preserve_intermediate_data: true
 storage_format: "parquet"
 use_arrow_batches: true
@@ -115,9 +111,7 @@ arrow_memory_mapping: false
     - **300-500**: 具有稳定处理的大数据集
     - **500+**: 仅适用于故障风险最小的大数据集
   - `max_size_mb`: 分区最大大小（MB）
-- **重试逻辑**：
-  - `max_retries`: 每个分区的最大重试次数
-  - `retry_backoff`: 重试策略（`exponential`、`linear`、`fixed`）
+
 
 #### `intermediate_storage` - 中间数据管理
 控制中间数据的文件格式、压缩和生命周期管理：
@@ -172,9 +166,7 @@ partition:
   size: 200  # 每个分区的样本数（较小以获得更好的容错性）
   max_size_mb: 32  # 分区最大大小（MB）（减少以加快处理速度）
   
-  # 重试设置
-  max_retries: 3
-  retry_backoff: "exponential"  # exponential, linear, fixed
+
 
 # 中间存储配置（格式、压缩和生命周期管理）
 intermediate_storage:

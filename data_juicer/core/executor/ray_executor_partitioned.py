@@ -153,10 +153,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 self.cfg, "max_partition_size_mb", 128
             )
 
-        # Retry configuration (now under partition section)
-        partition_config = getattr(self.cfg, "partition", {})
-        self.max_retries = partition_config.get("max_retries") or getattr(self.cfg, "max_retries", 3)
-        self.retry_backoff = partition_config.get("retry_backoff", "exponential")
+        # Retry configuration (fixed defaults)
+        self.max_retries = 3
+        self.retry_backoff = "exponential"
 
         # Intermediate storage configuration (includes file lifecycle management)
         intermediate_storage_config = getattr(self.cfg, "intermediate_storage", {})
@@ -876,13 +875,8 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 if attempt < self.max_retries:
                     logger.warning(f"Attempt {attempt + 1} failed for partition {partition_id}: {e}")
 
-                    # Calculate backoff delay based on strategy
-                    if self.retry_backoff == "exponential":
-                        delay = 2**attempt
-                    elif self.retry_backoff == "linear":
-                        delay = attempt + 1
-                    else:  # fixed
-                        delay = 1
+                    # Calculate exponential backoff delay
+                    delay = 2**attempt
 
                     logger.info(f"Retrying partition {partition_id} in {delay} seconds...")
                     time.sleep(delay)

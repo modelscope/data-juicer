@@ -97,7 +97,6 @@
     "partition_size": 10000,
     "max_partition_size_mb": 128,
     "storage_format": "parquet",
-    "max_retries": 3,
     "preserve_intermediate_data": true
   }
 } 

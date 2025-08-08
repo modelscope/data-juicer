@@ -71,9 +71,6 @@ partition:
   size: 50000  # Number of samples per partition (smaller for better fault tolerance)
   max_size_mb: 128  # Maximum partition size in MB (reduced for faster processing)
 
-  # Retry settings
-  max_retries: 3
-  retry_backoff: "exponential"  # exponential, linear, fixed
 
 # Checkpoint configuration
 checkpoint:

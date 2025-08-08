@@ -498,7 +498,6 @@ class EventLoggingMixin:
                 "checkpoint_strategy": config.get("checkpoint_strategy"),
                 "storage_format": config.get("storage_format"),
                 "compression": config.get("compression"),
-                "max_retries": config.get("max_retries"),
             },
         }
         event_id = f"job_start_{int(time.time())}"

@@ -522,12 +522,6 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
             )
 
             parser.add_argument(
-                "--max_retries",
-                type=int,
-                default=3,
-                help="Maximum number of retries for failed partitions (legacy flat config)",
-            )
-            parser.add_argument(
                 "--preserve_intermediate_data",
                 type=bool,
                 default=False,
@@ -552,21 +546,6 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 type=int,
                 default=128,
                 help="Maximum partition size in MB (nested partition config)",
-            )
-
-            # Retry configuration (nested under partition)
-            parser.add_argument(
-                "--partition.max_retries",
-                type=int,
-                default=3,
-                help="Maximum number of retries for failed partitions (nested partition config)",
-            )
-            parser.add_argument(
-                "--partition.retry_backoff",
-                type=str,
-                default="exponential",
-                choices=["exponential", "linear", "fixed"],
-                help="Retry backoff strategy for partitions (nested partition config)",
             )
 
             # Intermediate storage configuration (new structure) - includes file lifecycle management
