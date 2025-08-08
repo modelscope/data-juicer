@@ -44,7 +44,9 @@ def downsample(data_path, n=100, seed=0):
     random.shuffle(data)
     dataset_filename = data_path.split("/")[-1]
     tgt_filename = dataset_filename.split(".")[0] + "_downsampled." + dataset_filename.split(".")[1]
-    tgt_dir = "./outputs/tmp"
+    # tgt_dir = "./outputs/tmp"
+    # Downsampled files saved in original dir to preserve media path integrity.
+    tgt_dir = os.path.dirname(data_path)
     os.makedirs(tgt_dir, exist_ok=True)
     tgt_path = os.path.join(tgt_dir, tgt_filename)
     with open(tgt_path, "w") as f:

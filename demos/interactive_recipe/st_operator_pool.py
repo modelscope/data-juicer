@@ -318,7 +318,6 @@ class StOperator(Operator):
         return self.dj_stats_key is not None
 
     def render(self):
-        logger.info(f"render op: {self.name}")
         show_enabled_only = st.session_state.get("show_enabled_only")
         if show_enabled_only and not self.enabled:
             # Don't render op if show_enabled_only option is on and op is not enabled
