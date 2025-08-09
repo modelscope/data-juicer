@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """
-Comprehensive Demo for DataJuicer Fault-Tolerant Processing
+Comprehensive Demo for DataJuicer Job Management & Monitoring
 
-This script demonstrates all the implemented features:
-1. Job-specific directory isolation
-2. Flexible storage paths for event logs and checkpoints
-3. Configurable checkpointing strategies
-4. Event logging with JSONL format
-5. Job resumption capabilities
-6. Comprehensive job management
+This script demonstrates all the implemented job management features:
+1. Processing Snapshot Utility - Comprehensive job status analysis with JSON output
+2. Job Management Tools - Monitor and manage DataJuicer processing jobs
+3. Resource-Aware Partitioning - Automatic resource optimization for distributed processing
+4. Job-specific directory isolation
+5. Flexible storage paths for event logs and checkpoints
+6. Configurable checkpointing strategies
+7. Event logging with JSONL format
+8. Job resumption capabilities
+9. Comprehensive job management
 
 Usage:
-    python run_comprehensive_demo.py
+    python run_demo.py
 """
 
 import os
@@ -50,6 +53,34 @@ def run_data_juicer_command(config_file, job_id=None, extra_args=None):
         print(result.stderr)
     
     return result
+
+
+def run_snapshot_analysis(job_id, work_dir="./outputs/partition-checkpoint-eventlog"):
+    """Run the processing snapshot utility to analyze job status."""
+    print(f"\n📊 Processing Snapshot Analysis for {job_id}:")
+    print("=" * 60)
+    
+    # Run the snapshot utility
+    cmd = ["python", "-m", "data_juicer.utils.job.snapshot", 
+           os.path.join(work_dir, job_id)]
+    
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode == 0:
+            snapshot_data = json.loads(result.stdout)
+            print("✅ Snapshot Analysis Results:")
+            print(f"   Job Status: {snapshot_data.get('overall_status', 'unknown')}")
+            print(f"   Progress: {snapshot_data.get('overall_progress', {}).get('overall_percentage', 0):.1f}%")
+            print(f"   Duration: {snapshot_data.get('timing', {}).get('duration_formatted', 'unknown')}")
+            print(f"   Partitions: {snapshot_data.get('progress_summary', {}).get('completed_partitions', 0)}/{snapshot_data.get('progress_summary', {}).get('total_partitions', 0)}")
+            print(f"   Operations: {snapshot_data.get('progress_summary', {}).get('completed_operations', 0)}/{snapshot_data.get('progress_summary', {}).get('total_operations', 0)}")
+            print(f"   Resumable: {snapshot_data.get('checkpointing', {}).get('resumable', False)}")
+        else:
+            print(f"❌ Snapshot analysis failed: {result.stderr}")
+    except Exception as e:
+        print(f"❌ Error running snapshot analysis: {e}")
+    
+    print("=" * 60)
 
 
 def check_directory_structure(job_id, work_dir="./outputs/partition-checkpoint-eventlog"):
@@ -128,6 +159,30 @@ def check_job_summary(job_id, work_dir="./outputs/partition-checkpoint-eventlog"
     print("=" * 60)
 
 
+def check_resource_optimization():
+    """Check resource-aware partitioning configuration."""
+    print(f"\n⚙️ Resource-Aware Partitioning Check:")
+    print("=" * 60)
+    
+    # Check if resource optimization is enabled in config
+    config_file = "configs/demo/partition-checkpoint-eventlog.yaml"
+    if os.path.exists(config_file):
+        with open(config_file, 'r') as f:
+            config_content = f.read()
+        
+        if "resource_optimization:" in config_content and "auto_configure: true" in config_content:
+            print("✅ Resource optimization is enabled")
+            print("   - Automatic partition size optimization")
+            print("   - Worker count optimization")
+            print("   - 64MB partition targeting")
+        else:
+            print("ℹ️ Resource optimization not enabled (using manual configuration)")
+    else:
+        print(f"❌ Config file {config_file} not found")
+    
+    print("=" * 60)
+
+
 def get_latest_job_id(work_dir):
     """Get the most recently created job_id directory in work_dir."""
     if not os.path.exists(work_dir):
@@ -142,7 +197,7 @@ def get_latest_job_id(work_dir):
 
 def main():
     """Run the comprehensive demo."""
-    print("🚀 DataJuicer Fault-Tolerant Processing Demo")
+    print("🚀 DataJuicer Job Management & Monitoring Demo")
     print("=" * 80)
     
     config_file = "configs/demo/partition-checkpoint-eventlog.yaml"
@@ -154,6 +209,9 @@ def main():
         print("Please run this script from the DataJuicer root directory.")
         return
     
+    # Check resource optimization configuration
+    check_resource_optimization()
+    
     # Demo 1: First run with new job (auto-generated job_id)
     print("\n🎯 Demo 1: First Run (New Job, Auto-generated job_id)")
     print("=" * 80)
@@ -164,6 +222,7 @@ def main():
         check_directory_structure(job_id_1, work_dir)
         check_flexible_storage(job_id_1)
         check_job_summary(job_id_1, work_dir)
+        run_snapshot_analysis(job_id_1, work_dir)
     else:
         print("❌ First run failed!")
         return
@@ -176,6 +235,7 @@ def main():
         print("✅ Job resumption completed successfully!")
         print("Note: This should be much faster than the first run due to checkpoint resumption.")
         check_job_summary(job_id_1, work_dir)
+        run_snapshot_analysis(job_id_1, work_dir)
     else:
         print("❌ Job resumption failed!")
     
@@ -190,6 +250,7 @@ def main():
         check_directory_structure(job_id_2, work_dir)
         check_flexible_storage(job_id_2)
         check_job_summary(job_id_2, work_dir)
+        run_snapshot_analysis(job_id_2, work_dir)
     else:
         print("❌ Different checkpoint strategy failed!")
     
@@ -208,6 +269,9 @@ def main():
     print("\n🎉 Demo completed!")
     print("=" * 80)
     print("Key Features Demonstrated:")
+    print("✅ Processing Snapshot Utility - Comprehensive job status analysis with JSON output")
+    print("✅ Job Management Tools - Monitor and manage DataJuicer processing jobs")
+    print("✅ Resource-Aware Partitioning - Automatic resource optimization for distributed processing")
     print("✅ Job-specific directory isolation")
     print("✅ Flexible storage paths (event logs in /tmp/fast_event_logs)")
     print("✅ Flexible storage paths (checkpoints in /tmp/large_checkpoints)")

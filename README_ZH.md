@@ -34,7 +34,8 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 ----
 
 ## 新消息
-- 🛠️ [2025-06-04] 如何在“经验时代”处理反馈数据？我们提出了 [Trinity-RFT: A General-Purpose and Unified Framework for Reinforcement Fine-Tuning of LLMs](https://arxiv.org/abs/2505.17826)，该框架利用 Data-Juicer 为 RFT 场景量身定制数据处理管道。
+- 🛠️ [2025-08-09] **新增作业管理与监控功能**：我们新增了全面的作业监控功能，包括[处理快照工具](data_juicer/utils/job/snapshot.py)，提供详细的JSON格式作业状态分析、进度跟踪和检查点信息。同时引入了[资源感知分区](data_juicer/core/executor/partition_size_optimizer.py)功能，用于分布式处理资源的自动优化，以及增强的日志系统，提供集中化的日志轮转和保留策略。
+- 🛠️ [2025-06-04] 如何在"经验时代"处理反馈数据？我们提出了 [Trinity-RFT: A General-Purpose and Unified Framework for Reinforcement Fine-Tuning of LLMs](https://arxiv.org/abs/2505.17826)，该框架利用 Data-Juicer 为 RFT 场景量身定制数据处理管道。
 - 🎉 [2025-06-04] 我们的 [Data-Model Co-development 综述](https://ieeexplore.ieee.org/document/11027559) 已被 IEEE Transactions on Pattern Analysis and Machine Intelligence（**TPAMI**）接收！欢迎探索并贡献[awesome-list](https://modelscope.github.io/data-juicer/en/main/docs/awesome_llm_data.html)。
 - 🔎 [2025-06-04] 我们推出了 [DetailMaster: Can Your Text-to-Image Model Handle Long Prompts?](https://www.arxiv.org/abs/2505.16915) 一项合成基准测试，揭示了大模型虽擅长处理短描述，但在长提示下性能显著下降的问题。
 - 🎉 [2025-05-06] 我们的 [Data-Juicer Sandbox](https://arxiv.org/abs/2407.11784) 已被接收为 **ICML'25 Spotlight**（处于所有投稿中的前 2.6%）！
@@ -107,6 +108,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
   - [开发者指南](docs/DeveloperGuide_ZH.md)
   - [Data-Juicer分布式数据处理](docs/Distributed_ZH.md)
   - [沙盒实验室](docs/Sandbox_ZH.md)
+  - [作业管理与监控](docs/JobManagement_ZH.md)
 - Demos
   - [演示](demos/README_ZH.md)
     - [自动化评测：HELM 评测及可视化](demos/auto_evaluation_helm/README_ZH.md)
@@ -125,6 +127,10 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
   - [后处理工具](tools/postprocess/README_ZH.md)
   - [预处理工具](tools/preprocess/README_ZH.md)
   - [给数据打分](tools/quality_classifier/README_ZH.md)
+- 作业管理与监控
+  - [处理快照工具](data_juicer/utils/job/snapshot.py) - 提供JSON格式的全面作业状态分析
+  - [作业管理工具](data_juicer/utils/job/) - 监控和管理DataJuicer处理作业
+  - [资源感知分区](data_juicer/core/executor/partition_size_optimizer.py) - 分布式处理的自动资源优化
 - 第三方
   - [大语言模型生态](thirdparty/LLM_ecosystems/README_ZH.md)
   - [第三方模型库](thirdparty/models/README_ZH.md)
