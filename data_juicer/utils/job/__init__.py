@@ -1,25 +1,29 @@
 #!/usr/bin/env python3
 """
-DataJuicer Job Management Tools
+Job utilities for DataJuicer.
 
-A collection of utilities for managing DataJuicer jobs including monitoring progress
-and stopping running jobs.
+This module provides utilities for job management, monitoring, and analysis.
 """
 
 from .common import JobUtils, list_running_jobs
-from .monitor import JobProgressMonitor, show_job_progress
-from .stopper import JobStopper, stop_job
+from .snapshot import (
+    JobSnapshot,
+    OperationStatus,
+    PartitionStatus,
+    ProcessingSnapshotAnalyzer,
+    ProcessingStatus,
+    create_snapshot,
+)
 
 __all__ = [
-    # Common utilities
     "JobUtils",
     "list_running_jobs",
-    # Monitoring
-    "JobProgressMonitor",
-    "show_job_progress",
-    # Stopping
-    "JobStopper",
-    "stop_job",
+    "ProcessingSnapshotAnalyzer",
+    "create_snapshot",
+    "JobSnapshot",
+    "ProcessingStatus",
+    "OperationStatus",
+    "PartitionStatus",
 ]
 
 __version__ = "1.0.0"
