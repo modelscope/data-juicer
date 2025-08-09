@@ -476,9 +476,12 @@ class ConfigTest(DataJuicerTestCaseBase):
         # job_dir should equal work_dir since job_id is at the end
         self.assertEqual(cfg.job_dir, './outputs/my_project/20250804_143022_abc123')
         # Other directories should be under job_dir
-        self.assertEqual(cfg.event_log_dir, './outputs/my_project/20250804_143022_abc123/event_logs')
+        self.assertEqual(cfg.event_log_dir, './outputs/my_project/20250804_143022_abc123/logs')
         self.assertEqual(cfg.checkpoint_dir, './outputs/my_project/20250804_143022_abc123/checkpoints')
         self.assertEqual(cfg.partition_dir, './outputs/my_project/20250804_143022_abc123/partitions')
+        self.assertEqual(cfg.metadata_dir, './outputs/my_project/20250804_143022_abc123/metadata')
+        self.assertEqual(cfg.results_dir, './outputs/my_project/20250804_143022_abc123/results')
+        self.assertEqual(cfg.event_log_file, './outputs/my_project/20250804_143022_abc123/events.jsonl')
 
     def test_resolve_job_directories_without_job_id_placeholder(self):
         """Test resolve_job_directories when work_dir doesn't contain {job_id}."""
@@ -493,7 +496,7 @@ class ConfigTest(DataJuicerTestCaseBase):
         # job_dir should be work_dir + job_id
         self.assertEqual(cfg.job_dir, './outputs/my_project/20250804_143022_abc123')
         # Other directories should be under job_dir
-        self.assertEqual(cfg.event_log_dir, './outputs/my_project/20250804_143022_abc123/event_logs')
+        self.assertEqual(cfg.event_log_dir, './outputs/my_project/20250804_143022_abc123/logs')
         self.assertEqual(cfg.checkpoint_dir, './outputs/my_project/20250804_143022_abc123/checkpoints')
 
     def test_resolve_job_directories_placeholder_substitution(self):
@@ -511,10 +514,13 @@ class ConfigTest(DataJuicerTestCaseBase):
         # All placeholders should be substituted
         self.assertEqual(cfg.work_dir, './outputs/20250804_143022_abc123')
         self.assertEqual(cfg.export_path, './outputs/20250804_143022_abc123/results.jsonl')
-        # Note: event_log_dir is overridden by the system to use standard 'event_logs' directory
-        self.assertEqual(cfg.event_log_dir, './outputs/20250804_143022_abc123/event_logs')
+        # Note: event_log_dir is overridden by the system to use standard 'logs' directory
+        self.assertEqual(cfg.event_log_dir, './outputs/20250804_143022_abc123/logs')
         self.assertEqual(cfg.checkpoint_dir, './outputs/20250804_143022_abc123/checkpoints')
         self.assertEqual(cfg.partition_dir, './outputs/20250804_143022_abc123/partitions')
+        self.assertEqual(cfg.metadata_dir, './outputs/20250804_143022_abc123/metadata')
+        self.assertEqual(cfg.results_dir, './outputs/20250804_143022_abc123/results')
+        self.assertEqual(cfg.event_log_file, './outputs/20250804_143022_abc123/events.jsonl')
 
     def test_resolve_job_directories_missing_job_id(self):
         """Test resolve_job_directories when job_id is not set."""

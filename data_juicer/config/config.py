@@ -368,14 +368,15 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 default=True,
                 help="Enable event logging for job tracking and resumption",
             )
+            # Logging configuration
             parser.add_argument(
-                "--event_logging.max_log_size_mb",
+                "--max_log_size_mb",
                 type=int,
                 default=100,
                 help="Maximum log file size in MB before rotation",
             )
             parser.add_argument(
-                "--event_logging.backup_count",
+                "--backup_count",
                 type=int,
                 default=5,
                 help="Number of backup log files to keep",
@@ -548,7 +549,15 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 help="Maximum partition size in MB (nested partition config)",
             )
 
-            # Intermediate storage configuration (new structure) - includes file lifecycle management
+            # Resource optimization configuration (nested structure)
+            parser.add_argument(
+                "--resource_optimization.auto_configure",
+                type=bool,
+                default=False,
+                help="Enable automatic optimization of partition size, worker count, and other resource-dependent settings (nested resource_optimization config)",
+            )
+
+            # Intermediate storage configuration (nested structure)
             parser.add_argument(
                 "--intermediate_storage.preserve_intermediate_data",
                 type=bool,
@@ -748,6 +757,8 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
             filename=logfile_name,
             level="DEBUG" if cfg.debug else "INFO",
             redirect=cfg.executor_type == "default",
+            max_log_size_mb=getattr(cfg, "max_log_size_mb", 100),
+            backup_count=getattr(cfg, "backup_count", 5),
         )
 
     # check and get dataset dir
@@ -1386,12 +1397,12 @@ def resolve_job_directories(cfg):
         job_dir = os.path.join(cfg.work_dir, job_id)
 
     cfg.job_dir = job_dir
-    cfg.event_log_dir = os.path.join(job_dir, "event_logs")
+    cfg.event_log_dir = os.path.join(job_dir, "logs")
     cfg.checkpoint_dir = os.path.join(job_dir, "checkpoints")
     cfg.partition_dir = os.path.join(job_dir, "partitions")
     cfg.metadata_dir = os.path.join(job_dir, "metadata")
     cfg.results_dir = os.path.join(job_dir, "results")
-    cfg.event_log_file = os.path.join(cfg.event_log_dir, "events.jsonl")
+    cfg.event_log_file = os.path.join(job_dir, "events.jsonl")
     cfg.job_summary_file = os.path.join(job_dir, "job_summary.json")
     # Set backed_up_config_path using original config filename
     if hasattr(cfg, "config") and cfg.config:

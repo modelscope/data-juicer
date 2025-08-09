@@ -66,7 +66,7 @@ class JobUtils:
 
     def load_event_logs(self) -> List[Dict[str, Any]]:
         """Load and parse event logs."""
-        events_file = self.job_dir / "event_logs" / "events.jsonl"
+        events_file = self.job_dir / "events.jsonl"
         events = []
 
         if events_file.exists():
@@ -307,7 +307,7 @@ def list_running_jobs(base_dir: str = "outputs/partition-checkpoint-eventlog") -
                         job_summary = json.load(f)
 
                     # Check if processes are still running
-                    events_file = job_dir / "event_logs" / "events.jsonl"
+                    events_file = job_dir / "events.jsonl"
                     process_ids = set()
                     if events_file.exists():
                         try:

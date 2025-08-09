@@ -38,6 +38,8 @@ from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
 
+from .partition_size_optimizer import PartitionSizeOptimizer, auto_configure_resources
+
 ray = LazyLoader("ray")
 
 
@@ -135,22 +137,36 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         self._override_strategy_methods()
 
         # Partitioning configuration
-        # Support both flat and nested partition configuration
+        # Handle both flat and nested partition configurations
         partition_config = getattr(self.cfg, "partition", {})
 
-        # Check if auto-configuration is enabled
-        self.auto_configure_partitions = partition_config.get("auto_configure", False)
+        # If partition_config is None (flat configuration), create a dict with flat values
+        if partition_config is None:
+            partition_config = {
+                "size": getattr(self.cfg, "partition_size", 10000),
+                "max_size_mb": getattr(self.cfg, "max_partition_size_mb", 128),
+            }
 
-        if self.auto_configure_partitions:
-            logger.info("Auto-configuration enabled - will analyze dataset and optimize partition size")
+        # Check if auto-configuration is enabled
+        resource_optimization_config = getattr(self.cfg, "resource_optimization", {})
+        self.auto_configure_resources = resource_optimization_config.get("auto_configure", False)
+
+        if self.auto_configure_resources:
+            logger.info(
+                "Resource optimization enabled - will analyze dataset and optimize partition size, worker count, and other resource-dependent settings"
+            )
             # We'll configure this after loading the dataset
             self.partition_size = None
             self.max_partition_size_mb = None
         else:
-            # Read from nested partition config first, fall back to flat config
+            # Use manual configuration
+            self.auto_configure_resources = False
             self.partition_size = partition_config.get("size") or getattr(self.cfg, "partition_size", 10000)
             self.max_partition_size_mb = partition_config.get("max_size_mb") or getattr(
                 self.cfg, "max_partition_size_mb", 128
+            )
+            logger.info(
+                f"Manual resource configuration: partition_size={self.partition_size}, max_partition_size_mb={self.max_partition_size_mb}"
             )
 
         # Retry configuration (fixed defaults)
@@ -265,6 +281,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
 
         # Dataset mapping
         self.dataset_mapping: Optional[DatasetMapping] = None
+
+        # Initialize partition size optimizer for auto-configuration
+        if self.auto_configure_resources:
+            self.partition_optimizer = PartitionSizeOptimizer(self.cfg)
 
     def _should_checkpoint(self, op_idx: int, op_name: str, partition_id: int) -> bool:
         """Determine if checkpoint should be created based on configuration strategy."""
@@ -1369,8 +1389,38 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         logger.info("Preparing process operators...")
         ops = self._prepare_operators()
 
+        # Auto-configure partition size and worker count if enabled
+        if self.auto_configure_resources:
+            logger.info(
+                "Auto-configuring partition size and worker count based on data characteristics and available resources..."
+            )
+
+            try:
+                # Get resource optimization recommendations
+                recommendations = auto_configure_resources(self.cfg, dataset, ops)
+
+                # Apply recommendations
+                self.partition_size = recommendations["recommended_partition_size"]
+                self.max_partition_size_mb = recommendations["recommended_max_size_mb"]
+
+                logger.info(f"Resource optimization completed:")
+                logger.info(f"  Partition size: {self.partition_size} samples")
+                logger.info(f"  Max partition size: {self.max_partition_size_mb} MB")
+                logger.info(f"  Worker count: {getattr(self.cfg, 'np', 'Not set')}")
+                logger.info(f"  Primary modality: {recommendations['primary_modality']}")
+                logger.info(f"  Data characteristics: {recommendations['data_characteristics']}")
+                logger.info(f"  Resource analysis: {recommendations['resource_analysis']}")
+                logger.info(f"  Reasoning: {recommendations['reasoning']}")
+
+            except Exception as e:
+                logger.warning(f"Resource optimization failed: {e}, falling back to default values")
+                self.partition_size = 10000
+                self.max_partition_size_mb = 128
+
         # Create partitions FIRST to determine actual partition count
-        logger.info("Creating new partitions...")
+        logger.info(
+            f"Creating new partitions with size: {self.partition_size}, max_size_mb: {self.max_partition_size_mb}..."
+        )
 
         # Log repartition start event
         repartition_start_time = time.time()
@@ -1670,7 +1720,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             logger.info(f"Using actual partition count from dataset mapping: {self.dataset_mapping.partition_count}")
             return self.dataset_mapping.partition_count
 
-        if self.auto_configure_partitions:
+        if self.auto_configure_resources:
             # Will be determined after dataset loading
             return 1  # Placeholder
         else:

@@ -103,59 +103,18 @@ class Event:
 class EventLogger:
     """Event logging system with real-time capabilities and JSONL event log for resumability."""
 
-    def __init__(self, log_dir: str, max_log_size_mb: int = 100, backup_count: int = 5, job_id: Optional[str] = None):
+    def __init__(self, log_dir: str, job_id: Optional[str] = None, work_dir: Optional[str] = None):
         self.log_dir = Path(log_dir)
         self.log_dir.mkdir(parents=True, exist_ok=True)
-        self.max_log_size_mb = max_log_size_mb
-        self.backup_count = backup_count
         # Use provided job_id or generate a simple timestamp-based one
         self.job_id = job_id or f"{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}-{uuid4().hex[:6]}"
         self.events: deque = deque(maxlen=10000)
         self.event_lock = threading.Lock()
-        self._setup_file_logging()
-        self._start_cleanup_thread()
-        # Use simpler filename since we're in job-specific directory
-        self.jsonl_file = self.log_dir / "events.jsonl"
 
-    def _setup_file_logging(self):
-        """Setup file-based logging."""
-        log_file = self.log_dir / "events.log"
-
-        # Configure loguru for file logging
-        logger.add(
-            str(log_file),
-            format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level} | {message}",
-            level="INFO",
-            rotation=f"{self.max_log_size_mb} MB",
-            retention=self.backup_count,  # Use number directly, not string
-            compression="gz",
-        )
-
-    def _start_cleanup_thread(self):
-        """Start background thread for log cleanup."""
-
-        def cleanup_worker():
-            while True:
-                try:
-                    time.sleep(3600)  # Run every hour
-                    self._cleanup_old_logs()
-                except Exception as e:
-                    logger.warning(f"Error in cleanup thread: {e}")
-
-        cleanup_thread = threading.Thread(target=cleanup_worker, daemon=True)
-        cleanup_thread.start()
-
-    def _cleanup_old_logs(self):
-        """Clean up old log files."""
-        try:
-            log_files = list(self.log_dir.glob("events.log.*"))
-            if len(log_files) > self.backup_count:
-                # Sort by modification time and remove oldest
-                log_files.sort(key=lambda x: x.stat().st_mtime)
-                for old_file in log_files[: -self.backup_count]:
-                    old_file.unlink()
-        except Exception as e:
-            logger.warning(f"Error cleaning up old logs: {e}")
+        # Use work_dir for JSONL file if provided, otherwise use log_dir
+        self.jsonl_dir = Path(work_dir) if work_dir else self.log_dir
+        self.jsonl_dir.mkdir(parents=True, exist_ok=True)
+        self.jsonl_file = self.jsonl_dir / "events.jsonl"
 
     def log_event(self, event: Event):
         """Log an event (to memory, loguru, and JSONL for resumability)."""
@@ -364,12 +323,11 @@ class EventLoggingMixin:
         # Create job directory and subdirectories
         os.makedirs(job_dir, exist_ok=True)
 
-        # Use resolved event log directory from config
-        event_log_dir = self.cfg.event_log_dir
-        os.makedirs(event_log_dir, exist_ok=True)
-        max_log_size = event_config.get("max_log_size_mb", 100)
-        backup_count = event_config.get("backup_count", 5)
-        self.event_logger = EventLogger(event_log_dir, max_log_size, backup_count, job_id=job_id)
+        # Use logs directory instead of event_logs
+        logs_dir = os.path.join(job_dir, "logs")
+        os.makedirs(logs_dir, exist_ok=True)
+
+        self.event_logger = EventLogger(logs_dir, job_id=job_id, work_dir=job_dir)
 
         logger.info(f"Event logging initialized for {self.executor_type} executor")
 
