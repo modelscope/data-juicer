@@ -6,7 +6,6 @@
 
 ### ✅ 核心功能
 - **作业特定目录隔离**: 每个作业都有自己专用的目录结构
-- **灵活存储架构**: 事件日志（快速存储）和检查点（大容量存储）的独立存储路径
 - **可配置检查点策略**: 多种检查点频率和策略
 - **Spark 风格事件日志记录**: 用于可恢复性的 JSONL 格式全面事件跟踪
 - **作业恢复功能**: 从最后一个检查点恢复失败或中断的作业
@@ -37,19 +36,23 @@
 {work_dir}/
 ├── {job_id}/                    # 作业特定目录
 │   ├── job_summary.json         # 作业元数据和恢复信息
+│   ├── events.jsonl             # 机器可读事件（JSONL 格式）
+│   ├── dag_execution_plan.json  # DAG 执行计划
+│   ├── partition-checkpoint-eventlog.yaml  # 备份的配置文件
 │   ├── metadata/                # 作业元数据文件
 │   │   ├── dataset_mapping.json
 │   │   └── final_mapping_report.json
+│   ├── logs/                    # 人类可读日志
+│   │   ├── export_processed.jsonl_time_*.txt           # 主日志文件
+│   │   ├── export_processed.jsonl_time_*_DEBUG.txt     # 调试级别日志
+│   │   ├── export_processed.jsonl_time_*_WARNING.txt   # 警告级别日志
+│   │   └── export_processed.jsonl_time_*_ERROR.txt     # 错误级别日志
+│   ├── checkpoints/             # 检查点数据
+│   │   ├── checkpoint_*.json    # 检查点元数据
+│   │   └── partition_*/         # 分区检查点数据
 │   ├── partitions/              # 输入数据分区
-│   ├── intermediate/            # 中间处理结果
+│   ├── processed.jsonl/         # 中间处理结果
 │   └── results/                 # 最终处理结果
-├── {event_log_dir}/{job_id}/    # 灵活事件日志存储
-│   └── event_logs/
-│       ├── events.jsonl         # 机器可读事件
-│       └── events.log           # 人类可读日志
-└── {checkpoint_dir}/{job_id}/   # 灵活检查点存储
-    ├── checkpoint_*.json        # 检查点元数据
-    └── partition_*_*.parquet    # 分区检查点
 ```
 
 ## 🛠️ 配置
@@ -151,10 +154,6 @@ event_logging:
   max_log_size_mb: 100
   backup_count: 5
 
-# 灵活存储路径
-event_log_dir: /tmp/fast_event_logs      # 事件日志的快速存储
-checkpoint_dir: /tmp/large_checkpoints   # 检查点的大容量存储
-
 # 分区配置
 partition:
   # 基本分区设置
@@ -225,28 +224,34 @@ python demos/partition_and_checkpoint/run_comprehensive_demo.py
 ### 查看作业信息
 ```bash
 # 检查作业摘要
-cat ./outputs/demo-checkpoint-strategies/{job_id}/job_summary.json
+cat ./outputs/partition-checkpoint-eventlog/{job_id}/job_summary.json
 
 # 查看事件日志
-cat /tmp/fast_event_logs/{job_id}/event_logs/events.jsonl
+cat ./outputs/partition-checkpoint-eventlog/{job_id}/events.jsonl
 
 # 查看人类可读日志
-cat /tmp/fast_event_logs/{job_id}/event_logs/events.log
+cat ./outputs/partition-checkpoint-eventlog/{job_id}/logs/export_processed.jsonl_time_*.txt
+
+# 查看 DAG 执行计划
+cat ./outputs/partition-checkpoint-eventlog/{job_id}/dag_execution_plan.json
 ```
 
 ### 列出可用作业
 ```bash
 # 列出所有作业目录
-ls -la ./outputs/demo-checkpoint-strategies/
+ls -la ./outputs/partition-checkpoint-eventlog/
 ```
 
-### 检查灵活存储
+### 检查作业结构
 ```bash
-# 检查快速存储中的事件日志
-ls -la /tmp/fast_event_logs/
+# 检查作业目录结构
+ls -la ./outputs/partition-checkpoint-eventlog/{job_id}/
 
-# 检查大容量存储中的检查点
-ls -la /tmp/large_checkpoints/
+# 检查日志目录
+ls -la ./outputs/partition-checkpoint-eventlog/{job_id}/logs/
+
+# 检查检查点目录
+ls -la ./outputs/partition-checkpoint-eventlog/{job_id}/checkpoints/
 ```
 
 ## 📈 作业管理工具
@@ -780,7 +785,7 @@ tail -f /tmp/fast_event_logs/{job_id}/event_logs/events.log
 - ✅ **容错性**: 作业可以在故障后恢复
 - ✅ **可扩展性**: 通过分区处理大数据集
 - ✅ **可观察性**: 全面日志记录和监控
-- ✅ **灵活性**: 可配置检查点和存储
+- ✅ **灵活性**: 可配置检查点策略
 - ✅ **可用性**: 具有有意义的作业 ID 的简单命令行界面
 - ✅ **性能**: 从检查点快速恢复
 - ✅ **可靠性**: 强大的错误处理和验证

@@ -105,29 +105,40 @@ def check_directory_structure(job_id, work_dir="./outputs/partition-checkpoint-e
 
 
 def check_flexible_storage(job_id):
-    """Check flexible storage directories."""
-    print(f"\n💾 Flexible Storage for {job_id}:")
+    """Check job storage directories."""
+    print(f"\n💾 Job Storage for {job_id}:")
     print("=" * 60)
     
-    # Check event logs in fast storage
-    event_log_dir = f"/tmp/fast_event_logs/{job_id}/event_logs"
-    if os.path.exists(event_log_dir):
-        print(f"✅ Event Logs: {event_log_dir}")
-        for file in os.listdir(event_log_dir):
-            file_path = os.path.join(event_log_dir, file)
+    # Check event logs in job directory
+    event_log_file = f"./outputs/partition-checkpoint-eventlog/{job_id}/events.jsonl"
+    if os.path.exists(event_log_file):
+        size = os.path.getsize(event_log_file)
+        print(f"✅ Event Logs: {event_log_file} ({size} bytes)")
+    else:
+        print(f"❌ Event Logs: {event_log_file} not found")
+    
+    # Check logs directory
+    logs_dir = f"./outputs/partition-checkpoint-eventlog/{job_id}/logs"
+    if os.path.exists(logs_dir):
+        print(f"✅ Logs Directory: {logs_dir}")
+        for file in os.listdir(logs_dir):
+            file_path = os.path.join(logs_dir, file)
             size = os.path.getsize(file_path)
             print(f"   📄 {file} ({size} bytes)")
     else:
-        print(f"❌ Event Logs: {event_log_dir} not found")
+        print(f"❌ Logs Directory: {logs_dir} not found")
     
-    # Check checkpoints in large storage
-    checkpoint_dir = f"/tmp/large_checkpoints/{job_id}"
+    # Check checkpoints in job directory
+    checkpoint_dir = f"./outputs/partition-checkpoint-eventlog/{job_id}/checkpoints"
     if os.path.exists(checkpoint_dir):
         print(f"✅ Checkpoints: {checkpoint_dir}")
         for file in os.listdir(checkpoint_dir):
             file_path = os.path.join(checkpoint_dir, file)
-            size = os.path.getsize(file_path)
-            print(f"   💾 {file} ({size} bytes)")
+            if os.path.isfile(file_path):
+                size = os.path.getsize(file_path)
+                print(f"   💾 {file} ({size} bytes)")
+            else:
+                print(f"   📁 {file}/")
     else:
         print(f"❌ Checkpoints: {checkpoint_dir} not found")
     
@@ -273,10 +284,9 @@ def main():
     print("✅ Job Management Tools - Monitor and manage DataJuicer processing jobs")
     print("✅ Resource-Aware Partitioning - Automatic resource optimization for distributed processing")
     print("✅ Job-specific directory isolation")
-    print("✅ Flexible storage paths (event logs in /tmp/fast_event_logs)")
-    print("✅ Flexible storage paths (checkpoints in /tmp/large_checkpoints)")
-    print("✅ Configurable checkpointing strategies")
     print("✅ Event logging with JSONL format")
+    print("✅ Human-readable logs with multiple levels")
+    print("✅ Configurable checkpointing strategies")
     print("✅ Job resumption capabilities")
     print("✅ Comprehensive job management with job_summary.json")
     print("✅ Fast resumption from checkpoints")

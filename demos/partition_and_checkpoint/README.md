@@ -6,7 +6,6 @@ This directory contains the implementation of fault-tolerant, resumable DataJuic
 
 ### ✅ Core Features
 - **Job-Specific Directory Isolation**: Each job gets its own dedicated directory structure
-- **Flexible Storage Architecture**: Separate storage paths for event logs (fast storage) and checkpoints (large capacity storage)
 - **Configurable Checkpointing Strategies**: Multiple checkpointing frequencies and strategies
 - **Spark-Style Event Logging**: Comprehensive event tracking in JSONL format for resumability
 - **Job Resumption Capabilities**: Resume failed or interrupted jobs from the last checkpoint
@@ -37,19 +36,23 @@ This directory contains the implementation of fault-tolerant, resumable DataJuic
 {work_dir}/
 ├── {job_id}/                    # Job-specific directory
 │   ├── job_summary.json         # Job metadata and resumption info
+│   ├── events.jsonl             # Machine-readable events (JSONL format)
+│   ├── dag_execution_plan.json  # DAG execution plan
+│   ├── partition-checkpoint-eventlog.yaml  # Backed up config file
 │   ├── metadata/                # Job metadata files
 │   │   ├── dataset_mapping.json
 │   │   └── final_mapping_report.json
+│   ├── logs/                    # Human-readable logs
+│   │   ├── export_processed.jsonl_time_*.txt           # Main log file
+│   │   ├── export_processed.jsonl_time_*_DEBUG.txt     # Debug level logs
+│   │   ├── export_processed.jsonl_time_*_WARNING.txt   # Warning level logs
+│   │   └── export_processed.jsonl_time_*_ERROR.txt     # Error level logs
+│   ├── checkpoints/             # Checkpoint data
+│   │   ├── checkpoint_*.json    # Checkpoint metadata
+│   │   └── partition_*/         # Partition checkpoint data
 │   ├── partitions/              # Input data partitions
-│   ├── intermediate/            # Intermediate processing results
+│   ├── processed.jsonl/         # Intermediate processing results
 │   └── results/                 # Final processing results
-├── {event_log_dir}/{job_id}/    # Flexible event log storage
-│   └── event_logs/
-│       ├── events.jsonl         # Machine-readable events
-│       └── events.log           # Human-readable logs
-└── {checkpoint_dir}/{job_id}/   # Flexible checkpoint storage
-    ├── checkpoint_*.json        # Checkpoint metadata
-    └── partition_*_*.parquet    # Partition checkpoints
 ```
 
 ## 🛠️ Configuration
@@ -151,10 +154,6 @@ event_logging:
   max_log_size_mb: 100
   backup_count: 5
 
-# Flexible storage paths
-event_log_dir: /tmp/fast_event_logs      # Fast storage for event logs
-checkpoint_dir: /tmp/large_checkpoints   # Large capacity storage for checkpoints
-
 # Partitioning configuration
 partition:
   # Basic partitioning settings
@@ -225,28 +224,34 @@ python demos/partition_and_checkpoint/run_comprehensive_demo.py
 ### View Job Information
 ```bash
 # Check job summary
-cat ./outputs/demo-checkpoint-strategies/{job_id}/job_summary.json
+cat ./outputs/partition-checkpoint-eventlog/{job_id}/job_summary.json
 
 # View event logs
-cat /tmp/fast_event_logs/{job_id}/event_logs/events.jsonl
+cat ./outputs/partition-checkpoint-eventlog/{job_id}/events.jsonl
 
 # View human-readable logs
-cat /tmp/fast_event_logs/{job_id}/event_logs/events.log
+cat ./outputs/partition-checkpoint-eventlog/{job_id}/logs/export_processed.jsonl_time_*.txt
+
+# View DAG execution plan
+cat ./outputs/partition-checkpoint-eventlog/{job_id}/dag_execution_plan.json
 ```
 
 ### List Available Jobs
 ```bash
 # List all job directories
-ls -la ./outputs/demo-checkpoint-strategies/
+ls -la ./outputs/partition-checkpoint-eventlog/
 ```
 
-### Check Flexible Storage
+### Check Job Structure
 ```bash
-# Check event logs in fast storage
-ls -la /tmp/fast_event_logs/
+# Check job directory structure
+ls -la ./outputs/partition-checkpoint-eventlog/{job_id}/
 
-# Check checkpoints in large storage
-ls -la /tmp/large_checkpoints/
+# Check logs directory
+ls -la ./outputs/partition-checkpoint-eventlog/{job_id}/logs/
+
+# Check checkpoints directory
+ls -la ./outputs/partition-checkpoint-eventlog/{job_id}/checkpoints/
 ```
 
 ## 📈 Job Management Utilities
@@ -780,7 +785,7 @@ The implementation successfully demonstrates:
 - ✅ **Fault Tolerance**: Jobs can resume after failures
 - ✅ **Scalability**: Handles large datasets through partitioning
 - ✅ **Observability**: Comprehensive logging and monitoring
-- ✅ **Flexibility**: Configurable checkpointing and storage
+- ✅ **Flexibility**: Configurable checkpointing strategies
 - ✅ **Usability**: Simple command-line interface with meaningful job IDs
 - ✅ **Performance**: Fast resumption from checkpoints
 - ✅ **Reliability**: Robust error handling and validation
