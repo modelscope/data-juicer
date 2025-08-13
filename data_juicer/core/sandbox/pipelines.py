@@ -153,6 +153,7 @@ class Target:
     def check_target(self, context_infos: ContextInfos):
         curr_val = context_infos[self.key]
         try:
+            logger.debug(f"Checking {curr_val} {self.op} {self.tgt_val}")
             ret = eval(f"{curr_val} {self.op} {self.tgt_val}")
         except:  # noqa: E722
             logger.error(f"Invalid iter_targets [{str(self)}]: The target value [{curr_val}] " "is not a valid number.")
@@ -230,28 +231,36 @@ class SandboxPipeline:
 
         # ====== Data & model probe ======
         for probe_hook in self.probe_jobs:
-            logger.info(f"======= Pipeline [{self.name}]: Start Probe Hook [{probe_hook.meta_name}] =======")
+            logger.info(
+                f"======= Iter [{context_infos.iter}] - Pipeline [{self.name}]: Start Probe Hook [{probe_hook.meta_name}] ======="
+            )
             new_job_infos = probe_hook.run(context_infos)
             context_infos[self.name].record_job_infos(new_job_infos)
             logger.debug(f"Context Infos: {context_infos.to_dict()}")
 
         # ====== Data-model recipes iteration based on probe results ======
         for refine_hook in self.refine_recipe_jobs:
-            logger.info(f"======= Pipeline [{self.name}]: Start Refine Hook [{refine_hook.meta_name}] =======")
+            logger.info(
+                f"======= Iter [{context_infos.iter}] - Pipeline [{self.name}]: Start Refine Hook [{refine_hook.meta_name}] ======="
+            )
             new_job_infos = refine_hook.run(context_infos)
             context_infos[self.name].record_job_infos(new_job_infos)
             logger.debug(f"Context Infos: {context_infos.to_dict()}")
 
         # ====== Data processing & model training ======
         for exec_hook in self.execution_jobs:
-            logger.info(f"======= Pipeline [{self.name}]: Start Execution Hook [{exec_hook.meta_name}] =======")
+            logger.info(
+                f"======= Iter [{context_infos.iter}] - Pipeline [{self.name}]: Start Execution Hook [{exec_hook.meta_name}] ======="
+            )
             new_job_infos = exec_hook.run(context_infos)
             context_infos[self.name].record_job_infos(new_job_infos)
             logger.debug(f"Context Infos: {context_infos.to_dict()}")
 
         # ====== Evaluation on processed data or trained model ======
         for eval_hook in self.evaluation_jobs:
-            logger.info(f"======= Pipeline [{self.name}]: Start Evaluation Hook [{eval_hook.meta_name}] =======")
+            logger.info(
+                f"======= Iter [{context_infos.iter}] - Pipeline [{self.name}]: Start Evaluation Hook [{eval_hook.meta_name}] ======="
+            )
             new_job_infos = eval_hook.run(context_infos)
             context_infos[self.name].record_job_infos(new_job_infos)
             logger.debug(f"Context Infos: {context_infos.to_dict()}")

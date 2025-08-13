@@ -8,7 +8,9 @@ work_dir: './outputs/auto-prompt-optimization-for-grader-model'           # the 
 resume: true                                                              # allow resume from the existing context infos
 
 # iteration related parameters
-max_iter_num: 2
+max_iter_num: 5
+iter_targets:
+  - "grader_model_prompt_optimization.grades_evaluation.min_mse <= 0.26"
 iter_updater:
   select_and_merge_data_pools.merge_single_prompt_data_pools.merged_top_prompt_dataset: grader_model_prompt_optimization.generate_new_prompts.dj_configs.dataset_path
 
@@ -65,7 +67,9 @@ pipelines:
           meta_name: 'grades_evaluation'
           input:
             extra_configs.predicted_dataset_path: '-1.grader_model_inference_result'
-          output: 'single_prompt_eval_results'
+          output:
+            - 'single_prompt_eval_results'
+            - 'min_mse'
           extra_configs:
             type: 'mse'
             predicted_dataset_path: '<replaced_by_the_input>'

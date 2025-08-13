@@ -142,7 +142,8 @@ class AccuracyEvaluator(BaseEvaluator):
                     hit += 1
             result["accuracy"] = hit * 1.0 / total
             results.append(result)
-        return results
+        max_accuracy = max([result["accuracy"] for result in results])
+        return results, max_accuracy
 
 
 class MSEEvaluator(BaseEvaluator):
@@ -223,7 +224,8 @@ class MSEEvaluator(BaseEvaluator):
             result["mse"] = mse / total
             result["format_error"] = fmt_err
             results.append(result)
-        return results
+        min_mse = min([result["mse"] for result in results])
+        return results, min_mse
 
 
 class HelmEvaluator(BaseEvaluator):

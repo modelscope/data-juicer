@@ -7,6 +7,6 @@ def validate_hook_output(pipelines, output_key):
             )
             for hook in all_jobs:
                 if hook.meta_name == hook_meta_name:
-                    if hook.outputs is None or output_name in hook.output_keys:
+                    if hook.output_keys is None or output_name in hook.output_keys:
                         return True
     return False
