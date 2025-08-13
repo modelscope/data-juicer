@@ -32,8 +32,9 @@ class JobInfos:
 
     @classmethod
     def from_dict(cls, job_infos_dict):
+        job_infos_dict = job_infos_dict.copy()
         meta_name = job_infos_dict.pop("meta_name")
-        output_keys = job_infos_dict.keys()
+        output_keys = list(job_infos_dict.keys())
         outputs = [job_infos_dict[output_key] for output_key in output_keys]
         return cls(meta_name, output_keys, outputs)
 

@@ -542,7 +542,6 @@ class DataPoolCartesianJoin(BaseDataPoolManipulator):
     def _cartesian_join_two_dataset(self, first_dataset: NestedDataset, second_dataset: NestedDataset):
         len1 = len(first_dataset)
         len2 = len(second_dataset)
-        first_dataset_len2 = concatenate_datasets([first_dataset] * len2)
-        second_dataset_len1 = concatenate_datasets([second_dataset] * len1)
-        res_dataset = concatenate_datasets([first_dataset_len2, second_dataset_len1], axis=1)
-        return res_dataset
+        first_repeated = concatenate_datasets([NestedDataset.from_list([d] * len2) for d in first_dataset])
+        second_repeated = concatenate_datasets([second_dataset] * len1)
+        return concatenate_datasets([first_repeated, second_repeated], axis=1)

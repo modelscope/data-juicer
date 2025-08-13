@@ -392,11 +392,10 @@ class SandBoxExecutor:
             if from_value is not None:
                 cfg_levels = target_key.split(".")
                 if len(cfg_levels) < 4:
-                    logger.error(
+                    raise ValueError(
                         f"The target key [{target_key}] must be in the format of "
                         f"<pipeline_name>.<hook_meta_name>.[extra_configs|dj_configs].<hook_cfg_key1>[.<hook_cfg_keyn>]."
                     )
-                    return current_pipelines
                 tgt_pipeline_name = cfg_levels[0]
                 tgt_hook_meta_name = cfg_levels[1]
                 tgt_local_key = ".".join(cfg_levels[2:])
