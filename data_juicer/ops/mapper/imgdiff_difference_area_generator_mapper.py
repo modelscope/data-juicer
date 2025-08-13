@@ -116,6 +116,20 @@ class Difference_Area_Generator_Mapper(Mapper):
         *args,
         **kwargs,
     ):
+        """Initialization.
+
+        :param image_pair_similarity_filter_args: Arguments for image pair similarity filter.
+            Controls the similarity filtering between image pairs. Default empty dict will use
+            fixed values: min_score_1=0.1, max_score_1=1.0, min_score_2=0.1, max_score_2=1.0,
+            hf_clip="openai/clip-vit-base-patch32", num_proc=1.
+        :param image_segment_mapper_args: Arguments for image segmentation mapper.
+            Controls the image segmentation process. Default empty dict will use
+            fixed values: imgsz=1024, conf=0.05, iou=0.5, model_path="FastSAM-x.pt".
+        :param image_text_matching_filter_args: Arguments for image-text matching filter.
+            Controls the matching between cropped image regions and text descriptions.
+            Default empty dict will use fixed values: min_score=0.1, max_score=1.0,
+            hf_blip="Salesforce/blip-itm-base-coco", num_proc=1.
+        """
         super().__init__(*args, **kwargs)
 
         self.FIXED_ARGS = {}

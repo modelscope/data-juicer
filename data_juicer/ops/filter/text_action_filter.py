@@ -20,7 +20,7 @@ class TextActionFilter(Filter):
 
         :param lang: language of the text in the samples. 'en' for detection of
             actions in English and 'zh' for detection of actions in Chinese.
-        :param mini_action_num: The min action number in the filtering. samples
+        :param min_action_num: The min action number in the filtering. samples
             will be filtered if their action number in the text is below this
             parameter.
         """

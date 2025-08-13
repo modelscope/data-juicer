@@ -38,11 +38,11 @@ class AudioAddGaussianNoiseMapper(Mapper):
 
         Initialization method.
 
-        min_amplitude: float unit: linear amplitude.
+        :param min_amplitude: float unit: linear amplitude.
             Default: 0.001. Minimum noise amplification factor.
-        max_amplitude: float unit: linear amplitude.
+        :param max_amplitude: float unit: linear amplitude.
             Default: 0.015. Maximum noise amplification factor.
-        p: float range: [0.0, 1.0].  Default: 0.5.
+        :param p: float range: [0.0, 1.0].  Default: 0.5.
             The probability of applying this transform.
         save_dir: str. Default: None.
             The directory where generated audio files will be stored.

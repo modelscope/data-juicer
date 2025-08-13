@@ -39,6 +39,7 @@ class DownloadFileMapper(Mapper):
         :param download_field: The filed name to get the url to download.
         :param save_field: The filed name to save the downloaded file content.
         :param resume_download: Whether to resume download. if True, skip the sample if it exists.
+        :param timeout: Timeout for download.
         :param max_concurrent: Maximum concurrent downloads.
         :param args: extra args
         :param kwargs: extra args

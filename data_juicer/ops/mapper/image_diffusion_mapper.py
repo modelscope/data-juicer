@@ -71,26 +71,10 @@ class ImageDiffusionMapper(Mapper):
             guidance_scale > 1.
         :param aug_num: The image number to be produced by stable-diffusion
             model.
-        :param keep_candidate_mode: retain strategy for the generated
-            $caption_num$ candidates.
-
-            'random_any': Retain the random one from generated captions
-
-            'similar_one_simhash': Retain the generated one that is most
-                similar to the original caption
-
-            'all': Retain all generated captions by concatenation
-
-        Note:
-            This is a batched_OP, whose input and output type are
-            both list. Suppose there are $N$ list of input samples, whose batch
-            size is $b$, and denote caption_num as $M$.
-            The number of total samples after generation is $2Nb$ when
-            keep_original_sample is True and $Nb$ when keep_original_sample is
-            False. For 'random_any' and 'similar_one_simhash' mode,
-            it's $(1+M)Nb$ for 'all' mode when keep_original_sample is True
-            and $MNb$ when keep_original_sample is False.
-
+        :param keep_original_sample: whether to keep the original sample. If
+            it's set to False, there will be only generated captions in the
+            final datasets and the original captions will be removed. It's True
+            by default.
         :param caption_key: the key name of fields in samples to store captions
             for each images. It can be a string if there is only one image in
             each sample. Otherwise, it should be a list. If it's none,
