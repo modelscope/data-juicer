@@ -133,7 +133,7 @@ def analyze_resource_tag(code):
     of the "Resource Tags" in `tagging_mappings.json`. It makes the choice
     according to their assigning statement to attribute `_accelerator`.
     """
-    if "_accelerator = 'cuda'" in code:
+    if '_accelerator = "cuda"' in code or "_accelerator = 'cuda'" in code:
         return ["gpu"]
     else:
         return ["cpu"]
@@ -420,7 +420,7 @@ def generate_op_table_section(op_type, op_record_list):
 def get_op_desc_in_en_zh_batched(descs):
     separator = "\n"
     batch = separator.join(descs)
-    res = ts.translate_text(batch, translator="baidu", from_language="en", to_language="zh")
+    res = ts.translate_text(batch, translator="alibaba", from_language="en", to_language="zh")
     zhs = res.split(separator)
     assert len(zhs) == len(descs)
     return [desc + " " + zh.strip() for desc, zh in zip(descs, zhs)]

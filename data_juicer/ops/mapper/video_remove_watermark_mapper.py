@@ -42,6 +42,7 @@ class VideoRemoveWatermarkMapper(Mapper):
         frame_num: PositiveInt = 10,
         min_frame_threshold: PositiveInt = 7,
         detection_method: str = "pixel_value",
+        save_dir: str = None,
         *args,
         **kwargs,
     ):
@@ -70,11 +71,15 @@ class VideoRemoveWatermarkMapper(Mapper):
             the pixel diversity in different frames. The min_frame_threshold
             is useless and frame_num must be greater than 1 in
             'pixel_diversity' mode.
+        :param save_dir: The directory where generated video files will be stored.
+            If not specified, outputs will be saved in the same directory as their corresponding input files.
+            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         if roi_type not in ["ratio", "pixel"]:
             raise ValueError(f"roi_type [{roi_type}]" f" is not supported. " f"Can only be one of ['ratio', 'pixel']. ")
@@ -107,6 +112,7 @@ class VideoRemoveWatermarkMapper(Mapper):
         self.frame_num = frame_num
         self.min_frame_threshold = min_frame_threshold
         self.detection_method = detection_method
+        self.save_dir = save_dir
 
     def _detect_watermark_via_pixel_value(self, frames, rois):
         masks = []
@@ -207,7 +213,7 @@ class VideoRemoveWatermarkMapper(Mapper):
 
         for index, video_key in enumerate(loaded_video_keys):
             video = videos[video_key]
-            cleaned_video_key = transfer_filename(video_key, OP_NAME, **self._init_parameters)
+            cleaned_video_key = transfer_filename(video_key, OP_NAME, self.save_dir, **self._init_parameters)
 
             if not os.path.exists(cleaned_video_key) or cleaned_video_key not in loaded_video_keys:
                 watermark_mask = self._generate_watermark_mask(video, sample)
