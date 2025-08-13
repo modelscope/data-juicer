@@ -72,6 +72,10 @@ class DataEvaluatorFactory(object):
             from data_juicer.core.sandbox.evaluators import AccuracyEvaluator
 
             evaluator = AccuracyEvaluator(eval_cfg)
+        elif eval_cfg.type == "mse":
+            from data_juicer.core.sandbox.evaluators import MSEEvaluator
+
+            evaluator = MSEEvaluator(eval_cfg)
 
         return evaluator
 

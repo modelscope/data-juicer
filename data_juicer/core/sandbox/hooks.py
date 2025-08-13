@@ -72,6 +72,11 @@ class BaseHook:
         prev_dj_cfg = deepcopy(self.dj_cfg) if self.dj_cfg else None
         prev_extra_cfg = deepcopy(self.extra_cfg) if self.extra_cfg else None
 
+        logger.debug(f"Previous DJ Cfg: {prev_dj_cfg}")
+        logger.debug(f"Previous Extra Cfg: {prev_extra_cfg}")
+        logger.debug(f"Local Settings: {self.local_settings}")
+        logger.debug(f"Input Mappings: {self.input_mapping}")
+
         # update configs according to local settings
         for key, value in self.local_settings.items():
             key_to_updated_parts = key.split('.')

@@ -135,12 +135,93 @@ class AccuracyEvaluator(BaseEvaluator):
             total = 0
             hit = 0
             for pred_sample, gt_sample in zip(pred_ds, gt_ds):
-                pred_label = nested_query(pred_sample, self.predicted_label_key)
-                gt_label = nested_query(gt_sample, self.ground_truth_label_key)
+                pred_label = str(nested_query(pred_sample, self.predicted_label_key))
+                gt_label = str(nested_query(gt_sample, self.ground_truth_label_key))
                 total += 1
                 if pred_label == gt_label:
                     hit += 1
             result["accuracy"] = hit * 1.0 / total
+            results.append(result)
+        return results
+
+
+class MSEEvaluator(BaseEvaluator):
+    """
+    A simple evaluator to compute the MSE between the predicted values and ground truth.
+
+    The config file for this evaluator should at least include the following items:
+    1. `type`: must be "mse".
+    2. `predicted_dataset_path`: Required. The dataset path to the data that stores the predicted labels.
+    3. `ground_truth_dataset_path`:  The dataset path to the data that stores the ground truth labels. If it's None,
+        we assume that the ground truth labels are already in the predicted_dataset_path.
+    4. `predicted_value_key`: the key name to store the predicted values. '.' operator is allowed.
+    5. `ground_truth_value_key`: the key name to store the ground truth values. '.' operator is allowed.
+    """
+
+    def __init__(self, eval_config: dict):
+        super(MSEEvaluator, self).__init__(eval_config)
+        self.predicted_dataset_path = self.eval_config.get("predicted_dataset_path", [])
+        self.ground_truth_dataset_path = self.eval_config.get("ground_truth_dataset_path", [])
+        self.predicted_value_key = self.eval_config.get("predicted_value_key", None)
+        self.ground_truth_value_key = self.eval_config.get("ground_truth_value_key", None)
+
+        if isinstance(self.predicted_dataset_path, str):
+            self.predicted_dataset_path = [self.predicted_dataset_path]
+        if isinstance(self.ground_truth_dataset_path, str):
+            self.ground_truth_dataset_path = [self.ground_truth_dataset_path]
+        assert len(self.ground_truth_dataset_path) == 0 or len(self.predicted_dataset_path) == len(
+            self.ground_truth_dataset_path
+        )
+
+        existing_predicted_dataset_paths, existing_ground_truth_dataset_paths = [], []
+        if len(self.ground_truth_dataset_path) == 0:
+            logger.warning(
+                "The ground truth dataset path is not specified. Assume the ground truth labels are already "
+                "in the predicted dataset."
+            )
+            self.ground_truth_dataset_path = self.predicted_dataset_path[:]
+        for pred_path, gt_path in zip(self.predicted_dataset_path, self.ground_truth_dataset_path):
+            if os.path.exists(pred_path) and os.path.exists(gt_path):
+                existing_predicted_dataset_paths.append(pred_path)
+                existing_ground_truth_dataset_paths.append(gt_path)
+
+        if len(existing_predicted_dataset_paths) == 0:
+            raise ValueError("Please specify a valid predicted dataset path")
+        if self.predicted_value_key is None:
+            raise ValueError("Please specify the predicted value key")
+        if self.ground_truth_value_key is None:
+            raise ValueError("Please specify the ground truth value key")
+
+        self.predicted_dataset_path = existing_predicted_dataset_paths
+        self.ground_truth_dataset_path = existing_ground_truth_dataset_paths
+
+    def run(self, eval_type, eval_obj=None, **kwargs):
+        results = []
+        for pred_path, gt_path in zip(self.predicted_dataset_path, self.ground_truth_dataset_path):
+            pred_ds = load_data_pool(pred_path)
+            if gt_path == pred_path:
+                gt_ds = pred_ds
+            else:
+                gt_ds = load_data_pool(gt_path)
+
+            result = {}
+            result["pred_path"] = pred_path
+            result["gt_path"] = gt_path
+            total = 0
+            mse = 0
+            fmt_err = 0
+            for pred_sample, gt_sample in zip(pred_ds, gt_ds):
+                try:
+                    pred_value = float(nested_query(pred_sample, self.predicted_value_key))
+                    gt_value = float(nested_query(gt_sample, self.ground_truth_value_key))
+                except ValueError as e:
+                    logger.warning(f"{e}")
+                    fmt_err += 1
+                    continue
+                total += 1
+                mse += (pred_value - gt_value) ** 2
+            result["mse"] = mse / total
+            result["format_error"] = fmt_err
             results.append(result)
         return results
 

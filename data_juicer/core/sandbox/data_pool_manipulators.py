@@ -66,7 +66,7 @@ def check_io_paths(input_paths, export_path):
 
 def load_data_pool(ds_path) -> NestedDataset:
     """Load dataset. Can only return NestedDataset."""
-    db = DatasetBuilder(dict_to_namespace({"dataset_path": ds_path}))
+    db = DatasetBuilder(dict_to_namespace({"dataset_path": ds_path, "text_keys": None}))
     ds = db.load_dataset()
     return ds
 
@@ -504,7 +504,7 @@ class DataPoolCartesianJoin(BaseDataPoolManipulator):
         # read inputs
         first_data_pool_paths = self.data_pool_cfg.get("dataset_path_1", [])
         second_data_pool_paths = self.data_pool_cfg.get("dataset_path_2", [])
-        export_path = self.data_pool_cfg.get("export_path", None)
+        export_path = self.data_pool_cfg.get("export_path", "")
 
         # check I/O paths
         first_existing_input_paths, output_path = check_io_paths(first_data_pool_paths, export_path)

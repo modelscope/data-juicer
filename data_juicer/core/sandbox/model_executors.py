@@ -225,6 +225,7 @@ class LLMInferExecutor(BaseModelExecutor):
         # inference format related params
         self.build_messages_func = model_config.get("build_messages_func", "build_input")
         self.parse_output_func = model_config.get("parse_output_func", "parse_output")
+        self.func_kwargs = model_config.get("func_kwargs", {})
 
         self.build_messages_func = ALL_FUNCS.get(self.build_messages_func)
         self.parse_output_func = ALL_FUNCS.get(self.parse_output_func)
@@ -253,14 +254,14 @@ class LLMInferExecutor(BaseModelExecutor):
                 with jl.open(input_path) as reader:
                     for item in reader:
                         non_batch = False
-                        messages_list = self.build_messages_func(item)
+                        messages_list = self.build_messages_func(item, **self.func_kwargs)
                         if len(messages_list) > 0 and not isinstance(messages_list[0], list):
                             messages_list = [messages_list]
                             non_batch = True
                         results = []
                         for messages in messages_list:
                             output = self.executor_infer(messages)
-                            results.append(self.parse_output_func(output, item))
+                            results.append(self.parse_output_func(output, item, **self.func_kwargs))
                         if non_batch:
                             item[self.infer_res_key] = results[0]
                         else:
@@ -386,8 +387,7 @@ class APIModelInferExecutor(LLMInferExecutor):
                 endpoint=api_endpoint,
                 response_path=response_path,
                 **model_params,
-            ),
-            use_cuda=True,
+            )
         )
         sampling_params = sampling_params
         return executor, sampling_params

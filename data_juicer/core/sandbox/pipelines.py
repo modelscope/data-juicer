@@ -233,24 +233,28 @@ class SandboxPipeline:
             logger.info(f"======= Pipeline [{self.name}]: Start Probe Hook [{probe_hook.meta_name}] =======")
             new_job_infos = probe_hook.run(context_infos)
             context_infos[self.name].record_job_infos(new_job_infos)
+            logger.debug(f"Context Infos: {context_infos.to_dict()}")
 
         # ====== Data-model recipes iteration based on probe results ======
         for refine_hook in self.refine_recipe_jobs:
             logger.info(f"======= Pipeline [{self.name}]: Start Refine Hook [{refine_hook.meta_name}] =======")
             new_job_infos = refine_hook.run(context_infos)
             context_infos[self.name].record_job_infos(new_job_infos)
+            logger.debug(f"Context Infos: {context_infos.to_dict()}")
 
         # ====== Data processing & model training ======
         for exec_hook in self.execution_jobs:
             logger.info(f"======= Pipeline [{self.name}]: Start Execution Hook [{exec_hook.meta_name}] =======")
             new_job_infos = exec_hook.run(context_infos)
             context_infos[self.name].record_job_infos(new_job_infos)
+            logger.debug(f"Context Infos: {context_infos.to_dict()}")
 
         # ====== Evaluation on processed data or trained model ======
         for eval_hook in self.evaluation_jobs:
             logger.info(f"======= Pipeline [{self.name}]: Start Evaluation Hook [{eval_hook.meta_name}] =======")
             new_job_infos = eval_hook.run(context_infos)
             context_infos[self.name].record_job_infos(new_job_infos)
+            logger.debug(f"Context Infos: {context_infos.to_dict()}")
 
         return context_infos
 
@@ -400,7 +404,7 @@ class SandBoxExecutor:
                             if hook.meta_name == tgt_hook_meta_name:
                                 # put the updated configs key/values into the local settings
                                 hook.local_settings[tgt_local_key] = from_value
-                    current_pipeline[i] = current_pipeline
+                    current_pipelines[i] = current_pipeline
             else:
                 logger.warning(f"The iter_updater [{from_key}] is not found in the last context infos.")
         return current_pipelines
@@ -486,7 +490,7 @@ class SandBoxExecutor:
             current_pipelines = self.pipelines
             while True:
                 current_iter += 1
-                logger.info(f"Starting the iter {current_iter}...")
+                logger.info(f"============== Starting the iter {current_iter} ==============")
                 if num_pipeline_skip > 0:
                     context_infos = last_context_infos
                 else:
@@ -519,6 +523,7 @@ class SandBoxExecutor:
 
                 # check if there are any arguments to be updated from the last iteration
                 if len(self.iter_updater) > 0:
+                    logger.info("Updating arguments across iterations...")
                     current_pipelines = self.iterative_update_pipelines(current_pipelines, context_infos)
         finally:
             # export context infos

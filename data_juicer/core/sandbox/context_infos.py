@@ -43,7 +43,11 @@ class PipelineInfos:
     job_meta_names: List[str]
     job_infos: List[JobInfos]
 
-    def __init__(self, pipeline_name: str, job_meta_names: List[str] = [], job_infos: List[JobInfos] = []):
+    def __init__(self, pipeline_name: str, job_meta_names: List[str] = None, job_infos: List[JobInfos] = None):
+        if job_meta_names is None:
+            job_meta_names = []
+        if job_infos is None:
+            job_infos = []
         assert len(job_meta_names) == len(job_infos)
         self.pipeline_name = pipeline_name
         self.job_meta_names = job_meta_names
@@ -90,7 +94,11 @@ class ContextInfos:
     pipeline_names: List[str]
     pipeline_infos: List[PipelineInfos]
 
-    def __init__(self, iter: int, pipeline_names: List[str] = [], pipeline_infos: List[PipelineInfos] = []):
+    def __init__(self, iter: int, pipeline_names=None, pipeline_infos=None):
+        if pipeline_infos is None:
+            pipeline_infos = []
+        if pipeline_names is None:
+            pipeline_names = []
         assert len(pipeline_names) == len(pipeline_infos)
         self.iter = iter
         self.pipeline_names = pipeline_names
@@ -142,7 +150,9 @@ class ContextInfos:
 class GlobalContextInfos:
     context_infos: List[ContextInfos]
 
-    def __init__(self, context_infos: List[ContextInfos] = []):
+    def __init__(self, context_infos=None):
+        if context_infos is None:
+            context_infos = []
         self.context_infos = context_infos
 
     def record_context_infos(self, context_infos: ContextInfos):

@@ -37,6 +37,8 @@ def init_sandbox_configs(args=None):
 
     parser.add_argument("--resume", type=bool, default=False, help="Whether to resume from the existing context infos.")
 
+    parser.add_argument("--debug", type=bool, default=False, help="Whether to activate the debug mode.")
+
     parser.add_argument(
         "--hpo_config", type=str, help="Path to a configuration file when using auto-HPO tool.", required=False
     )
@@ -123,7 +125,7 @@ def init_sandbox_configs(args=None):
             os.makedirs(log_dir, exist_ok=True)
         timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))
         logfile_name = f"sandbox_log_{project_name}_{exp_name}_time_{timestamp}.txt"
-        setup_logger(save_dir=log_dir, filename=logfile_name)
+        setup_logger(save_dir=log_dir, filename=logfile_name, level="DEBUG" if cfg.debug else "INFO")
 
         return cfg
     except ArgumentError:
