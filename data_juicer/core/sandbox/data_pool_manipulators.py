@@ -64,16 +64,16 @@ def check_io_paths(input_paths, export_path):
     return existing_input_paths, export_path
 
 
+def load_data_pool(ds_path) -> NestedDataset:
+    """Load dataset. Can only return NestedDataset."""
+    db = DatasetBuilder(dict_to_namespace({"dataset_path": ds_path, "text_keys": None}))
+    ds = db.load_dataset()
+    return ds
+
+
 class BaseDataPoolManipulator(object):
     def __init__(self, data_pool_cfg: dict):
         self.data_pool_cfg = data_pool_cfg
-
-    @staticmethod
-    def _load_ds(ds_path) -> NestedDataset:
-        """Load dataset. Can only return NestedDataset."""
-        db = DatasetBuilder(dict_to_namespace({"dataset_path": ds_path}))
-        ds = db.load_dataset()
-        return ds
 
     def run(self):
         """
@@ -91,13 +91,20 @@ class DataPoolConstruction(BaseDataPoolManipulator):
             - an analyzed dataset.
             - an output path.
             - (optional) split_ratios. It's [1/3, 2/3] in default, Support fraction in string format.
+            - (optional) split_num. It's not activated in default. Support specifying the number of samples in one data
+                pool. Use split_num first if both of split_ratios and split_num are specified.
+            - (optional) ignore_stats. It's False in default. Whether to split the data pool according to the stats
+                ranking.
         Output: MxN data pools, where N is the number of types of analyzed stats and M means the number of split parts.
+            If ignore_stats is True, N is 1 and the result data pools are stored in the export_path directly.
             They are named following the rule "<stats_key_name>/<original_name>_<part_idx>.jsonl"
         """
         # read inputs
         input_dataset_paths = self.data_pool_cfg.get("dataset_path", [])
         export_path = self.data_pool_cfg.get("export_path", None)
         split_ratios = self.data_pool_cfg.get("split_ratios", [1.0 / 3.0, 2.0 / 3.0])
+        split_num = self.data_pool_cfg.get("split_num", None)
+        ignore_stats = self.data_pool_cfg.get("ignore_stats", False)
 
         # check I/O paths
         existing_input_paths, export_path = check_io_paths(input_dataset_paths, export_path)
@@ -110,16 +117,16 @@ class DataPoolConstruction(BaseDataPoolManipulator):
         logger.info(f"Constructing data pools with split ratios {split_ratios}...")
         output_paths = []
         for ds_path in existing_input_paths:
-            output_paths.extend(self._construct_data_pool(ds_path, export_path, split_ratios))
+            output_paths.extend(self._construct_data_pool(ds_path, export_path, split_ratios, split_num, ignore_stats))
 
         return output_paths
 
-    def _construct_data_pool(self, ds_path, export_path, split_ratios):
+    def _construct_data_pool(self, ds_path, export_path, split_ratios, split_num, ignore_stats=False):
         logger.info(f"Constructing data pool for {ds_path}...")
         ds_basename = os.path.splitext(os.path.basename(ds_path))[0]
-        ds = self._load_ds(ds_path)
+        ds = load_data_pool(ds_path)
         ds_schema = ds.schema()
-        if Fields.stats not in ds_schema.columns:
+        if not ignore_stats and Fields.stats not in ds_schema.columns:
             logger.warning(f"Dataset {ds_path} does not contain stats. Skipped!")
             return
         ds = ds.to_list()
@@ -127,9 +134,28 @@ class DataPoolConstruction(BaseDataPoolManipulator):
         if total_num == 0:
             logger.warning(f"Dataset {ds_path} is empty. Skipped!")
             return
-        split_points = [int(total_num * r + 0.5) for r in split_ratios]
+        if split_num is not None:
+            split_points = list(range(split_num, total_num, split_num))
+        else:
+            split_points = [int(total_num * r + 0.5) for r in split_ratios]
         split_points = [0] + split_points + [total_num]
         logger.info(f"Split points: {split_points}")
+
+        # do not consider the stats information
+        if ignore_stats:
+            logger.info("Ignore stats and split the dataset with the current dataset state.")
+            output_paths = []
+            os.makedirs(export_path, exist_ok=True)
+            for i in range(len(split_points) - 1):
+                start_idx = split_points[i]
+                end_idx = split_points[i + 1]
+                part_ds = ds[start_idx:end_idx]
+                curr_export_name = add_suffix_to_filename(ds_basename, f"_ignore_stats_{i}.jsonl")
+                output_path = os.path.join(export_path, curr_export_name)
+                with jl.open(output_path, "w") as writer:
+                    writer.write_all(part_ds)
+                output_paths.append(output_path)
+            return output_paths
 
         stats_schema = ds_schema.column_types[Fields.stats]
         if not isinstance(stats_schema, Schema):
@@ -218,6 +244,8 @@ class DataPoolCombination(BaseDataPoolManipulator):
         longest_common_prefix = get_longest_common_prefix(
             [os.path.splitext(os.path.basename(p))[0] for p in existing_input_paths]
         )
+        if longest_common_prefix == "":
+            longest_common_prefix = "default_prefix"
         output_paths = []
         output_path_pattern = os.path.join(export_path, f"{longest_common_prefix}_top_%s_num_%d.jsonl")
         for pools in combined_hierarchies:
@@ -238,7 +266,7 @@ class DataPoolCombination(BaseDataPoolManipulator):
         while True:
             # 1. read a new rank ds
             logger.info(f"Reading dataset of rank [{curr_rank}]...")
-            ds = self._load_ds(ordered_data_pool_paths[curr_rank]).to_list()
+            ds = load_data_pool(ordered_data_pool_paths[curr_rank]).to_list()
             ds_dict = {make_hashable(s): s for s in ds}
             dataset_records.update(ds_dict)
 
@@ -302,7 +330,7 @@ class DataPoolDuplication(BaseDataPoolManipulator):
     def _duplicate_dataset(self, dataset_path, export_path, dup_times, shuffle=False, seed=42):
         logger.info(f"Duplicating dataset for {dataset_path}...")
         ds_basename = os.path.splitext(os.path.basename(dataset_path))[0]
-        ds = self._load_ds(dataset_path)
+        ds = load_data_pool(dataset_path)
         output_paths = []
         for t in dup_times:
             res_ds = concatenate_datasets([ds] * t)
@@ -404,7 +432,7 @@ class DataPoolDownsampling(BaseDataPoolManipulator):
         existing_input_paths, export_path = check_io_paths(input_dataset_paths, export_path)
 
         # load all datasets
-        all_datasets = [self._load_ds(path) for path in existing_input_paths]
+        all_datasets = [load_data_pool(path) for path in existing_input_paths]
         all_lengths = [len(ds) for ds in all_datasets]
         if target_num is None:
             target_num = min(all_lengths)
@@ -418,3 +446,102 @@ class DataPoolDownsampling(BaseDataPoolManipulator):
             ds.to_json(output_path)
             output_paths.append(output_path)
         return output_paths
+
+
+class DataPoolMerging(BaseDataPoolManipulator):
+    def run(self):
+        """
+        merge data pools into one dataset or data pool.
+
+        Input:
+            - N split data pools.
+        Output: 1 merged dataset/data pool, which is named following the rule "<longest_common_prefix>_merged.jsonl"
+        """
+        # read inputs
+        ordered_data_pool_paths = self.data_pool_cfg.get("dataset_path", [])
+        export_path = self.data_pool_cfg.get("export_path", None)
+
+        # check I/O paths
+        existing_input_paths, output_path = check_io_paths(ordered_data_pool_paths, export_path)
+
+        # start to combine these data pools
+        logger.info("Merging data pools...")
+        # try to get the longest_common_prefix
+        longest_common_prefix = get_longest_common_prefix(
+            [os.path.splitext(os.path.basename(p))[0] for p in existing_input_paths]
+        )
+        if longest_common_prefix == "":
+            longest_common_prefix = "default_prefix"
+        output_path = os.path.join(export_path, f"{longest_common_prefix}_merged.jsonl")
+        data_pools = [load_data_pool(path) for path in existing_input_paths]
+        merged_dataset = concatenate_datasets(data_pools)
+        merged_dataset.to_json(output_path, force_ascii=False)
+        return output_path
+
+
+class DataPoolCartesianJoin(BaseDataPoolManipulator):
+    def run(self):
+        """
+        join two sets of data pools with Cartesian Join.
+
+        Example: Given two sets of data pools M and N, where M = {DP(A, B, C), DP(E, F), DP(G, H, I, J)} and
+            N = {DP(1), DP(2, 3)}. After this hook, they are Cartesian joined to:
+            {
+                DP(A1, B1, C1),
+                DP(A2, A3, B2, B3, C2, C3),
+                DP(E1, F1),
+                DP(E2, E3, F2, F3),
+                DP(G1, H1, I1, J1),
+                DP(G2, G3, H2, H3, I2, I3, J2, J3),
+            }
+
+        Input:
+            - M data pools.
+            - N data pools.
+        Output: M x N joined data pools MN, where MN(i, j) = M(i) x N(j).
+            They are named following the rule "<longest_common_prefix>_cartesian_join_{i}_{j}.jsonl"
+        """
+        # read inputs
+        first_data_pool_paths = self.data_pool_cfg.get("dataset_path_1", [])
+        second_data_pool_paths = self.data_pool_cfg.get("dataset_path_2", [])
+        export_path = self.data_pool_cfg.get("export_path", "")
+
+        # check I/O paths
+        first_existing_input_paths, output_path = check_io_paths(first_data_pool_paths, export_path)
+        second_existing_input_paths, output_path = check_io_paths(second_data_pool_paths, output_path)
+        first_num_data_pools = len(first_existing_input_paths)
+        second_num_data_pools = len(second_existing_input_paths)
+
+        # start to combine these data pools
+        logger.info(
+            f"Cartesian join two sets of data pools with "
+            f"{first_num_data_pools} and {second_num_data_pools} data pools..."
+        )
+        # try to get the longest_common_prefix
+        first_longest_common_prefix = get_longest_common_prefix(
+            [os.path.splitext(os.path.basename(p))[0] for p in first_existing_input_paths]
+        )
+        second_longest_common_prefix = get_longest_common_prefix(
+            [os.path.splitext(os.path.basename(p))[0] for p in second_existing_input_paths]
+        )
+        longest_common_prefix = f"{first_longest_common_prefix}_{second_longest_common_prefix}"
+        if longest_common_prefix == "_":
+            longest_common_prefix = "default_prefix"
+        output_path_pattern = os.path.join(export_path, f"{longest_common_prefix}_cartesian_join_%d_%d.jsonl")
+        output_paths = []
+        for i, first_path in enumerate(first_existing_input_paths):
+            for j, second_path in enumerate(second_existing_input_paths):
+                output_path = output_path_pattern % (i, j)
+                first_dataset = load_data_pool(first_path)
+                second_dataset = load_data_pool(second_path)
+                joined_dataset = self._cartesian_join_two_dataset(first_dataset, second_dataset)
+                joined_dataset.to_json(output_path, force_ascii=False)
+                output_paths.append(output_path)
+        return output_paths
+
+    def _cartesian_join_two_dataset(self, first_dataset: NestedDataset, second_dataset: NestedDataset):
+        len1 = len(first_dataset)
+        len2 = len(second_dataset)
+        first_repeated = concatenate_datasets([NestedDataset.from_list([d] * len2) for d in first_dataset])
+        second_repeated = concatenate_datasets([second_dataset] * len1)
+        return concatenate_datasets([first_repeated, second_repeated], axis=1)

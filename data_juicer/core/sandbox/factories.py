@@ -1,10 +1,12 @@
 from data_juicer.core import Analyzer as DJAnalyzer
 from data_juicer.core.executor import DefaultExecutor as DJExecutor
 from data_juicer.core.sandbox.data_pool_manipulators import (
+    DataPoolCartesianJoin,
     DataPoolCombination,
     DataPoolConstruction,
     DataPoolDownsampling,
     DataPoolDuplication,
+    DataPoolMerging,
     DataPoolRanking,
 )
 from data_juicer.core.sandbox.evaluators import Gpt3QualityEvaluator, InceptionEvaluator
@@ -66,6 +68,14 @@ class DataEvaluatorFactory(object):
             evaluator = InceptionEvaluator(eval_cfg)
         elif eval_cfg.type == "dj_text_quality_classifier":
             evaluator = Gpt3QualityEvaluator(eval_cfg)
+        elif eval_cfg.type == "accuracy":
+            from data_juicer.core.sandbox.evaluators import AccuracyEvaluator
+
+            evaluator = AccuracyEvaluator(eval_cfg)
+        elif eval_cfg.type == "mse":
+            from data_juicer.core.sandbox.evaluators import MSEEvaluator
+
+            evaluator = MSEEvaluator(eval_cfg)
 
         return evaluator
 
@@ -102,6 +112,10 @@ class DataPoolManipulatorFactory(object):
             manipulator = DataPoolDuplication(data_pool_cfg)
         elif data_pool_cfg.type == "data_pool_downsampling":
             manipulator = DataPoolDownsampling(data_pool_cfg)
+        elif data_pool_cfg.type == "data_pool_merging":
+            manipulator = DataPoolMerging(data_pool_cfg)
+        elif data_pool_cfg.type == "data_pool_cartesian_join":
+            manipulator = DataPoolCartesianJoin(data_pool_cfg)
 
         return manipulator
 
@@ -176,7 +190,7 @@ class ModelInferEvaluatorFactory(object):
         # add more model inference here freely
 
 
-mode_infer_evaluator_factory = ModelInferEvaluatorFactory()
+model_infer_evaluator_factory = ModelInferEvaluatorFactory()
 
 
 class ModelTrainExecutorFactory(object):
@@ -223,8 +237,20 @@ class ModelInferExecutorFactory(object):
             )
 
             return EasyAnimateInferExecutor(generate_cfg, **kwargs)
+        elif generate_cfg.type == "huggingface":
+            from data_juicer.core.sandbox.model_executors import (
+                HFTransformersInferExecutor,
+            )
 
-        # add more data generation here freely
+            return HFTransformersInferExecutor(generate_cfg, **kwargs)
+        elif generate_cfg.type == "vllm":
+            from data_juicer.core.sandbox.model_executors import VLLMInferExecutor
+
+            return VLLMInferExecutor(generate_cfg, **kwargs)
+        elif generate_cfg.type == "api":
+            from data_juicer.core.sandbox.model_executors import APIModelInferExecutor
+
+            return APIModelInferExecutor(generate_cfg, **kwargs)
 
 
 model_infer_executor_factory = ModelInferExecutorFactory()
