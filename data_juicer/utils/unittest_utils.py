@@ -104,10 +104,18 @@ class DataJuicerTestCaseBase(unittest.TestCase):
 
     def setUp(self):
         logger.info(f">>>>>>>>>> [Start Test]: {self.id()}")
+        current_tag = getattr(self, "current_tag", "standalone")
+        if current_tag.startswith("ray"):
+            ray = LazyLoader("ray")
+            ray.init(ignore_reinit_error=True)
 
     def tearDown(self) -> None:
         # clear models in memory
         free_models()
+        current_tag = getattr(self, "current_tag", "standalone")
+        if current_tag.startswith("ray"):
+            ray = LazyLoader("ray")
+            ray.shutdown(_exiting_interpreter=True)
 
     def generate_dataset(self, data) -> DJDataset:
         """Generate dataset for a specific executor.
