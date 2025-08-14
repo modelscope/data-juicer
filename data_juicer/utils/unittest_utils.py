@@ -81,6 +81,12 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         # clear models in memory
         free_models()
 
+        # start ray
+        current_tag = getattr(cls, "current_tag", "standalone")
+        if current_tag.startswith("ray"):
+            ray = LazyLoader("ray")
+            ray.init("auto", ignore_reinit_error=True, namespace="dj_dist_unittest")
+
     @classmethod
     def tearDownClass(cls, hf_model_name=None) -> None:
         import multiprocess
@@ -102,20 +108,17 @@ class DataJuicerTestCaseBase(unittest.TestCase):
                 logger.info("CLEAN all TRANSFORMERS_CACHE")
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
 
-    def setUp(self):
-        logger.info(f">>>>>>>>>> [Start Test]: {self.id()}")
-        current_tag = getattr(self, "current_tag", "standalone")
+        current_tag = getattr(cls, "current_tag", "standalone")
         if current_tag.startswith("ray"):
             ray = LazyLoader("ray")
-            ray.init("auto", ignore_reinit_error=True, namespace="dj_dist_unittest")
+            ray.shutdown(_exiting_interpreter=True)
+
+    def setUp(self):
+        logger.info(f">>>>>>>>>> [Start Test]: {self.id()}")
 
     def tearDown(self) -> None:
         # clear models in memory
         free_models()
-        current_tag = getattr(self, "current_tag", "standalone")
-        if current_tag.startswith("ray"):
-            ray = LazyLoader("ray")
-            ray.shutdown(_exiting_interpreter=True)
 
     def generate_dataset(self, data) -> DJDataset:
         """Generate dataset for a specific executor.
