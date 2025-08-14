@@ -107,7 +107,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         current_tag = getattr(self, "current_tag", "standalone")
         if current_tag.startswith("ray"):
             ray = LazyLoader("ray")
-            ray.init(ignore_reinit_error=True)
+            ray.init("auto", ignore_reinit_error=True, namespace="dj_dist_unittest")
 
     def tearDown(self) -> None:
         # clear models in memory
