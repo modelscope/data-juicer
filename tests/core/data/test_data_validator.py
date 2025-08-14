@@ -15,6 +15,8 @@ from data_juicer.core.data.data_validator import (
 class RequiredFieldsValidatorTest(DataJuicerTestCaseBase):
     
     def setUp(self):
+        super().setUp()
+
         # Create sample DataFrame
         self.data = [
             {

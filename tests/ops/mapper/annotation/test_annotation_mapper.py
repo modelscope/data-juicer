@@ -75,6 +75,8 @@ class AnnotationMapperTest(DataJuicerTestCaseBase):
     """Test cases for the BaseAnnotationMapper"""
 
     def setUp(self):
+        super().setUp()
+
         # Create samples for testing
         self.samples = [
             {"text": "Sample 1 text", "id": "sample1"},
@@ -408,6 +410,7 @@ class LabelStudioAnnotationMapperTest(DataJuicerTestCaseBase):
     """Test cases for LabelStudioAnnotationMapper"""
 
     def setUp(self):
+        super().setUp()
 
         # Create samples for testing
         self.samples = [
