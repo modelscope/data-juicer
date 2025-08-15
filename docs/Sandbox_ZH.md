@@ -44,7 +44,7 @@ Data-Juicer (DJ, 228k)模型输出样例如下表所示。
 在使用沙盒实验室前，你可能需要使用如下命令安装沙盒相关的依赖：
 
 ```shell
-pip install -v -e .[sandbox]
+uv pip install -v -e .[sandbox]
 ```
 
 并根据官方说明准备好沙盒中使用的第三方库（例如 EasyAnimate 、 VBench 、 InternVL 等），或者您也可以简单地从 GitHub 克隆第三方存储库，并在沙盒运行期间将安装过程留给我们的 `EnvManager` 完成。
@@ -53,7 +53,7 @@ pip install -v -e .[sandbox]
 
 1. 要使用[ModelScope](https://github.com/modelscope/modelscope)时需从ModelScope的独立host安装其相关依赖：
 ```shell
-pip install "modelscope[framework,nlp]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
+uv pip install "modelscope[framework,nlp]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
 ```
 可参考[ModelScope文档](https://www.modelscope.cn/docs/intro/environment-setup)获取更多信息。
 

@@ -517,8 +517,8 @@ numpy = ">=1.26.4,<2.0.0"
 
 [project.optional-dependencies]
 generic = [
-    "torch>=1.11.0",
-    "transformers>=4.47.0,<4.48.0",
+    "torch==2.6.0",
+    "transformers>=4.47.0",
     ...
 ]
 ```
@@ -551,7 +551,7 @@ uv pip install -e ".[ai_services]"  # 服务依赖
 
 ```shell
 # ===========install pre-commit tool===========
-pip install pre-commit
+uv pip install pre-commit
 
 cd <path_to_data_juicer>
 # install pre-commit script for data_juicer
