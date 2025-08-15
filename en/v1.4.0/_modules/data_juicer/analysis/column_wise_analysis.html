@@ -355,7 +355,8 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for data_juicer.analysis.column_wise_analysis</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.font_manager</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">fm</span>
@@ -368,7 +369,8 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.overall_analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">OverallAnalysis</span>
 
-<span class="n">FONT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ANALYZER_FONT&quot;</span><span class="p">,</span> <span class="s2">&quot;Heiti TC&quot;</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;matplotlib.font_manager&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+<span class="n">FONT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ANALYZER_FONT&quot;</span><span class="p">,</span> <span class="s2">&quot;Heiti SC&quot;</span><span class="p">)</span>
 <span class="n">FONT_PATH</span> <span class="o">=</span> <span class="n">fm</span><span class="o">.</span><span class="n">findfont</span><span class="p">(</span><span class="n">FONT</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.sans-serif&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">FONT</span><span class="p">]</span>

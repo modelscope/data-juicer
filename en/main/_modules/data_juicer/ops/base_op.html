@@ -361,7 +361,6 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_cuda_available</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span>
@@ -610,6 +609,9 @@
 <div class="viewcode-block" id="OP.runtime_np">
 <a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.OP.runtime_np">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">runtime_np</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Local import to avoid logger being serialized in multiprocessing</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
         <span class="n">op_proc</span> <span class="o">=</span> <span class="n">calculate_np</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mem_required</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpu_required</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Op [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s2">] running with number of procs:</span><span class="si">{</span><span class="n">op_proc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">op_proc</span></div>
