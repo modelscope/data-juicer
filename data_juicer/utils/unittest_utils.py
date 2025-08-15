@@ -86,14 +86,16 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         current_tag = getattr(cls, "current_tag", "standalone")
         if current_tag.startswith("ray"):
             ray = LazyLoader("ray")
-            if ray.is_initialized():
-                ray.shutdown()
 
             time.sleep(0.1)
 
-            ray.init("auto", ignore_reinit_error=True, namespace="dj_dist_unittest")
+            logger.info(f">>>>>>>>>>>>>>>>>>>> [Init Ray]: dj_dist_unittest_{cls.__name__}")
+            ray.init("auto", ignore_reinit_error=True, namespace=f"dj_dist_unittest_{cls.__name__}")
 
             cls._cleanup_ray_data_state()
+            import gc
+
+            gc.collect()
 
     @classmethod
     def tearDownClass(cls, hf_model_name=None) -> None:
@@ -118,9 +120,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
 
         current_tag = getattr(cls, "current_tag", "standalone")
         if current_tag.startswith("ray"):
-            ray = LazyLoader("ray")
             cls._cleanup_ray_data_state()
-            ray.shutdown(_exiting_interpreter=True)
 
     @classmethod
     def _cleanup_ray_data_state(cls):
