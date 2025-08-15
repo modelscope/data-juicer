@@ -13,7 +13,7 @@ from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 from .overall_analysis import OverallAnalysis
 
 logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
-FONT = os.environ.get("ANALYZER_FONT", "XXYY")
+FONT = os.environ.get("ANALYZER_FONT", "Heiti SC")
 FONT_PATH = fm.findfont(FONT)
 
 plt.rcParams["font.sans-serif"] = [FONT]

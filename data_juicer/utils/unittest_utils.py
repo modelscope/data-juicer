@@ -1,8 +1,8 @@
 import functools
+import gc
 import os
 import shutil
 import subprocess
-import time
 import unittest
 
 import numpy
@@ -86,15 +86,11 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         current_tag = getattr(cls, "current_tag", "standalone")
         if current_tag.startswith("ray"):
             ray = LazyLoader("ray")
-
-            time.sleep(0.1)
-
             logger.info(f">>>>>>>>>>>>>>>>>>>> [Init Ray]: dj_dist_unittest_{cls.__name__}")
             ray.init("auto", ignore_reinit_error=True, namespace=f"dj_dist_unittest_{cls.__name__}")
 
+            # erase existing resources
             cls._cleanup_ray_data_state()
-            import gc
-
             gc.collect()
 
     @classmethod
@@ -121,26 +117,26 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         current_tag = getattr(cls, "current_tag", "standalone")
         if current_tag.startswith("ray"):
             cls._cleanup_ray_data_state()
+            gc.collect()
 
     @classmethod
     def _cleanup_ray_data_state(cls):
-        """清理 Ray Data 的全局状态"""
+        """clean up the global states of Ray Data"""
         try:
-            # 清理 Ray Data 的全局上下文
+            # clean up the global contexts of Ray Data
             ray = LazyLoader("ray")
 
-            # 重置执行上下文
+            # reset execution context
             if hasattr(ray.data._internal.execution.streaming_executor, "_execution_context"):
                 ray.data._internal.execution.streaming_executor._execution_context = None
 
-            # 清理 stats manager
+            # clean up stats manager
             from ray.data._internal.stats import StatsManager
 
             if hasattr(StatsManager, "_instance"):
                 StatsManager._instance = None
 
         except Exception:
-            # 忽略清理过程中的错误
             pass
 
     def setUp(self):
