@@ -53,8 +53,8 @@ class DefaultExecutorTest(DataJuicerTestCaseBase):
 
     def test_end2end_execution_skip_export(self):
         cfg = init_configs(['--config', test_yaml_path])
-        cfg.export_path = os.path.join(self.tmp_dir, 'test_end2end_execution', 'res.jsonl')
-        cfg.work_dir = os.path.join(self.tmp_dir, 'test_end2end_execution')
+        cfg.export_path = os.path.join(self.tmp_dir, 'test_end2end_execution_skip_export', 'res.jsonl')
+        cfg.work_dir = os.path.join(self.tmp_dir, 'test_end2end_execution_skip_export')
         executor = DefaultExecutor(cfg)
         executor.run(skip_export=True)
 

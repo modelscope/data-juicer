@@ -4,7 +4,7 @@
   - [1. Build Your Own OPs](#1-build-your-own-ops)
     - [1.1 Build OPs Quickly](#11-build-ops-quickly)
     - [1.2 Contribute Your New OPs to the Open-Source Community](#12-contribute-your-new-ops-to-the-open-source-community)
-      - [1.2.2 Providing Basic OP Functions (alpha version)](#122-providing-basic-op-functions-alpha-version)
+      - [1.2.1 Providing Basic OP Functions (alpha version)](#121-providing-basic-op-functions-alpha-version)
       - [1.2.2 Making the OP More Usable (beta version)](#122-making-the-op-more-usable-beta-version)
       - [1.2.3 Making OP Faster \& More complete (stable version)](#123-making-op-faster--more-complete-stable-version)
   - [2. Build Your Own Data Recipes and Configs](#2-build-your-own-data-recipes-and-configs)
@@ -128,7 +128,7 @@ process:
 
 - 📣📣📣 Community contributors can submit corresponding operator PRs in the alpha state. After that, the contributor can work with the Data-Juicer team to gradually improve it to beta and stable versions in subsequent PRs. We welcome co-construction and will highlight [acknowledgements](https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement)!
 
-#### 1.2.2 Providing Basic OP Functions (alpha version)
+#### 1.2.1 Providing Basic OP Functions (alpha version)
 
 In the previous section 1.1, the operator we implemented has already fulfilled the basic functionalities, thus meeting the requirements for the ![alpha](https://img.shields.io/badge/alpha-red?style=plastic) version. Next, we will introduce how to extend this operator to make it more usable and standardized.
 
