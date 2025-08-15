@@ -24,6 +24,8 @@
 - Data-Juicer 支持每个人灵活、便捷定义自己的算子。
 - 在实现新的算子之前，请参考已有 [算子池](Operators.md) 以避免不必要的重复。
 
+> 以下示例的开发过程以直接在源码对应模块中添加算子为例。如果外部添加算子，可以通过传参`--custom-operator-paths` 或 yaml配置文件中配置`custom_operator_paths`参数注册新算子，例如：`custom_operator_paths: ['/path/to/new/op.py', '/path/to/new/ops/directory/]`。
+
 ### 1.1 快速构建算子
 
 下面以 "TextLengthFilter" 的算子（过滤仅包含预期文本长度的样本语料）为例，展示相应开发构建过程。

@@ -24,6 +24,8 @@
 - Data-Juicer allows everybody to easily build their own OPs.
 - Before implementing a new OP, please refer to existing [OperatorsZoo](Operators.md) to avoid unnecessary duplication.
 
+> The development process of the following example takes directly adding operators in the corresponding module of the source code as an example. If an operator is added externally, the new operator can be registered by passing the parameter `--custom-operator-paths` or configuring the `custom_operator_paths` parameter in the yaml file, for example: `custom_operator_paths: ['/path/to/new/op.py', '/path/to/new/ops/directory/]`.
+
 ### 1.1 Build OPs Quickly
 
 Assuming we want to add a new Filter operator called "TextLengthFilter" to get corpus of expected text length, we can follow the following steps to build it.
