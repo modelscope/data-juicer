@@ -54,6 +54,8 @@ git commit -m "<your_commit_message>"
 ### 2.1 构建示例
 下面以 "TextLengthFilter" 的算子（过滤仅包含预期文本长度的样本语料）为例，展示相应开发构建过程。
 
+>以下示例的开发过程以直接在源码对应模块中添加算子为例。如果外部添加算子，可以通过传参`--custom-operator-paths` 或 yaml配置文件中配置`custom_operator_paths`参数注册新算子，例如：`custom_operator_paths: ['/path/to/new/op.py', '/path/to/new/ops/directory/]`。
+
 #### 2.1.2 提供算子基本功能（alpha版本）
 
 1. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)，可选) 如果该算子定义了某个统计变量，那么请在 `data_juicer/utils/constant.py` 文件中添加一个新的`StatsKeys`属性来统一保存管理。

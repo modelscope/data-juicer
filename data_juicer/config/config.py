@@ -1,5 +1,6 @@
 import argparse
 import copy
+import importlib.util
 import json
 import os
 import shutil
@@ -38,6 +39,37 @@ def timing_context(description):
     elapsed_time = time.time() - start_time
     # Use a consistent format that won't be affected by logger reconfiguration
     logger.debug(f"{description} took {elapsed_time:.2f} seconds")
+
+
+def load_custom_operators(paths):
+    for path in paths:
+        abs_path = os.path.abspath(path)
+
+        if os.path.isfile(abs_path):
+            module_name = os.path.splitext(os.path.basename(abs_path))[0]
+            try:
+                spec = importlib.util.spec_from_file_location(module_name, abs_path)
+                module = importlib.util.module_from_spec(spec)
+                sys.modules[module_name] = module
+                spec.loader.exec_module(module)
+            except Exception as e:
+                raise RuntimeError(f"Failed to import {abs_path}: {e}")
+
+        elif os.path.isdir(abs_path):
+            if not os.path.exists(os.path.join(abs_path, "__init__.py")):
+                raise ValueError(f"Directory {abs_path} must contain __init__.py")
+
+            parent_dir = os.path.dirname(abs_path)
+            package_name = os.path.basename(abs_path)
+
+            # add module directory to system path
+            if parent_dir not in sys.path:
+                sys.path.insert(0, parent_dir)
+
+            try:
+                importlib.import_module(package_name)
+            except Exception as e:
+                raise RuntimeError(f"Failed to import package {abs_path}: {e}")
 
 
 def init_configs(args: Optional[List[str]] = None, which_entry: object = None, load_configs_only=False):
@@ -459,7 +491,9 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 help="Whether to save all stats to only one file. Only used in " "Analysis.",
             )
             parser.add_argument("--ray_address", type=str, default="auto", help="The address of the Ray cluster.")
-
+            parser.add_argument(
+                "--custom-operator-paths", nargs="+", help="Paths to custom operator scripts or directories."
+            )
             parser.add_argument("--debug", action="store_true", help="Whether to run in debug mode.")
 
             # Filter out non-essential arguments for initial parsing
@@ -506,6 +540,9 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
             # Parse all arguments
             with timing_context("Parsing arguments"):
                 cfg = parser.parse_args(args=args)
+
+                if cfg.custom_operator_paths:
+                    load_custom_operators(cfg.custom_operator_paths)
 
                 # check the entry
                 from data_juicer.core.analyzer import Analyzer
