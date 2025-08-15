@@ -51,6 +51,16 @@ class DefaultExecutorTest(DataJuicerTestCaseBase):
         # check result files
         self.assertTrue(os.path.exists(cfg.export_path))
 
+    def test_end2end_execution_skip_export(self):
+        cfg = init_configs(['--config', test_yaml_path])
+        cfg.export_path = os.path.join(self.tmp_dir, 'test_end2end_execution', 'res.jsonl')
+        cfg.work_dir = os.path.join(self.tmp_dir, 'test_end2end_execution')
+        executor = DefaultExecutor(cfg)
+        executor.run(skip_export=True)
+
+        # check result files
+        self.assertFalse(os.path.exists(cfg.export_path))
+
     def test_end2end_execution_with_existing_dataset(self):
         cfg = init_configs(['--config', test_yaml_path])
         cfg.export_path = os.path.join(self.tmp_dir, 'test_end2end_execution_with_existing_dataset', 'res.jsonl')

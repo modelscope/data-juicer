@@ -95,13 +95,15 @@ class DefaultExecutor(ExecutorBase):
         self,
         dataset: Union[Dataset, NestedDataset] = None,
         load_data_np: Optional[PositiveInt] = None,
-        skip_return=False,
+        skip_export: bool = False,
+        skip_return: bool = False,
     ):
         """
         Running the dataset process pipeline.
 
         :param dataset: a Dataset object to be executed.
         :param load_data_np: number of workers when loading the dataset.
+        :param skip_export: whether export the results into disk
         :param skip_return: skip return for API called.
         :return: processed dataset.
         """
@@ -160,8 +162,9 @@ class DefaultExecutor(ExecutorBase):
         logger.info(f"All OPs are done in {tend - tstart:.3f}s.")
 
         # 4. data export
-        logger.info("Exporting dataset to disk...")
-        self.exporter.export(dataset)
+        if not skip_export:
+            logger.info("Exporting dataset to disk...")
+            self.exporter.export(dataset)
         # compress the last dataset after exporting
         if self.cfg.use_cache and self.cfg.cache_compress:
             from data_juicer.utils.compress import compress
