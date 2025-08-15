@@ -613,6 +613,9 @@ from . import new_op2
         from data_juicer.ops.base_op import OPERATORS
         self.assertIn('custom_mapper1', list(OPERATORS.modules.keys()))
         self.assertIn('custom_mapper2', list(OPERATORS.modules.keys()))
+        
+        OPERATORS.modules.pop('custom_mapper1')
+        OPERATORS.modules.pop('custom_mapper2')
 
 
 if __name__ == '__main__':
