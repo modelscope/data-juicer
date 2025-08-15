@@ -12,6 +12,8 @@ class LoadFormatterTest(DataJuicerTestCaseBase):
     """Test cases specifically for the load_formatter function"""
 
     def setUp(self):
+        super().setUp()
+
         # Setup test data paths
         self._path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                  'data', 'structured')

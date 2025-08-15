@@ -17,6 +17,8 @@ from data_juicer.ops.mapper.download_file_mapper import DownloadFileMapper
 class DownloadFileMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
+        super().setUp()
+
         self.temp_dir = tempfile.mkdtemp()
         self.data_path = osp.abspath(osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data'))
         self.img1_path = osp.join(self.data_path, 'img1.png')

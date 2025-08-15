@@ -12,6 +12,7 @@ from data_juicer.download.wikipedia import (
 
 class TestDownload(unittest.TestCase):
     def setUp(self):
+        super().setUp()
         # Creates a temporary directory that persists until you delete it
         self.temp_dir = tempfile.mkdtemp(prefix='dj_test_')
 

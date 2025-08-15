@@ -13,6 +13,8 @@ from data_juicer.utils.mm_utils import load_images_byte
 class TestRayExporter(unittest.TestCase):
     def setUp(self):
         """Set up test data"""
+        super().setUp()
+
         import ray
         from data_juicer.core.data.ray_dataset import RayDataset
 

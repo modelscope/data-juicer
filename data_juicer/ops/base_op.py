@@ -3,7 +3,6 @@ from functools import wraps
 
 import numpy as np
 import pyarrow as pa
-from loguru import logger
 
 from data_juicer import is_cuda_available
 from data_juicer.utils.constant import Fields
@@ -221,6 +220,9 @@ class OP:
         return self.accelerator == "cuda" and is_cuda_available()
 
     def runtime_np(self):
+        # Local import to avoid logger being serialized in multiprocessing
+        from loguru import logger
+
         op_proc = calculate_np(self._name, self.mem_required, self.cpu_required, self.num_proc, self.use_cuda())
         logger.debug(f"Op [{self._name}] running with number of procs:{op_proc}")
         return op_proc

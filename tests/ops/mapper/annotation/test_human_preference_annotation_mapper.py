@@ -74,6 +74,8 @@ class HumanPreferenceAnnotationMapperTest(DataJuicerTestCaseBase):
     """Test cases for HumanPreferenceAnnotationMapper"""
 
     def setUp(self):
+        super().setUp()
+
         # Create samples for testing human preference
         self.samples = [
             {
