@@ -2,16 +2,25 @@
 
 ## Prerequisites
 
-- Python >= 3.10
+- Python >= 3.10 & <= 3.12
 - Git (for source installation)
 - uv (recommended package installer)
+  - uv can be installed by:
+
+```bash
+# Using curl
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Or using pip
+pip install uv
+```
 
 ## Basic DJ Installation
 
 Data-Juicer is now available on PyPI. The minimal installation includes core data processing capabilities:
 
 ```bash
-pip install py-data-juicer
+uv pip install py-data-juicer
 ```
 
 This provides:
@@ -27,7 +36,7 @@ For component details, plz refer to [pyproject.toml](../../pyproject.toml).
 **Core ML & DL**
 ```bash
 # Generic ML/DL capabilities
-pip install "py-data-juicer[generic]"
+uv pip install "py-data-juicer[generic]"
 ```
 Includes: PyTorch, Transformers, VLLM, etc.
 
@@ -35,51 +44,51 @@ Includes: PyTorch, Transformers, VLLM, etc.
 
 ```bash
 # Computer Vision
-pip install "py-data-juicer[vision]"
+uv pip install "py-data-juicer[vision]"
 
 # Natural Language Processing
-pip install "py-data-juicer[nlp]"
+uv pip install "py-data-juicer[nlp]"
 
 # Audio Processing
-pip install "py-data-juicer[audio]"
+uv pip install "py-data-juicer[audio]"
 
 **Additional Components**
 
 ```bash
 # Distributed Computing
-pip install "py-data-juicer[distributed]"
+uv pip install "py-data-juicer[distributed]"
 
 # AI Services & APIs
-pip install "py-data-juicer[ai_services]"
+uv pip install "py-data-juicer[ai_services]"
 
 **Development Tools**
 ```bash
 # Development & Testing
-pip install "py-data-juicer[dev]"
+uv pip install "py-data-juicer[dev]"
 ```
 
 ## Common Installation Patterns
 
 **1. Text Processing Setup**
 ```bash
-pip install "py-data-juicer[generic,nlp]"
+uv pip install "py-data-juicer[generic,nlp]"
 ```
 
 **2. Vision Processing Setup**
 ```bash
-pip install "py-data-juicer[generic,vision]"
+uv pip install "py-data-juicer[generic,vision]"
 ```
 
 **3. Full Processing Pipeline**
 ```bash
-pip install "py-data-juicer[generic,nlp,vision,distributed]"
+uv pip install "py-data-juicer[generic,nlp,vision,distributed]"
 ```
 
 
 **4. Complete Installation**
 ```bash
 # Install all features (except sandbox)
-pip install "py-data-juicer[all]"
+uv pip install "py-data-juicer[all]"
 ```
 
 
@@ -93,14 +102,7 @@ git clone https://github.com/modelscope/data-juicer.git
 cd data-juicer
 
 # Install dev dependencies
-pip install -e ".[dev]"
-
-# Optionally, use uv for venv and dependency management
-curl -LsSf https://astral.sh/uv/install.sh | sh   # install uv
-uv venv --python 3.10                             # initialize virtual env with python 3.10
-source .venv/bin/activate                         # activate virtual env
-uv pip install -e .                               # install minimal dependencies
-
+uv pip install -e ".[dev]"
 ```
 
 

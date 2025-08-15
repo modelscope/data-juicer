@@ -30,6 +30,18 @@ class RayExecutorTest(DataJuicerTestCaseBase):
         self.assertTrue(os.path.exists(cfg.export_path))
 
     @TEST_TAG('ray')
+    def test_end2end_execution_skip_export(self):
+        cfg = init_configs(
+            ['--config', os.path.join(self.root_path, 'demos/process_on_ray/configs/demo-new-config.yaml')])
+        cfg.export_path = os.path.join(self.tmp_dir, 'test_end2end_execution_skip_export', 'res.jsonl')
+        cfg.work_dir = os.path.join(self.tmp_dir, 'test_end2end_execution_skip_export')
+        executor = RayExecutor(cfg)
+        executor.run(skip_export=True)
+
+        # check result files
+        self.assertFalse(os.path.exists(cfg.export_path))
+
+    @TEST_TAG('ray')
     def test_end2end_execution_op_fusion(self):
         cfg = init_configs(['--config', os.path.join(self.root_path, 'demos/process_on_ray/configs/demo-new-config.yaml')])
         cfg.export_path = os.path.join(self.tmp_dir, 'test_end2end_execution_op_fusion', 'res.jsonl')

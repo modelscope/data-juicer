@@ -1,74 +1,39 @@
 # How-to Guide for Developers
 
 - [How-to Guide for Developers](#how-to-guide-for-developers)
-  - [1. Coding Style](#1-coding-style)
-  - [2. Build Your Own OPs](#2-build-your-own-ops)
-    - [2.1 Building Illustration](#21-building-illustration)
-      - [2.1.2 Providing Basic OP Functions (alpha version)](#212-providing-basic-op-functions-alpha-version)
-    - [2.1.2 Making the OP More Usable (beta version)](#212-making-the-op-more-usable-beta-version)
-    - [2.1.3 Making OP Faster \& More complete (stable version)](#213-making-op-faster--more-complete-stable-version)
-  - [3. Build Your Own Data Recipes and Configs](#3-build-your-own-data-recipes-and-configs)
-    - [3.1 Fruitful Config Sources \& Type Hints](#31-fruitful-config-sources--type-hints)
-    - [3.2 Hierarchical Configs and Helps](#32-hierarchical-configs-and-helps)
-  - [4. Dependency Management](#4-dependency-management)
-    - [4.1 Installing uv](#41-installing-uv)
-    - [4.2 Virtual Environment Management](#42-virtual-environment-management)
-    - [4.3 Adding New Dependencies](#43-adding-new-dependencies)
-    - [4.4 Development Setup](#44-development-setup)
-    - [4.5 Lazy Loading](#45-lazy-loading)
+  - [1. Build Your Own OPs](#1-build-your-own-ops)
+    - [1.1 Build OPs Quickly](#11-build-ops-quickly)
+    - [1.2 Contribute Your New OPs to the Open-Source Community](#12-contribute-your-new-ops-to-the-open-source-community)
+      - [1.2.1 Providing Basic OP Functions (alpha version)](#121-providing-basic-op-functions-alpha-version)
+      - [1.2.2 Making the OP More Usable (beta version)](#122-making-the-op-more-usable-beta-version)
+      - [1.2.3 Making OP Faster \& More complete (stable version)](#123-making-op-faster--more-complete-stable-version)
+  - [2. Build Your Own Data Recipes and Configs](#2-build-your-own-data-recipes-and-configs)
+    - [2.1 Fruitful Config Sources \& Type Hints](#21-fruitful-config-sources--type-hints)
+    - [2.2 Hierarchical Configs and Helps](#22-hierarchical-configs-and-helps)
+  - [3. Dependency Management](#3-dependency-management)
+    - [3.1 Installing uv](#31-installing-uv)
+    - [3.2 Virtual Environment Management](#32-virtual-environment-management)
+    - [3.3 Adding New Dependencies](#33-adding-new-dependencies)
+    - [3.4 Development Setup](#34-development-setup)
+    - [3.5 Lazy Loading](#35-lazy-loading)
+  - [4. Coding Style](#4-coding-style)
   - [5. Documentation Style](#5-documentation-style)
 
-## 1. Coding Style
-
-We define our styles in `.pre-commit-config.yaml`. Before committing,
-please install `pre-commit` tool to automatically check and modify accordingly:
-
-```shell
-# ===========install pre-commit tool===========
-pip install pre-commit
-
-cd <path_to_data_juicer>
-# install pre-commit script for data_juicer
-pre-commit install
-
-
-# ===========check all files===========
-git add .
-pre-commit run --all-files
-
-# commit after all checking are passed
-git commit -m "xxxx"
-```
-
-**Note**: We have configured pre-commit checks in github workflow. If this 
-check in your PR fails, please locally ① ensure that the relevant 
-dependencies of pre-commit are consistent with the project configuration 
-(which can be completed through `pre-commit clean` and `pre-commit install`); 
-and ② execute `pre-commit run --all-files` before push.
-
-## 2. Build Your Own OPs
+## 1. Build Your Own OPs
 
 - Data-Juicer allows everybody to easily build their own OPs.
 - Before implementing a new OP, please refer to existing [OperatorsZoo](Operators.md) to avoid unnecessary duplication.
-- According to the implementation progress, OP will be categorized into 3 types of versions:
-  - ![alpha](https://img.shields.io/badge/alpha-red?style=plastic) version: Only the basic OP implementations are finished.
-  - ![beta](https://img.shields.io/badge/beta-yellow?style=plastic) version: Based on the alpha version, unittests for this OP and basic docstring are added as well.
-  - ![stable](https://img.shields.io/badge/stable-green?style=plastic) version: Based on the beta version, OP optimizations (e.g. model management, batched processing, OP fusion, ...)
 
-- 📣📣📣 Community contributors can submit corresponding operator PRs in the alpha state. After that, the contributor can work with the Data-Juicer team to gradually improve it to beta and stable versions in subsequent PRs. We welcome co-construction and will highlight [acknowledgements](https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement)!
+> The development process of the following example takes directly adding operators in the corresponding module of the source code as an example. If an operator is added externally, the new operator can be registered by passing the parameter `--custom-operator-paths` or configuring the `custom_operator_paths` parameter in the yaml file, for example: `custom_operator_paths: ['/path/to/new/op.py', '/path/to/new/ops/directory/]`.
 
-### 2.1 Building Illustration
-  
+### 1.1 Build OPs Quickly
+
 Assuming we want to add a new Filter operator called "TextLengthFilter" to get corpus of expected text length, we can follow the following steps to build it.
 
->The development process of the following example takes directly adding operators in the corresponding module of the source code as an example. If an operator is added externally, the new operator can be registered by passing the parameter `--custom-operator-paths` or configuring the `custom_operator_paths` parameter in the yaml file, for example: `custom_operator_paths: ['/path/to/new/op.py', '/path/to/new/ops/directory/]`.
-
-#### 2.1.2 Providing Basic OP Functions (alpha version)
-
-1. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic), Optional) If the new OP defines  some statistical variables, please add the corresponding new `StatsKeys` attribute in `data_juicer/utils/constant.py` for unified management.
+1. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic), Optional) If the new OP defines  some statistical variables, please add the corresponding new `StatsKeysConstant` attribute in `data_juicer/utils/constant.py` for unified management.
 
 ```python
-class StatsKeys(object):
+class StatsKeysConstant(object):
     ...              # other keys
     text_len = 'text_len'
 ```
@@ -85,7 +50,7 @@ class StatsKeys(object):
 
     from data_juicer.utils.constant import Fields, StatsKeys
 
-    from ..base_op import OPERATORS, Filter
+    from data_juicer.ops.base_op import OPERATORS, Filter
 
 
     @OPERATORS.register_module('text_length_filter')
@@ -119,6 +84,7 @@ class StatsKeys(object):
             if StatsKeys.text_len in sample[Fields.stats]:
                 return sample
 
+            # compute text length and store it in the corresponding stats field
             sample[Fields.stats][StatsKeys.text_len] = len(sample[self.text_key])
             return sample
 
@@ -132,13 +98,11 @@ class StatsKeys(object):
 3. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) After implementation, add it to the OP dictionary in the `__init__.py` file in `data_juicer/ops/filter/` directory.
 
 ```python
-from . import (...,              # other OPs
-               text_length_filter)  # import this new OP module
 # other OPs
-from text_length_filter import TextLengthFilter  # import this new OP class
+from .text_length_filter import TextLengthFilter  # import this new OP class
 __all__ = [
     # other Ops
-    text_length_filter,  # add this new Op to __all__
+    "TextLengthFilter",  # add this new Op to __all__
 ]
 ```
 
@@ -157,9 +121,22 @@ process:
       max_len: 1000
 ```
 
-### 2.1.2 Making the OP More Usable (beta version)
+### 1.2 Contribute Your New OPs to the Open-Source Community
 
-6. (![beta](https://img.shields.io/badge/beta-yellow?style=plastic) strongly recommended) In order to enhance the robustness of the code, verify the correctness and intuitively show how to use its functions, it is best to unit test the newly added operators. For the `TextLengthFilter` operator above, implement a test file such as `test_text_length_filter.py` in `tests/ops/filter/`:
+- According to the implementation progress, OP will be categorized into 3 types of versions:
+  - ![alpha](https://img.shields.io/badge/alpha-red?style=plastic) version: Only the basic OP implementations are finished.
+  - ![beta](https://img.shields.io/badge/beta-yellow?style=plastic) version: Based on the alpha version, unittests for this OP and basic docstring are added as well.
+  - ![stable](https://img.shields.io/badge/stable-green?style=plastic) version: Based on the beta version, OP optimizations (e.g. model management, batched processing, OP fusion, ...)
+
+- 📣📣📣 Community contributors can submit corresponding operator PRs in the alpha state. After that, the contributor can work with the Data-Juicer team to gradually improve it to beta and stable versions in subsequent PRs. We welcome co-construction and will highlight [acknowledgements](https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement)!
+
+#### 1.2.1 Providing Basic OP Functions (alpha version)
+
+In the previous section 1.1, the operator we implemented has already fulfilled the basic functionalities, thus meeting the requirements for the ![alpha](https://img.shields.io/badge/alpha-red?style=plastic) version. Next, we will introduce how to extend this operator to make it more usable and standardized.
+
+### 1.2.2 Making the OP More Usable (beta version)
+
+- (![beta](https://img.shields.io/badge/beta-yellow?style=plastic) strongly recommended) In order to enhance the robustness of the code, verify the correctness and intuitively show how to use its functions, it is best to unit test the newly added operators. For the `TextLengthFilter` operator above, implement a test file such as `test_text_length_filter.py` in `tests/ops/filter/`:
 
 ```python
 import unittest
@@ -181,7 +158,7 @@ if __name__ == '__main__':
     unittest.main()
 ```
 
-7. (![beta](https://img.shields.io/badge/beta-yellow?style=plastic) strongly recommend) In order to facilitate other users to understand and use, it is best to update the newly added operator information to the corresponding documents, including the following two basic actions:
+- (![beta](https://img.shields.io/badge/beta-yellow?style=plastic) strongly recommend) In order to facilitate other users to understand and use, it is best to update the newly added operator information to the corresponding documents, including the following two basic actions:
    1. Please add basic information to the doc string of the operator class to ensure that it is complete and readable (including basic function description of the operator, input parameters, output parameters, etc.). There is no need for users to write in multiple places. Our `pre-commit` and sphinx build scripts will automatically extract doc strings to form operator pool documents and API documents.
    2. `configs/config_all.yaml`: This complete configuration file saves a list of all operators and parameters, as a source of information for some automated features and one of the important documents for users to refer to available operators. Therefore, after adding a new operator, please also add it to the document process list (grouped by operator type and sorted alphabetically):
    
@@ -206,7 +183,7 @@ if __name__ == '__main__':
    ```
 
 
-### 2.1.3 Making OP Faster & More complete (stable version)
+### 1.2.3 Making OP Faster & More complete (stable version)
 
 - (![stable](https://img.shields.io/badge/stable-green?style=plastic)) If Hugging Face models are used within an operator, you might want to leverage GPU acceleration. To achieve this, declare `_accelerator = 'cuda'` in the OP's constructor, and ensure that `compute_stats_single/batched` and `process_single/batched` methods accept an additional positional argument `rank`.
 
@@ -414,12 +391,12 @@ class PerplexityFilter(Filter):
 ```
 
 
-## 3. Build Your Own Data Recipes and Configs
+## 2. Build Your Own Data Recipes and Configs
 - We provide easy configuration based on [jsonargparse](https://github.com/omni-us/jsonargparse/) to reduce cost for boilerplate codes.
 - We provide fruitful examples in [Data Recipe Gallery](../docs/RecipeGallery.md) for reference reuse and extension.
 - 📣📣📣 Community contributors can submit PRs in the [Data Recipe Gallery] to add customized data recipes to promote dissemination, reuse and related technical evolution. We welcome co-construction and will highlight [acknowledgements](https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement)!
 
-### 3.1 Fruitful Config Sources & Type Hints
+### 2.1 Fruitful Config Sources & Type Hints
 - A global config object can be initialized via
 ```
 # core.executor.py
@@ -441,7 +418,7 @@ extended [types](https://jsonargparse.readthedocs.io/en/stable/#type-hints)
 from jsonargparse, such as `restricted types` and `Paths` with customized
 limitations.
 
-### 3.2 Hierarchical Configs and Helps
+### 2.2 Hierarchical Configs and Helps
 - You can use dot notation in the argument names freely to define the
 hierarchy, e.g., `maximum_line_length_filter.min`.
 More importantly, by default, we automatically register the configs from
@@ -498,11 +475,11 @@ optional arguments:
 
 ```
 
-## 4. Dependency Management
+## 3. Dependency Management
 
 Data-Juicer uses a modern dependency management system based on `uv` and `pyproject.toml`. Dependencies are managed through the standard Python packaging format (PEP 621) and installed on-demand using a lazy loading system.
 
-### 4.1 Installing uv
+### 3.1 Installing uv
 
 `uv` is a fast Python package installer and resolver, as a better drop-in replacement for pip. You can install it using:
 
@@ -516,7 +493,7 @@ pip install uv
 
 After installation, verify it's working by running `uv --version`.
 
-### 4.2 Virtual Environment Management
+### 3.2 Virtual Environment Management
 
 `uv` provides virtual environment management capabilities that replaces `venv` and `virtualenv`. Here are the common commands:
 
@@ -538,7 +515,7 @@ uv pip install -e .
 
 ```
 
-### 4.3 Adding New Dependencies
+### 3.3 Adding New Dependencies
 
 To add new dependencies:
 
@@ -556,13 +533,13 @@ numpy = ">=1.26.4,<2.0.0"
 
 [project.optional-dependencies]
 generic = [
-    "torch>=1.11.0",
-    "transformers>=4.47.0,<4.48.0",
+    "torch==2.6.0",
+    "transformers>=4.47.0",
     ...
 ]
 ```
 
-### 4.4 Development Setup
+### 3.4 Development Setup
 
 1. Install the package with all dependencies:
 ```bash
@@ -576,13 +553,42 @@ uv pip install -e ".[dev]"          # Development tools
 uv pip install -e ".[ai_services]"  # Services dependencies
 ```
 
-### 4.5 Lazy Loading
+### 3.5 Lazy Loading
 
 The lazy loading system automatically installs dependencies when they are first used. This means:
 - Initial installation is faster
 - Only required dependencies are installed
 - Dependencies are installed on-demand
 - Uses `uv` for fast installation when available
+
+## 4. Coding Style
+
+We define our styles in `.pre-commit-config.yaml`. Before committing,
+please install `pre-commit` tool to automatically check and modify accordingly:
+
+```shell
+# ===========install pre-commit tool===========
+uv pip install pre-commit
+
+cd <path_to_data_juicer>
+# install pre-commit script for data_juicer
+pre-commit install
+
+
+# ===========check all files===========
+git add .
+pre-commit run --all-files
+
+# commit after all checking are passed
+git commit -m "xxxx"
+```
+
+**Note**: We have configured pre-commit checks in github workflow. If this 
+check in your PR fails, please locally ① ensure that the relevant 
+dependencies of pre-commit are consistent with the project configuration 
+(which can be completed through `pre-commit clean` and `pre-commit install`); 
+and ② execute `pre-commit run --all-files` before push.
+
 
 ## 5. Documentation Style
 

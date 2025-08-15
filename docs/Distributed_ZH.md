@@ -62,8 +62,8 @@ Data-Juicer 支持基于 [Ray](https://github.com/ray-project/ray) 和阿里巴�
 在开始前，你应该安装 Data-Juicer 以及它的 `dist` 依赖需求：
 
 ```shell
-pip install -v -e .  # 安装 Data-Juicer 的最小依赖需求
-pip install -v -e ".[dist]"  # 包括 Ray 以及其他分布式相关的依赖库
+uv pip install -v -e .  # 安装 Data-Juicer 的最小依赖需求
+uv pip install -v -e ".[dist]"  # 包括 Ray 以及其他分布式相关的依赖库
 ```
 
 然后启动一个 Ray 集群（参考 [Ray 文档](https://docs.ray.io/en/latest/ray-core/starting-ray.html) ）：

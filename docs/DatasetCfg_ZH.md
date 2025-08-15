@@ -12,18 +12,18 @@
 有关更多详细信息，请参阅 [local_json.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/datasets/local_json.yaml)。
 ```yaml
 dataset:
-configs:
-- type: local
-path: path/to/your/local/dataset.json
-format: json
+  configs:
+    - type: local
+      path: path/to/your/local/dataset.json
+      format: json
 ```
 
 ```yaml
 dataset:
-configs:
-- type: local
-path: path/to/your/local/dataset.parquet
-format: parquet
+  configs:
+    - type: local
+      path: path/to/your/local/dataset.parquet
+      format: parquet
 ```
 
 ### Remote Huggingface 数据集
@@ -33,13 +33,13 @@ format: parquet
 
 ```yaml
 dataset:
-configs:
-- type: 'remote'
-source: 'huggingface'
-path: "HuggingFaceFW/fineweb"
-name: "CC-MAIN-2024-10"
-split: "train"
-limit: 1000
+  configs:
+    - type: 'remote'
+      source: 'huggingface'
+      path: "HuggingFaceFW/fineweb"
+      name: "CC-MAIN-2024-10"
+      split: "train"
+      limit: 1000
 ```
 
 ### 远程 Arxiv 数据集
@@ -49,13 +49,13 @@ limit: 1000
 
 ```yaml
 dataset:
-configs:
-- type: 'remote'
-source: 'arxiv'
-lang: 'en'
-dump_date: 'latest'
-force_download: false
-url_limit: 2
+  configs:
+    - type: 'remote'
+      source: 'arxiv'
+      lang: 'en'
+      dump_date: 'latest'
+      force_download: false
+      url_limit: 2
 ```
 
 ### 其他支持的数据集格式
@@ -70,14 +70,14 @@ url_limit: 2
 有关更多详细信息，请参阅 [mixture.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/datasets/mixture.yaml)。
 ```yaml
 dataset:
-max_sample_num: 10000
-configs:
-- type: 'local'
-weight: 1.0
-path: 'path/to/json/file'
-- type: 'local'
-weight: 1.0
-path: 'path/to/csv/file'
+  max_sample_num: 10000
+  configs:
+    - type: 'local'
+      weight: 1.0
+      path: 'path/to/json/file'
+    - type: 'local'
+      weight: 1.0
+      path: 'path/to/csv/file'
 ```
 
 ### 数据验证
@@ -86,24 +86,24 @@ path: 'path/to/csv/file'
 有关更多详细信息和支持的验证器，请参阅 [data_validator.py](https://github.com/modelscope/data-juicer/blob/main/data_juicer/core/data/data_validator.py)。
 ```yaml
 dataset:
-configs:
-- type: local
-path: path/to/data.json
+  configs:
+    - type: local
+      path: path/to/data.json
 
 validators:
-- type: swift_messages
-min_turns: 2
-max_turns: 20
-sample_size: 1000
-- type: required_fields
-required_fields:
-- "text"
-- "metadata"
-- "language"
-field_types:
-text: "str"
-metadata: "dict"
-language: "str"
+  - type: swift_messages
+    min_turns: 2
+    max_turns: 20
+    sample_size: 1000
+  - type: required_fields
+    required_fields:
+      - "text"
+      - "metadata"
+      - "language"
+    field_types:
+      text: "str"
+      metadata: "dict"
+      language: "str"
 ```
 
 ### 旧版 dataset_path 配置

@@ -1,72 +1,44 @@
 # 开发者指南
 
 - [开发者指南](#开发者指南)
-  - [1. 编码规范](#1-编码规范)
-  - [2. 构建自己的算子](#2-构建自己的算子)
-    - [2.1 构建示例](#21-构建示例)
-      - [2.1.2 提供算子基本功能（alpha版本）](#212-提供算子基本功能alpha版本)
-      - [2.1.2 使算子更可用（beta版本）](#212-使算子更可用beta版本)
-      - [2.1.3 使算子更快更完备（stable版本）](#213-使算子更快更完备stable版本)
-  - [3. 构建自己的数据菜谱和配置](#3-构建自己的数据菜谱和配置)
-    - [3.1 丰富的配置源和类型提示](#31-丰富的配置源和类型提示)
-    - [3.2 层次化的配置和帮助](#32-层次化的配置和帮助)
-  - [4. 依赖管理](#4-依赖管理)
-    - [4.1 安装 uv](#41-安装-uv)
-    - [4.2 虚拟环境管理](#42-虚拟环境管理)
-    - [4.3 添加新依赖](#43-添加新依赖)
-    - [4.4 开发环境设置](#44-开发环境设置)
-    - [4.5 延迟加载](#45-延迟加载)
+  - [1. 构建自己的算子](#1-构建自己的算子)
+    - [1.1 快速构建算子](#11-快速构建算子)
+    - [1.2 将你的算子贡献到开源社区](#12-将你的新算子贡献到开源社区)
+      - [1.2.1 提供算子基本功能（alpha版本）](#121-提供算子基本功能alpha版本)
+      - [1.2.2 使算子更可用（beta版本）](#122-使算子更可用beta版本)
+      - [1.2.3 使算子更快更完备（stable版本）](#123-使算子更快更完备stable版本)
+  - [2. 构建自己的数据菜谱和配置](#2-构建自己的数据菜谱和配置)
+    - [2.1 丰富的配置源和类型提示](#21-丰富的配置源和类型提示)
+    - [2.2 层次化的配置和帮助](#22-层次化的配置和帮助)
+  - [3. 依赖管理](#3-依赖管理)
+    - [3.1 安装 uv](#31-安装-uv)
+    - [3.2 虚拟环境管理](#32-虚拟环境管理)
+    - [3.3 添加新依赖](#33-添加新依赖)
+    - [3.4 开发环境设置](#34-开发环境设置)
+    - [3.5 延迟加载](#35-延迟加载)
+  - [4. 编码规范](#4-编码规范)
   - [5. 文档规范](#5-文档规范)
 
-## 1. 编码规范
-
-我们将编码规范定义在 `.pre-commit-config.yaml` 中。在向仓库贡献代码之前，请使用 `pre-commit` 工具对代码进行自动规范化。
-
-```shell
-# ===========install pre-commit tool===========
-pip install pre-commit
-
-cd <path_to_data_juicer>
-# install pre-commit script for data_juicer
-pre-commit install
-
-
-# ===========check all files===========
-git add .
-pre-commit run --all-files
-
-# commit after all checking are passed
-git commit -m "<your_commit_message>"
-```
-
-**注意**：我们在github workflow配置了pre-commit的检查。如果您的PR中该检查没通过，请在本地①确保pre-commit 的相关依赖与项目配置一致（可通过`pre-commit clean`和`pre-commit install`完成）；②push前执行了`pre-commit run --all-files`.
-
-## 2. 构建自己的算子
+## 1. 构建自己的算子
 
 - Data-Juicer 支持每个人灵活、便捷定义自己的算子。
 - 在实现新的算子之前，请参考已有 [算子池](Operators.md) 以避免不必要的重复。
-- 根据实现完整性，算子会被分类为3类：
-  - ![alpha](https://img.shields.io/badge/alpha-red?style=plastic) 版本：仅实现了最基本的算子能力
-  - ![beta](https://img.shields.io/badge/beta-yellow?style=plastic) 版本：在 alpha 版本基础上为算子添加了单元测试，补充基础文档描述
-  - ![stable](https://img.shields.io/badge/stable-green?style=plastic) 版本：在 beta 版本基础上进行了各项算子优化（如模型管理、批处理、算子融合等）
-- 📣📣📣 社区贡献者可在alpha状态后就提相应算子PR。此后该贡献者可以与Data-Juicer团队一起在后续PR中，将其渐进完善到beta和stable版本。我们非常欢迎共建，并会高亮[致谢](https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement)！
 
-### 2.1 构建示例
+> 以下示例的开发过程以直接在源码对应模块中添加算子为例。如果外部添加算子，可以通过传参`--custom-operator-paths` 或 yaml配置文件中配置`custom_operator_paths`参数注册新算子，例如：`custom_operator_paths: ['/path/to/new/op.py', '/path/to/new/ops/directory/]`。
+
+### 1.1 快速构建算子
+
 下面以 "TextLengthFilter" 的算子（过滤仅包含预期文本长度的样本语料）为例，展示相应开发构建过程。
 
->以下示例的开发过程以直接在源码对应模块中添加算子为例。如果外部添加算子，可以通过传参`--custom-operator-paths` 或 yaml配置文件中配置`custom_operator_paths`参数注册新算子，例如：`custom_operator_paths: ['/path/to/new/op.py', '/path/to/new/ops/directory/]`。
-
-#### 2.1.2 提供算子基本功能（alpha版本）
-
-1. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)，可选) 如果该算子定义了某个统计变量，那么请在 `data_juicer/utils/constant.py` 文件中添加一个新的`StatsKeys`属性来统一保存管理。
+1. (可选) 如果该算子定义了某个统计变量，那么请在 `data_juicer/utils/constant.py` 文件中添加一个新的`StatsKeys`属性来统一保存管理。
 
 ```python
-class StatsKeys(object):
+class StatsKeysConstant(object):
     ...              # other keys
     text_len = 'text_len'
 ```
 
-2. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) 在 `data_juicer/ops/filter/` 目录下创建一个新的算子文件 `text_length_filter.py`，内容如下：
+2. 在 `data_juicer/ops/filter/` 目录下创建一个新的算子文件 `text_length_filter.py`，内容如下：
     - 因为它是一个 Filter 算子，所以需要继承 `base_op.py` 中的 `Filter` 基类，并用 `@OPERATORS.register_module(xx_op)` 装饰器标记，以实现自动注册。
     - 为了方便实现，我们可以按单样本处理的方式实现两个核心方法 `compute_stats_single` 和 `process_single`，它们的输入输出均为单个样本的字典结构。
     - 【进阶】如果你比较熟悉 Data-Juicer 中的batch化处理，你也可以通过覆写 `compute_stats_batched` 和 `process_batched` 方法直接实现它们的batch化版本，它的处理会比单样本版本稍快一些。它们的输入和输出则是按列存储的字典结构，其中包括多个样本 （详见下方 2.1.3 小节）。
@@ -78,7 +50,7 @@ class StatsKeys(object):
 
     from data_juicer.utils.constant import Fields, StatsKeys
 
-    from ..base_op import OPERATORS, Filter
+    from data_juicer.ops.base_op import OPERATORS, Filter
 
 
     @OPERATORS.register_module('text_length_filter')
@@ -112,6 +84,7 @@ class StatsKeys(object):
             if StatsKeys.text_len in sample[Fields.stats]:
                 return sample
 
+            # compute text length and store it in the corresponding stats field
             sample[Fields.stats][StatsKeys.text_len] = len(sample[self.text_key])
             return sample
 
@@ -123,20 +96,18 @@ class StatsKeys(object):
     ```
 
 
-3. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
+3. 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
 
 ```python
-from . import (...,              # other OPs
-               text_length_filter)  # import this new OP module
 # other OPs
-from text_length_filter import TextLengthFilter  # import this new OP class
+from .text_length_filter import TextLengthFilter  # import this new OP class
 __all__ = [
     # other Ops
-    text_length_filter,  # add this new Op to __all__
+    "TextLengthFilter",  # add this new Op to __all__
 ]
 ```
 
-4. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) 算子有`environments/science_requires.txt`中列举的包依赖时，需要在`data_juicer/utils/auto_install_mapping.py`里的`OPS_TO_PKG`中添加对应的依赖包，以支持算子粒度的依赖安装。
+4. （可选）算子有`environments/science_requires.txt`中列举的包依赖时，需要在`data_juicer/utils/auto_install_mapping.py`里的`OPS_TO_PKG`中添加对应的依赖包，以支持算子粒度的依赖安装。
 
 5. 全部完成！现在您可以在自己的配置文件中使用新添加的算子：
 
@@ -151,9 +122,21 @@ process:
       max_len: 1000
 ```
 
-#### 2.1.2 使算子更可用（beta版本）
+### 1.2 将你的新算子贡献到开源社区
 
-6. （![beta](https://img.shields.io/badge/beta-yellow?style=plastic) 强烈推荐）为了增强代码鲁棒性、验证正确性和直观展示如何使用其功能，最好为新添加的算子进行单元测试。对于上面的 `TextLengthFilter` 算子，在 `tests/ops/filter/` 中实现如 `test_text_length_filter.py` 的测试文件：
+- 根据实现完整性，算子会被分类为3类：
+  - ![alpha](https://img.shields.io/badge/alpha-red?style=plastic) 版本：仅实现了最基本的算子能力
+  - ![beta](https://img.shields.io/badge/beta-yellow?style=plastic) 版本：在 alpha 版本基础上为算子添加了单元测试，补充基础文档描述
+  - ![stable](https://img.shields.io/badge/stable-green?style=plastic) 版本：在 beta 版本基础上进行了各项算子优化（如模型管理、批处理、算子融合等）
+- 📣📣📣 社区贡献者可在alpha状态后就提相应算子PR。此后该贡献者可以与Data-Juicer团队一起在后续PR中，将其渐进完善到beta和stable版本。我们非常欢迎共建，并会高亮[致谢](https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement)！
+
+
+#### 1.2.1 提供算子基本功能（alpha版本）
+在前一个章节1.1中，我们实现的算子已经完整实现了基本功能，因此它已经满足![alpha](https://img.shields.io/badge/alpha-red?style=plastic)版本的要求。接下来，我们将介绍如何将这个算子进行扩展，使其更可用、更规范。
+
+#### 1.2.2 使算子更可用（beta版本）
+
+- （![beta](https://img.shields.io/badge/beta-yellow?style=plastic) 强烈推荐）为了增强代码鲁棒性、验证正确性和直观展示如何使用其功能，最好为新添加的算子进行单元测试。对于上面的 `TextLengthFilter` 算子，在 `tests/ops/filter/` 中实现如 `test_text_length_filter.py` 的测试文件：
 
 ```python
 import unittest
@@ -176,7 +159,7 @@ if __name__ == '__main__':
     unittest.main()
 ```
 
-1. （![beta](https://img.shields.io/badge/beta-yellow?style=plastic) 强烈推荐）为了方便其他用户理解和使用，最好将新增的算子信息更新到相应的文档中，具体包括如下两个基本动作：
+- （![beta](https://img.shields.io/badge/beta-yellow?style=plastic) 强烈推荐）为了方便其他用户理解和使用，最好将新增的算子信息更新到相应的文档中，具体包括如下两个基本动作：
    1. 请在算子基类的doc string中补充基础信息，确保其完整可读（包括算子基本功能描述、入参、出参等）。无需用户麻烦地多处撰写，我们的`pre-commit`和sphinx构建脚本会自动抽取doc string形成算子池文档和API文档。
    2. `configs/config_all.yaml`：该全集配置文件保存了所有算子及参数的一个列表，作为一些自动化特性的信息来源以及用户参考可用算子的一个重要文档之一。因此，在新增算子后，请将其也添加到该文档process列表里（按算子类型分组并按字母序排序）：
    
@@ -201,7 +184,7 @@ if __name__ == '__main__':
    ```
 
 
-#### 2.1.3 使算子更快更完备（stable版本）
+#### 1.2.3 使算子更快更完备（stable版本）
 
 - (![stable](https://img.shields.io/badge/stable-green?style=plastic)) 如果在算子中使用了 Hugging Face 模型，您可能希望利用 GPU 加速。为了实现这一点，请在算子的构造函数中声明 `_accelerator = 'cuda'`，并确保 `compute_stats_single/batched` 和 `process_single/batched` 方法接受一个额外的位置参数 `rank`。
 
@@ -399,13 +382,13 @@ class PerplexityFilter(Filter):
 
 - 至此，该算子已经能够在算子融合功能开启后，自动地与其他算子进行融合并共享共有的中间变量，减少重复计算，加快整体的数据处理速度
 
-## 3. 构建自己的数据菜谱和配置
+## 2. 构建自己的数据菜谱和配置
 
 - 我们提供基于 [jsonargparse](https://github.com/omni-us/jsonargparse/) 的简单配置以降低样板代码的成本。
 - 我们提供大量的示例性菜谱以供参阅复用和扩展，[数据菜谱Gallery](../docs/RecipeGallery_ZH.md)。
 - 📣📣📣 社区贡献者可提PR在*数据菜谱Gallery*中添加自定义的数据菜谱，促进传播、复用和相关技术演进。我们非常欢迎共建，并会高亮[致谢](https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement)！
 
-### 3.1 丰富的配置源和类型提示
+### 2.1 丰富的配置源和类型提示
 
 - 全局配置对象可以通过以下方式初始化
 
@@ -425,7 +408,7 @@ self.cfg = init_configs()
 此外，还支持许多参数类型和相应的验证。
 包含 Python内置类型、来自 [Lib/typing](https://docs.python.org/3/library/typing.html) 的类型，以及来自 jsonargparse 的 [扩展类型](https://jsonargparse.readthedocs.io/en/stable/#type-hints)，例如具有自定义限制的 `restricted types` 和 `Paths`。
 
-### 3.2 层次化的配置和帮助
+### 2.2 层次化的配置和帮助
 
 - 您可以在参数名称中自由使用点符号来定义层次结构， 例如 `maximum_line_length_filter.min`.
 更重要的是，默认情况下，我们自动注册已实现的运算符的 docstring。 也就是说，所有的结构配置始终与代码同步。
@@ -479,11 +462,11 @@ optional arguments:
 
 ```
 
-## 4. 依赖管理
+## 3. 依赖管理
 
 Data-Juicer 使用基于 `uv` 和 `pyproject.toml` 的现代依赖管理系统。依赖通过标准的 Python 打包格式 (PEP 621) 进行管理，并使用延迟加载系统按需安装。
 
-### 4.1 安装 uv
+### 3.1 安装 uv
 
 `uv` 是一个快速的 Python 包安装器和解析器，用于替代 pip。您可以通过以下方式安装：
 
@@ -497,7 +480,7 @@ pip install uv
 
 安装完成后，您可以使用 `uv --version` 验证安装是否成功。
 
-### 4.2 虚拟环境管理
+### 3.2 虚拟环境管理
 
 `uv` 提供了虚拟环境管理功能，可以替代 `venv` 和 `virtualenv`。以下是常用命令：
 
@@ -518,7 +501,7 @@ source .venv/bin/activate
 uv pip install -e .
 ```
 
-### 4.3 添加新依赖
+### 3.3 添加新依赖
 
 添加新依赖的方法：
 
@@ -536,13 +519,13 @@ numpy = ">=1.26.4,<2.0.0"
 
 [project.optional-dependencies]
 generic = [
-    "torch>=1.11.0",
-    "transformers>=4.47.0,<4.48.0",
+    "torch==2.6.0",
+    "transformers>=4.47.0",
     ...
 ]
 ```
 
-### 4.4 开发环境设置
+### 3.4 开发环境设置
 
 1. 安装所有依赖：
 ```bash
@@ -556,13 +539,37 @@ uv pip install -e ".[dev]"          # 开发工具
 uv pip install -e ".[ai_services]"  # 服务依赖
 ```
 
-### 4.5 延迟加载
+### 3.5 延迟加载
 
 延迟加载系统在首次使用时自动安装依赖。这意味着：
 - 初始安装更快
 - 只安装必需的依赖
 - 依赖按需安装
 - 优先使用 `uv` 进行快速安装
+
+## 4. 编码规范
+
+我们将编码规范定义在 `.pre-commit-config.yaml` 中。在向仓库贡献代码之前，请使用 `pre-commit` 工具对代码进行自动规范化。
+
+```shell
+# ===========install pre-commit tool===========
+uv pip install pre-commit
+
+cd <path_to_data_juicer>
+# install pre-commit script for data_juicer
+pre-commit install
+
+
+# ===========check all files===========
+git add .
+pre-commit run --all-files
+
+# commit after all checking are passed
+git commit -m "<your_commit_message>"
+```
+
+**注意**：我们在github workflow配置了pre-commit的检查。如果您的PR中该检查没通过，请在本地①确保pre-commit 的相关依赖与项目配置一致（可通过`pre-commit clean`和`pre-commit install`完成）；②push前执行了`pre-commit run --all-files`.
+
 
 ## 5. 文档规范
 
