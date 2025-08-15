@@ -77,6 +77,7 @@ save_stats_in_one_file: false                               # whether to store a
 data_probe_algo: 'uniform'                                  # sampling algorithm for dataset. Should be one of ["uniform", "frequency_specified_field_selector", "topk_specified_field_selector"]. It's "uniform" in default. Only used for dataset sampling.
 data_probe_ratio: 1.0                                       # the sampling ratio to the original dataset size. It's 1.0 in default. Only used for dataset sampling.
 hpo_config: null                                            # path to a configuration file when using auto-HPO tool.
+custom_operator_paths: []                                   # Paths to custom operator scripts or directories.
 
 # process schedule: a list of several process operators with their arguments
 process:
