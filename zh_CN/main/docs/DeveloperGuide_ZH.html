@@ -438,6 +438,9 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 <section id="id4">
 <h3>2.1 构建示例<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
 <p>下面以 &quot;TextLengthFilter&quot; 的算子（过滤仅包含预期文本长度的样本语料）为例，展示相应开发构建过程。</p>
+<blockquote>
+<div><p>以下示例的开发过程以直接在源码对应模块中添加算子为例。如果外部添加算子，可以通过传参<code class="docutils literal notranslate"><span class="pre">--custom-operator-paths</span></code> 或 yaml配置文件中配置<code class="docutils literal notranslate"><span class="pre">custom_operator_paths</span></code>参数注册新算子，例如：<code class="docutils literal notranslate"><span class="pre">custom_operator_paths:</span> <span class="pre">['/path/to/new/op.py',</span> <span class="pre">'/path/to/new/ops/directory/]</span></code>。</p>
+</div></blockquote>
 <section id="alpha">
 <h4>2.1.2 提供算子基本功能（alpha版本）<a class="headerlink" href="#alpha" title="Link to this heading">¶</a></h4>
 <ol class="arabic simple">

@@ -441,6 +441,9 @@ and ② execute <code class="docutils literal notranslate"><span class="pre">pre
 <section id="building-illustration">
 <h3>2.1 Building Illustration<a class="headerlink" href="#building-illustration" title="Link to this heading">¶</a></h3>
 <p>Assuming we want to add a new Filter operator called “TextLengthFilter” to get corpus of expected text length, we can follow the following steps to build it.</p>
+<blockquote>
+<div><p>The development process of the following example takes directly adding operators in the corresponding module of the source code as an example. If an operator is added externally, the new operator can be registered by passing the parameter <code class="docutils literal notranslate"><span class="pre">--custom-operator-paths</span></code> or configuring the <code class="docutils literal notranslate"><span class="pre">custom_operator_paths</span></code> parameter in the yaml file, for example: <code class="docutils literal notranslate"><span class="pre">custom_operator_paths:</span> <span class="pre">['/path/to/new/op.py',</span> <span class="pre">'/path/to/new/ops/directory/]</span></code>.</p>
+</div></blockquote>
 <section id="providing-basic-op-functions-alpha-version">
 <h4>2.1.2 Providing Basic OP Functions (alpha version)<a class="headerlink" href="#providing-basic-op-functions-alpha-version" title="Link to this heading">¶</a></h4>
 <ol class="arabic simple">
