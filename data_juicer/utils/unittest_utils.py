@@ -2,6 +2,7 @@ import functools
 import os
 import shutil
 import subprocess
+import time
 import unittest
 
 import numpy
@@ -85,7 +86,14 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         current_tag = getattr(cls, "current_tag", "standalone")
         if current_tag.startswith("ray"):
             ray = LazyLoader("ray")
+            if ray.is_initialized():
+                ray.shutdown()
+
+            time.sleep(0.1)
+
             ray.init("auto", ignore_reinit_error=True, namespace="dj_dist_unittest")
+
+            cls._cleanup_ray_data_state()
 
     @classmethod
     def tearDownClass(cls, hf_model_name=None) -> None:
@@ -111,7 +119,29 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         current_tag = getattr(cls, "current_tag", "standalone")
         if current_tag.startswith("ray"):
             ray = LazyLoader("ray")
+            cls._cleanup_ray_data_state()
             ray.shutdown(_exiting_interpreter=True)
+
+    @classmethod
+    def _cleanup_ray_data_state(cls):
+        """清理 Ray Data 的全局状态"""
+        try:
+            # 清理 Ray Data 的全局上下文
+            ray = LazyLoader("ray")
+
+            # 重置执行上下文
+            if hasattr(ray.data._internal.execution.streaming_executor, "_execution_context"):
+                ray.data._internal.execution.streaming_executor._execution_context = None
+
+            # 清理 stats manager
+            from ray.data._internal.stats import StatsManager
+
+            if hasattr(StatsManager, "_instance"):
+                StatsManager._instance = None
+
+        except Exception:
+            # 忽略清理过程中的错误
+            pass
 
     def setUp(self):
         logger.info(f">>>>>>>>>> [Start Test]: {self.id()}")
