@@ -10,7 +10,7 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, FROM_FORK
 class OptimizePromptMapperTest(DataJuicerTestCaseBase):
     prompt_key = 'prompt'
     root_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', '..')
-    test_data_path = os.path.join(root_path, 'demos/data/demo-dataset-prompts.jsonl')
+    test_data_path = os.path.join(root_path, 'demos/data/auto-prompt-optim/demo-dataset-prompts.jsonl')
 
     def _run_op(self, model="Qwen/Qwen2.5-7B-Instruct", enable_vllm=False, is_hf_model=True, sampling_params=None, num_proc=1):
         gen_num = 3
