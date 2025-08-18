@@ -4,6 +4,8 @@ from data_juicer.utils.unittest_utils import TEST_TAG, DataJuicerTestCaseBase
 class TestRayDataset(DataJuicerTestCaseBase):
     def setUp(self):
         """Set up test data"""
+        super().setUp()
+
         import ray
         from data_juicer.core.data.ray_dataset import RayDataset
 

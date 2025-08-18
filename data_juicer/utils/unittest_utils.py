@@ -1,10 +1,12 @@
 import functools
+import gc
 import os
 import shutil
 import subprocess
 import unittest
 
 import numpy
+from loguru import logger
 
 from data_juicer import is_cuda_available
 from data_juicer.core.data import DJDataset, NestedDataset
@@ -50,18 +52,18 @@ def set_clear_model_flag(flag):
     global CLEAR_MODEL
     CLEAR_MODEL = flag
     if CLEAR_MODEL:
-        print("CLEAR DOWNLOADED MODELS AFTER UNITTESTS.")
+        logger.info("CLEAR DOWNLOADED MODELS AFTER UNITTESTS.")
     else:
-        print("KEEP DOWNLOADED MODELS AFTER UNITTESTS.")
+        logger.info("KEEP DOWNLOADED MODELS AFTER UNITTESTS.")
 
 
 def set_from_fork_flag(flag):
     global FROM_FORK
     FROM_FORK = flag
     if FROM_FORK:
-        print("This unit test is activated from a forked repo.")
+        logger.info("This unit test is activated from a forked repo.")
     else:
-        print("This unit test is activated from a dev branch.")
+        logger.info("This unit test is activated from a dev branch.")
 
 
 class DataJuicerTestCaseBase(unittest.TestCase):
@@ -80,6 +82,17 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         # clear models in memory
         free_models()
 
+        # start ray
+        current_tag = getattr(cls, "current_tag", "standalone")
+        if current_tag.startswith("ray"):
+            ray = LazyLoader("ray")
+            logger.info(f">>>>>>>>>>>>>>>>>>>> [Init Ray]: dj_dist_unittest_{cls.__name__}")
+            ray.init("auto", ignore_reinit_error=True, namespace=f"dj_dist_unittest_{cls.__name__}")
+
+            # erase existing resources
+            cls._cleanup_ray_data_state()
+            gc.collect()
+
     @classmethod
     def tearDownClass(cls, hf_model_name=None) -> None:
         import multiprocess
@@ -93,13 +106,41 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             # given the hf model name, remove this model only
             model_dir = os.path.join(transformers.TRANSFORMERS_CACHE, f'models--{hf_model_name.replace("/", "--")}')
             if os.path.exists(model_dir):
-                print(f"CLEAN model cache files for {hf_model_name}")
+                logger.info(f"CLEAN model cache files for {hf_model_name}")
                 shutil.rmtree(model_dir)
         else:
             # not given the hf model name, remove the whole TRANSFORMERS_CACHE
             if os.path.exists(transformers.TRANSFORMERS_CACHE):
-                print("CLEAN all TRANSFORMERS_CACHE")
+                logger.info("CLEAN all TRANSFORMERS_CACHE")
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
+
+        current_tag = getattr(cls, "current_tag", "standalone")
+        if current_tag.startswith("ray"):
+            cls._cleanup_ray_data_state()
+            gc.collect()
+
+    @classmethod
+    def _cleanup_ray_data_state(cls):
+        """clean up the global states of Ray Data"""
+        try:
+            # clean up the global contexts of Ray Data
+            ray = LazyLoader("ray")
+
+            # reset execution context
+            if hasattr(ray.data._internal.execution.streaming_executor, "_execution_context"):
+                ray.data._internal.execution.streaming_executor._execution_context = None
+
+            # clean up stats manager
+            from ray.data._internal.stats import StatsManager
+
+            if hasattr(StatsManager, "_instance"):
+                StatsManager._instance = None
+
+        except Exception:
+            pass
+
+    def setUp(self):
+        logger.info(f">>>>>>>>>> [Start Test]: {self.id()}")
 
     def tearDown(self) -> None:
         # clear models in memory
