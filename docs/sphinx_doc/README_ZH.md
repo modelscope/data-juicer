@@ -6,8 +6,7 @@ Data-Juicer 借助 Sphinx 构建文档。
 ```bash
 # $~/data_juicer/docs/sphinx_doc
 # 1.安装 sphinx 的依赖并初始化 sphinx-quickstart
-pip install "py-data-juicer[dev]"
-# or pip install -r ../../environments/dev_requires
+uv pip install "py-data-juicer[dev]"
 # 2. 运行文档构建脚本
 ./build_doc.sh
 

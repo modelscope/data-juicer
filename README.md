@@ -119,6 +119,7 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
   - [How-to Guide for Developers](docs/DeveloperGuide.md)
   - [Distributed Data Processing in Data-Juicer](docs/Distributed.md)
   - [Sandbox](docs/Sandbox.md)
+  - [Data-Juicer Agent](docs/DJ_agent.md)
 - Demos
   - [demos](demos/README.md)
 - Tools

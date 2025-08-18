@@ -7,6 +7,8 @@ from data_juicer.core.sandbox.env_manager import CondaEnv, VirtualEnv
 
 class TestCondaEnv(unittest.TestCase):
     def setUp(self):
+        super().setUp()
+
         self.test_dir = tempfile.TemporaryDirectory()
         self.env_name = "test_conda_env"
         self.config_path = os.path.join(self.test_dir.name, "env_config.yaml")
@@ -132,6 +134,8 @@ class TestCondaEnv(unittest.TestCase):
 
 class TestVirtualEnv(unittest.TestCase):
     def setUp(self):
+        super().setUp()
+
         self.env_name = 'test_virtual_env'
         self.test_dir = tempfile.TemporaryDirectory()
         self.requirements_file_path = os.path.join(self.test_dir.name, "requirements.txt")

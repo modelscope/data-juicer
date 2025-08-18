@@ -68,6 +68,10 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
                         'accelerator': None,
                         'num_proc': 4,
                         'cpu_required': 1,
@@ -92,6 +96,10 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
@@ -166,6 +174,10 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
@@ -191,6 +203,10 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
@@ -216,6 +232,10 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
@@ -241,6 +261,10 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
@@ -266,6 +290,10 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
@@ -543,6 +571,51 @@ class ConfigTest(DataJuicerTestCaseBase):
 
             with self.assertRaises(TypeError):
                 prepare_side_configs('xxx.txt')
+
+
+    def test_cli_custom_operator_paths(self):
+        """Test arg custom_operator_paths"""
+
+        new_ops_dir = f'{WORKDIR}/custom_ops'
+        new_op_path1 = os.path.join(new_ops_dir, 'new_op1.py')
+        new_op_path2 = os.path.join(new_ops_dir, 'test_dir_module/new_op2.py')
+        os.makedirs(os.path.dirname(new_op_path1), exist_ok=True)
+        os.makedirs(os.path.dirname(new_op_path2), exist_ok=True)
+
+        with open(new_op_path1, 'w') as f:
+            f.write("""
+from data_juicer.ops.base_op import OPERATORS, Mapper
+                                              
+@OPERATORS.register_module('custom_mapper1')
+class CustomMapper1(Mapper):
+    def process_single(self, data):
+        return data
+""")
+        with open(new_op_path2, 'w') as f:
+            f.write("""
+from data_juicer.ops.base_op import OPERATORS, Mapper
+                                              
+@OPERATORS.register_module('custom_mapper2')
+class CustomMapper2(Mapper):
+    def process_single(self, data):
+        return data
+""")
+            
+        with open(os.path.join(os.path.dirname(new_op_path2), '__init__.py'), 'w') as f:
+            f.write("""
+from . import new_op2
+""")
+
+        init_configs(args=[
+            '--config', test_yaml_path,
+            '--custom-operator-paths', new_op_path1, os.path.dirname(new_op_path2)
+        ])
+        from data_juicer.ops.base_op import OPERATORS
+        self.assertIn('custom_mapper1', list(OPERATORS.modules.keys()))
+        self.assertIn('custom_mapper2', list(OPERATORS.modules.keys()))
+        
+        OPERATORS.modules.pop('custom_mapper1')
+        OPERATORS.modules.pop('custom_mapper2')
 
 
 if __name__ == '__main__':
