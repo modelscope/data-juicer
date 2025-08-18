@@ -438,8 +438,8 @@
 <section id="id8">
 <h2>快速开始<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
 <p>在开始前，你应该安装 Data-Juicer 以及它的 <code class="docutils literal notranslate"><span class="pre">dist</span></code> 依赖需求：</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.<span class="w">  </span><span class="c1"># 安装 Data-Juicer 的最小依赖需求</span>
-pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dist]&quot;</span><span class="w">  </span><span class="c1"># 包括 Ray 以及其他分布式相关的依赖库</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.<span class="w">  </span><span class="c1"># 安装 Data-Juicer 的最小依赖需求</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dist]&quot;</span><span class="w">  </span><span class="c1"># 包括 Ray 以及其他分布式相关的依赖库</span>
 </pre></div>
 </div>
 <p>然后启动一个 Ray 集群（参考 <a class="reference external" href="https://docs.ray.io/en/latest/ray-core/starting-ray.html">Ray 文档</a> ）：</p>

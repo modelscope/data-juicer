@@ -367,15 +367,26 @@
 <section id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Python &gt;= 3.10</p></li>
+<li><p>Python &gt;= 3.10 &amp; &lt;= 3.12</p></li>
 <li><p>Git (for source installation)</p></li>
-<li><p>uv (recommended package installer)</p></li>
+<li><p>uv (recommended package installer)</p>
+<ul>
+<li><p>uv can be installed by:</p></li>
 </ul>
+</li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using curl</span>
+curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+
+<span class="c1"># Or using pip</span>
+pip<span class="w"> </span>install<span class="w"> </span>uv
+</pre></div>
+</div>
 </section>
 <section id="basic-dj-installation">
 <h2>Basic DJ Installation<a class="headerlink" href="#basic-dj-installation" title="Link to this heading">¶</a></h2>
 <p>Data-Juicer is now available on PyPI. The minimal installation includes core data processing capabilities:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>py-data-juicer
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>py-data-juicer
 </pre></div>
 </div>
 <p>This provides:</p>
@@ -391,53 +402,53 @@
 <p>For component details, plz refer to <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/pyproject.toml">pyproject.toml</a>.</p>
 <p><strong>Core ML &amp; DL</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generic ML/DL capabilities</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic]&quot;</span>
 </pre></div>
 </div>
 <p>Includes: PyTorch, Transformers, VLLM, etc.</p>
 <p><strong>Domain-Specific Features</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Computer Vision</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[vision]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[vision]&quot;</span>
 
 <span class="c1"># Natural Language Processing</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[nlp]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[nlp]&quot;</span>
 
 <span class="c1"># Audio Processing</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[audio]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[audio]&quot;</span>
 
 **Additional<span class="w"> </span>Components**
 
 <span class="sb">```</span>bash
 <span class="c1"># Distributed Computing</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[distributed]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[distributed]&quot;</span>
 
 <span class="c1"># AI Services &amp; APIs</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[ai_services]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[ai_services]&quot;</span>
 
 **Development<span class="w"> </span>Tools**
 <span class="sb">```</span>bash
 <span class="c1"># Development &amp; Testing</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[dev]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[dev]&quot;</span>
 </pre></div>
 </div>
 </section>
 <section id="common-installation-patterns">
 <h2>Common Installation Patterns<a class="headerlink" href="#common-installation-patterns" title="Link to this heading">¶</a></h2>
 <p><strong>1. Text Processing Setup</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic,nlp]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic,nlp]&quot;</span>
 </pre></div>
 </div>
 <p><strong>2. Vision Processing Setup</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic,vision]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic,vision]&quot;</span>
 </pre></div>
 </div>
 <p><strong>3. Full Processing Pipeline</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic,nlp,vision,distributed]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic,nlp,vision,distributed]&quot;</span>
 </pre></div>
 </div>
 <p><strong>4. Complete Installation</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install all features (except sandbox)</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[all]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[all]&quot;</span>
 </pre></div>
 </div>
 <p><strong>5. For Development Mode</strong></p>
@@ -447,13 +458,7 @@ git<span class="w"> </span>clone<span class="w"> </span>https://github.com/model
 <span class="nb">cd</span><span class="w"> </span>data-juicer
 
 <span class="c1"># Install dev dependencies</span>
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
-
-<span class="c1"># Optionally, use uv for venv and dependency management</span>
-curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh<span class="w">   </span><span class="c1"># install uv</span>
-uv<span class="w"> </span>venv<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.10<span class="w">                             </span><span class="c1"># initialize virtual env with python 3.10</span>
-<span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">                         </span><span class="c1"># activate virtual env</span>
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w">                               </span><span class="c1"># install minimal dependencies</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
 </pre></div>
 </div>
 </section>

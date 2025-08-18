@@ -443,7 +443,7 @@
 <section id="requirements">
 <h4>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">¶</a></h4>
 <p>Before using sandbox, you might need to install sandbox-related dependencies by running the command below:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>sandbox<span class="o">]</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>sandbox<span class="o">]</span>
 </pre></div>
 </div>
 <p>And prepare third-party libraries used in sandbox (e.g., EasyAnimate, VBench, InternVL, etc.) according to their official instructions, or you can simply clone the third-party repositories from GitHub and leave the installation process to our <code class="docutils literal notranslate"><span class="pre">EnvManager</span></code> during sandbox running.</p>
@@ -451,7 +451,7 @@
 <ol class="arabic simple">
 <li><p>To use <a class="reference external" href="https://github.com/modelscope/modelscope">ModelScope</a>, you need to install the related dependencies from its independent host:</p></li>
 </ol>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;modelscope[framework,nlp]&quot;</span><span class="w"> </span>-f<span class="w"> </span>https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;modelscope[framework,nlp]&quot;</span><span class="w"> </span>-f<span class="w"> </span>https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
 </pre></div>
 </div>
 <p>Please refer the the <a class="reference external" href="https://www.modelscope.cn/docs/Beginner-s-Guide/Environment-Setup">ModelScope documentation</a> for more information.</p>

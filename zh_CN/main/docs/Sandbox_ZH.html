@@ -445,7 +445,7 @@
 <section id="id5">
 <h4>依赖准备<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h4>
 <p>在使用沙盒实验室前，你可能需要使用如下命令安装沙盒相关的依赖：</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>sandbox<span class="o">]</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-v<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>sandbox<span class="o">]</span>
 </pre></div>
 </div>
 <p>并根据官方说明准备好沙盒中使用的第三方库（例如 EasyAnimate 、 VBench 、 InternVL 等），或者您也可以简单地从 GitHub 克隆第三方存储库，并在沙盒运行期间将安装过程留给我们的 <code class="docutils literal notranslate"><span class="pre">EnvManager</span></code> 完成。</p>
@@ -453,7 +453,7 @@
 <ol class="arabic simple">
 <li><p>要使用<a class="reference external" href="https://github.com/modelscope/modelscope">ModelScope</a>时需从ModelScope的独立host安装其相关依赖：</p></li>
 </ol>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;modelscope[framework,nlp]&quot;</span><span class="w"> </span>-f<span class="w"> </span>https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;modelscope[framework,nlp]&quot;</span><span class="w"> </span>-f<span class="w"> </span>https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
 </pre></div>
 </div>
 <p>可参考<a class="reference external" href="https://www.modelscope.cn/docs/intro/environment-setup">ModelScope文档</a>获取更多信息。</p>

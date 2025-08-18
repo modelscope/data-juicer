@@ -369,15 +369,26 @@
 <section id="id2">
 <h2>前置条件<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Python &gt;= 3.10</p></li>
+<li><p>Python &gt;= 3.10 &amp; &lt;= 3.12</p></li>
 <li><p>Git (用于源码安装)</p></li>
-<li><p>uv (推荐的包安装器)</p></li>
+<li><p>uv (推荐的包安装器)</p>
+<ul>
+<li><p>uv 可以通过以下方式安装：</p></li>
 </ul>
+</li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 使用 curl</span>
+curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+
+<span class="c1"># 或者使用 pip</span>
+pip<span class="w"> </span>install<span class="w"> </span>uv
+</pre></div>
+</div>
 </section>
 <section id="id3">
 <h2>基础安装<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
 <p>Data-Juicer 现已上架 PyPI。最小安装包含核心数据处理能力：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>py-data-juicer
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>py-data-juicer
 </pre></div>
 </div>
 <p>这将提供：</p>
@@ -393,53 +404,53 @@
 <p>组件详情请参考 <a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/pyproject.toml">pyproject.toml</a>。</p>
 <p><strong>核心 ML &amp; DL</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 通用 ML/DL 能力</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic]&quot;</span>
 </pre></div>
 </div>
 <p>包括：PyTorch、Transformers、VLLM 等。</p>
 <p><strong>领域特定功能</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 计算机视觉</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[vision]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[vision]&quot;</span>
 
 <span class="c1"># 自然语言处理</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[nlp]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[nlp]&quot;</span>
 
 <span class="c1"># 音频处理</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[audio]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[audio]&quot;</span>
 
 **附加组件**
 
 <span class="sb">```</span>bash
 <span class="c1"># 分布式计算</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[distributed]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[distributed]&quot;</span>
 
 <span class="c1"># AI 服务和 API</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[ai_services]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[ai_services]&quot;</span>
 
 **开发工具**
 <span class="sb">```</span>bash
 <span class="c1"># 开发和测试</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[dev]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[dev]&quot;</span>
 </pre></div>
 </div>
 </section>
 <section id="id5">
 <h2>常见安装模式<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
 <p><strong>1. 文本处理设置</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic,nlp]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic,nlp]&quot;</span>
 </pre></div>
 </div>
 <p><strong>2. 视觉处理设置</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic,vision]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic,vision]&quot;</span>
 </pre></div>
 </div>
 <p><strong>3. 完整处理流程</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic,nlp,vision,distributed]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[generic,nlp,vision,distributed]&quot;</span>
 </pre></div>
 </div>
 <p><strong>4. 完整安装</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 安装所有功能（除沙盒外）</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[all]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;py-data-juicer[all]&quot;</span>
 </pre></div>
 </div>
 <p><strong>5. 开发模式</strong></p>
@@ -449,13 +460,7 @@ git<span class="w"> </span>clone<span class="w"> </span>https://github.com/model
 <span class="nb">cd</span><span class="w"> </span>data-juicer
 
 <span class="c1"># 安装开发依赖</span>
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
-
-<span class="c1"># 可选：使用 uv 进行虚拟环境和依赖管理</span>
-curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh<span class="w">   </span><span class="c1"># 安装 uv</span>
-uv<span class="w"> </span>venv<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.10<span class="w">                             </span><span class="c1"># 使用 Python 3.10 初始化虚拟环境</span>
-<span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">                         </span><span class="c1"># 激活虚拟环境</span>
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w">                               </span><span class="c1"># 安装最小依赖</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
 </pre></div>
 </div>
 </section>
