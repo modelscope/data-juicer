@@ -44,7 +44,7 @@ To reproduce the paper's experiments, please refer to the sandbox usage guide be
 
 Before using sandbox, you might need to install sandbox-related dependencies by running the command below:
 ```shell
-pip install -v -e .[sandbox]
+uv pip install -v -e .[sandbox]
 ```
 And prepare third-party libraries used in sandbox (e.g., EasyAnimate, VBench, InternVL, etc.) according to their official instructions, or you can simply clone the third-party repositories from GitHub and leave the installation process to our `EnvManager` during sandbox running.
 
@@ -52,7 +52,7 @@ And prepare third-party libraries used in sandbox (e.g., EasyAnimate, VBench, In
 
 1. To use [ModelScope](https://github.com/modelscope/modelscope), you need to install the related dependencies from its independent host:
 ```shell
-pip install "modelscope[framework,nlp]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
+uv pip install "modelscope[framework,nlp]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
 ```
 Please refer the the [ModelScope documentation](https://www.modelscope.cn/docs/Beginner-s-Guide/Environment-Setup) for more information.
 
