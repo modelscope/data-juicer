@@ -11,6 +11,8 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 class OverallAnalysisTest(DataJuicerTestCaseBase):
 
     def setUp(self) -> None:
+        super().setUp()
+
         data_list = [
             {
                 Fields.meta: {

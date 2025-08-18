@@ -32,7 +32,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 [Demo Video] DataJuicer-Agent:数据处理，即刻启程！
 
-https://github.com/user-attachments/assets/58aea900-e51f-4ec2-b1c0-eead97967893
+https://github.com/user-attachments/assets/6eb726b7-6054-4b0c-905e-506b2b9c7927
 
 [Demo Video] DataJuicer-Sandbox: 降本增效，优化数据-模型协同开发！
 
@@ -115,6 +115,7 @@ https://github.com/user-attachments/assets/a45f0eee-0f0e-4ffe-9a42-d9a55370089d
   - [开发者指南](docs/DeveloperGuide_ZH.md)
   - [Data-Juicer分布式数据处理](docs/Distributed_ZH.md)
   - [沙盒实验室](docs/Sandbox_ZH.md)
+  - [Data-Juicer Agent](docs/DJ_agent_ZH.md)
 - Demos
   - [演示](demos/README_ZH.md)
     - [自动化评测：HELM 评测及可视化](demos/auto_evaluation_helm/README_ZH.md)

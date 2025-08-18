@@ -16,6 +16,7 @@ def timing_context(description):
 with timing_context('Importing operator modules'):
     from . import aggregator, deduplicator, filter, grouper, mapper, selector
     from .base_op import (
+        ATTRIBUTION_FILTERS,
         NON_STATS_FILTERS,
         OPERATORS,
         TAGGING_OPS,
