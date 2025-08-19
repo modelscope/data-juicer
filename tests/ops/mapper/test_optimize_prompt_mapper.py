@@ -1,4 +1,5 @@
 import os
+import math
 import unittest
 
 from datasets import load_dataset
@@ -28,7 +29,7 @@ class OptimizePromptMapperTest(DataJuicerTestCaseBase):
 
         results = dataset.map(op.process, num_proc=num_proc, with_rank=True, batched=True, batch_size=batch_size)
 
-        num_batches = len(dataset) // batch_size
+        num_batches = math.ceil(len(dataset) / batch_size)
         self.assertEqual(len(results), len(dataset) + num_batches * gen_num)
 
     def test(self):
