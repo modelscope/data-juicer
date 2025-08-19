@@ -4,6 +4,7 @@ import os
 import shutil
 import subprocess
 import unittest
+from typing import Dict, List
 
 import numpy
 from loguru import logger
@@ -194,6 +195,18 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         first = sorted(first, key=lambda x: tuple(sorted(x.items())))
         second = sorted(second, key=lambda x: tuple(sorted(x.items())))
         return self.assertEqual(first, second)
+
+    def assertListOfDictEqual(self, first: List[Dict], second: List[Dict], ignore_order=True):
+        """Assert two list of dicts are equal"""
+        if not ignore_order:
+            return self.assertEqual(first, second)
+        if len(first) != len(second):
+            return False
+
+        def process_list_of_dict(lst):
+            return sorted(tuple(d.items()) for d in lst)
+
+        return self.assertEqual(process_list_of_dict(first), process_list_of_dict(second))
 
 
 # for partial unittest
