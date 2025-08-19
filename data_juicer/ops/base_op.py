@@ -8,8 +8,9 @@ from loguru import logger
 
 from data_juicer import is_cuda_available
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.mm_utils import size_to_bytes
-from data_juicer.utils.model_utils import free_models, get_model
+from data_juicer.utils.mm_utils import  SpecialTokens, size_to_bytes
+from data_juicer.utils.model_utils import free_models
+from data_juicer.utils.model_utils import get_model
 from data_juicer.utils.process_utils import calculate_np
 from data_juicer.utils.registry import Registry
 
