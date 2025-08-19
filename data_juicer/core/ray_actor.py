@@ -59,8 +59,8 @@ class Actor:
     def filter_cuda_batched(self, data):
         if not self._model_loaded:
             self.load_model()
-        # data = self.op.compute_stats_batched(data, self.model, self.processor)
-        data = self.op.compute_stats_batched(data)
+        data = self.op.compute_stats_batched(data, self.model, self.processor)
+        
         keep_mask = list(self.op.process_batched(data))  # 将map对象转换为列表
     
         # 如果没有数据需要保留，返回None

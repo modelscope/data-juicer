@@ -99,7 +99,7 @@ class VideoSplitBySceneMapper(Mapper):
             if video_key in output_video_keys:
                 continue
 
-            redirected_video_key = transfer_filename(video_key, OP_NAME, self.save_dir, **self._init_parameters)
+            redirected_video_key = transfer_filename(video_key, OP_NAME, self.work_dir, **self._init_parameters)
             output_template = add_suffix_to_filename(redirected_video_key, "_$SCENE_NUMBER")
 
             # detect scenes

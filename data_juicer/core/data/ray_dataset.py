@@ -205,7 +205,8 @@ class RayDataset(DJDataset):
         actors = {}
         for op in operators:
             op_proc = 1 if op.use_cuda() else calculate_np(op._name, op.mem_required, op.cpu_required, self.num_proc, op.use_cuda())
-            actor_num = min(op_proc, self.data.count())
+            # actor_num = min(op_proc, self.data.count())
+            actor_num = op_proc
             actors[op._name] = []
 
             for _ in range(actor_num):
@@ -339,11 +340,11 @@ class RayDataset(DJDataset):
                 if data_item is None:
                     # 处理剩余的batch数据
                     if batch_buffer:
-                        self._process_and_forward_batch(
+                        results_count = self._process_and_forward_batch(
                             op, actor, batch_buffer, next_op_queues, final_results, 
                             result_lock, next_actor_index, log_data_flow
                         )
-                        next_actor_index += len(batch_buffer)
+                        next_actor_index += results_count
                     
                     # 更新终止计数器
                     with termination_counters[op_name]['lock']:
@@ -572,9 +573,10 @@ class RayDataset(DJDataset):
                 
                 # 当batch满了或者是批处理操作时处理
                 if len(batch_buffer) >= batch_size or not op.is_batched_op():
+                    processed_batch_len = len(batch_buffer)
                     self._process_batch(op, actor, batch_buffer, final_results, result_lock)
                     batch_buffer = []
-                    processed_count += len(batch_buffer) if batch_buffer else 1
+                    processed_count += processed_batch_len
                 
             except queue.Empty:
                 # 超时时处理已有的batch数据
@@ -785,7 +787,7 @@ class RayDataset(DJDataset):
         return self.data.to_pandas().to_dict(orient="records")
 
 
-class JSONStreamDatasource(ray.data.read_api.CSVDatasource):
+class JSONStreamDatasource(ray.data.read_api.JSONDatasource):
     """
     A temp Datasource for reading json stream.
 
