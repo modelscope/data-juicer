@@ -116,6 +116,10 @@ class VideoAestheticsFilter(Filter):
         )
 
     def compute_stats_single_actor(self, sample, model, processor, rank=None, context=False):
+        """
+        Compute aesthetics scores for a single sample in the actor.
+        With the model and processor loaded when the actor was created.
+        """
         # check if it's computed already
         if StatsKeys.video_frames_aesthetics_score in sample[Fields.stats]:
             return sample

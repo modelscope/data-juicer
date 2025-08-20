@@ -75,6 +75,7 @@ class RayExecutor(ExecutorBase):
             keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
             **self.cfg.export_extra_args,
         )
+        # Process data with parallel operators
         self.op_enable_parallel = True
         # self.op_enable_parallel = False
 

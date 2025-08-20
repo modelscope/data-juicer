@@ -334,16 +334,8 @@ class VideoCaptioningFromFramesMapper(Mapper):
 
     def process_batched_actor(self, samples, model, processor, rank=None, context=False):
         """
-        :param samples:
-        :return:
-
-        Note:
-            This is a batched_OP, whose the input and output type are
-            both list. Suppose there are $N$ input sample list with batch
-            size as $b$, and denote caption_num as $M$.
-            the number of total samples after generation is $2Nb$
-            for 'random_any' and 'similar_one' mode,
-            and $(1+M)Nb$ for 'all' mode.
+        Process a batch of samples in the actor.
+        With the model and processor loaded when the actor was created.
         """
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []
