@@ -33,7 +33,7 @@ dependencies = [
     "pydantic>=2.0", # data validation
     "uv",
     "wordcloud",
-    "spacy==3.8.0",
+    "spacy==3.8.7",
     "httpx",
     "av==13.1.0", # video/audio handling
     "emoji==2.2.0", # emoji handling
