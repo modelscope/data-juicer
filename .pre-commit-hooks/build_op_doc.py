@@ -133,7 +133,7 @@ def analyze_resource_tag(code):
     of the "Resource Tags" in `tagging_mappings.json`. It makes the choice
     according to their assigning statement to attribute `_accelerator`.
     """
-    if "_accelerator = 'cuda'" in code:
+    if '_accelerator = "cuda"' in code or "_accelerator = 'cuda'" in code:
         return ["gpu"]
     else:
         return ["cpu"]

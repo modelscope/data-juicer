@@ -115,6 +115,7 @@ https://github.com/user-attachments/assets/a45f0eee-0f0e-4ffe-9a42-d9a55370089d
   - [开发者指南](docs/DeveloperGuide_ZH.md)
   - [Data-Juicer分布式数据处理](docs/Distributed_ZH.md)
   - [沙盒实验室](docs/Sandbox_ZH.md)
+  - [Data-Juicer Agent](docs/DJ_agent_ZH.md)
 - Demos
   - [演示](demos/README_ZH.md)
     - [自动化评测：HELM 评测及可视化](demos/auto_evaluation_helm/README_ZH.md)

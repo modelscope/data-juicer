@@ -62,6 +62,7 @@ class VideoResizeAspectRatioMapper(Mapper):
         min_ratio: str = "9/21",
         max_ratio: str = "21/9",
         strategy: str = "increase",
+        save_dir: str = None,
         *args,
         **kwargs,
     ):
@@ -80,11 +81,15 @@ class VideoResizeAspectRatioMapper(Mapper):
             video dimensions. It can be either 'decrease' to reduce the
             dimension or 'increase' to enlarge it. Accepted values are
             ['decrease', 'increase'].
+        :param save_dir: The directory where generated video files will be stored.
+            If not specified, outputs will be saved in the same directory as their corresponding input files.
+            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         strategy = strategy.lower()
         if strategy not in self.STRATEGY:
@@ -95,6 +100,7 @@ class VideoResizeAspectRatioMapper(Mapper):
         self.min_ratio = Fraction(str(min_ratio).replace(":", "/"))
         self.max_ratio = Fraction(str(max_ratio).replace(":", "/"))
         self.strategy = strategy
+        self.save_dir = save_dir
 
     def process_single(self, sample):
         # there is no video in this sample
@@ -125,7 +131,7 @@ class VideoResizeAspectRatioMapper(Mapper):
                 self.max_ratio,
                 self.strategy,
             )
-            resized_video_key = transfer_filename(video_key, OP_NAME, **self._init_parameters)
+            resized_video_key = transfer_filename(video_key, OP_NAME, self.save_dir, **self._init_parameters)
             if not os.path.exists(resized_video_key) or resized_video_key not in loaded_video_keys:
                 args = ["-nostdin", "-v", "quiet", "-y"]
                 stream = ffmpeg.input(video_key)

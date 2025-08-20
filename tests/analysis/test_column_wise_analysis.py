@@ -42,6 +42,8 @@ class GetRowColFuncTest(DataJuicerTestCaseBase):
 class ColumnWiseAnalysisTest(DataJuicerTestCaseBase):
 
     def setUp(self) -> None:
+        super().setUp()
+
         data_list = [
             {
                 Fields.meta: {

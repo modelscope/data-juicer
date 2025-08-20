@@ -79,11 +79,12 @@ class RayExecutor(ExecutorBase):
         self.op_enable_parallel = True
         # self.op_enable_parallel = False
 
-    def run(self, load_data_np: Optional[PositiveInt] = None, skip_return=False):
+    def run(self, load_data_np: Optional[PositiveInt] = None, skip_export: bool = False, skip_return: bool = False):
         """
         Running the dataset process pipeline
 
         :param load_data_np: number of workers when loading the dataset.
+        :param skip_export: whether export the results into disk
         :param skip_return: skip return for API called.
         :return: processed dataset.
         """
@@ -112,8 +113,9 @@ class RayExecutor(ExecutorBase):
                 dataset.process(ops)
 
             # 4. data export
-            logger.info("Exporting dataset to disk...")
-            self.exporter.export(dataset.data, columns=columns)
+            if not skip_export:
+                logger.info("Exporting dataset to disk...")
+                self.exporter.export(dataset.data, columns=columns)
             tend = time.time()
             logger.info(f"All Ops are done in {tend - tstart:.3f}s.")
 

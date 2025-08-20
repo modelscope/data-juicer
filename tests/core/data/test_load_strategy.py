@@ -257,6 +257,8 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
 class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
     def setUp(self):
         """Instance-level setup run before each test"""
+        super().setUp()
+
         cur_dir = osp.dirname(osp.abspath(__file__))
         self.tmp_dir = osp.join(cur_dir, f'tmp_{uuid.uuid4().hex}')
         os.makedirs(self.tmp_dir, exist_ok=True)

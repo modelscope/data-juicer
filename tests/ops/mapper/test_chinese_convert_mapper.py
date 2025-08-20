@@ -8,6 +8,8 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 class ChineseConvertMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self, mode='s2t'):
+        super().setUp()
+
         self.op = ChineseConvertMapper(mode)
 
     def _run_chinese_convert(self, samples):
