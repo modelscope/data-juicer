@@ -9,8 +9,7 @@ from loguru import logger
 from data_juicer import is_cuda_available
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens, size_to_bytes
-from data_juicer.utils.model_utils import free_models
-from data_juicer.utils.model_utils import get_model
+from data_juicer.utils.model_utils import free_models, get_model
 from data_juicer.utils.process_utils import calculate_np
 from data_juicer.utils.registry import Registry
 
@@ -23,7 +22,7 @@ ATTRIBUTION_FILTERS = Registry("Attribution Filters")
 
 import pytz
 from datetime import datetime
-beijing_tz = pytz.timezone('Asia/Singapore')
+beijing_tz = pytz.timezone("Asia/Singapore")
 
 def convert_list_dict_to_dict_list(samples):
     # reconstruct samples from "list of dicts" to "dict of lists"
@@ -300,10 +299,10 @@ class OP:
         end = time.time()
         end_time = datetime.fromtimestamp(end, pytz.utc).astimezone(beijing_tz)
         print(
-                f"[Actor] {self._name} Model loaded in {end - start:.3f} seconds "
-                f"from {start_time.strftime('%Y-%m-%d %H:%M:%S')} "
-                f"to {end_time.strftime('%Y-%m-%d %H:%M:%S')}"
-            )
+            f"[Actor] {self._name} Model loaded in {end - start:.3f} seconds "
+            f"from {start_time.strftime('%Y-%m-%d %H:%M:%S')} "
+            f"to {end_time.strftime('%Y-%m-%d %H:%M:%S')}"
+        )
         return model, processor
     
 class Mapper(OP):

@@ -1,4 +1,3 @@
-import pyarrow
 import ray
 
 @ray.remote(num_gpus=0.0) 
