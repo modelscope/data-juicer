@@ -361,7 +361,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
             res_samples[key] = [s[key] for s in samples_after_generation]
 
         return res_samples
-    
+
     def _process_single_sample(self, ori_sample, rank=None, context=False):
         # there is no videos in this sample
         if self.video_key not in ori_sample or not ori_sample[self.video_key]:

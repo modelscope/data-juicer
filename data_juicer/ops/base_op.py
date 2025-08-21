@@ -1,7 +1,7 @@
 import copy
 import time
-from functools import wraps
 from datetime import datetime
+from functools import wraps
 
 import numpy as np
 import pyarrow as pa
@@ -21,6 +21,7 @@ TAGGING_OPS = Registry("Tagging Operators")
 ATTRIBUTION_FILTERS = Registry("Attribution Filters")
 
 beijing_tz = pytz.timezone("Asia/Singapore")
+
 
 def convert_list_dict_to_dict_list(samples):
     # reconstruct samples from "list of dicts" to "dict of lists"
@@ -298,7 +299,7 @@ class OP:
         return np.empty((0, 0), dtype=str)
 
     def load_model(self, rank=None):
-        
+
         start = time.time()
         start_time = datetime.fromtimestamp(start, pytz.utc).astimezone(beijing_tz)
         model, processor = get_model(self.model_key, rank=rank, use_cuda=self.use_cuda())
@@ -310,7 +311,8 @@ class OP:
             f"to {end_time.strftime('%Y-%m-%d %H:%M:%S')}"
         )
         return model, processor
-    
+
+
 class Mapper(OP):
     def __init__(self, *args, **kwargs):
         """

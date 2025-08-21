@@ -57,9 +57,9 @@ class RayExecutor(ExecutorBase):
 
         # init ray
         logger.info("Initializing Ray ...")
- 
+
         ray.init(self.cfg.ray_address, ignore_reinit_error=True)
-        
+
         self.tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
 
         # absolute path resolution logic

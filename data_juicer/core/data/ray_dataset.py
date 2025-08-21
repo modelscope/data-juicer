@@ -8,6 +8,7 @@ import uuid
 from datetime import datetime
 from functools import partial
 from typing import Any, Dict, List, Literal, Optional, Union
+
 import pyarrow
 from jsonargparse import Namespace
 from loguru import logger
@@ -25,6 +26,7 @@ from data_juicer.utils.process_utils import calculate_np
 from data_juicer.utils.webdataset_utils import _custom_default_decoder
 
 ray = LazyLoader("ray")
+
 
 def get_abs_path(path, dataset_dir):
     if is_remote_path(path):
@@ -155,8 +157,7 @@ class RayDataset(DJDataset):
             self._run_single_op(op)
             self.data = self.data.materialize()
         return self
-    
-    
+
     def process_parallel(self, operators, *, exporter=None, checkpointer=None, tracer=None) -> DJDataset:
         """
         Process the dataset in parallel using multiple operators.
@@ -179,6 +180,7 @@ class RayDataset(DJDataset):
                     add_stats = True
 
         if add_meta:
+
             def process_batch_arrow(table: pyarrow.Table):
                 new_column_data = [{} for _ in range(len(table))]
                 new_table = table.append_column(Fields.meta, [new_column_data])
@@ -187,6 +189,7 @@ class RayDataset(DJDataset):
             self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow")
 
         if add_stats:
+
             def process_batch_arrow(table: pyarrow.Table):
                 new_column_data = [{} for _ in range(len(table))]
                 new_table = table.append_column(Fields.stats, [new_column_data])
@@ -273,19 +276,19 @@ class RayDataset(DJDataset):
             first_op_queues = actor_queues[first_op._name]
             actor_index = 0
             row_counter = 0  # Initialize row counter
-            
+
             try:
                 for batch in self.data.iter_batches(batch_size=1, batch_format="pyarrow"):
                     for row_idx in range(len(batch)):
                         row_data = {col: batch[col][row_idx].as_py() for col in batch.column_names}
                         row_data["_row_id"] = row_counter
                         row_counter += 1
-                        
+
                         # distribute data to actors in a round-robin manner
                         target_queue = first_op_queues[actor_index % len(first_op_queues)]
                         target_queue.put(row_data)
                         actor_index += 1
-                        
+
             except Exception as e:
                 logger.error(f"Error in data distributor: {e}")
             finally:
@@ -306,7 +309,7 @@ class RayDataset(DJDataset):
             self.data = ray.data.from_items(final_results)
 
         return self
-    
+
     def _process_actor_streaming(
         self,
         op_idx,
@@ -323,17 +326,17 @@ class RayDataset(DJDataset):
         """Process data for a single operator actor in a streaming manner."""
         op_name = op._name
         input_queue = actor_queues[op_name][actor_id]
-        
+
         next_op_queues = None
         if op_idx + 1 < len(operators):
             next_op_name = operators[op_idx + 1]._name
             next_op_queues = actor_queues[next_op_name]
-        
+
         logger.info(f"Starting streaming processor for {op_name} actor {actor_id}")
         processed_count = 0
         batch_buffer = []
         next_actor_index = 0
-        
+
         # data flow logging function
         def log_data_flow(row_id, action, start_time=None):
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
@@ -348,7 +351,7 @@ class RayDataset(DJDataset):
         while True:
             try:
                 data_item = input_queue.get(timeout=5.0)
-                
+
                 if data_item is None:
                     if batch_buffer:
                         results_count = self._process_and_forward_batch(
@@ -362,7 +365,7 @@ class RayDataset(DJDataset):
                             log_data_flow,
                         )
                         next_actor_index += results_count
-                    
+
                     # update termination counter
                     with termination_counters[op_name]["lock"]:
                         termination_counters[op_name]["count"] += 1
@@ -373,13 +376,13 @@ class RayDataset(DJDataset):
                     if current_count >= total_actors and next_op_queues:
                         for q in next_op_queues:
                             q.put(None)
-                    
+
                     break
- 
+
                 row_id = data_item.get("_row_id", "unknown")
                 start_time = time.time()
                 log_data_flow(row_id, "start", start_time)
-                
+
                 batch_buffer.append((data_item, start_time, row_id))
 
                 if len(batch_buffer) >= batch_size or not op.is_batched_op():
@@ -396,7 +399,7 @@ class RayDataset(DJDataset):
                     next_actor_index += results_count
                     processed_count += len(batch_buffer)
                     batch_buffer = []
-                
+
             except queue.Empty:
                 if batch_buffer:
                     results_count = self._process_and_forward_batch(
@@ -416,14 +419,14 @@ class RayDataset(DJDataset):
             except Exception as e:
                 logger.error(f"Error in {op_name} actor {actor_id}: {e}")
                 break
-        
+
         logger.info(f"Streaming processor for {op_name} actor {actor_id} completed, processed {processed_count} items")
 
     def _process_batch(self, op, actor, batch_data, final_results, result_lock):
         """Process a batch of data with the given operator and actor."""
         if not batch_data:
             return
-        
+
         try:
             if len(batch_data) == 1:
                 future = self._submit_to_actor(op, actor, batch_data[0])
@@ -445,7 +448,7 @@ class RayDataset(DJDataset):
                     final_results.extend(results)
                 elif results is not None:
                     final_results.append(results)
-                    
+
         except Exception as e:
             logger.error(f"Error processing batch: {e}")
 
@@ -488,12 +491,12 @@ class RayDataset(DJDataset):
         """Process batch data and forward to downstream with data flow tracking"""
         if not batch_data_with_metadata:
             return 0
-        
+
         # separate the data, start time, and line number
         batch_data = [item[0] for item in batch_data_with_metadata]
         start_times = [item[1] for item in batch_data_with_metadata]
         row_ids = [item[2] for item in batch_data_with_metadata]
-        
+
         try:
             if len(batch_data) == 1:
                 future = self._submit_to_actor(op, actor, batch_data[0])
@@ -509,7 +512,7 @@ class RayDataset(DJDataset):
                     elif result is not None:
                         flattened_results.append(result)
                 results = flattened_results
-            
+
             valid_results = []
             if isinstance(op, Mapper):
                 if isinstance(results, list):
@@ -522,7 +525,7 @@ class RayDataset(DJDataset):
                         valid_results = results
                     else:
                         valid_results = [results]
-            
+
             for row_id, start_time in zip(row_ids, start_times):
                 log_data_flow(row_id, "end", start_time)
 
@@ -541,20 +544,20 @@ class RayDataset(DJDataset):
             elif not next_op_queues and valid_results:
                 with result_lock:
                     final_results.extend(valid_results)
-            
+
             return len(valid_results)
-            
+
         except Exception as e:
             for row_id, start_time in zip(row_ids, start_times):
                 log_data_flow(row_id, "end", start_time)
             logger.error(f"Error processing and forwarding batch: {e}")
             return 0
-        
+
     def _process_single_operator_streaming(self, op, op_actors, batch_size):
         """Stream processing for a single operator."""
         final_results = []
         result_lock = threading.Lock()
-        
+
         # create an independent queue for each actor.
         actor_queues = [queue.Queue(maxsize=50) for _ in op_actors]
 
@@ -568,7 +571,7 @@ class RayDataset(DJDataset):
             )
             thread.start()
             threads.append(thread)
-    
+
         actor_index = 0
         for batch in self.data.iter_batches(batch_size=1, batch_format="pyarrow"):
             for row_idx in range(len(batch)):
@@ -576,19 +579,19 @@ class RayDataset(DJDataset):
                 target_queue = actor_queues[actor_index % len(actor_queues)]
                 target_queue.put(row_data)
                 actor_index += 1
-        
+
         # notify all Actors to terminate.
         for actor_queue in actor_queues:
             actor_queue.put(None)
-        
+
         for thread in threads:
             thread.join()
-        
+
         if final_results:
             self.data = ray.data.from_items(final_results)
-        
+
         return self
-    
+
     def _process_single_actor(self, op, actor, input_queue, final_results, result_lock, batch_size):
         """
         Process data for a single actor in a streaming manner.
@@ -596,7 +599,7 @@ class RayDataset(DJDataset):
         """
         batch_buffer = []
         processed_count = 0
-        
+
         while True:
             try:
                 data_item = input_queue.get(timeout=30.0)
@@ -604,16 +607,16 @@ class RayDataset(DJDataset):
                     if batch_buffer:
                         self._process_batch(op, actor, batch_buffer, final_results, result_lock)
                     break
-                
+
                 batch_buffer.append(data_item)
-                
+
                 # process when the batch is full or during batch processing operations.
                 if len(batch_buffer) >= batch_size or not op.is_batched_op():
                     processed_batch_len = len(batch_buffer)
                     self._process_batch(op, actor, batch_buffer, final_results, result_lock)
                     batch_buffer = []
                     processed_count += processed_batch_len
-                
+
             except queue.Empty:
                 if batch_buffer:
                     self._process_batch(op, actor, batch_buffer, final_results, result_lock)
@@ -623,7 +626,6 @@ class RayDataset(DJDataset):
                 logger.error(f"Error in single actor processing: {e}")
                 break
         logger.info(f"Single actor completed, processed {processed_count} items")
-
 
     def transform_to_2d_format(self, data):
         """
@@ -639,11 +641,11 @@ class RayDataset(DJDataset):
         source_files = data["__dj__source_file__"]
 
         unique_sources = list(dict.fromkeys(source_files))
-        
+
         source_to_indices = {}
         for source in unique_sources:
             source_to_indices[source] = [i for i, s in enumerate(source_files) if s == source]
-        
+
         transformed_data = {}
         for field_name, field_value in data.items():
             if field_name == "__dj__source_file__":
@@ -677,7 +679,7 @@ class RayDataset(DJDataset):
                     indices = source_to_indices[source]
                     transformed_data[field_name].append(field_value)
             else:
- 
+
                 transformed_data[field_name] = []
                 for source in unique_sources:
                     indices = source_to_indices[source]
@@ -685,7 +687,6 @@ class RayDataset(DJDataset):
 
         return transformed_data
 
-    
     def _run_single_op(self, op):
         op_proc = calculate_np(op._name, op.mem_required, op.cpu_required, self.num_proc, op.use_cuda())
         num_gpus = get_num_gpus(op, op_proc)

@@ -19,6 +19,7 @@ torch = LazyLoader("torch")
 
 OP_NAME = "video_watermark_filter"
 
+
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 @INTER_SAMPLED_FRAMES.register_module(OP_NAME)
@@ -165,7 +166,7 @@ class VideoWatermarkFilter(Filter):
                 close_video(videos[vid_key])
 
         return sample
-    
+
     def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_watermark_prob in sample[Fields.stats]:
