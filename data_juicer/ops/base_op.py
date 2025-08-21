@@ -1,16 +1,16 @@
 import copy
 import time
 from functools import wraps
+from datetime import datetime
 
 import numpy as np
 import pyarrow as pa
+import pytz
 
 from data_juicer import is_cuda_available
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens, size_to_bytes
-
 from data_juicer.utils.model_utils import free_models, get_model
-
 from data_juicer.utils.process_utils import calculate_np
 from data_juicer.utils.registry import Registry
 
@@ -19,10 +19,6 @@ UNFORKABLE = Registry("Unforkable")
 NON_STATS_FILTERS = Registry("Non-stats Filters")
 TAGGING_OPS = Registry("Tagging Operators")
 ATTRIBUTION_FILTERS = Registry("Attribution Filters")
-
-from datetime import datetime
-
-import pytz
 
 beijing_tz = pytz.timezone("Asia/Singapore")
 

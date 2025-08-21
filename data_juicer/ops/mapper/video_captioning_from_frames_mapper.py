@@ -331,7 +331,6 @@ class VideoCaptioningFromFramesMapper(Mapper):
                 generated_text_candidates_single_chunk[max_index])
         return generated_text_per_chunk
 
-
     def process_batched_actor(self, samples, model, processor, rank=None, context=False):
         """
         Process a batch of samples in the actor.
@@ -349,10 +348,10 @@ class VideoCaptioningFromFramesMapper(Mapper):
             if self.keep_original_sample:
                 samples_after_generation.append(ori_sample)
             generated_samples = self._process_single_sample_actor(ori_sample,
-                                                            model,
-                                                            processor,
-                                                            rank=rank,
-                                                            context=context)
+                                                                  model,
+                                                                  processor,
+                                                                  rank=rank,
+                                                                  context=context)
             if len(generated_samples) != 0:
                 samples_after_generation.extend(generated_samples)
         # reconstruct samples from "list of dicts" to "dict of lists"
@@ -363,9 +362,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
 
         return res_samples
     
-
     def _process_single_sample(self, ori_sample, rank=None, context=False):
-
         # there is no videos in this sample
         if self.video_key not in ori_sample or not ori_sample[self.video_key]:
             return []

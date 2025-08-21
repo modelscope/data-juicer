@@ -92,9 +92,7 @@ class Actor:
                 key: [value for value, keep in zip(values, keep_mask) if keep] for key, values in data.items()
             }
         elif isinstance(data, list):
-
             filtered_data = [item for item, keep in zip(data, keep_mask) if keep]
         else:
             raise ValueError("Unsupported data type for batch filtering")
-        
         return filtered_data
