@@ -37,7 +37,7 @@ Data-Juicer 中的算子分为以下 7 种类型。
 | [filter](#filter) | 54 | Filters out low-quality samples. 过滤低质量样本。 |
 | [formatter](#formatter) | 8 | Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。 |
 | [grouper](#grouper) | 3 | Group samples to batched samples. 将样本分组，每一组组成一个批量样本。 |
-| [mapper](#mapper) | 81 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
+| [mapper](#mapper) | 82 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
 | [selector](#selector) | 5 | Selects top samples based on ranking. 基于排序选取高质量样本。 |
 
 All the specific operators are listed below, each featured with several capability tags. 
@@ -198,6 +198,7 @@ All the specific operators are listed below, each featured with several capabili
 | image_blur_mapper | 🏞Image 💻CPU 🟢Stable | Mapper to blur images. 映射器来模糊图像。 | [code](../data_juicer/ops/mapper/image_blur_mapper.py) | [tests](../tests/ops/mapper/test_image_blur_mapper.py) |
 | image_captioning_from_gpt4v_mapper | 🔮Multimodal 💻CPU 🟡Beta | Mapper to generate samples whose texts are generated based on gpt-4-vision and the image. Mapper生成样本，其文本基于gpt-4-vision和图像生成。 | [code](../data_juicer/ops/mapper/image_captioning_from_gpt4v_mapper.py) | [tests](../tests/ops/mapper/test_image_captioning_from_gpt4v_mapper.py) |
 | image_captioning_mapper | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Mapper to generate samples whose captions are generated based on another model and the figure. 映射器生成样本，其标题是基于另一个模型和图生成的。 | [code](../data_juicer/ops/mapper/image_captioning_mapper.py) | [tests](../tests/ops/mapper/test_image_captioning_mapper.py) |
+| image_detection_yolo_mapper | 🏞Image 🚀GPU 🟢Stable | Perform object detection (with YOLO) on images and return the bounding boxes and class labels. 在图像上执行目标检测并返回边界框与物体类别标签。 | [code](../data_juicer/ops/mapper/image_detection_yolo_mapper.py) | [tests](../tests/ops/mapper/test_image_detection_yolo_mapper.py) |
 | image_diffusion_mapper | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Generate image by diffusion model. 通过扩散模型生成图像。 | [code](../data_juicer/ops/mapper/image_diffusion_mapper.py) | [tests](../tests/ops/mapper/test_image_diffusion_mapper.py) |
 | image_face_blur_mapper | 🏞Image 💻CPU 🟢Stable | Mapper to blur faces detected in images. 映射器模糊图像中检测到的人脸。 | [code](../data_juicer/ops/mapper/image_face_blur_mapper.py) | [tests](../tests/ops/mapper/test_image_face_blur_mapper.py) |
 | image_remove_background_mapper | 🏞Image 💻CPU 🟢Stable | Mapper to remove background of images. 映射器删除图像的背景。 | [code](../data_juicer/ops/mapper/image_remove_background_mapper.py) | [tests](../tests/ops/mapper/test_image_remove_background_mapper.py) |

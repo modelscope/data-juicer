@@ -62,6 +62,8 @@ BACKUP_MODEL_LINKS = {
     "FastSAM-x.pt": "https://github.com/ultralytics/assets/releases/download/v8.2.0/" "FastSAM-x.pt",
     # spacy
     "*_core_web_md-3.*.0": "https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/" "data_juicer/models/",
+    # YOLO
+    "yolo11n.pt": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n.pt",
 }
 
 
@@ -862,6 +864,12 @@ def prepare_video_blip_model(pretrained_model_name_or_path, *, return_model=True
     return (model, processor) if return_model else processor
 
 
+def prepare_yolo_model(model_path, **model_params):
+    device = model_params.pop("device", "cpu")
+    model = ultralytics.YOLO(check_model(model_path)).to(device)
+    return model
+
+
 def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
     """
     Prepare and load a HuggingFace model with the corresponding processor.
@@ -1014,6 +1022,7 @@ MODEL_FUNCTION_MAPPING = {
     "spacy": prepare_spacy_model,
     "video_blip": prepare_video_blip_model,
     "vllm": prepare_vllm_model,
+    "yolo": prepare_yolo_model,
     "embedding": prepare_embedding_model,
 }
 
