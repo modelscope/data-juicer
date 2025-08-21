@@ -36,7 +36,7 @@ class DJDataset(ABC):
         """process a list of operators on the dataset."""
 
     @abstractmethod
-    def process_parallel(self, operators, *, exporter=None, checkpointer=None, tracer=None) -> DJDataset: 
+    def process_parallel(self, operators, *, exporter=None, checkpointer=None, tracer=None) -> DJDataset:
         """Implementing op parallel data processing based on Ray Actor"""
 
     @abstractmethod

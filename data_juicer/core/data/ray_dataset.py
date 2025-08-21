@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime
 import os
-from functools import partial
 import queue
 import threading
 import time
-from typing import Any, Dict, List, Literal, Optional, Union
 import uuid
-from data_juicer.core.RayOperatorWrapper import Actor
+from datetime import datetime
+from functools import partial
+from typing import Any, Dict, List, Literal, Optional, Union
 import pyarrow
 from jsonargparse import Namespace
 from loguru import logger
@@ -16,6 +15,7 @@ from loguru import logger
 from data_juicer import cuda_device_count
 from data_juicer.core.data import DJDataset
 from data_juicer.core.data.schema import Schema
+from data_juicer.core.RayOperatorWrapper import Actor
 from data_juicer.ops import Deduplicator, Filter, Mapper
 from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
@@ -96,8 +96,6 @@ class RayDataset(DJDataset):
     def __init__(self, dataset: ray.data.Dataset, dataset_path: str = None, cfg: Optional[Namespace] = None) -> None:
         self.data = preprocess_dataset(dataset, dataset_path, cfg)
         self.num_proc = getattr(cfg, "np", getattr(cfg, "num_proc", None)) if cfg else None
-        # self.gpu_pg = placement_group([{"CPU": 16, "GPU": 2}], strategy="STRICT_SPREAD")
-        # ray.get(self.gpu_pg.ready())
 
     def schema(self) -> Schema:
         """Get dataset schema.
@@ -252,15 +250,15 @@ class RayDataset(DJDataset):
                 thread = threading.Thread(
                     target=self._process_actor_streaming,
                     args=(
-                        idx, 
-                        op, 
-                        actor, 
-                        i, 
-                        actor_queues, 
-                        operators, 
-                        final_results, 
-                        result_lock, 
-                        batch_sizes[op._name], 
+                        idx,
+                        op,
+                        actor,
+                        i,
+                        actor_queues,
+                        operators,
+                        final_results,
+                        result_lock,
+                        batch_sizes[op._name],
                         termination_counters,
                     ),
                     name=f"actor_{op._name}_{i}",
@@ -310,23 +308,22 @@ class RayDataset(DJDataset):
         return self
     
     def _process_actor_streaming(
-        self, 
+        self,
         op_idx,
-        op, 
-        actor, 
-        actor_id, 
-        actor_queues, 
-        operators, 
-        final_results, 
-        result_lock, 
-        batch_size, 
+        op,
+        actor,
+        actor_id,
+        actor_queues,
+        operators,
+        final_results,
+        result_lock,
+        batch_size,
         termination_counters,
     ):
         """Process data for a single operator actor in a streaming manner."""
         op_name = op._name
         input_queue = actor_queues[op_name][actor_id]
         
-        # 确定输出目标
         next_op_queues = None
         if op_idx + 1 < len(operators):
             next_op_name = operators[op_idx + 1]._name
@@ -348,38 +345,9 @@ class RayDataset(DJDataset):
                     f"[DataFlow] Row {row_id} | {op_name}_actor_{actor_id} | END | {timestamp} | Duration: {duration:.3f} s"
                 )
 
-        def flush_buffer(current_next_actor_index):
-            """
-            辅助函数，用于处理并清空缓冲区。
-            它会更新外部的 processed_count 并返回成功转发的结果数量。
-            """
-            if not batch_buffer:
-                return 0
-            
-            nonlocal processed_count
-            items_in_buffer = len(batch_buffer)
-            
-            results_count = self._process_and_forward_batch(
-                op, 
-                actor, 
-                batch_buffer, 
-                next_op_queues, 
-                final_results, 
-                result_lock, 
-                current_next_actor_index, 
-                log_data_flow,
-            )
-            
-            # 核心修正：无论处理结果如何，处理过的项目数都应该增加
-            processed_count += items_in_buffer
-            batch_buffer.clear()  # 清空缓冲区
-            
-            return results_count
-
         while True:
             try:
-                # 将超时时间设置得短一些，可以更频繁地处理因超时而触发的批次
-                data_item = input_queue.get(timeout=5.0) 
+                data_item = input_queue.get(timeout=5.0)
                 
                 if data_item is None:
                     if batch_buffer:
@@ -507,16 +475,16 @@ class RayDataset(DJDataset):
                 )
 
     def _process_and_forward_batch(
-            self,
-            op,
-            actor,
-            batch_data_with_metadata,
-            next_op_queues,
-            final_results,
-            result_lock,
-            next_actor_index,
-            log_data_flow,
-        ):
+        self,
+        op,
+        actor,
+        batch_data_with_metadata,
+        next_op_queues,
+        final_results,
+        result_lock,
+        next_actor_index,
+        log_data_flow,
+    ):
         """Process batch data and forward to downstream with data flow tracking"""
         if not batch_data_with_metadata:
             return 0
@@ -654,7 +622,6 @@ class RayDataset(DJDataset):
             except Exception as e:
                 logger.error(f"Error in single actor processing: {e}")
                 break
-        
         logger.info(f"Single actor completed, processed {processed_count} items")
 
 

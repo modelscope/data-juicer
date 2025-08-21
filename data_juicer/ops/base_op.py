@@ -1,6 +1,6 @@
 import copy
-from functools import wraps
 import time
+from functools import wraps
 
 import numpy as np
 import pyarrow as pa
@@ -20,9 +20,10 @@ NON_STATS_FILTERS = Registry("Non-stats Filters")
 TAGGING_OPS = Registry("Tagging Operators")
 ATTRIBUTION_FILTERS = Registry("Attribution Filters")
 
+from datetime import datetime
 
 import pytz
-from datetime import datetime
+
 beijing_tz = pytz.timezone("Asia/Singapore")
 
 def convert_list_dict_to_dict_list(samples):

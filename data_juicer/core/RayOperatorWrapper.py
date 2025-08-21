@@ -1,6 +1,6 @@
 import ray
 
-@ray.remote(num_gpus=0.0) 
+@ray.remote(num_gpus=0.0)
 class Actor:
     def __init__(self, op, rank=None):
 
@@ -53,7 +53,7 @@ class Actor:
             self.load_model()
         data = self.op.compute_stats_batched(data, self.model, self.processor)
         # transform the map object to a list
-        keep_mask = list(self.op.process_batched(data))  
+        keep_mask = list(self.op.process_batched(data))
     
         if not any(keep_mask):
             return None
@@ -69,7 +69,6 @@ class Actor:
             raise ValueError("Unsupported data type for batch filtering")
         
         return filtered_data
-
 
     def filter_cpu_single(self, data):
         data = self.op.compute_stats_single(data)
@@ -82,7 +81,7 @@ class Actor:
     def filter_cpu_batched(self, data):
         data = self.op.compute_stats_batched(data)
         # transform the map object to a list
-        keep_mask = list(self.op.process_batched(data))  
+        keep_mask = list(self.op.process_batched(data))
 
         if not any(keep_mask):
             return None
@@ -99,5 +98,3 @@ class Actor:
             raise ValueError("Unsupported data type for batch filtering")
         
         return filtered_data
-
-    
