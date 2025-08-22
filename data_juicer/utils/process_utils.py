@@ -7,7 +7,10 @@ import psutil
 from loguru import logger
 
 from data_juicer import cuda_device_count
+from data_juicer.utils.constant import RAY_JOB_ENV_VAR
+from data_juicer.utils.lazy_loader import LazyLoader
 
+ray = LazyLoader("ray")
 _RAY_NODES_INFO = None
 
 
@@ -50,32 +53,37 @@ def get_min_cuda_memory():
     return min_cuda_memory
 
 
-def is_ray_enabled():
-    # TODO: optimize executor_type == 'ray'
+def is_ray_initialized():
     try:
-        import ray
         return ray.is_initialized()
     except Exception:
         return False
 
 
+def is_ray_mode():
+    if int(os.environ.get(RAY_JOB_ENV_VAR, 0)):
+        assert is_ray_initialized(), "Ray cluster is not initialized."
+        return True
+
+    return False
+
+
 def cpu_count():
-    if is_ray_enabled():
-        import ray
+    if is_ray_mode():
         available_resources = ray.available_resources()
-        available_cpu = available_resources.get('CPU', 0)
+        available_cpu = available_resources.get("CPU", 0)
         return available_cpu
 
     return psutil.cpu_count()
 
 
 def available_memories():
-    if is_ray_enabled():
+    if is_ray_mode():
         ray_nodes_info = get_ray_nodes_info()
 
         available_mems = []
         for nodeid, info in ray_nodes_info:
-            available_mems.append(info['memory'])
+            available_mems.append(info["memory"])
 
         return available_mems
 
@@ -83,22 +91,21 @@ def available_memories():
 
 
 def available_gpu_memories():
-    if is_ray_enabled():
+    if is_ray_mode():
         ray_nodes_info = get_ray_nodes_info()
 
         available_gpu_mems = []
         for nodeid, info in ray_nodes_info:
-            available_gpu_mems.extend(info['gpus_memory'])
+            available_gpu_mems.extend(info["gpus_memory"])
 
         return available_gpu_mems
 
     try:
-        nvidia_smi_output = subprocess.check_output([
-            'nvidia-smi', '--query-gpu=memory.free',
-            '--format=csv,noheader,nounits'
-        ]).decode('utf-8')
+        nvidia_smi_output = subprocess.check_output(
+            ["nvidia-smi", "--query-gpu=memory.free", "--format=csv,noheader,nounits"]
+        ).decode("utf-8")
 
-        return [int(i) for i in nvidia_smi_output.strip().split('\n')]
+        return [int(i) for i in nvidia_smi_output.strip().split("\n")]
     except Exception:
         return []
 
@@ -109,8 +116,6 @@ def get_ray_nodes_info():
     if _RAY_NODES_INFO is not None:
         return _RAY_NODES_INFO
 
-    import ray
-
     @ray.remote
     def collect_node_info():
         mem_info = psutil.virtual_memory()
@@ -119,12 +124,11 @@ def get_ray_nodes_info():
 
         try:
             free_gpus_memory = []
-            nvidia_smi_output = subprocess.check_output([
-                'nvidia-smi', '--query-gpu=memory.free',
-                '--format=csv,noheader,nounits'
-            ]).decode('utf-8')
+            nvidia_smi_output = subprocess.check_output(
+                ["nvidia-smi", "--query-gpu=memory.free", "--format=csv,noheader,nounits"]
+            ).decode("utf-8")
 
-            for line in nvidia_smi_output.strip().split('\n'):
+            for line in nvidia_smi_output.strip().split("\n"):
                 free_gpus_memory.append(int(line))
 
         except Exception:
@@ -132,35 +136,32 @@ def get_ray_nodes_info():
             free_gpus_memory = []
 
         return {
-            'memory': free_mem,  # MB
-            'cpu_count': cpu_count,
-            'gpus_memory': free_gpus_memory,  # MB
+            "memory": free_mem,  # MB
+            "cpu_count": cpu_count,
+            "gpus_memory": free_gpus_memory,  # MB
         }
 
-    ray.init(address='auto', ignore_reinit_error=True)
+    assert is_ray_initialized(), "Ray cluster is not initialized."
+    ray.init(address="auto", ignore_reinit_error=True)
 
     nodes = ray.nodes()
-    alive_nodes = [node for node in nodes if node['Alive']]
+    alive_nodes = [node for node in nodes if node["Alive"]]
     # skip head node
-    worker_nodes = [
-        node for node in alive_nodes
-        if 'head' not in node['NodeManagerHostname']
-    ]
+    worker_nodes = [node for node in alive_nodes if "head" not in node["NodeManagerHostname"]]
 
     futures = []
     for node in worker_nodes:
-        node_id = node['NodeID']
+        node_id = node["NodeID"]
         from ray.util import scheduling_strategies
-        strategy = scheduling_strategies.NodeAffinitySchedulingStrategy(
-            node_id=node_id, soft=False)
-        future = collect_node_info.options(
-            scheduling_strategy=strategy).remote()
+
+        strategy = scheduling_strategies.NodeAffinitySchedulingStrategy(node_id=node_id, soft=False)
+        future = collect_node_info.options(scheduling_strategy=strategy).remote()
         futures.append(future)
 
     results = ray.get(futures)
 
     for i, (node, info) in enumerate(zip(alive_nodes, results)):
-        node_id = node['NodeID']
+        node_id = node["NodeID"]
         _RAY_NODES_INFO[node_id] = info
 
     ray.shutdown()
@@ -168,18 +169,13 @@ def get_ray_nodes_info():
     return _RAY_NODES_INFO
 
 
-def calculate_np(name,
-                 mem_required,
-                 cpu_required,
-                 num_proc=None,
-                 use_cuda=False):
+def calculate_np(name, mem_required, cpu_required, num_proc=None, use_cuda=False):
     """Calculate the optimum number of processes for the given OP"""
     eps = 1e-9  # about 1 byte
 
     if use_cuda:
         auto_num_proc = None
-        cuda_mems_available = [m / 1024
-                               for m in available_gpu_memories()]  # GB
+        cuda_mems_available = [m / 1024 for m in available_gpu_memories()]  # GB
         if mem_required == 0:
             logger.warning(
                 f"The required cuda memory of Op[{name}] "
@@ -191,17 +187,17 @@ def calculate_np(name,
                 f"config_all.yaml file."
             )
         else:
-            auto_num_proc = sum([
-                math.floor(cuda_mem_available / mem_required)
-                for cuda_mem_available in cuda_mems_available
-            ])
+            auto_num_proc = sum(
+                [math.floor(cuda_mem_available / mem_required) for cuda_mem_available in cuda_mems_available]
+            )
             if auto_num_proc < cuda_device_count():
                 logger.warning(
-                    f'The required cuda memory:{mem_required}GB might '
-                    f'be more than the available cuda devices memory list:'
-                    f'{cuda_mems_available}GB.'
-                    f'This Op[{name}] might '
-                    f'require more resource to run.')
+                    f"The required cuda memory:{mem_required}GB might "
+                    f"be more than the available cuda devices memory list:"
+                    f"{cuda_mems_available}GB."
+                    f"This Op[{name}] might "
+                    f"require more resource to run."
+                )
 
         if auto_num_proc and num_proc:
             op_proc = min(auto_num_proc, num_proc)
@@ -230,18 +226,17 @@ def calculate_np(name,
 
         op_proc = num_proc
         mems_available = [m / 1024 for m in available_memories()]  # GB
-        auto_proc = sum([
-            math.floor(mem_available / (mem_required + eps))
-            for mem_available in mems_available
-        ])
+        auto_proc = sum([math.floor(mem_available / (mem_required + eps)) for mem_available in mems_available])
         op_proc = min(op_proc, auto_proc)
 
         if op_proc < 1.0:
-            logger.warning(f'The required CPU number:{cpu_required} '
-                           f'and memory:{mem_required}GB might '
-                           f'be more than the available CPU:{cpu_num} '
-                           f'and memory :{mems_available}GB.'
-                           f'This Op [{name}] might '
-                           f'require more resource to run.')
+            logger.warning(
+                f"The required CPU number:{cpu_required} "
+                f"and memory:{mem_required}GB might "
+                f"be more than the available CPU:{cpu_num} "
+                f"and memory :{mems_available}GB."
+                f"This Op [{name}] might "
+                f"require more resource to run."
+            )
         op_proc = max(op_proc, 1)
         return op_proc
