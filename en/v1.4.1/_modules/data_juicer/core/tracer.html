@@ -362,6 +362,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span>
+
 
 <div class="viewcode-block" id="Tracer">
 <a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.tracer.Tracer">[docs]</a>
@@ -375,18 +377,25 @@
 
 <div class="viewcode-block" id="Tracer.__init__">
 <a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.tracer.Tracer.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work_dir</span><span class="p">,</span> <span class="n">show_num</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work_dir</span><span class="p">,</span> <span class="n">op_list_to_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_num</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
 <span class="sd">        :param work_dir: the work directory to store the comparison</span>
 <span class="sd">            results</span>
+<span class="sd">        :param op_list_to_trace: the OP list to be traced.</span>
 <span class="sd">        :param show_num: the maximum number of samples to show in the</span>
 <span class="sd">            comparison result files.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;trace&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op_list_to_trace</span> <span class="o">=</span> <span class="n">op_list_to_trace</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">op_list_to_trace</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Trace for all ops.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">op_list_to_trace</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">OPERATORS</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">op_list_to_trace</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">op_list_to_trace</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span> <span class="o">=</span> <span class="n">show_num</span></div>
 
 
@@ -405,6 +414,9 @@
 <span class="sd">        :param text_key: which text_key to trace</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">op_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_list_to_trace</span><span class="p">:</span>
+            <span class="k">return</span>
+
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">previous_ds</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">processed_ds</span><span class="p">)</span>
         <span class="n">dif_dict</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span>
@@ -459,6 +471,9 @@
 <span class="sd">        :param text_key: which text_key to trace</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">op_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_list_to_trace</span><span class="p">:</span>
+            <span class="k">return</span>
+
         <span class="k">assert</span> <span class="n">previous_ds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">text_key</span><span class="p">]</span> <span class="o">==</span> <span class="n">processed_ds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">text_key</span><span class="p">]</span>
         <span class="n">aug_dict</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -491,6 +506,9 @@
 <span class="sd">        :param processed_ds: dataset processed by the filter</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">op_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_list_to_trace</span><span class="p">:</span>
+            <span class="k">return</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">previous_ds</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">processed_ds</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] are all &quot;</span>
@@ -552,6 +570,9 @@
 <span class="sd">            deduplicator</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">op_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_list_to_trace</span><span class="p">:</span>
+            <span class="k">return</span>
+
         <span class="k">if</span> <span class="n">dup_pairs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">] does not generate dup_pairs &quot;</span>
