@@ -419,8 +419,16 @@ def generate_op_table_section(op_type, op_record_list):
 
 def get_op_desc_in_en_zh_batched(descs):
     separator = "\n"
+    limit = int(5e3)
     batch = separator.join(descs)
-    res = ts.translate_text(batch, translator="alibaba", from_language="en", to_language="zh")
+    if len(batch) > limit:
+        # split
+        split_idx = int(len(descs) / 2)
+        res1 = get_op_desc_in_en_zh_batched(descs[:split_idx])
+        res2 = get_op_desc_in_en_zh_batched(descs[split_idx:])
+        return res1 + res2
+    else:
+        res = ts.translate_text(batch, translator="alibaba", from_language="en", to_language="zh")
     zhs = res.split(separator)
     assert len(zhs) == len(descs)
     return [desc + " " + zh.strip() for desc, zh in zip(descs, zhs)]
