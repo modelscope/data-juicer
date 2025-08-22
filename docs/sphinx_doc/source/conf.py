@@ -18,7 +18,7 @@ release = version
 
 # -- Path setup --------------------------------------------------------------
 current_dir = os.path.dirname(__file__)
-sys.path.insert(0, os.path.abspath("../../"))
+# sys.path.insert(0, os.path.abspath("../../"))
 sys.path.insert(0, current_dir)
 
 from custom_myst import ReplaceVideoLinksTransform
@@ -42,7 +42,7 @@ extensions = [
     "myst_parser",
     "sphinx_copybutton",
     "sphinx_multiversion",
-    "sphinxcontrib.apidoc",  # TODO: Replace with sphinx.ext.apidoc when sphinx>=8.2
+    # "sphinxcontrib.apidoc",  # TODO: Replace with sphinx.ext.apidoc when sphinx>=8.2
 ]
 
 # -- Extension configuration ------------------------------------------------
@@ -52,6 +52,12 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
+
+symlink_path = Path('docs/sphinx_doc/source/extra/tests/ops/data')
+
+if symlink_path.is_symlink():
+    symlink_path.unlink()
+    print(f"Symlink {symlink_path} has been removed.")
 
 def is_valid_tag(tag):
     try:
@@ -78,12 +84,13 @@ def get_filtered_tags():
 # sphinx_multiversion configuration
 # smv_tag_whitelist = r"^v\d+\.\d+\.\d+$"
 try:
-    smv_tag_whitelist = get_filtered_tags()
+    # smv_tag_whitelist = get_filtered_tags()
+    smv_tag_whitelist = None
 except Exception as e:
     print(f"Warning: Failed to get git tags for multi-version docs, falling back to current version. Error: {e}", file=sys.stderr)
     smv_tag_whitelist = rf"^v{release}$"
 
-smv_branch_whitelist = r"^main$"
+smv_branch_whitelist = r"^(main|feat/doc-enhance-op)$"
 smv_released_pattern = r"^refs/tags/v\d+\.\d+\.\d+$"
 smv_remote_whitelist = r"^origin$"
 
@@ -124,6 +131,7 @@ html_sidebars = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_css_files = ["sidebar-menu.css"]
 html_static_path = ["_static"]
+html_extra_path = ['extra']
 
 # -- Internationalization settings ------------------------------------------
 # Language settings
@@ -211,6 +219,16 @@ def create_symlinks(source_dir):
 
         if not target.exists():
             target.symlink_to(os.path.relpath(md_file, target.parent))
+    
+    assets_dir = project_root / "tests" / "ops" / "data"
+    target_assets_dir = Path(current_dir) / "extra" / "tests" / "ops" / "data"
+    print(f"Copying {assets_dir} to {target_assets_dir}")
+    if target_assets_dir.is_symlink():
+        print("Target assets dir exists, removing it")
+        target_assets_dir.unlink()
+    if assets_dir.exists():
+        target_assets_dir.parent.mkdir(parents=True, exist_ok=True)
+        target_assets_dir.symlink_to(assets_dir)
 
 
 def update_metadata_docnames(app, config):
