@@ -1597,6 +1597,37 @@ print(res) # {&quot;AlphanumericFilter&quot;: [&quot;alnum_ratio&quot;, &quot;al
 </section>
 <section id="module-data_juicer.utils.file_utils">
 <span id="data-juicer-utils-file-utils-module"></span><h2>data_juicer.utils.file_utils module<a class="headerlink" href="#module-data_juicer.utils.file_utils" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.utils.file_utils.Sizes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">Sizes</span></span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#Sizes"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.Sizes" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.file_utils.Sizes.KiB">
+<span class="sig-name descname"><span class="pre">KiB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1024</span></em><a class="headerlink" href="#data_juicer.utils.file_utils.Sizes.KiB" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.file_utils.Sizes.MiB">
+<span class="sig-name descname"><span class="pre">MiB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1048576</span></em><a class="headerlink" href="#data_juicer.utils.file_utils.Sizes.MiB" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.file_utils.Sizes.GiB">
+<span class="sig-name descname"><span class="pre">GiB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1073741824</span></em><a class="headerlink" href="#data_juicer.utils.file_utils.Sizes.GiB" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.file_utils.Sizes.TiB">
+<span class="sig-name descname"><span class="pre">TiB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1099511627776</span></em><a class="headerlink" href="#data_juicer.utils.file_utils.Sizes.TiB" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.file_utils.byte_size_to_size_str">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">byte_size_to_size_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#byte_size_to_size_str"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.byte_size_to_size_str" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.file_utils.follow_read">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">follow_read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logfile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_existing_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AsyncGenerator</span></span></span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#follow_read"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.follow_read" title="Link to this definition">¶</a></dt>
@@ -3561,6 +3592,14 @@ Currently, <cite>standalone</cite>, <cite>ray</cite> are supported.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-data_juicer.utils.file_utils">data_juicer.utils.file_utils module</a><ul>
+<li><a class="reference internal" href="#data_juicer.utils.file_utils.Sizes"><code class="docutils literal notranslate"><span class="pre">Sizes</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.utils.file_utils.Sizes.KiB"><code class="docutils literal notranslate"><span class="pre">Sizes.KiB</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.file_utils.Sizes.MiB"><code class="docutils literal notranslate"><span class="pre">Sizes.MiB</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.file_utils.Sizes.GiB"><code class="docutils literal notranslate"><span class="pre">Sizes.GiB</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.file_utils.Sizes.TiB"><code class="docutils literal notranslate"><span class="pre">Sizes.TiB</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.utils.file_utils.byte_size_to_size_str"><code class="docutils literal notranslate"><span class="pre">byte_size_to_size_str()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.file_utils.follow_read"><code class="docutils literal notranslate"><span class="pre">follow_read()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.file_utils.find_files_with_suffix"><code class="docutils literal notranslate"><span class="pre">find_files_with_suffix()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.file_utils.is_remote_path"><code class="docutils literal notranslate"><span class="pre">is_remote_path()</span></code></a></li>

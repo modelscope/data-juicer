@@ -362,6 +362,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">HashKeys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sizes</span><span class="p">,</span> <span class="n">byte_size_to_size_str</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_arguments</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.webdataset_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">reconstruct_custom_webdataset_format</span>
 
 
@@ -386,17 +388,29 @@
 
 <div class="viewcode-block" id="RayExporter.__init__">
 <a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.RayExporter.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="n">export_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep_stats_in_res_ds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">keep_hashes_in_res_ds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">export_path</span><span class="p">,</span>
+        <span class="n">export_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">export_shard_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">keep_stats_in_res_ds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">keep_hashes_in_res_ds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
 <span class="sd">        :param export_path: the path to export datasets.</span>
+<span class="sd">        :param export_type: the format type of the exported datasets.</span>
+<span class="sd">        :param export_shard_size: the approximate size of each shard of exported</span>
+<span class="sd">            dataset. In default, it&#39;s 0, which means export the dataset in the default setting of ray.</span>
 <span class="sd">        :param keep_stats_in_res_ds: whether to keep stats in the result</span>
 <span class="sd">            dataset.</span>
 <span class="sd">        :param keep_hashes_in_res_ds: whether to keep hashes in the result</span>
 <span class="sd">            dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">export_path</span> <span class="o">=</span> <span class="n">export_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">=</span> <span class="n">export_shard_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_stats_in_res_ds</span> <span class="o">=</span> <span class="n">keep_stats_in_res_ds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_hashes_in_res_ds</span> <span class="o">=</span> <span class="n">keep_hashes_in_res_ds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">export_format</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_export_format</span><span class="p">(</span><span class="n">export_path</span><span class="p">)</span> <span class="k">if</span> <span class="n">export_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">export_type</span>
@@ -405,7 +419,28 @@
                 <span class="sa">f</span><span class="s1">&#39;export data format &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">export_format</span><span class="si">}</span><span class="s1">&quot; is not supported &#39;</span>
                 <span class="sa">f</span><span class="s2">&quot;for now. Only support </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_SUPPORTED_FORMATS</span><span class="si">}</span><span class="s2">. Please check export_type or export_path.&quot;</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">export_extra_args</span> <span class="o">=</span> <span class="n">kwargs</span> <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_extra_args</span> <span class="o">=</span> <span class="n">kwargs</span> <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="c1"># get the string format of shard size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span> <span class="o">=</span> <span class="n">byte_size_to_size_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span><span class="p">)</span>
+
+        <span class="c1"># we recommend users to set a shard size between MiB and TiB.</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">&lt;</span> <span class="n">Sizes</span><span class="o">.</span><span class="n">MiB</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The export_shard_size [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span><span class="si">}</span><span class="s2">]&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; is less than 1MiB. If the result dataset is too &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;large, there might be too many shard files to &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;generate.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">&gt;=</span> <span class="n">Sizes</span><span class="o">.</span><span class="n">TiB</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The export_shard_size [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span><span class="si">}</span><span class="s2">]&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; is larger than 1TiB. It might generate large &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;single shard file and make loading and exporting &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;slower.&quot;</span>
+            <span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_export_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
@@ -459,6 +494,14 @@
             <span class="s2">&quot;export_extra_args&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_extra_args</span><span class="p">,</span>
             <span class="s2">&quot;export_format&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_format</span><span class="p">,</span>
         <span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># compute the min_rows_per_file for export methods</span>
+            <span class="n">dataset_nbytes</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">size_bytes</span><span class="p">()</span>
+            <span class="n">dataset_num_rows</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+            <span class="n">num_shards</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dataset_nbytes</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">num_shards</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">num_shards</span><span class="p">,</span> <span class="n">dataset_num_rows</span><span class="p">)</span>
+            <span class="n">rows_per_file</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dataset_num_rows</span> <span class="o">/</span> <span class="n">num_shards</span><span class="p">)</span>
+            <span class="n">export_kwargs</span><span class="p">[</span><span class="s2">&quot;export_extra_args&quot;</span><span class="p">][</span><span class="s2">&quot;min_rows_per_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rows_per_file</span>
         <span class="k">return</span> <span class="n">export_method</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="o">**</span><span class="n">export_kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RayExporter.export">
@@ -486,7 +529,9 @@
 <span class="sd">        :param kwargs: extra arguments.</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">export_path</span><span class="p">,</span> <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="n">export_extra_args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;export_extra_args&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">filtered_kwargs</span> <span class="o">=</span> <span class="n">filter_arguments</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">write_json</span><span class="p">,</span> <span class="n">export_extra_args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">export_path</span><span class="p">,</span> <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">filtered_kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RayExporter.write_webdataset">
@@ -509,8 +554,9 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">field_mapping</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">reconstruct_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">reconstruct_custom_webdataset_format</span><span class="p">,</span> <span class="n">field_mapping</span><span class="o">=</span><span class="n">field_mapping</span><span class="p">)</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">reconstruct_func</span><span class="p">)</span>
+        <span class="n">filtered_kwargs</span> <span class="o">=</span> <span class="n">filter_arguments</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">write_webdataset</span><span class="p">,</span> <span class="n">export_extra_args</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">write_webdataset</span><span class="p">(</span><span class="n">export_path</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">_custom_default_encoder</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">write_webdataset</span><span class="p">(</span><span class="n">export_path</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">_custom_default_encoder</span><span class="p">,</span> <span class="o">**</span><span class="n">filtered_kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RayExporter.write_others">
@@ -526,7 +572,10 @@
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">export_format</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;export_format&quot;</span><span class="p">,</span> <span class="s2">&quot;parquet&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;write_</span><span class="si">{</span><span class="n">export_format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span><span class="n">export_path</span><span class="p">)</span></div>
+        <span class="n">write_method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;write_</span><span class="si">{</span><span class="n">export_format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">export_extra_args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;export_extra_args&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">filtered_kwargs</span> <span class="o">=</span> <span class="n">filter_arguments</span><span class="p">(</span><span class="n">write_method</span><span class="p">,</span> <span class="n">export_extra_args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;write_</span><span class="si">{</span><span class="n">export_format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span><span class="n">export_path</span><span class="p">,</span> <span class="o">**</span><span class="n">filtered_kwargs</span><span class="p">)</span></div>
 
 
     <span class="c1"># suffix to export method</span>

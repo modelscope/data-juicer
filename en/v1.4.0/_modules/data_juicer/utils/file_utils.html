@@ -375,6 +375,34 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_PREFIX</span><span class="p">,</span> <span class="n">Fields</span>
 
 
+<div class="viewcode-block" id="Sizes">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.file_utils.Sizes">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Sizes</span><span class="p">:</span>
+    <span class="n">KiB</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">10</span>  <span class="c1"># 1024</span>
+    <span class="n">MiB</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">20</span>  <span class="c1"># 1024*1024</span>
+    <span class="n">GiB</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">30</span>  <span class="c1"># 1024*1024*1024</span>
+    <span class="n">TiB</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">40</span>  <span class="c1"># 1024*1024*1024*1024</span></div>
+
+
+
+<div class="viewcode-block" id="byte_size_to_size_str">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.file_utils.byte_size_to_size_str">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">byte_size_to_size_str</span><span class="p">(</span><span class="n">byte_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="c1"># get the string format of shard size</span>
+    <span class="k">if</span> <span class="n">byte_size</span> <span class="o">//</span> <span class="n">Sizes</span><span class="o">.</span><span class="n">TiB</span><span class="p">:</span>
+        <span class="n">size_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2"> TiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">byte_size</span> <span class="o">/</span> <span class="n">Sizes</span><span class="o">.</span><span class="n">TiB</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">byte_size</span> <span class="o">//</span> <span class="n">Sizes</span><span class="o">.</span><span class="n">GiB</span><span class="p">:</span>
+        <span class="n">size_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2"> GiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">byte_size</span> <span class="o">/</span> <span class="n">Sizes</span><span class="o">.</span><span class="n">GiB</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">byte_size</span> <span class="o">//</span> <span class="n">Sizes</span><span class="o">.</span><span class="n">MiB</span><span class="p">:</span>
+        <span class="n">size_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2"> MiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">byte_size</span> <span class="o">/</span> <span class="n">Sizes</span><span class="o">.</span><span class="n">MiB</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">byte_size</span> <span class="o">//</span> <span class="n">Sizes</span><span class="o">.</span><span class="n">KiB</span><span class="p">:</span>
+        <span class="n">size_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2"> KiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">byte_size</span> <span class="o">/</span> <span class="n">Sizes</span><span class="o">.</span><span class="n">KiB</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">size_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2"> Bytes&quot;</span> <span class="o">%</span> <span class="n">byte_size</span>
+    <span class="k">return</span> <span class="n">size_str</span></div>
+
+
+
 <div class="viewcode-block" id="follow_read">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.file_utils.follow_read">[docs]</a>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">follow_read</span><span class="p">(</span>

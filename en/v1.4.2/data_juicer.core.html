@@ -854,26 +854,6 @@ dataset better.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The Exporter class is used to export a dataset to files of specific
 format.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.exporter.Exporter.KiB">
-<span class="sig-name descname"><span class="pre">KiB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1024</span></em><a class="headerlink" href="#data_juicer.core.exporter.Exporter.KiB" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.exporter.Exporter.MiB">
-<span class="sig-name descname"><span class="pre">MiB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1048576</span></em><a class="headerlink" href="#data_juicer.core.exporter.Exporter.MiB" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.exporter.Exporter.GiB">
-<span class="sig-name descname"><span class="pre">GiB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1073741824</span></em><a class="headerlink" href="#data_juicer.core.exporter.Exporter.GiB" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.exporter.Exporter.TiB">
-<span class="sig-name descname"><span class="pre">TiB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1099511627776</span></em><a class="headerlink" href="#data_juicer.core.exporter.Exporter.TiB" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.exporter.Exporter.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_in_parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/exporter.html#Exporter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.exporter.Exporter.__init__" title="Link to this definition">¶</a></dt>
@@ -882,9 +862,11 @@ format.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>export_path</strong> – the path to export datasets.</p></li>
-<li><p><strong>export_shard_size</strong> – the size of each shard of exported
+<li><p><strong>export_type</strong> – the format type of the exported datasets.</p></li>
+<li><p><strong>export_shard_size</strong> – the approximate size of each shard of exported
 dataset. In default, it’s 0, which means export the dataset
 to a single file.</p></li>
+<li><p><strong>export_in_parallel</strong> – whether to export the datasets in parallel.</p></li>
 <li><p><strong>num_proc</strong> – number of process to export the dataset.</p></li>
 <li><p><strong>export_ds</strong> – whether to export the dataset contents.</p></li>
 <li><p><strong>keep_stats_in_res_ds</strong> – whether to keep stats in the result
@@ -1093,18 +1075,21 @@ result for each OP.</p>
 <span id="data-juicer-core-ray-exporter-module"></span><h2>data_juicer.core.ray_exporter module<a class="headerlink" href="#module-data_juicer.core.ray_exporter" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.core.ray_exporter.RayExporter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.ray_exporter.</span></span><span class="sig-name descname"><span class="pre">RayExporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.ray_exporter.RayExporter" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.ray_exporter.</span></span><span class="sig-name descname"><span class="pre">RayExporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.ray_exporter.RayExporter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The Exporter class is used to export a ray dataset to files of specific
 format.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.ray_exporter.RayExporter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.ray_exporter.RayExporter.__init__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.ray_exporter.RayExporter.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Initialization method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>export_path</strong> – the path to export datasets.</p></li>
+<li><p><strong>export_type</strong> – the format type of the exported datasets.</p></li>
+<li><p><strong>export_shard_size</strong> – the approximate size of each shard of exported
+dataset. In default, it’s 0, which means export the dataset in the default setting of ray.</p></li>
 <li><p><strong>keep_stats_in_res_ds</strong> – whether to keep stats in the result
 dataset.</p></li>
 <li><p><strong>keep_hashes_in_res_ds</strong> – whether to keep hashes in the result
@@ -1735,26 +1720,6 @@ Default is “uniform”.</p></li>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The Exporter class is used to export a dataset to files of specific
 format.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.Exporter.KiB">
-<span class="sig-name descname"><span class="pre">KiB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1024</span></em><a class="headerlink" href="#data_juicer.core.Exporter.KiB" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.Exporter.MiB">
-<span class="sig-name descname"><span class="pre">MiB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1048576</span></em><a class="headerlink" href="#data_juicer.core.Exporter.MiB" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.Exporter.GiB">
-<span class="sig-name descname"><span class="pre">GiB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1073741824</span></em><a class="headerlink" href="#data_juicer.core.Exporter.GiB" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.Exporter.TiB">
-<span class="sig-name descname"><span class="pre">TiB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1099511627776</span></em><a class="headerlink" href="#data_juicer.core.Exporter.TiB" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.Exporter.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_in_parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/exporter.html#Exporter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Exporter.__init__" title="Link to this definition">¶</a></dt>
@@ -1763,9 +1728,11 @@ format.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>export_path</strong> – the path to export datasets.</p></li>
-<li><p><strong>export_shard_size</strong> – the size of each shard of exported
+<li><p><strong>export_type</strong> – the format type of the exported datasets.</p></li>
+<li><p><strong>export_shard_size</strong> – the approximate size of each shard of exported
 dataset. In default, it’s 0, which means export the dataset
 to a single file.</p></li>
+<li><p><strong>export_in_parallel</strong> – whether to export the datasets in parallel.</p></li>
 <li><p><strong>num_proc</strong> – number of process to export the dataset.</p></li>
 <li><p><strong>export_ds</strong> – whether to export the dataset contents.</p></li>
 <li><p><strong>keep_stats_in_res_ds</strong> – whether to keep stats in the result
@@ -1858,18 +1825,21 @@ dataset.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.core.RayExporter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.</span></span><span class="sig-name descname"><span class="pre">RayExporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.RayExporter" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.</span></span><span class="sig-name descname"><span class="pre">RayExporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.RayExporter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The Exporter class is used to export a ray dataset to files of specific
 format.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.RayExporter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.RayExporter.__init__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_exporter.html#RayExporter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.RayExporter.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Initialization method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>export_path</strong> – the path to export datasets.</p></li>
+<li><p><strong>export_type</strong> – the format type of the exported datasets.</p></li>
+<li><p><strong>export_shard_size</strong> – the approximate size of each shard of exported
+dataset. In default, it’s 0, which means export the dataset in the default setting of ray.</p></li>
 <li><p><strong>keep_stats_in_res_ds</strong> – whether to keep stats in the result
 dataset.</p></li>
 <li><p><strong>keep_hashes_in_res_ds</strong> – whether to keep hashes in the result
@@ -2251,10 +2221,6 @@ deduplicator</p></li>
 </li>
 <li><a class="reference internal" href="#module-data_juicer.core.exporter">data_juicer.core.exporter module</a><ul>
 <li><a class="reference internal" href="#data_juicer.core.exporter.Exporter"><code class="docutils literal notranslate"><span class="pre">Exporter</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.exporter.Exporter.KiB"><code class="docutils literal notranslate"><span class="pre">Exporter.KiB</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.exporter.Exporter.MiB"><code class="docutils literal notranslate"><span class="pre">Exporter.MiB</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.exporter.Exporter.GiB"><code class="docutils literal notranslate"><span class="pre">Exporter.GiB</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.exporter.Exporter.TiB"><code class="docutils literal notranslate"><span class="pre">Exporter.TiB</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.exporter.Exporter.__init__"><code class="docutils literal notranslate"><span class="pre">Exporter.__init__()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.exporter.Exporter.export"><code class="docutils literal notranslate"><span class="pre">Exporter.export()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.exporter.Exporter.export_compute_stats"><code class="docutils literal notranslate"><span class="pre">Exporter.export_compute_stats()</span></code></a></li>
@@ -2353,10 +2319,6 @@ deduplicator</p></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#data_juicer.core.Exporter"><code class="docutils literal notranslate"><span class="pre">Exporter</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.Exporter.KiB"><code class="docutils literal notranslate"><span class="pre">Exporter.KiB</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.Exporter.MiB"><code class="docutils literal notranslate"><span class="pre">Exporter.MiB</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.Exporter.GiB"><code class="docutils literal notranslate"><span class="pre">Exporter.GiB</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.Exporter.TiB"><code class="docutils literal notranslate"><span class="pre">Exporter.TiB</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.Exporter.__init__"><code class="docutils literal notranslate"><span class="pre">Exporter.__init__()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.Exporter.export"><code class="docutils literal notranslate"><span class="pre">Exporter.export()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.Exporter.export_compute_stats"><code class="docutils literal notranslate"><span class="pre">Exporter.export_compute_stats()</span></code></a></li>

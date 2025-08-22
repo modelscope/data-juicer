@@ -364,6 +364,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">HashKeys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sizes</span><span class="p">,</span> <span class="n">byte_size_to_size_str</span>
 
 
 <div class="viewcode-block" id="Exporter">
@@ -371,11 +372,6 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">Exporter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The Exporter class is used to export a dataset to files of specific</span>
 <span class="sd">    format.&quot;&quot;&quot;</span>
-
-    <span class="n">KiB</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">10</span>  <span class="c1"># 1024</span>
-    <span class="n">MiB</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">20</span>  <span class="c1"># 1024*1024</span>
-    <span class="n">GiB</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">30</span>  <span class="c1"># 1024*1024*1024</span>
-    <span class="n">TiB</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">40</span>  <span class="c1"># 1024*1024*1024*1024</span>
 
 <div class="viewcode-block" id="Exporter.__init__">
 <a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.exporter.Exporter.__init__">[文档]</a>
@@ -396,9 +392,11 @@
 <span class="sd">        Initialization method.</span>
 
 <span class="sd">        :param export_path: the path to export datasets.</span>
-<span class="sd">        :param export_shard_size: the size of each shard of exported</span>
+<span class="sd">        :param export_type: the format type of the exported datasets.</span>
+<span class="sd">        :param export_shard_size: the approximate size of each shard of exported</span>
 <span class="sd">            dataset. In default, it&#39;s 0, which means export the dataset</span>
 <span class="sd">            to a single file.</span>
+<span class="sd">        :param export_in_parallel: whether to export the datasets in parallel.</span>
 <span class="sd">        :param num_proc: number of process to export the dataset.</span>
 <span class="sd">        :param export_ds: whether to export the dataset contents.</span>
 <span class="sd">        :param keep_stats_in_res_ds: whether to keep stats in the result</span>
@@ -425,26 +423,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
         <span class="c1"># get the string format of shard size</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">//</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">TiB</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2"> TiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">/</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">TiB</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">//</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">GiB</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2"> GiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">/</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">GiB</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">//</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">MiB</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2"> MiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">/</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">MiB</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">//</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">KiB</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2"> KiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">/</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">KiB</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2"> Bytes&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span> <span class="o">=</span> <span class="n">byte_size_to_size_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span><span class="p">)</span>
 
         <span class="c1"># we recommend users to set a shard size between MiB and TiB.</span>
-        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">&lt;</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">MiB</span><span class="p">:</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">&lt;</span> <span class="n">Sizes</span><span class="o">.</span><span class="n">MiB</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;The export_shard_size [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span><span class="si">}</span><span class="s2">]&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot; is less than 1MiB. If the result dataset is too &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;large, there might be too many shard files to &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;generate.&quot;</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">&gt;=</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">TiB</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">&gt;=</span> <span class="n">Sizes</span><span class="o">.</span><span class="n">TiB</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;The export_shard_size [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_shard_size_str</span><span class="si">}</span><span class="s2">]&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot; is larger than 1TiB. It might generate large &quot;</span>
