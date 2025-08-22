@@ -233,21 +233,9 @@ def process_read(app, docname, source):
     source[0] = process_doc_links(app, docname, source)
 
 
-def copy_sphinx_doc_to_build(app, config):
-    """Copies the entire project directory to the Sphinx build directory."""
-    source_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    dest_dir = app.srcdir.parent.parent.parent / "docs/sphinx_doc"
-
-    try:
-        shutil.copytree(source_dir, dest_dir, dirs_exist_ok=True)
-    except Exception as e:
-        print(f"Error copying documentation: {e}")
-
-
 def setup(app):
     """Setup Sphinx application hooks"""
     app.add_transform(ReplaceVideoLinksTransform)
-    app.connect("config-inited", copy_sphinx_doc_to_build)
     app.connect("config-inited", rebuild_source_dir)
     app.config.root_doc = "index_ZH" if app.config.language == "zh_CN" else "index"
 
