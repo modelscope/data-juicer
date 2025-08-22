@@ -7,12 +7,9 @@ import os
 import re
 import sys
 import shutil
-import subprocess
 from pathlib import Path
-from sphinx import project as sphinx_project
 from data_juicer import __version__ as version
 
-from packaging import version as pv
 
 CURRENT_VERSION = os.environ.get("DOCS_VERSION", "")
 GIT_REF_FOR_LINKS = os.environ.get("GIT_REF_FOR_LINKS", "main")
@@ -140,6 +137,7 @@ html_context = {
     "available_versions": AVAILABLE_VERSIONS,
 }
 
+
 # -- setup configuration ------------------------------------------------
 def find_zh_exclusions(app, config):
     """
@@ -175,7 +173,7 @@ def copy_markdown_files(source_dir):
     if REPO_ROOT and os.path.isdir(REPO_ROOT):
         project_root = Path(REPO_ROOT)
     else:
-        project_root = source_dir.parent.parent
+        project_root = source_dir.parent.parent.parent
     for md_file in project_root.rglob("*.md"):
         exclude_paths = ["outputs", "sphinx_doc", ".github"]
         if any(path in str(md_file) for path in exclude_paths):
@@ -184,6 +182,7 @@ def copy_markdown_files(source_dir):
         target.parent.mkdir(parents=True, exist_ok=True)
         if not target.exists():
             shutil.copy2(md_file, target)
+
 
 def rebuild_source_dir(app, config):
     """Rebuild source directory for documentation"""
