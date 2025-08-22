@@ -418,7 +418,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 <td><p>Group samples to batched samples. 将样本分组，每一组组成一个批量样本。</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../data_juicer.ops.mapper.html#module-data_juicer.ops.mapper" title="data_juicer.ops.mapper"><span class="xref myst py py-mod">mapper</span></a></p></td>
-<td class="text-center"><p>81</p></td>
+<td class="text-center"><p>82</p></td>
 <td><p>Edits and transforms samples. 对数据样本进行编辑和转换。</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../data_juicer.ops.selector.html#module-data_juicer.ops.selector" title="data_juicer.ops.selector"><span class="xref myst py py-mod">selector</span></a></p></td>
@@ -775,7 +775,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 </tr>
 <tr class="row-even"><td><p>special_characters_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
-<td><p>Filter to keep samples with special-char ratio within a specific range. 过滤器将具有特殊字符比率的样品保持在特定范围内。</p></td>
+<td><p>Filter to keep samples with special-char ratio within a specific range. 过滤器，以保持样品与特殊字符的比例在一个特定的范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/special_characters_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_special_characters_filter.py">tests</a></p></td>
 </tr>
@@ -972,7 +972,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 </tr>
 <tr class="row-even"><td><p>text_formatter</p></td>
 <td><p>🔴Alpha</p></td>
-<td><p>The class is used to load and format text-type files. 类用于加载和格式化文本类型的文件。</p></td>
+<td><p>The class is used to load and format text-type files. 类用于加载和格式化文本类型文件。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/format/text_formatter.py">code</a></p></td>
 <td><p>-</p></td>
 </tr>
@@ -1048,7 +1048,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 </tr>
 <tr class="row-even"><td><p>calibrate_qa_mapper</p></td>
 <td><p>🔤Text 💻CPU 🔗API 🟢Stable</p></td>
-<td><p>Mapper to calibrate question-answer pairs based on reference text. 映射器基于参考文本校准问题-答案对。</p></td>
+<td><p>Mapper to calibrate question-answer pairs based on reference text. 映射器基于参考文本校准问答对。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/calibrate_qa_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_calibrate_qa_mapper.py">tests</a></p></td>
 </tr>
@@ -1214,307 +1214,313 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/image_captioning_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_image_captioning_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>image_diffusion_mapper</p></td>
+<tr class="row-even"><td><p>image_detection_yolo_mapper</p></td>
+<td><p>🏞Image 🚀GPU 🟢Stable</p></td>
+<td><p>Perform object detection (with YOLO) on images and return the bounding boxes and class labels. 对图像执行对象检测 (使用YOLO) 并返回边界框和类标签。</p></td>
+<td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/image_detection_yolo_mapper.py">code</a></p></td>
+<td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_image_detection_yolo_mapper.py">tests</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>image_diffusion_mapper</p></td>
 <td><p>🔮Multimodal 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Generate image by diffusion model. 通过扩散模型生成图像。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/image_diffusion_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_image_diffusion_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>image_face_blur_mapper</p></td>
+<tr class="row-even"><td><p>image_face_blur_mapper</p></td>
 <td><p>🏞Image 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to blur faces detected in images. 映射器模糊图像中检测到的人脸。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/image_face_blur_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_image_face_blur_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>image_remove_background_mapper</p></td>
+<tr class="row-odd"><td><p>image_remove_background_mapper</p></td>
 <td><p>🏞Image 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to remove background of images. 映射器删除图像的背景。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/image_remove_background_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_image_remove_background_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>image_segment_mapper</p></td>
+<tr class="row-even"><td><p>image_segment_mapper</p></td>
 <td><p>🏞Image 🚀GPU 🟢Stable</p></td>
-<td><p>Perform segment-anything on images and return the bounding boxes. 在图像上执行segment-thing并返回边界框。</p></td>
+<td><p>Perform segment-anything on images and return the bounding boxes. 对图像执行segment-任何操作并返回边界框。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/image_segment_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_image_segment_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>image_tagging_mapper</p></td>
+<tr class="row-odd"><td><p>image_tagging_mapper</p></td>
 <td><p>🏞Image 🚀GPU 🟢Stable</p></td>
 <td><p>Mapper to generate image tags. 映射器生成图像标签。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/image_tagging_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_image_tagging_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>imgdiff_difference_area_generator_mapper</p></td>
+<tr class="row-even"><td><p>imgdiff_difference_area_generator_mapper</p></td>
 <td><p>🚀GPU 🟡Beta</p></td>
 <td><p>A fused operator for OPs that is used to run sequential OPs on the same batch to allow fine-grained control on data processing. OPs的融合操作符，用于在同一批次上运行顺序OPs，以实现对数据处理的细粒度控制。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/imgdiff_difference_area_generator_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_imgdiff_difference_area_generator_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>imgdiff_difference_caption_generator_mapper</p></td>
+<tr class="row-odd"><td><p>imgdiff_difference_caption_generator_mapper</p></td>
 <td><p>🚀GPU 🟡Beta</p></td>
 <td><p>A fused operator for OPs that is used to run sequential OPs on the same batch to allow fine-grained control on data processing. OPs的融合操作符，用于在同一批次上运行顺序OPs，以实现对数据处理的细粒度控制。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/imgdiff_difference_caption_generator_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_imgdiff_difference_caption_generator_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>mllm_mapper</p></td>
+<tr class="row-even"><td><p>mllm_mapper</p></td>
 <td><p>🔮Multimodal 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Mapper to use MLLMs for visual question answering tasks. Mapper使用MLLMs进行视觉问答任务。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/mllm_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_mllm_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>nlpaug_en_mapper</p></td>
+<tr class="row-odd"><td><p>nlpaug_en_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to simply augment samples in English based on nlpaug library. 映射器基于nlpaug库简单地增加英语样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/nlpaug_en_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_nlpaug_en_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>nlpcda_zh_mapper</p></td>
+<tr class="row-even"><td><p>nlpcda_zh_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to simply augment samples in Chinese based on nlpcda library. 基于nlpcda库的映射器可以简单地增加中文样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/nlpcda_zh_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_nlpcda_zh_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>optimize_qa_mapper</p></td>
+<tr class="row-odd"><td><p>optimize_qa_mapper</p></td>
 <td><p>🚀GPU 🌊vLLM 🧩HF 🟢Stable</p></td>
 <td><p>Mapper to optimize question-answer pairs. 映射器来优化问题-答案对。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/optimize_qa_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_optimize_qa_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>optimize_query_mapper</p></td>
+<tr class="row-even"><td><p>optimize_query_mapper</p></td>
 <td><p>🚀GPU 🟢Stable</p></td>
 <td><p>Mapper to optimize query in question-answer pairs. 映射器来优化问答对中的查询。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/optimize_query_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_optimize_query_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>optimize_response_mapper</p></td>
+<tr class="row-odd"><td><p>optimize_response_mapper</p></td>
 <td><p>🚀GPU 🟢Stable</p></td>
 <td><p>Mapper to optimize response in question-answer pairs. 映射器来优化问答对中的响应。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/optimize_response_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_optimize_response_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>pair_preference_mapper</p></td>
+<tr class="row-even"><td><p>pair_preference_mapper</p></td>
 <td><p>🔤Text 💻CPU 🔗API 🟢Stable</p></td>
 <td><p>Mapper to construct paired preference samples. 映射器来构造成对的偏好样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/pair_preference_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_pair_preference_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>punctuation_normalization_mapper</p></td>
+<tr class="row-odd"><td><p>punctuation_normalization_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to normalize unicode punctuations to English punctuations in text samples. 映射器将文本示例中的unicode标点规范化为英文标点。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/punctuation_normalization_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_punctuation_normalization_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>python_file_mapper</p></td>
+<tr class="row-even"><td><p>python_file_mapper</p></td>
 <td><p>💻CPU 🟢Stable</p></td>
 <td><p>Mapper for executing Python function defined in a file. Mapper用于执行文件中定义的Python函数。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/python_file_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_python_file_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>python_lambda_mapper</p></td>
+<tr class="row-odd"><td><p>python_lambda_mapper</p></td>
 <td><p>💻CPU 🟢Stable</p></td>
 <td><p>Mapper for executing Python lambda function on data samples. 用于对数据示例执行Python lambda函数的映射器。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/python_lambda_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_python_lambda_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>query_intent_detection_mapper</p></td>
+<tr class="row-even"><td><p>query_intent_detection_mapper</p></td>
 <td><p>🚀GPU 🧩HF 🧩HF 🟢Stable</p></td>
 <td><p>Mapper to predict user’s Intent label in query. Mapper在查询中预测用户的意图标签。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/query_intent_detection_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_query_intent_detection_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>query_sentiment_detection_mapper</p></td>
+<tr class="row-odd"><td><p>query_sentiment_detection_mapper</p></td>
 <td><p>🚀GPU 🧩HF 🧩HF 🟢Stable</p></td>
 <td><p>Mapper to predict user’s sentiment label (‘negative’, ‘neutral’ and ‘positive’) in query. Mapper在查询中预测用户的情绪标签 (“负面”，“中性” 和 “正面”)。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/query_sentiment_detection_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_query_sentiment_detection_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>query_topic_detection_mapper</p></td>
+<tr class="row-even"><td><p>query_topic_detection_mapper</p></td>
 <td><p>🚀GPU 🧩HF 🧩HF 🟢Stable</p></td>
 <td><p>Mapper to predict user’s topic label in query. Mapper在查询中预测用户的主题标签。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/query_topic_detection_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_query_topic_detection_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>relation_identity_mapper</p></td>
+<tr class="row-odd"><td><p>relation_identity_mapper</p></td>
 <td><p>🔤Text 💻CPU 🔗API 🟢Stable</p></td>
 <td><p>identify relation between two entity in the text. 确定文本中两个实体之间的关系。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/relation_identity_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_relation_identity_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>remove_bibliography_mapper</p></td>
+<tr class="row-even"><td><p>remove_bibliography_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to remove bibliography at the end of documents in Latex samples. 映射器删除Latex样本中文档末尾的参考书目。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/remove_bibliography_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_remove_bibliography_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>remove_comments_mapper</p></td>
+<tr class="row-odd"><td><p>remove_comments_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to remove comments in different kinds of documents. 映射器删除不同类型的文档中的注释。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/remove_comments_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_remove_comments_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>remove_header_mapper</p></td>
+<tr class="row-even"><td><p>remove_header_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to remove headers at the beginning of documents in Latex samples. 映射器删除Latex示例中文档开头的标题。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/remove_header_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_remove_header_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>remove_long_words_mapper</p></td>
+<tr class="row-odd"><td><p>remove_long_words_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to remove long words within a specific range. 映射器删除特定范围内的长词。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/remove_long_words_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_remove_long_words_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>remove_non_chinese_character_mapper</p></td>
+<tr class="row-even"><td><p>remove_non_chinese_character_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to remove non chinese Character in text samples. 映射器删除文本样本中的非中文字符。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/remove_non_chinese_character_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_remove_non_chinese_character_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>remove_repeat_sentences_mapper</p></td>
+<tr class="row-odd"><td><p>remove_repeat_sentences_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to remove repeat sentences in text samples. 映射器删除文本样本中的重复句子。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/remove_repeat_sentences_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_remove_repeat_sentences_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>remove_specific_chars_mapper</p></td>
+<tr class="row-even"><td><p>remove_specific_chars_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
-<td><p>Mapper to clean specific chars in text samples. 映射器来清理文本示例中的特定字符。</p></td>
+<td><p>Mapper to clean specific chars in text samples. 映射器来清理文本样本中的特定字符。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/remove_specific_chars_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_remove_specific_chars_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>remove_table_text_mapper</p></td>
+<tr class="row-odd"><td><p>remove_table_text_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to remove table texts from text samples. 映射器从文本样本中删除表文本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/remove_table_text_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_remove_table_text_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>remove_words_with_incorrect_substrings_mapper</p></td>
+<tr class="row-even"><td><p>remove_words_with_incorrect_substrings_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to remove words with incorrect substrings. 映射器删除不正确的子字符串的单词。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/remove_words_with_incorrect_substrings_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_remove_words_with_incorrect_substrings_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>replace_content_mapper</p></td>
+<tr class="row-odd"><td><p>replace_content_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to replace all content in the text that matches a specific regular expression pattern with a designated replacement string. 映射程序将文本中与特定正则表达式模式匹配的所有内容替换为指定的替换字符串。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/replace_content_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_replace_content_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>sdxl_prompt2prompt_mapper</p></td>
+<tr class="row-even"><td><p>sdxl_prompt2prompt_mapper</p></td>
 <td><p>🔤Text 🚀GPU 🟢Stable</p></td>
 <td><p>Generate pairs of similar images by the SDXL model. 通过SDXL模型生成相似图像对。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/sdxl_prompt2prompt_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_sdxl_prompt2prompt_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>sentence_augmentation_mapper</p></td>
+<tr class="row-odd"><td><p>sentence_augmentation_mapper</p></td>
 <td><p>🔤Text 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Mapper to augment sentences. 映射器来增加句子。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/sentence_augmentation_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_sentence_augmentation_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>sentence_split_mapper</p></td>
+<tr class="row-even"><td><p>sentence_split_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to split text samples to sentences. 映射器将文本样本拆分为句子。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/sentence_split_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_sentence_split_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>text_chunk_mapper</p></td>
+<tr class="row-odd"><td><p>text_chunk_mapper</p></td>
 <td><p>🔤Text 💻CPU 🔗API 🟢Stable</p></td>
 <td><p>Split input text to chunks. 将输入文本拆分为块。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/text_chunk_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_text_chunk_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_captioning_from_audio_mapper</p></td>
+<tr class="row-even"><td><p>video_captioning_from_audio_mapper</p></td>
 <td><p>🔮Multimodal 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Mapper to caption a video according to its audio streams based on Qwen-Audio model. 映射器根据基于qwen-audio模型的音频流为视频添加字幕。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_captioning_from_audio_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_captioning_from_audio_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>video_captioning_from_frames_mapper</p></td>
+<tr class="row-odd"><td><p>video_captioning_from_frames_mapper</p></td>
 <td><p>🔮Multimodal 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Mapper to generate samples whose captions are generated based on an image-to-text model and sampled video frames. 映射器生成样本，其字幕是基于图像到文本模型和采样的视频帧生成的。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_captioning_from_frames_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_captioning_from_frames_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_captioning_from_summarizer_mapper</p></td>
+<tr class="row-even"><td><p>video_captioning_from_summarizer_mapper</p></td>
 <td><p>🔮Multimodal 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Mapper to generate video captions by summarizing several kinds of generated texts (captions from video/audio/frames, tags from audio/frames, …). 映射器通过总结几种生成的文本 (来自视频/音频/帧的字幕，来自音频/帧的标签，…) 来生成视频字幕。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_captioning_from_summarizer_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_captioning_from_summarizer_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>video_captioning_from_video_mapper</p></td>
+<tr class="row-odd"><td><p>video_captioning_from_video_mapper</p></td>
 <td><p>🔮Multimodal 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Mapper to generate samples whose captions are generated based on a video-to-text model and sampled video frame. 映射器生成样本，其字幕是基于视频到文本模型和采样的视频帧生成的。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_captioning_from_video_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_captioning_from_video_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_extract_frames_mapper</p></td>
+<tr class="row-even"><td><p>video_extract_frames_mapper</p></td>
 <td><p>🔮Multimodal 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to extract frames from video files according to specified methods. 映射器根据指定的方法从视频文件中提取帧。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_extract_frames_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_extract_frames_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>video_face_blur_mapper</p></td>
+<tr class="row-odd"><td><p>video_face_blur_mapper</p></td>
 <td><p>🎬Video 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to blur faces detected in videos. 映射器模糊在视频中检测到的人脸。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_face_blur_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_face_blur_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_ffmpeg_wrapped_mapper</p></td>
+<tr class="row-even"><td><p>video_ffmpeg_wrapped_mapper</p></td>
 <td><p>🎬Video 💻CPU 🟢Stable</p></td>
 <td><p>Simple wrapper for FFmpeg video filters. FFmpeg视频过滤器的简单包装。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_ffmpeg_wrapped_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_ffmpeg_wrapped_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>video_remove_watermark_mapper</p></td>
+<tr class="row-odd"><td><p>video_remove_watermark_mapper</p></td>
 <td><p>🎬Video 💻CPU 🟢Stable</p></td>
-<td><p>Remove the watermarks in videos given regions. 删除视频中给定区域的水印。</p></td>
+<td><p>Remove the watermarks in videos given regions. 删除视频给定区域中的水印。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_remove_watermark_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_remove_watermark_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_resize_aspect_ratio_mapper</p></td>
+<tr class="row-even"><td><p>video_resize_aspect_ratio_mapper</p></td>
 <td><p>🎬Video 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to resize videos by aspect ratio. 映射器按纵横比调整视频大小。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_resize_aspect_ratio_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_resize_aspect_ratio_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>video_resize_resolution_mapper</p></td>
+<tr class="row-odd"><td><p>video_resize_resolution_mapper</p></td>
 <td><p>🎬Video 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to resize videos resolution. 映射器来调整视频分辨率。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_resize_resolution_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_resize_resolution_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_split_by_duration_mapper</p></td>
+<tr class="row-even"><td><p>video_split_by_duration_mapper</p></td>
 <td><p>🔮Multimodal 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to split video by duration. 映射器按持续时间分割视频。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_split_by_duration_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_split_by_duration_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>video_split_by_key_frame_mapper</p></td>
+<tr class="row-odd"><td><p>video_split_by_key_frame_mapper</p></td>
 <td><p>🔮Multimodal 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to split video by key frame. 映射器按关键帧分割视频。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_split_by_key_frame_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_split_by_key_frame_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_split_by_scene_mapper</p></td>
+<tr class="row-even"><td><p>video_split_by_scene_mapper</p></td>
 <td><p>🔮Multimodal 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to cut videos into scene clips. 映射器将视频剪切成场景剪辑。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_split_by_scene_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_split_by_scene_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>video_tagging_from_audio_mapper</p></td>
+<tr class="row-odd"><td><p>video_tagging_from_audio_mapper</p></td>
 <td><p>🎬Video 🚀GPU 🧩HF 🟢Stable</p></td>
 <td><p>Mapper to generate video tags from audio streams extracted by video using the Audio Spectrogram Transformer. 映射器使用音频频谱图转换器从视频提取的音频流生成视频标签。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_tagging_from_audio_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_tagging_from_audio_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>video_tagging_from_frames_mapper</p></td>
+<tr class="row-even"><td><p>video_tagging_from_frames_mapper</p></td>
 <td><p>🎬Video 🚀GPU 🟢Stable</p></td>
 <td><p>Mapper to generate video tags from frames extract by video. 映射器从视频提取的帧生成视频标签。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/video_tagging_from_frames_mapper.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/mapper/test_video_tagging_from_frames_mapper.py">tests</a></p></td>
 </tr>
-<tr class="row-even"><td><p>whitespace_normalization_mapper</p></td>
+<tr class="row-odd"><td><p>whitespace_normalization_mapper</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
 <td><p>Mapper to normalize different kinds of whitespaces to whitespace ‘ ‘ (0x20) in text samples. 映射器，用于将文本示例中的不同类型的空白标准化为空白 “” (0 x20)。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/mapper/whitespace_normalization_mapper.py">code</a></p></td>

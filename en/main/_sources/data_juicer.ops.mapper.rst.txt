@@ -252,6 +252,14 @@ data\_juicer.ops.mapper.image\_captioning\_mapper module
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.mapper.image\_detection\_yolo\_mapper module
+-------------------------------------------------------------
+
+.. automodule:: data_juicer.ops.mapper.image_detection_yolo_mapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.mapper.image\_diffusion\_mapper module
 -------------------------------------------------------
 
