@@ -88,60 +88,60 @@ All the specific operators are listed below, each featured with several capabili
 
 | Operator 算子 | Tags 标签 | Description 描述 | Details 详情 | Reference 参考 |
 |----------|------|-------------|-------------|-------------|
-| alphanumeric_filter | 🔤Text 💻CPU 🧩HF 🟢Stable | Filter to keep samples with alphabet/numeric ratio within a specific range. 过滤器保持样品与字母/数字的比例在一个特定的范围内。 | [info](operators/filter/alphanumeric_filter.md) | - |
+| alphanumeric_filter | 🔤Text 💻CPU 🧩HF 🟢Stable | Filter to keep samples with an alphabet/numeric ratio within a specific range. 过滤器，以保持具有特定范围内的字母/数字比率的样本。 | [info](operators/filter/alphanumeric_filter.md) | - |
 | audio_duration_filter | 📣Audio 💻CPU 🟢Stable | Keep data samples whose audios' durations are within a specified range. 保留音频持续时间在指定范围内的数据样本。 | [info](operators/filter/audio_duration_filter.md) | - |
-| audio_nmf_snr_filter | 📣Audio 💻CPU 🟢Stable | Keep data samples whose audios' SNRs (computed based on NMF) are within a specified range. 保留音频的snr (根据NMF计算) 在指定范围内的数据样本。 | [info](operators/filter/audio_nmf_snr_filter.md) | - |
-| audio_size_filter | 📣Audio 💻CPU 🟢Stable | Keep data samples whose audio size (in bytes/kb/MB/...) within a specific range. 保留音频大小 (以字节/kb/MB/... 为单位) 在特定范围内的数据样本。 | [info](operators/filter/audio_size_filter.md) | - |
+| audio_nmf_snr_filter | 📣Audio 💻CPU 🟢Stable | Keep data samples whose audio Signal-to-Noise Ratios (SNRs) are within a specified range. 保留音频信噪比 (snr) 在指定范围内的数据样本。 | [info](operators/filter/audio_nmf_snr_filter.md) | - |
+| audio_size_filter | 📣Audio 💻CPU 🟢Stable | Keep data samples based on the size of their audio files. 根据音频文件的大小保留数据样本。 | [info](operators/filter/audio_size_filter.md) | - |
 | average_line_length_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with average line length within a specific range. 过滤器，以保持平均线长度在特定范围内的样本。 | - | - |
-| character_repetition_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with char-level n-gram repetition ratio within a specific range. 过滤器将具有char级n-gram重复比率的样本保持在特定范围内。 | [info](operators/filter/character_repetition_filter.md) | - |
-| flagged_words_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with flagged-word ratio less than a specific max value. 过滤以保持标记词比率小于特定最大值的样本。 | [info](operators/filter/flagged_words_filter.md) | - |
+| character_repetition_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with character-level n-gram repetition ratio within a specific range. 过滤器将具有字符级n-gram重复比的样本保持在特定范围内。 | [info](operators/filter/character_repetition_filter.md) | - |
+| flagged_words_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with a flagged-word ratio less than a specific maximum value. 过滤以保留标记词比率小于特定最大值的样本。 | [info](operators/filter/flagged_words_filter.md) | - |
 | general_field_filter | 💻CPU 🟡Beta | Filter to keep samples based on a general field filter condition. 根据常规字段筛选条件保留样本。 | - | - |
 | image_aesthetics_filter | 🏞Image 🚀GPU 🧩HF 🟢Stable | Filter to keep samples with aesthetics scores within a specific range. 过滤以保持美学分数在特定范围内的样品。 | [info](operators/filter/image_aesthetics_filter.md) | - |
 | image_aspect_ratio_filter | 🏞Image 💻CPU 🟢Stable | Filter to keep samples with image aspect ratio within a specific range. 过滤器，以保持样本的图像纵横比在特定范围内。 | [info](operators/filter/image_aspect_ratio_filter.md) | - |
 | image_face_count_filter | 🏞Image 💻CPU 🟢Stable | Filter to keep samples with the number of faces within a specific range. 过滤以保持样本的面数在特定范围内。 | [info](operators/filter/image_face_count_filter.md) | - |
 | image_face_ratio_filter | 🏞Image 💻CPU 🟢Stable | Filter to keep samples with face area ratios within a specific range. 过滤以保持面面积比在特定范围内的样本。 | [info](operators/filter/image_face_ratio_filter.md) | - |
-| image_nsfw_filter | 🏞Image 🚀GPU 🧩HF 🟢Stable | Filter to keep samples whose images have low nsfw scores. 过滤器保留图像具有低nsfw分数的样本。 | [info](operators/filter/image_nsfw_filter.md) | - |
+| image_nsfw_filter | 🏞Image 🚀GPU 🧩HF 🟢Stable | Filter to keep samples whose images have low NSFW scores. 过滤器保留图像具有低NSFW分数的样本。 | [info](operators/filter/image_nsfw_filter.md) | - |
 | image_pair_similarity_filter | 🏞Image 🚀GPU 🧩HF 🟢Stable | Filter to keep image pairs with similarities between images within a specific range. 过滤器将图像之间具有相似性的图像对保持在特定范围内。 | - | - |
-| image_shape_filter | 🏞Image 💻CPU 🟢Stable | Filter to keep samples with image shape (w, h) within specific ranges. 过滤器保持样品的图像形状 (w，h) 在特定范围内。 | [info](operators/filter/image_shape_filter.md) | - |
-| image_size_filter | 🏞Image 💻CPU 🟢Stable | Keep data samples whose image size (in Bytes/KB/MB/...) within a specific range. 保留图像大小 (以字节/KB/MB/... 为单位) 在特定范围内的数据样本。 | [info](operators/filter/image_size_filter.md) | - |
-| image_text_matching_filter | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Filter to keep samples those matching score between image and text within a specific range. 过滤器将图像和文本之间的匹配分数保持在特定范围内。 | [info](operators/filter/image_text_matching_filter.md) | - |
-| image_text_similarity_filter | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Filter to keep samples those similarities between image and text within a specific range. 过滤器将图像和文本之间的相似性保持在特定范围内。 | [info](operators/filter/image_text_similarity_filter.md) | - |
+| image_shape_filter | 🏞Image 💻CPU 🟢Stable | Filter to keep samples with image shape (width, height) within specific ranges. 过滤器，以保持样本的图像形状 (宽度，高度) 在特定的范围内。 | [info](operators/filter/image_shape_filter.md) | - |
+| image_size_filter | 🏞Image 💻CPU 🟢Stable | Keep data samples whose image sizes (in Bytes/KB/MB/...) are within a specific range. 保留图像大小 (以字节/KB/MB/... 为单位) 在特定范围内的数据样本。 | [info](operators/filter/image_size_filter.md) | - |
+| image_text_matching_filter | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Filter to keep samples with image-text matching scores within a specific range. 过滤器将图像文本匹配分数的样本保持在特定范围内。 | [info](operators/filter/image_text_matching_filter.md) | - |
+| image_text_similarity_filter | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Filter to keep samples with image-text similarity within a specified range. 过滤器将具有图像-文本相似性的样本保持在指定范围内。 | [info](operators/filter/image_text_similarity_filter.md) | - |
 | image_watermark_filter | 🏞Image 🚀GPU 🧩HF 🟢Stable | Filter to keep samples whose images have no watermark with high probability. 过滤器，以保留图像没有水印的样本。 | [info](operators/filter/image_watermark_filter.md) | - |
-| in_context_influence_filter | 🚀GPU 🟢Stable | Filter to keep texts whose in-context influence upon validation set within a specific range. 过滤器，以将上下文对验证的影响设置在特定范围内的文本保留下来。 | [info](operators/filter/in_context_influence_filter.md) | - |
+| in_context_influence_filter | 🚀GPU 🟢Stable | Filter to keep texts based on their in-context influence on a validation set. 过滤以根据文本在上下文中对验证集的影响来保留文本。 | [info](operators/filter/in_context_influence_filter.md) | - |
 | instruction_following_difficulty_filter | 🚀GPU 🟡Beta | Filter to keep texts whose instruction follows difficulty (IFD, https://arxiv.org/abs/2308.12032) falls within a specific range. 过滤以保持其指令跟随难度 (IFD， https://arxiv.org/abs/ 2308.12032) 落在特定范围内的文本。 | [info](operators/filter/instruction_following_difficulty_filter.md) | - |
 | language_id_score_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples in a specific language with confidence score larger than a specific min value. 过滤器以保留置信度得分大于特定最小值的特定语言的样本。 | [info](operators/filter/language_id_score_filter.md) | - |
 | llm_analysis_filter | 🚀GPU 🌊vLLM 🧩HF 🔗API 🟡Beta | Base filter class for leveraging LLMs to filter various samples. 用于利用llm过滤各种样本的基本筛选器类。 | - | - |
-| llm_difficulty_score_filter | 💻CPU 🟡Beta | Filter to keep sample with high difficulty score estimated by LLM. 过滤器以保持LLM估计的高难度分数的样本。 | - | - |
+| llm_difficulty_score_filter | 💻CPU 🟡Beta | Filter to keep samples with a high difficulty score estimated by an LLM. 过滤器，以保留由LLM估计的高难度分数的样本。 | - | - |
 | llm_perplexity_filter | 🚀GPU 🧩HF 🟡Beta | Filter to keep samples with perplexity score, computed using a specified llm, within a specific range. 过滤器将使用指定llm计算的具有困惑度分数的样本保持在特定范围内。 | [info](operators/filter/llm_perplexity_filter.md) | - |
-| llm_quality_score_filter | 💻CPU 🟡Beta | Filter to keep sample with high quality score estimated by LLM. 过滤器以保持LLM估计的高质量分数的样本。 | - | - |
-| llm_task_relevance_filter | 💻CPU 🟡Beta | Filter to keep sample with high relevance score to validation tasks estimated by LLM. 过滤以保持与LLM估计的验证任务具有高相关性得分的样本。 | [info](operators/filter/llm_task_relevance_filter.md) | - |
-| maximum_line_length_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with maximum line length within a specific range. 过滤器将最大行长度的样本保持在特定范围内。 | - | - |
-| perplexity_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with perplexity score less than a specific max value. 过滤以保留困惑度分数小于特定最大值的样本。 | [info](operators/filter/perplexity_filter.md) | - |
+| llm_quality_score_filter | 💻CPU 🟡Beta | Filter to keep samples with a high quality score estimated by an LLM. 过滤器，以保持LLM估计的高质量分数的样本。 | - | - |
+| llm_task_relevance_filter | 💻CPU 🟡Beta | Filter to keep samples with high relevance scores to validation tasks estimated by an LLM. 过滤器以保留与LLM估计的验证任务具有高相关性分数的样本。 | [info](operators/filter/llm_task_relevance_filter.md) | - |
+| maximum_line_length_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with a maximum line length within a specified range. 筛选器将最大行长度的样本保持在指定范围内。 | - | - |
+| perplexity_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with a perplexity score below a specified maximum value. 筛选以保留困惑度分数低于指定最大值的样本。 | [info](operators/filter/perplexity_filter.md) | - |
 | phrase_grounding_recall_filter | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Filter to keep samples whose locating recalls of phrases extracted from text in the images are within a specified range. 过滤器，用于保留从图像中的文本中提取的短语的定位回忆在指定范围内的样本。 | [info](operators/filter/phrase_grounding_recall_filter.md) | - |
-| special_characters_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with special-char ratio within a specific range. 过滤器，以保持样品与特殊字符的比例在一个特定的范围内。 | [info](operators/filter/special_characters_filter.md) | - |
+| special_characters_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with special-character ratio within a specific range. 过滤器将具有特殊字符比率的样本保持在特定范围内。 | [info](operators/filter/special_characters_filter.md) | - |
 | specified_field_filter | 💻CPU 🟢Stable | Filter based on specified field information. 根据指定的字段信息进行筛选。 | [info](operators/filter/specified_field_filter.md) | - |
 | specified_numeric_field_filter | 💻CPU 🟢Stable | Filter based on specified numeric field information. 根据指定的数值字段信息进行筛选。 | [info](operators/filter/specified_numeric_field_filter.md) | - |
-| stopwords_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with stopword ratio larger than a specific min value. 过滤以保持停止词比率大于特定最小值的样本。 | [info](operators/filter/stopwords_filter.md) | - |
+| stopwords_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with a stopword ratio greater than a specified minimum value. 过滤器以保留停止词比率大于指定最小值的样本。 | [info](operators/filter/stopwords_filter.md) | - |
 | suffix_filter | 💻CPU 🟢Stable | Filter to keep samples with specified suffix. 过滤器以保留具有指定后缀的样本。 | - | - |
-| text_action_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep texts those contain actions in the text. 过滤以保留文本中包含操作的文本。 | [info](operators/filter/text_action_filter.md) | - |
+| text_action_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep texts that contain a minimum number of actions. 过滤以保留包含最少数量操作的文本。 | [info](operators/filter/text_action_filter.md) | - |
 | text_embd_similarity_filter | 🔤Text 🚀GPU 🔗API 🟡Beta | Filter to keep texts whose average embedding similarity to a set of given validation texts falls within a specific range. 过滤器，以保留与一组给定验证文本的平均嵌入相似度在特定范围内的文本。 | [info](operators/filter/text_embd_similarity_filter.md) | - |
 | text_entity_dependency_filter | 🔤Text 💻CPU 🟢Stable | Identify the entities in the text which are independent with other token, and filter them. 识别文本中与其他令牌独立的实体，并对其进行过滤。 | [info](operators/filter/text_entity_dependency_filter.md) | - |
 | text_length_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with total text length within a specific range. 过滤以保持文本总长度在特定范围内的样本。 | [info](operators/filter/text_length_filter.md) | - |
-| text_pair_similarity_filter | 🔤Text 🚀GPU 🧩HF 🟢Stable | Filter to keep text pairs with similarities between texts within a specific range. 过滤器将文本之间具有相似性的文本对保留在特定范围内。 | [info](operators/filter/text_pair_similarity_filter.md) | - |
-| token_num_filter | 🔤Text 💻CPU 🧩HF 🟢Stable | Filter to keep samples with total token number within a specific range. 筛选器将总令牌数的样本保留在特定范围内。 | - | - |
+| text_pair_similarity_filter | 🔤Text 🚀GPU 🧩HF 🟢Stable | Filter to keep text pairs with similarities within a specific range. 过滤以将具有相似性的文本对保持在特定范围内。 | [info](operators/filter/text_pair_similarity_filter.md) | - |
+| token_num_filter | 🔤Text 💻CPU 🧩HF 🟢Stable | Filter to keep samples with a total token number within a specified range. 筛选器将总令牌数的样本保留在指定范围内。 | - | - |
 | video_aesthetics_filter | 🎬Video 🚀GPU 🧩HF 🟢Stable | Filter to keep data samples with aesthetics scores for specified frames in the videos within a specific range. 过滤器将视频中指定帧的美学得分数据样本保留在特定范围内。 | - | - |
 | video_aspect_ratio_filter | 🎬Video 💻CPU 🟢Stable | Filter to keep samples with video aspect ratio within a specific range. 过滤器将视频纵横比的样本保持在特定范围内。 | [info](operators/filter/video_aspect_ratio_filter.md) | - |
 | video_duration_filter | 🎬Video 💻CPU 🟢Stable | Keep data samples whose videos' durations are within a specified range. 保留视频持续时间在指定范围内的数据样本。 | [info](operators/filter/video_duration_filter.md) | - |
 | video_frames_text_similarity_filter | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Filter to keep samples those similarities between sampled video frame images and text within a specific range. 过滤以保持采样视频帧图像和文本之间的相似性在特定范围内。 | [info](operators/filter/video_frames_text_similarity_filter.md) | - |
 | video_motion_score_filter | 🎬Video 💻CPU 🟢Stable | Filter to keep samples with video motion scores within a specific range. 过滤器将视频运动分数的样本保持在特定范围内。 | [info](operators/filter/video_motion_score_filter.md) | - |
 | video_motion_score_raft_filter | 🎬Video 🚀GPU 🟢Stable | Filter to keep samples with video motion scores within a specified range. 过滤器将视频运动分数的样本保持在指定范围内。 | [info](operators/filter/video_motion_score_raft_filter.md) | - |
-| video_nsfw_filter | 🎬Video 🚀GPU 🧩HF 🟢Stable | Filter to keep samples whose videos have low nsfw scores. 过滤器以保留其视频具有低nsfw分数的样本。 | [info](operators/filter/video_nsfw_filter.md) | - |
+| video_nsfw_filter | 🎬Video 🚀GPU 🧩HF 🟢Stable | Filter to keep samples whose videos have low NSFW scores. 过滤器以保留其视频具有低NSFW分数的样本。 | [info](operators/filter/video_nsfw_filter.md) | - |
 | video_ocr_area_ratio_filter | 🎬Video 🚀GPU 🟢Stable | Keep data samples whose detected text area ratios for specified frames in the video are within a specified range. 保留检测到的视频中指定帧的文本面积比率在指定范围内的数据样本。 | [info](operators/filter/video_ocr_area_ratio_filter.md) | - |
 | video_resolution_filter | 🎬Video 💻CPU 🟢Stable | Keep data samples whose videos' resolutions are within a specified range. 保留视频分辨率在指定范围内的数据样本。 | [info](operators/filter/video_resolution_filter.md) | - |
-| video_tagging_from_frames_filter | 🎬Video 🚀GPU 🟢Stable | Filter to keep samples whose videos contain the given tags. 过滤器以保留其视频包含给定标签的样本。 | [info](operators/filter/video_tagging_from_frames_filter.md) | - |
+| video_tagging_from_frames_filter | 🎬Video 🚀GPU 🟢Stable | Filter to keep samples whose videos contain specified tags. 过滤器以保留其视频包含指定标签的样本。 | [info](operators/filter/video_tagging_from_frames_filter.md) | - |
 | video_watermark_filter | 🎬Video 🚀GPU 🧩HF 🟢Stable | Filter to keep samples whose videos have no watermark with high probability. 过滤器以保持其视频具有高概率没有水印的样本。 | [info](operators/filter/video_watermark_filter.md) | - |
 | word_repetition_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with word-level n-gram repetition ratio within a specific range. 过滤器将单词级n-gram重复比率的样本保持在特定范围内。 | [info](operators/filter/word_repetition_filter.md) | - |
-| words_num_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with total words number within a specific range. 过滤器，以保持总字数在特定范围内的样本。 | [info](operators/filter/words_num_filter.md) | - |
+| words_num_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with a total word count within a specified range. 过滤器将样本的总字数保持在指定范围内。 | [info](operators/filter/words_num_filter.md) | - |
 
 ## formatter <a name="formatter"/>
 

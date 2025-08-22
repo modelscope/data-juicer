@@ -15,8 +15,14 @@ OP_NAME = "perplexity_filter"
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)
 class PerplexityFilter(Filter):
-    """Filter to keep samples with perplexity score less than a specific max
-    value."""
+    """Filter to keep samples with a perplexity score below a specified maximum value.
+
+    This operator computes the perplexity of text samples using a Hugging Face tokenizer and
+    a KenLM language model. It keeps samples with a perplexity score less than or equal to
+    the specified maximum. The perplexity is calculated character-based by default. If the
+    perplexity for a sample has already been computed, it will be reused from the
+    'perplexity' field in the stats. This operator supports batched operations for
+    efficiency."""
 
     _batched_op = True
 

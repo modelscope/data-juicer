@@ -17,9 +17,18 @@ OP_NAME = "llm_task_relevance_filter"
 @OPERATORS.register_module(OP_NAME)
 @ATTRIBUTION_FILTERS.register_module(OP_NAME)
 class LLMTaskRelevanceFilter(LLMAnalysisFilter):
-    """
-    Filter to keep sample with high relevance score to validation tasks estimated by LLM.
-    """
+    """Filter to keep samples with high relevance scores to validation tasks estimated by an
+    LLM.
+
+    This operator evaluates the relevance of each sample to a specified validation task
+    using an LLM. The LLM scores the sample on multiple dimensions, including topical
+    relevance, linguistic style match, task match, knowledge alignment, and potential
+    utility. Each dimension is scored on a 1-5 scale, with 5 being the highest. The key
+    metric, 'llm_task_relevance', is the average score across these dimensions. Samples are
+    kept if their average score meets or exceeds the specified minimum threshold. The
+    operator uses either an API or a Hugging Face model for evaluation. If no validation
+    dataset or task description is provided, the 'prepare_valid_feature' method must be
+    called manually before applying the filter."""
 
     # TODO: fix dataset cast error
 

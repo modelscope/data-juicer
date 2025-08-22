@@ -12,7 +12,15 @@ from ..op_fusion import LOADED_IMAGES
 @OPERATORS.register_module("image_shape_filter")
 @LOADED_IMAGES.register_module("image_shape_filter")
 class ImageShapeFilter(Filter):
-    """Filter to keep samples with image shape (w, h) within specific ranges."""
+    """Filter to keep samples with image shape (width, height) within specific ranges.
+
+    This operator filters samples based on the width and height of images. It keeps samples
+    where the image dimensions fall within the specified ranges. The operator supports two
+    strategies: 'any' and 'all'. In 'any' mode, a sample is kept if at least one image meets
+    the criteria. In 'all' mode, all images in the sample must meet the criteria for the
+    sample to be kept. The image width and height are stored in the 'image_width' and
+    'image_height' fields of the sample's stats. If no images are present in the sample, the
+    corresponding stats fields will be empty arrays."""
 
     _batched_op = True
 
