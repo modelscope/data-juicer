@@ -33,15 +33,15 @@ repos:
         additional_dependencies:
           - flake8-pyproject
           - flake8-black
-  # - repo: local
-  #   hooks:
-  #     - id: build-op-doc
-  #       name: build OP doc
-  #       entry: python .pre-commit-hooks/build_op_doc.py
-  #       language: python
-  #       require_serial: true
-  #       additional_dependencies:
-  #         - translators==5.9.3
+  - repo: local
+    hooks:
+      - id: build-op-doc
+        name: build OP doc
+        entry: python .pre-commit-hooks/build_op_doc.py
+        language: python
+        require_serial: true
+        additional_dependencies:
+          - translators==6.0.1
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
     hooks:

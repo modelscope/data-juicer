@@ -19,7 +19,7 @@ ultralytics = LazyLoader("ultralytics")
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageDetectionYoloMapper(Mapper):
-    """Perform object detection on images and return the bounding boxes and class labels."""
+    """Perform object detection (with YOLO) on images and return the bounding boxes and class labels."""
 
     _accelerator = "cuda"
 
