@@ -284,12 +284,6 @@ class TracerTest(DataJuicerTestCaseBase):
             {'text': 'processed text 2'},
             {'text': 'text 3'},
         ])
-        dif_list = [
-            {
-                'original text': 'text 2',
-                'processed_text': 'processed text 2',
-            }
-        ]
         tracer = Tracer(self.work_dir, op_list_to_trace=['non_existing_mapper'])
         tracer.trace_mapper('clean_email_mapper', prev_ds, done_ds, 'text')
         trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-clean_email_mapper.jsonl')

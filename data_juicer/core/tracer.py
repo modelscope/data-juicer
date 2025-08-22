@@ -29,11 +29,11 @@ class Tracer:
         if not os.path.exists(self.work_dir):
             os.makedirs(self.work_dir)
         self.op_list_to_trace = op_list_to_trace
-        if self.op_list_to_trace is None or len(self.op_list_to_trace) == 0:
+        if not op_list_to_trace:
             logger.info("Trace for all ops.")
             self.op_list_to_trace = set(OPERATORS.modules.keys())
-        if not isinstance(self.op_list_to_trace, set):
-            self.op_list_to_trace = set(self.op_list_to_trace)
+        else:
+            self.op_list_to_trace = set(op_list_to_trace)
         self.show_num = show_num
 
     def trace_mapper(self, op_name: str, previous_ds: Dataset, processed_ds: Dataset, text_key: str):
