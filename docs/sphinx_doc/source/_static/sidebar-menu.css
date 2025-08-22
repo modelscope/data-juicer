@@ -66,9 +66,6 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
-}
-
-.sidebar-bottom-menu .section.version dd {
   scrollbar-width: none;
 }
 .sidebar-bottom-menu .section.version dd:hover {
