@@ -175,7 +175,7 @@ def copy_markdown_files(source_dir):
     else:
         project_root = source_dir.parent.parent.parent
     for md_file in project_root.rglob("*.md"):
-        exclude_paths = ["outputs", "sphinx_doc", ".github"]
+        exclude_paths = ["outputs", "sphinx_doc", ".github", ".worktrees"]
         if any(path in str(md_file) for path in exclude_paths):
             continue
         target = source_dir / md_file.relative_to(project_root)

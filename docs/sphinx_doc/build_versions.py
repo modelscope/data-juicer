@@ -54,7 +54,7 @@ def copy_docs_source_to(wt_root: Path):
     dst = wt_root / DOCS_REL
     dst.parent.mkdir(parents=True, exist_ok=True)
     print(f"[COPY] {src} -> {dst}")
-    shutil.copytree(src, dst, dirs_exist_ok=True)
+    shutil.copytree(src, dst, dirs_exist_ok=True, ignore=shutil.ignore_patterns(".git", "build", ".pyc"))
 
 def maybe_init_submodules(wt_root: Path):
     """Initialize submodules in worktree if repository uses them"""
@@ -100,6 +100,7 @@ def build_one(ref: str, ref_label: str, available_versions: list[str]):
             "sphinx-build",
             "-b", "html",                            # HTML builder
             "-D", f"language={lang}",                # Set language for this build
+            "-j", "auto",
             str(src),                                # Source directory
             str(out_dir),                            # Output directory
         ]
