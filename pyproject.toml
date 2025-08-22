@@ -17,33 +17,33 @@ classifiers = [
 
 # Core dependencies
 dependencies = [
-    "datasets>=2.19.0",  # core data loading
-    "fsspec==2023.5.0",  # file system operations
-    "pandas",  # data manipulation
-    "numpy>=1.26.4,<2.0.0",  # numerical operations
-    "loguru",  # logging
-    "tqdm",  # progress bars
-    "jsonargparse[signatures]",  # configuration
-    "jsonlines",  # JSONL handling
-    "zstandard",  # compression
-    "lz4",  # compression
-    "multiprocess==0.70.12",  # parallel processing
-    "dill==0.3.4",  # serialization
-    "psutil",  # system monitoring
-    "pydantic>=2.0",  # data validation
+    "datasets>=2.19.0", # core data loading
+    "fsspec==2023.5.0", # file system operations
+    "pandas", # data manipulation
+    "numpy>=1.26.4,<2.0.0", # numerical operations
+    "loguru", # logging
+    "tqdm", # progress bars
+    "jsonargparse[signatures]", # configuration
+    "jsonlines", # JSONL handling
+    "zstandard", # compression
+    "lz4", # compression
+    "multiprocess==0.70.16", # parallel processing
+    "dill==0.3.8", # serialization
+    "psutil", # system monitoring
+    "pydantic>=2.0", # data validation
     "uv",
     "wordcloud",
-    "spacy==3.7.0",
+    "spacy==3.8.7",
     "httpx",
-    "av==13.1.0",  # video/audio handling
-    "emoji==2.2.0",  # emoji handling
+    "av==13.1.0", # video/audio handling
+    "emoji==2.2.0", # emoji handling
     "tabulate",
     "librosa>=0.10",
     "resampy",
     "samplerate==0.1.0",
     "bs4",
     "matplotlib",
-    "plotly",  # interactive plots
+    "plotly", # interactive plots
     "seaborn",
     "requests",
     "wget",
@@ -53,29 +53,32 @@ dependencies = [
     "Pillow",
     "fastapi>=0.110",
     "mwparserfromhell",
-    "regex",  # regular expressions
+    "regex", # regular expressions
     "tomli",
-    "gitpython"
+    "tomli-w",
+    "gitpython",
+    "mcp[cli]>=1.7.0",
+    "pylance",
 ]
 
 [project.optional-dependencies]
 # Generic ML & DL
 generic = [
-    "torch>=1.11.0",  # PyTorch
-    "transformers>=4.47.0,<4.48.0",  # Hugging Face Transformers
+    "torch==2.6.0",  # PyTorch
+    "transformers>=4.47.0",  # Hugging Face Transformers
     "transformers_stream_generator",  # Stream generation for Transformers
     "einops",  # Tensor operations
     "accelerate",  # Model acceleration
-    "vllm>=0.6.5",  # LLM serving
-    "huggingface_hub<0.26.0",  # Hugging Face Hub
+    "vllm==0.8.5.post1",  # LLM serving
     "onnxruntime",  # ONNX runtime
+    "cudf-cu12==25.4.0", # dataframe on GPU
 ]
 
 # Computer Vision
 vision = [
     "opencv-python",  # OpenCV
     "imagededup",  # Image deduplication
-    "diffusers>=0.18.0",  # Diffusion models
+    "diffusers>=0.33.0",  # Diffusion models
     "simple-aesthetics-predictor",  # Image aesthetics
     "scenedetect[opencv]",  # Scene detection
     "ultralytics",  # YOLO models
@@ -95,7 +98,7 @@ nlp = [
     "nlpaug",  # Text augmentation
     "nlpcda",  # Chinese text augmentation
     "tiktoken",  # Token counting
-    "opencc==1.1.6",  # Chinese conversion
+    "opencc==1.1.9",  # Chinese conversion
     "spacy-pkuseg",  # Chinese segmentation
     "rouge",  # Text evaluation
 ]
@@ -110,7 +113,7 @@ audio = [
 
 # Distributed Computing
 distributed = [
-    "ray==2.40.0",  # distributed computing
+    "ray[default]==2.47.1",  # distributed computing
     "pyspark",  # distributed data processing
 ]
 
@@ -120,7 +123,13 @@ dev = [
     "pre-commit",  # pre-commit hooks
     "sphinx",
     "sphinx-autobuild",
+    "sphinx-multiversion",
+    "sphinx_copybutton",
+    "sphinxcontrib-apidoc",
+    "furo",
     "sphinx_rtd_theme",
+    "myst_parser",
+    "linkify-it-py",
     "recommonmark",
     "wandb<=0.19.0",
     "fire",
@@ -129,6 +138,8 @@ dev = [
     "pytest",  # testing framework
     "pytest-cov",  # coverage reporting
     "build",  # package building
+    "black>=25.1.0",
+    "flake8-black",
 ]
 
 # AI Services & APIs
@@ -143,23 +154,9 @@ ai_services = [
 # Todo: the sandbox dependencies will be provided in
 # micro-services rather than all-in-one env
 sandbox = [
-    "torch>=1.11.0",
+    "torch==2.6.0",
     "fire",
     "pyspark",
-    "vbench",
-    "modelscope",
-    "deepspeed",
-    "safetensors",
-    "timm",
-    "xformers",
-    "decord",
-    "opencv-python",
-    "omegaconf",
-    "imageio[ffmpeg,pyav]",
-    "tensorboard",
-    "diffusers==0.27.0",
-    "transformers>=4.37.2",
-    "func_timeout",
 ]
 
 
@@ -172,6 +169,7 @@ all = [
     "py-data-juicer[distributed]",
     "py-data-juicer[dev]",
     "py-data-juicer[ai_services]",
+    "py-data-juicer[sandbox]",
 ]
 
 [project.scripts]
@@ -183,8 +181,11 @@ dj-install = "data_juicer.tools.dj_install:main"
 requires = ["hatchling", "uv>=0.1.0"]
 build-backend = "hatchling.build"
 
+[tool.hatch.version]
+path = "data_juicer/__init__.py"
+
 [tool.hatch.build.targets.wheel]
-packages = ["data_juicer"]
+packages = ["data_juicer", "tools"]
 include = ["uv.lock", "pyproject.toml"]
 
 [tool.hatch.build]
@@ -199,6 +200,15 @@ per-file-ignores = [
     "*/__init__.py: F401"
 ]
 max-line-length = 120
+extend-ignore = [
+    "E203",  # whitespace before ':' (black handles this)
+    "E501",  # line too long (black handles this)
+    "BLK100",  # black would make changes (black handles this)
+]
 
-[tool.hatch.version]
-path = "data_juicer/__init__.py"
+[tool.black]
+line-length = 120
+target-version = ['py310']
+
+[tool.isort]
+profile = "black"

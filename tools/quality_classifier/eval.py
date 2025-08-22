@@ -28,11 +28,7 @@ from tools.quality_classifier.qc_utils import eval, init_spark, load_datasets
 
 
 @logger.catch(reraise=True)
-def main(positive_datasets=None,
-         negative_datasets=None,
-         model='my_quality_model',
-         tokenizer=None,
-         text_key='text'):
+def main(positive_datasets=None, negative_datasets=None, model="my_quality_model", tokenizer=None, text_key="text"):
     """
     Evaluate a trained quality classifier using specific positive/negative
     datasets
@@ -68,16 +64,8 @@ def main(positive_datasets=None,
     spark = init_spark()
 
     # load positive and negative datasets
-    pos = load_datasets(spark,
-                        positive_datasets,
-                        text_key=text_key,
-                        label=1,
-                        only_text=True)
-    neg = load_datasets(spark,
-                        negative_datasets,
-                        text_key=text_key,
-                        label=0,
-                        only_text=True)
+    pos = load_datasets(spark, positive_datasets, text_key=text_key, label=1, only_text=True)
+    neg = load_datasets(spark, negative_datasets, text_key=text_key, label=0, only_text=True)
 
     # merge positive and negative datasets
     if pos is not None and neg is not None:
@@ -87,13 +75,13 @@ def main(positive_datasets=None,
     elif neg is not None:
         ds = neg
     else:
-        logger.error('Empty dataset.')
+        logger.error("Empty dataset.")
         exit(0)
 
     # start evaluation
-    logger.info(f'Number of samples: {ds.count()}')
+    logger.info(f"Number of samples: {ds.count()}")
     eval(model, ds, tokenizer)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     fire.Fire(main)

@@ -1,5 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
+import os
+import numpy as np
 
 from data_juicer.utils.model_utils import (
     get_backup_model_link,
@@ -7,6 +9,7 @@ from data_juicer.utils.model_utils import (
     prepare_api_model,
     prepare_huggingface_model,
     prepare_vllm_model,
+    prepare_embedding_model,
     prepare_diffusion_model,
     prepare_fasttext_model,
     prepare_kenlm_model,
@@ -76,7 +79,7 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
     @patch('data_juicer.utils.model_utils.openai')
     @patch('data_juicer.utils.model_utils.tiktoken')
     def test_prepare_api_model(self, mock_tiktoken, mock_openai):
-        # Test basic API model
+        # Test basic API model with default endpoint
         mock_client = MagicMock()
         mock_openai.OpenAI.return_value = mock_client
         mock_processor = MagicMock()
@@ -84,8 +87,10 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
 
         model = prepare_api_model('test_model')
         self.assertEqual(model._client, mock_client)
+        self.assertEqual(model.model, 'test_model')
+        self.assertEqual(model.endpoint, '/chat/completions')
 
-        # Test with processor
+        # Test with processor for chat model
         mock_openai.OpenAI.reset_mock()
         mock_tiktoken.encoding_for_model.reset_mock()
         model, processor = prepare_api_model('test_model', return_processor=True)
@@ -93,6 +98,32 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
         self.assertEqual(processor, mock_processor)
         mock_tiktoken.encoding_for_model.assert_called_once()
 
+        # Test explicit chat endpoint with different casing
+        mock_openai.OpenAI.reset_mock()
+        chat_model = prepare_api_model('test_model', endpoint='/v1/CHAT/completions')
+        self.assertEqual(chat_model.endpoint, '/v1/CHAT/completions')
+        self.assertEqual(chat_model.response_path, 'choices.0.message.content')
+        
+        # Test embedding endpoint with default response path
+        embed_model = prepare_api_model('test_model', endpoint='/embeddings')
+        self.assertEqual(embed_model.endpoint, '/embeddings')
+        self.assertEqual(embed_model.response_path, 'data.0.embedding')
+        
+        # Test with processor for embedding model
+        mock_tiktoken.encoding_for_model.reset_mock()
+        embed_model, processor = prepare_api_model(
+            'text_embedding_model',
+            endpoint='/embeddings',
+            return_processor=True
+        )
+        self.assertEqual(processor, mock_processor)
+        mock_tiktoken.encoding_for_model.assert_called_with('text_embedding_model')
+
+        # Test unsupported endpoint
+        with self.assertRaises(ValueError) as context:
+            prepare_api_model('test_model', endpoint='/unsupported/endpoint')
+        self.assertIn('Unsupported endpoint', str(context.exception))
+        
     @patch('data_juicer.utils.model_utils.transformers')
     def test_prepare_huggingface_model(self, mock_transformers):
         # Test model with processor
@@ -111,6 +142,8 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
 
     @patch('data_juicer.utils.model_utils.os')
     def test_prepare_vllm_model(self, mock_os):
+        mock_os.path.join.return_value = 'test_model'
+
         # Create a mock vllm module
         mock_vllm = MagicMock()
         mock_model = MagicMock()
@@ -143,6 +176,27 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
         model, _ = prepare_vllm_model('test_model', **model_params)
         mock_vllm.LLM.assert_called_once_with(model='test_model', generation_config='auto', **model_params)
 
+    @patch('data_juicer.utils.model_utils.torch')
+    @patch('data_juicer.utils.model_utils.transformers')
+    def test_prepare_embedding_model(self, mock_transformers, mock_torch):
+        # Test embedding model
+        mock_tokenizer = MagicMock()
+        mock_model = MagicMock()
+        mock_model.to.return_value = mock_model
+
+        mock_transformers.AutoTokenizer.from_pretrained.return_value = mock_tokenizer
+        mock_transformers.AutoModel.from_pretrained.return_value = mock_model
+
+        model = prepare_embedding_model('test_model', device='cuda:0')
+        mock_transformers.AutoTokenizer.from_pretrained.assert_called_once_with(
+            'test_model', trust_remote_code=True)
+        mock_transformers.AutoModel.from_pretrained.assert_called_once_with(
+            'test_model', trust_remote_code=True)
+
+        # Test the return function
+        self.assertTrue(hasattr(model, 'encode'))
+        self.assertTrue(callable(model.encode))
+
     @patch('data_juicer.utils.model_utils.diffusers')
     def test_prepare_diffusion_model(self, mock_diffusers):
         mock_model = MagicMock()
@@ -156,12 +210,66 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
             prepare_diffusion_model('test_model', 'invalid_type')
 
     @patch('data_juicer.utils.model_utils.fasttext')
-    def test_prepare_fasttext_model(self, mock_fasttext):
+    def test_prepare_fasttext_model_mock(self, mock_fasttext):
         mock_model = MagicMock()
         mock_fasttext.load_model.return_value = mock_model
 
         model = prepare_fasttext_model('test_model')
         self.assertEqual(model, mock_model)
+
+    def test_prepare_fasttext_model_real(self):
+        """Test FastText model loading and prediction functionality with real model."""
+        # Test with default language identification model
+        model = prepare_fasttext_model()
+        
+        # Test basic prediction functionality
+        test_texts = [
+            "Hello, this is an English text.",
+            "Bonjour, ceci est un texte français.",
+            "你好，这是一段中文文本。"
+        ]
+        
+        for text in test_texts:
+            predictions = model.predict(text)
+            # FastText predict returns a tuple of (labels, scores)
+            self.assertIsInstance(predictions, tuple, "Predictions should be a tuple")
+            self.assertEqual(len(predictions), 2, "Predictions should contain labels and scores")
+            
+            labels, scores = predictions
+            self.assertIsInstance(labels, tuple, "Labels should be a tuple")
+            self.assertIsInstance(scores, np.ndarray, "Scores should be a numpy array")
+            self.assertEqual(len(labels), len(scores), "Number of labels should match number of scores")
+            
+            # Check first prediction
+            self.assertTrue(labels[0].startswith('__label__'), 
+                          "Label should start with __label__")
+            self.assertIsInstance(scores[0], (float, np.floating), "Score should be a float")
+
+    def test_prepare_fasttext_model_invalid(self):
+        """Test FastText model with invalid model file."""
+        with self.assertRaises(Exception):
+            prepare_fasttext_model("invalid_model.bin")
+
+    def test_prepare_fasttext_model_force_download(self):
+        """Test FastText model with force download."""
+        # First remove the model file if it exists
+        from data_juicer.utils.cache_utils import DATA_JUICER_MODELS_CACHE
+        from data_juicer.utils.model_utils import prepare_fasttext_model
+        
+        # Get the default model name from the function's default parameter
+        default_model_name = prepare_fasttext_model.__defaults__[0]
+        model_path = os.path.join(DATA_JUICER_MODELS_CACHE, default_model_name)
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
+        if os.path.exists(model_path):
+            os.remove(model_path)
+        
+        # Test loading with force download
+        model = prepare_fasttext_model(force=True)
+        self.assertIsNotNone(model, "Model should be loaded after force download")
+        
+        # Test prediction after force download
+        predictions = model.predict("This is a test.")
+        self.assertGreater(len(predictions), 0, "Model should return predictions after force download")
 
     @patch('data_juicer.utils.model_utils.kenlm')
     def test_prepare_kenlm_model(self, mock_kenlm):
@@ -238,6 +346,9 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
     def test_prepare_model(self):
         # Test valid model type
         model_func = prepare_model('huggingface', pretrained_model_name_or_path='test_model')
+        self.assertIsNotNone(model_func)
+
+        model_func = prepare_model('embedding', model_path='test_embedding_model', device='cuda:0')
         self.assertIsNotNone(model_func)
 
         # Test invalid model type

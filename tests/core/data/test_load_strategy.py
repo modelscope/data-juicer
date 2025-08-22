@@ -4,7 +4,7 @@ from data_juicer.core.data.load_strategy import (
     DefaultLocalDataLoadStrategy,
     RayLocalJsonDataLoadStrategy
 )
-from argparse import Namespace
+from jsonargparse import Namespace
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 from data_juicer.config import get_default_cfg
 import os
@@ -257,6 +257,8 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
 class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
     def setUp(self):
         """Instance-level setup run before each test"""
+        super().setUp()
+
         cur_dir = osp.dirname(osp.abspath(__file__))
         self.tmp_dir = osp.join(cur_dir, f'tmp_{uuid.uuid4().hex}')
         os.makedirs(self.tmp_dir, exist_ok=True)
@@ -329,7 +331,34 @@ class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
         result = list(dataset.get(2))
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0]['text'], 'hello world')
+
+    @TEST_TAG('ray')
+    def test_read_parquet(self):
+        """Test read parquet"""
+        rel_path = './tests/core/data/test_data/parquet/sample.parquet'
+        strategy = RayLocalJsonDataLoadStrategy({
+            'path': rel_path
+        }, self.cfg)
+
+        dataset = strategy.load_data()
+        result = list(dataset.get(2))
         
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['text'], "Today is Sunday and it's a happy day!")
+        self.assertEqual(result[1]['text'], "Today is Monday and it's a happy day!")
+
+        rel_path = './tests/core/data/test_data/parquet'
+        strategy = RayLocalJsonDataLoadStrategy({
+            'path': rel_path
+        }, self.cfg)
+
+        dataset = strategy.load_data()
+        result = list(dataset.get(2))
+        
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['text'], "Today is Sunday and it's a happy day!")
+        self.assertEqual(result[1]['text'], "Today is Monday and it's a happy day!")
+
 
 if __name__ == '__main__':
     unittest.main()

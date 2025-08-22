@@ -1,27 +1,28 @@
-__version__ = '1.3.3'
+__version__ = "1.4.2"
 
 import os
 import subprocess
 import sys
 
 from loguru import logger
+
 # allow loading truncated images for some too large images.
 from PIL import ImageFile
 
 from data_juicer.utils.availability_utils import _is_package_available
 from data_juicer.utils.lazy_loader import LazyLoader
 
-torch = LazyLoader('torch')
+torch = LazyLoader("torch")
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # For now, only INFO will be shown. Later the severity level will be changed
 # when setup_logger is called to initialize the logger.
 logger.remove()
-logger.add(sys.stderr, level='INFO')
+logger.add(sys.stderr, level="INFO")
 
 
 def _cuda_device_count():
-    _torch_available = _is_package_available('torch')
+    _torch_available = _is_package_available("torch")
 
     # TODO: optimize executor_type == 'ray'
     is_ray_enabled = False
@@ -36,15 +37,14 @@ def _cuda_device_count():
         return torch.cuda.device_count()
 
     try:
-        nvidia_smi_output = subprocess.check_output(['nvidia-smi', '-L'],
-                                                    text=True)
-        all_devices = nvidia_smi_output.strip().split('\n')
+        nvidia_smi_output = subprocess.check_output(["nvidia-smi", "-L"], text=True)
+        all_devices = nvidia_smi_output.strip().split("\n")
 
-        cuda_visible_devices = os.getenv('CUDA_VISIBLE_DEVICES')
+        cuda_visible_devices = os.getenv("CUDA_VISIBLE_DEVICES")
         if cuda_visible_devices is not None:
             logger.warning(
-                'CUDA_VISIBLE_DEVICES is ignored when torch is unavailable. '
-                'All detected GPUs will be used.')
+                "CUDA_VISIBLE_DEVICES is ignored when torch is unavailable. " "All detected GPUs will be used."
+            )
 
         return len(all_devices)
     except Exception:
