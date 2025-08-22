@@ -22,7 +22,7 @@
       <dt>Version</dt>
       <dd>
         {% for v in available_versions %}
-        <a href="{{ pathto('', 1) ~ '../../' ~ lang_code ~ '/' ~ v ~ '/' ~ pagename ~ '.html' }}" {% if
+        <a href="{{ pathto('', 1) ~ '../' ~ v ~ '/' ~ pagename ~ '.html' }}" {% if
           v==current_version %}class="active" {% endif %}>
           {{ v }}
         </a>
