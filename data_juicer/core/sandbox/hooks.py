@@ -20,6 +20,7 @@ from data_juicer.core.sandbox.factories import (
     model_infer_executor_factory,
     model_train_executor_factory,
 )
+from data_juicer.core.sandbox.utils import add_iter_subdir_to_paths
 from data_juicer.utils.constant import JobRequiredKeys
 from tools.hpo.execute_hpo_3sigma import modify_recipe_k_sigma
 
@@ -58,6 +59,18 @@ class BaseHook:
 
         # update the args of this hook with input mappings and local settings
         self._input_updating_hook(context_infos)
+        # updating export_path of dj config.
+        # we assume that for non-dj hooks, the output paths are specified by "export_path" field always.
+        if self.inited_dj_cfg and 'export_path' in self.inited_dj_cfg:
+            self.inited_dj_cfg['export_path'] = add_iter_subdir_to_paths(
+                [self.inited_dj_cfg['export_path']], self.curr_iter)[0]
+        if self.extra_cfg and 'export_path' in self.extra_cfg:
+            if isinstance(self.extra_cfg['export_path'], list):
+                self.extra_cfg['export_path'] = add_iter_subdir_to_paths(
+                    self.extra_cfg['export_path'], self.curr_iter)
+            else:
+                self.extra_cfg['export_path'] = add_iter_subdir_to_paths(
+                    [self.extra_cfg['export_path']], self.curr_iter)[0]
 
         outputs = self.hook()
 

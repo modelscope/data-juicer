@@ -3,12 +3,12 @@ import os
 from copy import deepcopy
 from typing import List
 
-import wandb
 import yaml
 from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import dict_to_namespace, namespace_to_dict
 from loguru import logger
 
+import wandb
 from data_juicer.config import merge_config, prepare_side_configs
 from data_juicer.core.sandbox.context_infos import (
     ContextInfos,
@@ -495,7 +495,7 @@ class SandBoxExecutor:
             current_iter = 0
 
         try:
-            current_pipelines = self.pipelines
+            current_pipelines = deepcopy(self.pipelines)
             while True:
                 current_iter += 1
                 logger.info(f"============== Starting the iter {current_iter} ==============")
@@ -532,6 +532,7 @@ class SandBoxExecutor:
                 # check if there are any arguments to be updated from the last iteration
                 if len(self.iter_updater) > 0:
                     logger.info("Updating arguments across iterations...")
+                    current_pipelines = deepcopy(self.pipelines)
                     current_pipelines = self.iterative_update_pipelines(current_pipelines, context_infos)
         finally:
             # export context infos
