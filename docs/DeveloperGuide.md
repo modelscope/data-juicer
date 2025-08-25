@@ -17,7 +17,7 @@
     - [4.3.1 Providing Basic OP Functions (alpha version)](#431-providing-basic-op-functions-alpha-version)
     - [4.3.2 Making the OP More Usable (beta version)](#432-making-the-op-more-usable-beta-version)
     - [4.3.2 Making OP Faster \& More complete (stable version)](#432-making-op-faster--more-complete-stable-version)
-  - [4.3.3 Contribute Your New Recipes](#433-contribute-your-new-recipes)
+  - [4.4 Contribute Your New Recipes](#44-contribute-your-new-recipes)
 
 ## 1. Build Your Own OPs Quickly
 
@@ -125,7 +125,7 @@ process:
 ## 2. Build Your Own Data Recipes and Configs
 - We provide easy configuration based on [jsonargparse](https://github.com/omni-us/jsonargparse/) to reduce cost for boilerplate codes.
 - We provide fruitful examples in [Data Recipe Gallery](../docs/RecipeGallery.md) for reference reuse and extension.
-- 📣📣📣 Community contributors can submit PRs in the [Data Recipe Gallery] to add customized data recipes to promote dissemination, reuse and related technical evolution. We greatly welcome co-construction and will highlight [acknowledgements](https://github.com/modelscope/data-juicer?tab=readme-ov-file#contribution-and-acknowledgements)!
+- 📣📣📣 Community contributors can submit PRs in the *Data Recipe Gallery* to add customized data recipes to promote dissemination, reuse and related technical evolution. We greatly welcome co-construction and will highlight [acknowledgements](https://github.com/modelscope/data-juicer?tab=readme-ov-file#contribution-and-acknowledgements)!
 
 ### 2.1 Fruitful Config Sources & Type Hints
 - A global config object can be initialized via
@@ -611,8 +611,8 @@ class PerplexityFilter(Filter):
 ```
 
 
-### 4.3.3 Contribute Your New Recipes 
-- Community contributors can submit PRs in the [Data Recipe Gallery] to add customized data recipes to promote dissemination, reuse and related technical evolution. 
+### 4.4 Contribute Your New Recipes 
+- Community contributors can submit PRs in the [Data Recipe Gallery](../docs/RecipeGallery.md) to add customized data recipes to promote dissemination, reuse and related technical evolution. 
 
 - Feel free to add the corresponding references of your new recipe, or just propose some requirements/ideas to improve the existing recipes.
 
