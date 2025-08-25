@@ -34,9 +34,9 @@ class SuffixFilter(Filter):
 
     def process_single(self, sample):
         if self.suffixes:
-            if sample[Fields.suffix] in self.suffixes:
-                return True
-            else:
-                return False
+            res_bool = sample[Fields.suffix] in self.suffixes
+            if self.reversed_range:
+                res_bool = not res_bool
+            return res_bool
         else:
             return True

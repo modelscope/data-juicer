@@ -194,7 +194,10 @@ class VideoMotionScoreFilter(Filter):
         video_motion_scores = sample[Fields.stats][StatsKeys.video_motion_score]
 
         keep_bools = np.array(
-            [self.min_score <= motion_score <= self.max_score for motion_score in video_motion_scores]
+            [
+                self.get_keep_boolean(motion_score, self.min_score, self.max_score)
+                for motion_score in video_motion_scores
+            ]
         )
         if len(keep_bools) <= 0:
             return True

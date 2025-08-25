@@ -90,4 +90,4 @@ json
     def process_single(self, sample, rank=None):
         itm_score = sample[Fields.stats][StatsKeys.llm_difficulty_score]
 
-        return itm_score >= self.min_score
+        return self.get_keep_boolean(itm_score, self.min_score, self.max_score)
