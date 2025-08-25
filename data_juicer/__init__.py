@@ -13,7 +13,7 @@ from data_juicer.utils.availability_utils import _is_package_available
 from data_juicer.utils.lazy_loader import LazyLoader
 
 torch = LazyLoader("torch")
-ray = LazyLoader("torch")
+ray = LazyLoader("ray")
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # For now, only INFO will be shown. Later the severity level will be changed

@@ -61,7 +61,7 @@ def is_ray_initialized():
 
 
 def is_ray_mode():
-    if int(os.environ.get(RAY_JOB_ENV_VAR, 0)):
+    if int(os.environ.get(RAY_JOB_ENV_VAR, "0")):
         assert is_ray_initialized(), "Ray cluster is not initialized."
         return True
 
@@ -82,7 +82,7 @@ def available_memories():
         ray_nodes_info = get_ray_nodes_info()
 
         available_mems = []
-        for nodeid, info in ray_nodes_info:
+        for nodeid, info in ray_nodes_info.items():
             available_mems.append(info["memory"])
 
         return available_mems
@@ -95,7 +95,7 @@ def available_gpu_memories():
         ray_nodes_info = get_ray_nodes_info()
 
         available_gpu_mems = []
-        for nodeid, info in ray_nodes_info:
+        for nodeid, info in ray_nodes_info.items():
             available_gpu_mems.extend(info["gpus_memory"])
 
         return available_gpu_mems
@@ -160,11 +160,14 @@ def get_ray_nodes_info():
 
     results = ray.get(futures)
 
+    _RAY_NODES_INFO = {}
     for i, (node, info) in enumerate(zip(alive_nodes, results)):
         node_id = node["NodeID"]
         _RAY_NODES_INFO[node_id] = info
 
     ray.shutdown()
+
+    logger.info(f"Ray cluster info:\n{_RAY_NODES_INFO}")
 
     return _RAY_NODES_INFO
 
@@ -208,16 +211,17 @@ def calculate_np(name, mem_required, cpu_required, num_proc=None, use_cuda=False
                     f"on the mem_required of Op[{name}]. "
                     f"Set the `num_proc` to {auto_num_proc}."
                 )
-        elif not auto_num_proc and not num_proc:
+        elif auto_num_proc is None and num_proc is None:
             op_proc = cuda_device_count()
             logger.warning(
                 f"Both mem_required and num_proc of Op[{name}] are not set."
                 f"Set the `num_proc` to number of GPUs {op_proc}."
             )
         else:
-            op_proc = auto_num_proc if auto_num_proc else num_proc
+            op_proc = auto_num_proc if auto_num_proc is not None else num_proc
 
-        op_proc = max(op_proc, 1)
+        if op_proc <= 1:
+            op_proc = len(available_memories())  # number of processes is equal to the number of nodes
         return op_proc
     else:
         cpu_num = cpu_count()
@@ -238,5 +242,6 @@ def calculate_np(name, mem_required, cpu_required, num_proc=None, use_cuda=False
                 f"This Op [{name}] might "
                 f"require more resource to run."
             )
-        op_proc = max(op_proc, 1)
+        if op_proc <= 1:
+            op_proc = len(available_memories())  # number of processes is equal to the number of nodes
         return op_proc

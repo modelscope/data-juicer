@@ -571,7 +571,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 cfg = parser.parse_args(args=args)
 
                 if cfg.executor_type == "ray":
-                    os.environ[RAY_JOB_ENV_VAR] = 1
+                    os.environ[RAY_JOB_ENV_VAR] = "1"
 
                 if cfg.custom_operator_paths:
                     load_custom_operators(cfg.custom_operator_paths)
