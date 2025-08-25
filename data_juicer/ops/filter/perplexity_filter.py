@@ -15,22 +15,22 @@ OP_NAME = "perplexity_filter"
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)
 class PerplexityFilter(Filter):
-    """Filter to keep samples with perplexity score less than a specific max
-    value."""
+    """Filter to keep samples with perplexity score in a specified range."""
 
     _batched_op = True
 
-    def __init__(self, lang: str = "en", max_ppl: float = 1500, *args, **kwargs):
+    def __init__(self, lang: str = "en", min_ppl: float = 0, max_ppl: float = 1500, *args, **kwargs):
         """
         Initialization method.
 
         :param lang: Compute perplexity for samples in which language.
-        :param max_ppl: The max filter perplexity in this op, samples
-            will be filtered if their perplexity exceeds this parameter.
+        :param min_ppl: The min filter perplexity in this op.
+        :param max_ppl: The max filter perplexity in this op.
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self.min_ppl = min_ppl
         self.max_ppl = max_ppl
         self.lang = lang
         self.sp_model_key = prepare_model(model_type="sentencepiece", lang=lang)
@@ -68,7 +68,8 @@ class PerplexityFilter(Filter):
         return samples
 
     def process_batched(self, samples):
-        if isinstance(samples[Fields.stats], list):
-            return map(lambda stat: stat[StatsKeys.perplexity] <= self.max_ppl, samples[Fields.stats])
-        else:
-            return samples[Fields.stats][StatsKeys.perplexity] <= self.max_ppl
+        assert isinstance(samples[Fields.stats], list)
+        return map(
+            lambda stat: self.get_keep_boolean(stat[StatsKeys.perplexity], self.min_ppl, self.max_ppl),
+            samples[Fields.stats],
+        )

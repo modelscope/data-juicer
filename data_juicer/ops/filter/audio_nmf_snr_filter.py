@@ -114,7 +114,7 @@ class AudioNMFSNRFilter(Filter):
 
     def process_single(self, sample):
         audio_snrs = sample[Fields.stats][StatsKeys.audio_nmf_snr]
-        keep_bools = np.array([self.min_snr <= snr <= self.max_snr for snr in audio_snrs])
+        keep_bools = np.array([self.get_keep_boolean(snr, self.min_snr, self.max_snr) for snr in audio_snrs])
         if len(keep_bools) <= 0:
             return True
 

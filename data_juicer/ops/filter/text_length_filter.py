@@ -42,11 +42,8 @@ class TextLengthFilter(Filter):
         return samples
 
     def process_batched(self, samples):
-        if isinstance(samples[Fields.stats], list):
-            return map(lambda stat: self.min_len <= stat[StatsKeys.text_len] <= self.max_len, samples[Fields.stats])
-        else:
-            # single sample for ray filter
-            if self.min_len <= samples[Fields.stats][StatsKeys.text_len] <= self.max_len:
-                return True
-            else:
-                return False
+        assert isinstance(samples[Fields.stats], list)
+        return map(
+            lambda stat: self.get_keep_boolean(stat[StatsKeys.text_len], self.min_len, self.max_len),
+            samples[Fields.stats],
+        )

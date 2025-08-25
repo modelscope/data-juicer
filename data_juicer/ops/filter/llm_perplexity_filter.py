@@ -113,4 +113,4 @@ class LLMPerplexityFilter(Filter):
     def process_single(self, sample):
         ppl = sample[Fields.stats][StatsKeys.llm_perplexity]
 
-        return self.min_score <= ppl <= self.max_score
+        return self.get_keep_boolean(ppl, self.min_score, self.max_score)

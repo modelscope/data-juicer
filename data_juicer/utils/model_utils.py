@@ -163,13 +163,13 @@ def filter_arguments(func, args_dict):
 
 
 class ChatAPIModel:
-    def __init__(self, model, endpoint=None, response_path=None, **kwargs):
+    def __init__(self, model=None, endpoint=None, response_path=None, **kwargs):
         """
         Initializes an instance of the APIModel class.
 
         :param model: The name of the model to be used for making API
             calls. This should correspond to a valid model identifier
-            recognized by the API server.
+            recognized by the API server. If it's None, use the first available model from the server.
         :param endpoint: The URL endpoint for the API. If provided as a
             relative path, it will be appended to the base URL (defined by the
             `OPENAI_BASE_URL` environment variable or through an additional
@@ -188,6 +188,12 @@ class ChatAPIModel:
 
         client_args = filter_arguments(openai.OpenAI, kwargs)
         self._client = openai.OpenAI(**client_args)
+        if self.model is None:
+            logger.warning("No model specified. Using the first available model from the server.")
+            models_list = self._client.models.list().data
+            if len(models_list) == 0:
+                raise ValueError("No models available on the server.")
+            self.model = models_list[0].id
 
     def __call__(self, messages, **kwargs):
         """
@@ -221,11 +227,12 @@ class ChatAPIModel:
 
 
 class EmbeddingAPIModel:
-    def __init__(self, model, endpoint=None, response_path=None, **kwargs):
+    def __init__(self, model=None, endpoint=None, response_path=None, **kwargs):
         """
         Initializes an instance specialized for embedding APIs.
 
         :param model: The model identifier for embedding API calls.
+            If it's None, use the first available model from the server.
         :param endpoint: API endpoint URL. Defaults to '/embeddings'.
         :param response_path: Path to extract embeddings from response.
             Defaults to 'data.0.embedding'.
@@ -237,6 +244,11 @@ class EmbeddingAPIModel:
 
         client_args = filter_arguments(openai.OpenAI, kwargs)
         self._client = openai.OpenAI(**client_args)
+        if self.model is None:
+            logger.warning("No model specified. Using the first available model from the server.")
+            if len(self._client.models.list().data) == 0:
+                raise ValueError("No models available on the server.")
+            self.model = self._client.models.list().data[0].id
 
     def __call__(self, input, **kwargs):
         """

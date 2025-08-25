@@ -409,9 +409,24 @@ class Filter(OP):
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
             queries and responses
+
+        :param min_closed_interval: whether the min_val of the specified filter range is a closed interval. It's True
+            by default.
+        :param max_closed_interval: whether the max_val of the specified filter range is a closed interval. It's True
+            by default.
+        :param reversed_range: whether to reverse the target range [min_val, max_val] to (-∞, min_val) or (max_val, +∞).
+            It's False by default.
         """
         super(Filter, self).__init__(*args, **kwargs)
         self.stats_export_path = kwargs.get("stats_export_path", None)
+
+        # filter strategy related
+        self.min_closed_interval = kwargs.get("min_closed_interval", True)
+        self.max_closed_interval = kwargs.get("max_closed_interval", True)
+        self.reversed_range = kwargs.get("reversed_range", False)
+        if self.reversed_range:
+            self.min_closed_interval = not self.min_closed_interval
+            self.max_closed_interval = not self.max_closed_interval
 
         # runtime wrappers
         if self.is_batched_op():
@@ -443,6 +458,16 @@ class Filter(OP):
 
     def __call__(self, *args, **kwargs):
         return self.compute_stats(*args, **kwargs)
+
+    def get_keep_boolean(self, val, min_val=None, max_val=None):
+        res_bool = True
+        if min_val is not None:
+            res_bool = res_bool and (val >= min_val if self.min_closed_interval else val > min_val)
+        if max_val is not None:
+            res_bool = res_bool and (val <= max_val if self.max_closed_interval else val < max_val)
+        if self.reversed_range:
+            res_bool = not res_bool
+        return res_bool
 
     def compute_stats_batched(self, samples, *args, **kwargs):
         keys = samples.keys()

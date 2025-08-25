@@ -172,7 +172,7 @@ class VideoWatermarkFilter(Filter):
         if len(itm_probs) <= 0:
             return True
 
-        keep_bools = np.array([itm_prob < self.prob_threshold for itm_prob in itm_probs])
+        keep_bools = np.array([self.get_keep_boolean(itm_prob, None, self.prob_threshold) for itm_prob in itm_probs])
 
         # different strategies
         if self.any:

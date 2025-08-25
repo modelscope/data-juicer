@@ -183,7 +183,10 @@ class VideoOcrAreaRatioFilter(Filter):
     def process_single(self, sample):
         video_ocr_area_ratios = sample[Fields.stats][StatsKeys.video_ocr_area_ratio]
         keep_bools = np.array(
-            [self.min_area_ratio <= ocr_area_ratio <= self.max_area_ratio for ocr_area_ratio in video_ocr_area_ratios]
+            [
+                self.get_keep_boolean(ocr_area_ratio, self.min_area_ratio, self.max_area_ratio)
+                for ocr_area_ratio in video_ocr_area_ratios
+            ]
         )
         if len(keep_bools) <= 0:
             return True
