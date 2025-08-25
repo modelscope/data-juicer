@@ -7,6 +7,7 @@ from loguru import logger
 
 from data_juicer.config import get_init_configs, prepare_side_configs
 from data_juicer.core.data.dj_dataset import nested_query
+from data_juicer.core.sandbox.context_infos import ContextInfos, JobInfos
 from data_juicer.core.sandbox.factories import (
     data_analyzer_factory,
     data_evaluator_factory,
@@ -14,11 +15,12 @@ from data_juicer.core.sandbox.factories import (
     data_pool_manipulator_factory,
     general_data_executor_factory,
     general_probe_factory,
-    mode_infer_evaluator_factory,
     model_evaluator_factory,
+    model_infer_evaluator_factory,
     model_infer_executor_factory,
     model_train_executor_factory,
 )
+from data_juicer.core.sandbox.utils import add_iter_subdir_to_paths
 from data_juicer.utils.constant import JobRequiredKeys
 from tools.hpo.execute_hpo_3sigma import modify_recipe_k_sigma
 
@@ -48,21 +50,45 @@ class BaseHook:
         # extra config for some other specific jobs
         self.extra_cfg = job_cfg.get(JobRequiredKeys.extra_configs.value, None)
 
-    def run(self, **context_infos):
-        self._input_updating_hook(**context_infos)
+        # the current iteration number
+        self.curr_iter = None
 
-        outputs = self.hook(**context_infos)
+    def run(self, context_infos: ContextInfos):
+        # record the current iteration number
+        self.curr_iter = context_infos.iter
+
+        # update the args of this hook with input mappings and local settings
+        self._input_updating_hook(context_infos)
+        # updating export_path of dj config.
+        # we assume that for non-dj hooks, the output paths are specified by "export_path" field always.
+        if self.inited_dj_cfg and 'export_path' in self.inited_dj_cfg:
+            self.inited_dj_cfg['export_path'] = add_iter_subdir_to_paths(
+                [self.inited_dj_cfg['export_path']], self.curr_iter)[0]
+        if self.extra_cfg and 'export_path' in self.extra_cfg:
+            if isinstance(self.extra_cfg['export_path'], list):
+                self.extra_cfg['export_path'] = add_iter_subdir_to_paths(
+                    self.extra_cfg['export_path'], self.curr_iter)
+            else:
+                self.extra_cfg['export_path'] = add_iter_subdir_to_paths(
+                    [self.extra_cfg['export_path']], self.curr_iter)[0]
+
+        outputs = self.hook()
 
         if outputs:
             return self._output_recording_hook(outputs)
         else:
-            return context_infos
+            return None
 
-    def _input_updating_hook(self, **context_infos):
+    def _input_updating_hook(self, context_infos: ContextInfos):
         self.specify_dj_and_extra_configs(allow_fail=True)
 
         prev_dj_cfg = deepcopy(self.dj_cfg) if self.dj_cfg else None
         prev_extra_cfg = deepcopy(self.extra_cfg) if self.extra_cfg else None
+
+        logger.debug(f"Previous DJ Cfg: {prev_dj_cfg}")
+        logger.debug(f"Previous Extra Cfg: {prev_extra_cfg}")
+        logger.debug(f"Local Settings: {self.local_settings}")
+        logger.debug(f"Input Mappings: {self.input_mapping}")
 
         # update configs according to local settings
         for key, value in self.local_settings.items():
@@ -99,34 +125,12 @@ class BaseHook:
                     raise ValueError(f'Need to specify the job result keys precisely for inputs to '
                                      f'find the target values. Only got [{key_in_history}].')
                 # find the last non-empty job_infos
-                pipeline_keys = list(context_infos.keys())
-                if len(pipeline_keys) == 0:
+                if len(context_infos) == 0:
                     raise ValueError(f'Cannot find the previous non-empty job infos for [{key_in_history}].')
-                last_idx = len(pipeline_keys) - 1
-                history_job_infos = context_infos[pipeline_keys[last_idx]]
-                while len(history_job_infos) == 0:
-                    last_idx -= 1
-                    if last_idx < 0:
-                        raise ValueError(f'Cannot find the previous non-empty job infos for [{key_in_history}].')
-                    history_job_infos = context_infos[pipeline_keys[last_idx]]
-                # get the last job_infos
-                history_job_infos = history_job_infos[-1]
+                history_job_infos = context_infos.get_the_last_job_infos()
                 key_in_history_parts = key_in_history_parts[1:]
-            else:
-                # get the target job_infos according to pipeline_name and job meta_name
-                # get the latest infos
-                if len(key_in_history_parts) <= 2:
-                    raise ValueError(f'Need to specify the job result keys precisely for inputs to '
-                                     f'find the target values in addition to the pipeline name and meta name of jobs.'
-                                     f'Only got [{key_in_history}].')
-                pipeline_name = key_in_history_parts[0]
-                meta_name = key_in_history_parts[1]
-                job_info_list = context_infos[pipeline_name]
-                for job_info in job_info_list:
-                    if job_info['meta_name'] == meta_name:
-                        history_job_infos = job_info
-                        key_in_history_parts = key_in_history_parts[2:]
-                        break
+            # query target values
+            target_value = history_job_infos['.'.join(key_in_history_parts)]
             # check which config group to update
             cfg_type = key_to_updated_parts[0]
             if cfg_type == JobRequiredKeys.dj_configs.value:
@@ -136,8 +140,6 @@ class BaseHook:
             else:
                 raise ValueError(f'The key {key_to_updated_parts[0]} to update is not supported.')
             key_to_updated_parts = key_to_updated_parts[1:]
-            # query target values
-            target_value = nested_query(history_job_infos, '.'.join(key_in_history_parts))
             # update the target key
             if len(key_to_updated_parts) > 0:
                 if len(key_to_updated_parts) > 1:
@@ -170,9 +172,7 @@ class BaseHook:
                 f'## HOOK [{self.hook_type}]: The number of outputs does not match the number of output keys. '
                 f'Expected {len(self.output_keys)} but got {len(outputs)}'
             )
-        curr_job_infos = {'meta_name': self.meta_name}
-        for key, ret in zip(self.output_keys, outputs):
-            curr_job_infos[key] = ret
+        curr_job_infos = JobInfos(self.meta_name, self.output_keys, outputs)
         return curr_job_infos
 
     def hook(self, **kwargs):
@@ -260,7 +260,7 @@ class ProbeViaModelInferHook(BaseHook):
 
     def hook(self, **kwargs):
         data_executor = data_executor_factory(self.inited_dj_cfg)
-        model_infer_executor = mode_infer_evaluator_factory(self.extra_cfg)
+        model_infer_executor = model_infer_evaluator_factory(self.extra_cfg)
         # TODO
         # probe the model (calling inference sub-pipeline) based on
         # original data, such that we know what is the "hard" data for

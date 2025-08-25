@@ -124,6 +124,8 @@ json
         :param api_or_hf_model: API or huggingface model name.
         :param min_score: The min score threshold to keep the sample.
         :param max_score: The max score threshold to keep the sample.
+        :param is_hf_model:  If true, use Transformers for loading hugging face or
+            local llm.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -136,7 +138,7 @@ json
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
         :param enable_vllm: If true, use VLLM for loading hugging face or
-            local llm. Otherwise, use API for reference.
+            local llm.
         :param model_params: Parameters for initializing the API model.
         :param sampling_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}

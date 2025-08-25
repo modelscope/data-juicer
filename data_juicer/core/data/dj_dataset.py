@@ -456,6 +456,13 @@ class NestedDataset(Dataset, DJDataset):
         NestedDataset."""
         return NestedDataset(super().from_dict(*args, **kargs))
 
+    @classmethod
+    def from_list(cls, *args, **kargs):
+        """Override the from_dict func, which is called by most from_xx
+        constructors, such that the constructed dataset object is
+        NestedDataset."""
+        return NestedDataset(super().from_list(*args, **kargs))
+
     def add_column(self, *args, **kargs):
         """Override the add column func, such that the processed samples
         can be accessed by nested manner."""

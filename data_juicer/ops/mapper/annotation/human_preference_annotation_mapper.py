@@ -108,16 +108,17 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
         **kwargs,
     ):
         """Initialize the human preference annotation operator."""
+        # Ensure text_key is set to prompt_key if not explicitly provided
+        if "text_key" not in kwargs:
+            kwargs["text_key"] = prompt_key
+
+        super().__init__(**kwargs)
         # Store our class-specific attributes
         self.answer1_key = answer1_key
         self.answer2_key = answer2_key
         self.prompt_key = prompt_key
         self.chosen_key = chosen_key
         self.rejected_key = rejected_key
-
-        # Ensure text_key is set to prompt_key if not explicitly provided
-        if "text_key" not in kwargs:
-            kwargs["text_key"] = prompt_key
 
         # Prepare the label_config parameter
         if label_config_file and os.path.exists(label_config_file):
@@ -127,9 +128,6 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
         else:
             kwargs["label_config"] = self.DEFAULT_LABEL_CONFIG.strip()
             logger.info("Using default UI config for human preference annotation")
-
-        # Initialize the parent class with remaining kwargs
-        super().__init__(**kwargs)
 
     def _format_task(self, samples: List[Dict]) -> Dict:
         """Format samples as a Label Studio task for human preference.
