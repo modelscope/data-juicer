@@ -471,7 +471,7 @@
         <span class="k">if</span> <span class="n">score</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_score</span> <span class="o">&lt;=</span> <span class="n">score</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keep_boolean</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

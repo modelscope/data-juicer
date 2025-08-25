@@ -376,7 +376,7 @@
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_SAMPLED_FRAMES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoNSFWFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples whose videos have low nsfw scores.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples whose videos have nsfw scores in a specified range.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
@@ -386,6 +386,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hf_nsfw_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Falconsai/nsfw_image_detection&quot;</span><span class="p">,</span>
         <span class="n">trust_remote_code</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">min_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">max_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
         <span class="n">frame_sampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all_keyframes&quot;</span><span class="p">,</span>
         <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
@@ -427,6 +428,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;mem_required&quot;</span><span class="p">,</span> <span class="s2">&quot;1GB&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_score</span> <span class="o">=</span> <span class="n">min_score</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span> <span class="o">=</span> <span class="n">max_score</span>
         <span class="k">if</span> <span class="n">frame_sampling_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;all_keyframes&quot;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -528,7 +530,9 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">itm_scores</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
-        <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">itm_score</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span> <span class="k">for</span> <span class="n">itm_score</span> <span class="ow">in</span> <span class="n">itm_scores</span><span class="p">])</span>
+        <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_keep_boolean</span><span class="p">(</span><span class="n">itm_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span><span class="p">)</span> <span class="k">for</span> <span class="n">itm_score</span> <span class="ow">in</span> <span class="n">itm_scores</span><span class="p">]</span>
+        <span class="p">)</span>
 
         <span class="c1"># different strategies</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">any</span><span class="p">:</span>

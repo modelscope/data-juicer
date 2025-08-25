@@ -631,7 +631,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 </tr>
 <tr class="row-even"><td><p>flagged_words_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
-<td><p>Filter to keep samples with flagged-word ratio less than a specific max value. 过滤以保持标记词比率小于特定最大值的样本。</p></td>
+<td><p>Filter to keep samples with flagged-word ratio in a specified range. 过滤器将标记词比率的样本保留在指定范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/flagged_words_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_flagged_words_filter.py">tests</a></p></td>
 </tr>
@@ -667,7 +667,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 </tr>
 <tr class="row-even"><td><p>image_nsfw_filter</p></td>
 <td><p>🏞Image 🚀GPU 🧩HF 🟢Stable</p></td>
-<td><p>Filter to keep samples whose images have low nsfw scores. 过滤器保留图像具有低nsfw分数的样本。</p></td>
+<td><p>Filter to keep samples whose images have nsfw scores in a specified range. 过滤器保留其图像的nsfw分数在指定范围内的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/image_nsfw_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_image_nsfw_filter.py">tests</a></p></td>
 </tr>
@@ -763,7 +763,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 </tr>
 <tr class="row-even"><td><p>perplexity_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
-<td><p>Filter to keep samples with perplexity score less than a specific max value. 过滤以保留困惑度分数小于特定最大值的样本。</p></td>
+<td><p>Filter to keep samples with perplexity score in a specified range. 过滤以保持困惑分数在指定范围内的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/perplexity_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_perplexity_filter.py">tests</a></p></td>
 </tr>
@@ -793,7 +793,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 </tr>
 <tr class="row-odd"><td><p>stopwords_filter</p></td>
 <td><p>🔤Text 💻CPU 🟢Stable</p></td>
-<td><p>Filter to keep samples with stopword ratio larger than a specific min value. 过滤以保持停止词比率大于特定最小值的样本。</p></td>
+<td><p>Filter to keep samples with stopword ratio in a specified range. 过滤器将停止词比率的样本保持在指定范围内。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/stopwords_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_stopwords_filter.py">tests</a></p></td>
 </tr>
@@ -877,7 +877,7 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 </tr>
 <tr class="row-odd"><td><p>video_nsfw_filter</p></td>
 <td><p>🎬Video 🚀GPU 🧩HF 🟢Stable</p></td>
-<td><p>Filter to keep samples whose videos have low nsfw scores. 过滤器以保留其视频具有低nsfw分数的样本。</p></td>
+<td><p>Filter to keep samples whose videos have nsfw scores in a specified range. 过滤器以保留其视频的nsfw分数在指定范围内的样本。</p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/data_juicer/ops/filter/video_nsfw_filter.py">code</a></p></td>
 <td><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/main/tests/ops/filter/test_video_nsfw_filter.py">tests</a></p></td>
 </tr>

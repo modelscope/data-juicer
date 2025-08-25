@@ -457,6 +457,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">api_or_hf_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
         <span class="n">min_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">max_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">is_hf_model</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -477,8 +478,8 @@
 <span class="sd">        Initialization method.</span>
 
 <span class="sd">        :param api_or_hf_model: API or huggingface model name.</span>
-<span class="sd">        :param min_score: The lowest score threshold to keep</span>
-<span class="sd">            the sample.</span>
+<span class="sd">        :param min_score: The min score threshold to keep the sample.</span>
+<span class="sd">        :param max_score: The max score threshold to keep the sample.</span>
 <span class="sd">        :param api_endpoint: URL endpoint for the API.</span>
 <span class="sd">        :param response_path: Path to extract content from the API response.</span>
 <span class="sd">            Defaults to &#39;choices.0.message.content&#39;.</span>
@@ -511,6 +512,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dim_required_keys</span> <span class="o">=</span> <span class="n">dim_required_keys</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_DIM_REQUIRED_KEYS</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">min_score</span> <span class="o">=</span> <span class="n">min_score</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span> <span class="o">=</span> <span class="n">max_score</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">enable_vllm</span> <span class="o">=</span> <span class="n">enable_vllm</span>
@@ -665,7 +667,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">itm_score</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_analysis_score</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">itm_score</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">itm_score</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_score</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keep_boolean</span><span class="p">(</span><span class="n">itm_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># disable the dimension score filter</span>
             <span class="k">return</span> <span class="kc">True</span></div>

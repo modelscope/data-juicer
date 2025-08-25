@@ -830,9 +830,24 @@
 <span class="sd">        :param response_key: the key name of field that stores responses</span>
 <span class="sd">        :param history_key: the key name of field that stores history of</span>
 <span class="sd">            queries and responses</span>
+
+<span class="sd">        :param min_closed_interval: whether the min_val of the specified filter range is a closed interval. It&#39;s True</span>
+<span class="sd">            by default.</span>
+<span class="sd">        :param max_closed_interval: whether the max_val of the specified filter range is a closed interval. It&#39;s True</span>
+<span class="sd">            by default.</span>
+<span class="sd">        :param reversed_range: whether to reverse the target range [min_val, max_val] to (-∞, min_val) or (max_val, +∞).</span>
+<span class="sd">            It&#39;s False by default.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Filter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stats_export_path</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stats_export_path&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># filter strategy related</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_closed_interval</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_closed_interval&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_closed_interval</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_closed_interval&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reversed_range</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reversed_range&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reversed_range</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min_closed_interval</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_closed_interval</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_closed_interval</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_closed_interval</span>
 
         <span class="c1"># runtime wrappers</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">():</span>
@@ -865,6 +880,19 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Filter.get_keep_boolean">
+<a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Filter.get_keep_boolean">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_keep_boolean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">min_val</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">res_bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">min_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res_bool</span> <span class="o">=</span> <span class="n">res_bool</span> <span class="ow">and</span> <span class="p">(</span><span class="n">val</span> <span class="o">&gt;=</span> <span class="n">min_val</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_closed_interval</span> <span class="k">else</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="n">min_val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res_bool</span> <span class="o">=</span> <span class="n">res_bool</span> <span class="ow">and</span> <span class="p">(</span><span class="n">val</span> <span class="o">&lt;=</span> <span class="n">max_val</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_closed_interval</span> <span class="k">else</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="n">max_val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reversed_range</span><span class="p">:</span>
+            <span class="n">res_bool</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">res_bool</span>
+        <span class="k">return</span> <span class="n">res_bool</span></div>
+
 
 <div class="viewcode-block" id="Filter.compute_stats_batched">
 <a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Filter.compute_stats_batched">[文档]</a>

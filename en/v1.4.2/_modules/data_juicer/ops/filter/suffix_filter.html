@@ -394,10 +394,10 @@
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.suffix_filter.SuffixFilter.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">suffixes</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">suffix</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">suffixes</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">True</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">False</span>
+            <span class="n">res_bool</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">suffix</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">suffixes</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reversed_range</span><span class="p">:</span>
+                <span class="n">res_bool</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">res_bool</span>
+            <span class="k">return</span> <span class="n">res_bool</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span></div>
 </div>

@@ -3331,10 +3331,21 @@ to be processed</p></li>
 <li><p><strong>response_key</strong> -- the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> -- the key name of field that stores history of
 queries and responses</p></li>
+<li><p><strong>min_closed_interval</strong> -- whether the min_val of the specified filter range is a closed interval. It's True
+by default.</p></li>
+<li><p><strong>max_closed_interval</strong> -- whether the max_val of the specified filter range is a closed interval. It's True
+by default.</p></li>
+<li><p><strong>reversed_range</strong> -- whether to reverse the target range [min_val, max_val] to (-∞, min_val) or (max_val, +∞).
+It's False by default.</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.get_keep_boolean">
+<span class="sig-name descname"><span class="pre">get_keep_boolean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Filter.get_keep_boolean"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.get_keep_boolean" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.compute_stats_batched">
@@ -4077,10 +4088,21 @@ to be processed</p></li>
 <li><p><strong>response_key</strong> -- the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> -- the key name of field that stores history of
 queries and responses</p></li>
+<li><p><strong>min_closed_interval</strong> -- whether the min_val of the specified filter range is a closed interval. It's True
+by default.</p></li>
+<li><p><strong>max_closed_interval</strong> -- whether the max_val of the specified filter range is a closed interval. It's True
+by default.</p></li>
+<li><p><strong>reversed_range</strong> -- whether to reverse the target range [min_val, max_val] to (-∞, min_val) or (max_val, +∞).
+It's False by default.</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.Filter.get_keep_boolean">
+<span class="sig-name descname"><span class="pre">get_keep_boolean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Filter.get_keep_boolean"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.Filter.get_keep_boolean" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.Filter.compute_stats_batched">
@@ -4499,6 +4521,7 @@ the input must be the output of some Grouper OP.</p>
 </li>
 <li><a class="reference internal" href="#data_juicer.ops.base_op.Filter"><code class="docutils literal notranslate"><span class="pre">Filter</span></code></a><ul>
 <li><a class="reference internal" href="#data_juicer.ops.base_op.Filter.__init__"><code class="docutils literal notranslate"><span class="pre">Filter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Filter.get_keep_boolean"><code class="docutils literal notranslate"><span class="pre">Filter.get_keep_boolean()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.ops.base_op.Filter.compute_stats_batched"><code class="docutils literal notranslate"><span class="pre">Filter.compute_stats_batched()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.ops.base_op.Filter.process_batched"><code class="docutils literal notranslate"><span class="pre">Filter.process_batched()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.ops.base_op.Filter.compute_stats_single"><code class="docutils literal notranslate"><span class="pre">Filter.compute_stats_single()</span></code></a></li>
@@ -4576,6 +4599,7 @@ the input must be the output of some Grouper OP.</p>
 <li><a class="reference internal" href="#data_juicer.ops.load_ops"><code class="docutils literal notranslate"><span class="pre">load_ops()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.ops.Filter"><code class="docutils literal notranslate"><span class="pre">Filter</span></code></a><ul>
 <li><a class="reference internal" href="#data_juicer.ops.Filter.__init__"><code class="docutils literal notranslate"><span class="pre">Filter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.Filter.get_keep_boolean"><code class="docutils literal notranslate"><span class="pre">Filter.get_keep_boolean()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.ops.Filter.compute_stats_batched"><code class="docutils literal notranslate"><span class="pre">Filter.compute_stats_batched()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.ops.Filter.process_batched"><code class="docutils literal notranslate"><span class="pre">Filter.process_batched()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.ops.Filter.compute_stats_single"><code class="docutils literal notranslate"><span class="pre">Filter.compute_stats_single()</span></code></a></li>

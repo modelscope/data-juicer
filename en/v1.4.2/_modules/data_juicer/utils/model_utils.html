@@ -529,13 +529,13 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">ChatAPIModel</span><span class="p">:</span>
 <div class="viewcode-block" id="ChatAPIModel.__init__">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.ChatAPIModel.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes an instance of the APIModel class.</span>
 
 <span class="sd">        :param model: The name of the model to be used for making API</span>
 <span class="sd">            calls. This should correspond to a valid model identifier</span>
-<span class="sd">            recognized by the API server.</span>
+<span class="sd">            recognized by the API server. If it&#39;s None, use the first available model from the server.</span>
 <span class="sd">        :param endpoint: The URL endpoint for the API. If provided as a</span>
 <span class="sd">            relative path, it will be appended to the base URL (defined by the</span>
 <span class="sd">            `OPENAI_BASE_URL` environment variable or through an additional</span>
@@ -553,7 +553,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">response_path</span> <span class="o">=</span> <span class="n">response_path</span> <span class="ow">or</span> <span class="s2">&quot;choices.0.message.content&quot;</span>
 
         <span class="n">client_args</span> <span class="o">=</span> <span class="n">filter_arguments</span><span class="p">(</span><span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">(</span><span class="o">**</span><span class="n">client_args</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">(</span><span class="o">**</span><span class="n">client_args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No model specified. Using the first available model from the server.&quot;</span><span class="p">)</span>
+            <span class="n">models_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">list</span><span class="p">()</span><span class="o">.</span><span class="n">data</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">models_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No models available on the server.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">models_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -593,11 +599,12 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">EmbeddingAPIModel</span><span class="p">:</span>
 <div class="viewcode-block" id="EmbeddingAPIModel.__init__">
 <a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.EmbeddingAPIModel.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes an instance specialized for embedding APIs.</span>
 
 <span class="sd">        :param model: The model identifier for embedding API calls.</span>
+<span class="sd">            If it&#39;s None, use the first available model from the server.</span>
 <span class="sd">        :param endpoint: API endpoint URL. Defaults to &#39;/embeddings&#39;.</span>
 <span class="sd">        :param response_path: Path to extract embeddings from response.</span>
 <span class="sd">            Defaults to &#39;data.0.embedding&#39;.</span>
@@ -608,7 +615,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">response_path</span> <span class="o">=</span> <span class="n">response_path</span> <span class="ow">or</span> <span class="s2">&quot;data.0.embedding&quot;</span>
 
         <span class="n">client_args</span> <span class="o">=</span> <span class="n">filter_arguments</span><span class="p">(</span><span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">(</span><span class="o">**</span><span class="n">client_args</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">(</span><span class="o">**</span><span class="n">client_args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No model specified. Using the first available model from the server.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">list</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No models available on the server.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">list</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

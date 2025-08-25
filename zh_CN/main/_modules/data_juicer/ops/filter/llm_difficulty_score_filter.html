@@ -458,7 +458,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">itm_score</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_difficulty_score</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">itm_score</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_score</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keep_boolean</span><span class="p">(</span><span class="n">itm_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

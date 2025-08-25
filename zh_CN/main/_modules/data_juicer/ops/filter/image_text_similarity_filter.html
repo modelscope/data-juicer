@@ -516,7 +516,9 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">similarity</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
-        <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">min_score</span> <span class="o">&lt;=</span> <span class="n">sim_value</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span> <span class="k">for</span> <span class="n">sim_value</span> <span class="ow">in</span> <span class="n">similarity</span><span class="p">])</span>
+        <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_keep_boolean</span><span class="p">(</span><span class="n">sim_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span><span class="p">)</span> <span class="k">for</span> <span class="n">sim_value</span> <span class="ow">in</span> <span class="n">similarity</span><span class="p">]</span>
+        <span class="p">)</span>
 
         <span class="c1"># different strategies</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">any</span><span class="p">:</span>

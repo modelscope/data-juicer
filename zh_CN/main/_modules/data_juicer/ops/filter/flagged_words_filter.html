@@ -383,8 +383,7 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_WORDS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">FlaggedWordFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with flagged-word ratio less than a specific max</span>
-<span class="sd">    value.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with flagged-word ratio in a specified range.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -394,6 +393,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
         <span class="n">tokenization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">min_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">max_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.045</span><span class="p">,</span>
         <span class="n">flagged_words_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">ASSET_DIR</span><span class="p">,</span>
         <span class="n">use_words_aug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -409,6 +409,7 @@
 <span class="sd">            &quot;all&quot;, we will adopt the one merged from all the available</span>
 <span class="sd">            languages</span>
 <span class="sd">        :param tokenization: Whether to use model to tokenize documents</span>
+<span class="sd">        :param min_ratio: The min filter ratio in this op.</span>
 <span class="sd">        :param max_ratio: The max filter ratio in this op.</span>
 <span class="sd">        :param flagged_words_dir: The directory storing the</span>
 <span class="sd">            flagged_words file(s) whose name includes &quot;flagged_words&quot;</span>
@@ -423,6 +424,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span> <span class="o">=</span> <span class="n">min_ratio</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span> <span class="o">=</span> <span class="n">max_ratio</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_words_aug</span> <span class="o">=</span> <span class="n">use_words_aug</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">words_aug_group_sizes</span> <span class="o">=</span> <span class="n">words_aug_group_sizes</span>
@@ -497,7 +499,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
             <span class="nb">map</span><span class="p">(</span>
-                <span class="k">lambda</span> <span class="n">stat</span><span class="p">:</span> <span class="n">stat</span><span class="p">[</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">flagged_words_ratio</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span><span class="p">,</span>
+                <span class="k">lambda</span> <span class="n">stat</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keep_boolean</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">flagged_words_ratio</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span><span class="p">),</span>
                 <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">],</span>
             <span class="p">)</span>
         <span class="p">)</span></div>
