@@ -366,20 +366,7 @@
           <section id="how-to-guide-for-developers">
 <h1>How-to Guide for Developers<a class="headerlink" href="#how-to-guide-for-developers" title="Link to this heading">¶</a></h1>
 <ul class="simple">
-<li><p><a class="reference internal" href="#how-to-guide-for-developers">How-to Guide for Developers</a></p>
-<ul>
-<li><p><a class="reference internal" href="#build-your-own-ops">1. Build Your Own OPs</a></p>
-<ul>
-<li><p><a class="reference internal" href="#build-ops-quickly">1.1 Build OPs Quickly</a></p></li>
-<li><p><a class="reference internal" href="#contribute-your-new-ops-to-the-open-source-community">1.2 Contribute Your New OPs to the Open-Source Community</a></p>
-<ul>
-<li><p><a class="reference internal" href="#providing-basic-op-functions-alpha-version">1.2.1 Providing Basic OP Functions (alpha version)</a></p></li>
-<li><p><a class="reference internal" href="#making-the-op-more-usable-beta-version">1.2.2 Making the OP More Usable (beta version)</a></p></li>
-<li><p><a class="reference internal" href="#making-op-faster-more-complete-stable-version">1.2.3 Making OP Faster &amp; More complete (stable version)</a></p></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><p><a class="reference internal" href="#build-your-own-ops-quickly">1. Build Your Own OPs Quickly</a></p></li>
 <li><p><a class="reference internal" href="#build-your-own-data-recipes-and-configs">2. Build Your Own Data Recipes and Configs</a></p>
 <ul>
 <li><p><a class="reference internal" href="#fruitful-config-sources-type-hints">2.1 Fruitful Config Sources &amp; Type Hints</a></p></li>
@@ -395,13 +382,23 @@
 <li><p><a class="reference internal" href="#lazy-loading">3.5 Lazy Loading</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#coding-style">4. Coding Style</a></p></li>
-<li><p><a class="reference internal" href="#documentation-style">5. Documentation Style</a></p></li>
+<li><p><a class="reference internal" href="#contribution-to-the-open-source-community">4. Contribution to the Open-source Community</a></p>
+<ul>
+<li><p><a class="reference internal" href="#coding-style">4.1 Coding Style</a></p></li>
+<li><p><a class="reference internal" href="#documentation-style">4.2 Documentation Style</a></p></li>
+<li><p><a class="reference internal" href="#contribute-your-new-ops-to-the-open-source-community">4.3 Contribute Your New OPs to the Open-Source Community</a></p>
+<ul>
+<li><p><a class="reference internal" href="#providing-basic-op-functions-alpha-version">4.3.1 Providing Basic OP Functions (alpha version)</a></p></li>
+<li><p><a class="reference internal" href="#making-the-op-more-usable-beta-version">4.3.2 Making the OP More Usable (beta version)</a></p></li>
+<li><p><a class="reference internal" href="#making-op-faster-more-complete-stable-version">4.3.2 Making OP Faster &amp; More complete (stable version)</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#contribute-your-new-recipes">4.4 Contribute Your New Recipes</a></p></li>
 </ul>
 </li>
 </ul>
-<section id="build-your-own-ops">
-<h2>1. Build Your Own OPs<a class="headerlink" href="#build-your-own-ops" title="Link to this heading">¶</a></h2>
+<section id="build-your-own-ops-quickly">
+<h2>1. Build Your Own OPs Quickly<a class="headerlink" href="#build-your-own-ops-quickly" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Data-Juicer allows everybody to easily build their own OPs.</p></li>
 <li><p>Before implementing a new OP, please refer to existing <a class="reference internal" href="Operators.html"><span class="std std-doc">OperatorsZoo</span></a> to avoid unnecessary duplication.</p></li>
@@ -409,11 +406,9 @@
 <blockquote>
 <div><p>The development process of the following example takes directly adding operators in the corresponding module of the source code as an example. If an operator is added externally, the new operator can be registered by passing the parameter <code class="docutils literal notranslate"><span class="pre">--custom-operator-paths</span></code> or configuring the <code class="docutils literal notranslate"><span class="pre">custom_operator_paths</span></code> parameter in the yaml file, for example: <code class="docutils literal notranslate"><span class="pre">custom_operator_paths:</span> <span class="pre">['/path/to/new/op.py',</span> <span class="pre">'/path/to/new/ops/directory/]</span></code>.</p>
 </div></blockquote>
-<section id="build-ops-quickly">
-<h3>1.1 Build OPs Quickly<a class="headerlink" href="#build-ops-quickly" title="Link to this heading">¶</a></h3>
 <p>Assuming we want to add a new Filter operator called “TextLengthFilter” to get corpus of expected text length, we can follow the following steps to build it.</p>
 <ol class="arabic simple">
-<li><p>(<img alt="alpha" src="https://img.shields.io/badge/alpha-red?style=plastic" />, Optional) If the new OP defines  some statistical variables, please add the corresponding new <code class="docutils literal notranslate"><span class="pre">StatsKeysConstant</span></code> attribute in <code class="docutils literal notranslate"><span class="pre">data_juicer/utils/constant.py</span></code> for unified management.</p></li>
+<li><p>(Optional) If the new OP defines  some statistical variables, please add the corresponding new <code class="docutils literal notranslate"><span class="pre">StatsKeysConstant</span></code> attribute in <code class="docutils literal notranslate"><span class="pre">data_juicer/utils/constant.py</span></code> for unified management.</p></li>
 </ol>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">StatsKeysConstant</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="o">...</span>              <span class="c1"># other keys</span>
@@ -421,11 +416,11 @@
 </pre></div>
 </div>
 <ol class="arabic" start="2">
-<li><p>(<img alt="alpha" src="https://img.shields.io/badge/alpha-red?style=plastic" />) Create a new OP file <code class="docutils literal notranslate"><span class="pre">text_length_filter.py</span></code> in the corresponding <code class="docutils literal notranslate"><span class="pre">data_juicer/ops/filter/</span></code> directory as follows.</p>
+<li><p>Create a new OP file <code class="docutils literal notranslate"><span class="pre">text_length_filter.py</span></code> in the corresponding <code class="docutils literal notranslate"><span class="pre">data_juicer/ops/filter/</span></code> directory as follows.</p>
 <ul class="simple">
 <li><p>It’s a Filter OP, so the new OP needs to inherit from the basic <code class="docutils literal notranslate"><span class="pre">Filter</span></code> class in the <code class="docutils literal notranslate"><span class="pre">base_op.py</span></code>, and be decorated with <code class="docutils literal notranslate"><span class="pre">&#64;OPERATORS.register_module(xx_op)</span></code> to register itself automatically.</p></li>
 <li><p>For convenience, we can implement the core functions <code class="docutils literal notranslate"><span class="pre">compute_stats_single</span></code> and <code class="docutils literal notranslate"><span class="pre">process_single</span></code> in a single-sample way, whose input and output are a single sample dictionary.</p></li>
-<li><p>[Advanced] If you are familiar with batched processing in Data-Juicer, you can also implement the batched version directly by overwriting the <code class="docutils literal notranslate"><span class="pre">compute_stats_batched</span></code> and <code class="docutils literal notranslate"><span class="pre">process_batched</span></code> functions, which will be slightly faster than single-sample version. Their input and output are a column-wise dict with multiple samples (detailed in the following Section 2.1.3).</p></li>
+<li><p>[Advanced] If you are familiar with batched processing in Data-Juicer, you can also implement the batched version directly by overwriting the <code class="docutils literal notranslate"><span class="pre">compute_stats_batched</span></code> and <code class="docutils literal notranslate"><span class="pre">process_batched</span></code> functions, which will be slightly faster than single-sample version. Their input and output are a column-wise dict with multiple samples (detailed in the following Section 4.3.3).</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
@@ -479,7 +474,7 @@
 </pre></div>
 </div>
 </li>
-<li><p>(<img alt="alpha" src="https://img.shields.io/badge/alpha-red?style=plastic" />) After implementation, add it to the OP dictionary in the <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file in <code class="docutils literal notranslate"><span class="pre">data_juicer/ops/filter/</span></code> directory.</p></li>
+<li><p>After implementation, add it to the OP dictionary in the <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file in <code class="docutils literal notranslate"><span class="pre">data_juicer/ops/filter/</span></code> directory.</p></li>
 </ol>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># other OPs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.text_length_filter</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextLengthFilter</span>  <span class="c1"># import this new OP class</span>
@@ -490,7 +485,7 @@
 </pre></div>
 </div>
 <ol class="arabic simple" start="4">
-<li><p>(<img alt="alpha" src="https://img.shields.io/badge/alpha-red?style=plastic" />) When an operator has package dependencies listed in <code class="docutils literal notranslate"><span class="pre">environments/science_requires.txt</span></code>, you need to add the corresponding dependency packages to the <code class="docutils literal notranslate"><span class="pre">OPS_TO_PKG</span></code> dictionary in <code class="docutils literal notranslate"><span class="pre">data_juicer/utils/auto_install_mapping.py</span></code> to support dependency installation at the operator level.</p></li>
+<li><p>When an operator has package dependencies listed in <code class="docutils literal notranslate"><span class="pre">environments/science_requires.txt</span></code>, you need to add the corresponding dependency packages to the <code class="docutils literal notranslate"><span class="pre">OPS_TO_PKG</span></code> dictionary in <code class="docutils literal notranslate"><span class="pre">data_juicer/utils/auto_install_mapping.py</span></code> to support dependency installation at the operator level.</p></li>
 <li><p>Now you can use this new OP with custom arguments in your own config files!</p></li>
 </ol>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># other configs</span>
@@ -503,26 +498,258 @@
 <span class="w">      </span><span class="nt">max_len</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
 </pre></div>
 </div>
+<ol class="arabic simple" start="6">
+<li><p>Community contributors can submit corresponding operator PRs and work with the Data-Juicer team to gradually improve it in subsequent PRs. Please see more details <a class="reference internal" href="#contribution-to-the-open-source-community">below</a>. We greatly welcome co-construction and will <a class="reference external" href="https://github.com/modelscope/data-juicer?tab=readme-ov-file#contribution-and-acknowledgements">highlight acknowledgements</a>!</p></li>
+</ol>
+</section>
+<section id="build-your-own-data-recipes-and-configs">
+<h2>2. Build Your Own Data Recipes and Configs<a class="headerlink" href="#build-your-own-data-recipes-and-configs" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>We provide easy configuration based on <a class="reference external" href="https://github.com/omni-us/jsonargparse/">jsonargparse</a> to reduce cost for boilerplate codes.</p></li>
+<li><p>We provide fruitful examples in <a class="reference internal" href="RecipeGallery.html"><span class="std std-doc">Data Recipe Gallery</span></a> for reference reuse and extension.</p></li>
+<li><p>📣📣📣 Community contributors can submit PRs in the <em>Data Recipe Gallery</em> to add customized data recipes to promote dissemination, reuse and related technical evolution. We greatly welcome co-construction and will highlight <a class="reference external" href="https://github.com/modelscope/data-juicer?tab=readme-ov-file#contribution-and-acknowledgements">acknowledgements</a>!</p></li>
+</ul>
+<section id="fruitful-config-sources-type-hints">
+<h3>2.1 Fruitful Config Sources &amp; Type Hints<a class="headerlink" href="#fruitful-config-sources-type-hints" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>A global config object can be initialized via</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># core.executor.py</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">init_configs</span><span class="p">()</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>in which function arguments from diverse sources can be specified and mixed
+up, including</p></li>
+</ul>
+<ol class="arabic simple">
+<li><p><em>hard-coded default values</em> when registering the config into parser or specified in the classes’ <code class="docutils literal notranslate"><span class="pre">__init__</span></code> functions</p></li>
+<li><p>default <em>config files</em> in json (yaml or jsonnet supersets)</p></li>
+<li><p><em>environment variables</em></p></li>
+<li><p><em>POSIX-style command line arguments</em>, such as <code class="docutils literal notranslate"><span class="pre">--project_name</span> <span class="pre">my_data_demo</span></code> or <code class="docutils literal notranslate"><span class="pre">--project_name=my_data_demo</span></code> , including config files</p></li>
+</ol>
+<ul class="simple">
+<li><p>The final parsed values are mixed from these sources. And the override order is the same as the numbers above.</p></li>
+</ul>
+<p>Besides, many argument types and respective validation are supported.
+Including python built-in types, types from <a class="reference external" href="https://docs.python.org/3/library/typing.html">Lib/typing</a> module, and
+extended <a class="reference external" href="https://jsonargparse.readthedocs.io/en/stable/#type-hints">types</a>
+from jsonargparse, such as <code class="docutils literal notranslate"><span class="pre">restricted</span> <span class="pre">types</span></code> and <code class="docutils literal notranslate"><span class="pre">Paths</span></code> with customized
+limitations.</p>
+</section>
+<section id="hierarchical-configs-and-helps">
+<h3>2.2 Hierarchical Configs and Helps<a class="headerlink" href="#hierarchical-configs-and-helps" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>You can use dot notation in the argument names freely to define the
+hierarchy, e.g., <code class="docutils literal notranslate"><span class="pre">maximum_line_length_filter.min</span></code>.
+More importantly, by default, we automatically register the configs from
+the docstrings of implemented operators. That is, the structure of all
+configs are always in sync with codes.</p></li>
+<li><p>You can get the hierarchical help information by running a script that calls
+our executor such as</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python tools/process_data.py --help
+
+usage: process_data.py [-h] [--config CONFIG] [--print_config[=flags]] [--project_name PROJECT_NAME] [--dataset_path DATASET_PATH] [--dataset_dir DATASET_DIR] [--export_path EXPORT_PATH] [--process PROCESS]
+                            [--np NP] [--text_keys TEXT_KEYS] [--document_deduplicator CONFIG] [--document_deduplicator.hash_method HASH_METHOD] [--document_deduplicator.lowercase LOWERCASE]
+                            [--document_deduplicator.ignore_non_character IGNORE_NON_CHARACTER] [--language_id_score_filter CONFIG] [--language_id_score_filter.lang LANG] [--words_num_filter CONFIG] [--words_num_filter.min MIN] [--words_num_filter.max MAX]
+                            [--alphanumeric_filter CONFIG] [--alphanumeric_filter.min MIN] [--alphanumeric_filter.max MAX] [--average_line_length_filter CONFIG] [--average_line_length_filter.min MIN] [--average_line_length_filter.max MAX]
+                            [--maximum_line_length_filter CONFIG] [--maximum_line_length_filter.min MIN] [--maximum_line_length_filter.max MAX] [--text_length_filter CONFIG] [--text_length_filter.min MIN] [--text_length_filter.max MAX]
+                            [--remove_comments_mapper CONFIG] [--remove_comments_mapper.type TYPE] [--remove_comments_mapper.inline INLINE] [--remove_comments_mapper.multiline MULTILINE] [--remove_header_mapper CONFIG]
+                            [--remove_header_mapper.before_section BEFORE_SECTION]
+
+optional arguments:
+  -h, --help            Show this help message and exit.
+  --config CONFIG       Path to a configuration file.
+  --print_config[=flags]
+                        Print the configuration after applying all other arguments and exit. The optional flags customizes the output and are one or more keywords separated by comma. The supported flags are: comments, skip_default, skip_null.
+  --project_name PROJECT_NAME
+                        name of your data process project. (type: str, default: null)
+  --dataset_path DATASET_PATH
+                        path to your dataset file, relative with respect to the config file&#39;s location (type: Path_fr, default: null)
+  --dataset_dir DATASET_DIR
+                        path to your dataset(s) within a directory, relative with respect to the config file&#39;s location (type: Path_drw, default: null)
+  --export_path EXPORT_PATH
+                        path to the output processed dataset, relative with respect to the config file&#39;s location (type: Path_fc, default: null)
+  --process PROCESS, --process+ PROCESS
+                        a list of several process operators with their arguments (type: List[Dict], default: null)
+  --np NP               number of subprocess to process your dataset. (type: PositiveInt, default: null)
+
+&lt;class &#39;data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter&#39;&gt;:
+  --alphanumeric_filter CONFIG
+                        Path to a configuration file.
+  --alphanumeric_filter.min MIN
+                        the min filter rate in alphanumeric op. (type: ClosedUnitInterval, default: 0.0)
+  --alphanumeric_filter.max MAX
+                        the max filter rate in alphanumeric op. (type: ClosedUnitInterval, default: 0.25)
+
+&lt;class &#39;data_juicer.ops.filter.text_length_filter.TextLengthFilter&#39;&gt;:
+  --text_length_filter CONFIG
+                        Path to a configuration file.
+  --text_length_filter.min MIN
+                        min text length in the filtering (type: int, default: 10)
+  --text_length_filter.max MAX
+                        max text length in the filtering (type: int, default: 10000)
+
+......
+
+</pre></div>
+</div>
+</section>
+</section>
+<section id="dependency-management">
+<h2>3. Dependency Management<a class="headerlink" href="#dependency-management" title="Link to this heading">¶</a></h2>
+<p>Data-Juicer uses a modern dependency management system based on <code class="docutils literal notranslate"><span class="pre">uv</span></code> and <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>. Dependencies are managed through the standard Python packaging format (PEP 621) and installed on-demand using a lazy loading system.</p>
+<section id="installing-uv">
+<h3>3.1 Installing uv<a class="headerlink" href="#installing-uv" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">uv</span></code> is a fast Python package installer and resolver, as a better drop-in replacement for pip. You can install it using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using curl</span>
+curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+
+<span class="c1"># Or using pip</span>
+pip<span class="w"> </span>install<span class="w"> </span>uv
+</pre></div>
+</div>
+<p>After installation, verify it’s working by running <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">--version</span></code>.</p>
+</section>
+<section id="virtual-environment-management">
+<h3>3.2 Virtual Environment Management<a class="headerlink" href="#virtual-environment-management" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">uv</span></code> provides virtual environment management capabilities that replaces <code class="docutils literal notranslate"><span class="pre">venv</span></code> and <code class="docutils literal notranslate"><span class="pre">virtualenv</span></code>. Here are the common commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a new virtual environment</span>
+uv<span class="w"> </span>venv
+
+<span class="c1"># Or create a virtual environment with a specific Python version</span>
+uv<span class="w"> </span>venv<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.10
+
+<span class="c1"># Activate the virtual environment</span>
+<span class="c1"># On Unix/macOS</span>
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+<span class="c1"># On Windows</span>
+.venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate
+
+<span class="c1"># Install minimal dependencies in the virtual environment</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+<section id="adding-new-dependencies">
+<h3>3.3 Adding New Dependencies<a class="headerlink" href="#adding-new-dependencies" title="Link to this heading">¶</a></h3>
+<p>To add new dependencies:</p>
+<ol class="arabic simple">
+<li><p>Add them to the appropriate section in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>:</p>
+<ul class="simple">
+<li><p>Core dependencies go in <code class="docutils literal notranslate"><span class="pre">[project.dependencies]</span></code></p></li>
+<li><p>Optional dependencies go in <code class="docutils literal notranslate"><span class="pre">[project.optional-dependencies]</span></code> under the appropriate group (generic, dev, audio, video, etc.)</p></li>
+</ul>
+</li>
+<li><p>The lazy loading system will automatically handle installation when the dependencies are first used.</p></li>
+</ol>
+<p>Example:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[project.dependencies]</span>
+<span class="c1"># Core dependencies</span>
+<span class="n">numpy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=1.26.4,&lt;2.0.0&quot;</span>
+
+<span class="k">[project.optional-dependencies]</span>
+<span class="n">generic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;torch==2.6.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;transformers&gt;=4.47.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="err">...</span>
+<span class="err">]</span>
+</pre></div>
+</div>
+</section>
+<section id="development-setup">
+<h3>3.4 Development Setup<a class="headerlink" href="#development-setup" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>Install the package with all dependencies:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Or install with specific groups:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[generic]&quot;</span><span class="w">      </span><span class="c1"># Generic dependencies</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span><span class="w">          </span><span class="c1"># Development tools</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[ai_services]&quot;</span><span class="w">  </span><span class="c1"># Services dependencies</span>
+</pre></div>
+</div>
+</section>
+<section id="lazy-loading">
+<h3>3.5 Lazy Loading<a class="headerlink" href="#lazy-loading" title="Link to this heading">¶</a></h3>
+<p>The lazy loading system automatically installs dependencies when they are first used. This means:</p>
+<ul class="simple">
+<li><p>Initial installation is faster</p></li>
+<li><p>Only required dependencies are installed</p></li>
+<li><p>Dependencies are installed on-demand</p></li>
+<li><p>Uses <code class="docutils literal notranslate"><span class="pre">uv</span></code> for fast installation when available</p></li>
+</ul>
+</section>
+</section>
+<section id="contribution-to-the-open-source-community">
+<h2>4. Contribution to the Open-source Community<a class="headerlink" href="#contribution-to-the-open-source-community" title="Link to this heading">¶</a></h2>
+<section id="coding-style">
+<h3>4.1 Coding Style<a class="headerlink" href="#coding-style" title="Link to this heading">¶</a></h3>
+<p>We define our styles in <code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code>. Before committing,
+please install <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> tool to automatically check and modify accordingly:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># ===========install pre-commit tool===========</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pre-commit
+
+<span class="nb">cd</span><span class="w"> </span>&lt;path_to_data_juicer&gt;
+<span class="c1"># install pre-commit script for data_juicer</span>
+pre-commit<span class="w"> </span>install
+
+
+<span class="c1"># ===========check all files===========</span>
+git<span class="w"> </span>add<span class="w"> </span>.
+pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+
+<span class="c1"># commit after all checking are passed</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;xxxx&quot;</span>
+</pre></div>
+</div>
+<p><strong>Note</strong>: We have configured pre-commit checks in github workflow. If this
+check in your PR fails, please locally ① ensure that the relevant
+dependencies of pre-commit are consistent with the project configuration
+(which can be completed through <code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">clean</span></code> and <code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">install</span></code>);
+and ② execute <code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">run</span> <span class="pre">--all-files</span></code> before push.</p>
+</section>
+<section id="documentation-style">
+<h3>4.2 Documentation Style<a class="headerlink" href="#documentation-style" title="Link to this heading">¶</a></h3>
+<p>We use Sphinx for document management. To ensure the smooth integration of development documents into the Sphinx documentation system, please pay attention to the following guidelines when writing:</p>
+<ol class="arabic simple">
+<li><p>Heading Hierarchy</p>
+<ul class="simple">
+<li><p>Level 1 Heading (<code class="docutils literal notranslate"><span class="pre">#</span></code>): Each document <strong>must and can only</strong> contain one Level 1 heading, which serves as the overall title of the document.</p></li>
+<li><p>Ensure the heading hierarchy is correct and avoid skipping heading levels. For example, a Level 1 heading should be followed by a Level 2 heading, not a Level 3 heading.</p></li>
+</ul>
+</li>
+<li><p>File Naming Conventions</p>
+<ul class="simple">
+<li><p>Chinese Documents: Chinese Markdown files must be named with the suffix <code class="docutils literal notranslate"><span class="pre">_ZH</span></code>. For example: <code class="docutils literal notranslate"><span class="pre">README_ZH.md</span></code></p></li>
+</ul>
+</li>
+</ol>
 </section>
 <section id="contribute-your-new-ops-to-the-open-source-community">
-<h3>1.2 Contribute Your New OPs to the Open-Source Community<a class="headerlink" href="#contribute-your-new-ops-to-the-open-source-community" title="Link to this heading">¶</a></h3>
+<h3>4.3 Contribute Your New OPs to the Open-Source Community<a class="headerlink" href="#contribute-your-new-ops-to-the-open-source-community" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>According to the implementation progress, OP will be categorized into 3 types of versions:</p>
+<li><p>To faciliate community contribution, according to the implementation progress, OP will be categorized into 3 types of versions:</p>
 <ul>
 <li><p><img alt="alpha" src="https://img.shields.io/badge/alpha-red?style=plastic" /> version: Only the basic OP implementations are finished.</p></li>
 <li><p><img alt="beta" src="https://img.shields.io/badge/beta-yellow?style=plastic" /> version: Based on the alpha version, unittests for this OP and basic docstring are added as well.</p></li>
 <li><p><img alt="stable" src="https://img.shields.io/badge/stable-green?style=plastic" /> version: Based on the beta version, OP optimizations (e.g. model management, batched processing, OP fusion, …)</p></li>
 </ul>
 </li>
-<li><p>📣📣📣 Community contributors can submit corresponding operator PRs in the alpha state. After that, the contributor can work with the Data-Juicer team to gradually improve it to beta and stable versions in subsequent PRs. We welcome co-construction and will highlight <a class="reference external" href="https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement">acknowledgements</a>!</p></li>
+<li><p>Community contributors can submit corresponding operator PRs in the alpha state. After that, the contributor can work with the Data-Juicer team to gradually improve it to beta and stable versions in subsequent PRs. We welcome co-construction and will highlight <a class="reference external" href="https://github.com/modelscope/data-juicer?tab=readme-ov-file#contribution-and-acknowledgements">acknowledgements</a>!</p></li>
+<li><p>Welcome to add the corresponding references of your new recipe (e.g., a new implementation inspired by some existing ideas or codes, or an advanced algorithm proposed in an existing paper).</p></li>
 </ul>
 <section id="providing-basic-op-functions-alpha-version">
-<h4>1.2.1 Providing Basic OP Functions (alpha version)<a class="headerlink" href="#providing-basic-op-functions-alpha-version" title="Link to this heading">¶</a></h4>
-<p>In the previous section 1.1, the operator we implemented has already fulfilled the basic functionalities, thus meeting the requirements for the <img alt="alpha" src="https://img.shields.io/badge/alpha-red?style=plastic" /> version. Next, we will introduce how to extend this operator to make it more usable and standardized.</p>
-</section>
+<h4>4.3.1 Providing Basic OP Functions (alpha version)<a class="headerlink" href="#providing-basic-op-functions-alpha-version" title="Link to this heading">¶</a></h4>
+<p>In the previous <a class="reference internal" href="#build-your-own-ops-quickly">section</a>, the operator we implemented has already fulfilled the basic functionalities, thus meeting the requirements for the <img alt="alpha" src="https://img.shields.io/badge/alpha-red?style=plastic" /> version. Next, we will introduce how to extend this operator to make it more usable and standardized.</p>
 </section>
 <section id="making-the-op-more-usable-beta-version">
-<h3>1.2.2 Making the OP More Usable (beta version)<a class="headerlink" href="#making-the-op-more-usable-beta-version" title="Link to this heading">¶</a></h3>
+<h4>4.3.2 Making the OP More Usable (beta version)<a class="headerlink" href="#making-the-op-more-usable-beta-version" title="Link to this heading">¶</a></h4>
 <ul class="simple">
 <li><p>(<img alt="beta" src="https://img.shields.io/badge/beta-yellow?style=plastic" /> strongly recommended) In order to enhance the robustness of the code, verify the correctness and intuitively show how to use its functions, it is best to unit test the newly added operators. For the <code class="docutils literal notranslate"><span class="pre">TextLengthFilter</span></code> operator above, implement a test file such as <code class="docutils literal notranslate"><span class="pre">test_text_length_filter.py</span></code> in <code class="docutils literal notranslate"><span class="pre">tests/ops/filter/</span></code>:</p></li>
 </ul>
@@ -574,7 +801,7 @@
 </ul>
 </section>
 <section id="making-op-faster-more-complete-stable-version">
-<h3>1.2.3 Making OP Faster &amp; More complete (stable version)<a class="headerlink" href="#making-op-faster-more-complete-stable-version" title="Link to this heading">¶</a></h3>
+<h4>4.3.2 Making OP Faster &amp; More complete (stable version)<a class="headerlink" href="#making-op-faster-more-complete-stable-version" title="Link to this heading">¶</a></h4>
 <ul>
 <li><p>(<img alt="stable" src="https://img.shields.io/badge/stable-green?style=plastic" />) If Hugging Face models are used within an operator, you might want to leverage GPU acceleration. To achieve this, declare <code class="docutils literal notranslate"><span class="pre">_accelerator</span> <span class="pre">=</span> <span class="pre">'cuda'</span></code> in the OP’s constructor, and ensure that <code class="docutils literal notranslate"><span class="pre">compute_stats_single/batched</span></code> and <code class="docutils literal notranslate"><span class="pre">process_single/batched</span></code> methods accept an additional positional argument <code class="docutils literal notranslate"><span class="pre">rank</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ... (same as above)</span>
@@ -786,232 +1013,14 @@ it’s calculated by this new OP.</p></li>
 </div>
 </section>
 </section>
-<section id="build-your-own-data-recipes-and-configs">
-<h2>2. Build Your Own Data Recipes and Configs<a class="headerlink" href="#build-your-own-data-recipes-and-configs" title="Link to this heading">¶</a></h2>
+<section id="contribute-your-new-recipes">
+<h3>4.4 Contribute Your New Recipes<a class="headerlink" href="#contribute-your-new-recipes" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>We provide easy configuration based on <a class="reference external" href="https://github.com/omni-us/jsonargparse/">jsonargparse</a> to reduce cost for boilerplate codes.</p></li>
-<li><p>We provide fruitful examples in <a class="reference internal" href="RecipeGallery.html"><span class="std std-doc">Data Recipe Gallery</span></a> for reference reuse and extension.</p></li>
-<li><p>📣📣📣 Community contributors can submit PRs in the [Data Recipe Gallery] to add customized data recipes to promote dissemination, reuse and related technical evolution. We welcome co-construction and will highlight <a class="reference external" href="https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement">acknowledgements</a>!</p></li>
-</ul>
-<section id="fruitful-config-sources-type-hints">
-<h3>2.1 Fruitful Config Sources &amp; Type Hints<a class="headerlink" href="#fruitful-config-sources-type-hints" title="Link to this heading">¶</a></h3>
-<ul class="simple">
-<li><p>A global config object can be initialized via</p></li>
-</ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># core.executor.py</span>
-<span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">init_configs</span><span class="p">()</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>in which function arguments from diverse sources can be specified and mixed
-up, including</p></li>
-</ul>
-<ol class="arabic simple">
-<li><p><em>hard-coded default values</em> when registering the config into parser or specified in the classes’ <code class="docutils literal notranslate"><span class="pre">__init__</span></code> functions</p></li>
-<li><p>default <em>config files</em> in json (yaml or jsonnet supersets)</p></li>
-<li><p><em>environment variables</em></p></li>
-<li><p><em>POSIX-style command line arguments</em>, such as <code class="docutils literal notranslate"><span class="pre">--project_name</span> <span class="pre">my_data_demo</span></code> or <code class="docutils literal notranslate"><span class="pre">--project_name=my_data_demo</span></code> , including config files</p></li>
-</ol>
-<ul class="simple">
-<li><p>The final parsed values are mixed from these sources. And the override order is the same as the numbers above.</p></li>
-</ul>
-<p>Besides, many argument types and respective validation are supported.
-Including python built-in types, types from <a class="reference external" href="https://docs.python.org/3/library/typing.html">Lib/typing</a> module, and
-extended <a class="reference external" href="https://jsonargparse.readthedocs.io/en/stable/#type-hints">types</a>
-from jsonargparse, such as <code class="docutils literal notranslate"><span class="pre">restricted</span> <span class="pre">types</span></code> and <code class="docutils literal notranslate"><span class="pre">Paths</span></code> with customized
-limitations.</p>
-</section>
-<section id="hierarchical-configs-and-helps">
-<h3>2.2 Hierarchical Configs and Helps<a class="headerlink" href="#hierarchical-configs-and-helps" title="Link to this heading">¶</a></h3>
-<ul class="simple">
-<li><p>You can use dot notation in the argument names freely to define the
-hierarchy, e.g., <code class="docutils literal notranslate"><span class="pre">maximum_line_length_filter.min</span></code>.
-More importantly, by default, we automatically register the configs from
-the docstrings of implemented operators. That is, the structure of all
-configs are always in sync with codes.</p></li>
-<li><p>You can get the hierarchical help information by running a script that calls
-our executor such as</p></li>
-</ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python tools/process_data.py --help
-
-usage: process_data.py [-h] [--config CONFIG] [--print_config[=flags]] [--project_name PROJECT_NAME] [--dataset_path DATASET_PATH] [--dataset_dir DATASET_DIR] [--export_path EXPORT_PATH] [--process PROCESS]
-                            [--np NP] [--text_keys TEXT_KEYS] [--document_deduplicator CONFIG] [--document_deduplicator.hash_method HASH_METHOD] [--document_deduplicator.lowercase LOWERCASE]
-                            [--document_deduplicator.ignore_non_character IGNORE_NON_CHARACTER] [--language_id_score_filter CONFIG] [--language_id_score_filter.lang LANG] [--words_num_filter CONFIG] [--words_num_filter.min MIN] [--words_num_filter.max MAX]
-                            [--alphanumeric_filter CONFIG] [--alphanumeric_filter.min MIN] [--alphanumeric_filter.max MAX] [--average_line_length_filter CONFIG] [--average_line_length_filter.min MIN] [--average_line_length_filter.max MAX]
-                            [--maximum_line_length_filter CONFIG] [--maximum_line_length_filter.min MIN] [--maximum_line_length_filter.max MAX] [--text_length_filter CONFIG] [--text_length_filter.min MIN] [--text_length_filter.max MAX]
-                            [--remove_comments_mapper CONFIG] [--remove_comments_mapper.type TYPE] [--remove_comments_mapper.inline INLINE] [--remove_comments_mapper.multiline MULTILINE] [--remove_header_mapper CONFIG]
-                            [--remove_header_mapper.before_section BEFORE_SECTION]
-
-optional arguments:
-  -h, --help            Show this help message and exit.
-  --config CONFIG       Path to a configuration file.
-  --print_config[=flags]
-                        Print the configuration after applying all other arguments and exit. The optional flags customizes the output and are one or more keywords separated by comma. The supported flags are: comments, skip_default, skip_null.
-  --project_name PROJECT_NAME
-                        name of your data process project. (type: str, default: null)
-  --dataset_path DATASET_PATH
-                        path to your dataset file, relative with respect to the config file&#39;s location (type: Path_fr, default: null)
-  --dataset_dir DATASET_DIR
-                        path to your dataset(s) within a directory, relative with respect to the config file&#39;s location (type: Path_drw, default: null)
-  --export_path EXPORT_PATH
-                        path to the output processed dataset, relative with respect to the config file&#39;s location (type: Path_fc, default: null)
-  --process PROCESS, --process+ PROCESS
-                        a list of several process operators with their arguments (type: List[Dict], default: null)
-  --np NP               number of subprocess to process your dataset. (type: PositiveInt, default: null)
-
-&lt;class &#39;data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter&#39;&gt;:
-  --alphanumeric_filter CONFIG
-                        Path to a configuration file.
-  --alphanumeric_filter.min MIN
-                        the min filter rate in alphanumeric op. (type: ClosedUnitInterval, default: 0.0)
-  --alphanumeric_filter.max MAX
-                        the max filter rate in alphanumeric op. (type: ClosedUnitInterval, default: 0.25)
-
-&lt;class &#39;data_juicer.ops.filter.text_length_filter.TextLengthFilter&#39;&gt;:
-  --text_length_filter CONFIG
-                        Path to a configuration file.
-  --text_length_filter.min MIN
-                        min text length in the filtering (type: int, default: 10)
-  --text_length_filter.max MAX
-                        max text length in the filtering (type: int, default: 10000)
-
-......
-
-</pre></div>
-</div>
-</section>
-</section>
-<section id="dependency-management">
-<h2>3. Dependency Management<a class="headerlink" href="#dependency-management" title="Link to this heading">¶</a></h2>
-<p>Data-Juicer uses a modern dependency management system based on <code class="docutils literal notranslate"><span class="pre">uv</span></code> and <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>. Dependencies are managed through the standard Python packaging format (PEP 621) and installed on-demand using a lazy loading system.</p>
-<section id="installing-uv">
-<h3>3.1 Installing uv<a class="headerlink" href="#installing-uv" title="Link to this heading">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">uv</span></code> is a fast Python package installer and resolver, as a better drop-in replacement for pip. You can install it using:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using curl</span>
-curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
-
-<span class="c1"># Or using pip</span>
-pip<span class="w"> </span>install<span class="w"> </span>uv
-</pre></div>
-</div>
-<p>After installation, verify it’s working by running <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">--version</span></code>.</p>
-</section>
-<section id="virtual-environment-management">
-<h3>3.2 Virtual Environment Management<a class="headerlink" href="#virtual-environment-management" title="Link to this heading">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">uv</span></code> provides virtual environment management capabilities that replaces <code class="docutils literal notranslate"><span class="pre">venv</span></code> and <code class="docutils literal notranslate"><span class="pre">virtualenv</span></code>. Here are the common commands:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a new virtual environment</span>
-uv<span class="w"> </span>venv
-
-<span class="c1"># Or create a virtual environment with a specific Python version</span>
-uv<span class="w"> </span>venv<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.10
-
-<span class="c1"># Activate the virtual environment</span>
-<span class="c1"># On Unix/macOS</span>
-<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
-<span class="c1"># On Windows</span>
-.venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate
-
-<span class="c1"># Install minimal dependencies in the virtual environment</span>
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
-</pre></div>
-</div>
-</section>
-<section id="adding-new-dependencies">
-<h3>3.3 Adding New Dependencies<a class="headerlink" href="#adding-new-dependencies" title="Link to this heading">¶</a></h3>
-<p>To add new dependencies:</p>
-<ol class="arabic simple">
-<li><p>Add them to the appropriate section in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>:</p>
-<ul class="simple">
-<li><p>Core dependencies go in <code class="docutils literal notranslate"><span class="pre">[project.dependencies]</span></code></p></li>
-<li><p>Optional dependencies go in <code class="docutils literal notranslate"><span class="pre">[project.optional-dependencies]</span></code> under the appropriate group (generic, dev, audio, video, etc.)</p></li>
-</ul>
-</li>
-<li><p>The lazy loading system will automatically handle installation when the dependencies are first used.</p></li>
-</ol>
-<p>Example:</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[project.dependencies]</span>
-<span class="c1"># Core dependencies</span>
-<span class="n">numpy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=1.26.4,&lt;2.0.0&quot;</span>
-
-<span class="k">[project.optional-dependencies]</span>
-<span class="n">generic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="s2">&quot;torch==2.6.0&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s2">&quot;transformers&gt;=4.47.0&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="err">...</span>
-<span class="err">]</span>
-</pre></div>
-</div>
-</section>
-<section id="development-setup">
-<h3>3.4 Development Setup<a class="headerlink" href="#development-setup" title="Link to this heading">¶</a></h3>
-<ol class="arabic simple">
-<li><p>Install the package with all dependencies:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
-</pre></div>
-</div>
-<ol class="arabic simple" start="2">
-<li><p>Or install with specific groups:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[generic]&quot;</span><span class="w">      </span><span class="c1"># Generic dependencies</span>
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span><span class="w">          </span><span class="c1"># Development tools</span>
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[ai_services]&quot;</span><span class="w">  </span><span class="c1"># Services dependencies</span>
-</pre></div>
-</div>
-</section>
-<section id="lazy-loading">
-<h3>3.5 Lazy Loading<a class="headerlink" href="#lazy-loading" title="Link to this heading">¶</a></h3>
-<p>The lazy loading system automatically installs dependencies when they are first used. This means:</p>
-<ul class="simple">
-<li><p>Initial installation is faster</p></li>
-<li><p>Only required dependencies are installed</p></li>
-<li><p>Dependencies are installed on-demand</p></li>
-<li><p>Uses <code class="docutils literal notranslate"><span class="pre">uv</span></code> for fast installation when available</p></li>
+<li><p>Community contributors can submit PRs in the <a class="reference internal" href="RecipeGallery.html"><span class="std std-doc">Data Recipe Gallery</span></a> to add customized data recipes to promote dissemination, reuse and related technical evolution.</p></li>
+<li><p>Feel free to add the corresponding references of your new recipe, or just propose some requirements/ideas to improve the existing recipes.</p></li>
+<li><p>We greatly welcome co-construction and will highlight <a class="reference external" href="https://github.com/modelscope/data-juicer?tab=readme-ov-file#contribution-and-acknowledgements">acknowledgements</a>!</p></li>
 </ul>
 </section>
-</section>
-<section id="coding-style">
-<h2>4. Coding Style<a class="headerlink" href="#coding-style" title="Link to this heading">¶</a></h2>
-<p>We define our styles in <code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code>. Before committing,
-please install <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> tool to automatically check and modify accordingly:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># ===========install pre-commit tool===========</span>
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pre-commit
-
-<span class="nb">cd</span><span class="w"> </span>&lt;path_to_data_juicer&gt;
-<span class="c1"># install pre-commit script for data_juicer</span>
-pre-commit<span class="w"> </span>install
-
-
-<span class="c1"># ===========check all files===========</span>
-git<span class="w"> </span>add<span class="w"> </span>.
-pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
-
-<span class="c1"># commit after all checking are passed</span>
-git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;xxxx&quot;</span>
-</pre></div>
-</div>
-<p><strong>Note</strong>: We have configured pre-commit checks in github workflow. If this
-check in your PR fails, please locally ① ensure that the relevant
-dependencies of pre-commit are consistent with the project configuration
-(which can be completed through <code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">clean</span></code> and <code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">install</span></code>);
-and ② execute <code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">run</span> <span class="pre">--all-files</span></code> before push.</p>
-</section>
-<section id="documentation-style">
-<h2>5. Documentation Style<a class="headerlink" href="#documentation-style" title="Link to this heading">¶</a></h2>
-<p>We use Sphinx for document management. To ensure the smooth integration of development documents into the Sphinx documentation system, please pay attention to the following guidelines when writing:</p>
-<ol class="arabic simple">
-<li><p>Heading Hierarchy</p>
-<ul class="simple">
-<li><p>Level 1 Heading (<code class="docutils literal notranslate"><span class="pre">#</span></code>): Each document <strong>must and can only</strong> contain one Level 1 heading, which serves as the overall title of the document.</p></li>
-<li><p>Ensure the heading hierarchy is correct and avoid skipping heading levels. For example, a Level 1 heading should be followed by a Level 2 heading, not a Level 3 heading.</p></li>
-</ul>
-</li>
-<li><p>File Naming Conventions</p>
-<ul class="simple">
-<li><p>Chinese Documents: Chinese Markdown files must be named with the suffix <code class="docutils literal notranslate"><span class="pre">_ZH</span></code>. For example: <code class="docutils literal notranslate"><span class="pre">README_ZH.md</span></code></p></li>
-</ul>
-</li>
-</ol>
 </section>
 </section>
 
@@ -1071,16 +1080,7 @@ and ② execute <code class="docutils literal notranslate"><span class="pre">pre
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">How-to Guide for Developers</a><ul>
-<li><a class="reference internal" href="#build-your-own-ops">1. Build Your Own OPs</a><ul>
-<li><a class="reference internal" href="#build-ops-quickly">1.1 Build OPs Quickly</a></li>
-<li><a class="reference internal" href="#contribute-your-new-ops-to-the-open-source-community">1.2 Contribute Your New OPs to the Open-Source Community</a><ul>
-<li><a class="reference internal" href="#providing-basic-op-functions-alpha-version">1.2.1 Providing Basic OP Functions (alpha version)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#making-the-op-more-usable-beta-version">1.2.2 Making the OP More Usable (beta version)</a></li>
-<li><a class="reference internal" href="#making-op-faster-more-complete-stable-version">1.2.3 Making OP Faster &amp; More complete (stable version)</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#build-your-own-ops-quickly">1. Build Your Own OPs Quickly</a></li>
 <li><a class="reference internal" href="#build-your-own-data-recipes-and-configs">2. Build Your Own Data Recipes and Configs</a><ul>
 <li><a class="reference internal" href="#fruitful-config-sources-type-hints">2.1 Fruitful Config Sources &amp; Type Hints</a></li>
 <li><a class="reference internal" href="#hierarchical-configs-and-helps">2.2 Hierarchical Configs and Helps</a></li>
@@ -1094,8 +1094,18 @@ and ② execute <code class="docutils literal notranslate"><span class="pre">pre
 <li><a class="reference internal" href="#lazy-loading">3.5 Lazy Loading</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#coding-style">4. Coding Style</a></li>
-<li><a class="reference internal" href="#documentation-style">5. Documentation Style</a></li>
+<li><a class="reference internal" href="#contribution-to-the-open-source-community">4. Contribution to the Open-source Community</a><ul>
+<li><a class="reference internal" href="#coding-style">4.1 Coding Style</a></li>
+<li><a class="reference internal" href="#documentation-style">4.2 Documentation Style</a></li>
+<li><a class="reference internal" href="#contribute-your-new-ops-to-the-open-source-community">4.3 Contribute Your New OPs to the Open-Source Community</a><ul>
+<li><a class="reference internal" href="#providing-basic-op-functions-alpha-version">4.3.1 Providing Basic OP Functions (alpha version)</a></li>
+<li><a class="reference internal" href="#making-the-op-more-usable-beta-version">4.3.2 Making the OP More Usable (beta version)</a></li>
+<li><a class="reference internal" href="#making-op-faster-more-complete-stable-version">4.3.2 Making OP Faster &amp; More complete (stable version)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contribute-your-new-recipes">4.4 Contribute Your New Recipes</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

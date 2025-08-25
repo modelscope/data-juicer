@@ -368,42 +368,39 @@
           <section id="id1">
 <h1>开发者指南<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
 <ul class="simple">
-<li><p><a class="reference internal" href="#id1">开发者指南</a></p>
+<li><p><a class="reference internal" href="#id2">1. 快速构建你自己的算子</a></p></li>
+<li><p><a class="reference internal" href="#id3">2. 构建你自己的数据菜谱和配置项</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id2">1. 构建自己的算子</a></p>
-<ul>
-<li><p><a class="reference internal" href="#id3">1.1 快速构建算子</a></p></li>
-<li><p><a class="reference internal" href="#id4">1.2 将你的算子贡献到开源社区</a></p>
-<ul>
-<li><p><a class="reference internal" href="#alpha">1.2.1 提供算子基本功能（alpha版本）</a></p></li>
-<li><p><a class="reference internal" href="#beta">1.2.2 使算子更可用（beta版本）</a></p></li>
-<li><p><a class="reference internal" href="#stable">1.2.3 使算子更快更完备（stable版本）</a></p></li>
+<li><p><a class="reference internal" href="#id4">2.1 丰富的配置源和类型提示</a></p></li>
+<li><p><a class="reference internal" href="#id5">2.2 层次化的配置和帮助</a></p></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><p><a class="reference internal" href="#id5">2. 构建自己的数据菜谱和配置</a></p>
-<ul>
-<li><p><a class="reference internal" href="#id6">2.1 丰富的配置源和类型提示</a></p></li>
-<li><p><a class="reference internal" href="#id7">2.2 层次化的配置和帮助</a></p></li>
-</ul>
-</li>
-<li><p><a class="reference internal" href="#id8">3. 依赖管理</a></p>
+<li><p><a class="reference internal" href="#id6">3. 依赖管理</a></p>
 <ul>
 <li><p><a class="reference internal" href="#uv">3.1 安装 uv</a></p></li>
-<li><p><a class="reference internal" href="#id9">3.2 虚拟环境管理</a></p></li>
-<li><p><a class="reference internal" href="#id10">3.3 添加新依赖</a></p></li>
-<li><p><a class="reference internal" href="#id11">3.4 开发环境设置</a></p></li>
-<li><p><a class="reference internal" href="#id12">3.5 延迟加载</a></p></li>
+<li><p><a class="reference internal" href="#id7">3.2 虚拟环境管理</a></p></li>
+<li><p><a class="reference internal" href="#id8">3.3 添加新依赖</a></p></li>
+<li><p><a class="reference internal" href="#id9">3.4 开发环境设置</a></p></li>
+<li><p><a class="reference internal" href="#id10">3.5 延迟加载</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id13">4. 编码规范</a></p></li>
-<li><p><a class="reference internal" href="#id14">5. 文档规范</a></p></li>
+<li><p><a class="reference internal" href="#id11">4. 为开源社区贡献</a></p>
+<ul>
+<li><p><a class="reference internal" href="#id12">4.1 编码规范</a></p></li>
+<li><p><a class="reference internal" href="#id13">4.2 文档规范</a></p></li>
+<li><p><a class="reference internal" href="#id14">4.3 将你的新算子贡献到开源社区</a></p>
+<ul>
+<li><p><a class="reference internal" href="#alpha">4.3.1 提供算子基本功能（alpha版本）</a></p></li>
+<li><p><a class="reference internal" href="#beta">4.3.2 使算子更可用（beta版本）</a></p></li>
+<li><p><a class="reference internal" href="#stable">4.3.3 使算子更快更完备（stable版本）</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#id15">4.4 贡献您的新配方</a></p></li>
 </ul>
 </li>
 </ul>
 <section id="id2">
-<h2>1. 构建自己的算子<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<h2>1. 快速构建你自己的算子<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Data-Juicer 支持每个人灵活、便捷定义自己的算子。</p></li>
 <li><p>在实现新的算子之前，请参考已有 <a class="reference internal" href="Operators.html"><span class="std std-doc">算子池</span></a> 以避免不必要的重复。</p></li>
@@ -411,8 +408,6 @@
 <blockquote>
 <div><p>以下示例的开发过程以直接在源码对应模块中添加算子为例。如果外部添加算子，可以通过传参<code class="docutils literal notranslate"><span class="pre">--custom-operator-paths</span></code> 或 yaml配置文件中配置<code class="docutils literal notranslate"><span class="pre">custom_operator_paths</span></code>参数注册新算子，例如：<code class="docutils literal notranslate"><span class="pre">custom_operator_paths:</span> <span class="pre">['/path/to/new/op.py',</span> <span class="pre">'/path/to/new/ops/directory/]</span></code>。</p>
 </div></blockquote>
-<section id="id3">
-<h3>1.1 快速构建算子<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
 <p>下面以 &quot;TextLengthFilter&quot; 的算子（过滤仅包含预期文本长度的样本语料）为例，展示相应开发构建过程。</p>
 <ol class="arabic simple">
 <li><p>(可选) 如果该算子定义了某个统计变量，那么请在 <code class="docutils literal notranslate"><span class="pre">data_juicer/utils/constant.py</span></code> 文件中添加一个新的<code class="docutils literal notranslate"><span class="pre">StatsKeys</span></code>属性来统一保存管理。</p></li>
@@ -505,9 +500,227 @@
 <span class="w">      </span><span class="nt">max_len</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
 </pre></div>
 </div>
+<ol class="arabic simple" start="6">
+<li><p>社区贡献者可在alpha状态后就提相应算子PR。此后该贡献者可以与Data-Juicer团队一起在后续PR中，将其渐进完善到beta和stable版本。更多细节请参考下方第4节。我们非常欢迎共建，并会<a class="reference external" href="https://github.com/modelscope/data-juicer?tab=readme-ov-file#contribution-and-acknowledgements">高亮致谢</a>！</p></li>
+</ol>
 </section>
+<section id="id3">
+<h2>2. 构建你自己的数据菜谱和配置项<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>我们提供基于 <a class="reference external" href="https://github.com/omni-us/jsonargparse/">jsonargparse</a> 的简单配置以降低样板代码的成本。</p></li>
+<li><p>我们提供大量的示例性菜谱以供参阅复用和扩展，<a class="reference internal" href="RecipeGallery_ZH.html"><span class="std std-doc">数据菜谱Gallery</span></a>。</p></li>
+<li><p>📣📣📣 社区贡献者可提PR在<em>数据菜谱Gallery</em>中添加自定义的数据菜谱，促进传播、复用和相关技术演进。更多细节请参考下方第4节。我们非常欢迎共建，并会<a class="reference external" href="https://github.com/modelscope/data-juicer?tab=readme-ov-file#contribution-and-acknowledgements">高亮致谢</a>！</p></li>
+</ul>
 <section id="id4">
-<h3>1.2 将你的新算子贡献到开源社区<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<h3>2.1 丰富的配置源和类型提示<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>全局配置对象可以通过以下方式初始化</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># core.executor.py</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">init_configs</span><span class="p">()</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>其中可以指定和混合来自不同来源的函数参数，包括</p>
+<ol class="arabic simple">
+<li><p><em>硬编码默认值</em> 将配置注册到解析器中或在类的 <code class="docutils literal notranslate"><span class="pre">__init__</span></code> 函数中指定</p></li>
+<li><p>json 格式的默认<em>配置文件</em>（yaml 或 jsonnet 超集）</p></li>
+<li><p><em>环境变量</em></p></li>
+<li><p><em>POSIX-style 命令行参数</em>， 例如 <code class="docutils literal notranslate"><span class="pre">--project_name</span> <span class="pre">my_data_demo</span></code> 或 <code class="docutils literal notranslate"><span class="pre">--project_name=my_data_demo</span></code>，包含配置文件</p></li>
+</ol>
+</li>
+<li><p>最终解析的值是来自这些来源的混合。 并且覆盖顺序与上面的数字相同。</p></li>
+</ul>
+<p>此外，还支持许多参数类型和相应的验证。
+包含 Python内置类型、来自 <a class="reference external" href="https://docs.python.org/3/library/typing.html">Lib/typing</a> 的类型，以及来自 jsonargparse 的 <a class="reference external" href="https://jsonargparse.readthedocs.io/en/stable/#type-hints">扩展类型</a>，例如具有自定义限制的 <code class="docutils literal notranslate"><span class="pre">restricted</span> <span class="pre">types</span></code> 和 <code class="docutils literal notranslate"><span class="pre">Paths</span></code>。</p>
+</section>
+<section id="id5">
+<h3>2.2 层次化的配置和帮助<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>您可以在参数名称中自由使用点符号来定义层次结构， 例如 <code class="docutils literal notranslate"><span class="pre">maximum_line_length_filter.min</span></code>.
+更重要的是，默认情况下，我们自动注册已实现的运算符的 docstring。 也就是说，所有的结构配置始终与代码同步。</p></li>
+<li><p>您可以通过运行脚本来获取层次化的帮助信息，例如：</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python tools/process_data.py --help
+
+usage: process_data.py [-h] [--config CONFIG] [--print_config[=flags]] [--project_name PROJECT_NAME] [--dataset_path DATASET_PATH] [--dataset_dir DATASET_DIR] [--export_path EXPORT_PATH] [--process PROCESS]
+                            [--np NP] [--text_kes TEXT_KEYS] [--document_deduplicator CONFIG] [--document_deduplicator.hash_method HASH_METHOD] [--document_deduplicator.lowercase LOWERCASE]
+                            [--document_deduplicator.ignore_non_character IGNORE_NON_CHARACTER] [--language_id_score_filter CONFIG] [--language_id_score_filter.lang LANG] [--words_num_filter CONFIG] [--words_num_filter.min MIN] [--words_num_filter.max MAX]
+                            [--alphanumeric_filter CONFIG] [--alphanumeric_filter.min MIN] [--alphanumeric_filter.max MAX] [--average_line_length_filter CONFIG] [--average_line_length_filter.min MIN] [--average_line_length_filter.max MAX]
+                            [--maximum_line_length_filter CONFIG] [--maximum_line_length_filter.min MIN] [--maximum_line_length_filter.max MAX] [--text_length_filter CONFIG] [--text_length_filter.min MIN] [--text_length_filter.max MAX]
+                            [--remove_comments_mapper CONFIG] [--remove_comments_mapper.type TYPE] [--remove_comments_mapper.inline INLINE] [--remove_comments_mapper.multiline MULTILINE] [--remove_header_mapper CONFIG]
+                            [--remove_header_mapper.before_section BEFORE_SECTION]
+
+optional arguments:
+  -h, --help            Show this help message and exit.
+  --config CONFIG       Path to a configuration file.
+  --print_config[=flags]
+                        Print the configuration after applying all other arguments and exit. The optional flags customizes the output and are one or more keywords separated by comma. The supported flags are: comments, skip_default, skip_null.
+  --project_name PROJECT_NAME
+                        name of your data process project. (type: str, default: null)
+  --dataset_path DATASET_PATH
+                        path to your dataset file, relative with respect to the config file&#39;s location (type: Path_fr, default: null)
+  --dataset_dir DATASET_DIR
+                        path to your dataset(s) within a directory, relative with respect to the config file&#39;s location (type: Path_drw, default: null)
+  --export_path EXPORT_PATH
+                        path to the output processed dataset, relative with respect to the config file&#39;s location (type: Path_fc, default: null)
+  --process PROCESS, --process+ PROCESS
+                        a list of several process operators with their arguments (type: List[Dict], default: null)
+  --np NP               number of subprocess to process your dataset. (type: PositiveInt, default: null)
+
+&lt;class &#39;data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter&#39;&gt;:
+  --alphanumeric_filter CONFIG
+                        Path to a configuration file.
+  --alphanumeric_filter.min MIN
+                        the min filter rate in alphanumeric op. (type: ClosedUnitInterval, default: 0.0)
+  --alphanumeric_filter.max MAX
+                        the max filter rate in alphanumeric op. (type: ClosedUnitInterval, default: 0.25)
+
+&lt;class &#39;data_juicer.ops.filter.text_length_filter.TextLengthFilter&#39;&gt;:
+  --text_length_filter CONFIG
+                        Path to a configuration file.
+  --text_length_filter.min MIN
+                        min text length in the filtering (type: int, default: 10)
+  --text_length_filter.max MAX
+                        max text length in the filtering (type: int, default: 10000)
+
+......
+
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id6">
+<h2>3. 依赖管理<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<p>Data-Juicer 使用基于 <code class="docutils literal notranslate"><span class="pre">uv</span></code> 和 <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> 的现代依赖管理系统。依赖通过标准的 Python 打包格式 (PEP 621) 进行管理，并使用延迟加载系统按需安装。</p>
+<section id="uv">
+<h3>3.1 安装 uv<a class="headerlink" href="#uv" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">uv</span></code> 是一个快速的 Python 包安装器和解析器，用于替代 pip。您可以通过以下方式安装：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 使用 curl 安装</span>
+curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+
+<span class="c1"># 或使用 pip 安装</span>
+pip<span class="w"> </span>install<span class="w"> </span>uv
+</pre></div>
+</div>
+<p>安装完成后，您可以使用 <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">--version</span></code> 验证安装是否成功。</p>
+</section>
+<section id="id7">
+<h3>3.2 虚拟环境管理<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">uv</span></code> 提供了虚拟环境管理功能，可以替代 <code class="docutils literal notranslate"><span class="pre">venv</span></code> 和 <code class="docutils literal notranslate"><span class="pre">virtualenv</span></code>。以下是常用命令：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 创建新的虚拟环境</span>
+uv<span class="w"> </span>venv
+
+<span class="c1"># 创建指定 Python 版本的虚拟环境</span>
+uv<span class="w"> </span>venv<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.10
+
+<span class="c1"># 激活虚拟环境</span>
+<span class="c1"># 在 Unix/macOS 上</span>
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+<span class="c1"># 在 Windows 上</span>
+.venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate
+
+<span class="c1"># 在虚拟环境中安装最小依赖</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+<section id="id8">
+<h3>3.3 添加新依赖<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<p>添加新依赖的方法：</p>
+<ol class="arabic simple">
+<li><p>将依赖添加到 <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> 的相应部分：</p>
+<ul class="simple">
+<li><p>核心依赖放在 <code class="docutils literal notranslate"><span class="pre">[project.dependencies]</span></code> 中</p></li>
+<li><p>可选依赖放在 <code class="docutils literal notranslate"><span class="pre">[project.optional-dependencies]</span></code> 的相应组中（ generic、dev、audio、video，etc.）</p></li>
+</ul>
+</li>
+<li><p>延迟加载系统会在首次使用时自动处理依赖安装。</p></li>
+</ol>
+<p>示例：</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[project.dependencies]</span>
+<span class="c1"># 核心依赖</span>
+<span class="n">numpy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=1.26.4,&lt;2.0.0&quot;</span>
+
+<span class="k">[project.optional-dependencies]</span>
+<span class="n">generic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;torch==2.6.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;transformers&gt;=4.47.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="err">...</span>
+<span class="err">]</span>
+</pre></div>
+</div>
+</section>
+<section id="id9">
+<h3>3.4 开发环境设置<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>安装所有依赖：</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>或安装特定组：</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[generic]&quot;</span><span class="w">      </span><span class="c1"># 通用依赖</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span><span class="w">          </span><span class="c1"># 开发工具</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[ai_services]&quot;</span><span class="w">  </span><span class="c1"># 服务依赖</span>
+</pre></div>
+</div>
+</section>
+<section id="id10">
+<h3>3.5 延迟加载<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h3>
+<p>延迟加载系统在首次使用时自动安装依赖。这意味着：</p>
+<ul class="simple">
+<li><p>初始安装更快</p></li>
+<li><p>只安装必需的依赖</p></li>
+<li><p>依赖按需安装</p></li>
+<li><p>优先使用 <code class="docutils literal notranslate"><span class="pre">uv</span></code> 进行快速安装</p></li>
+</ul>
+</section>
+</section>
+<section id="id11">
+<h2>4. 为开源社区贡献<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h2>
+<section id="id12">
+<h3>4.1 编码规范<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h3>
+<p>我们将编码规范定义在 <code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code> 中。在向仓库贡献代码之前，请使用 <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> 工具对代码进行自动规范化。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># ===========install pre-commit tool===========</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pre-commit
+
+<span class="nb">cd</span><span class="w"> </span>&lt;path_to_data_juicer&gt;
+<span class="c1"># install pre-commit script for data_juicer</span>
+pre-commit<span class="w"> </span>install
+
+
+<span class="c1"># ===========check all files===========</span>
+git<span class="w"> </span>add<span class="w"> </span>.
+pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+
+<span class="c1"># commit after all checking are passed</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;&lt;your_commit_message&gt;&quot;</span>
+</pre></div>
+</div>
+<p><strong>注意</strong>：我们在github workflow配置了pre-commit的检查。如果您的PR中该检查没通过，请在本地①确保pre-commit 的相关依赖与项目配置一致（可通过<code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">clean</span></code>和<code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">install</span></code>完成）；②push前执行了<code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">run</span> <span class="pre">--all-files</span></code>.</p>
+</section>
+<section id="id13">
+<h3>4.2 文档规范<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h3>
+<p>我们使用 Sphinx 进行文档管理。为保证开发文档顺利集成到 Sphinx 文档系统中，请在编写时注意以下规范：</p>
+<ol class="arabic simple">
+<li><p>标题层级</p>
+<ul class="simple">
+<li><p>一级标题（<code class="docutils literal notranslate"><span class="pre">#</span></code>）：每个文档<strong>必须且只能</strong>包含一个一级标题，作为文档的整体标题。</p></li>
+<li><p>确保标题层级结构正确，不要跳级使用标题。例如，一级标题下应该是二级标题，而不是直接跳到三级标题。</p></li>
+</ul>
+</li>
+<li><p>文件命名规范</p>
+<ul class="simple">
+<li><p>中文文档：中文 Markdown 文件的命名必须以 <code class="docutils literal notranslate"><span class="pre">_ZH</span></code> 结尾。例如：<code class="docutils literal notranslate"><span class="pre">README_ZH.md</span></code></p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="id14">
+<h3>4.3 将你的新算子贡献到开源社区<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>根据实现完整性，算子会被分类为3类：</p>
 <ul>
@@ -516,14 +729,15 @@
 <li><p><img alt="stable" src="https://img.shields.io/badge/stable-green?style=plastic" /> 版本：在 beta 版本基础上进行了各项算子优化（如模型管理、批处理、算子融合等）</p></li>
 </ul>
 </li>
-<li><p>📣📣📣 社区贡献者可在alpha状态后就提相应算子PR。此后该贡献者可以与Data-Juicer团队一起在后续PR中，将其渐进完善到beta和stable版本。我们非常欢迎共建，并会高亮<a class="reference external" href="https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement">致谢</a>！</p></li>
+<li><p>社区贡献者可以在 alpha 版本提交相应的算子 PR。之后，贡献者可以与 Data-Juicer 团队合作，在后续 PR 中逐步将其改进到 beta 版本和稳定版本。我们欢迎共同创作，并将重点标注<a class="reference external" href="https://github.com/modelscope/data-juicer?tab=readme-ov-file#contribution-and-acknowledgements">致谢</a>！</p></li>
+<li><p>欢迎添加新算子的相应参考文献（例如，受现有想法或代码启发的新实现，或现有论文中提出的高级算法）。</p></li>
 </ul>
 <section id="alpha">
-<h4>1.2.1 提供算子基本功能（alpha版本）<a class="headerlink" href="#alpha" title="Link to this heading">¶</a></h4>
-<p>在前一个章节1.1中，我们实现的算子已经完整实现了基本功能，因此它已经满足<img alt="alpha" src="https://img.shields.io/badge/alpha-red?style=plastic" />版本的要求。接下来，我们将介绍如何将这个算子进行扩展，使其更可用、更规范。</p>
+<h4>4.3.1 提供算子基本功能（alpha版本）<a class="headerlink" href="#alpha" title="Link to this heading">¶</a></h4>
+<p>在前面<a class="reference internal" href="#id2">章节</a>中，我们实现的算子已经完整实现了基本功能，因此它已经满足<img alt="alpha" src="https://img.shields.io/badge/alpha-red?style=plastic" />版本的要求。接下来，我们将介绍如何将这个算子进行扩展，使其更可用、更规范。</p>
 </section>
 <section id="beta">
-<h4>1.2.2 使算子更可用（beta版本）<a class="headerlink" href="#beta" title="Link to this heading">¶</a></h4>
+<h4>4.3.2 使算子更可用（beta版本）<a class="headerlink" href="#beta" title="Link to this heading">¶</a></h4>
 <ul class="simple">
 <li><p>（<img alt="beta" src="https://img.shields.io/badge/beta-yellow?style=plastic" /> 强烈推荐）为了增强代码鲁棒性、验证正确性和直观展示如何使用其功能，最好为新添加的算子进行单元测试。对于上面的 <code class="docutils literal notranslate"><span class="pre">TextLengthFilter</span></code> 算子，在 <code class="docutils literal notranslate"><span class="pre">tests/ops/filter/</span></code> 中实现如 <code class="docutils literal notranslate"><span class="pre">test_text_length_filter.py</span></code> 的测试文件：</p></li>
 </ul>
@@ -576,7 +790,7 @@
 </ul>
 </section>
 <section id="stable">
-<h4>1.2.3 使算子更快更完备（stable版本）<a class="headerlink" href="#stable" title="Link to this heading">¶</a></h4>
+<h4>4.3.3 使算子更快更完备（stable版本）<a class="headerlink" href="#stable" title="Link to this heading">¶</a></h4>
 <ul>
 <li><p>(<img alt="stable" src="https://img.shields.io/badge/stable-green?style=plastic" />) 如果在算子中使用了 Hugging Face 模型，您可能希望利用 GPU 加速。为了实现这一点，请在算子的构造函数中声明 <code class="docutils literal notranslate"><span class="pre">_accelerator</span> <span class="pre">=</span> <span class="pre">'cuda'</span></code>，并确保 <code class="docutils literal notranslate"><span class="pre">compute_stats_single/batched</span></code> 和 <code class="docutils literal notranslate"><span class="pre">process_single/batched</span></code> 方法接受一个额外的位置参数 <code class="docutils literal notranslate"><span class="pre">rank</span></code>。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ... (same as above)</span>
@@ -779,219 +993,14 @@
 </ul>
 </section>
 </section>
-</section>
-<section id="id5">
-<h2>2. 构建自己的数据菜谱和配置<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<section id="id15">
+<h3>4.4 贡献您的新配方<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>我们提供基于 <a class="reference external" href="https://github.com/omni-us/jsonargparse/">jsonargparse</a> 的简单配置以降低样板代码的成本。</p></li>
-<li><p>我们提供大量的示例性菜谱以供参阅复用和扩展，<a class="reference internal" href="RecipeGallery_ZH.html"><span class="std std-doc">数据菜谱Gallery</span></a>。</p></li>
-<li><p>📣📣📣 社区贡献者可提PR在<em>数据菜谱Gallery</em>中添加自定义的数据菜谱，促进传播、复用和相关技术演进。我们非常欢迎共建，并会高亮<a class="reference external" href="https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement">致谢</a>！</p></li>
-</ul>
-<section id="id6">
-<h3>2.1 丰富的配置源和类型提示<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
-<ul class="simple">
-<li><p>全局配置对象可以通过以下方式初始化</p></li>
-</ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># core.executor.py</span>
-<span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">init_configs</span><span class="p">()</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>其中可以指定和混合来自不同来源的函数参数，包括</p>
-<ol class="arabic simple">
-<li><p><em>硬编码默认值</em> 将配置注册到解析器中或在类的 <code class="docutils literal notranslate"><span class="pre">__init__</span></code> 函数中指定</p></li>
-<li><p>json 格式的默认<em>配置文件</em>（yaml 或 jsonnet 超集）</p></li>
-<li><p><em>环境变量</em></p></li>
-<li><p><em>POSIX-style 命令行参数</em>， 例如 <code class="docutils literal notranslate"><span class="pre">--project_name</span> <span class="pre">my_data_demo</span></code> 或 <code class="docutils literal notranslate"><span class="pre">--project_name=my_data_demo</span></code>，包含配置文件</p></li>
-</ol>
-</li>
-<li><p>最终解析的值是来自这些来源的混合。 并且覆盖顺序与上面的数字相同。</p></li>
-</ul>
-<p>此外，还支持许多参数类型和相应的验证。
-包含 Python内置类型、来自 <a class="reference external" href="https://docs.python.org/3/library/typing.html">Lib/typing</a> 的类型，以及来自 jsonargparse 的 <a class="reference external" href="https://jsonargparse.readthedocs.io/en/stable/#type-hints">扩展类型</a>，例如具有自定义限制的 <code class="docutils literal notranslate"><span class="pre">restricted</span> <span class="pre">types</span></code> 和 <code class="docutils literal notranslate"><span class="pre">Paths</span></code>。</p>
-</section>
-<section id="id7">
-<h3>2.2 层次化的配置和帮助<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
-<ul class="simple">
-<li><p>您可以在参数名称中自由使用点符号来定义层次结构， 例如 <code class="docutils literal notranslate"><span class="pre">maximum_line_length_filter.min</span></code>.
-更重要的是，默认情况下，我们自动注册已实现的运算符的 docstring。 也就是说，所有的结构配置始终与代码同步。</p></li>
-<li><p>您可以通过运行脚本来获取层次化的帮助信息，例如：</p></li>
-</ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python tools/process_data.py --help
-
-usage: process_data.py [-h] [--config CONFIG] [--print_config[=flags]] [--project_name PROJECT_NAME] [--dataset_path DATASET_PATH] [--dataset_dir DATASET_DIR] [--export_path EXPORT_PATH] [--process PROCESS]
-                            [--np NP] [--text_kes TEXT_KEYS] [--document_deduplicator CONFIG] [--document_deduplicator.hash_method HASH_METHOD] [--document_deduplicator.lowercase LOWERCASE]
-                            [--document_deduplicator.ignore_non_character IGNORE_NON_CHARACTER] [--language_id_score_filter CONFIG] [--language_id_score_filter.lang LANG] [--words_num_filter CONFIG] [--words_num_filter.min MIN] [--words_num_filter.max MAX]
-                            [--alphanumeric_filter CONFIG] [--alphanumeric_filter.min MIN] [--alphanumeric_filter.max MAX] [--average_line_length_filter CONFIG] [--average_line_length_filter.min MIN] [--average_line_length_filter.max MAX]
-                            [--maximum_line_length_filter CONFIG] [--maximum_line_length_filter.min MIN] [--maximum_line_length_filter.max MAX] [--text_length_filter CONFIG] [--text_length_filter.min MIN] [--text_length_filter.max MAX]
-                            [--remove_comments_mapper CONFIG] [--remove_comments_mapper.type TYPE] [--remove_comments_mapper.inline INLINE] [--remove_comments_mapper.multiline MULTILINE] [--remove_header_mapper CONFIG]
-                            [--remove_header_mapper.before_section BEFORE_SECTION]
-
-optional arguments:
-  -h, --help            Show this help message and exit.
-  --config CONFIG       Path to a configuration file.
-  --print_config[=flags]
-                        Print the configuration after applying all other arguments and exit. The optional flags customizes the output and are one or more keywords separated by comma. The supported flags are: comments, skip_default, skip_null.
-  --project_name PROJECT_NAME
-                        name of your data process project. (type: str, default: null)
-  --dataset_path DATASET_PATH
-                        path to your dataset file, relative with respect to the config file&#39;s location (type: Path_fr, default: null)
-  --dataset_dir DATASET_DIR
-                        path to your dataset(s) within a directory, relative with respect to the config file&#39;s location (type: Path_drw, default: null)
-  --export_path EXPORT_PATH
-                        path to the output processed dataset, relative with respect to the config file&#39;s location (type: Path_fc, default: null)
-  --process PROCESS, --process+ PROCESS
-                        a list of several process operators with their arguments (type: List[Dict], default: null)
-  --np NP               number of subprocess to process your dataset. (type: PositiveInt, default: null)
-
-&lt;class &#39;data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter&#39;&gt;:
-  --alphanumeric_filter CONFIG
-                        Path to a configuration file.
-  --alphanumeric_filter.min MIN
-                        the min filter rate in alphanumeric op. (type: ClosedUnitInterval, default: 0.0)
-  --alphanumeric_filter.max MAX
-                        the max filter rate in alphanumeric op. (type: ClosedUnitInterval, default: 0.25)
-
-&lt;class &#39;data_juicer.ops.filter.text_length_filter.TextLengthFilter&#39;&gt;:
-  --text_length_filter CONFIG
-                        Path to a configuration file.
-  --text_length_filter.min MIN
-                        min text length in the filtering (type: int, default: 10)
-  --text_length_filter.max MAX
-                        max text length in the filtering (type: int, default: 10000)
-
-......
-
-</pre></div>
-</div>
-</section>
-</section>
-<section id="id8">
-<h2>3. 依赖管理<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
-<p>Data-Juicer 使用基于 <code class="docutils literal notranslate"><span class="pre">uv</span></code> 和 <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> 的现代依赖管理系统。依赖通过标准的 Python 打包格式 (PEP 621) 进行管理，并使用延迟加载系统按需安装。</p>
-<section id="uv">
-<h3>3.1 安装 uv<a class="headerlink" href="#uv" title="Link to this heading">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">uv</span></code> 是一个快速的 Python 包安装器和解析器，用于替代 pip。您可以通过以下方式安装：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 使用 curl 安装</span>
-curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
-
-<span class="c1"># 或使用 pip 安装</span>
-pip<span class="w"> </span>install<span class="w"> </span>uv
-</pre></div>
-</div>
-<p>安装完成后，您可以使用 <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">--version</span></code> 验证安装是否成功。</p>
-</section>
-<section id="id9">
-<h3>3.2 虚拟环境管理<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">uv</span></code> 提供了虚拟环境管理功能，可以替代 <code class="docutils literal notranslate"><span class="pre">venv</span></code> 和 <code class="docutils literal notranslate"><span class="pre">virtualenv</span></code>。以下是常用命令：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 创建新的虚拟环境</span>
-uv<span class="w"> </span>venv
-
-<span class="c1"># 创建指定 Python 版本的虚拟环境</span>
-uv<span class="w"> </span>venv<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.10
-
-<span class="c1"># 激活虚拟环境</span>
-<span class="c1"># 在 Unix/macOS 上</span>
-<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
-<span class="c1"># 在 Windows 上</span>
-.venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate
-
-<span class="c1"># 在虚拟环境中安装最小依赖</span>
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
-</pre></div>
-</div>
-</section>
-<section id="id10">
-<h3>3.3 添加新依赖<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h3>
-<p>添加新依赖的方法：</p>
-<ol class="arabic simple">
-<li><p>将依赖添加到 <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> 的相应部分：</p>
-<ul class="simple">
-<li><p>核心依赖放在 <code class="docutils literal notranslate"><span class="pre">[project.dependencies]</span></code> 中</p></li>
-<li><p>可选依赖放在 <code class="docutils literal notranslate"><span class="pre">[project.optional-dependencies]</span></code> 的相应组中（ generic、dev、audio、video，etc.）</p></li>
-</ul>
-</li>
-<li><p>延迟加载系统会在首次使用时自动处理依赖安装。</p></li>
-</ol>
-<p>示例：</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[project.dependencies]</span>
-<span class="c1"># 核心依赖</span>
-<span class="n">numpy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=1.26.4,&lt;2.0.0&quot;</span>
-
-<span class="k">[project.optional-dependencies]</span>
-<span class="n">generic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="s2">&quot;torch==2.6.0&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s2">&quot;transformers&gt;=4.47.0&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="err">...</span>
-<span class="err">]</span>
-</pre></div>
-</div>
-</section>
-<section id="id11">
-<h3>3.4 开发环境设置<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
-<ol class="arabic simple">
-<li><p>安装所有依赖：</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
-</pre></div>
-</div>
-<ol class="arabic simple" start="2">
-<li><p>或安装特定组：</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[generic]&quot;</span><span class="w">      </span><span class="c1"># 通用依赖</span>
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span><span class="w">          </span><span class="c1"># 开发工具</span>
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[ai_services]&quot;</span><span class="w">  </span><span class="c1"># 服务依赖</span>
-</pre></div>
-</div>
-</section>
-<section id="id12">
-<h3>3.5 延迟加载<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h3>
-<p>延迟加载系统在首次使用时自动安装依赖。这意味着：</p>
-<ul class="simple">
-<li><p>初始安装更快</p></li>
-<li><p>只安装必需的依赖</p></li>
-<li><p>依赖按需安装</p></li>
-<li><p>优先使用 <code class="docutils literal notranslate"><span class="pre">uv</span></code> 进行快速安装</p></li>
+<li><p>社区贡献者可以在<a class="reference internal" href="RecipeGallery_ZH.html"><span class="std std-doc">数据配方库</span></a>中提交 PR，添加自定义数据配方，以促进传播、复用和相关技术演进。</p></li>
+<li><p>欢迎添加您新配方的相应参考文献，或提出一些新需求、以及改进现有配方的想法。</p></li>
+<li><p>我们非常欢迎共建，并将重点<a class="reference external" href="https://github.com/modelscope/data-juicer?tab=readme-ov-file#contribution-and-acknowledgements">注明致谢</a>！</p></li>
 </ul>
 </section>
-</section>
-<section id="id13">
-<h2>4. 编码规范<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
-<p>我们将编码规范定义在 <code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code> 中。在向仓库贡献代码之前，请使用 <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> 工具对代码进行自动规范化。</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># ===========install pre-commit tool===========</span>
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pre-commit
-
-<span class="nb">cd</span><span class="w"> </span>&lt;path_to_data_juicer&gt;
-<span class="c1"># install pre-commit script for data_juicer</span>
-pre-commit<span class="w"> </span>install
-
-
-<span class="c1"># ===========check all files===========</span>
-git<span class="w"> </span>add<span class="w"> </span>.
-pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
-
-<span class="c1"># commit after all checking are passed</span>
-git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;&lt;your_commit_message&gt;&quot;</span>
-</pre></div>
-</div>
-<p><strong>注意</strong>：我们在github workflow配置了pre-commit的检查。如果您的PR中该检查没通过，请在本地①确保pre-commit 的相关依赖与项目配置一致（可通过<code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">clean</span></code>和<code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">install</span></code>完成）；②push前执行了<code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">run</span> <span class="pre">--all-files</span></code>.</p>
-</section>
-<section id="id14">
-<h2>5. 文档规范<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h2>
-<p>我们使用 Sphinx 进行文档管理。为保证开发文档顺利集成到 Sphinx 文档系统中，请在编写时注意以下规范：</p>
-<ol class="arabic simple">
-<li><p>标题层级</p>
-<ul class="simple">
-<li><p>一级标题（<code class="docutils literal notranslate"><span class="pre">#</span></code>）：每个文档<strong>必须且只能</strong>包含一个一级标题，作为文档的整体标题。</p></li>
-<li><p>确保标题层级结构正确，不要跳级使用标题。例如，一级标题下应该是二级标题，而不是直接跳到三级标题。</p></li>
-</ul>
-</li>
-<li><p>文件命名规范</p>
-<ul class="simple">
-<li><p>中文文档：中文 Markdown 文件的命名必须以 <code class="docutils literal notranslate"><span class="pre">_ZH</span></code> 结尾。例如：<code class="docutils literal notranslate"><span class="pre">README_ZH.md</span></code></p></li>
-</ul>
-</li>
-</ol>
 </section>
 </section>
 
@@ -1051,31 +1060,32 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">开发者指南</a><ul>
-<li><a class="reference internal" href="#id2">1. 构建自己的算子</a><ul>
-<li><a class="reference internal" href="#id3">1.1 快速构建算子</a></li>
-<li><a class="reference internal" href="#id4">1.2 将你的新算子贡献到开源社区</a><ul>
-<li><a class="reference internal" href="#alpha">1.2.1 提供算子基本功能（alpha版本）</a></li>
-<li><a class="reference internal" href="#beta">1.2.2 使算子更可用（beta版本）</a></li>
-<li><a class="reference internal" href="#stable">1.2.3 使算子更快更完备（stable版本）</a></li>
+<li><a class="reference internal" href="#id2">1. 快速构建你自己的算子</a></li>
+<li><a class="reference internal" href="#id3">2. 构建你自己的数据菜谱和配置项</a><ul>
+<li><a class="reference internal" href="#id4">2.1 丰富的配置源和类型提示</a></li>
+<li><a class="reference internal" href="#id5">2.2 层次化的配置和帮助</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id5">2. 构建自己的数据菜谱和配置</a><ul>
-<li><a class="reference internal" href="#id6">2.1 丰富的配置源和类型提示</a></li>
-<li><a class="reference internal" href="#id7">2.2 层次化的配置和帮助</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id8">3. 依赖管理</a><ul>
+<li><a class="reference internal" href="#id6">3. 依赖管理</a><ul>
 <li><a class="reference internal" href="#uv">3.1 安装 uv</a></li>
-<li><a class="reference internal" href="#id9">3.2 虚拟环境管理</a></li>
-<li><a class="reference internal" href="#id10">3.3 添加新依赖</a></li>
-<li><a class="reference internal" href="#id11">3.4 开发环境设置</a></li>
-<li><a class="reference internal" href="#id12">3.5 延迟加载</a></li>
+<li><a class="reference internal" href="#id7">3.2 虚拟环境管理</a></li>
+<li><a class="reference internal" href="#id8">3.3 添加新依赖</a></li>
+<li><a class="reference internal" href="#id9">3.4 开发环境设置</a></li>
+<li><a class="reference internal" href="#id10">3.5 延迟加载</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id13">4. 编码规范</a></li>
-<li><a class="reference internal" href="#id14">5. 文档规范</a></li>
+<li><a class="reference internal" href="#id11">4. 为开源社区贡献</a><ul>
+<li><a class="reference internal" href="#id12">4.1 编码规范</a></li>
+<li><a class="reference internal" href="#id13">4.2 文档规范</a></li>
+<li><a class="reference internal" href="#id14">4.3 将你的新算子贡献到开源社区</a><ul>
+<li><a class="reference internal" href="#alpha">4.3.1 提供算子基本功能（alpha版本）</a></li>
+<li><a class="reference internal" href="#beta">4.3.2 使算子更可用（beta版本）</a></li>
+<li><a class="reference internal" href="#stable">4.3.3 使算子更快更完备（stable版本）</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id15">4.4 贡献您的新配方</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
