@@ -1,11 +1,11 @@
 import fnmatch
 import os
 from abc import ABC, abstractmethod
-from argparse import Namespace
 from dataclasses import dataclass
 from typing import Dict, Optional, Type
 
 import datasets
+from jsonargparse import Namespace
 from loguru import logger
 
 from data_juicer.core.data import DJDataset
@@ -24,11 +24,12 @@ class StrategyKey:
     """
     Immutable key for strategy registration with wildcard support
     """
+
     executor_type: str
     data_type: str
     data_source: str
 
-    def matches(self, other: 'StrategyKey') -> bool:
+    def matches(self, other: "StrategyKey") -> bool:
         """
         Check if this key matches another key with wildcard support
 
@@ -38,9 +39,11 @@ class StrategyKey:
         - '[seq]' matches any character in seq
         - '[!seq]' matches any character not in seq
         """
-        return (fnmatch.fnmatch(other.executor_type, self.executor_type)
-                and fnmatch.fnmatch(other.data_type, self.data_type)
-                and fnmatch.fnmatch(other.data_source, self.data_source))
+        return (
+            fnmatch.fnmatch(other.executor_type, self.executor_type)
+            and fnmatch.fnmatch(other.data_type, self.data_type)
+            and fnmatch.fnmatch(other.data_source, self.data_source)
+        )
 
 
 class DataLoadStrategy(ABC, ConfigValidator):
@@ -52,23 +55,24 @@ class DataLoadStrategy(ABC, ConfigValidator):
         self.validate_config(ds_config)
         self.ds_config = ds_config
         self.cfg = cfg
-        self.weight = ds_config.get('weight', 1.0)  # default weight is 1.0
+        self.weight = ds_config.get("weight", 1.0)  # default weight is 1.0
 
     @abstractmethod
     def load_data(self, **kwargs) -> DJDataset:
-        pass
+        """Need to be implemented in the"""
 
 
 class DataLoadStrategyRegistry:
     """
     Flexible strategy registry with wildcard matching
     """
+
     _strategies: Dict[StrategyKey, Type[DataLoadStrategy]] = {}
 
     @classmethod
     def get_strategy_class(
-            cls, executor_type: str, data_type: str,
-            data_source: str) -> Optional[Type[DataLoadStrategy]]:
+        cls, executor_type: str, data_type: str, data_source: str
+    ) -> Optional[Type[DataLoadStrategy]]:
         """
         Retrieve the most specific matching strategy
 
@@ -76,15 +80,17 @@ class DataLoadStrategyRegistry:
         1. Exact match
         2. Wildcard matches from most specific to most general
         """
-        logger.info(f'Getting strategy class for '
-                    f'exec: {executor_type}, '
-                    f'data_type: {data_type}, '
-                    f'data_source: {data_source}')
+        logger.info(
+            f"Getting strategy class for "
+            f"exec: {executor_type}, "
+            f"data_type: {data_type}, "
+            f"data_source: {data_source}"
+        )
 
         # default to wildcard if not provided
-        executor_type = executor_type or '*'
-        data_type = data_type or '*'
-        data_source = data_source or '*'
+        executor_type = executor_type or "*"
+        data_type = data_type or "*"
+        data_source = data_source or "*"
 
         # Create the lookup key
         lookup_key = StrategyKey(executor_type, data_type, data_source)
@@ -111,20 +117,20 @@ class DataLoadStrategyRegistry:
                 Two wildcards: 2
                 All wildcards: 3
                 """
-                return sum(1 for part in
-                           [key.executor_type, key.data_type, key.data_source]
-                           if part == '*')
+                return sum(1 for part in [key.executor_type, key.data_type, key.data_source] if part == "*")
 
             matching_strategies.sort(key=lambda x: specificity_score(x[0]))
             found = matching_strategies[0][1]
-            logger.info(f'Found matching strategies: {found}')
+            logger.info(f"Found matching strategies: {found}")
             return found
 
         # No matching strategy found
-        logger.warning(f'No matching strategy found for combination '
-                       f'exec: {executor_type}, '
-                       f'data_type: {data_type}, '
-                       f'data_source: {data_source}')
+        logger.warning(
+            f"No matching strategy found for combination "
+            f"exec: {executor_type}, "
+            f"data_type: {data_type}, "
+            f"data_source: {data_source}"
+        )
         return None
 
     @classmethod
@@ -159,7 +165,7 @@ class RayDataLoadStrategy(DataLoadStrategy):
 
     @abstractmethod
     def load_data(self, **kwargs) -> DJDataset:
-        pass
+        """Need to be implemented in the"""
 
 
 class DefaultDataLoadStrategy(DataLoadStrategy):
@@ -169,7 +175,7 @@ class DefaultDataLoadStrategy(DataLoadStrategy):
 
     @abstractmethod
     def load_data(self, **kwargs) -> DJDataset:
-        pass
+        """Need to be implemented in the"""
 
 
 # TODO dask support
@@ -185,23 +191,16 @@ class DefaultDataLoadStrategy(DataLoadStrategy):
 #         pass
 
 
-@DataLoadStrategyRegistry.register('ray', 'local', '*')
+@DataLoadStrategyRegistry.register("ray", "local", "*")
 class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
-
     # TODO ray defaults to json
 
-    CONFIG_VALIDATION_RULES = {
-        'required_fields': ['path'],
-        'field_types': {
-            'path': str
-        },
-        'custom_validators': {}
-    }
+    CONFIG_VALIDATION_RULES = {"required_fields": ["path"], "field_types": {"path": str}, "custom_validators": {}}
 
     def load_data(self, **kwargs):
         from data_juicer.core.data.ray_dataset import RayDataset
 
-        path = self.ds_config['path']
+        path = self.ds_config["path"]
 
         # Convert to absolute path if relative
         if not os.path.isabs(path):
@@ -209,22 +208,16 @@ class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
             possible_paths = [
                 # Current working directory
                 os.path.abspath(path),
-
                 # Original DJ root directory relative to script location
-                os.path.abspath(
-                    os.path.join(os.path.dirname(__file__), '..', '..', '..',
-                                 path)),
-
+                os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", path)),
                 # User's home directory
-                os.path.expanduser(os.path.join('~', path))
+                os.path.expanduser(os.path.join("~", path)),
             ]
 
             # Ray work directory
-            ray_work_dir = getattr(self.cfg, 'work_dir',
-                                   None) if self.cfg else None
+            ray_work_dir = getattr(self.cfg, "work_dir", None) if self.cfg else None
             if ray_work_dir:
-                possible_paths.append(
-                    os.path.abspath(os.path.join(ray_work_dir, path)))
+                possible_paths.append(os.path.abspath(os.path.join(ray_work_dir, path)))
 
             # Try each path
             for abs_path in possible_paths:
@@ -235,32 +228,33 @@ class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
                 # No valid path found
                 raise FileNotFoundError(
                     f"Could not find file '{path}' in any location. "
-                    f'Tried: {possible_paths}. '
-                    f'Current working directory: {os.getcwd()}')
+                    f"Tried: {possible_paths}. "
+                    f"Current working directory: {os.getcwd()}"
+                )
 
-        logger.info(f'Using resolved path for loading ray dataset: {path}')
+        logger.info(f"Using resolved path for loading ray dataset: {path}")
 
         file_extension_map = {
-            '.json': 'json',
-            '.jsonl': 'json',
-            '.txt': 'text',
-            '.csv': 'csv',
-            '.tsv': 'csv',
-            '.parquet': 'parquet',
-            '.npy': 'numpy',
-            '.tfrecords': 'tfrecords',
-            '.lance': 'lance',
+            ".json": "json",
+            ".jsonl": "json",
+            ".txt": "text",
+            ".csv": "csv",
+            ".tsv": "csv",
+            ".parquet": "parquet",
+            ".npy": "numpy",
+            ".tfrecords": "tfrecords",
+            ".lance": "lance",
         }
         auto_detect = False
-        data_source = self.ds_config.get('source', None)
+        data_source = self.ds_config.get("source", None)
         if data_source is None:
             auto_detect = True
         else:
             suffix = os.path.splitext(data_source)[1]
             if suffix in file_extension_map:
                 data_format = file_extension_map[suffix]
-            elif '.' + data_source in file_extension_map:
-                data_format = file_extension_map['.' + data_source]
+            elif "." + data_source in file_extension_map:
+                data_format = file_extension_map["." + data_source]
             else:
                 auto_detect = True
         if auto_detect:
@@ -281,184 +275,150 @@ class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
                             break
             file_extension = os.path.splitext(item_path)[1]
             # by default, we use json type to load data
-            data_format = file_extension_map.get(file_extension, 'json')
-            logger.info(f'Try to load data as {data_format}.')
+            data_format = file_extension_map.get(file_extension, "json")
+            logger.info(f"Try to load data as {data_format}.")
         else:
-            logger.info(f'Loading {data_format} data.')
+            logger.info(f"Loading {data_format} data.")
         try:
             dataset = RayDataset.read(data_format, path)
             return RayDataset(dataset, dataset_path=path, cfg=self.cfg)
         except Exception as e:
             if auto_detect:
                 raise RuntimeError(
-                    f'Failed to load data from {path}. '
-                    f'Please check data format and set the correct `dataset.configs.source`. '
-                    f'Current working directory: {os.getcwd()}. '
-                    f'Error: {str(e)}')
+                    f"Failed to load data from {path}. "
+                    f"Please check data format and set the correct `dataset.configs.source`. "
+                    f"Current working directory: {os.getcwd()}. "
+                    f"Error: {str(e)}"
+                )
             else:
                 raise RuntimeError(
-                    f'Failed to load {data_format} data from {path}. '
-                    f'Current working directory: {os.getcwd()}. '
-                    f'Error: {str(e)}')
+                    f"Failed to load {data_format} data from {path}. "
+                    f"Current working directory: {os.getcwd()}. "
+                    f"Error: {str(e)}"
+                )
 
 
-@DataLoadStrategyRegistry.register('ray', 'remote', 'huggingface')
+@DataLoadStrategyRegistry.register("ray", "remote", "huggingface")
 class RayHuggingfaceDataLoadStrategy(RayDataLoadStrategy):
-
-    CONFIG_VALIDATION_RULES = {
-        'required_fields': ['path'],
-        'field_types': {
-            'path': str
-        },
-        'custom_validators': {}
-    }
+    CONFIG_VALIDATION_RULES = {"required_fields": ["path"], "field_types": {"path": str}, "custom_validators": {}}
 
     def load_data(self, **kwargs):
-        raise NotImplementedError(
-            'Huggingface data load strategy for Ray is not implemented')
+        raise NotImplementedError("Huggingface data load strategy for Ray is not implemented")
 
 
-@DataLoadStrategyRegistry.register('default', 'local', '*')
+@DataLoadStrategyRegistry.register("default", "local", "*")
 class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
     """
     data load strategy for on disk data for LocalExecutor
     rely on AutoFormatter for actual data loading
     """
 
-    CONFIG_VALIDATION_RULES = {
-        'required_fields': ['path'],
-        'field_types': {
-            'path': str
-        },
-        'custom_validators': {}
-    }
+    CONFIG_VALIDATION_RULES = {"required_fields": ["path"], "field_types": {"path": str}, "custom_validators": {}}
 
     def load_data(self, **kwargs):
         # Get config values with defaults
-        text_keys = getattr(self.cfg, 'text_keys',
-                            ['text'])  # Default to ['text']
-        suffixes = getattr(self.cfg, 'suffixes', None)  # Default to None
+        text_keys = getattr(self.cfg, "text_keys", ["text"])  # Default to ['text']
+        suffixes = getattr(self.cfg, "suffixes", None)  # Default to None
         # if there is suffix_filter op, turn on the add_suffix flag
         add_suffix = False
-        process_list = self.cfg.get('process', [])
+        process_list = self.cfg.process if hasattr(self.cfg, "process") else []
         for op in process_list:
             op_name, _ = list(op.items())[0]
-            if op_name == 'suffix_filter':
+            if op_name == "suffix_filter":
                 add_suffix = True
                 break
-        load_data_np = kwargs.get('num_proc', 1)
+        load_data_np = kwargs.get("num_proc", 1)
 
         # use proper formatter to load data
-        formatter = load_formatter(dataset_path=self.ds_config['path'],
-                                   text_keys=text_keys,
-                                   suffixes=suffixes,
-                                   add_suffix=add_suffix,
-                                   **kwargs)
+        formatter = load_formatter(
+            dataset_path=self.ds_config["path"], text_keys=text_keys, suffixes=suffixes, add_suffix=add_suffix, **kwargs
+        )
         # TODO more sophiscated localformatter routing
         return formatter.load_dataset(load_data_np, self.cfg)
 
 
-@DataLoadStrategyRegistry.register('default', 'remote', 'huggingface')
+@DataLoadStrategyRegistry.register("default", "remote", "huggingface")
 class DefaultHuggingfaceDataLoadStrategy(DefaultDataLoadStrategy):
     """
     data load strategy for Huggingface dataset for LocalExecutor
     """
 
     CONFIG_VALIDATION_RULES = {
-        'required_fields': ['path'],
-        'optional_fields':
-        ['split', 'limit', 'name', 'data_files', 'data_dir'],
-        'field_types': {
-            'path': str
-        },
-        'custom_validators': {}
+        "required_fields": ["path"],
+        "optional_fields": ["split", "limit", "name", "data_files", "data_dir"],
+        "field_types": {"path": str},
+        "custom_validators": {},
     }
 
     def load_data(self, **kwargs):
-        num_proc = kwargs.pop('num_proc', 1)
+        num_proc = kwargs.pop("num_proc", 1)
         ds = datasets.load_dataset(
-            self.ds_config['path'],
-            split=self.ds_config.get('split', None),
-            data_files=self.ds_config.get('data_files', None),
-            data_dir=self.ds_config.get('data_dir', None),
-            name=self.ds_config.get('name', None),
-            limit=self.ds_config.get('limit', None),
+            self.ds_config["path"],
+            split=self.ds_config.get("split", None),
+            data_files=self.ds_config.get("data_files", None),
+            data_dir=self.ds_config.get("data_dir", None),
+            name=self.ds_config.get("name", None),
+            limit=self.ds_config.get("limit", None),
             num_proc=num_proc,
-            **kwargs)
-        return unify_format(ds,
-                            text_keys=self.cfg.text_keys,
-                            num_proc=num_proc,
-                            global_cfg=self.cfg)
+            **kwargs,
+        )
+        return unify_format(ds, text_keys=self.cfg.text_keys, num_proc=num_proc, global_cfg=self.cfg)
 
 
-@DataLoadStrategyRegistry.register('default', 'remote', 'modelscope')
+@DataLoadStrategyRegistry.register("default", "remote", "modelscope")
 class DefaultModelScopeDataLoadStrategy(DefaultDataLoadStrategy):
     """
     data load strategy for ModelScope dataset for LocalExecutor
     """
 
     def load_data(self, **kwargs):
-        raise NotImplementedError(
-            'ModelScope data load strategy is not implemented')
+        raise NotImplementedError("ModelScope data load strategy is not implemented")
 
 
-@DataLoadStrategyRegistry.register('default', 'remote', 'arxiv')
+@DataLoadStrategyRegistry.register("default", "remote", "arxiv")
 class DefaultArxivDataLoadStrategy(DefaultDataLoadStrategy):
     """
     data load strategy for arxiv dataset for LocalExecutor
     """
 
     CONFIG_VALIDATION_RULES = {
-        'required_fields': ['path'],
-        'field_types': {
-            'path': (str)  # has to be a string
-        },
-        'custom_validators': {}
+        "required_fields": ["path"],
+        "field_types": {"path": (str)},  # has to be a string
+        "custom_validators": {},
     }
 
     def load_data(self, **kwargs):
-        raise NotImplementedError(
-            'Arxiv data load strategy is not implemented')
+        raise NotImplementedError("Arxiv data load strategy is not implemented")
 
 
-@DataLoadStrategyRegistry.register('default', 'remote', 'wiki')
+@DataLoadStrategyRegistry.register("default", "remote", "wiki")
 class DefaultWikiDataLoadStrategy(DefaultDataLoadStrategy):
     """
     data load strategy for wiki dataset for LocalExecutor
     """
 
-    CONFIG_VALIDATION_RULES = {
-        'required_fields': ['path'],
-        'field_types': {
-            'path': str
-        },
-        'custom_validators': {}
-    }
+    CONFIG_VALIDATION_RULES = {"required_fields": ["path"], "field_types": {"path": str}, "custom_validators": {}}
 
     def load_data(self, **kwargs):
-        raise NotImplementedError('Wiki data load strategy is not implemented')
+        raise NotImplementedError("Wiki data load strategy is not implemented")
 
 
-@DataLoadStrategyRegistry.register('default', 'remote', 'commoncrawl')
+@DataLoadStrategyRegistry.register("default", "remote", "commoncrawl")
 class DefaultCommonCrawlDataLoadStrategy(DefaultDataLoadStrategy):
     """
     data load strategy for commoncrawl dataset for LocalExecutor
     """
 
     CONFIG_VALIDATION_RULES = {
-        'required_fields': ['start_snapshot', 'end_snapshot'],
-        'optional_fields': ['aws', 'url_limit'],
-        'field_types': {
-            'start_snapshot': str,
-            'end_snapshot': str
+        "required_fields": ["start_snapshot", "end_snapshot"],
+        "optional_fields": ["aws", "url_limit"],
+        "field_types": {"start_snapshot": str, "end_snapshot": str},
+        "custom_validators": {
+            "start_snashot": validate_snapshot_format,
+            "end_snapshot": validate_snapshot_format,
+            "url_limit": lambda x: x > 0,
         },
-        'custom_validators': {
-            'start_snashot': validate_snapshot_format,
-            'end_snapshot': validate_snapshot_format,
-            'url_limit': lambda x: x > 0
-        }
     }
 
     def load_data(self, **kwargs):
-        raise NotImplementedError(
-            'CommonCrawl data load strategy is not implemented')
+        raise NotImplementedError("CommonCrawl data load strategy is not implemented")

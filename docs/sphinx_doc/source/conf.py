@@ -7,15 +7,21 @@ import os
 import re
 import sys
 import shutil
+import subprocess
 from pathlib import Path
+from sphinx import project as sphinx_project
 from data_juicer import __version__ as version
 
-from sphinx import project as sphinx_project
+from packaging import version as pv
 
 release = version
 
 # -- Path setup --------------------------------------------------------------
+current_dir = os.path.dirname(__file__)
 sys.path.insert(0, os.path.abspath("../../"))
+sys.path.insert(0, current_dir)
+
+from custom_myst import ReplaceVideoLinksTransform
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -46,12 +52,40 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
+
+def is_valid_tag(tag):
+    try:
+        if not re.match(r"^v\d+\.\d+\.\d+$", tag):
+            return False
+        ver = pv.parse(tag)
+        min_ver = pv.parse("v1.4.0")
+        return ver >= min_ver
+    except Exception:
+        return False
+
+
+def get_filtered_tags():
+    result = subprocess.run(["git", "tag"], stdout=subprocess.PIPE, text=True, check=True)
+    tags = result.stdout.strip().split("\n") if result.stdout else []
+
+    valid_tags = [tag for tag in tags if is_valid_tag(tag)]
+
+    escaped_tags = [re.escape(tag) for tag in valid_tags]
+
+    return r"^(" + "|".join(escaped_tags) + r")$"
+
+
 # sphinx_multiversion configuration
 # smv_tag_whitelist = r"^v\d+\.\d+\.\d+$"
-smv_tag_whitelist = rf"^v{release}$"
+try:
+    smv_tag_whitelist = get_filtered_tags()
+except Exception as e:
+    print(f"Warning: Failed to get git tags for multi-version docs, falling back to current version. Error: {e}", file=sys.stderr)
+    smv_tag_whitelist = rf"^v{release}$"
+
 smv_branch_whitelist = r"^main$"
 smv_released_pattern = r"^refs/tags/v\d+\.\d+\.\d+$"
-smv_remote_whitelist = r'^origin$'
+smv_remote_whitelist = r"^origin$"
 
 # apidoc settings
 apidoc_module_dir = "../../../data_juicer"
@@ -72,7 +106,7 @@ exclude_patterns = ["build", "demos/process_video_on_ray/data/Note.md"]
 # The theme to use for HTML and HTML Help pages.
 # See the documentation for a list of builtin themes.
 html_theme = "furo"
-html_title = "data-juicer"
+html_title = "Data Juicer"
 
 # Sidebar configuration
 html_sidebars = {
@@ -145,19 +179,13 @@ def find_zh_exclusions(app, config):
                 base_name, ext = os.path.splitext(file)
                 zh_file = f"{base_name}_ZH{ext}"
                 zh_file_path = os.path.join(root, zh_file)
-                rel_path = os.path.normpath(
-                    os.path.relpath(os.path.join(root, file), app.srcdir)
-                )
+                rel_path = os.path.normpath(os.path.relpath(os.path.join(root, file), app.srcdir))
 
                 # If Chinese version exists, add to exclusions
                 if os.path.exists(zh_file_path):
                     zh_exclusions.append(rel_path)
                 else:
-                    non_zh_pages.add(
-                        os.path.normpath(
-                            os.path.relpath(os.path.join(root, base_name), app.srcdir)
-                        )
-                    )
+                    non_zh_pages.add(os.path.normpath(os.path.relpath(os.path.join(root, base_name), app.srcdir)))
 
     if config.language == "zh_CN":
         config.exclude_patterns.extend(zh_exclusions)
@@ -189,9 +217,7 @@ def update_metadata_docnames(app, config):
     if hasattr(app.config, "smv_metadata"):
         metadata = app.config.smv_metadata
     else:
-        print(
-            "smv_metadata not found in app.config.  sphinx_multiversion likely not initialized yet."
-        )
+        print("smv_metadata not found in app.config.  sphinx_multiversion likely not initialized yet.")
         return
 
     main_sourcedir = metadata["main"].get("sourcedir")
@@ -201,30 +227,6 @@ def update_metadata_docnames(app, config):
     for version_name, _ in metadata.items():
         app.config.smv_metadata[version_name]["docnames"] = updated_docnames
 
-def versions_a_lt_or_eq_to_b(version_a, version_b):
-
-    def is_valid_version(version):
-        return bool(re.match(r"^v\d+\.\d+\.\d+$", version))
-
-    if not is_valid_version(version_a):
-        return False
-
-    if not is_valid_version(version_b):
-        raise ValueError(f"Invalid version format for version_b: {version_b}")
-
-    try:
-        parts_a = [int(x) for x in version_a[1:].split(".")]
-        parts_b = [int(x) for x in version_b[1:].split(".")]
-
-        for i in range(3):
-            if parts_a[i] < parts_b[i]:
-                return True
-            elif parts_a[i] > parts_b[i]:
-                return False
-
-        return True
-    except ValueError:
-        raise ValueError("Version numbers must be numeric")
 
 def rebuild_source_dir(app, config):
     """Rebuild source directory for documentation"""
@@ -298,6 +300,7 @@ def setup(app):
     """Setup Sphinx application hooks"""
     current_version = app.config.smv_current_version
     print(f"Current version: {current_version}")
+    app.add_transform(ReplaceVideoLinksTransform)
     app.config.smv_latest_version = f"v{release}"
     app.connect("config-inited", copy_sphinx_doc_to_build)
     app.connect("config-inited", rebuild_source_dir)

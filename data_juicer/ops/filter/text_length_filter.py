@@ -5,18 +5,14 @@ from data_juicer.utils.constant import Fields, StatsKeys
 from ..base_op import OPERATORS, Filter
 
 
-@OPERATORS.register_module('text_length_filter')
+@OPERATORS.register_module("text_length_filter")
 class TextLengthFilter(Filter):
     """Filter to keep samples with total text length within a specific
     range."""
 
     _batched_op = True
 
-    def __init__(self,
-                 min_len: int = 10,
-                 max_len: int = sys.maxsize,
-                 *args,
-                 **kwargs):
+    def __init__(self, min_len: int = 10, max_len: int = sys.maxsize, *args, **kwargs):
         """
         Initialization method.
 
@@ -47,13 +43,10 @@ class TextLengthFilter(Filter):
 
     def process_batched(self, samples):
         if isinstance(samples[Fields.stats], list):
-            return map(
-                lambda stat: self.min_len <= stat[StatsKeys.text_len] <= self.
-                max_len, samples[Fields.stats])
+            return map(lambda stat: self.min_len <= stat[StatsKeys.text_len] <= self.max_len, samples[Fields.stats])
         else:
             # single sample for ray filter
-            if self.min_len <= samples[Fields.stats][
-                    StatsKeys.text_len] <= self.max_len:
+            if self.min_len <= samples[Fields.stats][StatsKeys.text_len] <= self.max_len:
                 return True
             else:
                 return False

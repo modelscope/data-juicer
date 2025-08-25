@@ -13,6 +13,7 @@ class Schema:
         column_types: Mapping of column names to their types
         columns: List of column names in order
     """
+
     column_types: Dict[str, Any]
     columns: List[str]
 
@@ -32,12 +33,8 @@ class Schema:
     @classmethod
     def from_ray_schema(cls, schema):
         # convert schema to proper list and dict
-        column_types = {
-            k: Schema.map_ray_type_to_python(v)
-            for k, v in zip(schema.names, schema.types)
-        }
-        return Schema(column_types=column_types,
-                      columns=list(column_types.keys()))
+        column_types = {k: Schema.map_ray_type_to_python(v) for k, v in zip(schema.names, schema.types)}
+        return Schema(column_types=column_types, columns=list(column_types.keys()))
 
     @classmethod
     def map_hf_type_to_python(cls, feature):
@@ -57,13 +54,13 @@ class Schema:
             Corresponding Python type
         """
         type_mapping = {
-            'string': str,
-            'int32': int,
-            'int64': int,
-            'float32': float,
-            'float64': float,
-            'bool': bool,
-            'binary': bytes
+            "string": str,
+            "int32": int,
+            "int64": int,
+            "float32": float,
+            "float64": float,
+            "bool": bool,
+            "binary": bytes,
         }
         if isinstance(feature, Value):
             # Map Value types
@@ -76,7 +73,7 @@ class Schema:
             return List[type_mapping.get(feature.dtype, Any)]
 
         # Dictionary types - check if it's a dictionary feature
-        elif isinstance(feature, dict) or str(type(feature)).endswith('Dict'):
+        elif isinstance(feature, dict) or str(type(feature)).endswith("Dict"):
             return Schema.from_hf_features(feature)
 
         elif isinstance(feature, ClassLabel):
@@ -101,7 +98,7 @@ class Schema:
         # String types
         if pa.types.is_string(ray_type):
             return str
-        if pa.types.is_binary(ray_type):
+        if pa.types.is_binary(ray_type) or pa.types.is_fixed_size_binary(ray_type):
             return bytes
 
         # Numeric types
@@ -121,9 +118,7 @@ class Schema:
         # Dictionary/Struct types
         if pa.types.is_struct(ray_type):
             names = ray_type.names
-            types = [
-                Schema.map_ray_type_to_python(t.type) for t in ray_type.fields
-            ]
+            types = [Schema.map_ray_type_to_python(t.type) for t in ray_type.fields]
             return Schema(column_types=dict(zip(names, types)), columns=names)
 
         if pa.types.is_map(ray_type):
@@ -137,13 +132,12 @@ class Schema:
         # Ensure all columns are in column_types
         if not all(col in self.column_types for col in self.columns):
             missing = set(self.columns) - set(self.column_types.keys())
-            raise ValueError(
-                f'Missing type definitions for columns: {missing}')
+            raise ValueError(f"Missing type definitions for columns: {missing}")
 
     def __str__(self) -> str:
         """Return formatted string representation of schema"""
-        lines = ['Dataset Schema:']
-        lines.append('-' * 40)
+        lines = ["Dataset Schema:"]
+        lines.append("-" * 40)
         for col in self.columns:
-            lines.append(f'{col}: {self.column_types[col]}')
-        return '\n'.join(lines)
+            lines.append(f"{col}: {self.column_types[col]}")
+        return "\n".join(lines)
