@@ -32,9 +32,9 @@
 Data-Juicer is a one-stop system to process text and multimodal data for and with foundation models (typically LLMs).
 We provide a [playground](http://8.138.149.181/) with a managed JupyterLab. [Try Data-Juicer](http://8.138.149.181/) straight away in your browser! If you find Data-Juicer useful for your research or development, please kindly support us by starting it (then be instantly notified of our new releases) and citing our [works](#references).
 
-[Platform for AI of Alibaba Cloud (PAI)](https://www.aliyun.com/product/bigdata/learn) has cited our work and integrated Data-Juicer into its data processing products. PAI is an AI Native large model and AIGC engineering platform that provides dataset management, computing power management, model tool chain, model development, model training, model deployment, and AI asset management. For documentation on data processing, please refer to: [PAI-Data Processing for Large Models](https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX).
+[Platform for AI of Alibaba Cloud (PAI)](https://www.aliyun.com/product/bigdata/learn) has deeply integrated Data-Juicer into its data processing products. PAI is an AI Native large model and AIGC engineering platform that provides dataset management, computing power management, model tool chain, model development, model training, model deployment, and AI asset management. For documentation on data processing, please refer to: [PAI-Data Processing for Large Models](https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX).
 
-Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets.  We welcome you to join us (via issues, PRs, [Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw)  channel, [DingDing](https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11) group, ...), in promoting data-model co-development along with research and applications of foundation models!
+Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets.  We welcome you to [join us](#contribution-and-acknowledgements), in promoting data-model co-development along with research and applications of foundation models!
 
 
 ## News
@@ -134,17 +134,17 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 ## License
 Data-Juicer is released under Apache License 2.0.
 
-## Contributing
-We are in a rapidly developing field and greatly welcome contributions of new
-features, bug fixes, and better documentation. Please refer to
-[How-to Guide for Developers](docs/DeveloperGuide.md).
+## Contribution and Acknowledgements
 
-## Acknowledgement
-Data-Juicer is used across various foundation model applications and research initiatives, such as industrial scenarios in Alibaba Tongyi and Alibaba Cloud's platform for AI (PAI).
-We look forward to more of your experience, suggestions, and discussions for collaboration!
+Data-Juicer has benefited greatly from and continues to welcome contributions at all levels: new operators (from simple functions to advanced algorithms based on existing papers), data-recipes & processing scenarios, feature requests, efficiency enhancements, bug fixes, better documentation and usage feedback. Please refer to our [Developer Guide](docs/DeveloperGuide.md) to get started. Spreading the world in the community and giving the repository a star ⭐ are also invaluable forms of support!
 
-Data-Juicer thanks many community [contributors](https://github.com/modelscope/data-juicer/graphs/contributors) and open-source projects, such as
-[Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), ....
+Our sincere gratitude goes to all our [code contributors](https://github.com/modelscope/data-juicer/graphs/contributors) who are the cornerstone of this project. We strive to keep the list below updated and look forward to including more names (alphabetical order); please reach out if we have missed any acknowledgements.
+- **Initiated by:** Alibaba Tongyi Lab
+- **Co-developed and Optimized with:** Alibaba Cloud PAI, Anyscale (Ray Team), Sun Yat-sen University ([Knowledge Engineering Lab](https://github.com/YingShen-SYSU/AIGC)), NVIDIA (NeMo Team), ...
+- **Used by & Valuable Feedback from:** [AgentScope](https://github.com/agentscope-ai/agentscope), Alibaba Group, Ant Group, BUAI, BYD Auto, Bytedance, CAS, [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio), [EasyAnimate](https://github.com/aigc-apps/EasyAnimate), [Eval-Scope](https://github.com/modelscope/evalscope), JD.com, [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory), Nanjing University, OPPO, Peking University, [RM-Gallery](https://github.com/modelscope/RM-Gallery), RUC, Tsinghua University, [Trinity-RFT](https://github.com/modelscope/Trinity-RFT), UCAS, Xiaohongshu, Xiaomi, Ximalaya, ZJU, ...
+- **Inspired by:** Data-Juicer also thanks pioneering open-source projects such as [Apache Arrow](https://github.com/apache/arrow), [BLOOM](https://huggingface.co/bigscience/bloom), [RedPajama-Data](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Ray](https://github.com/ray-project/ray), [Hugging Face Datasets](https://github.com/huggingface/datasets), ...
+
+We look forward to your feedback and collaboration, including partnership inquiries or proposals for new sub-projects related to Data-Juicer. Feel free to contact via issues, PRs, [Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw) channel, [DingDing](https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11) group, and [e-mails](mailto:datajuicer@outlook.com).
 
 
 
