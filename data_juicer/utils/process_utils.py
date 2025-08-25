@@ -165,8 +165,6 @@ def get_ray_nodes_info():
         node_id = node["NodeID"]
         _RAY_NODES_INFO[node_id] = info
 
-    ray.shutdown()
-
     logger.info(f"Ray cluster info:\n{_RAY_NODES_INFO}")
 
     return _RAY_NODES_INFO

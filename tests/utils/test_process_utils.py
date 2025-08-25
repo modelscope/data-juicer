@@ -40,12 +40,11 @@ class CalculateNpTest(DataJuicerTestCaseBase):
     
     def tearDown(self):
         os.environ[RAY_JOB_ENV_VAR] = self._ori_ray_job_env_value
-        ray.shutdown()
         return super().tearDown()
 
     def enable_ray_mode(self):
         os.environ[RAY_JOB_ENV_VAR] = '1'
-        ray.init(address='auto')
+        ray.init(address='auto', ignore_reinit_error=True)
 
     def test_cuda_mem_required_zero_and_num_proc_not_given(self):
         logger = MagicMock()
