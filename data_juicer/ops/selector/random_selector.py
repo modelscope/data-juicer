@@ -14,7 +14,7 @@ class RandomSelector(Selector):
     def __init__(
         self,
         select_ratio: Optional[Annotated[float, Field(ge=0, le=1)]] = None,
-        select_num: PositiveInt = None,
+        select_num: Optional[PositiveInt] = None,
         *args,
         **kwargs,
     ):
