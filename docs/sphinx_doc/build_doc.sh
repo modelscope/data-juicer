@@ -66,8 +66,8 @@ echo "Starting build..."
 make clean
 python build_versions.py
 
-# Post-build cleanup (optional, as build_versions.py already has cleanup logic)
-echo "Build completed, performing final cleanup..."
-cleanup_worktrees
+# # Post-build cleanup (optional, as build_versions.py already has cleanup logic)
+# echo "Build completed, performing final cleanup..."
+# cleanup_worktrees
 
 echo "All operations completed successfully!"

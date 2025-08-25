@@ -64,6 +64,16 @@ def maybe_init_submodules(wt_root: Path):
         except Exception as e:
             print(f"[WARN] submodule init failed: {e}")
 
+def copy_markdown_files(wt_root: Path):
+    for md_file in wt_root.rglob("*.md"):
+        exclude_paths = ["outputs", "sphinx_doc", ".github"]
+        if any(path in str(md_file) for path in exclude_paths):
+            continue
+        target = wt_root / DOCS_REL / "source" / md_file.relative_to(wt_root)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if not target.exists():
+            shutil.copy2(md_file, target)
+
 def build_one(ref: str, ref_label: str, available_versions: list[str]):
     """Build documentation for a single version/branch"""
     # Create and setup worktree for the specific git reference
@@ -74,6 +84,7 @@ def build_one(ref: str, ref_label: str, available_versions: list[str]):
 
     # Override docs/sphinx_doc with current repo version for unified templates
     copy_docs_source_to(wt)
+    copy_markdown_files(wt)
 
     src = wt / DOCS_REL / "source"
     if not src.exists():
@@ -94,6 +105,16 @@ def build_one(ref: str, ref_label: str, available_versions: list[str]):
         env["AVAILABLE_VERSIONS"] = ",".join(available_versions)  # All available versions for switcher
         env["REPO_ROOT"] = str(wt)                   # Version-specific repo root for copying markdown files
         env["CODE_ROOT"] = str(wt)                   # Version-specific code root for autodoc imports
+        
+        # Generate the API rst files
+        api_cmd = [
+            "sphinx-apidoc",
+            "-o", str(wt / DOCS_REL / "source" / "api"),
+            str(wt / "data_juicer"),
+            "-t", "_templates",
+            "-e"
+        ]
+        run(api_cmd, env=env)
         
         # Execute Sphinx build command
         cmd = [
