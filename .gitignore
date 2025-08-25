@@ -31,3 +31,8 @@ tests/ops/data/*dup*
 tests/tools/tmp_*/
 tests/ops/deduplicator/chinese_dedup/
 tests/ops/deduplicator/english_dedup/
+demos/process_video_on_ray/data/videos/
+log.txt
+mps_test_results/
+spatial-sharing-sys/
+test.py
