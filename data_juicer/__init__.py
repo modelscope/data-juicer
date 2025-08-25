@@ -13,6 +13,7 @@ from data_juicer.utils.availability_utils import _is_package_available
 from data_juicer.utils.lazy_loader import LazyLoader
 
 torch = LazyLoader("torch")
+ray = LazyLoader("ray")
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # For now, only INFO will be shown. Later the severity level will be changed
@@ -23,6 +24,13 @@ logger.add(sys.stderr, level="INFO")
 
 def _cuda_device_count():
     _torch_available = _is_package_available("torch")
+
+    from data_juicer.utils.process_utils import is_ray_mode
+
+    if is_ray_mode():
+        available_resources = ray.available_resources()
+        available_gpu = available_resources.get("GPU", 0)
+        return available_gpu
 
     if _torch_available:
         return torch.cuda.device_count()
