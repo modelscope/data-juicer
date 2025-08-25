@@ -34,8 +34,8 @@ class TracerTest(DataJuicerTestCaseBase):
             }
         ]
         tracer = Tracer(self.work_dir)
-        tracer.trace_mapper('MockMapper', prev_ds, done_ds, 'text')
-        trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-MockMapper.jsonl')
+        tracer.trace_mapper('clean_email_mapper', prev_ds, done_ds, 'text')
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-clean_email_mapper.jsonl')
         self.assertTrue(os.path.exists(trace_file_path))
         trace_records = []
         with jl.open(trace_file_path, 'r') as reader:
@@ -61,8 +61,8 @@ class TracerTest(DataJuicerTestCaseBase):
             }
         ]
         tracer = Tracer(self.work_dir, show_num=1)
-        tracer.trace_mapper('MockMapper', prev_ds, done_ds, 'text')
-        trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-MockMapper.jsonl')
+        tracer.trace_mapper('clean_email_mapper', prev_ds, done_ds, 'text')
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-clean_email_mapper.jsonl')
         self.assertTrue(os.path.exists(trace_file_path))
         trace_records = []
         with jl.open(trace_file_path, 'r') as reader:
@@ -82,8 +82,8 @@ class TracerTest(DataJuicerTestCaseBase):
             {'text': 'text 3'},
         ])
         tracer = Tracer(self.work_dir)
-        tracer.trace_mapper('MockMapper', prev_ds, done_ds, 'text')
-        trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-MockMapper.jsonl')
+        tracer.trace_mapper('clean_email_mapper', prev_ds, done_ds, 'text')
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-clean_email_mapper.jsonl')
         self.assertFalse(os.path.exists(trace_file_path))
 
     def test_trace_batched_mapper(self):
@@ -115,8 +115,8 @@ class TracerTest(DataJuicerTestCaseBase):
             {'text': 'augmented text 3-2'},
         ]
         tracer = Tracer(self.work_dir)
-        tracer.trace_batch_mapper('MockMapper', prev_ds, done_ds, 'text')
-        trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-MockMapper.jsonl')
+        tracer.trace_batch_mapper('clean_email_mapper', prev_ds, done_ds, 'text')
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-clean_email_mapper.jsonl')
         self.assertTrue(os.path.exists(trace_file_path))
         trace_records = []
         with jl.open(trace_file_path, 'r') as reader:
@@ -148,8 +148,8 @@ class TracerTest(DataJuicerTestCaseBase):
             {'text': 'text 2'},
         ]
         tracer = Tracer(self.work_dir, show_num=4)
-        tracer.trace_batch_mapper('MockMapper', prev_ds, done_ds, 'text')
-        trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-MockMapper.jsonl')
+        tracer.trace_batch_mapper('clean_email_mapper', prev_ds, done_ds, 'text')
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-clean_email_mapper.jsonl')
         self.assertTrue(os.path.exists(trace_file_path))
         trace_records = []
         with jl.open(trace_file_path, 'r') as reader:
@@ -171,8 +171,8 @@ class TracerTest(DataJuicerTestCaseBase):
             {'text': 'text 2'},
         ]
         tracer = Tracer(self.work_dir)
-        tracer.trace_filter('MockFilter', prev_ds, done_ds)
-        trace_file_path = os.path.join(self.work_dir, 'trace', 'filter-MockFilter.jsonl')
+        tracer.trace_filter('alphanumeric_filter', prev_ds, done_ds)
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'filter-alphanumeric_filter.jsonl')
         self.assertTrue(os.path.exists(trace_file_path))
         trace_records = []
         with jl.open(trace_file_path, 'r') as reader:
@@ -193,8 +193,8 @@ class TracerTest(DataJuicerTestCaseBase):
             {'text': 'text 2'},
         ]
         tracer = Tracer(self.work_dir, show_num=1)
-        tracer.trace_filter('MockFilter', prev_ds, done_ds)
-        trace_file_path = os.path.join(self.work_dir, 'trace', 'filter-MockFilter.jsonl')
+        tracer.trace_filter('alphanumeric_filter', prev_ds, done_ds)
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'filter-alphanumeric_filter.jsonl')
         self.assertTrue(os.path.exists(trace_file_path))
         trace_records = []
         with jl.open(trace_file_path, 'r') as reader:
@@ -214,8 +214,8 @@ class TracerTest(DataJuicerTestCaseBase):
             {'text': 'text 3'},
         ])
         tracer = Tracer(self.work_dir)
-        tracer.trace_filter('MockMapper', prev_ds, done_ds)
-        trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-MockMapper.jsonl')
+        tracer.trace_filter('alphanumeric_filter', prev_ds, done_ds)
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'filter-alphanumeric_filter.jsonl')
         self.assertFalse(os.path.exists(trace_file_path))
 
     def test_trace_filter_empty(self):
@@ -231,8 +231,8 @@ class TracerTest(DataJuicerTestCaseBase):
             {'text': 'text 3'},
         ]
         tracer = Tracer(self.work_dir)
-        tracer.trace_filter('MockFilter', prev_ds, done_ds)
-        trace_file_path = os.path.join(self.work_dir, 'trace', 'filter-MockFilter.jsonl')
+        tracer.trace_filter('alphanumeric_filter', prev_ds, done_ds)
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'filter-alphanumeric_filter.jsonl')
         self.assertTrue(os.path.exists(trace_file_path))
         trace_records = []
         with jl.open(trace_file_path, 'r') as reader:
@@ -252,8 +252,8 @@ class TracerTest(DataJuicerTestCaseBase):
             {'dup1': 'text 3', 'dup2': 'text 3-1'},
         ]
         tracer = Tracer(self.work_dir)
-        tracer.trace_deduplicator('MockDeduplicator', dup_pairs)
-        trace_file_path = os.path.join(self.work_dir, 'trace', 'duplicate-MockDeduplicator.jsonl')
+        tracer.trace_deduplicator('document_deduplicator', dup_pairs)
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'duplicate-document_deduplicator.jsonl')
         self.assertTrue(os.path.exists(trace_file_path))
         trace_records = []
         with jl.open(trace_file_path, 'r') as reader:
@@ -263,14 +263,30 @@ class TracerTest(DataJuicerTestCaseBase):
 
     def test_trace_deduplicator_None(self):
         tracer = Tracer(self.work_dir)
-        tracer.trace_deduplicator('MockDeduplicator', None)
-        trace_file_path = os.path.join(self.work_dir, 'trace', 'duplicate-MockDeduplicator.jsonl')
+        tracer.trace_deduplicator('document_deduplicator', None)
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'duplicate-document_deduplicator.jsonl')
         self.assertFalse(os.path.exists(trace_file_path))
 
     def test_trace_deduplicator_empty(self):
         tracer = Tracer(self.work_dir)
-        tracer.trace_deduplicator('MockDeduplicator', {})
-        trace_file_path = os.path.join(self.work_dir, 'trace', 'duplicate-MockDeduplicator.jsonl')
+        tracer.trace_deduplicator('document_deduplicator', {})
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'duplicate-document_deduplicator.jsonl')
+        self.assertFalse(os.path.exists(trace_file_path))
+
+    def test_op_list_to_trace(self):
+        prev_ds = Dataset.from_list([
+            {'text': 'text 1'},
+            {'text': 'text 2'},
+            {'text': 'text 3'},
+        ])
+        done_ds = Dataset.from_list([
+            {'text': 'text 1'},
+            {'text': 'processed text 2'},
+            {'text': 'text 3'},
+        ])
+        tracer = Tracer(self.work_dir, op_list_to_trace=['non_existing_mapper'])
+        tracer.trace_mapper('clean_email_mapper', prev_ds, done_ds, 'text')
+        trace_file_path = os.path.join(self.work_dir, 'trace', 'mapper-clean_email_mapper.jsonl')
         self.assertFalse(os.path.exists(trace_file_path))
 
 
