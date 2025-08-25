@@ -72,6 +72,10 @@ class Actor:
         return filtered_data
 
     def filter_cpu_single(self, data):
+        if "text" in data and isinstance(data["text"], list) and len(data["text"]) == 1:
+            data["text"] = data["text"][0]
+        if "__dj__stats__" in data and isinstance(data["__dj__stats__"], list) and len(data["__dj__stats__"]) == 1:
+            data["__dj__stats__"] = data["__dj__stats__"][0]
         data = self.op.compute_stats_single(data)
         keep = self.op.process_single(data)
         if keep:
@@ -81,7 +85,7 @@ class Actor:
 
     def filter_cpu_batched(self, data):
         data = self.op.compute_stats_batched(data)
-        # transform the map object to a list
+
         keep_mask = list(self.op.process_batched(data))
 
         if not any(keep_mask):
@@ -89,11 +93,17 @@ class Actor:
 
         # filter data based on the keep_mask
         if isinstance(data, dict):
-            filtered_data = {
-                key: [value for value, keep in zip(values, keep_mask) if keep] for key, values in data.items()
-            }
+            filtered_data = {}
+            for key, values in data.items():
+                if key in ["text", "__dj__stats__"]:
+                    # 对这些字段应用过滤
+                    filtered_data[key] = [value for value, keep in zip(values, keep_mask) if keep]
+                else:
+                    # 对其他字段保持原样
+                    filtered_data[key] = values
         elif isinstance(data, list):
             filtered_data = [item for item, keep in zip(data, keep_mask) if keep]
         else:
             raise ValueError("Unsupported data type for batch filtering")
+
         return filtered_data

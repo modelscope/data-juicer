@@ -348,6 +348,9 @@ class NestedDataset(Dataset, DJDataset):
                     logger.error("Error occurred when making log summarization")
         return dataset
 
+    def process_parallel(self, *args, **kwargs):
+        raise NotImplementedError("The process_parallel method needs to be implemented for the NestedDataset class.")
+
     def update_args(self, args, kargs, is_filter=False):
         if args:
             args = list(args)

@@ -184,6 +184,7 @@ class RayDataset(DJDataset):
             def process_batch_arrow(table: pyarrow.Table):
                 new_column_data = [{} for _ in range(len(table))]
                 new_table = table.append_column(Fields.meta, [new_column_data])
+                print("new_table:", new_table)
                 return new_table
 
             self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow")
@@ -193,6 +194,7 @@ class RayDataset(DJDataset):
             def process_batch_arrow(table: pyarrow.Table):
                 new_column_data = [{} for _ in range(len(table))]
                 new_table = table.append_column(Fields.stats, [new_column_data])
+                print("new_table:", new_table)
                 return new_table
 
             self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow")
@@ -205,7 +207,6 @@ class RayDataset(DJDataset):
                 if op.use_cuda()
                 else calculate_np(op._name, op.mem_required, op.cpu_required, self.num_proc, op.use_cuda())
             )
-            # actor_num = min(op_proc, self.data.count())
             actor_num = op_proc
             actors[op._name] = []
 
@@ -304,8 +305,8 @@ class RayDataset(DJDataset):
         # wait for all processing threads to finish
         for thread in threads:
             thread.join()
-
         if final_results:
+
             self.data = ray.data.from_items(final_results)
 
         return self
@@ -453,6 +454,7 @@ class RayDataset(DJDataset):
             logger.error(f"Error processing batch: {e}")
 
     def _submit_to_actor(self, op, actor, data_item):
+        """Submit a single data item to the actor for processing."""
         if isinstance(op, Mapper):
             if op.use_cuda():
                 return (
@@ -472,7 +474,7 @@ class RayDataset(DJDataset):
                 )
             else:
                 return (
-                    actor.filter_cpu_batched.remote(data_item)
+                    actor.filter_cpu_batched.remote(self.transform((data_item)))
                     if op.is_batched_op()
                     else actor.filter_cpu_single.remote(data_item)
                 )
@@ -491,7 +493,6 @@ class RayDataset(DJDataset):
         """Process batch data and forward to downstream with data flow tracking"""
         if not batch_data_with_metadata:
             return 0
-
         # separate the data, start time, and line number
         batch_data = [item[0] for item in batch_data_with_metadata]
         start_times = [item[1] for item in batch_data_with_metadata]
@@ -626,6 +627,16 @@ class RayDataset(DJDataset):
                 logger.error(f"Error in single actor processing: {e}")
                 break
         logger.info(f"Single actor completed, processed {processed_count} items")
+
+    def transform(self, data):
+
+        if not isinstance(data.get("text"), list):
+            data["text"] = [data["text"]]
+
+        if not isinstance(data.get("__dj__stats__"), list):
+            data["__dj__stats__"] = [data["__dj__stats__"]]
+
+        return data
 
     def transform_to_2d_format(self, data):
         """
