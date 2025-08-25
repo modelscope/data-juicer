@@ -26,9 +26,9 @@
 
 Data-Juicer 是一个一站式系统，面向大模型的文本及多模态数据处理。我们提供了一个基于 JupyterLab 的 [Playground](http://8.138.149.181/)，您可以从浏览器中在线试用 Data-Juicer。 如果Data-Juicer对您的研发有帮助，请支持加星（自动订阅我们的新发布）、以及引用我们的[工作](#参考文献) 。
 
-[阿里云人工智能平台 PAI](https://www.aliyun.com/product/bigdata/learn) 已引用Data-Juicer并将其能力集成到PAI的数据处理产品中。PAI提供包含数据集管理、算力管理、模型工具链、模型开发、模型训练、模型部署、AI资产管理在内的功能模块，为用户提供高性能、高稳定、企业级的大模型工程化能力。数据处理的使用文档请参考：[PAI-大模型数据处理](https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX)。
+[阿里云人工智能平台 PAI](https://www.aliyun.com/product/bigdata/learn) 已深度集成Data-Juicer到其数据处理产品中。PAI提供包含数据集管理、算力管理、模型工具链、模型开发、模型训练、模型部署、AI资产管理在内的功能模块，为用户提供高性能、高稳定、企业级的大模型工程化能力。数据处理的使用文档请参考：[PAI-大模型数据处理](https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX)。
 
-Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多的功能和数据菜谱。热烈欢迎您加入我们（issues/PRs/[Slack频道](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8275bc8g7ypp) /[钉钉群](https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11)/...），一起推进大模型的数据-模型协同开发和研究应用！
+Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多的功能和数据菜谱。热烈欢迎您[加入我们](#贡献与致谢)，一起推进大模型的数据-模型协同开发和研究应用！
 
 [Demo Video] DataJuicer-Agent:数据处理，即刻启程！
 
@@ -143,17 +143,19 @@ https://github.com/user-attachments/assets/a45f0eee-0f0e-4ffe-9a42-d9a55370089d
 
 Data-Juicer 在 Apache License 2.0 协议下发布。
 
-## 贡献
+## 贡献与致谢
 
-大模型是一个高速发展的领域，我们非常欢迎贡献新功能、修复漏洞以及文档改善。请参考[开发者指南](docs/DeveloperGuide_ZH.md)。
+Data-Juicer 的发展离不开社区的参与和反馈，非常欢迎各方面的贡献：开发新的算子（无论是简单函数还是现有论文的先进算法）、分享新的数据菜谱和使用场景、提出新功能需求、提升代码效率、修复程序错误、完善项目文档、反馈使用体验等。您可参考[开发者指南](docs/DeveloperGuide_ZH.md)开启贡献；在社区中宣传本项目，或为我们的代码仓库点亮星标 ⭐，同样是对该项目非常宝贵的支持！
 
+我们由衷感谢所有为本项目做出贡献的[代码贡献者](https://github.com/modelscope/data-juicer/graphs/contributors)，他们是本项目的基石。我们尽力确保以下名单的完整和及时，并期待更多名字的加入（英文字母序排列）。若有疏漏，请随时联系我们。
 
-## 致谢
+- **发起方：** 阿里巴巴通义实验室
+- **联合研发优化：** 阿里云PAI、Anyscale (Ray Team)、中山大学 ([知识工程实验室](https://github.com/YingShen-SYSU/AIGC))、NVIDIA (NeMo Team) 等
+- **用户/提供无价反馈：** [AgentScope](https://github.com/agentscope-ai/agentscope)、阿里巴巴集团、蚂蚁集团、智源、比亚迪、字节跳动、[DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio)、[EasyAnimate](https://github.com/aigc-apps/EasyAnimate)、[Eval-Scope](https://github.com/modelscope/evalscope)、京东、[LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)、南京大学、OPPO、北京大学、[RM-Gallery](https://github.com/modelscope/RM-Gallery)、中国人民大学、清华大学、[Trinity-RFT](https://github.com/modelscope/Trinity-RFT)、中国科学院、中国科学院大学、小红书、小米、喜马拉雅、浙江大学等
+- **其它项目：** Data-Juicer 也感谢许多先驱开源项目，例如 [Apache Arrow](https://github.com/apache/arrow)、[BLOOM](https://huggingface.co/bigscience/bloom)、[Hugging Face Datasets](https://github.com/huggingface/datasets)、[RedPajama-Data](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1)、[Ray](https://github.com/ray-project/ray)、[vLLM](https://github.com/vllm-project/vllm) 等
 
-Data-Juicer被许多大模型相关产品和研究工作所使用，例如阿里巴巴通义和阿里云人工智能平台 (PAI) 之上的工业界场景。 我们期待更多您的体验反馈、建议和合作共建！
+我们期待您的反馈与合作。如您有合作意向或关于新子项目的提案，欢迎通过 GitHub Issues、Pull Requests、[Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw) 频道、[钉钉](https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11)群或[邮件](mailto:datajuicer@outlook.com)与我们联系。
 
-
-Data-Juicer 感谢社区[贡献者](https://github.com/modelscope/data-juicer/graphs/contributors) 和相关的先驱开源项目，譬如[Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), ....
 
 ## 参考文献
 如果您发现Data-Juicer对您的研发有帮助，请引用以下工作，[1.0paper](https://arxiv.org/abs/2309.02033), [2.0paper](https://arxiv.org/abs/2501.14755)。
