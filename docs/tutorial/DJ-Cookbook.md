@@ -1,14 +1,14 @@
 # DJ-Cookbook
 
 ## Curated Resources
-- [KDD-Tutorial](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html)
+- [KDD-Tutorial](https://modelscope.github.io/data-juicer/en/main/_static/tutorial_kdd24.html)
 - [Awesome LLM-Data](../awesome_llm_data.md)
 - ["Bad" Data Exhibition](../BadDataExhibition.md)
 
 
 ## Coding with Data-Juicer (DJ)
 - Basics
-  - [Overview of DJ](README.md)
+  - [Overview of DJ](../../README.md)
   - [Quick Start](QuickStart.md)
   - [Configuration](../RecipeGallery.md)
   - [Data Format Conversion](../../tools/fmt_conversion/README.md)
