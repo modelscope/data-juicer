@@ -175,6 +175,9 @@ class OP:
         self.batch_size = kwargs.get("batch_size", 1000)
         self.work_dir = kwargs.get("work_dir", None)
 
+        # A placeholder for the gloabl context shared among operators
+        self.context = None
+
         # for unittest, do not skip the error.
         # It would be set to be True in config init.
         self.skip_op_error = kwargs.get("skip_op_error", False)
@@ -250,13 +253,16 @@ class OP:
         related_parameters.update(extra_param_dict)
         return related_parameters
 
-    def run(self, dataset):
+    def run(self, dataset, *, exporter=None, tracer=None, context=None):
         from data_juicer.core.data import NestedDataset
 
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
         # add meta field for OPs that produce tags
         from data_juicer.core.data import add_same_content_to_new_column
+
+        # Set the context for the current OP instance
+        self.context = context
 
         if self._name in TAGGING_OPS.modules and Fields.meta not in dataset.features:
             dataset = dataset.map(
@@ -372,8 +378,8 @@ class Mapper(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, *, exporter=None, tracer=None):
-        dataset = super(Mapper, self).run(dataset)
+    def run(self, dataset, *, exporter=None, tracer=None, context=None):
+        dataset = super(Mapper, self).run(dataset, exporter=exporter, tracer=tracer, context=context)
         new_dataset = dataset.map(
             self.process,
             num_proc=self.runtime_np(),
@@ -477,8 +483,8 @@ class Filter(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
-        dataset = super(Filter, self).run(dataset)
+    def run(self, dataset, *, exporter=None, tracer=None, reduce=True, context=None):
+        dataset = super(Filter, self).run(dataset, exporter=exporter, tracer=tracer, context=context)
         new_dataset = dataset.map(
             self.compute_stats,
             num_proc=self.runtime_np(),
@@ -550,8 +556,8 @@ class Deduplicator(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
-        dataset = super(Deduplicator, self).run(dataset)
+    def run(self, dataset, *, exporter=None, tracer=None, reduce=True, context=None):
+        dataset = super(Deduplicator, self).run(dataset, exporter=exporter, tracer=tracer, context=context)
         new_dataset = dataset.map(
             self.compute_hash, num_proc=self.runtime_np(), with_rank=self.use_cuda(), desc=self._name + "_compute_hash"
         )
@@ -595,8 +601,8 @@ class Selector(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, *, exporter=None, tracer=None):
-        dataset = super(Selector, self).run(dataset)
+    def run(self, dataset, *, exporter=None, tracer=None, context=None):
+        dataset = super(Selector, self).run(dataset, exporter=exporter, tracer=tracer, context=context)
         new_dataset = self.process(dataset)
         if tracer:
             tracer.trace_filter(self._name, dataset, new_dataset)
@@ -635,8 +641,8 @@ class Grouper(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, *, exporter=None, tracer=None):
-        dataset = super(Grouper, self).run(dataset)
+    def run(self, dataset, *, exporter=None, tracer=None, context=None):
+        dataset = super(Grouper, self).run(dataset, exporter=exporter, tracer=tracer, context=context)
         batched_samples = self.process(dataset)
         from data_juicer.core.data import NestedDataset
 
@@ -682,8 +688,8 @@ class Aggregator(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, *, exporter=None, tracer=None):
-        dataset = super(Aggregator, self).run(dataset)
+    def run(self, dataset, *, exporter=None, tracer=None, context=None):
+        dataset = super(Aggregator, self).run(dataset, exporter=exporter, tracer=tracer, context=context)
         # add batched meta field for OPs that produce aggregations
         if Fields.batch_meta not in dataset.features:
             from data_juicer.core.data import add_same_content_to_new_column
@@ -706,3 +712,31 @@ class Aggregator(OP):
             tracer.trace_mapper(self._name, dataset, new_dataset, self.text_key)
         free_models()
         return new_dataset
+
+
+class StatefulOP(OP):
+    """
+    Base class for operators that need to access the global state
+    and the whole dataset. Its `process` method will be called with the
+    entire dataset and the shared context.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(StatefulOP, self).__init__(*args, **kwargs)
+
+    def process(self, dataset, context: dict):
+        """
+        Process the whole dataset and read/write the context.
+
+        :param dataset: The entire dataset at the current stage.
+        :param context: The global shared context dictionary.
+        :return: The processed dataset.
+        """
+        raise NotImplementedError
+
+    def run(self, dataset, *, context=None):
+        """
+        Execute the stateful operation.
+        """
+        dataset = super().run(dataset, context=context)
+        return self.process(dataset, context)

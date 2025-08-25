@@ -12,6 +12,7 @@ from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.ray_exporter import RayExporter
 from data_juicer.ops import load_ops
+from data_juicer.ops.base_op import StatefulOP
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
 
@@ -54,6 +55,10 @@ class RayExecutor(ExecutorBase):
         self.executor_type = "ray"
         self.work_dir = self.cfg.work_dir
         self.adapter = Adapter(self.cfg)
+
+        # Initialize the global context
+        self.global_context = {}
+        logger.info("Initialized global context for the run.")
 
         # init ray
         logger.info("Initializing Ray ...")
@@ -100,7 +105,32 @@ class RayExecutor(ExecutorBase):
             # 3. data process
             logger.info("Processing data...")
             tstart = time.time()
-            dataset.process(ops)
+
+            # Put the initial context into Ray's object store
+            context_ref = ray.put(self.global_context)
+
+            for op in ops:
+                op_name = op.__class__.__name__
+                logger.info(f"Applying OP [{op_name}]...")
+
+                if isinstance(op, StatefulOP):
+                    # NOTE: StatefulOPs on Ray are complex.
+                    # A simple implementation might collect data to the driver,
+                    # which can be a bottleneck. A true distributed implementation
+                    # would require using Ray's distributed aggregation patterns.
+                    # For now, we can issue a warning or support simple cases.
+                    logger.warning(
+                        f"Running StatefulOP [{op_name}] on Ray. This might be slow if it collects data to the driver."
+                    )
+                    # The context needs to be retrieved from the object store
+                    current_context = ray.get(context_ref)
+                    dataset.data = op.process(dataset.data, current_context)
+                    # Update the context and put it back into the object store
+                    self.global_context.update(current_context)
+                    context_ref = ray.put(self.global_context)
+                else:
+                    # Pass the context reference to the dataset's process method
+                    dataset.process_op(op, context_ref=context_ref)
 
             # 4. data export
             if not skip_export:

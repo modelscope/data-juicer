@@ -142,14 +142,20 @@ class RayDataset(DJDataset):
 
         return [row[column] for row in self.data.take()]
 
-    def process(self, operators, *, exporter=None, checkpointer=None, tracer=None) -> DJDataset:
+    def process(self, operators, *, exporter=None, checkpointer=None, tracer=None, context=None) -> DJDataset:
         if operators is None:
             return self
         if not isinstance(operators, list):
             operators = [operators]
         for op in operators:
-            self._run_single_op(op)
+            self._process_op_with_context(op, context=context)
         return self
+
+    def _process_op_with_context(self, op, context=None):
+        # set context on the op instance, it will be serialized to workers
+        if context:
+            op.context = context
+        self._run_single_op(op)
 
     def _run_single_op(self, op):
         op_proc = calculate_np(op._name, op.mem_required, op.cpu_required, self.num_proc, op.use_cuda())

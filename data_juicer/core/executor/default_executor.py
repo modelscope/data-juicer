@@ -14,6 +14,7 @@ from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.exporter import Exporter
 from data_juicer.core.tracer import Tracer
 from data_juicer.ops import OPERATORS, load_ops
+from data_juicer.ops.base_op import StatefulOP
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.ops.selector import (
     FrequencySpecifiedFieldSelector,
@@ -41,6 +42,10 @@ class DefaultExecutor(ExecutorBase):
         super().__init__(cfg)
         self.executor_type = "default"
         self.work_dir = self.cfg.work_dir
+
+        # Initialize the global context
+        self.global_context = {}
+        logger.info("Initialized global context for the run.")
 
         self.tracer = None
         self.ckpt_manager = None
@@ -149,15 +154,36 @@ class DefaultExecutor(ExecutorBase):
         # - If checkpoint is open, clean the cache files after each process
         logger.info("Processing data...")
         tstart = time()
-        dataset = dataset.process(
-            ops,
-            work_dir=self.work_dir,
-            exporter=self.exporter,
-            checkpointer=self.ckpt_manager,
-            tracer=self.tracer,
-            adapter=self.adapter,
-            open_monitor=self.cfg.open_monitor,
-        )
+
+        # Get the list of OPs that have been already processed
+        processed_ops = set()
+        if self.cfg.use_checkpoint and self.ckpt_manager:
+            processed_ops = self.ckpt_manager.get_processed_op_list()
+
+        for op in ops:
+            op_name = op.__class__.__name__
+            if op_name in processed_ops:
+                logger.info(f"Skipping OP [{op_name}] due to checkpoint.")
+                continue
+
+            logger.info(f"Applying OP [{op_name}]...")
+
+            # Pass the global context to each OP
+            # StatefulOPs have a different run signature
+            if isinstance(op, StatefulOP):
+                dataset = op.run(dataset, context=self.global_context)
+            else:
+                # Normal OPs (Mapper, Filter, etc.)
+                dataset = op.run(dataset, exporter=self.exporter, tracer=self.tracer, context=self.global_context)
+
+            # After each OP, save checkpoint if enabled
+            if self.cfg.use_checkpoint and self.ckpt_manager:
+                self.ckpt_manager.add_finished_op(op_name)
+                # In practice, you might want to clean the cache before saving
+                if self.cfg.use_cache:
+                    dataset.cleanup_cache_files()
+                self.ckpt_manager.save_ckpt(dataset)
+
         tend = time()
         logger.info(f"All OPs are done in {tend - tstart:.3f}s.")
 
