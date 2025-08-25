@@ -145,7 +145,7 @@ Data-Juicer is released under Apache License 2.0.
 
 ## Contribution and Acknowledgements
 
-Data-Juicer has benefited greatly from and continues to welcome contributions at all levels: new operators (from simple functions to advanced algorithms based on existing papers), data-recipes & processing scenarios, feature requests, efficiency enhancements, bug fixes, better documentation and usage feedback. Please refer to our [Developer Guide](docs/DeveloperGuide.md) to get started. Spreading the world in the community and giving the repository a star ⭐ are also invaluable forms of support!
+Data-Juicer has benefited greatly from and continues to welcome contributions at all levels: new operators (from simple functions to advanced algorithms based on existing papers), data-recipes & processing scenarios, feature requests, efficiency enhancements, bug fixes, better documentation and usage feedback. Please refer to our [Developer Guide](docs/DeveloperGuide.md) to get started. Spreading the word in the community and giving the repository a star ⭐ are also invaluable forms of support!
 
 Our sincere gratitude goes to all our [code contributors](https://github.com/modelscope/data-juicer/graphs/contributors) who are the cornerstone of this project. We strive to keep the list below updated and look forward to including more names (alphabetical order); please reach out if we have missed any acknowledgements.
 - **Initiated by:** Alibaba Tongyi Lab
