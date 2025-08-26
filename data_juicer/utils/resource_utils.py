@@ -117,10 +117,6 @@ def available_gpu_memories() -> List[int]:
         return ray_available_gpu_memories()
 
     try:
-        nvidia_smi_output = subprocess.check_output(
-            ["nvidia-smi", "--query-gpu=memory.free", "--format=csv,noheader,nounits"]
-        ).decode("utf-8")
-
-        return [int(i) for i in nvidia_smi_output.strip().split("\n")]
+        return query_cuda_info("memory.free")
     except Exception:
         return []
