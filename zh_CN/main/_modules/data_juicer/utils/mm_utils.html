@@ -4,13 +4,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="索引" href="../../../genindex.html" /><link rel="search" title="搜索" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>data_juicer.utils.mm_utils - Data Juicer</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sidebar-menu.css?v=dcc41d8a" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sidebar-menu.css?v=aecff795" />
     
     
 
@@ -38,15 +38,6 @@
 </style></head>
   <body>
     
-
-<p>
-  <strong>
-    
-    You're reading the documentation from the main branch.
-    For the latest released version, please have a look at <a href="../../../../v1.4.2/index.html">v1.4.2</a>.
-    
-  </strong>
-</p>
 
 
     <script>
@@ -247,6 +238,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/hpo/README_ZH.html">数据菜谱的自动化超参优化</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/humanops/README.html">Label Studio Service Utility</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/mm_eval/vbench_metrics/README_ZH.html">VBench metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/postprocess/README_ZH.html">Postprocess tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/preprocess/README_ZH.html">预处理工具</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/quality_classifier/README_ZH.html">给数据打分</a></li>
@@ -259,75 +251,69 @@
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of data_juicer.core package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.core.data.html">data_juicer.core.data package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.core.executor.html">data_juicer.core.executor package</a></li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of data_juicer.ops package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.aggregator.html">data_juicer.ops.aggregator package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.grouper.html">data_juicer.ops.grouper package</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.format.html">data_juicer.format</a></li>
 </ul>
 </li>
 </ul>
 
 </div></div><div class="sidebar-bottom-menu">
-    <div class="current-info">
-        <span class="current-lang">zh-CN</span>|<span class="current-version">main</span>
+  <div class="current-info">
+    <span class="current-lang">zh-CN</span>|<span class="current-version">main</span>
+  </div>
+  <div class="dropdown-panel">
+    
+    <div class="section">
+      <dt>Language</dt>
+      <dd>
+        
+        <a href="../../../../../en/main/_modules/data_juicer/utils/mm_utils.html"
+          >
+          English
+        </a>
+        
+        <a href="../../../../../zh_CN/main/_modules/data_juicer/utils/mm_utils_ZH.html"
+          >
+          简体中文
+        </a>
+        
+      </dd>
     </div>
-    <div class="dropdown-panel">
-        
-        <div class="section">
-            <dt>Language</dt>
-            <dd>
-                
-                <a href="../../../../../en/main/_modules/data_juicer/utils/mm_utils.html"
-                    >
-                    English
-                </a>
-                
-                <a href="../../../../../zh_CN/main/_modules/data_juicer/utils/mm_utils_ZH.html"
-                    >
-                    简体中文
-                </a>
-                
-            </dd>
-        </div>
-        
+    
 
+    
+    <div class="section version">
+      <dt>Version</dt>
+      <dd>
         
-        <div class="section">
-            <dt>Version</dt>
-            <dd>
-                    <a href="../../../../v1.4.0/index.html">v1.4.0</a>
-                    <a href="../../../../v1.4.1/index.html">v1.4.1</a>
-                    <a href="../../../../v1.4.2/index.html">v1.4.2</a>
-                    <a href="mm_utils.html">main</a>
-            </dd>
-        </div>
+        <a href="../../../../main/_modules/data_juicer/utils/mm_utils.html" class="active" >
+          main
+        </a>
         
+        <a href="../../../../v1.4.2/_modules/data_juicer/utils/mm_utils.html" >
+          v1.4.2
+        </a>
+        
+        <a href="../../../../v1.4.1/_modules/data_juicer/utils/mm_utils.html" >
+          v1.4.1
+        </a>
+        
+        <a href="../../../../v1.4.0/_modules/data_juicer/utils/mm_utils.html" >
+          v1.4.0
+        </a>
+        
+      </dd>
     </div>
+    
+  </div>
 </div>
       </div>
       
@@ -387,7 +373,7 @@
 <span class="c1"># A class to keep special tokens for multimodal information in the texts</span>
 <span class="c1"># The tokens in this class can be updated by corresponding arguments in config</span>
 <div class="viewcode-block" id="SpecialTokens">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.SpecialTokens">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.SpecialTokens">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpecialTokens</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="c1"># modality</span>
     <span class="n">image</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">DEFAULT_PREFIX</span><span class="si">}</span><span class="s2">image&gt;&quot;</span>
@@ -414,7 +400,7 @@
 
 
 <div class="viewcode-block" id="get_special_tokens">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.get_special_tokens">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.get_special_tokens">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_special_tokens</span><span class="p">():</span>
     <span class="n">special_token_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">)}</span>
     <span class="k">return</span> <span class="n">special_token_dict</span></div>
@@ -422,7 +408,7 @@
 
 
 <div class="viewcode-block" id="remove_special_tokens">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.remove_special_tokens">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.remove_special_tokens">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">remove_special_tokens</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">get_special_tokens</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
         <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -431,7 +417,7 @@
 
 
 <div class="viewcode-block" id="remove_non_special_tokens">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.remove_non_special_tokens">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.remove_non_special_tokens">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">remove_non_special_tokens</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
     <span class="n">special_tokens</span> <span class="o">=</span> <span class="n">get_special_tokens</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
     <span class="n">patterns</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">special_tokens</span><span class="p">)</span>
@@ -443,7 +429,7 @@
 
 
 <div class="viewcode-block" id="load_mm_bytes_from_sample">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_mm_bytes_from_sample">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.load_mm_bytes_from_sample">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_mm_bytes_from_sample</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">mm_idx</span><span class="p">,</span> <span class="n">mm_bytes_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="c1"># if mm_bytes_key is not specified or there is no bytes_key, return None</span>
     <span class="k">if</span> <span class="n">mm_bytes_key</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">mm_bytes_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
@@ -484,7 +470,7 @@
 
 
 <div class="viewcode-block" id="load_data_with_context">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_data_with_context">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.load_data_with_context">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">loaded_data_keys</span><span class="p">,</span> <span class="n">load_func</span><span class="p">,</span> <span class="n">mm_bytes_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The unified loading function with contexts for multimodal data.</span>
@@ -531,21 +517,21 @@
 
 <span class="c1"># Images</span>
 <div class="viewcode-block" id="load_images">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_images">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.load_images">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_images</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">load_image</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="load_images_byte">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_images_byte">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.load_images_byte">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_images_byte</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">load_image_byte</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="load_image">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_image">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.load_image">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_image</span><span class="p">(</span><span class="n">path_or_bytes</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path_or_bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
         <span class="n">img</span> <span class="o">=</span> <span class="n">PIL</span><span class="o">.</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">path_or_bytes</span><span class="p">))</span>
@@ -558,7 +544,7 @@
 
 
 <div class="viewcode-block" id="load_image_byte">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_image_byte">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.load_image_byte">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_image_byte</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">image_file</span><span class="p">:</span>
         <span class="n">image_data</span> <span class="o">=</span> <span class="n">image_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -567,7 +553,7 @@
 
 
 <div class="viewcode-block" id="image_path_to_base64">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.image_path_to_base64">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.image_path_to_base64">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">image_path_to_base64</span><span class="p">(</span><span class="n">image_path</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">image_file</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">image_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span></div>
@@ -575,14 +561,14 @@
 
 
 <div class="viewcode-block" id="image_byte_to_base64">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.image_byte_to_base64">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.image_byte_to_base64">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">image_byte_to_base64</span><span class="p">(</span><span class="n">image_byte</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">image_byte</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="pil_to_opencv">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.pil_to_opencv">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.pil_to_opencv">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">pil_to_opencv</span><span class="p">(</span><span class="n">pil_image</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;RGB&quot;</span><span class="p">:</span>
         <span class="n">pil_image</span> <span class="o">=</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
@@ -594,7 +580,7 @@
 
 
 <div class="viewcode-block" id="detect_faces">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.detect_faces">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.detect_faces">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">detect_faces</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">detector</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">):</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">pil_to_opencv</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
     <span class="n">gray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
@@ -611,7 +597,7 @@
 
 
 <div class="viewcode-block" id="get_file_size">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.get_file_size">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.get_file_size">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_file_size</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
@@ -620,7 +606,7 @@
 
 
 <div class="viewcode-block" id="iou">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.iou">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.iou">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">iou</span><span class="p">(</span><span class="n">box1</span><span class="p">,</span> <span class="n">box2</span><span class="p">):</span>
     <span class="n">x1_min</span><span class="p">,</span> <span class="n">y1_min</span><span class="p">,</span> <span class="n">x1_max</span><span class="p">,</span> <span class="n">y1_max</span> <span class="o">=</span> <span class="n">box1</span>
     <span class="n">x2_min</span><span class="p">,</span> <span class="n">y2_min</span><span class="p">,</span> <span class="n">x2_max</span><span class="p">,</span> <span class="n">y2_max</span> <span class="o">=</span> <span class="n">box2</span>
@@ -637,7 +623,7 @@
 
 
 <div class="viewcode-block" id="calculate_resized_dimensions">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.calculate_resized_dimensions">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.calculate_resized_dimensions">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">calculate_resized_dimensions</span><span class="p">(</span>
     <span class="n">original_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="n">PositiveInt</span><span class="p">],</span>
     <span class="n">target_size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="n">PositiveInt</span><span class="p">]],</span>
@@ -691,14 +677,14 @@
 
 <span class="c1"># Audios</span>
 <div class="viewcode-block" id="load_audios">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_audios">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.load_audios">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_audios</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">load_audio</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="load_audio">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_audio">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.load_audio">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_audio</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">aud_feature</span> <span class="o">=</span> <span class="n">Audio</span><span class="p">(</span><span class="n">sampling_rate</span><span class="p">)</span>
     <span class="n">aud</span> <span class="o">=</span> <span class="n">aud_feature</span><span class="o">.</span><span class="n">decode_example</span><span class="p">(</span><span class="n">aud_feature</span><span class="o">.</span><span class="n">encode_example</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
@@ -708,14 +694,14 @@
 
 <span class="c1"># Videos</span>
 <div class="viewcode-block" id="load_videos">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_videos">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.load_videos">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_videos</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">load_video</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="load_video">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.load_video">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.load_video">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_video</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a video using its path.</span>
@@ -734,7 +720,7 @@
 
 
 <div class="viewcode-block" id="get_video_duration">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.get_video_duration">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.get_video_duration">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_video_duration</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span> <span class="n">video_stream_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the video&#39;s duration from the container</span>
@@ -764,7 +750,7 @@
 
 
 <div class="viewcode-block" id="get_decoded_frames_from_video">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.get_decoded_frames_from_video">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.get_decoded_frames_from_video">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_decoded_frames_from_video</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span> <span class="n">video_stream_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the video&#39;s frames from the container</span>
@@ -788,7 +774,7 @@
 
 
 <div class="viewcode-block" id="cut_video_by_seconds">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.cut_video_by_seconds">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.cut_video_by_seconds">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">cut_video_by_seconds</span><span class="p">(</span>
     <span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span>
     <span class="n">output_video</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -898,7 +884,7 @@
 
 
 <div class="viewcode-block" id="process_each_frame">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.process_each_frame">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.process_each_frame">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">process_each_frame</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span> <span class="n">output_video</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">frame_func</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Process each frame in video by replacing each frame by</span>
@@ -965,7 +951,7 @@
 
 
 <div class="viewcode-block" id="extract_key_frames_by_seconds">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.extract_key_frames_by_seconds">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.extract_key_frames_by_seconds">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">extract_key_frames_by_seconds</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract key frames by seconds.</span>
 <span class="sd">    :param input_video: input video path or av.container.InputContainer.</span>
@@ -1000,7 +986,7 @@
 
 
 <div class="viewcode-block" id="extract_key_frames">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.extract_key_frames">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.extract_key_frames">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">extract_key_frames</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract key frames from the input video. If there is no keyframes in the</span>
@@ -1046,7 +1032,7 @@
 
 
 <div class="viewcode-block" id="get_key_frame_seconds">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.get_key_frame_seconds">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.get_key_frame_seconds">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_key_frame_seconds</span><span class="p">(</span><span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get seconds of key frames in the input video.</span>
@@ -1059,7 +1045,7 @@
 
 
 <div class="viewcode-block" id="extract_video_frames_uniformly_by_seconds">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.extract_video_frames_uniformly_by_seconds">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.extract_video_frames_uniformly_by_seconds">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">extract_video_frames_uniformly_by_seconds</span><span class="p">(</span>
     <span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span> <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span><span class="p">,</span> <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="p">):</span>
@@ -1098,7 +1084,7 @@
 
 
 <div class="viewcode-block" id="extract_video_frames_uniformly">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.extract_video_frames_uniformly">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.extract_video_frames_uniformly">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">extract_video_frames_uniformly</span><span class="p">(</span>
     <span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span>
     <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span><span class="p">,</span>
@@ -1225,7 +1211,7 @@
 
 
 <div class="viewcode-block" id="extract_audio_from_video">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.extract_audio_from_video">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.extract_audio_from_video">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">extract_audio_from_video</span><span class="p">(</span>
     <span class="n">input_video</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">],</span>
     <span class="n">output_audio</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1337,7 +1323,7 @@
 
 <span class="c1"># Others</span>
 <div class="viewcode-block" id="size_to_bytes">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.size_to_bytes">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.size_to_bytes">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">size_to_bytes</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
     <span class="n">alphabets_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">char</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">size</span> <span class="k">if</span> <span class="n">char</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()]</span>
     <span class="n">numbers_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">char</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">size</span> <span class="k">if</span> <span class="n">char</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()]</span>
@@ -1381,7 +1367,7 @@
 
 
 <div class="viewcode-block" id="insert_texts_after_placeholders">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.insert_texts_after_placeholders">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.insert_texts_after_placeholders">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">insert_texts_after_placeholders</span><span class="p">(</span><span class="n">original_string</span><span class="p">,</span> <span class="n">placeholders</span><span class="p">,</span> <span class="n">new_texts</span><span class="p">,</span> <span class="n">delimiter_in_insert_pos</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholders</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_texts</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of placeholders and new_texts must be equal&quot;</span><span class="p">)</span>
@@ -1406,7 +1392,7 @@
 
 
 <div class="viewcode-block" id="timecode_string_to_seconds">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.timecode_string_to_seconds">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.timecode_string_to_seconds">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">timecode_string_to_seconds</span><span class="p">(</span><span class="n">timecode</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a timecode string to the float seconds.</span>
@@ -1424,7 +1410,7 @@
 
 
 <div class="viewcode-block" id="parse_string_to_roi">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.parse_string_to_roi">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.parse_string_to_roi">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">parse_string_to_roi</span><span class="p">(</span><span class="n">roi_string</span><span class="p">,</span> <span class="n">roi_type</span><span class="o">=</span><span class="s2">&quot;pixel&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a roi string to four number x1, y1, x2, y2 stand for the region.</span>
@@ -1463,7 +1449,7 @@
 
 
 <div class="viewcode-block" id="close_video">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.mm_utils.close_video">[文档]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.mm_utils.html#data_juicer.utils.mm_utils.close_video">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">close_video</span><span class="p">(</span><span class="n">container</span><span class="p">:</span> <span class="n">av</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">InputContainer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Close the video stream and container to avoid memory leak.</span>

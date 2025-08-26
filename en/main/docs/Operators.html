@@ -5,13 +5,13 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Data Recipe Gallery" href="RecipeGallery.html" /><link rel="prev" title="Quick Start" href="tutorial/QuickStart.html" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>Operator Schemas 算子提要 - Data Juicer</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sidebar-menu.css?v=dcc41d8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/sidebar-menu.css?v=aecff795" />
     
     
 
@@ -39,15 +39,6 @@
 </style></head>
   <body>
     
-
-<p>
-  <strong>
-    
-    You're reading the documentation from the main branch.
-    For the latest released version, please have a look at <a href="../../v1.4.2/docs/Operators.html">v1.4.2</a>.
-    
-  </strong>
-</p>
 
 
     <script>
@@ -246,6 +237,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../tools/hpo/README.html">Hyper-parameter Optimization for Data Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README.html">Metrics for video generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/vbench_metrics/README.html">VBench metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/postprocess/README.html">Postprocess tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/preprocess/README.html">Preprocess Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/quality_classifier/README.html">Data Scoring</a></li>
@@ -258,75 +250,69 @@
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../data_juicer.core.html">data_juicer.core package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of data_juicer.core package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../data_juicer.core.data.html">data_juicer.core.data package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../data_juicer.core.executor.html">data_juicer.core.executor package</a></li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../data_juicer.ops.html">data_juicer.ops package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of data_juicer.ops package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.aggregator.html">data_juicer.ops.aggregator package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.grouper.html">data_juicer.ops.grouper package</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../data_juicer.analysis.html">data_juicer.analysis package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../data_juicer.config.html">data_juicer.config package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../data_juicer.format.html">data_juicer.format package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.format.html">data_juicer.format</a></li>
 </ul>
 </li>
 </ul>
 
 </div></div><div class="sidebar-bottom-menu">
-    <div class="current-info">
-        <span class="current-lang">en</span>|<span class="current-version">main</span>
+  <div class="current-info">
+    <span class="current-lang">en</span>|<span class="current-version">main</span>
+  </div>
+  <div class="dropdown-panel">
+    
+    <div class="section">
+      <dt>Language</dt>
+      <dd>
+        
+        <a href="../../../en/main/docs/Operators.html"
+          class="active" >
+          English
+        </a>
+        
+        <a href="../../../zh_CN/main/docs/Operators.html"
+          >
+          简体中文
+        </a>
+        
+      </dd>
     </div>
-    <div class="dropdown-panel">
-        
-        <div class="section">
-            <dt>Language</dt>
-            <dd>
-                
-                <a href="../../../en/main/docs/Operators.html"
-                    class="active" >
-                    English
-                </a>
-                
-                <a href="../../../zh_CN/main/docs/Operators.html"
-                    >
-                    简体中文
-                </a>
-                
-            </dd>
-        </div>
-        
+    
 
+    
+    <div class="section version">
+      <dt>Version</dt>
+      <dd>
         
-        <div class="section">
-            <dt>Version</dt>
-            <dd>
-                    <a href="../../v1.4.0/docs/Operators.html">v1.4.0</a>
-                    <a href="../../v1.4.1/docs/Operators.html">v1.4.1</a>
-                    <a href="../../v1.4.2/docs/Operators.html">v1.4.2</a>
-                    <a href="Operators.html">main</a>
-            </dd>
-        </div>
+        <a href="../../main/docs/Operators.html" class="active" >
+          main
+        </a>
         
+        <a href="../../v1.4.2/docs/Operators.html" >
+          v1.4.2
+        </a>
+        
+        <a href="../../v1.4.1/docs/Operators.html" >
+          v1.4.1
+        </a>
+        
+        <a href="../../v1.4.0/docs/Operators.html" >
+          v1.4.0
+        </a>
+        
+      </dd>
     </div>
+    
+  </div>
 </div>
       </div>
       
@@ -397,31 +383,31 @@ Data-Juicer 中的算子分为以下 7 种类型。</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><a class="reference internal" href="../data_juicer.ops.aggregator.html#module-data_juicer.ops.aggregator" title="data_juicer.ops.aggregator"><span class="xref myst py py-mod">aggregator</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/data_juicer.ops.aggregator.html#module-data_juicer.ops.aggregator" title="data_juicer.ops.aggregator"><span class="xref myst py py-mod">aggregator</span></a></p></td>
 <td class="text-center"><p>4</p></td>
 <td><p>Aggregate for batched samples, such as summary or conclusion. 对批量样本进行汇总，如得出总结或结论。</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../data_juicer.ops.deduplicator.html#module-data_juicer.ops.deduplicator" title="data_juicer.ops.deduplicator"><span class="xref myst py py-mod">deduplicator</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/data_juicer.ops.deduplicator.html#module-data_juicer.ops.deduplicator" title="data_juicer.ops.deduplicator"><span class="xref myst py py-mod">deduplicator</span></a></p></td>
 <td class="text-center"><p>10</p></td>
 <td><p>Detects and removes duplicate samples. 识别、删除重复样本。</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../data_juicer.core.html#data_juicer.core.NestedDataset.filter" title="data_juicer.core.NestedDataset.filter"><span class="xref myst py py-meth">filter</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/data_juicer.core.html#data_juicer.core.NestedDataset.filter" title="data_juicer.core.NestedDataset.filter"><span class="xref myst py py-meth">filter</span></a></p></td>
 <td class="text-center"><p>54</p></td>
 <td><p>Filters out low-quality samples. 过滤低质量样本。</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../data_juicer.format.html#module-data_juicer.format.formatter" title="data_juicer.format.formatter"><span class="xref myst py py-mod">formatter</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/data_juicer.format.formatter.html#module-data_juicer.format.formatter" title="data_juicer.format.formatter"><span class="xref myst py py-mod">formatter</span></a></p></td>
 <td class="text-center"><p>8</p></td>
 <td><p>Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../data_juicer.ops.grouper.html#module-data_juicer.ops.grouper" title="data_juicer.ops.grouper"><span class="xref myst py py-mod">grouper</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/data_juicer.ops.grouper.html#module-data_juicer.ops.grouper" title="data_juicer.ops.grouper"><span class="xref myst py py-mod">grouper</span></a></p></td>
 <td class="text-center"><p>3</p></td>
 <td><p>Group samples to batched samples. 将样本分组，每一组组成一个批量样本。</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../data_juicer.ops.mapper.html#module-data_juicer.ops.mapper" title="data_juicer.ops.mapper"><span class="xref myst py py-mod">mapper</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/data_juicer.ops.mapper.html#module-data_juicer.ops.mapper" title="data_juicer.ops.mapper"><span class="xref myst py py-mod">mapper</span></a></p></td>
 <td class="text-center"><p>82</p></td>
 <td><p>Edits and transforms samples. 对数据样本进行编辑和转换。</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../data_juicer.ops.selector.html#module-data_juicer.ops.selector" title="data_juicer.ops.selector"><span class="xref myst py py-mod">selector</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/data_juicer.ops.selector.html#module-data_juicer.ops.selector" title="data_juicer.ops.selector"><span class="xref myst py py-mod">selector</span></a></p></td>
 <td class="text-center"><p>5</p></td>
 <td><p>Selects top samples based on ranking. 基于排序选取高质量样本。</p></td>
 </tr>

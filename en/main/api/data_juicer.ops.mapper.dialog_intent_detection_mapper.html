@@ -1,0 +1,547 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
+        <title>data_juicer.ops.mapper.dialog_intent_detection_mapper module - Data Juicer</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sidebar-menu.css?v=aecff795" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Data Juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">Data Juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/DJ-Cookbook.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/Installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/QuickStart.html">Quick Start</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">docs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RecipeGallery.html">Data Recipe Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DatasetCfg.html">Dataset Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/BadDataExhibition.html">“Bad” Data Exhibition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_SORA.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_agent.html">DataJuicer-Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_service.html">DJ_service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DeveloperGuide.html">How-to Guide for Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Distributed.html">Distributed Data Processing in Data-Juicer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Sandbox.html">Sandbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../demos/README.html">Demos</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tools/distributed_deduplication/README.html">Distributed Fuzzy Deduplication Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/README.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/gpt_eval/README.html">GPT EVAL: Evaluate your model with OpenAI API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/recorder/README.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/README.html">Format Conversion Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README.html">Multimodal Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README.html">Post Tuning Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/hpo/README.html">Hyper-parameter Optimization for Data Recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README.html">Metrics for video generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/vbench_metrics/README.html">VBench metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/postprocess/README.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/preprocess/README.html">Preprocess Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/quality_classifier/README.html">Data Scoring</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">thirdparty</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README.html">LLM Ecosystems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/models/README.html">Third-party Model Library</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+  <div class="current-info">
+    <span class="current-lang">en</span>|<span class="current-version">main</span>
+  </div>
+  <div class="dropdown-panel">
+    
+    <div class="section">
+      <dt>Language</dt>
+      <dd>
+        
+        <a href="../../../en/main/api/data_juicer.ops.mapper.dialog_intent_detection_mapper.html"
+          class="active" >
+          English
+        </a>
+        
+        <a href="../../../zh_CN/main/api/data_juicer.ops.mapper.dialog_intent_detection_mapper.html"
+          >
+          简体中文
+        </a>
+        
+      </dd>
+    </div>
+    
+
+    
+    <div class="section version">
+      <dt>Version</dt>
+      <dd>
+        
+        <a href="../../main/api/data_juicer.ops.mapper.dialog_intent_detection_mapper.html" class="active" >
+          main
+        </a>
+        
+        <a href="../../v1.4.2/api/data_juicer.ops.mapper.dialog_intent_detection_mapper.html" >
+          v1.4.2
+        </a>
+        
+        <a href="../../v1.4.1/api/data_juicer.ops.mapper.dialog_intent_detection_mapper.html" >
+          v1.4.1
+        </a>
+        
+        <a href="../../v1.4.0/api/data_juicer.ops.mapper.dialog_intent_detection_mapper.html" >
+          v1.4.0
+        </a>
+        
+      </dd>
+    </div>
+    
+  </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/api/data_juicer.ops.mapper.dialog_intent_detection_mapper.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-data_juicer.ops.mapper.dialog_intent_detection_mapper">
+<span id="data-juicer-ops-mapper-dialog-intent-detection-mapper-module"></span><h1>data_juicer.ops.mapper.dialog_intent_detection_mapper module<a class="headerlink" href="#module-data_juicer.ops.mapper.dialog_intent_detection_mapper" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.dialog_intent_detection_mapper.</span></span><span class="sig-name descname"><span class="pre">DialogIntentDetectionMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpt-4o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intent_candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_round</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ge</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">ge</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'dialog_intent_labels'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'dialog_intent_labels_analysis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidate_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/dialog_intent_detection_mapper.html#DialogIntentDetectionMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.base_op.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
+<p>Mapper to generate user’s intent labels in dialog. Input from
+history_key, query_key and response_key. Output lists of
+labels and analysis for queries in the dialog.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_SYSTEM_PROMPT">
+<span class="sig-name descname"><span class="pre">DEFAULT_SYSTEM_PROMPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'请判断用户和LLM多轮对话中用户的意图。\n要求：\n-</span> <span class="pre">需要先进行分析，然后列出用户所具有的意图，下面是一个样例，请模仿样例格式输出。\n用户：你好，我最近对人工智能很感兴趣，能给我讲讲什么是机器学习吗？\n意图分析：用户在请求信息，希望了解有关机器学习的基础知识。\n意图类别：信息查找\nLLM：你好！当然可以。机器学习是一种人工智能方法，允许计算机通过数据自动改进和学习。\n用户：听起来很有趣，有没有推荐的入门书籍或资料？\n意图分析：用户在请求建议，希望获取关于机器学习的入门资源。\n意图类别：请求建议\nLLM：有很多不错的入门书籍和资源。一本常被推荐的书是《Python机器学习实践》（Python</span> <span class="pre">Machine</span> <span class="pre">Learning），它涵盖了基础知识和一些实际案例。此外，您还可以参考Coursera或edX上的在线课程，这些课程提供了系统的学习路径。\n用户：谢谢你的建议！我还想知道，学习机器学习需要什么样的数学基础？\n意图分析：用户在寻求信息，希望了解学习机器学习所需的前提条件，特别是在数学方面。\n意图类别：信息查找\nLLM：学习机器学习通常需要一定的数学基础，特别是线性代数、概率论和统计学。这些数学领域帮助理解算法的工作原理和数据模式分析。如果您对这些主题不太熟悉，建议先从相关基础书籍或在线资源开始学习。\n用户：明白了，我会先补习这些基础知识。再次感谢你的帮助！\n意图分析：用户表达感谢，并表示计划付诸行动来补充所需的基础知识。\n意图类别：其他'</span></em><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_SYSTEM_PROMPT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_QUERY_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_QUERY_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'用户：{query}\n'</span></em><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_QUERY_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_RESPONSE_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_RESPONSE_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'LLM：{response}\n'</span></em><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_RESPONSE_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_CANDIDATES_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_CANDIDATES_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'备选意图类别：[{candidate_str}]'</span></em><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_CANDIDATES_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_ANALYSIS_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_ANALYSIS_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'意图分析：{analysis}\n'</span></em><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_ANALYSIS_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_LABELS_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_LABELS_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'意图类别：{labels}\n'</span></em><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_LABELS_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_ANALYSIS_PATTERN">
+<span class="sig-name descname"><span class="pre">DEFAULT_ANALYSIS_PATTERN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'意图分析：(.*?)\n'</span></em><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_ANALYSIS_PATTERN" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_LABELS_PATTERN">
+<span class="sig-name descname"><span class="pre">DEFAULT_LABELS_PATTERN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'意图类别：(.*?)($|\n)'</span></em><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_LABELS_PATTERN" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpt-4o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intent_candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_round</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ge</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">ge</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'dialog_intent_labels'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'dialog_intent_labels_analysis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidate_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/dialog_intent_detection_mapper.html#DialogIntentDetectionMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>api_model</strong> – API model name.</p></li>
+<li><p><strong>intent_candidates</strong> – The output intent candidates. Use the
+intent labels of the open domain if it is None.</p></li>
+<li><p><strong>max_round</strong> – The max num of round in the dialog to build the
+prompt.</p></li>
+<li><p><strong>labels_key</strong> – The key name in the meta field to store the
+output labels. It is ‘dialog_intent_labels’ in default.</p></li>
+<li><p><strong>analysis_key</strong> – The key name in the meta field to store the
+corresponding analysis. It is ‘dialog_intent_labels_analysis’
+in default.</p></li>
+<li><p><strong>api_endpoint</strong> – URL endpoint for the API.</p></li>
+<li><p><strong>response_path</strong> – Path to extract content from the API response.
+Defaults to ‘choices.0.message.content’.</p></li>
+<li><p><strong>system_prompt</strong> – System prompt for the task.</p></li>
+<li><p><strong>query_template</strong> – Template for query part to build the input
+prompt.</p></li>
+<li><p><strong>response_template</strong> – Template for response part to build the
+input prompt.</p></li>
+<li><p><strong>candidate_template</strong> – Template for intent candidates to
+build the input prompt.</p></li>
+<li><p><strong>analysis_template</strong> – Template for analysis part to build the
+input prompt.</p></li>
+<li><p><strong>labels_template</strong> – Template for labels to build the
+input prompt.</p></li>
+<li><p><strong>analysis_pattern</strong> – Pattern to parse the return intent
+analysis.</p></li>
+<li><p><strong>labels_pattern</strong> – Pattern to parse the return intent
+labels.</p></li>
+<li><p><strong>try_num</strong> – The number of retry attempts when there is an API
+call error or output parsing error.</p></li>
+<li><p><strong>model_params</strong> – Parameters for initializing the API model.</p></li>
+<li><p><strong>sampling_params</strong> – Extra parameters passed to the API call.
+e.g {‘temperature’: 0.9, ‘top_p’: 0.95}</p></li>
+<li><p><strong>kwargs</strong> – Extra keyword arguments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.build_input">
+<span class="sig-name descname"><span class="pre">build_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">history</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/dialog_intent_detection_mapper.html#DialogIntentDetectionMapper.build_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.build_input" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.parse_output">
+<span class="sig-name descname"><span class="pre">parse_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/dialog_intent_detection_mapper.html#DialogIntentDetectionMapper.parse_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.parse_output" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.process_single">
+<span class="sig-name descname"><span class="pre">process_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/dialog_intent_detection_mapper.html#DialogIntentDetectionMapper.process_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.process_single" title="Link to this definition">¶</a></dt>
+<dd><p>For sample level, sample –&gt; sample</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> – sample to process</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>processed sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">data_juicer.ops.mapper.dialog_intent_detection_mapper module</a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_SYSTEM_PROMPT"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper.DEFAULT_SYSTEM_PROMPT</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_QUERY_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper.DEFAULT_QUERY_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_RESPONSE_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper.DEFAULT_RESPONSE_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_CANDIDATES_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper.DEFAULT_CANDIDATES_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_ANALYSIS_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper.DEFAULT_ANALYSIS_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_LABELS_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper.DEFAULT_LABELS_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_ANALYSIS_PATTERN"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper.DEFAULT_ANALYSIS_PATTERN</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.DEFAULT_LABELS_PATTERN"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper.DEFAULT_LABELS_PATTERN</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.__init__"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.build_input"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper.build_input()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.parse_output"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper.parse_output()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.process_single"><code class="docutils literal notranslate"><span class="pre">DialogIntentDetectionMapper.process_single()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="../_static/documentation_options.js?v=02f2166e"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

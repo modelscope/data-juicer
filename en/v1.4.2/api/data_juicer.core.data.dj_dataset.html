@@ -1,0 +1,798 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
+        <title>data_juicer.core.data.dj_dataset module - Data Juicer</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sidebar-menu.css?v=aecff795" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Data Juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">Data Juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/DJ-Cookbook.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/Installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/QuickStart.html">Quick Start</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">docs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RecipeGallery.html">Data Recipe Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DatasetCfg.html">Dataset Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/BadDataExhibition.html">“Bad” Data Exhibition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_SORA.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_agent.html">DataJuicer-Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_service.html">DJ_service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DeveloperGuide.html">How-to Guide for Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Distributed.html">Distributed Data Processing in Data-Juicer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Sandbox.html">Sandbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../demos/README.html">Demos</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tools/distributed_deduplication/README.html">Distributed Fuzzy Deduplication Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/README.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/gpt_eval/README.html">GPT EVAL: Evaluate your model with OpenAI API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/recorder/README.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/README.html">Format Conversion Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README.html">Multimodal Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README.html">Post Tuning Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/hpo/README.html">Hyper-parameter Optimization for Data Recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README.html">Metrics for video generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/postprocess/README.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/preprocess/README.html">Preprocess Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/quality_classifier/README.html">Data Scoring</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">thirdparty</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README.html">LLM Ecosystems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/models/README.html">Third-party Model Library</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+  <div class="current-info">
+    <span class="current-lang">en</span>|<span class="current-version">v1.4.2</span>
+  </div>
+  <div class="dropdown-panel">
+    
+    <div class="section">
+      <dt>Language</dt>
+      <dd>
+        
+        <a href="../../../en/v1.4.2/api/data_juicer.core.data.dj_dataset.html"
+          class="active" >
+          English
+        </a>
+        
+        <a href="../../../zh_CN/v1.4.2/api/data_juicer.core.data.dj_dataset.html"
+          >
+          简体中文
+        </a>
+        
+      </dd>
+    </div>
+    
+
+    
+    <div class="section version">
+      <dt>Version</dt>
+      <dd>
+        
+        <a href="../../main/api/data_juicer.core.data.dj_dataset.html" >
+          main
+        </a>
+        
+        <a href="../../v1.4.2/api/data_juicer.core.data.dj_dataset.html" class="active" >
+          v1.4.2
+        </a>
+        
+        <a href="../../v1.4.1/api/data_juicer.core.data.dj_dataset.html" >
+          v1.4.1
+        </a>
+        
+        <a href="../../v1.4.0/api/data_juicer.core.data.dj_dataset.html" >
+          v1.4.0
+        </a>
+        
+      </dd>
+    </div>
+    
+  </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/api/data_juicer.core.data.dj_dataset.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-data_juicer.core.data.dj_dataset">
+<span id="data-juicer-core-data-dj-dataset-module"></span><h1>data_juicer.core.data.dj_dataset module<a class="headerlink" href="#module-data_juicer.core.data.dj_dataset" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.DJDataset">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.dj_dataset.</span></span><span class="sig-name descname"><span class="pre">DJDataset</span></span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#DJDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.DJDataset" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Base dataset of DJ</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.DJDataset.process">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operators</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">exporter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpointer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset" title="data_juicer.core.data.dj_dataset.DJDataset"><span class="pre">DJDataset</span></a></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#DJDataset.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.DJDataset.process" title="Link to this definition">¶</a></dt>
+<dd><p>process a list of operators on the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.DJDataset.schema">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">schema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="data_juicer.core.data.schema.html#data_juicer.core.data.schema.Schema" title="data_juicer.core.data.schema.Schema"><span class="pre">Schema</span></a></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#DJDataset.schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.DJDataset.schema" title="Link to this definition">¶</a></dt>
+<dd><p>Get dataset schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dataset schema containing column names and types</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="data_juicer.core.data.schema.html#data_juicer.core.data.schema.Schema" title="data_juicer.core.data.schema.Schema">Schema</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.DJDataset.get">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#DJDataset.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.DJDataset.get" title="Link to this definition">¶</a></dt>
+<dd><p>Get k rows from the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> – Number of rows to take</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of rows from the dataset.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.DJDataset.get_column">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#DJDataset.get_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.DJDataset.get_column" title="Link to this definition">¶</a></dt>
+<dd><p>Get values from a specific column/field, optionally limited to first k rows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>column</strong> – Name of the column to retrieve</p></li>
+<li><p><strong>k</strong> – Optional number of rows to return. If None, returns all rows</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of values from the specified column</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>KeyError</strong> – If column doesn’t exist in dataset</p></li>
+<li><p><strong>ValueError</strong> – If k is negative</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.DJDataset.to_list">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#DJDataset.to_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.DJDataset.to_list" title="Link to this definition">¶</a></dt>
+<dd><p>Convert the current dataset to a Python list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.DJDataset.contain_column">
+<span class="sig-name descname"><span class="pre">contain_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#DJDataset.contain_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.DJDataset.contain_column" title="Link to this definition">¶</a></dt>
+<dd><p>Check whether the dataset contains a specific column/field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>column</strong> – Name of the column to check</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the dataset contains the column, False otherwise</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.wrap_func_with_nested_access">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.dj_dataset.</span></span><span class="sig-name descname"><span class="pre">wrap_func_with_nested_access</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#wrap_func_with_nested_access"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.wrap_func_with_nested_access" title="Link to this definition">¶</a></dt>
+<dd><p>Before conducting actual function <cite>f</cite>, wrap its args and kargs into nested
+ones.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> – function to be wrapped.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>wrapped function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.nested_obj_factory">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.dj_dataset.</span></span><span class="sig-name descname"><span class="pre">nested_obj_factory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#nested_obj_factory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.nested_obj_factory" title="Link to this definition">¶</a></dt>
+<dd><p>Use nested classes to wrap the input object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> – object to be nested.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>nested object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedQueryDict">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.dj_dataset.</span></span><span class="sig-name descname"><span class="pre">NestedQueryDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedQueryDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedQueryDict" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>Enhanced dict for better usability.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedQueryDict.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedQueryDict.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedQueryDict.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDatasetDict">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.dj_dataset.</span></span><span class="sig-name descname"><span class="pre">NestedDatasetDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDatasetDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDatasetDict" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetDict</span></code></p>
+<p>Enhanced HuggingFace-DatasetDict for better usability and efficiency.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDatasetDict.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDatasetDict.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDatasetDict.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDatasetDict.map">
+<span class="sig-name descname"><span class="pre">map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDatasetDict.map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDatasetDict.map" title="Link to this definition">¶</a></dt>
+<dd><p>Override the map func, which is called by most common operations,
+such that the processed samples can be accessed by nested manner.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.dj_dataset.</span></span><span class="sig-name descname"><span class="pre">NestedDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>, <a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset" title="data_juicer.core.data.dj_dataset.DJDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">DJDataset</span></code></a></p>
+<p>Enhanced HuggingFace-Dataset for better usability and efficiency.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.schema">
+<span class="sig-name descname"><span class="pre">schema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="data_juicer.core.data.schema.html#data_juicer.core.data.schema.Schema" title="data_juicer.core.data.schema.Schema"><span class="pre">Schema</span></a></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.schema" title="Link to this definition">¶</a></dt>
+<dd><p>Get dataset schema.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.get" title="Link to this definition">¶</a></dt>
+<dd><p>Get k rows from the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.get_column">
+<span class="sig-name descname"><span class="pre">get_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.get_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.get_column" title="Link to this definition">¶</a></dt>
+<dd><p>Get column values from HuggingFace dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>column</strong> – Name of the column to retrieve</p></li>
+<li><p><strong>k</strong> – Optional number of rows to return. If None, returns all rows</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of values from the specified column</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>KeyError</strong> – If column doesn’t exist</p></li>
+<li><p><strong>ValueError</strong> – If k is negative</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operators</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">work_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exporter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpointer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adapter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_monitor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.process" title="Link to this definition">¶</a></dt>
+<dd><p>process a list of operators on the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.update_args">
+<span class="sig-name descname"><span class="pre">update_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.update_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.update_args" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.map">
+<span class="sig-name descname"><span class="pre">map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.map" title="Link to this definition">¶</a></dt>
+<dd><p>Override the map func, which is called by most common operations,
+such that the processed samples can be accessed by nested manner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.filter" title="Link to this definition">¶</a></dt>
+<dd><p>Override the filter func, which is called by most common operations,
+such that the processed samples can be accessed by nested manner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.select">
+<span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.select" title="Link to this definition">¶</a></dt>
+<dd><p>Override the select func, such that selected samples can be accessed
+by nested manner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.to_list">
+<span class="sig-name descname"><span class="pre">to_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.to_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.to_list" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the dataset as a Python list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>list</cite></p>
+</dd>
+</dl>
+<p>Example:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`py</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">ds.to_list()</span>
+<span class="pre">`</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.from_dict">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Override the from_dict func, which is called by most from_xx
+constructors, such that the constructed dataset object is
+NestedDataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.add_column">
+<span class="sig-name descname"><span class="pre">add_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.add_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.add_column" title="Link to this definition">¶</a></dt>
+<dd><p>Override the add column func, such that the processed samples
+can be accessed by nested manner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.select_columns">
+<span class="sig-name descname"><span class="pre">select_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.select_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.select_columns" title="Link to this definition">¶</a></dt>
+<dd><p>Override the select columns func, such that the processed samples
+can be accessed by nested manner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.remove_columns">
+<span class="sig-name descname"><span class="pre">remove_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.remove_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.remove_columns" title="Link to this definition">¶</a></dt>
+<dd><p>Override the remove columns func, such that the processed samples
+can be accessed by nested manner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.cleanup_cache_files">
+<span class="sig-name descname"><span class="pre">cleanup_cache_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.cleanup_cache_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.cleanup_cache_files" title="Link to this definition">¶</a></dt>
+<dd><p>Override the cleanup_cache_files func, clear raw and compressed
+cache files.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.load_from_disk">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_from_disk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.load_from_disk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.load_from_disk" title="Link to this definition">¶</a></dt>
+<dd><p>Loads a dataset that was previously saved using [<cite>save_to_disk</cite>] from a dataset directory, or from a
+filesystem using any implementation of <cite>fsspec.spec.AbstractFileSystem</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_path</strong> (<cite>path-like</cite>) – Path (e.g. <cite>“dataset/train”</cite>) or remote URI (e.g. <cite>“s3//my-bucket/dataset/train”</cite>)
+of the dataset directory where the dataset will be loaded from.</p></li>
+<li><p><strong>keep_in_memory</strong> (<cite>bool</cite>, defaults to <cite>None</cite>) – Whether to copy the dataset in-memory. If <cite>None</cite>, the
+dataset will not be copied in-memory unless explicitly enabled by setting
+<cite>datasets.config.IN_MEMORY_MAX_SIZE</cite> to nonzero. See more details in the
+[improve performance](../cache#improve-performance) section.</p></li>
+<li><p><strong>storage_options</strong> (<cite>dict</cite>, <em>optional</em>) – <p>Key/value pairs to be passed on to the file-system backend, if any.</p>
+<p>&lt;Added version=”2.8.0”/&gt;</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>If <cite>dataset_path</cite> is a path of a dataset directory, the dataset requested.</p></li>
+<li><p>If <cite>dataset_path</cite> is a path of a dataset dict directory, a <cite>datasets.DatasetDict</cite> with each split.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>[<cite>Dataset</cite>] or [<cite>DatasetDict</cite>]</p>
+</dd>
+</dl>
+<p>Example:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`py</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">ds</span> <span class="pre">=</span> <span class="pre">load_from_disk(&quot;path/to/dataset/directory&quot;)</span>
+<span class="pre">`</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.nested_query">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.dj_dataset.</span></span><span class="sig-name descname"><span class="pre">nested_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDatasetDict" title="data_juicer.core.data.dj_dataset.NestedDatasetDict"><span class="pre">NestedDatasetDict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset" title="data_juicer.core.data.dj_dataset.NestedDataset"><span class="pre">NestedDataset</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedQueryDict" title="data_juicer.core.data.dj_dataset.NestedQueryDict"><span class="pre">NestedQueryDict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#nested_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.nested_query" title="Link to this definition">¶</a></dt>
+<dd><p>Find item from a given object, by first checking flatten layer, then
+checking nested layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root_obj</strong> – the object</p></li>
+<li><p><strong>key</strong> – the stored item to be queried, e.g., “meta” or
+“meta.date”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.add_same_content_to_new_column">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.dj_dataset.</span></span><span class="sig-name descname"><span class="pre">add_same_content_to_new_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#add_same_content_to_new_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.add_same_content_to_new_column" title="Link to this definition">¶</a></dt>
+<dd><p>A helper function to speed up add_column function. Apply map on this
+function in parallel instead of using add_column.
+:param sample: a single sample to add this new column/field.
+:param new_column_name: the name of this new column/field.
+:param initial_value: the initial value of this new column/field.</p>
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">data_juicer.core.data.dj_dataset module</a><ul>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset"><code class="docutils literal notranslate"><span class="pre">DJDataset</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset.process"><code class="docutils literal notranslate"><span class="pre">DJDataset.process()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset.schema"><code class="docutils literal notranslate"><span class="pre">DJDataset.schema()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset.get"><code class="docutils literal notranslate"><span class="pre">DJDataset.get()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset.get_column"><code class="docutils literal notranslate"><span class="pre">DJDataset.get_column()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset.to_list"><code class="docutils literal notranslate"><span class="pre">DJDataset.to_list()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.DJDataset.contain_column"><code class="docutils literal notranslate"><span class="pre">DJDataset.contain_column()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.wrap_func_with_nested_access"><code class="docutils literal notranslate"><span class="pre">wrap_func_with_nested_access()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.nested_obj_factory"><code class="docutils literal notranslate"><span class="pre">nested_obj_factory()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedQueryDict"><code class="docutils literal notranslate"><span class="pre">NestedQueryDict</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedQueryDict.__init__"><code class="docutils literal notranslate"><span class="pre">NestedQueryDict.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDatasetDict"><code class="docutils literal notranslate"><span class="pre">NestedDatasetDict</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDatasetDict.__init__"><code class="docutils literal notranslate"><span class="pre">NestedDatasetDict.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDatasetDict.map"><code class="docutils literal notranslate"><span class="pre">NestedDatasetDict.map()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset"><code class="docutils literal notranslate"><span class="pre">NestedDataset</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.__init__"><code class="docutils literal notranslate"><span class="pre">NestedDataset.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.schema"><code class="docutils literal notranslate"><span class="pre">NestedDataset.schema()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.get"><code class="docutils literal notranslate"><span class="pre">NestedDataset.get()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.get_column"><code class="docutils literal notranslate"><span class="pre">NestedDataset.get_column()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.process"><code class="docutils literal notranslate"><span class="pre">NestedDataset.process()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.update_args"><code class="docutils literal notranslate"><span class="pre">NestedDataset.update_args()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.map"><code class="docutils literal notranslate"><span class="pre">NestedDataset.map()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.filter"><code class="docutils literal notranslate"><span class="pre">NestedDataset.filter()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.select"><code class="docutils literal notranslate"><span class="pre">NestedDataset.select()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.to_list"><code class="docutils literal notranslate"><span class="pre">NestedDataset.to_list()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.from_dict"><code class="docutils literal notranslate"><span class="pre">NestedDataset.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.add_column"><code class="docutils literal notranslate"><span class="pre">NestedDataset.add_column()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.select_columns"><code class="docutils literal notranslate"><span class="pre">NestedDataset.select_columns()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.remove_columns"><code class="docutils literal notranslate"><span class="pre">NestedDataset.remove_columns()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.cleanup_cache_files"><code class="docutils literal notranslate"><span class="pre">NestedDataset.cleanup_cache_files()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.load_from_disk"><code class="docutils literal notranslate"><span class="pre">NestedDataset.load_from_disk()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.nested_query"><code class="docutils literal notranslate"><span class="pre">nested_query()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.add_same_content_to_new_column"><code class="docutils literal notranslate"><span class="pre">add_same_content_to_new_column()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="../_static/documentation_options.js?v=02f2166e"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

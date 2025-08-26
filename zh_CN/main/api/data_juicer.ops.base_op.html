@@ -1,0 +1,953 @@
+<!doctype html>
+<html class="no-js" lang="zh-CN" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="索引" href="../genindex.html" /><link rel="search" title="搜索" href="../search.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
+        <title>data_juicer.ops.base_op module - Data Juicer</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sidebar-menu.css?v=aecff795" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index_ZH.html"><div class="brand">Data Juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index_ZH.html">
+  
+  <span class="sidebar-brand-text">Data Juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="搜索" name="q" aria-label="搜索">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">教程</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/DJ-Cookbook_ZH.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/Installation_ZH.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/QuickStart_ZH.html">快速上手</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">帮助文档</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RecipeGallery_ZH.html">数据菜谱Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DatasetCfg_ZH.html">数据集配置指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/BadDataExhibition_ZH.html">“坏”数据展览</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_SORA_ZH.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_agent_ZH.html">DataJuicer-Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_service_ZH.html">DJ_服务化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DeveloperGuide_ZH.html">开发者指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Sandbox_ZH.html">沙盒实验室</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../demos/README_ZH.html">演示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/auto_evaluation_helm/README_ZH.html">自动化评测：HELM 评测及可视化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/role_playing_system_prompt/README_ZH.html">为LLM构造角色扮演的system prompt</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">工具</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tools/distributed_deduplication/README_ZH.html">分布式模糊去重工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/README_ZH.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/gpt_eval/README_ZH.html">GPT EVAL：使用 OpenAI API 评测大模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/recorder/README_ZH.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/README_ZH.html">格式转换工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README_ZH.html">多模态工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README_ZH.html">后微调工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/hpo/README_ZH.html">数据菜谱的自动化超参优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/vbench_metrics/README_ZH.html">VBench metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/postprocess/README_ZH.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/preprocess/README_ZH.html">预处理工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/quality_classifier/README_ZH.html">给数据打分</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">第三方</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README_ZH.html">大语言模型生态</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/models/README_ZH.html">第三方模型库</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+  <div class="current-info">
+    <span class="current-lang">zh-CN</span>|<span class="current-version">main</span>
+  </div>
+  <div class="dropdown-panel">
+    
+    <div class="section">
+      <dt>Language</dt>
+      <dd>
+        
+        <a href="../../../en/main/api/data_juicer.ops.base_op.html"
+          >
+          English
+        </a>
+        
+        <a href="../../../zh_CN/main/api/data_juicer.ops.base_op.html"
+          >
+          简体中文
+        </a>
+        
+      </dd>
+    </div>
+    
+
+    
+    <div class="section version">
+      <dt>Version</dt>
+      <dd>
+        
+        <a href="../../main/api/data_juicer.ops.base_op.html" class="active" >
+          main
+        </a>
+        
+        <a href="../../v1.4.2/api/data_juicer.ops.base_op.html" >
+          v1.4.2
+        </a>
+        
+        <a href="../../v1.4.1/api/data_juicer.ops.base_op.html" >
+          v1.4.1
+        </a>
+        
+        <a href="../../v1.4.0/api/data_juicer.ops.base_op.html" >
+          v1.4.0
+        </a>
+        
+      </dd>
+    </div>
+    
+  </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/api/data_juicer.ops.base_op.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-data_juicer.ops.base_op">
+<span id="data-juicer-ops-base-op-module"></span><h1>data_juicer.ops.base_op module<a class="headerlink" href="#module-data_juicer.ops.base_op" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.convert_list_dict_to_dict_list">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">convert_list_dict_to_dict_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#convert_list_dict_to_dict_list"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.convert_list_dict_to_dict_list" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.convert_dict_list_to_list_dict">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">convert_dict_list_to_list_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#convert_dict_list_to_list_dict"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.convert_dict_list_to_list_dict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.convert_arrow_to_python">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">convert_arrow_to_python</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#convert_arrow_to_python"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.convert_arrow_to_python" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.catch_map_batches_exception">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">catch_map_batches_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_op_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#catch_map_batches_exception"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.catch_map_batches_exception" title="Link to this definition">¶</a></dt>
+<dd><p>For batched-map sample-level fault tolerance.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.catch_map_single_exception">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">catch_map_single_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_op_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#catch_map_single_exception"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.catch_map_single_exception" title="Link to this definition">¶</a></dt>
+<dd><p>For single-map sample-level fault tolerance.
+The input sample is expected batch_size = 1.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">OP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#OP"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#OP.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Base class of operators.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text_key</strong> -- the key name of field that stores sample texts
+to be processed.</p></li>
+<li><p><strong>image_key</strong> -- the key name of field that stores sample image list
+to be processed</p></li>
+<li><p><strong>audio_key</strong> -- the key name of field that stores sample audio list
+to be processed</p></li>
+<li><p><strong>video_key</strong> -- the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> -- the key name of field that stores sample image bytes list
+to be processed</p></li>
+<li><p><strong>query_key</strong> -- the key name of field that stores sample queries</p></li>
+<li><p><strong>response_key</strong> -- the key name of field that stores responses</p></li>
+<li><p><strong>history_key</strong> -- the key name of field that stores history of
+queries and responses</p></li>
+<li><p><strong>index_key</strong> -- index the samples before process if not None</p></li>
+<li><p><strong>batch_size</strong> -- the batch size for processing</p></li>
+<li><p><strong>work_dir</strong> -- the working directory for this operator</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.is_batched_op">
+<span class="sig-name descname"><span class="pre">is_batched_op</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#OP.is_batched_op"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.is_batched_op" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#OP.process"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.process" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.use_cuda">
+<span class="sig-name descname"><span class="pre">use_cuda</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#OP.use_cuda"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.use_cuda" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.runtime_np">
+<span class="sig-name descname"><span class="pre">runtime_np</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#OP.runtime_np"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.runtime_np" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.remove_extra_parameters">
+<span class="sig-name descname"><span class="pre">remove_extra_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#OP.remove_extra_parameters"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.remove_extra_parameters" title="Link to this definition">¶</a></dt>
+<dd><p>at the beginning of the init of the mapper op, call
+self.remove_extra_parameters(locals())
+to get the init parameter dict of the op for convenience</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.add_parameters">
+<span class="sig-name descname"><span class="pre">add_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_parameter_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra_param_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#OP.add_parameters"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.add_parameters" title="Link to this definition">¶</a></dt>
+<dd><p>add parameters for each sample, need to keep extra_param_dict
+and init_parameter_dict unchanged.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#OP.run"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.empty_history">
+<span class="sig-name descname"><span class="pre">empty_history</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#OP.empty_history"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.empty_history" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Mapper">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">Mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Mapper"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Mapper" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="#data_juicer.ops.base_op.OP" title="data_juicer.ops.base_op.OP"><code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Mapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Mapper.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Mapper.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Base class that conducts data editing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text_key</strong> -- the key name of field that stores sample texts
+to be processed.</p></li>
+<li><p><strong>image_key</strong> -- the key name of field that stores sample image list
+to be processed</p></li>
+<li><p><strong>audio_key</strong> -- the key name of field that stores sample audio list
+to be processed</p></li>
+<li><p><strong>video_key</strong> -- the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> -- the key name of field that stores sample image bytes list
+to be processed</p></li>
+<li><p><strong>query_key</strong> -- the key name of field that stores sample queries</p></li>
+<li><p><strong>response_key</strong> -- the key name of field that stores responses</p></li>
+<li><p><strong>history_key</strong> -- the key name of field that stores history of
+queries and responses</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Mapper.process_batched">
+<span class="sig-name descname"><span class="pre">process_batched</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Mapper.process_batched"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Mapper.process_batched" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Mapper.process_single">
+<span class="sig-name descname"><span class="pre">process_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Mapper.process_single"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Mapper.process_single" title="Link to this definition">¶</a></dt>
+<dd><p>For sample level, sample --&gt; sample</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> -- sample to process</p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>processed sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Mapper.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">exporter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Mapper.run"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Mapper.run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">Filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Filter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="#data_juicer.ops.base_op.OP" title="data_juicer.ops.base_op.OP"><code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Filter.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Base class that removes specific info.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text_key</strong> -- the key name of field that stores sample texts
+to be processed</p></li>
+<li><p><strong>image_key</strong> -- the key name of field that stores sample image list
+to be processed</p></li>
+<li><p><strong>audio_key</strong> -- the key name of field that stores sample audio list
+to be processed</p></li>
+<li><p><strong>video_key</strong> -- the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> -- the key name of field that stores sample image bytes list
+to be processed</p></li>
+<li><p><strong>query_key</strong> -- the key name of field that stores sample queries</p></li>
+<li><p><strong>response_key</strong> -- the key name of field that stores responses</p></li>
+<li><p><strong>history_key</strong> -- the key name of field that stores history of
+queries and responses</p></li>
+<li><p><strong>min_closed_interval</strong> -- whether the min_val of the specified filter range is a closed interval. It's True
+by default.</p></li>
+<li><p><strong>max_closed_interval</strong> -- whether the max_val of the specified filter range is a closed interval. It's True
+by default.</p></li>
+<li><p><strong>reversed_range</strong> -- whether to reverse the target range [min_val, max_val] to (-∞, min_val) or (max_val, +∞).
+It's False by default.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.get_keep_boolean">
+<span class="sig-name descname"><span class="pre">get_keep_boolean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Filter.get_keep_boolean"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.get_keep_boolean" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.compute_stats_batched">
+<span class="sig-name descname"><span class="pre">compute_stats_batched</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Filter.compute_stats_batched"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.compute_stats_batched" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.process_batched">
+<span class="sig-name descname"><span class="pre">process_batched</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Filter.process_batched"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.process_batched" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.compute_stats_single">
+<span class="sig-name descname"><span class="pre">compute_stats_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Filter.compute_stats_single"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.compute_stats_single" title="Link to this definition">¶</a></dt>
+<dd><p>Compute stats for the sample which is used as a metric to decide
+whether to filter this sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample</strong> -- input sample.</p></li>
+<li><p><strong>context</strong> -- whether to store context information of intermediate
+vars in the sample temporarily.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>sample with computed stats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.process_single">
+<span class="sig-name descname"><span class="pre">process_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Filter.process_single"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.process_single" title="Link to this definition">¶</a></dt>
+<dd><p>For sample level, sample --&gt; Boolean.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> -- sample to decide whether to filter</p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>true for keeping and false for filtering</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">exporter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Filter.run"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Deduplicator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">Deduplicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Deduplicator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Deduplicator" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="#data_juicer.ops.base_op.OP" title="data_juicer.ops.base_op.OP"><code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Deduplicator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Deduplicator.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Deduplicator.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Base class that conducts deduplication.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text_key</strong> -- the key name of field that stores sample texts
+to be processed</p></li>
+<li><p><strong>image_key</strong> -- the key name of field that stores sample image list
+to be processed</p></li>
+<li><p><strong>audio_key</strong> -- the key name of field that stores sample audio list
+to be processed</p></li>
+<li><p><strong>video_key</strong> -- the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> -- the key name of field that stores sample image bytes list
+to be processed</p></li>
+<li><p><strong>query_key</strong> -- the key name of field that stores sample queries</p></li>
+<li><p><strong>response_key</strong> -- the key name of field that stores responses</p></li>
+<li><p><strong>history_key</strong> -- the key name of field that stores history of
+queries and responses</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Deduplicator.compute_hash">
+<span class="sig-name descname"><span class="pre">compute_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Deduplicator.compute_hash"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Deduplicator.compute_hash" title="Link to this definition">¶</a></dt>
+<dd><p>Compute hash values for the sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> -- input sample</p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>sample with computed hash value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Deduplicator.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Deduplicator.process"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Deduplicator.process" title="Link to this definition">¶</a></dt>
+<dd><p>For doc-level, dataset --&gt; dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> -- input dataset</p></li>
+<li><p><strong>show_num</strong> -- number of traced samples used when tracer is
+open.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>deduplicated dataset and the sampled duplicate pairs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Deduplicator.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">exporter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Deduplicator.run"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Deduplicator.run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Selector">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">Selector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Selector"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Selector" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="#data_juicer.ops.base_op.OP" title="data_juicer.ops.base_op.OP"><code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Selector.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Selector.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Selector.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Base class that conducts selection in dataset-level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text_key</strong> -- the key name of field that stores sample texts
+to be processed</p></li>
+<li><p><strong>image_key</strong> -- the key name of field that stores sample image list
+to be processed</p></li>
+<li><p><strong>audio_key</strong> -- the key name of field that stores sample audio list
+to be processed</p></li>
+<li><p><strong>video_key</strong> -- the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> -- the key name of field that stores sample image bytes list
+to be processed</p></li>
+<li><p><strong>query_key</strong> -- the key name of field that stores sample queries</p></li>
+<li><p><strong>response_key</strong> -- the key name of field that stores responses</p></li>
+<li><p><strong>history_key</strong> -- the key name of field that stores history of
+queries and responses</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Selector.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Selector.process"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Selector.process" title="Link to this definition">¶</a></dt>
+<dd><p>Dataset --&gt; dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dataset</strong> -- input dataset</p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>selected dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Selector.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">exporter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Selector.run"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Selector.run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Grouper">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">Grouper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Grouper"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Grouper" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="#data_juicer.ops.base_op.OP" title="data_juicer.ops.base_op.OP"><code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Grouper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Grouper.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Grouper.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Base class that group samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text_key</strong> -- the key name of field that stores sample texts
+to be processed</p></li>
+<li><p><strong>image_key</strong> -- the key name of field that stores sample image list
+to be processed</p></li>
+<li><p><strong>audio_key</strong> -- the key name of field that stores sample audio list
+to be processed</p></li>
+<li><p><strong>video_key</strong> -- the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> -- the key name of field that stores sample image bytes list
+to be processed</p></li>
+<li><p><strong>query_key</strong> -- the key name of field that stores sample queries</p></li>
+<li><p><strong>response_key</strong> -- the key name of field that stores responses</p></li>
+<li><p><strong>history_key</strong> -- the key name of field that stores history of
+queries and responses</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Grouper.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Grouper.process"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Grouper.process" title="Link to this definition">¶</a></dt>
+<dd><p>Dataset --&gt; dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dataset</strong> -- input dataset</p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>dataset of batched samples.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Grouper.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">exporter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Grouper.run"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Grouper.run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Aggregator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">Aggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Aggregator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Aggregator" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="#data_juicer.ops.base_op.OP" title="data_juicer.ops.base_op.OP"><code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Aggregator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Aggregator.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Aggregator.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Base class that group samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text_key</strong> -- the key name of field that stores sample texts
+to be processed</p></li>
+<li><p><strong>image_key</strong> -- the key name of field that stores sample image list
+to be processed</p></li>
+<li><p><strong>audio_key</strong> -- the key name of field that stores sample audio list
+to be processed</p></li>
+<li><p><strong>video_key</strong> -- the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> -- the key name of field that stores sample image bytes list
+to be processed</p></li>
+<li><p><strong>query_key</strong> -- the key name of field that stores sample queries</p></li>
+<li><p><strong>response_key</strong> -- the key name of field that stores responses</p></li>
+<li><p><strong>history_key</strong> -- the key name of field that stores history of
+queries and responses</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Aggregator.process_single">
+<span class="sig-name descname"><span class="pre">process_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Aggregator.process_single"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Aggregator.process_single" title="Link to this definition">¶</a></dt>
+<dd><p>For sample level, batched sample --&gt; sample,
+the input must be the output of some Grouper OP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> -- batched sample to aggregate</p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>aggregated sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Aggregator.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">exporter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/base_op.html#Aggregator.run"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Aggregator.run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">data_juicer.ops.base_op module</a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.convert_list_dict_to_dict_list"><code class="docutils literal notranslate"><span class="pre">convert_list_dict_to_dict_list()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.convert_dict_list_to_list_dict"><code class="docutils literal notranslate"><span class="pre">convert_dict_list_to_list_dict()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.convert_arrow_to_python"><code class="docutils literal notranslate"><span class="pre">convert_arrow_to_python()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.catch_map_batches_exception"><code class="docutils literal notranslate"><span class="pre">catch_map_batches_exception()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.catch_map_single_exception"><code class="docutils literal notranslate"><span class="pre">catch_map_single_exception()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.OP"><code class="docutils literal notranslate"><span class="pre">OP</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.OP.__init__"><code class="docutils literal notranslate"><span class="pre">OP.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.OP.is_batched_op"><code class="docutils literal notranslate"><span class="pre">OP.is_batched_op()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.OP.process"><code class="docutils literal notranslate"><span class="pre">OP.process()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.OP.use_cuda"><code class="docutils literal notranslate"><span class="pre">OP.use_cuda()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.OP.runtime_np"><code class="docutils literal notranslate"><span class="pre">OP.runtime_np()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.OP.remove_extra_parameters"><code class="docutils literal notranslate"><span class="pre">OP.remove_extra_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.OP.add_parameters"><code class="docutils literal notranslate"><span class="pre">OP.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.OP.run"><code class="docutils literal notranslate"><span class="pre">OP.run()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.OP.empty_history"><code class="docutils literal notranslate"><span class="pre">OP.empty_history()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Mapper"><code class="docutils literal notranslate"><span class="pre">Mapper</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Mapper.__init__"><code class="docutils literal notranslate"><span class="pre">Mapper.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Mapper.process_batched"><code class="docutils literal notranslate"><span class="pre">Mapper.process_batched()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Mapper.process_single"><code class="docutils literal notranslate"><span class="pre">Mapper.process_single()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Mapper.run"><code class="docutils literal notranslate"><span class="pre">Mapper.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Filter"><code class="docutils literal notranslate"><span class="pre">Filter</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Filter.__init__"><code class="docutils literal notranslate"><span class="pre">Filter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Filter.get_keep_boolean"><code class="docutils literal notranslate"><span class="pre">Filter.get_keep_boolean()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Filter.compute_stats_batched"><code class="docutils literal notranslate"><span class="pre">Filter.compute_stats_batched()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Filter.process_batched"><code class="docutils literal notranslate"><span class="pre">Filter.process_batched()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Filter.compute_stats_single"><code class="docutils literal notranslate"><span class="pre">Filter.compute_stats_single()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Filter.process_single"><code class="docutils literal notranslate"><span class="pre">Filter.process_single()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Filter.run"><code class="docutils literal notranslate"><span class="pre">Filter.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Deduplicator"><code class="docutils literal notranslate"><span class="pre">Deduplicator</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Deduplicator.__init__"><code class="docutils literal notranslate"><span class="pre">Deduplicator.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Deduplicator.compute_hash"><code class="docutils literal notranslate"><span class="pre">Deduplicator.compute_hash()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Deduplicator.process"><code class="docutils literal notranslate"><span class="pre">Deduplicator.process()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Deduplicator.run"><code class="docutils literal notranslate"><span class="pre">Deduplicator.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Selector"><code class="docutils literal notranslate"><span class="pre">Selector</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Selector.__init__"><code class="docutils literal notranslate"><span class="pre">Selector.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Selector.process"><code class="docutils literal notranslate"><span class="pre">Selector.process()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Selector.run"><code class="docutils literal notranslate"><span class="pre">Selector.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Grouper"><code class="docutils literal notranslate"><span class="pre">Grouper</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Grouper.__init__"><code class="docutils literal notranslate"><span class="pre">Grouper.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Grouper.process"><code class="docutils literal notranslate"><span class="pre">Grouper.process()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Grouper.run"><code class="docutils literal notranslate"><span class="pre">Grouper.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Aggregator"><code class="docutils literal notranslate"><span class="pre">Aggregator</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Aggregator.__init__"><code class="docutils literal notranslate"><span class="pre">Aggregator.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Aggregator.process_single"><code class="docutils literal notranslate"><span class="pre">Aggregator.process_single()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.base_op.Aggregator.run"><code class="docutils literal notranslate"><span class="pre">Aggregator.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="../_static/documentation_options.js?v=011da5d6"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    </body>
+</html>

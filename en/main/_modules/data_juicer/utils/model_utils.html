@@ -4,13 +4,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>data_juicer.utils.model_utils - Data Juicer</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sidebar-menu.css?v=dcc41d8a" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sidebar-menu.css?v=aecff795" />
     
     
 
@@ -38,15 +38,6 @@
 </style></head>
   <body>
     
-
-<p>
-  <strong>
-    
-    You're reading the documentation from the main branch.
-    For the latest released version, please have a look at <a href="../../../../v1.4.2/index.html">v1.4.2</a>.
-    
-  </strong>
-</p>
 
 
     <script>
@@ -245,6 +236,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/hpo/README.html">Hyper-parameter Optimization for Data Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/humanops/README.html">Label Studio Service Utility</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/mm_eval/inception_metrics/README.html">Metrics for video generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/mm_eval/vbench_metrics/README.html">VBench metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/postprocess/README.html">Postprocess tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/preprocess/README.html">Preprocess Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/quality_classifier/README.html">Data Scoring</a></li>
@@ -257,75 +249,69 @@
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of data_juicer.core package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.core.data.html">data_juicer.core.data package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.core.executor.html">data_juicer.core.executor package</a></li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of data_juicer.ops package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.aggregator.html">data_juicer.ops.aggregator package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.grouper.html">data_juicer.ops.grouper package</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of data_juicer.ops.mapper package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../data_juicer.ops.mapper.annotation.html">data_juicer.ops.mapper.annotation package</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.format.html">data_juicer.format</a></li>
 </ul>
 </li>
 </ul>
 
 </div></div><div class="sidebar-bottom-menu">
-    <div class="current-info">
-        <span class="current-lang">en</span>|<span class="current-version">main</span>
+  <div class="current-info">
+    <span class="current-lang">en</span>|<span class="current-version">main</span>
+  </div>
+  <div class="dropdown-panel">
+    
+    <div class="section">
+      <dt>Language</dt>
+      <dd>
+        
+        <a href="../../../../../en/main/_modules/data_juicer/utils/model_utils.html"
+          class="active" >
+          English
+        </a>
+        
+        <a href="../../../../../zh_CN/main/_modules/data_juicer/utils/model_utils_ZH.html"
+          >
+          简体中文
+        </a>
+        
+      </dd>
     </div>
-    <div class="dropdown-panel">
-        
-        <div class="section">
-            <dt>Language</dt>
-            <dd>
-                
-                <a href="../../../../../en/main/_modules/data_juicer/utils/model_utils.html"
-                    class="active" >
-                    English
-                </a>
-                
-                <a href="../../../../../zh_CN/main/_modules/data_juicer/utils/model_utils_ZH.html"
-                    >
-                    简体中文
-                </a>
-                
-            </dd>
-        </div>
-        
+    
 
+    
+    <div class="section version">
+      <dt>Version</dt>
+      <dd>
         
-        <div class="section">
-            <dt>Version</dt>
-            <dd>
-                    <a href="../../../../v1.4.0/index.html">v1.4.0</a>
-                    <a href="../../../../v1.4.1/index.html">v1.4.1</a>
-                    <a href="../../../../v1.4.2/index.html">v1.4.2</a>
-                    <a href="model_utils.html">main</a>
-            </dd>
-        </div>
+        <a href="../../../../main/_modules/data_juicer/utils/model_utils.html" class="active" >
+          main
+        </a>
         
+        <a href="../../../../v1.4.2/_modules/data_juicer/utils/model_utils.html" >
+          v1.4.2
+        </a>
+        
+        <a href="../../../../v1.4.1/_modules/data_juicer/utils/model_utils.html" >
+          v1.4.1
+        </a>
+        
+        <a href="../../../../v1.4.0/_modules/data_juicer/utils/model_utils.html" >
+          v1.4.0
+        </a>
+        
+      </dd>
     </div>
+    
+  </div>
 </div>
       </div>
       
@@ -427,7 +413,7 @@
 
 
 <div class="viewcode-block" id="get_backup_model_link">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.get_backup_model_link">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.get_backup_model_link">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_backup_model_link</span><span class="p">(</span><span class="n">model_name</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">BACKUP_MODEL_LINKS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
@@ -437,7 +423,7 @@
 
 
 <div class="viewcode-block" id="check_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.check_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.check_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check whether a model exists in DATA_JUICER_MODELS_CACHE.</span>
@@ -498,7 +484,7 @@
 
 
 <div class="viewcode-block" id="check_model_home">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.check_model_home">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.check_model_home">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">check_model_home</span><span class="p">(</span><span class="n">model_name</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">DJEMH</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">model_name</span>
@@ -511,7 +497,7 @@
 
 
 <div class="viewcode-block" id="filter_arguments">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.filter_arguments">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.filter_arguments">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">filter_arguments</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args_dict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Filters and returns only the valid arguments for a given function</span>
@@ -534,10 +520,10 @@
 
 
 <div class="viewcode-block" id="ChatAPIModel">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.ChatAPIModel">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.ChatAPIModel">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ChatAPIModel</span><span class="p">:</span>
 <div class="viewcode-block" id="ChatAPIModel.__init__">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.ChatAPIModel.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.ChatAPIModel.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes an instance of the APIModel class.</span>
@@ -604,10 +590,10 @@
 
 
 <div class="viewcode-block" id="EmbeddingAPIModel">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.EmbeddingAPIModel">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.EmbeddingAPIModel">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EmbeddingAPIModel</span><span class="p">:</span>
 <div class="viewcode-block" id="EmbeddingAPIModel.__init__">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.EmbeddingAPIModel.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.EmbeddingAPIModel.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes an instance specialized for embedding APIs.</span>
@@ -657,7 +643,7 @@
 
 
 <div class="viewcode-block" id="prepare_api_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_api_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_api_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_api_model</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_processor</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">processor_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span>
 <span class="p">):</span>
@@ -738,7 +724,7 @@
 
 
 <div class="viewcode-block" id="prepare_diffusion_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_diffusion_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_diffusion_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_diffusion_model</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="n">diffusion_type</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare and load an Diffusion model from HuggingFace.</span>
@@ -787,7 +773,7 @@
 
 
 <div class="viewcode-block" id="prepare_fastsam_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_fastsam_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_fastsam_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_fastsam_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;device&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">ultralytics</span><span class="o">.</span><span class="n">FastSAM</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -796,7 +782,7 @@
 
 
 <div class="viewcode-block" id="prepare_fasttext_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_fasttext_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_fasttext_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_fasttext_model</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;lid.176.bin&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare and load a fasttext model.</span>
@@ -827,7 +813,7 @@
 
 
 <div class="viewcode-block" id="prepare_huggingface_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_huggingface_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_huggingface_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_huggingface_model</span><span class="p">(</span>
     <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_pipe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pipe_task</span><span class="o">=</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span>
 <span class="p">):</span>
@@ -881,7 +867,7 @@
 
 
 <div class="viewcode-block" id="prepare_kenlm_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_kenlm_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_kenlm_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_kenlm_model</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">name_pattern</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.arpa.bin&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare and load a kenlm model.</span>
@@ -904,7 +890,7 @@
 
 
 <div class="viewcode-block" id="prepare_nltk_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_nltk_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_nltk_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_nltk_model</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">name_pattern</span><span class="o">=</span><span class="s2">&quot;punkt.</span><span class="si">{}</span><span class="s2">.pickle&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare and load a nltk punkt model with enhanced resource handling.</span>
@@ -950,7 +936,7 @@
 
 
 <div class="viewcode-block" id="prepare_nltk_pos_tagger">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_nltk_pos_tagger">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_nltk_pos_tagger">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_nltk_pos_tagger</span><span class="p">(</span><span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare and load NLTK&#39;s part-of-speech tagger with enhanced resource</span>
@@ -996,7 +982,7 @@
 
 
 <div class="viewcode-block" id="prepare_opencv_classifier">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_opencv_classifier">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_opencv_classifier">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_opencv_classifier</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CascadeClassifier</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">model</span></div>
@@ -1004,7 +990,7 @@
 
 
 <div class="viewcode-block" id="prepare_recognizeAnything_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_recognizeAnything_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_recognizeAnything_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_recognizeAnything_model</span><span class="p">(</span>
     <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="s2">&quot;ram_plus_swin_large_14m.pth&quot;</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="mi">384</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span>
 <span class="p">):</span>
@@ -1032,7 +1018,7 @@
 
 
 <div class="viewcode-block" id="prepare_sdxl_prompt2prompt">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_sdxl_prompt2prompt">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_sdxl_prompt2prompt">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_sdxl_prompt2prompt</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="n">pipe_func</span><span class="p">,</span> <span class="n">torch_dtype</span><span class="o">=</span><span class="s2">&quot;fp32&quot;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">):</span>
     <span class="n">pretrained_model_name_or_path</span> <span class="o">=</span> <span class="n">check_model_home</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">torch_dtype</span> <span class="o">==</span> <span class="s2">&quot;fp32&quot;</span><span class="p">:</span>
@@ -1048,7 +1034,7 @@
 
 
 <div class="viewcode-block" id="prepare_sentencepiece_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_sentencepiece_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_sentencepiece_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_sentencepiece_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare and load a sentencepiece model.</span>
@@ -1067,7 +1053,7 @@
 
 
 <div class="viewcode-block" id="prepare_sentencepiece_for_lang">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_sentencepiece_for_lang">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_sentencepiece_for_lang">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_sentencepiece_for_lang</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">name_pattern</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.sp.model&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare and load a sentencepiece model for specific language.</span>
@@ -1083,7 +1069,7 @@
 
 
 <div class="viewcode-block" id="prepare_simple_aesthetics_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_simple_aesthetics_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_simple_aesthetics_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_simple_aesthetics_model</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare and load a simple aesthetics model.</span>
@@ -1122,7 +1108,7 @@
 
 
 <div class="viewcode-block" id="prepare_spacy_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_spacy_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_spacy_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_spacy_model</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">name_pattern</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_core_web_md-3.7.0&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare spacy model for specific language.</span>
@@ -1179,7 +1165,7 @@
 
 
 <div class="viewcode-block" id="prepare_video_blip_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_video_blip_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_video_blip_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_video_blip_model</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare and load a video-clip model with the corresponding processor.</span>
@@ -1308,7 +1294,7 @@
 
 
 <div class="viewcode-block" id="prepare_yolo_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_yolo_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_yolo_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_yolo_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">model_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;device&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">ultralytics</span><span class="o">.</span><span class="n">YOLO</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -1317,7 +1303,7 @@
 
 
 <div class="viewcode-block" id="prepare_vllm_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_vllm_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_vllm_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_vllm_model</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare and load a HuggingFace model with the corresponding processor.</span>
@@ -1339,7 +1325,7 @@
 
 
 <div class="viewcode-block" id="prepare_embedding_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_embedding_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_embedding_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_embedding_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare and load an embedding model using transformers.</span>
@@ -1411,7 +1397,7 @@
 
 
 <div class="viewcode-block" id="update_sampling_params">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.update_sampling_params">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.update_sampling_params">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">update_sampling_params</span><span class="p">(</span><span class="n">sampling_params</span><span class="p">,</span> <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="n">enable_vllm</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">enable_vllm</span><span class="p">:</span>
         <span class="n">update_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;max_tokens&quot;</span><span class="p">}</span>
@@ -1485,7 +1471,7 @@
 
 
 <div class="viewcode-block" id="prepare_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.prepare_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="p">,</span> <span class="o">**</span><span class="n">model_kwargs</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="n">MODEL_FUNCTION_MAPPING</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;model_type must be one of the following: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="nb">list</span><span class="p">(</span><span class="n">MODEL_FUNCTION_MAPPING</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -1500,7 +1486,7 @@
 
 
 <div class="viewcode-block" id="get_model">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.get_model">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.get_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">model_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -1520,7 +1506,7 @@
 
 
 <div class="viewcode-block" id="free_models">
-<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.free_models">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.utils.model_utils.html#data_juicer.utils.model_utils.free_models">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">free_models</span><span class="p">(</span><span class="n">clear_model_zoo</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">MODEL_ZOO</span>
     <span class="k">for</span> <span class="n">model_key</span> <span class="ow">in</span> <span class="n">MODEL_ZOO</span><span class="p">:</span>

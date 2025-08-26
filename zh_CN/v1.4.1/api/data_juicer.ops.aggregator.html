@@ -1,0 +1,799 @@
+<!doctype html>
+<html class="no-js" lang="zh-CN" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="索引" href="../genindex.html" /><link rel="search" title="搜索" href="../search.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
+        <title>data_juicer.ops.aggregator - Data Juicer</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sidebar-menu.css?v=aecff795" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index_ZH.html"><div class="brand">Data Juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index_ZH.html">
+  
+  <span class="sidebar-brand-text">Data Juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="搜索" name="q" aria-label="搜索">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">教程</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/DJ-Cookbook_ZH.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/Installation_ZH.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/QuickStart_ZH.html">快速上手</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">帮助文档</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RecipeGallery_ZH.html">数据菜谱Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DatasetCfg_ZH.html">数据集配置指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/BadDataExhibition_ZH.html">“坏”数据展览</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_SORA_ZH.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_service_ZH.html">DJ_服务化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DeveloperGuide_ZH.html">开发者指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Sandbox_ZH.html">沙盒实验室</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../demos/README_ZH.html">演示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/auto_evaluation_helm/README_ZH.html">自动化评测：HELM 评测及可视化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/role_playing_system_prompt/README_ZH.html">为LLM构造角色扮演的system prompt</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">工具</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tools/distributed_deduplication/README_ZH.html">分布式模糊去重工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/README_ZH.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/gpt_eval/README_ZH.html">GPT EVAL：使用 OpenAI API 评测大模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/recorder/README_ZH.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/README_ZH.html">格式转换工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README_ZH.html">多模态工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README_ZH.html">后微调工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/hpo/README_ZH.html">数据菜谱的自动化超参优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/postprocess/README_ZH.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/preprocess/README_ZH.html">预处理工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/quality_classifier/README_ZH.html">给数据打分</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">第三方</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README_ZH.html">大语言模型生态</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/models/README_ZH.html">第三方模型库</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+  <div class="current-info">
+    <span class="current-lang">zh-CN</span>|<span class="current-version">v1.4.1</span>
+  </div>
+  <div class="dropdown-panel">
+    
+    <div class="section">
+      <dt>Language</dt>
+      <dd>
+        
+        <a href="../../../en/v1.4.1/api/data_juicer.ops.aggregator.html"
+          >
+          English
+        </a>
+        
+        <a href="../../../zh_CN/v1.4.1/api/data_juicer.ops.aggregator.html"
+          >
+          简体中文
+        </a>
+        
+      </dd>
+    </div>
+    
+
+    
+    <div class="section version">
+      <dt>Version</dt>
+      <dd>
+        
+        <a href="../../main/api/data_juicer.ops.aggregator.html" >
+          main
+        </a>
+        
+        <a href="../../v1.4.2/api/data_juicer.ops.aggregator.html" >
+          v1.4.2
+        </a>
+        
+        <a href="../../v1.4.1/api/data_juicer.ops.aggregator.html" class="active" >
+          v1.4.1
+        </a>
+        
+        <a href="../../v1.4.0/api/data_juicer.ops.aggregator.html" >
+          v1.4.0
+        </a>
+        
+      </dd>
+    </div>
+    
+  </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/api/data_juicer.ops.aggregator.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-data_juicer.ops.aggregator">
+<span id="data-juicer-ops-aggregator"></span><h1>data_juicer.ops.aggregator<a class="headerlink" href="#module-data_juicer.ops.aggregator" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.NestedAggregator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.aggregator.</span></span><span class="sig-name descname"><span class="pre">NestedAggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpt-4o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'event_description'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_token_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_doc_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/nested_aggregator.html#NestedAggregator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.NestedAggregator" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="data_juicer.ops.base_op.html#data_juicer.ops.base_op.Aggregator" title="data_juicer.ops.base_op.Aggregator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aggregator</span></code></a></p>
+<p>Considering the limitation of input length, nested aggregate
+contents for each given number of samples.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.NestedAggregator.DEFAULT_INPUT_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_INPUT_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'{sub_docs}\n\n文档总结：\n'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.NestedAggregator.DEFAULT_INPUT_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.NestedAggregator.DEFAULT_SUB_DOC_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_SUB_DOC_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'文档碎片：\n{text}\n'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.NestedAggregator.DEFAULT_SUB_DOC_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.NestedAggregator.DEFAULT_SYSTEM_PROMPT">
+<span class="sig-name descname"><span class="pre">DEFAULT_SYSTEM_PROMPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'给定一些文档碎片，将这些文档整合成一个文档总结。\n要求：\n-</span> <span class="pre">总结的长度与文档碎片的平均长度基本一致\n-</span> <span class="pre">不要包含主观看法\n-</span> <span class="pre">注意要尽可能保留文本的专有名词\n-</span> <span class="pre">只输出文档总结不要输出其他内容\n-</span> <span class="pre">参考如下样例：\n文档碎片：\n唐僧师徒四人行至白虎岭，遇上了变化多端的白骨精。\n\n文档碎片：\n白骨精首次变身少女送斋，被孙悟空识破打死，唐僧责怪悟空。\n\n文档碎片：\n妖怪再变老妇寻女，又被悟空击毙，师傅更加不满，念紧箍咒惩罚。\n\n文档碎片：\n不甘心的白骨精第三次化作老公公来诱骗，依旧逃不过金睛火眼。\n\n文档碎片：\n最终，在观音菩萨的帮助下，真相大白，唐僧明白了自己的误解。\n\n\n文档总结：\n唐僧师徒在白虎岭三遇白骨精变化诱惑，悟空屡次识破击毙妖怪却遭误解，最终观音相助真相大白。'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.NestedAggregator.DEFAULT_SYSTEM_PROMPT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.NestedAggregator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpt-4o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'event_description'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_token_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_doc_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/nested_aggregator.html#NestedAggregator.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.NestedAggregator.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.
+:param api_model: API model name.
+:param input_key: The input key in the meta field of the samples.</p>
+<blockquote>
+<div><p>It is &quot;event_description&quot; in default.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_key</strong> -- The output key in the aggregation field in the
+samples. It is same as the input_key in default.</p></li>
+<li><p><strong>max_token_num</strong> -- The max token num of the total tokens of the
+sub documents. Without limitation if it is None.</p></li>
+<li><p><strong>api_endpoint</strong> -- URL endpoint for the API.</p></li>
+<li><p><strong>response_path</strong> -- Path to extract content from the API response.
+Defaults to 'choices.0.message.content'.</p></li>
+<li><p><strong>system_prompt</strong> -- The system prompt.</p></li>
+<li><p><strong>sub_doc_template</strong> -- The template for input text in each sample.</p></li>
+<li><p><strong>input_template</strong> -- The input template.</p></li>
+<li><p><strong>try_num</strong> -- The number of retry attempts when there is an API
+call error or output parsing error.</p></li>
+<li><p><strong>model_params</strong> -- Parameters for initializing the API model.</p></li>
+<li><p><strong>sampling_params</strong> -- Extra parameters passed to the API call.
+e.g {'temperature': 0.9, 'top_p': 0.95}</p></li>
+<li><p><strong>kwargs</strong> -- Extra keyword arguments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.NestedAggregator.parse_output">
+<span class="sig-name descname"><span class="pre">parse_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/nested_aggregator.html#NestedAggregator.parse_output"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.NestedAggregator.parse_output" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.NestedAggregator.process_single">
+<span class="sig-name descname"><span class="pre">process_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/nested_aggregator.html#NestedAggregator.process_single"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.NestedAggregator.process_single" title="Link to this definition">¶</a></dt>
+<dd><p>For sample level, batched sample --&gt; sample,
+the input must be the output of some Grouper OP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> -- batched sample to aggregate</p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>aggregated sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.NestedAggregator.recursive_summary">
+<span class="sig-name descname"><span class="pre">recursive_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_docs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/nested_aggregator.html#NestedAggregator.recursive_summary"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.NestedAggregator.recursive_summary" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MetaTagsAggregator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.aggregator.</span></span><span class="sig-name descname"><span class="pre">MetaTagsAggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpt-4o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta_tag_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'dialog_sentiment_labels'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_tag_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/meta_tags_aggregator.html#MetaTagsAggregator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.MetaTagsAggregator" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="data_juicer.ops.base_op.html#data_juicer.ops.base_op.Aggregator" title="data_juicer.ops.base_op.Aggregator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aggregator</span></code></a></p>
+<p>Merge similar meta tags to one tag.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_INPUT_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_INPUT_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'{target_tag_str}|</span> <span class="pre">合并前标签</span> <span class="pre">|</span> <span class="pre">频次</span> <span class="pre">|\n|</span> <span class="pre">------</span> <span class="pre">|</span> <span class="pre">------</span> <span class="pre">|\n{tag_strs}'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_INPUT_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_OUTPUT_PATTERN">
+<span class="sig-name descname"><span class="pre">DEFAULT_OUTPUT_PATTERN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'\\*\\*\\s*(\\w+)归类为(\\w+)\\s*\\*\\*'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_OUTPUT_PATTERN" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_SYSTEM_PROMPT">
+<span class="sig-name descname"><span class="pre">DEFAULT_SYSTEM_PROMPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'给定一些标签以及这些标签出现的频次，合并意思相近的标签。\n要求：\n-</span> <span class="pre">任务分为两种情况，一种是给定合并后的标签，需要将合并前的标签映射到这些标签。如果给定的合并后的标签中有类似“其他”这种标签，将无法归类的标签合并到“其他”。以下是这种情况的一个样例：\n合并后的标签应限定在[科技,</span> <span class="pre">健康,</span> <span class="pre">其他]中。\n|</span> <span class="pre">合并前标签</span> <span class="pre">|</span> <span class="pre">频次</span> <span class="pre">|\n|</span> <span class="pre">------</span> <span class="pre">|</span> <span class="pre">------</span> <span class="pre">|\n|</span> <span class="pre">医疗</span> <span class="pre">|</span> <span class="pre">20</span> <span class="pre">|\n|</span> <span class="pre">信息技术</span> <span class="pre">|</span> <span class="pre">16</span> <span class="pre">|\n|</span> <span class="pre">学习</span> <span class="pre">|</span> <span class="pre">19</span> <span class="pre">|\n|</span> <span class="pre">气候变化</span> <span class="pre">|</span> <span class="pre">22</span> <span class="pre">|\n|</span> <span class="pre">人工智能</span> <span class="pre">|</span> <span class="pre">11</span> <span class="pre">|\n|</span> <span class="pre">养生</span> <span class="pre">|</span> <span class="pre">17</span> <span class="pre">|\n|</span> <span class="pre">科学创新</span> <span class="pre">|</span> <span class="pre">10</span> <span class="pre">|\n\n##</span> <span class="pre">分析：“信息技术”、“人工智能”、“科学创新”都属于“科技”类别，“医疗”和“养生”跟“健康”有关联，“学习”、“气候变化”和“科技”还有“健康”关联不强，应该被归为“其他”。\n##</span> <span class="pre">标签合并：\n**</span> <span class="pre">医疗归类为健康</span> <span class="pre">**\n**</span> <span class="pre">信息技术归类为科技</span> <span class="pre">**\n**</span> <span class="pre">学习归类为其他</span> <span class="pre">**\n**</span> <span class="pre">气候变化归类为其他</span> <span class="pre">**\n**</span> <span class="pre">人工智能归类为科技</span> <span class="pre">**\n**</span> <span class="pre">养生归类为健康</span> <span class="pre">**\n**</span> <span class="pre">科学创新归类为科技</span> <span class="pre">**\n-</span> <span class="pre">另外一种情况没有事先给定合并后的标签，需要生成合理的标签类别：|</span> <span class="pre">合并前标签</span> <span class="pre">|</span> <span class="pre">频次</span> <span class="pre">|\n|</span> <span class="pre">------</span> <span class="pre">|</span> <span class="pre">------</span> <span class="pre">|\n|</span> <span class="pre">医疗</span> <span class="pre">|</span> <span class="pre">20</span> <span class="pre">|\n|</span> <span class="pre">信息技术</span> <span class="pre">|</span> <span class="pre">16</span> <span class="pre">|\n|</span> <span class="pre">学习</span> <span class="pre">|</span> <span class="pre">2</span> <span class="pre">|\n|</span> <span class="pre">气候变化</span> <span class="pre">|</span> <span class="pre">1</span> <span class="pre">|\n|</span> <span class="pre">人工智能</span> <span class="pre">|</span> <span class="pre">11</span> <span class="pre">|\n|</span> <span class="pre">养生</span> <span class="pre">|</span> <span class="pre">17</span> <span class="pre">|\n|</span> <span class="pre">科学创新</span> <span class="pre">|</span> <span class="pre">10</span> <span class="pre">|\n\n##</span> <span class="pre">分析：“信息技术”、“人工智能”、“科学创新”这三个标签比较相近，归为同一类，都属于“科技”类别，“医疗”和“养生”都跟“健康”有关系，可以归类为“健康”，“学习”和“气候变化”跟其他标签关联度不强，且频次较低，统一归类为“其他”。\n##</span> <span class="pre">标签合并：\n**</span> <span class="pre">医疗归类为健康</span> <span class="pre">**\n**</span> <span class="pre">信息技术归类为科技</span> <span class="pre">**\n**</span> <span class="pre">学习归类为其他</span> <span class="pre">**\n**</span> <span class="pre">气候变化归类为其他</span> <span class="pre">**\n**</span> <span class="pre">人工智能归类为科技</span> <span class="pre">**\n**</span> <span class="pre">养生归类为健康</span> <span class="pre">**\n**</span> <span class="pre">科学创新归类为科技</span> <span class="pre">**\n'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_SYSTEM_PROMPT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_TAG_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_TAG_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'|</span> <span class="pre">{tag}</span> <span class="pre">|</span> <span class="pre">{cnt}</span> <span class="pre">|'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_TAG_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_TARGET_TAG_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_TARGET_TAG_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'合并后的标签应限定在[{target_tags}]中。\n'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_TARGET_TAG_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MetaTagsAggregator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpt-4o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta_tag_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'dialog_sentiment_labels'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_tag_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/meta_tags_aggregator.html#MetaTagsAggregator.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.MetaTagsAggregator.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.
+:param api_model: API model name.
+:param meta_tag_key: The key of the meta tag to be mapped.
+:param target_tags: The tags that is supposed to be mapped to.
+:param api_endpoint: URL endpoint for the API.
+:param response_path: Path to extract content from the API response.</p>
+<blockquote>
+<div><p>Defaults to 'choices.0.message.content'.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system_prompt</strong> -- The system prompt.</p></li>
+<li><p><strong>input_template</strong> -- The input template.</p></li>
+<li><p><strong>target_tag_template</strong> -- The tap template for target tags.</p></li>
+<li><p><strong>tag_template</strong> -- The tap template for each tag and its
+frequency.</p></li>
+<li><p><strong>output_pattern</strong> -- The output pattern.</p></li>
+<li><p><strong>try_num</strong> -- The number of retry attempts when there is an API
+call error or output parsing error.</p></li>
+<li><p><strong>model_params</strong> -- Parameters for initializing the API model.</p></li>
+<li><p><strong>sampling_params</strong> -- Extra parameters passed to the API call.
+e.g {'temperature': 0.9, 'top_p': 0.95}</p></li>
+<li><p><strong>kwargs</strong> -- Extra keyword arguments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MetaTagsAggregator.meta_map">
+<span class="sig-name descname"><span class="pre">meta_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meta_cnts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/meta_tags_aggregator.html#MetaTagsAggregator.meta_map"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.MetaTagsAggregator.meta_map" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MetaTagsAggregator.parse_output">
+<span class="sig-name descname"><span class="pre">parse_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/meta_tags_aggregator.html#MetaTagsAggregator.parse_output"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.MetaTagsAggregator.parse_output" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MetaTagsAggregator.process_single">
+<span class="sig-name descname"><span class="pre">process_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/meta_tags_aggregator.html#MetaTagsAggregator.process_single"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.MetaTagsAggregator.process_single" title="Link to this definition">¶</a></dt>
+<dd><p>For sample level, batched sample --&gt; sample,
+the input must be the output of some Grouper OP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> -- batched sample to aggregate</p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>aggregated sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.EntityAttributeAggregator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.aggregator.</span></span><span class="sig-name descname"><span class="pre">EntityAttributeAggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpt-4o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'event_description'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'entity_attribute'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_token_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_pattern_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/entity_attribute_aggregator.html#EntityAttributeAggregator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.EntityAttributeAggregator" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="data_juicer.ops.base_op.html#data_juicer.ops.base_op.Aggregator" title="data_juicer.ops.base_op.Aggregator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aggregator</span></code></a></p>
+<p>Return conclusion of the given entity's attribute from some docs.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.EntityAttributeAggregator.DEFAULT_EXAMPLE_PROMPT">
+<span class="sig-name descname"><span class="pre">DEFAULT_EXAMPLE_PROMPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'-</span> <span class="pre">例如，根据相关文档总结`孙悟空`的`出身背景`，**100字**以内的样例如下：\n`孙悟空`的`出身背景`总结：\n#</span> <span class="pre">孙悟空\n##</span> <span class="pre">出身背景\n号称齐天大圣，花果山水帘洞的美猴王、西行取经队伍中的大师兄。师父是唐僧玄奘，曾拜菩提祖师学艺。亲生父母未知，自石头中孕育而生。自认斗战胜佛，最怕观世音菩萨和紧箍咒。\n'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.DEFAULT_EXAMPLE_PROMPT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.EntityAttributeAggregator.DEFAULT_INPUT_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_INPUT_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'`{entity}`的相关文档：\n{sub_docs}\n\n`{entity}`的`{attribute}`总结：\n'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.DEFAULT_INPUT_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.EntityAttributeAggregator.DEFAULT_OUTPUT_PATTERN_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_OUTPUT_PATTERN_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'\\#\\s*{entity}\\s*\\#\\#\\s*{attribute}\\s*(.*?)\\Z'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.DEFAULT_OUTPUT_PATTERN_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.EntityAttributeAggregator.DEFAULT_SYSTEM_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_SYSTEM_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'给定与`{entity}`相关的一些文档，总结`{entity}`的`{attribute}`。\n要求：\n-</span> <span class="pre">尽量使用原文专有名词\n-</span> <span class="pre">联系上下文，自动忽略上下文不一致的细节错误\n-</span> <span class="pre">只对文档中与`{entity}`的`{attribute}`有关的内容进行总结\n-</span> <span class="pre">字数限制在**{word_limit}字以内**\n-</span> <span class="pre">要求输出格式如下：\n#</span> <span class="pre">{entity}\n##</span> <span class="pre">{attribute}\n...\n{example}'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.DEFAULT_SYSTEM_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.EntityAttributeAggregator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpt-4o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'event_description'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'entity_attribute'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_token_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_pattern_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/entity_attribute_aggregator.html#EntityAttributeAggregator.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.
+:param api_model: API model name.
+:param entity: The given entity.
+:param attribute: The given attribute.
+:param input_key: The input key in the meta field of the samples.</p>
+<blockquote>
+<div><p>It is &quot;event_description&quot; in default.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_key</strong> -- The output key in the aggregation field of the
+samples. It is &quot;entity_attribute&quot; in default.</p></li>
+<li><p><strong>word_limit</strong> -- Prompt the output length.</p></li>
+<li><p><strong>max_token_num</strong> -- The max token num of the total tokens of the
+sub documents. Without limitation if it is None.</p></li>
+<li><p><strong>api_endpoint</strong> -- URL endpoint for the API.</p></li>
+<li><p><strong>response_path</strong> -- Path to extract content from the API response.
+Defaults to 'choices.0.message.content'.</p></li>
+<li><p><strong>system_prompt_template</strong> -- The system prompt template.</p></li>
+<li><p><strong>example_prompt</strong> -- The example part in the system prompt.</p></li>
+<li><p><strong>input_template</strong> -- The input template.</p></li>
+<li><p><strong>output_pattern_template</strong> -- The output template.</p></li>
+<li><p><strong>try_num</strong> -- The number of retry attempts when there is an API
+call error or output parsing error.</p></li>
+<li><p><strong>model_params</strong> -- Parameters for initializing the API model.</p></li>
+<li><p><strong>sampling_params</strong> -- Extra parameters passed to the API call.
+e.g {'temperature': 0.9, 'top_p': 0.95}</p></li>
+<li><p><strong>kwargs</strong> -- Extra keyword arguments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.EntityAttributeAggregator.attribute_summary">
+<span class="sig-name descname"><span class="pre">attribute_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_docs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/entity_attribute_aggregator.html#EntityAttributeAggregator.attribute_summary"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.attribute_summary" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.EntityAttributeAggregator.parse_output">
+<span class="sig-name descname"><span class="pre">parse_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/entity_attribute_aggregator.html#EntityAttributeAggregator.parse_output"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.parse_output" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.EntityAttributeAggregator.process_single">
+<span class="sig-name descname"><span class="pre">process_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/entity_attribute_aggregator.html#EntityAttributeAggregator.process_single"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.process_single" title="Link to this definition">¶</a></dt>
+<dd><p>For sample level, batched sample --&gt; sample,
+the input must be the output of some Grouper OP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> -- batched sample to aggregate</p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>aggregated sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MostRelevantEntitiesAggregator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.aggregator.</span></span><span class="sig-name descname"><span class="pre">MostRelevantEntitiesAggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpt-4o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_entity_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'event_description'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'most_relevant_entities'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_token_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/most_relevant_entities_aggregator.html#MostRelevantEntitiesAggregator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator" title="Link to this definition">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="data_juicer.ops.base_op.html#data_juicer.ops.base_op.Aggregator" title="data_juicer.ops.base_op.Aggregator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aggregator</span></code></a></p>
+<p>Extract entities closely related to a given entity from some texts,
+and sort them in descending order of importance.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.DEFAULT_INPUT_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_INPUT_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'`{entity}`的相关文档：\n{sub_docs}\n\n与`{entity}`最相关的一些`{entity_type}`：\n'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.DEFAULT_INPUT_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.DEFAULT_OUTPUT_PATTERN">
+<span class="sig-name descname"><span class="pre">DEFAULT_OUTPUT_PATTERN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'\\#\\#\\s*列表\\s*(.*?)\\Z'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.DEFAULT_OUTPUT_PATTERN" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.DEFAULT_SYSTEM_TEMPLATE">
+<span class="sig-name descname"><span class="pre">DEFAULT_SYSTEM_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'给定与`{entity}`相关的一些文档，总结一些与`{entity}`最为相关的`{entity_type}`。\n要求：\n-</span> <span class="pre">不用包含与{entity}为同一{entity_type}的{entity_type}。\n-</span> <span class="pre">请按照人物的重要性进行排序，**越重要人物在列表越前面**。\n-</span> <span class="pre">你的返回格式如下：\n##</span> <span class="pre">分析\n你对各个{entity_type}与{entity}关联度的分析\n##</span> <span class="pre">列表\n人物1,</span> <span class="pre">人物2,</span> <span class="pre">人物3,</span> <span class="pre">...'</span></em><a class="headerlink" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.DEFAULT_SYSTEM_TEMPLATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpt-4o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_entity_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'event_description'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'most_relevant_entities'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_token_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/most_relevant_entities_aggregator.html#MostRelevantEntitiesAggregator.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.
+:param api_model: API model name.
+:param entity: The given entity.
+:param query_entity_type: The type of queried relevant entities.
+:param input_key: The input key in the meta field of the samples.</p>
+<blockquote>
+<div><p>It is &quot;event_description&quot; in default.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_key</strong> -- The output key in the aggregation field of the
+samples. It is &quot;most_relevant_entities&quot; in default.</p></li>
+<li><p><strong>max_token_num</strong> -- The max token num of the total tokens of the
+sub documents. Without limitation if it is None.</p></li>
+<li><p><strong>api_endpoint</strong> -- URL endpoint for the API.</p></li>
+<li><p><strong>response_path</strong> -- Path to extract content from the API response.
+Defaults to 'choices.0.message.content'.</p></li>
+<li><p><strong>system_prompt_template</strong> -- The system prompt template.</p></li>
+<li><p><strong>input_template</strong> -- The input template.</p></li>
+<li><p><strong>output_pattern</strong> -- The output pattern.</p></li>
+<li><p><strong>try_num</strong> -- The number of retry attempts when there is an API
+call error or output parsing error.</p></li>
+<li><p><strong>model_params</strong> -- Parameters for initializing the API model.</p></li>
+<li><p><strong>sampling_params</strong> -- Extra parameters passed to the API call.
+e.g {'temperature': 0.9, 'top_p': 0.95}</p></li>
+<li><p><strong>kwargs</strong> -- Extra keyword arguments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.parse_output">
+<span class="sig-name descname"><span class="pre">parse_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/most_relevant_entities_aggregator.html#MostRelevantEntitiesAggregator.parse_output"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.parse_output" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.process_single">
+<span class="sig-name descname"><span class="pre">process_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/most_relevant_entities_aggregator.html#MostRelevantEntitiesAggregator.process_single"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.process_single" title="Link to this definition">¶</a></dt>
+<dd><p>For sample level, batched sample --&gt; sample,
+the input must be the output of some Grouper OP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> -- batched sample to aggregate</p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>aggregated sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.query_most_relevant_entities">
+<span class="sig-name descname"><span class="pre">query_most_relevant_entities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_docs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/aggregator/most_relevant_entities_aggregator.html#MostRelevantEntitiesAggregator.query_most_relevant_entities"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.query_most_relevant_entities" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">data_juicer.ops.aggregator</a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.NestedAggregator"><code class="docutils literal notranslate"><span class="pre">NestedAggregator</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.NestedAggregator.DEFAULT_INPUT_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">NestedAggregator.DEFAULT_INPUT_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.NestedAggregator.DEFAULT_SUB_DOC_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">NestedAggregator.DEFAULT_SUB_DOC_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.NestedAggregator.DEFAULT_SYSTEM_PROMPT"><code class="docutils literal notranslate"><span class="pre">NestedAggregator.DEFAULT_SYSTEM_PROMPT</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.NestedAggregator.__init__"><code class="docutils literal notranslate"><span class="pre">NestedAggregator.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.NestedAggregator.parse_output"><code class="docutils literal notranslate"><span class="pre">NestedAggregator.parse_output()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.NestedAggregator.process_single"><code class="docutils literal notranslate"><span class="pre">NestedAggregator.process_single()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.NestedAggregator.recursive_summary"><code class="docutils literal notranslate"><span class="pre">NestedAggregator.recursive_summary()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MetaTagsAggregator"><code class="docutils literal notranslate"><span class="pre">MetaTagsAggregator</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_INPUT_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">MetaTagsAggregator.DEFAULT_INPUT_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_OUTPUT_PATTERN"><code class="docutils literal notranslate"><span class="pre">MetaTagsAggregator.DEFAULT_OUTPUT_PATTERN</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_SYSTEM_PROMPT"><code class="docutils literal notranslate"><span class="pre">MetaTagsAggregator.DEFAULT_SYSTEM_PROMPT</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_TAG_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">MetaTagsAggregator.DEFAULT_TAG_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MetaTagsAggregator.DEFAULT_TARGET_TAG_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">MetaTagsAggregator.DEFAULT_TARGET_TAG_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MetaTagsAggregator.__init__"><code class="docutils literal notranslate"><span class="pre">MetaTagsAggregator.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MetaTagsAggregator.meta_map"><code class="docutils literal notranslate"><span class="pre">MetaTagsAggregator.meta_map()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MetaTagsAggregator.parse_output"><code class="docutils literal notranslate"><span class="pre">MetaTagsAggregator.parse_output()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MetaTagsAggregator.process_single"><code class="docutils literal notranslate"><span class="pre">MetaTagsAggregator.process_single()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.EntityAttributeAggregator"><code class="docutils literal notranslate"><span class="pre">EntityAttributeAggregator</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.DEFAULT_EXAMPLE_PROMPT"><code class="docutils literal notranslate"><span class="pre">EntityAttributeAggregator.DEFAULT_EXAMPLE_PROMPT</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.DEFAULT_INPUT_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">EntityAttributeAggregator.DEFAULT_INPUT_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.DEFAULT_OUTPUT_PATTERN_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">EntityAttributeAggregator.DEFAULT_OUTPUT_PATTERN_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.DEFAULT_SYSTEM_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">EntityAttributeAggregator.DEFAULT_SYSTEM_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.__init__"><code class="docutils literal notranslate"><span class="pre">EntityAttributeAggregator.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.attribute_summary"><code class="docutils literal notranslate"><span class="pre">EntityAttributeAggregator.attribute_summary()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.parse_output"><code class="docutils literal notranslate"><span class="pre">EntityAttributeAggregator.parse_output()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.EntityAttributeAggregator.process_single"><code class="docutils literal notranslate"><span class="pre">EntityAttributeAggregator.process_single()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator"><code class="docutils literal notranslate"><span class="pre">MostRelevantEntitiesAggregator</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.DEFAULT_INPUT_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">MostRelevantEntitiesAggregator.DEFAULT_INPUT_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.DEFAULT_OUTPUT_PATTERN"><code class="docutils literal notranslate"><span class="pre">MostRelevantEntitiesAggregator.DEFAULT_OUTPUT_PATTERN</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.DEFAULT_SYSTEM_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">MostRelevantEntitiesAggregator.DEFAULT_SYSTEM_TEMPLATE</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.__init__"><code class="docutils literal notranslate"><span class="pre">MostRelevantEntitiesAggregator.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.parse_output"><code class="docutils literal notranslate"><span class="pre">MostRelevantEntitiesAggregator.parse_output()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.process_single"><code class="docutils literal notranslate"><span class="pre">MostRelevantEntitiesAggregator.process_single()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.query_most_relevant_entities"><code class="docutils literal notranslate"><span class="pre">MostRelevantEntitiesAggregator.query_most_relevant_entities()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="../_static/documentation_options.js?v=011da5d6"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    </body>
+</html>
