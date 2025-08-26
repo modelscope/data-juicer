@@ -15,7 +15,8 @@ from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import is_remote_path
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.process_utils import calculate_np, cuda_device_count
+from data_juicer.utils.process_utils import calculate_np
+from data_juicer.utils.resource_utils import cuda_device_count
 from data_juicer.utils.webdataset_utils import _custom_default_decoder
 
 ray = LazyLoader("ray")

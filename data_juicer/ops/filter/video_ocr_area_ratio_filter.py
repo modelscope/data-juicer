@@ -11,7 +11,7 @@ from data_juicer.utils.mm_utils import (
     load_data_with_context,
     load_video,
 )
-from data_juicer.utils.process_utils import cuda_device_count
+from data_juicer.utils.resource_utils import cuda_device_count
 
 from ..base_op import OPERATORS, UNFORKABLE, Filter
 from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS

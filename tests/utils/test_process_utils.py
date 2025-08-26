@@ -139,6 +139,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             )
 
     def test_cpu_num_proc_unset_and_mem_unlimited(self):
+        from data_juicer.utils.resource_utils import available_memories, cpu_count
         with patch(f"{self._patch_module}.available_memories") as mock_avail_mem, \
             patch(f"{self._patch_module}.cpu_count") as mock_cpu_count:
             mock_avail_mem.return_value = [8 * 1024]

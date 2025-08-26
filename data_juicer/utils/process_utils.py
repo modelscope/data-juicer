@@ -1,56 +1,16 @@
 import math
 import os
 import subprocess
-from typing import List
 
 import multiprocess as mp
-import psutil
 from loguru import logger
 
-from data_juicer.utils.availability_utils import _is_package_available
-from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.ray_utils import (
-    check_and_initialize_ray,
-    ray_available_gpu_memories,
-    ray_available_memories,
-    ray_cpu_count,
-    ray_gpu_count,
+from data_juicer.utils.resource_utils import (
+    available_gpu_memories,
+    available_memories,
+    cpu_count,
+    cuda_device_count,
 )
-
-torch = LazyLoader("torch")
-
-
-def _cuda_device_count():
-    _torch_available = _is_package_available("torch")
-
-    if check_and_initialize_ray():
-        return ray_gpu_count()
-
-    if _torch_available:
-        return torch.cuda.device_count()
-
-    try:
-        nvidia_smi_output = subprocess.check_output(["nvidia-smi", "-L"], text=True)
-        all_devices = nvidia_smi_output.strip().split("\n")
-
-        cuda_visible_devices = os.getenv("CUDA_VISIBLE_DEVICES")
-        if cuda_visible_devices is not None:
-            logger.warning(
-                "CUDA_VISIBLE_DEVICES is ignored when torch is unavailable. " "All detected GPUs will be used."
-            )
-
-        return len(all_devices)
-    except Exception:
-        # nvidia-smi not found or other error
-        return 0
-
-
-def cuda_device_count():
-    return _cuda_device_count()
-
-
-def is_cuda_available():
-    return cuda_device_count() > 0
 
 
 def setup_mp(method=None):
@@ -90,36 +50,6 @@ def get_min_cuda_memory():
         free_memory = int(line)
         min_cuda_memory = min(min_cuda_memory, free_memory)
     return min_cuda_memory
-
-
-def cpu_count():
-    if check_and_initialize_ray():
-        return ray_cpu_count()
-
-    return psutil.cpu_count()
-
-
-def available_memories() -> List[int]:
-    """Available memory for each node in MB."""
-    if check_and_initialize_ray():
-        return ray_available_memories()
-
-    return [int(psutil.virtual_memory().available / (1024**2))]
-
-
-def available_gpu_memories() -> List[int]:
-    """Available gpu memory of each gpu card for each alive node in MB."""
-    if check_and_initialize_ray():
-        return ray_available_gpu_memories()
-
-    try:
-        nvidia_smi_output = subprocess.check_output(
-            ["nvidia-smi", "--query-gpu=memory.free", "--format=csv,noheader,nounits"]
-        ).decode("utf-8")
-
-        return [int(i) for i in nvidia_smi_output.strip().split("\n")]
-    except Exception:
-        return []
 
 
 def calculate_np(name, mem_required, cpu_required, num_proc=None, use_cuda=False):

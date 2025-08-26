@@ -18,7 +18,7 @@ from data_juicer.utils.nltk_utils import (
     ensure_nltk_resource,
     patch_nltk_pickle_security,
 )
-from data_juicer.utils.process_utils import cuda_device_count
+from data_juicer.utils.resource_utils import cuda_device_count
 
 from .cache_utils import DATA_JUICER_EXTERNAL_MODELS_HOME as DJEMH
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC

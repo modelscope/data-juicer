@@ -8,8 +8,8 @@ from loguru import logger
 from PIL import ImageFile
 
 from data_juicer.utils.common_utils import deprecated
-from data_juicer.utils.process_utils import cuda_device_count as _count_cuda
-from data_juicer.utils.process_utils import is_cuda_available as _check_cuda
+from data_juicer.utils.resource_utils import cuda_device_count as _count_cuda
+from data_juicer.utils.resource_utils import is_cuda_available as _check_cuda
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -20,8 +20,8 @@ logger.add(sys.stderr, level="INFO")
 
 
 cuda_device_count = deprecated(
-    "`data_juicer.cuda_device_count` will be deprecated, please use `from data_juicer.utils.process_utils import cuda_device_count`"
+    "`data_juicer.cuda_device_count` will be deprecated, please use `from data_juicer.utils.resource_utils import cuda_device_count`"
 )(_count_cuda)
 is_cuda_available = deprecated(
-    "`data_juicer.is_cuda_available` will be deprecated, please use `from data_juicer.utils.process_utils import is_cuda_available`"
+    "`data_juicer.is_cuda_available` will be deprecated, please use `from data_juicer.utils.resource_utils import is_cuda_available`"
 )(_check_cuda)

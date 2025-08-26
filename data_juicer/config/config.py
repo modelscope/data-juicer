@@ -671,7 +671,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         )
 
     # check number of processes np
-    from data_juicer.utils.process_utils import cpu_count
+    from data_juicer.utils.resource_utils import cpu_count
 
     sys_cpu_count = cpu_count()
     if not cfg.get("np", None):
