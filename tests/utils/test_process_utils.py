@@ -35,6 +35,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self._patch_module = 'data_juicer.utils.process_utils'
+        self._patch_ray_module = 'data_juicer.utils.ray_utils'
         self._ori_ray_job_env_value = os.environ.get(RAY_JOB_ENV_VAR, '0')
         super().setUp()
     
@@ -48,7 +49,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
 
     def test_cuda_mem_required_zero_and_num_proc_not_given(self):
         logger = MagicMock()
-        with patch(f"{self._patch_module}.get_ray_nodes_info") as mock_ray_nodes_info, \
+        with patch(f"{self._patch_ray_module}.get_ray_nodes_info") as mock_ray_nodes_info, \
             patch(f"{self._patch_module}.cuda_device_count") as mock_cuda_count, \
             patch(f"{self._patch_module}.logger", logger):
             mock_ray_nodes_info.return_value = {
@@ -74,7 +75,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
 
     def test_cuda_auto_less_than_device_count(self):
         logger = MagicMock()
-        with patch(f"{self._patch_module}.get_ray_nodes_info") as mock_ray_nodes_info, \
+        with patch(f"{self._patch_ray_module}.get_ray_nodes_info") as mock_ray_nodes_info, \
             patch(f"{self._patch_module}.logger", logger):
             mock_ray_nodes_info.return_value = {
                 'node1_id': {'memory': 512, 'cpu_count': 8, 'gpus_memory': [2 * 1024]},
