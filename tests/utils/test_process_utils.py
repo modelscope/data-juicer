@@ -23,7 +23,7 @@ class ProcessUtilsTest(DataJuicerTestCaseBase):
         setup_mp(['spawn', 'forkserver', 'fork'])
         self.assertEqual(mp.get_start_method(), 'spawn')
 
-    def xxtest_get_min_cuda_memory(self):
+    def test_get_min_cuda_memory(self):
         if torch.cuda.is_available():
             self.assertIsInstance(get_min_cuda_memory(), int)
         else:
