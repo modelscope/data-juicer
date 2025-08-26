@@ -243,9 +243,12 @@ def find_corresponding_test_file(file_path):
 
 
 def get_partial_test_cases():
+    must_run = {"tests/config/test_config.py"}
     diff_files = get_diff_files()
     test_files = [find_corresponding_test_file(file_path) for file_path in diff_files]
     if None in test_files:
         # can't find corresponding test files for some changed files: run all
         return None
+    # add test cases that must be run
+    test_files = list(must_run.union(set(test_files)))
     return test_files
