@@ -4,11 +4,10 @@ from functools import wraps
 import numpy as np
 import pyarrow as pa
 
-from data_juicer import is_cuda_available
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens, size_to_bytes
 from data_juicer.utils.model_utils import free_models
-from data_juicer.utils.process_utils import calculate_np
+from data_juicer.utils.process_utils import calculate_np, is_cuda_available
 from data_juicer.utils.registry import Registry
 
 OPERATORS = Registry("Operators")

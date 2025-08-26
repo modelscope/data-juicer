@@ -7,12 +7,50 @@ import multiprocess as mp
 import psutil
 from loguru import logger
 
-from data_juicer import cuda_device_count
-from data_juicer.utils.constant import RAY_JOB_ENV_VAR
+from data_juicer.utils.availability_utils import _is_package_available
 from data_juicer.utils.lazy_loader import LazyLoader
+from data_juicer.utils.ray_utils import (
+    check_and_initialize_ray,
+    ray_available_gpu_memories,
+    ray_available_memories,
+    ray_cpu_count,
+    ray_gpu_count,
+)
 
-ray = LazyLoader("ray")
-_RAY_NODES_INFO = None
+torch = LazyLoader("torch")
+
+
+def _cuda_device_count():
+    _torch_available = _is_package_available("torch")
+
+    if check_and_initialize_ray():
+        return ray_gpu_count()
+
+    if _torch_available:
+        return torch.cuda.device_count()
+
+    try:
+        nvidia_smi_output = subprocess.check_output(["nvidia-smi", "-L"], text=True)
+        all_devices = nvidia_smi_output.strip().split("\n")
+
+        cuda_visible_devices = os.getenv("CUDA_VISIBLE_DEVICES")
+        if cuda_visible_devices is not None:
+            logger.warning(
+                "CUDA_VISIBLE_DEVICES is ignored when torch is unavailable. " "All detected GPUs will be used."
+            )
+
+        return len(all_devices)
+    except Exception:
+        # nvidia-smi not found or other error
+        return 0
+
+
+def cuda_device_count():
+    return _cuda_device_count()
+
+
+def is_cuda_available():
+    return cuda_device_count() > 0
 
 
 def setup_mp(method=None):
@@ -54,54 +92,25 @@ def get_min_cuda_memory():
     return min_cuda_memory
 
 
-def is_ray_initialized():
-    try:
-        return ray.is_initialized()
-    except Exception:
-        return False
-
-
-def is_ray_mode():
-    if int(os.environ.get(RAY_JOB_ENV_VAR, "0")):
-        assert is_ray_initialized(), "Ray cluster is not initialized."
-        return True
-
-    return False
-
-
 def cpu_count():
-    if is_ray_mode():
-        available_resources = ray.available_resources()
-        available_cpu = available_resources.get("CPU", 0)
-        return available_cpu
+    if check_and_initialize_ray():
+        return ray_cpu_count()
 
     return psutil.cpu_count()
 
 
 def available_memories() -> List[int]:
     """Available memory for each node in MB."""
-    if is_ray_mode():
-        ray_nodes_info = get_ray_nodes_info()
-
-        available_mems = []
-        for nodeid, info in ray_nodes_info.items():
-            available_mems.append(info["memory"])
-
-        return available_mems
+    if check_and_initialize_ray():
+        return ray_available_memories()
 
     return [int(psutil.virtual_memory().available / (1024**2))]
 
 
 def available_gpu_memories() -> List[int]:
     """Available gpu memory of each gpu card for each alive node in MB."""
-    if is_ray_mode():
-        ray_nodes_info = get_ray_nodes_info()
-
-        available_gpu_mems = []
-        for nodeid, info in ray_nodes_info.items():
-            available_gpu_mems.extend(info["gpus_memory"])
-
-        return available_gpu_mems
+    if check_and_initialize_ray():
+        return ray_available_gpu_memories()
 
     try:
         nvidia_smi_output = subprocess.check_output(
@@ -111,66 +120,6 @@ def available_gpu_memories() -> List[int]:
         return [int(i) for i in nvidia_smi_output.strip().split("\n")]
     except Exception:
         return []
-
-
-def get_ray_nodes_info():
-    global _RAY_NODES_INFO
-
-    if _RAY_NODES_INFO is not None:
-        return _RAY_NODES_INFO
-
-    @ray.remote
-    def collect_node_info():
-        mem_info = psutil.virtual_memory()
-        free_mem = int(mem_info.available / (1024**2))  # MB
-        cpu_count = psutil.cpu_count()
-
-        try:
-            free_gpus_memory = []
-            nvidia_smi_output = subprocess.check_output(
-                ["nvidia-smi", "--query-gpu=memory.free", "--format=csv,noheader,nounits"]
-            ).decode("utf-8")
-
-            for line in nvidia_smi_output.strip().split("\n"):
-                free_gpus_memory.append(int(line))
-
-        except Exception:
-            # no gpu
-            free_gpus_memory = []
-
-        return {
-            "memory": free_mem,  # MB
-            "cpu_count": cpu_count,
-            "gpus_memory": free_gpus_memory,  # MB
-        }
-
-    assert is_ray_initialized(), "Ray cluster is not initialized."
-    ray.init(address="auto", ignore_reinit_error=True)
-
-    nodes = ray.nodes()
-    alive_nodes = [node for node in nodes if node["Alive"]]
-    # skip head node
-    worker_nodes = [node for node in alive_nodes if "head" not in node["NodeManagerHostname"]]
-
-    futures = []
-    for node in worker_nodes:
-        node_id = node["NodeID"]
-        from ray.util import scheduling_strategies
-
-        strategy = scheduling_strategies.NodeAffinitySchedulingStrategy(node_id=node_id, soft=False)
-        future = collect_node_info.options(scheduling_strategy=strategy).remote()
-        futures.append(future)
-
-    results = ray.get(futures)
-
-    _RAY_NODES_INFO = {}
-    for i, (node, info) in enumerate(zip(alive_nodes, results)):
-        node_id = node["NodeID"]
-        _RAY_NODES_INFO[node_id] = info
-
-    logger.info(f"Ray cluster info:\n{_RAY_NODES_INFO}")
-
-    return _RAY_NODES_INFO
 
 
 def calculate_np(name, mem_required, cpu_required, num_proc=None, use_cuda=False):

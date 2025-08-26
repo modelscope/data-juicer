@@ -12,13 +12,13 @@ import multiprocess as mp
 import wget
 from loguru import logger
 
-from data_juicer import cuda_device_count
 from data_juicer.utils.common_utils import nested_access
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.nltk_utils import (
     ensure_nltk_resource,
     patch_nltk_pickle_security,
 )
+from data_juicer.utils.process_utils import cuda_device_count
 
 from .cache_utils import DATA_JUICER_EXTERNAL_MODELS_HOME as DJEMH
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC

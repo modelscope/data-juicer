@@ -13,7 +13,6 @@ from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.ray_exporter import RayExporter
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
-from data_juicer.utils.constant import RAY_JOB_ENV_VAR
 from data_juicer.utils.lazy_loader import LazyLoader
 
 ray = LazyLoader("ray")
@@ -59,11 +58,10 @@ class RayExecutor(ExecutorBase):
         # init ray
         logger.info("Initializing Ray ...")
 
-        from ray.runtime_env import RuntimeEnv
+        from data_juicer.utils.ray_utils import initialize_ray
 
-        runtime_env = RuntimeEnv(env_vars={RAY_JOB_ENV_VAR: os.environ.get(RAY_JOB_ENV_VAR, "0")})
+        initialize_ray(cfg=cfg, force=True)
 
-        ray.init(self.cfg.ray_address, ignore_reinit_error=True, runtime_env=runtime_env)
         self.tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
 
         # absolute path resolution logic
