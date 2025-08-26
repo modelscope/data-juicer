@@ -116,11 +116,81 @@ class VideoAestheticsFilter(Filter):
             "" if frame_sampling_method == "all_keyframes" else f"-{frame_num}"
         )
 
+    def compute_stats_single_actor(self, sample, model, processor, rank=None, context=False):
+        """
+        Compute aesthetics scores for a single sample in the actor.
+        With the model and processor loaded when the actor was created.
+        """
+        # check if it's computed already
+        if StatsKeys.video_frames_aesthetics_score in sample[Fields.stats]:
+            return sample
+        # there is no video in this sample
+        if self.video_key not in sample or not sample[self.video_key]:
+            sample[Fields.stats][StatsKeys.video_frames_aesthetics_score] = np.array([], dtype=np.float64)
+            return sample
+
+        # load videos
+        loaded_video_keys = sample[self.video_key]
+        sample, videos = load_data_with_context(sample, context, loaded_video_keys, load_video)
+
+        aesthetics_scores = []
+        for key, video in videos.items():
+            sampled_frames_key = key + self.sampled_frames_key_suffix
+            if video is None:
+                continue
+            elif context and sampled_frames_key in sample[Fields.context]:
+                # sampled frames can be found in the context
+                frames = sample[Fields.context][sampled_frames_key]
+            else:
+                # extract frame images
+                if self.frame_sampling_method == "all_keyframes":
+                    frames = extract_key_frames(video)
+                elif self.frame_sampling_method == "uniform":
+                    frames = extract_video_frames_uniformly(video, self.frame_num)
+                else:
+                    frames = []
+
+                # store the sampled frames in the context
+                if context:
+                    sample[Fields.context][sampled_frames_key] = frames
+            frame_images = [frame.to_image() for frame in frames]
+
+            if len(frame_images) > 0:
+                # compute aesthetics_scores
+                # model, processor = get_model(self.model_key, rank=rank, use_cuda=self.use_cuda())
+                inputs = processor(images=frame_images, return_tensors="pt").to(model.device)
+                with torch.no_grad():
+                    outputs = model(**inputs)
+                if self.need_normalized_by_ten:
+                    aesthetics_score = outputs.logits / 10.0
+                else:
+                    aesthetics_score = outputs.logits
+
+                if self.reduce_mode == "avg":
+                    aesthetics_score = float(aesthetics_score.mean())
+                elif self.reduce_mode == "max":
+                    aesthetics_score = float(aesthetics_score.max())
+                else:
+                    aesthetics_score = float(aesthetics_score.min())
+            else:
+                aesthetics_score = 0.0
+
+            aesthetics_scores.append(aesthetics_score)
+
+        logger.debug(f"aesthetics_score: {aesthetics_scores}")
+
+        sample[Fields.stats][StatsKeys.video_frames_aesthetics_score] = aesthetics_scores
+
+        if not context:
+            for vid_key in videos:
+                close_video(videos[vid_key])
+
+        return sample
+
     def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_frames_aesthetics_score in sample[Fields.stats]:
             return sample
-
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.stats][StatsKeys.video_frames_aesthetics_score] = np.array([], dtype=np.float64)

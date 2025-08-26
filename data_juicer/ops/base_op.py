@@ -1,13 +1,16 @@
 import copy
+import time
+from datetime import datetime
 from functools import wraps
 
 import numpy as np
 import pyarrow as pa
+import pytz
 
 from data_juicer import is_cuda_available
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens, size_to_bytes
-from data_juicer.utils.model_utils import free_models
+from data_juicer.utils.model_utils import free_models, get_model
 from data_juicer.utils.process_utils import calculate_np
 from data_juicer.utils.registry import Registry
 
@@ -16,6 +19,8 @@ UNFORKABLE = Registry("Unforkable")
 NON_STATS_FILTERS = Registry("Non-stats Filters")
 TAGGING_OPS = Registry("Tagging Operators")
 ATTRIBUTION_FILTERS = Registry("Attribution Filters")
+
+beijing_tz = pytz.timezone("Asia/Singapore")
 
 
 def convert_list_dict_to_dict_list(samples):
@@ -190,6 +195,7 @@ class OP:
         self.num_proc = kwargs.get("num_proc", None)
         self.cpu_required = kwargs.get("cpu_required", 1)
         self.mem_required = kwargs.get("mem_required", 0)
+        self.gpu_required = kwargs.get("gpu_required", 1)
         if isinstance(self.mem_required, str):
             self.mem_required = size_to_bytes(self.mem_required) / 1024**3
 
@@ -291,6 +297,20 @@ class OP:
 
     def empty_history(self):
         return np.empty((0, 0), dtype=str)
+
+    def load_model(self, rank=None):
+
+        start = time.time()
+        start_time = datetime.fromtimestamp(start, pytz.utc).astimezone(beijing_tz)
+        model, processor = get_model(self.model_key, rank=rank, use_cuda=self.use_cuda())
+        end = time.time()
+        end_time = datetime.fromtimestamp(end, pytz.utc).astimezone(beijing_tz)
+        print(
+            f"[Actor] {self._name} Model loaded in {end - start:.3f} seconds "
+            f"from {start_time.strftime('%Y-%m-%d %H:%M:%S')} "
+            f"to {end_time.strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+        return model, processor
 
 
 class Mapper(OP):

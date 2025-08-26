@@ -57,7 +57,9 @@ class RayExecutor(ExecutorBase):
 
         # init ray
         logger.info("Initializing Ray ...")
+
         ray.init(self.cfg.ray_address, ignore_reinit_error=True)
+
         self.tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
 
         # absolute path resolution logic
@@ -74,6 +76,9 @@ class RayExecutor(ExecutorBase):
             keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
             **self.cfg.export_extra_args,
         )
+        # Process data with parallel operators
+        self.op_enable_parallel = True
+        # self.op_enable_parallel = False
 
     def run(self, load_data_np: Optional[PositiveInt] = None, skip_export: bool = False, skip_return: bool = False):
         """
@@ -86,7 +91,9 @@ class RayExecutor(ExecutorBase):
         """
         # 1. load data
         logger.info("Loading dataset with Ray...")
+        dstart = time.time()
         dataset = self.datasetbuilder.load_dataset(num_proc=load_data_np)
+        logger.info(f"Data loading in {time.time() - dstart:.3f}")
         columns = dataset.schema().columns
 
         # 2. extract processes
@@ -101,7 +108,10 @@ class RayExecutor(ExecutorBase):
             # 3. data process
             logger.info("Processing data...")
             tstart = time.time()
-            dataset.process(ops)
+            if self.op_enable_parallel:
+                dataset.process_parallel(ops)
+            else:
+                dataset.process(ops)
 
             # 4. data export
             if not skip_export:
