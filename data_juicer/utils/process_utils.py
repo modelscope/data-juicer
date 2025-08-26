@@ -1,6 +1,7 @@
 import math
 import os
 import subprocess
+from typing import List
 
 import multiprocess as mp
 import psutil
@@ -77,7 +78,8 @@ def cpu_count():
     return psutil.cpu_count()
 
 
-def available_memories():
+def available_memories() -> List[int]:
+    """Available memory for each node in MB."""
     if is_ray_mode():
         ray_nodes_info = get_ray_nodes_info()
 
@@ -87,10 +89,11 @@ def available_memories():
 
         return available_mems
 
-    return [psutil.virtual_memory().available]
+    return [int(psutil.virtual_memory().available / (1024**2))]
 
 
-def available_gpu_memories():
+def available_gpu_memories() -> List[int]:
+    """Available gpu memory of each gpu card for each alive node in MB."""
     if is_ray_mode():
         ray_nodes_info = get_ray_nodes_info()
 
@@ -119,7 +122,7 @@ def get_ray_nodes_info():
     @ray.remote
     def collect_node_info():
         mem_info = psutil.virtual_memory()
-        free_mem = mem_info.available / (1024**2)  # MB
+        free_mem = int(mem_info.available / (1024**2))  # MB
         cpu_count = psutil.cpu_count()
 
         try:
