@@ -7,6 +7,7 @@ doc, please run the following commands:
 ```bash
 # $~/data_juicer/docs/sphinx_doc
 # 1. install the sphinx requirements and init the sphinx-quickstart
+# Note: Please run in Python>=3.11 environment
 uv pip install "py-data-juicer[dev]"
 
 # 2. auto generate and build the doc
