@@ -107,7 +107,16 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
         rejected_key: str = "rejected",
         **kwargs,
     ):
-        """Initialize the human preference annotation operator."""
+        """
+        Initialize the human preference annotation operator.
+
+        :param label_config_file: Path to the label config file
+        :param answer1_key: Key for the first answer
+        :param answer2_key: Key for the second answer
+        :param prompt_key: Key for the prompt/question
+        :param chosen_key: Key for the chosen answer
+        :param rejected_key: Key for the rejected answer
+        """
         # Ensure text_key is set to prompt_key if not explicitly provided
         if "text_key" not in kwargs:
             kwargs["text_key"] = prompt_key

@@ -45,6 +45,7 @@ class RayImageDeduplicator(RayBasicDeduplicator):
         Initialization.
         :param backend: the backend for dedup, either 'ray_actor' or 'redis'
         :param redis_address: the address of redis server
+        :param method: the hash method to use
         :param args: extra args
         :param kwargs: extra args
         """

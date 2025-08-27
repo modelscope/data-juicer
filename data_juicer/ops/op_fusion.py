@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 from loguru import logger
@@ -188,7 +188,13 @@ class GeneralFusedOP(Mapper):
 
     _batched_op = True
 
-    def __init__(self, batch_size: int = 1, fused_op_list: List = None, *args, **kwargs):
+    def __init__(self, batch_size: int = 1, fused_op_list: Optional[List] = None, *args, **kwargs):
+        """
+        Initialization.
+
+        :param batch_size: the batch size of the input samples.
+        :param fused_op_list: a list of OPs to be fused.
+        """
         super().__init__(*args, **kwargs)
         self.batch_size = batch_size
         if fused_op_list is None:
