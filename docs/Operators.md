@@ -37,7 +37,7 @@ Data-Juicer 中的算子分为以下 7 种类型。
 | [filter](#filter) | 54 | Filters out low-quality samples. 过滤低质量样本。 |
 | [formatter](#formatter) | 8 | Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。 |
 | [grouper](#grouper) | 3 | Group samples to batched samples. 将样本分组，每一组组成一个批量样本。 |
-| [mapper](#mapper) | 82 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
+| [mapper](#mapper) | 83 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
 | [selector](#selector) | 5 | Selects top samples based on ranking. 基于排序选取高质量样本。 |
 
 All the specific operators are listed below, each featured with several capability tags. 
@@ -209,6 +209,7 @@ All the specific operators are listed below, each featured with several capabili
 | mllm_mapper | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Mapper to use MLLMs for visual question answering tasks. Mapper使用MLLMs进行视觉问答任务。 | [code](../data_juicer/ops/mapper/mllm_mapper.py) | [tests](../tests/ops/mapper/test_mllm_mapper.py) |
 | nlpaug_en_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to simply augment samples in English based on nlpaug library. 映射器基于nlpaug库简单地增加英语样本。 | [code](../data_juicer/ops/mapper/nlpaug_en_mapper.py) | [tests](../tests/ops/mapper/test_nlpaug_en_mapper.py) |
 | nlpcda_zh_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to simply augment samples in Chinese based on nlpcda library. 基于nlpcda库的映射器可以简单地增加中文样本。 | [code](../data_juicer/ops/mapper/nlpcda_zh_mapper.py) | [tests](../tests/ops/mapper/test_nlpcda_zh_mapper.py) |
+| optimize_prompt_mapper | 🚀GPU 🌊vLLM 🧩HF 🔗API 🟡Beta | Mapper to optimize prompts based on the existing ones. 映射器根据现有的优化提示。 | [code](../data_juicer/ops/mapper/optimize_prompt_mapper.py) | [tests](../tests/ops/mapper/test_optimize_prompt_mapper.py) |
 | optimize_qa_mapper | 🚀GPU 🌊vLLM 🧩HF 🟢Stable | Mapper to optimize question-answer pairs. 映射器来优化问题-答案对。 | [code](../data_juicer/ops/mapper/optimize_qa_mapper.py) | [tests](../tests/ops/mapper/test_optimize_qa_mapper.py) |
 | optimize_query_mapper | 🚀GPU 🟢Stable | Mapper to optimize query in question-answer pairs. 映射器来优化问答对中的查询。 | [code](../data_juicer/ops/mapper/optimize_query_mapper.py) | [tests](../tests/ops/mapper/test_optimize_query_mapper.py) |
 | optimize_response_mapper | 🚀GPU 🟢Stable | Mapper to optimize response in question-answer pairs. 映射器来优化问答对中的响应。 | [code](../data_juicer/ops/mapper/optimize_response_mapper.py) | [tests](../tests/ops/mapper/test_optimize_response_mapper.py) |
