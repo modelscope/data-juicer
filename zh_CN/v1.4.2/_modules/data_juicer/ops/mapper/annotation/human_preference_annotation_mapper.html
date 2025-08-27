@@ -457,7 +457,16 @@
         <span class="n">rejected_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rejected&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the human preference annotation operator.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the human preference annotation operator.</span>
+
+<span class="sd">        :param label_config_file: Path to the label config file</span>
+<span class="sd">        :param answer1_key: Key for the first answer</span>
+<span class="sd">        :param answer2_key: Key for the second answer</span>
+<span class="sd">        :param prompt_key: Key for the prompt/question</span>
+<span class="sd">        :param chosen_key: Key for the chosen answer</span>
+<span class="sd">        :param rejected_key: Key for the rejected answer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Store our class-specific attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">answer1_key</span> <span class="o">=</span> <span class="n">answer1_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">answer2_key</span> <span class="o">=</span> <span class="n">answer2_key</span>

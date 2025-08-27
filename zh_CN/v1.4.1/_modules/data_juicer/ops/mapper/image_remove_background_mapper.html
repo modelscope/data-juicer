@@ -385,17 +385,17 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
-<span class="sd">        alpha_matting (bool, optional):</span>
+<span class="sd">        :param alpha_matting: (bool, optional)</span>
 <span class="sd">            Flag indicating whether to use alpha matting. Defaults to False.</span>
-<span class="sd">        alpha_matting_foreground_threshold (int, optional):</span>
+<span class="sd">        :param alpha_matting_foreground_threshold: (int, optional)</span>
 <span class="sd">            Foreground threshold for alpha matting. Defaults to 240.</span>
-<span class="sd">        alpha_matting_background_threshold (int, optional):</span>
+<span class="sd">        :param alpha_matting_background_threshold: (int, optional)</span>
 <span class="sd">            Background threshold for alpha matting. Defaults to 10.</span>
-<span class="sd">        alpha_matting_erode_size (int, optional):</span>
+<span class="sd">        :param alpha_matting_erode_size: (int, optional)</span>
 <span class="sd">            Erosion size for alpha matting. Defaults to 10.</span>
-<span class="sd">        bgcolor (Optional[Tuple[int, int, int, int]], optional):</span>
+<span class="sd">        :param bgcolor: (Optional[Tuple[int, int, int, int]], optional)</span>
 <span class="sd">            Background color for the cutout image. Defaults to None.</span>
-<span class="sd">        save_dir: The directory where generated image files will be stored.</span>
+<span class="sd">        :param save_dir: The directory where generated image files will be stored.</span>
 <span class="sd">            If not specified, outputs will be saved in the same directory as their corresponding input files.</span>
 <span class="sd">            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.</span>
 <span class="sd">        *args (Optional[Any]): Additional positional arguments.</span>

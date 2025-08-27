@@ -360,19 +360,23 @@
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.image_remove_background_mapper.ImageRemoveBackgroundMapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha_matting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_matting_foreground_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">240</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_matting_background_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_matting_erode_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bgcolor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/image_remove_background_mapper.html#ImageRemoveBackgroundMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.image_remove_background_mapper.ImageRemoveBackgroundMapper.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Initialization method.</p>
-<dl class="simple">
-<dt>alpha_matting (bool, optional):</dt><dd><p>Flag indicating whether to use alpha matting. Defaults to False.</p>
-</dd>
-<dt>alpha_matting_foreground_threshold (int, optional):</dt><dd><p>Foreground threshold for alpha matting. Defaults to 240.</p>
-</dd>
-<dt>alpha_matting_background_threshold (int, optional):</dt><dd><p>Background threshold for alpha matting. Defaults to 10.</p>
-</dd>
-<dt>alpha_matting_erode_size (int, optional):</dt><dd><p>Erosion size for alpha matting. Defaults to 10.</p>
-</dd>
-<dt>bgcolor (Optional[Tuple[int, int, int, int]], optional):</dt><dd><p>Background color for the cutout image. Defaults to None.</p>
-</dd>
-<dt>save_dir: The directory where generated image files will be stored.</dt><dd><p>If not specified, outputs will be saved in the same directory as their corresponding input files.
-This path can alternatively be defined by setting the <cite>DJ_PRODUCED_DATA_DIR</cite> environment variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha_matting</strong> – (bool, optional)
+Flag indicating whether to use alpha matting. Defaults to False.</p></li>
+<li><p><strong>alpha_matting_foreground_threshold</strong> – (int, optional)
+Foreground threshold for alpha matting. Defaults to 240.</p></li>
+<li><p><strong>alpha_matting_background_threshold</strong> – (int, optional)
+Background threshold for alpha matting. Defaults to 10.</p></li>
+<li><p><strong>alpha_matting_erode_size</strong> – (int, optional)
+Erosion size for alpha matting. Defaults to 10.</p></li>
+<li><p><strong>bgcolor</strong> – (Optional[Tuple[int, int, int, int]], optional)
+Background color for the cutout image. Defaults to None.</p></li>
+<li><p><strong>save_dir</strong> – The directory where generated image files will be stored.
+If not specified, outputs will be saved in the same directory as their corresponding input files.
+This path can alternatively be defined by setting the <cite>DJ_PRODUCED_DATA_DIR</cite> environment variable.</p></li>
+</ul>
 </dd>
 </dl>
 <p><a href="#id1"><span class="problematic" id="id2">*</span></a>args (Optional[Any]): Additional positional arguments.

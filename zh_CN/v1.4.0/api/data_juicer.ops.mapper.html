@@ -360,13 +360,19 @@
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.AudioAddGaussianNoiseMapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_amplitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_amplitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.015</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/audio_add_gaussian_noise_mapper.html#AudioAddGaussianNoiseMapper.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.AudioAddGaussianNoiseMapper.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_amplitude</strong> -- float unit: linear amplitude.
+Default: 0.001. Minimum noise amplification factor.</p></li>
+<li><p><strong>max_amplitude</strong> -- float unit: linear amplitude.
+Default: 0.015. Maximum noise amplification factor.</p></li>
+<li><p><strong>p</strong> -- float range: [0.0, 1.0].  Default: 0.5.
+The probability of applying this transform.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="simple">
-<dt>min_amplitude: float unit: linear amplitude.</dt><dd><p>Default: 0.001. Minimum noise amplification factor.</p>
-</dd>
-<dt>max_amplitude: float unit: linear amplitude.</dt><dd><p>Default: 0.015. Maximum noise amplification factor.</p>
-</dd>
-<dt>p: float range: [0.0, 1.0].  Default: 0.5.</dt><dd><p>The probability of applying this transform.</p>
-</dd>
 <dt>save_dir: str. Default: None.</dt><dd><p>The directory where generated audio files will be stored.
 If not specified, outputs will be saved in the same directory as their corresponding input files.
 This path can alternatively be defined by setting the <cite>DJ_PRODUCED_DATA_DIR</cite> environment variable.</p>
@@ -1216,24 +1222,21 @@ the same batch to allow fine-grained control on data processing.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.Difference_Area_Generator_Mapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_pair_similarity_filter_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_segment_mapper_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_text_matching_filter_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/imgdiff_difference_area_generator_mapper.html#Difference_Area_Generator_Mapper.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.Difference_Area_Generator_Mapper.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>Base class that conducts data editing.</p>
+<dd><p>Initialization.</p>
 <dl class="field-list simple">
 <dt class="field-odd">参数<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text_key</strong> -- the key name of field that stores sample texts
-to be processed.</p></li>
-<li><p><strong>image_key</strong> -- the key name of field that stores sample image list
-to be processed</p></li>
-<li><p><strong>audio_key</strong> -- the key name of field that stores sample audio list
-to be processed</p></li>
-<li><p><strong>video_key</strong> -- the key name of field that stores sample video list
-to be processed</p></li>
-<li><p><strong>image_bytes_key</strong> -- the key name of field that stores sample image bytes list
-to be processed</p></li>
-<li><p><strong>query_key</strong> -- the key name of field that stores sample queries</p></li>
-<li><p><strong>response_key</strong> -- the key name of field that stores responses</p></li>
-<li><p><strong>history_key</strong> -- the key name of field that stores history of
-queries and responses</p></li>
+<li><p><strong>image_pair_similarity_filter_args</strong> -- Arguments for image pair similarity filter.
+Controls the similarity filtering between image pairs. Default empty dict will use
+fixed values: min_score_1=0.1, max_score_1=1.0, min_score_2=0.1, max_score_2=1.0,
+hf_clip=&quot;openai/clip-vit-base-patch32&quot;, num_proc=1.</p></li>
+<li><p><strong>image_segment_mapper_args</strong> -- Arguments for image segmentation mapper.
+Controls the image segmentation process. Default empty dict will use
+fixed values: imgsz=1024, conf=0.05, iou=0.5, model_path=&quot;FastSAM-x.pt&quot;.</p></li>
+<li><p><strong>image_text_matching_filter_args</strong> -- Arguments for image-text matching filter.
+Controls the matching between cropped image regions and text descriptions.
+Default empty dict will use fixed values: min_score=0.1, max_score=1.0,
+hf_blip=&quot;Salesforce/blip-itm-base-coco&quot;, num_proc=1.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1264,24 +1267,22 @@ the same batch to allow fine-grained control on data processing.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.Difference_Caption_Generator_Mapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mllm_mapper_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_text_matching_filter_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_pair_similarity_filter_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/imgdiff_difference_caption_generator_mapper.html#Difference_Caption_Generator_Mapper.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.Difference_Caption_Generator_Mapper.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>Base class that conducts data editing.</p>
+<dd><p>Initialization.</p>
 <dl class="field-list simple">
 <dt class="field-odd">参数<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text_key</strong> -- the key name of field that stores sample texts
-to be processed.</p></li>
-<li><p><strong>image_key</strong> -- the key name of field that stores sample image list
-to be processed</p></li>
-<li><p><strong>audio_key</strong> -- the key name of field that stores sample audio list
-to be processed</p></li>
-<li><p><strong>video_key</strong> -- the key name of field that stores sample video list
-to be processed</p></li>
-<li><p><strong>image_bytes_key</strong> -- the key name of field that stores sample image bytes list
-to be processed</p></li>
-<li><p><strong>query_key</strong> -- the key name of field that stores sample queries</p></li>
-<li><p><strong>response_key</strong> -- the key name of field that stores responses</p></li>
-<li><p><strong>history_key</strong> -- the key name of field that stores history of
-queries and responses</p></li>
+<li><p><strong>mllm_mapper_args</strong> -- Arguments for multimodal language model mapper.
+Controls the generation of captions for bounding box regions. Default empty dict
+will use fixed values: max_new_tokens=256, temperature=0.2, top_p=None,
+num_beams=1, hf_model=&quot;llava-hf/llava-v1.6-vicuna-7b-hf&quot;.</p></li>
+<li><p><strong>image_text_matching_filter_args</strong> -- Arguments for image-text matching filter.
+Controls the matching between cropped regions and generated captions.
+Default empty dict will use fixed values: min_score=0.1, max_score=1.0,
+hf_blip=&quot;Salesforce/blip-itm-base-coco&quot;, num_proc=1.</p></li>
+<li><p><strong>text_pair_similarity_filter_args</strong> -- Arguments for text pair similarity filter.
+Controls the similarity comparison between caption pairs. Default empty dict
+will use fixed values: min_score=0.1, max_score=1.0,
+hf_clip=&quot;openai/clip-vit-base-patch32&quot;, text_key_second=&quot;target_text&quot;, num_proc=1.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1319,6 +1320,7 @@ queries and responses</p></li>
 <li><p><strong>download_field</strong> -- The filed name to get the url to download.</p></li>
 <li><p><strong>save_field</strong> -- The filed name to save the downloaded file content.</p></li>
 <li><p><strong>resume_download</strong> -- Whether to resume download. if True, skip the sample if it exists.</p></li>
+<li><p><strong>timeout</strong> -- Timeout for download.</p></li>
 <li><p><strong>max_concurrent</strong> -- Maximum concurrent downloads.</p></li>
 <li><p><strong>args</strong> -- extra args</p></li>
 <li><p><strong>kwargs</strong> -- extra args</p></li>
@@ -2118,6 +2120,18 @@ Assistant: 冰岛的首都是雷克雅未克（Reykjavik）。
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.HumanPreferenceAnnotationMapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_config_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">answer1_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'answer1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">answer2_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'answer2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'prompt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chosen_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'chosen'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rejected_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'rejected'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/annotation/human_preference_annotation_mapper.html#HumanPreferenceAnnotationMapper.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.HumanPreferenceAnnotationMapper.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Initialize the human preference annotation operator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label_config_file</strong> -- Path to the label config file</p></li>
+<li><p><strong>answer1_key</strong> -- Key for the first answer</p></li>
+<li><p><strong>answer2_key</strong> -- Key for the second answer</p></li>
+<li><p><strong>prompt_key</strong> -- Key for the prompt/question</p></li>
+<li><p><strong>chosen_key</strong> -- Key for the chosen answer</p></li>
+<li><p><strong>rejected_key</strong> -- Key for the rejected answer</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -2370,32 +2384,10 @@ expense of lower image quality. Guidance scale is enabled when
 guidance_scale &gt; 1.</p></li>
 <li><p><strong>aug_num</strong> -- The image number to be produced by stable-diffusion
 model.</p></li>
-<li><p><strong>keep_candidate_mode</strong> -- <p>retain strategy for the generated
-$caption_num$ candidates.</p>
-<p>'random_any': Retain the random one from generated captions</p>
-<dl class="simple">
-<dt>'similar_one_simhash': Retain the generated one that is most</dt><dd><p>similar to the original caption</p>
-</dd>
-</dl>
-<p>'all': Retain all generated captions by concatenation</p>
-</p></li>
-</ul>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">备注</p>
-<p>This is a batched_OP, whose input and output type are
-both list. Suppose there are $N$ list of input samples, whose batch
-size is $b$, and denote caption_num as $M$.
-The number of total samples after generation is $2Nb$ when
-keep_original_sample is True and $Nb$ when keep_original_sample is
-False. For 'random_any' and 'similar_one_simhash' mode,
-it's $(1+M)Nb$ for 'all' mode when keep_original_sample is True
-and $MNb$ when keep_original_sample is False.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<li><p><strong>keep_original_sample</strong> -- whether to keep the original sample. If
+it's set to False, there will be only generated captions in the
+final datasets and the original captions will be removed. It's True
+by default.</p></li>
 <li><p><strong>caption_key</strong> -- the key name of fields in samples to store captions
 for each images. It can be a string if there is only one image in
 each sample. Otherwise, it should be a list. If it's none,
@@ -2484,19 +2476,23 @@ This path can alternatively be defined by setting the <cite>DJ_PRODUCED_DATA_DIR
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.ImageRemoveBackgroundMapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha_matting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_matting_foreground_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">240</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_matting_background_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_matting_erode_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bgcolor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/image_remove_background_mapper.html#ImageRemoveBackgroundMapper.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.ImageRemoveBackgroundMapper.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Initialization method.</p>
-<dl class="simple">
-<dt>alpha_matting (bool, optional):</dt><dd><p>Flag indicating whether to use alpha matting. Defaults to False.</p>
-</dd>
-<dt>alpha_matting_foreground_threshold (int, optional):</dt><dd><p>Foreground threshold for alpha matting. Defaults to 240.</p>
-</dd>
-<dt>alpha_matting_background_threshold (int, optional):</dt><dd><p>Background threshold for alpha matting. Defaults to 10.</p>
-</dd>
-<dt>alpha_matting_erode_size (int, optional):</dt><dd><p>Erosion size for alpha matting. Defaults to 10.</p>
-</dd>
-<dt>bgcolor (Optional[Tuple[int, int, int, int]], optional):</dt><dd><p>Background color for the cutout image. Defaults to None.</p>
-</dd>
-<dt>save_dir: The directory where generated image files will be stored.</dt><dd><p>If not specified, outputs will be saved in the same directory as their corresponding input files.
-This path can alternatively be defined by setting the <cite>DJ_PRODUCED_DATA_DIR</cite> environment variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha_matting</strong> -- (bool, optional)
+Flag indicating whether to use alpha matting. Defaults to False.</p></li>
+<li><p><strong>alpha_matting_foreground_threshold</strong> -- (int, optional)
+Foreground threshold for alpha matting. Defaults to 240.</p></li>
+<li><p><strong>alpha_matting_background_threshold</strong> -- (int, optional)
+Background threshold for alpha matting. Defaults to 10.</p></li>
+<li><p><strong>alpha_matting_erode_size</strong> -- (int, optional)
+Erosion size for alpha matting. Defaults to 10.</p></li>
+<li><p><strong>bgcolor</strong> -- (Optional[Tuple[int, int, int, int]], optional)
+Background color for the cutout image. Defaults to None.</p></li>
+<li><p><strong>save_dir</strong> -- The directory where generated image files will be stored.
+If not specified, outputs will be saved in the same directory as their corresponding input files.
+This path can alternatively be defined by setting the <cite>DJ_PRODUCED_DATA_DIR</cite> environment variable.</p></li>
+</ul>
 </dd>
 </dl>
 <p><a href="#id5"><span class="problematic" id="id6">*</span></a>args (Optional[Any]): Additional positional arguments.

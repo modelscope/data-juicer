@@ -384,6 +384,21 @@
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization.</span>
+
+<span class="sd">        :param mllm_mapper_args: Arguments for multimodal language model mapper.</span>
+<span class="sd">            Controls the generation of captions for bounding box regions. Default empty dict</span>
+<span class="sd">            will use fixed values: max_new_tokens=256, temperature=0.2, top_p=None,</span>
+<span class="sd">            num_beams=1, hf_model=&quot;llava-hf/llava-v1.6-vicuna-7b-hf&quot;.</span>
+<span class="sd">        :param image_text_matching_filter_args: Arguments for image-text matching filter.</span>
+<span class="sd">            Controls the matching between cropped regions and generated captions.</span>
+<span class="sd">            Default empty dict will use fixed values: min_score=0.1, max_score=1.0,</span>
+<span class="sd">            hf_blip=&quot;Salesforce/blip-itm-base-coco&quot;, num_proc=1.</span>
+<span class="sd">        :param text_pair_similarity_filter_args: Arguments for text pair similarity filter.</span>
+<span class="sd">            Controls the similarity comparison between caption pairs. Default empty dict</span>
+<span class="sd">            will use fixed values: min_score=0.1, max_score=1.0,</span>
+<span class="sd">            hf_clip=&quot;openai/clip-vit-base-patch32&quot;, text_key_second=&quot;target_text&quot;, num_proc=1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">FIXED_ARGS</span> <span class="o">=</span> <span class="p">{}</span>

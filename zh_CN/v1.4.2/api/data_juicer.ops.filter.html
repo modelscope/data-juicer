@@ -1590,6 +1590,7 @@ foundational functionality for dimensional scoring (0~5) and tagging.</p>
 <li><p><strong>api_or_hf_model</strong> -- API or huggingface model name.</p></li>
 <li><p><strong>min_score</strong> -- The min score threshold to keep the sample.</p></li>
 <li><p><strong>max_score</strong> -- The max score threshold to keep the sample.</p></li>
+<li><p><strong>is_hf_model</strong> -- If true, use huggingface model. Otherwise, use API.</p></li>
 <li><p><strong>api_endpoint</strong> -- URL endpoint for the API.</p></li>
 <li><p><strong>response_path</strong> -- Path to extract content from the API response.
 Defaults to 'choices.0.message.content'.</p></li>
@@ -2371,7 +2372,7 @@ vars in the sample temporarily.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lang</strong> -- language of the text in the samples. 'en' for detection of
 actions in English and 'zh' for detection of actions in Chinese.</p></li>
-<li><p><strong>mini_action_num</strong> -- The min action number in the filtering. samples
+<li><p><strong>min_action_num</strong> -- The min action number in the filtering. samples
 will be filtered if their action number in the text is below this
 parameter.</p></li>
 </ul>
@@ -2510,7 +2511,7 @@ and filter them. The text containing no entities will be omitted.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lang</strong> -- language of the text in the samples. 'en' for detection of
 entities in English and 'zh' for detection of entities in Chinese.</p></li>
-<li><p><strong>mini_dependency_num</strong> -- The min token number in the filtering.
+<li><p><strong>min_dependency_num</strong> -- The min token number in the filtering.
 Objects is independent if their number of edges in the dependency
 tree is below this parameter.</p></li>
 <li><p><strong>any_or_all</strong> -- keep this sample with 'any' or 'all' strategy.

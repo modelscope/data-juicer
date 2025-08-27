@@ -375,24 +375,21 @@ the same batch to allow fine-grained control on data processing.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.Difference_Area_Generator_Mapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_pair_similarity_filter_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_segment_mapper_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_text_matching_filter_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/imgdiff_difference_area_generator_mapper.html#Difference_Area_Generator_Mapper.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.Difference_Area_Generator_Mapper.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>Base class that conducts data editing.</p>
+<dd><p>Initialization.</p>
 <dl class="field-list simple">
 <dt class="field-odd">参数<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text_key</strong> -- the key name of field that stores sample texts
-to be processed.</p></li>
-<li><p><strong>image_key</strong> -- the key name of field that stores sample image list
-to be processed</p></li>
-<li><p><strong>audio_key</strong> -- the key name of field that stores sample audio list
-to be processed</p></li>
-<li><p><strong>video_key</strong> -- the key name of field that stores sample video list
-to be processed</p></li>
-<li><p><strong>image_bytes_key</strong> -- the key name of field that stores sample image bytes list
-to be processed</p></li>
-<li><p><strong>query_key</strong> -- the key name of field that stores sample queries</p></li>
-<li><p><strong>response_key</strong> -- the key name of field that stores responses</p></li>
-<li><p><strong>history_key</strong> -- the key name of field that stores history of
-queries and responses</p></li>
+<li><p><strong>image_pair_similarity_filter_args</strong> -- Arguments for image pair similarity filter.
+Controls the similarity filtering between image pairs. Default empty dict will use
+fixed values: min_score_1=0.1, max_score_1=1.0, min_score_2=0.1, max_score_2=1.0,
+hf_clip=&quot;openai/clip-vit-base-patch32&quot;, num_proc=1.</p></li>
+<li><p><strong>image_segment_mapper_args</strong> -- Arguments for image segmentation mapper.
+Controls the image segmentation process. Default empty dict will use
+fixed values: imgsz=1024, conf=0.05, iou=0.5, model_path=&quot;FastSAM-x.pt&quot;.</p></li>
+<li><p><strong>image_text_matching_filter_args</strong> -- Arguments for image-text matching filter.
+Controls the matching between cropped image regions and text descriptions.
+Default empty dict will use fixed values: min_score=0.1, max_score=1.0,
+hf_blip=&quot;Salesforce/blip-itm-base-coco&quot;, num_proc=1.</p></li>
 </ul>
 </dd>
 </dl>
