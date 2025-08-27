@@ -41,8 +41,11 @@ class OptimizeQAMapper(Mapper):
 
     def __init__(
         self,
-        hf_model: str = "Qwen/Qwen2.5-7B-Instruct",
+        api_or_hf_model: str = "Qwen/Qwen2.5-7B-Instruct",
+        is_hf_model: bool = True,
         *,
+        api_endpoint: Optional[str] = None,
+        response_path: Optional[str] = None,
         system_prompt: Optional[str] = None,
         input_template: Optional[str] = None,
         qa_pair_template: Optional[str] = None,
@@ -55,7 +58,11 @@ class OptimizeQAMapper(Mapper):
         """
         Initialization method.
 
-        :param hf_model: Hugging Face model ID.
+        :param api_or_hf_model: API or huggingface model name.
+        :param is_hf_model: If true, use huggingface model. Otherwise, use API.
+        :param api_endpoint: URL endpoint for the API.
+        :param response_path: Path to extract content from the API response.
+            Defaults to 'choices.0.message.content'.
         :param system_prompt: System prompt for guiding the optimization task.
         :param input_template: Template for building the input for the model.
             Please make sure the template contains one placeholder '{}', which
@@ -79,11 +86,12 @@ class OptimizeQAMapper(Mapper):
         self.qa_pair_template = qa_pair_template or self.DEFAULT_QA_PAIR_TEMPLATE
         self.output_pattern = output_pattern or self.DEFAULT_OUTPUT_PATTERN
 
+        self.is_hf_model = is_hf_model
         self.enable_vllm = enable_vllm
         model_params = model_params or {}
         sampling_params = sampling_params or {}
 
-        sampling_params = update_sampling_params(sampling_params, hf_model, self.enable_vllm)
+        sampling_params = update_sampling_params(sampling_params, api_or_hf_model, self.enable_vllm)
 
         if enable_vllm:
             assert torch.cuda.device_count() >= 1, "must be executed in CUDA"
@@ -96,13 +104,28 @@ class OptimizeQAMapper(Mapper):
                     {tensor_parallel_size} for vllm."
                 )
                 model_params["tensor_parallel_size"] = tensor_parallel_size
-            self.model_key = prepare_model(model_type="vllm", pretrained_model_name_or_path=hf_model, **model_params)
-            self.sampling_params = vllm.SamplingParams(**sampling_params)
-        else:
             self.model_key = prepare_model(
-                model_type="huggingface", pretrained_model_name_or_path=hf_model, return_pipe=True, **model_params
+                model_type="vllm", pretrained_model_name_or_path=api_or_hf_model, **model_params
+            )
+            self.sampling_params = vllm.SamplingParams(**sampling_params)
+        elif is_hf_model:
+            self.model_key = prepare_model(
+                model_type="huggingface",
+                pretrained_model_name_or_path=api_or_hf_model,
+                return_pipe=True,
+                **model_params,
             )
             self.sampling_params = sampling_params
+        else:
+            self.sampling_params = sampling_params
+
+            self.model_key = prepare_model(
+                model_type="api",
+                model=api_or_hf_model,
+                endpoint=api_endpoint,
+                response_path=response_path,
+                **model_params,
+            )
 
     def build_input(self, sample):
         qa_pair = self.qa_pair_template.format(sample[self.query_key], sample[self.response_key])
@@ -118,7 +141,10 @@ class OptimizeQAMapper(Mapper):
             return None, None
 
     def process_single(self, sample, rank=None):
-        model, _ = get_model(self.model_key, rank, self.use_cuda())
+        if self.enable_vllm or self.is_hf_model:
+            model, _ = get_model(self.model_key, rank, self.use_cuda())
+        else:
+            model = get_model(self.model_key, rank, self.use_cuda())
 
         input_prompt = self.build_input(sample)
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": input_prompt}]
@@ -126,10 +152,12 @@ class OptimizeQAMapper(Mapper):
         if self.enable_vllm:
             response = model.chat(messages, self.sampling_params)
             output = response[0].outputs[0].text
-        else:
+        elif self.is_hf_model:
             # model is pipe
             response = model(messages, return_full_text=False, **self.sampling_params)
             output = response[0]["generated_text"]
+        else:
+            output = model(messages, **self.sampling_params)
 
         parsed_q, parsed_a = self.parse_output(output)
         if parsed_q:
