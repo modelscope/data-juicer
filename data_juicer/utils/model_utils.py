@@ -62,6 +62,8 @@ BACKUP_MODEL_LINKS = {
     "FastSAM-x.pt": "https://github.com/ultralytics/assets/releases/download/v8.2.0/" "FastSAM-x.pt",
     # spacy
     "*_core_web_md-3.*.0": "https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/" "data_juicer/models/",
+    # YOLO
+    "yolo11n.pt": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n.pt",
 }
 
 
@@ -161,13 +163,13 @@ def filter_arguments(func, args_dict):
 
 
 class ChatAPIModel:
-    def __init__(self, model, endpoint=None, response_path=None, **kwargs):
+    def __init__(self, model=None, endpoint=None, response_path=None, **kwargs):
         """
         Initializes an instance of the APIModel class.
 
         :param model: The name of the model to be used for making API
             calls. This should correspond to a valid model identifier
-            recognized by the API server.
+            recognized by the API server. If it's None, use the first available model from the server.
         :param endpoint: The URL endpoint for the API. If provided as a
             relative path, it will be appended to the base URL (defined by the
             `OPENAI_BASE_URL` environment variable or through an additional
@@ -186,6 +188,12 @@ class ChatAPIModel:
 
         client_args = filter_arguments(openai.OpenAI, kwargs)
         self._client = openai.OpenAI(**client_args)
+        if self.model is None:
+            logger.warning("No model specified. Using the first available model from the server.")
+            models_list = self._client.models.list().data
+            if len(models_list) == 0:
+                raise ValueError("No models available on the server.")
+            self.model = models_list[0].id
 
     def __call__(self, messages, **kwargs):
         """
@@ -219,11 +227,12 @@ class ChatAPIModel:
 
 
 class EmbeddingAPIModel:
-    def __init__(self, model, endpoint=None, response_path=None, **kwargs):
+    def __init__(self, model=None, endpoint=None, response_path=None, **kwargs):
         """
         Initializes an instance specialized for embedding APIs.
 
         :param model: The model identifier for embedding API calls.
+            If it's None, use the first available model from the server.
         :param endpoint: API endpoint URL. Defaults to '/embeddings'.
         :param response_path: Path to extract embeddings from response.
             Defaults to 'data.0.embedding'.
@@ -235,6 +244,11 @@ class EmbeddingAPIModel:
 
         client_args = filter_arguments(openai.OpenAI, kwargs)
         self._client = openai.OpenAI(**client_args)
+        if self.model is None:
+            logger.warning("No model specified. Using the first available model from the server.")
+            if len(self._client.models.list().data) == 0:
+                raise ValueError("No models available on the server.")
+            self.model = self._client.models.list().data[0].id
 
     def __call__(self, input, **kwargs):
         """
@@ -862,6 +876,12 @@ def prepare_video_blip_model(pretrained_model_name_or_path, *, return_model=True
     return (model, processor) if return_model else processor
 
 
+def prepare_yolo_model(model_path, **model_params):
+    device = model_params.pop("device", "cpu")
+    model = ultralytics.YOLO(check_model(model_path)).to(device)
+    return model
+
+
 def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
     """
     Prepare and load a HuggingFace model with the corresponding processor.
@@ -1014,6 +1034,7 @@ MODEL_FUNCTION_MAPPING = {
     "spacy": prepare_spacy_model,
     "video_blip": prepare_video_blip_model,
     "vllm": prepare_vllm_model,
+    "yolo": prepare_yolo_model,
     "embedding": prepare_embedding_model,
 }
 

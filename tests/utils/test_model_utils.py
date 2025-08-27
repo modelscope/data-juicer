@@ -142,6 +142,8 @@ class ModelUtilsTest(DataJuicerTestCaseBase):
 
     @patch('data_juicer.utils.model_utils.os')
     def test_prepare_vllm_model(self, mock_os):
+        mock_os.path.join.return_value = 'test_model'
+
         # Create a mock vllm module
         mock_vllm = MagicMock()
         mock_model = MagicMock()

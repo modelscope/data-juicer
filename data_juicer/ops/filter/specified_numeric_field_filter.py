@@ -1,5 +1,7 @@
 import sys
 
+from data_juicer.utils.constant import Fields
+
 from ..base_op import NON_STATS_FILTERS, OPERATORS, Filter
 
 
@@ -51,19 +53,24 @@ class SpecifiedNumericFieldFilter(Filter):
         self.max_value = max_value
 
     def compute_stats_single(self, sample):
+        # get the value from the original field
+        field_value = sample
+        for key in self.field_key.split("."):
+            assert key in field_value.keys(), "'{}' not in {}".format(key, field_value.keys())
+            field_value = field_value[key]
+        # copy it into the stats field
+        if self.field_key not in sample[Fields.stats]:
+            sample[Fields.stats][self.field_key] = field_value
         return sample
 
     def process_single(self, sample):
         if not self.field_key:
             return True
 
-        field_value = sample
-        for key in self.field_key.split("."):
-            assert key in field_value.keys(), "'{}' not in {}".format(key, field_value.keys())
-            field_value = field_value[key]
+        field_value = sample[Fields.stats][self.field_key]
 
         if is_number(field_value):
             field_value = float(field_value)
-            return self.min_value <= field_value <= self.max_value
+            return self.get_keep_boolean(field_value, self.min_value, self.max_value)
         else:
             return False

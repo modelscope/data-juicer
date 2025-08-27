@@ -1,6 +1,6 @@
 # DJ-Cookbook
 ## 资源合集
-- [KDD'24 相关教程](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html)
+- [KDD'24 相关教程](https://modelscope.github.io/data-juicer/en/main/_static/tutorial_kdd24.html)
 - [Awesome LLM-Data](../awesome_llm_data.md)
 - ["坏"数据展览](../BadDataExhibition_ZH.md)
 

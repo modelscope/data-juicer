@@ -61,8 +61,10 @@ class MetaKeys(object):
     video_frames = "video_frames"
     # # image tags
     image_tags = "image_tags"
-    # bounding box tag
+    # # bounding box tag
     bbox_tag = DEFAULT_PREFIX + "bbox__"
+    # # class label (from detection) tag
+    class_label_tag = DEFAULT_PREFIX + "class_label__"
 
     # === info extraction related tags ===
     # # for event extraction

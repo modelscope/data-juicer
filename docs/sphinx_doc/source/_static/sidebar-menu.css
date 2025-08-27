@@ -60,3 +60,31 @@
 .sidebar-bottom-menu .section dd a.active {
   font-weight: bold;
 }
+
+.sidebar-bottom-menu .section.version dd {
+  max-height: calc(3 * (1.6em + 0.6em)); /* 3 rows */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: none;
+}
+.sidebar-bottom-menu .section.version dd:hover {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-foreground-secondary) transparent;
+}
+
+.sidebar-bottom-menu .section.version dd::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+.sidebar-bottom-menu .section.version dd:hover::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar-bottom-menu .section.version dd:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(128,128,128,0.35);
+  border-radius: 6px;
+}
+.sidebar-bottom-menu .section.version dd:hover::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(128,128,128,0.55);
+}

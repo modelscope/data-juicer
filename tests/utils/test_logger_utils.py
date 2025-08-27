@@ -13,6 +13,7 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 class LoggerUtilsTest(DataJuicerTestCaseBase):
 
     def setUp(self) -> None:
+        super().setUp()
         self.temp_output_path = 'tmp/test_logger_utils/'
         data_juicer.utils.logger_utils.LOGGER_SETUP = False
 

@@ -9,6 +9,8 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 class TestNestedDataset(DataJuicerTestCaseBase):
     def setUp(self):
         """Set up test data"""
+        super().setUp()
+
         self.data = [
             {
                 'text': 'Hello',

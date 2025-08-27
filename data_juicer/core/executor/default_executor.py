@@ -13,7 +13,7 @@ from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.exporter import Exporter
 from data_juicer.core.tracer import Tracer
-from data_juicer.ops import OPERATORS, load_ops
+from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.ops.selector import (
     FrequencySpecifiedFieldSelector,
@@ -85,23 +85,21 @@ class DefaultExecutor(ExecutorBase):
         self.open_tracer = self.cfg.open_tracer
         if self.open_tracer:
             logger.info("Preparing tracer...")
-            self.tracer = Tracer(self.work_dir, show_num=self.cfg.trace_num)
-            self.op_list_to_trace = self.cfg.op_list_to_trace
-            if len(self.cfg.op_list_to_trace) == 0:
-                logger.info("Trace for all ops.")
-                self.op_list_to_trace = set(OPERATORS.modules.keys())
+            self.tracer = Tracer(self.work_dir, self.cfg.op_list_to_trace, show_num=self.cfg.trace_num)
 
     def run(
         self,
         dataset: Union[Dataset, NestedDataset] = None,
         load_data_np: Optional[PositiveInt] = None,
-        skip_return=False,
+        skip_export: bool = False,
+        skip_return: bool = False,
     ):
         """
         Running the dataset process pipeline.
 
         :param dataset: a Dataset object to be executed.
         :param load_data_np: number of workers when loading the dataset.
+        :param skip_export: whether export the results into disk
         :param skip_return: skip return for API called.
         :return: processed dataset.
         """
@@ -160,8 +158,9 @@ class DefaultExecutor(ExecutorBase):
         logger.info(f"All OPs are done in {tend - tstart:.3f}s.")
 
         # 4. data export
-        logger.info("Exporting dataset to disk...")
-        self.exporter.export(dataset)
+        if not skip_export:
+            logger.info("Exporting dataset to disk...")
+            self.exporter.export(dataset)
         # compress the last dataset after exporting
         if self.cfg.use_cache and self.cfg.cache_compress:
             from data_juicer.utils.compress import compress

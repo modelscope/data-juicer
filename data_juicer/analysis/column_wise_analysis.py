@@ -1,3 +1,4 @@
+import logging
 import math
 import os
 
@@ -11,7 +12,8 @@ from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 
 from .overall_analysis import OverallAnalysis
 
-FONT = os.environ.get("ANALYZER_FONT", "Heiti TC")
+logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
+FONT = os.environ.get("ANALYZER_FONT", "Heiti SC")
 FONT_PATH = fm.findfont(FONT)
 
 plt.rcParams["font.sans-serif"] = [FONT]

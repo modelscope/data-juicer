@@ -58,7 +58,9 @@ class ImageSizeFilter(Filter):
 
     def process_single(self, sample):
         image_sizes = sample[Fields.stats][StatsKeys.image_sizes]
-        keep_bools = np.array([self.min_size <= image_size <= self.max_size for image_size in image_sizes])
+        keep_bools = np.array(
+            [self.get_keep_boolean(image_size, self.min_size, self.max_size) for image_size in image_sizes]
+        )
         if len(keep_bools) <= 0:
             return True
 

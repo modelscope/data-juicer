@@ -68,7 +68,9 @@ class AudioDurationFilter(Filter):
 
     def process_single(self, sample):
         audio_durations = sample[Fields.stats][StatsKeys.audio_duration]
-        keep_bools = np.array([self.min_duration <= duration <= self.max_duration for duration in audio_durations])
+        keep_bools = np.array(
+            [self.get_keep_boolean(duration, self.min_duration, self.max_duration) for duration in audio_durations]
+        )
         if len(keep_bools) <= 0:
             return True
 
