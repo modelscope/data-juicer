@@ -101,7 +101,7 @@ class ImageDiffusionMapper(Mapper):
             If not specified, outputs will be saved in the same directory as their corresponding input files.
             This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         """
-        kwargs.setdefault("mem_required", "8GB")
+        kwargs["mem_required"] = "8GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
         self._init_parameters.pop("save_dir", None)

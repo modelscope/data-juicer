@@ -62,7 +62,7 @@ class SDXLPrompt2PromptMapper(Mapper):
         :param output_dir: the storage location of the generated images.
 
         """
-        kwargs.setdefault("mem_required", "38GB")
+        kwargs["mem_required"] = "38GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
         self.num_inference_steps = num_inference_steps
