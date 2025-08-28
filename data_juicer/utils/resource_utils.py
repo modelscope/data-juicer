@@ -67,7 +67,7 @@ def _cuda_device_count():
     _torch_available = _is_package_available("torch")
 
     if check_and_initialize_ray():
-        return ray_gpu_count()
+        return int(ray_gpu_count())
 
     if _torch_available:
         return torch.cuda.device_count()
@@ -98,7 +98,7 @@ def is_cuda_available():
 
 def cpu_count():
     if check_and_initialize_ray():
-        return ray_cpu_count()
+        return int(ray_cpu_count())
 
     return psutil.cpu_count()
 

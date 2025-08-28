@@ -69,9 +69,10 @@ def get_ray_nodes_info(cfg=None):
             free_gpus_memory = []
 
         return {
-            "memory": free_mem,  # MB
+            "free_memory": free_mem,  # MB
             "cpu_count": cpu_count,
-            "gpus_memory": free_gpus_memory,  # MB
+            "gpu_count": len(free_gpus_memory),
+            "free_gpus_memory": free_gpus_memory,  # MB
         }
 
     initialize_ray(cfg)
@@ -103,14 +104,14 @@ def get_ray_nodes_info(cfg=None):
 
 
 def ray_cpu_count():
-    available_resources = ray.available_resources()
-    available_cpu = available_resources.get("CPU", 0)
+    cluster_resources = ray.cluster_resources()
+    available_cpu = cluster_resources.get("CPU", 0)
     return available_cpu
 
 
 def ray_gpu_count():
-    available_resources = ray.available_resources()
-    available_gpu = available_resources.get("GPU", 0)
+    cluster_resources = ray.cluster_resources()
+    available_gpu = cluster_resources.get("GPU", 0)
     return available_gpu
 
 
@@ -120,7 +121,7 @@ def ray_available_memories():
 
     available_mems = []
     for nodeid, info in ray_nodes_info.items():
-        available_mems.append(info["memory"])
+        available_mems.append(info["free_memory"])
 
     return available_mems
 
@@ -131,6 +132,6 @@ def ray_available_gpu_memories():
 
     available_gpu_mems = []
     for nodeid, info in ray_nodes_info.items():
-        available_gpu_mems.extend(info["gpus_memory"])
+        available_gpu_mems.extend(info["free_gpus_memory"])
 
     return available_gpu_mems

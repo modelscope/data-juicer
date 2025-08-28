@@ -53,8 +53,8 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             patch(f"{self._patch_module}.cuda_device_count") as mock_cuda_count, \
             patch(f"{self._patch_module}.logger", logger):
             mock_ray_nodes_info.return_value = {
-                'node1_id': {'memory': 512, 'cpu_count': 8, 'gpus_memory': [2 * 1024]},
-                'node2_id': {'memory': 512, 'cpu_count': 8, 'gpus_memory': [2 * 1024]},
+                'node1_id': {'free_memory': 512, 'cpu_count': 8, 'free_gpus_memory': [2 * 1024]},
+                'node2_id': {'free_memory': 512, 'cpu_count': 8, 'free_gpus_memory': [2 * 1024]},
                 }
             mock_cuda_count.return_value = 2
             self.enable_ray_mode()
@@ -78,8 +78,8 @@ class CalculateNpTest(DataJuicerTestCaseBase):
         with patch(f"{self._patch_ray_module}.get_ray_nodes_info") as mock_ray_nodes_info, \
             patch(f"{self._patch_module}.logger", logger):
             mock_ray_nodes_info.return_value = {
-                'node1_id': {'memory': 512, 'cpu_count': 8, 'gpus_memory': [2 * 1024]},
-                'node2_id': {'memory': 512, 'cpu_count': 8, 'gpus_memory': [2 * 1024]},
+                'node1_id': {'free_memory': 512, 'cpu_count': 8, 'free_gpus_memory': [2 * 1024]},
+                'node2_id': {'free_memory': 512, 'cpu_count': 8, 'free_gpus_memory': [2 * 1024]},
                 }
             self.enable_ray_mode()
             result = calculate_np("test_op", mem_required=3, cpu_required=0, use_cuda=True)
