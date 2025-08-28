@@ -51,9 +51,16 @@ def rescale(width, height, ori_ratio, min_ratio, max_ratio, strategy):
 
 @OPERATORS.register_module(OP_NAME)
 class VideoResizeAspectRatioMapper(Mapper):
-    """Mapper to resize videos by aspect ratio.
-    AspectRatio = W / H.
-    """
+    """Resizes videos to fit within a specified aspect ratio range. This operator adjusts the
+    dimensions of videos to ensure their aspect ratios fall within a defined range. It can
+    either increase or decrease the video dimensions based on the specified strategy. The
+    aspect ratio is calculated as width divided by height. If a video's aspect ratio is
+    outside the given range, it will be resized to match the closest boundary (either the
+    minimum or maximum ratio). The `min_ratio` and `max_ratio` should be provided as strings
+    in the format "9:21" or "9/21". The resizing process uses the `ffmpeg` library to handle
+    the actual video scaling. Videos that do not need resizing are left unchanged. The
+    operator supports saving the modified videos to a specified directory or the same
+    directory as the input files."""
 
     STRATEGY = ["decrease", "increase"]
 

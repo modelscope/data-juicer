@@ -103,8 +103,21 @@ OP_NAME = "imgdiff_difference_area_generator_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class Difference_Area_Generator_Mapper(Mapper):
-    """A fused operator for OPs that is used to run sequential OPs on
-    the same batch to allow fine-grained control on data processing."""
+    """Generates and filters bounding boxes for image pairs based on similarity, segmentation,
+    and text matching.
+
+    This operator processes image pairs to identify and filter regions with significant
+    differences. It uses a sequence of operations:
+    - Filters out image pairs with large differences.
+    - Segments the images to identify potential objects.
+    - Crops sub-images based on bounding boxes.
+    - Determines if the sub-images contain valid objects using image-text matching.
+    - Filters out sub-images that are too similar.
+    - Removes overlapping bounding boxes.
+    - Uses Hugging Face models for similarity and text matching, and FastSAM for
+      segmentation.
+    - Caches intermediate results in `DATA_JUICER_ASSETS_CACHE`.
+    - Returns the filtered bounding boxes in the `MetaKeys.bbox_tag` field."""
 
     _accelerator = "cuda"
 

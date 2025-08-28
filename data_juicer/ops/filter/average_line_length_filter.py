@@ -11,8 +11,13 @@ OP_NAME = "average_line_length_filter"
 @OPERATORS.register_module(OP_NAME)
 @INTER_LINES.register_module(OP_NAME)
 class AverageLineLengthFilter(Filter):
-    """Filter to keep samples with average line length within a specific
-    range."""
+    """Filter to keep samples with average line length within a specific range.
+
+    This operator filters out samples based on their average line length. It keeps samples
+    where the average line length is between the specified minimum and maximum values. The
+    average line length is calculated as the total text length divided by the number of
+    lines. If the context is provided, it uses precomputed lines from the context. The
+    computed average line length is stored in the 'avg_line_length' key in the stats field."""
 
     _batched_op = True
 

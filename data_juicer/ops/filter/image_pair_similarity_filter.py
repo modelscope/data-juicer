@@ -16,8 +16,14 @@ OP_NAME = "image_pair_similarity_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImagePairSimilarityFilter(Filter):
-    """Filter to keep image pairs with similarities between images
-    within a specific range."""
+    """Filter to keep image pairs with similarities between images within a specific range.
+
+    This operator uses a Hugging Face CLIP model to compute the cosine similarity between
+    two images in each sample. It retains samples where the similarity score falls within
+    the specified minimum and maximum thresholds. The 'any' strategy keeps a sample if any
+    of the image pairs meet the condition, while the 'all' strategy requires all image pairs
+    to meet the condition. The similarity scores are cached in the 'image_pair_similarity'
+    field. Each sample must include exactly two distinct images."""
 
     _accelerator = "cuda"
 

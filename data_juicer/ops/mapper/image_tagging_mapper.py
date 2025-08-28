@@ -17,7 +17,14 @@ OP_NAME = "image_tagging_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageTaggingMapper(Mapper):
-    """Mapper to generate image tags."""
+    """Generates image tags for each image in the sample.
+
+    This operator processes images to generate descriptive tags. It uses a Hugging Face
+    model to analyze the images and produce relevant tags. The tags are stored in the
+    specified field, defaulting to 'image_tags'. If the tags are already present in the
+    sample, the operator will not recompute them. For samples without images, an empty tag
+    array is assigned. The generated tags are sorted by frequency and stored as a list of
+    strings."""
 
     _accelerator = "cuda"
 

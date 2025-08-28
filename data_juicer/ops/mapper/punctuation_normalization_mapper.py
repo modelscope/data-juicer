@@ -7,8 +7,13 @@ from ..base_op import OPERATORS, Mapper
 
 @OPERATORS.register_module("punctuation_normalization_mapper")
 class PunctuationNormalizationMapper(Mapper):
-    """Mapper to normalize unicode punctuations to English punctuations in text
-    samples."""
+    """Normalizes unicode punctuations to their English equivalents in text samples.
+
+    This operator processes a batch of text samples and replaces any unicode punctuation
+    with its corresponding English punctuation. The mapping includes common substitutions
+    like "，" to ",", "。" to ".", and "“" to ". It iterates over each character in the text,
+    replacing it if it is found in the predefined punctuation map. The result is a set of
+    text samples with consistent punctuation formatting."""
 
     _batched_op = True
 

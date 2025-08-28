@@ -8,9 +8,15 @@ from ..base_op import OPERATORS, Filter
 
 @OPERATORS.register_module("image_size_filter")
 class ImageSizeFilter(Filter):
-    """Keep data samples whose image size (in Bytes/KB/MB/...) within a
-    specific range.
-    """
+    """Keep data samples whose image sizes are within a specific range.
+
+    This operator filters data samples based on the size of their images. It retains samples
+    if the image sizes fall within the specified minimum and maximum size range. The
+    `any_or_all` parameter determines the filtering strategy: 'any' keeps the sample if any
+    image meets the size criteria, while 'all' keeps the sample only if all images meet the
+    criteria. The key metric `image_sizes` is computed in bytes. If the image sizes are
+    already cached in the `image_sizes` field, they are reused. Otherwise, the operator
+    calculates the sizes from the image byte data or file paths."""
 
     _batched_op = True
 

@@ -23,9 +23,14 @@ OP_NAME = "sdxl_prompt2prompt_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class SDXLPrompt2PromptMapper(Mapper):
-    """
-    Generate pairs of similar images by the SDXL model
-    """
+    """Generates pairs of similar images using the SDXL model.
+
+    This operator uses a Hugging Face diffusion model to generate image pairs based on two
+    text prompts. The quality and similarity of the generated images are controlled by
+    parameters such as `num_inference_steps` and `guidance_scale`. The first and second text
+    prompts are specified using `text_key` and `text_key_second`, respectively. The
+    generated images are saved in the specified `output_dir` with unique filenames. The
+    operator requires both text keys to be set for processing."""
 
     _accelerator = "cuda"
 

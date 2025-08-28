@@ -11,9 +11,17 @@ OP_NAME = "llm_difficulty_score_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class LLMDifficultyScoreFilter(LLMAnalysisFilter):
-    """
-    Filter to keep sample with high difficulty score estimated by LLM.
-    """
+    """Filter to keep samples with a high difficulty score estimated by an LLM.
+
+    This operator evaluates the difficulty of each sample using a large language model (LLM)
+    and retains only those with a difficulty score above a specified threshold. The LLM
+    analyzes the sample across multiple dimensions, including linguistic complexity,
+    conceptual depth, prior knowledge, step complexity, and ambiguity. Each dimension is
+    scored on a 1-5 scale, where 1 is novice-friendly and 5 is expert-level. The overall
+    difficulty score is computed as the average of these dimension scores. The operator uses
+    a Hugging Face tokenizer for text processing. The difficulty score is cached in the
+    'llm_difficulty_score' field, and detailed analysis is stored in
+    'llm_difficulty_record'."""
 
     # avoid leading whitespace
     DEFAULT_SYSTEM_PROMPT = """

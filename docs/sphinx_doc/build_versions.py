@@ -9,6 +9,7 @@ from packaging import version as pv
 # Repository structure and build configuration
 REPO_ROOT = Path(__file__).resolve().parents[2]   
 SITE_DIR = REPO_ROOT / "docs" / "sphinx_doc" / "build"            # Build output directory
+TEST_DATA_REL = Path("tests/ops/data")
 WORKTREES_DIR = REPO_ROOT / ".worktrees"          # Temporary worktree directory for version builds
 DOCS_REL = Path("docs/sphinx_doc")
 LANGS = ["en", "zh_CN"]                           # Supported documentation languages
@@ -73,6 +74,8 @@ def copy_markdown_files(wt_root: Path):
         target.parent.mkdir(parents=True, exist_ok=True)
         if not target.exists():
             shutil.copy2(md_file, target)
+    
+    shutil.copytree(wt_root / TEST_DATA_REL, wt_root / DOCS_REL / "source" / "extra" / TEST_DATA_REL, dirs_exist_ok=True)
 
 def build_one(ref: str, ref_label: str, available_versions: list[str]):
     """Build documentation for a single version/branch"""

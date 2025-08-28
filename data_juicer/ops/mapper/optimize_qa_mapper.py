@@ -20,9 +20,13 @@ OP_NAME = "optimize_qa_mapper"
 # TODO: Extend LLM-based OPs into API-based implementation.
 @OPERATORS.register_module(OP_NAME)
 class OptimizeQAMapper(Mapper):
-    """
-    Mapper to optimize question-answer pairs.
-    """
+    """Mapper to optimize question-answer pairs.
+
+    This operator refines and enhances the quality of question-answer pairs. It uses a
+    Hugging Face model to generate more detailed and accurate questions and answers. The
+    input is formatted using a template, and the output is parsed using a regular
+    expression. The system prompt, input template, and output pattern can be customized. If
+    VLLM is enabled, the operator accelerates inference on CUDA devices."""
 
     # avoid leading whitespace
     DEFAULT_SYSTEM_PROMPT = (

@@ -15,7 +15,15 @@ OP_NAME = "image_blur_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageBlurMapper(Mapper):
-    """Mapper to blur images."""
+    """Blurs images in the dataset with a specified probability and blur type.
+
+    This operator blurs images using one of three types: mean, box, or Gaussian. The
+    probability of an image being blurred is controlled by the `p` parameter. The blur
+    effect is applied using a kernel with a specified radius. Blurred images are saved to a
+    directory, which can be specified or defaults to the input directory. If the save
+    directory is not provided, the `DJ_PRODUCED_DATA_DIR` environment variable can be used
+    to set it. The operator ensures that the blur type is one of the supported options and
+    that the radius is non-negative."""
 
     def __init__(
         self, p: float = 0.2, blur_type: str = "gaussian", radius: float = 2, save_dir: str = None, *args, **kwargs

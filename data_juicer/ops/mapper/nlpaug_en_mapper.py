@@ -17,7 +17,17 @@ OP_NAME = "nlpaug_en_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class NlpaugEnMapper(Mapper):
-    """Mapper to simply augment samples in English based on nlpaug library."""
+    """Augments English text samples using various methods from the nlpaug library.
+
+    This operator applies a series of text augmentation techniques to generate new samples.
+    It supports both word-level and character-level augmentations, such as deleting,
+    swapping, and inserting words or characters. The number of augmented samples can be
+    controlled, and the original samples can be kept or removed. When multiple augmentation
+    methods are enabled, they can be applied sequentially or independently. Sequential
+    application means each sample is augmented by all enabled methods in sequence, while
+    independent application generates multiple augmented samples for each method. We
+    recommend using 1-3 augmentation methods at a time to avoid significant changes in
+    sample semantics."""
 
     _batched_op = True
 
