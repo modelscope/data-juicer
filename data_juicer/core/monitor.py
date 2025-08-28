@@ -4,7 +4,7 @@ from functools import partial
 from multiprocessing import get_context
 
 from data_juicer.utils.resource_utils import (
-    get_cpu_count,
+    cpu_count,
     get_cpu_utilization,
     query_cuda_info,
     query_mem_info,
@@ -99,7 +99,7 @@ class Monitor:
         resource_dict["timestamp"] = time.time()
 
         # CPU
-        resource_dict["CPU count"] = get_cpu_count()
+        resource_dict["CPU count"] = cpu_count()
         resource_dict["CPU util."] = get_cpu_utilization() / 100.0
         resource_dict["Total mem."] = query_mem_info("total")
         resource_dict["Used mem."] = query_mem_info("used")

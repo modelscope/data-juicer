@@ -25,6 +25,7 @@ from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS
 from data_juicer.ops.op_fusion import FUSION_STRATEGIES
+from data_juicer.utils.constant import RAY_JOB_ENV_VAR
 from data_juicer.utils.logger_utils import setup_logger
 from data_juicer.utils.mm_utils import SpecialTokens
 
@@ -569,6 +570,9 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
             with timing_context("Parsing arguments"):
                 cfg = parser.parse_args(args=args)
 
+                if cfg.executor_type == "ray":
+                    os.environ[RAY_JOB_ENV_VAR] = "1"
+
                 if cfg.custom_operator_paths:
                     load_custom_operators(cfg.custom_operator_paths)
 
@@ -667,8 +671,10 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         )
 
     # check number of processes np
-    sys_cpu_count = os.cpu_count()
-    if cfg.get("np", None) is None:
+    from data_juicer.utils.resource_utils import cpu_count
+
+    sys_cpu_count = cpu_count()
+    if not cfg.get("np", None):
         cfg.np = sys_cpu_count
         logger.warning(
             f"Number of processes `np` is not set, " f"set it to cpu count [{sys_cpu_count}] as default value."

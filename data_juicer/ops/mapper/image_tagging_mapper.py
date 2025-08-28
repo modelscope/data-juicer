@@ -29,7 +29,7 @@ class ImageTaggingMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "9GB")
+        kwargs["mem_required"] = "9GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self.model_key = prepare_model(
             model_type="recognizeAnything", pretrained_model_name_or_path="ram_plus_swin_large_14m.pth", input_size=384

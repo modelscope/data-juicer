@@ -38,7 +38,7 @@ class VideoTaggingFromAudioMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "500MB")
+        kwargs["mem_required"] = "500MB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self.model_key = prepare_model(
             model_type="huggingface", pretrained_model_name_or_path=hf_ast, trust_remote_code=trust_remote_code

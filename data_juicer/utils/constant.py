@@ -7,6 +7,7 @@ from enum import Enum
 import zstandard as zstd
 from loguru import logger
 
+RAY_JOB_ENV_VAR = "RAY_JOB"
 DEFAULT_PREFIX = "__dj__"
 
 

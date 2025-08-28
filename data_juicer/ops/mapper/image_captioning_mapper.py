@@ -86,7 +86,7 @@ class ImageCaptioningMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "16GB")
+        kwargs["mem_required"] = "16GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
 
         super().__init__(*args, **kwargs)
 

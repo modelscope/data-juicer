@@ -49,8 +49,8 @@ class MllmMapper(Mapper):
         """
         torch.set_num_threads(1)
 
-        kwargs.setdefault("mem_required", "32GB")
-        kwargs.setdefault("num_proc", 1)
+        kwargs["mem_required"] = "32GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
+        kwargs["num_proc"] = 1 if kwargs.get("num_proc", None) is None else kwargs["num_proc"]
         super().__init__(*args, **kwargs)
 
         self.hf_model = hf_model

@@ -32,7 +32,7 @@ class VideoCaptioningFromAudioMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "30GB")
+        kwargs["mem_required"] = "30GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         LazyLoader.check_packages(["transformers", "transformers_stream_generator", "einops", "accelerate", "tiktoken"])
 

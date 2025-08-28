@@ -3,9 +3,9 @@ from typing import Optional, Tuple, Union
 
 from pydantic import PositiveFloat, PositiveInt
 
-from data_juicer import cuda_device_count
 from data_juicer.ops.filter.video_motion_score_filter import VideoMotionScoreFilter
 from data_juicer.utils.lazy_loader import LazyLoader
+from data_juicer.utils.resource_utils import cuda_device_count
 
 from ..base_op import OPERATORS, UNFORKABLE
 

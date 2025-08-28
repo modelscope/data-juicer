@@ -1,9 +1,21 @@
+import os
 import subprocess
+from typing import List
 
 import psutil
 from loguru import logger
 
+from data_juicer.utils.availability_utils import _is_package_available
 from data_juicer.utils.lazy_loader import LazyLoader
+from data_juicer.utils.ray_utils import (
+    check_and_initialize_ray,
+    ray_available_gpu_memories,
+    ray_available_memories,
+    ray_cpu_count,
+    ray_gpu_count,
+)
+
+torch = LazyLoader("torch")
 
 ray = LazyLoader("ray")
 
@@ -38,10 +50,6 @@ def query_cuda_info(query_key):
     return cuda_info_list
 
 
-def get_cpu_count():
-    return psutil.cpu_count()
-
-
 def get_cpu_utilization():
     return psutil.cpu_percent()
 
@@ -55,64 +63,60 @@ def query_mem_info(query_key):
     return val
 
 
-def get_ray_gpu_count():
-    """
-    Get the number of available GPUs in the Ray cluster.
+def _cuda_device_count():
+    _torch_available = _is_package_available("torch")
 
-    Returns:
-        int: Number of available GPUs, or 0 if no GPUs are available or Ray is not initialized
-    """
+    if check_and_initialize_ray():
+        return int(ray_gpu_count())
+
+    if _torch_available:
+        return torch.cuda.device_count()
+
     try:
-        if not ray.is_initialized():
-            logger.warning("Ray is not initialized. Call ray.init() first.")
-            return 0
+        nvidia_smi_output = subprocess.check_output(["nvidia-smi", "-L"], text=True)
+        all_devices = nvidia_smi_output.strip().split("\n")
 
-        # Get available resources
-        resources = ray.available_resources()
-        gpu_count = int(resources.get("GPU", 0))
+        cuda_visible_devices = os.getenv("CUDA_VISIBLE_DEVICES")
+        if cuda_visible_devices is not None:
+            logger.warning(
+                "CUDA_VISIBLE_DEVICES is ignored when torch is unavailable. " "All detected GPUs will be used."
+            )
 
-        if gpu_count == 0:
-            logger.warning("No GPUs available in Ray cluster")
-        else:
-            logger.info(f"Found {gpu_count} GPUs in Ray cluster")
-
-        return gpu_count
-    except Exception as e:
-        logger.error(f"Error getting Ray GPU count: {str(e)}")
+        return len(all_devices)
+    except Exception:
+        # nvidia-smi not found or other error
         return 0
 
 
-def get_ray_gpu_memory():
-    """
-    Get the available GPU memory in the Ray cluster.
+def cuda_device_count():
+    return _cuda_device_count()
 
-    Returns:
-        dict: Dictionary mapping GPU indices to available memory in MB, or empty dict if no GPUs available
-    """
+
+def is_cuda_available():
+    return cuda_device_count() > 0
+
+
+def cpu_count():
+    if check_and_initialize_ray():
+        return int(ray_cpu_count())
+
+    return psutil.cpu_count()
+
+
+def available_memories() -> List[int]:
+    """Available memory for each node in MB."""
+    if check_and_initialize_ray():
+        return ray_available_memories()
+
+    return [int(psutil.virtual_memory().available / (1024**2))]
+
+
+def available_gpu_memories() -> List[int]:
+    """Available gpu memory of each gpu card for each alive node in MB."""
+    if check_and_initialize_ray():
+        return ray_available_gpu_memories()
+
     try:
-        if not ray.is_initialized():
-            logger.warning("Ray is not initialized. Call ray.init() first.")
-            return {}
-
-        # Get available resources
-        resources = ray.available_resources()
-        gpu_count = int(resources.get("GPU", 0))
-
-        if gpu_count == 0:
-            logger.warning("No GPUs available in Ray cluster")
-            return {}
-
-        # Get memory info for each GPU
-        gpu_memory = {}
-        for i in range(gpu_count):
-            memory = query_cuda_info("memory.free")
-            if memory is not None and i < len(memory):
-                gpu_memory[i] = memory[i]
-                logger.info(f"GPU {i} has {memory[i]}MB free memory")
-            else:
-                logger.warning(f"Could not get memory info for GPU {i}")
-
-        return gpu_memory
-    except Exception as e:
-        logger.error(f"Error getting Ray GPU memory: {str(e)}")
-        return {}
+        return query_cuda_info("memory.free")
+    except Exception:
+        return []

@@ -7,7 +7,6 @@ from jsonargparse import Namespace
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.core.adapter import Adapter
 from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.ray_exporter import RayExporter
@@ -53,11 +52,16 @@ class RayExecutor(ExecutorBase):
         super().__init__(cfg)
         self.executor_type = "ray"
         self.work_dir = self.cfg.work_dir
-        self.adapter = Adapter(self.cfg)
+        # TODO: support ray
+        # self.adapter = Adapter(self.cfg)
 
         # init ray
         logger.info("Initializing Ray ...")
-        ray.init(self.cfg.ray_address, ignore_reinit_error=True)
+
+        from data_juicer.utils.ray_utils import initialize_ray
+
+        initialize_ray(cfg=cfg, force=True)
+
         self.tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
 
         # absolute path resolution logic
