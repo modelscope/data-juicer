@@ -2,6 +2,7 @@ import re
 from typing import Dict, Optional
 
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -17,7 +18,6 @@ vllm = LazyLoader("vllm")
 OP_NAME = "optimize_qa_mapper"
 
 
-# TODO: Extend LLM-based OPs into API-based implementation.
 @OPERATORS.register_module(OP_NAME)
 class OptimizeQAMapper(Mapper):
     """
@@ -50,6 +50,7 @@ class OptimizeQAMapper(Mapper):
         input_template: Optional[str] = None,
         qa_pair_template: Optional[str] = None,
         output_pattern: Optional[str] = None,
+        try_num: PositiveInt = 3,
         enable_vllm: bool = False,
         model_params: Optional[Dict] = None,
         sampling_params: Optional[Dict] = None,
@@ -73,6 +74,8 @@ class OptimizeQAMapper(Mapper):
             '{}' to format question and answer.
         :param output_pattern: Regular expression pattern to extract question
             and answer from model response.
+        :param try_num: The number of retry attempts when there is an API
+            call error or output parsing error.
         :param enable_vllm: Whether to use VLLM for inference acceleration.
         :param model_params: Parameters for initializing the model.
         :param sampling_params: Sampling parameters for text generation (e.g.,
@@ -85,6 +88,8 @@ class OptimizeQAMapper(Mapper):
         self.input_template = input_template or self.DEFAULT_INPUT_TEMPLATE
         self.qa_pair_template = qa_pair_template or self.DEFAULT_QA_PAIR_TEMPLATE
         self.output_pattern = output_pattern or self.DEFAULT_OUTPUT_PATTERN
+
+        self.try_num = try_num
 
         self.is_hf_model = is_hf_model
         self.enable_vllm = enable_vllm
@@ -149,17 +154,24 @@ class OptimizeQAMapper(Mapper):
         input_prompt = self.build_input(sample)
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": input_prompt}]
 
-        if self.enable_vllm:
-            response = model.chat(messages, self.sampling_params)
-            output = response[0].outputs[0].text
-        elif self.is_hf_model:
-            # model is pipe
-            response = model(messages, return_full_text=False, **self.sampling_params)
-            output = response[0]["generated_text"]
-        else:
-            output = model(messages, **self.sampling_params)
+        parsed_q, parsed_a = None, None
+        for _ in range(self.try_num):
+            try:
+                if self.enable_vllm:
+                    response = model.chat(messages, self.sampling_params)
+                    output = response[0].outputs[0].text
+                elif self.is_hf_model:
+                    # model is pipe
+                    response = model(messages, return_full_text=False, **self.sampling_params)
+                    output = response[0]["generated_text"]
+                else:
+                    output = model(messages, **self.sampling_params)
+                parsed_q, parsed_a = self.parse_output(output)
+                if parsed_q or parsed_a:
+                    break
+            except Exception as e:
+                logger.warning(f"Exception: {e}")
 
-        parsed_q, parsed_a = self.parse_output(output)
         if parsed_q:
             sample[self.query_key] = parsed_q
         if parsed_a:
