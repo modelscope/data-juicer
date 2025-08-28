@@ -53,7 +53,8 @@ class RayExecutor(ExecutorBase):
         super().__init__(cfg)
         self.executor_type = "ray"
         self.work_dir = self.cfg.work_dir
-        self.adapter = Adapter(self.cfg)
+        # TODO: support ray
+        # self.adapter = Adapter(self.cfg)
 
         # init ray
         logger.info("Initializing Ray ...")
