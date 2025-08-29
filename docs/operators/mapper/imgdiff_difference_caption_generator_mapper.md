@@ -24,9 +24,9 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `mllm_mapper_args` | typing.Optional[typing.Dict] | `{}` |  |
-| `image_text_matching_filter_args` | typing.Optional[typing.Dict] | `{}` |  |
-| `text_pair_similarity_filter_args` | typing.Optional[typing.Dict] | `{}` |  |
+| `mllm_mapper_args` | typing.Optional[typing.Dict] | `{}` | Arguments for multimodal language model mapper. |
+| `image_text_matching_filter_args` | typing.Optional[typing.Dict] | `{}` | Arguments for image-text matching filter. |
+| `text_pair_similarity_filter_args` | typing.Optional[typing.Dict] | `{}` | Arguments for text pair similarity filter. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

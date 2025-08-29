@@ -26,7 +26,7 @@ Tags 标签: cpu, hf, multimodal
 | `strength` | typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | `0.8` | Indicates extent to transform the reference image. |
 | `guidance_scale` | <class 'float'> | `7.5` | A higher guidance scale value encourages the |
 | `aug_num` | typing.Annotated[int, Gt(gt=0)] | `1` | The image number to be produced by stable-diffusion |
-| `keep_original_sample` | <class 'bool'> | `True` |  |
+| `keep_original_sample` | <class 'bool'> | `True` | whether to keep the original sample. If |
 | `caption_key` | typing.Optional[str] | `None` | the key name of fields in samples to store captions |
 | `hf_img2seq` | <class 'str'> | `'Salesforce/blip2-opt-2.7b'` | model name on huggingface to generate caption if |
 | `save_dir` | <class 'str'> | `None` | The directory where generated image files will be stored. |

@@ -17,12 +17,12 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `label_config_file` | <class 'str'> | `None` |  |
-| `answer1_key` | <class 'str'> | `'answer1'` |  |
-| `answer2_key` | <class 'str'> | `'answer2'` |  |
-| `prompt_key` | <class 'str'> | `'prompt'` |  |
-| `chosen_key` | <class 'str'> | `'chosen'` |  |
-| `rejected_key` | <class 'str'> | `'rejected'` |  |
+| `label_config_file` | <class 'str'> | `None` | Path to the label config file |
+| `answer1_key` | <class 'str'> | `'answer1'` | Key for the first answer |
+| `answer2_key` | <class 'str'> | `'answer2'` | Key for the second answer |
+| `prompt_key` | <class 'str'> | `'prompt'` | Key for the prompt/question |
+| `chosen_key` | <class 'str'> | `'chosen'` | Key for the chosen answer |
+| `rejected_key` | <class 'str'> | `'rejected'` | Key for the rejected answer |
 | `kwargs` |  | `''` |  |
 
 ## 📊 Effect demonstration 效果演示

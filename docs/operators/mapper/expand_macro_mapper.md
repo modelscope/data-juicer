@@ -188,8 +188,8 @@ In the specialization stage, the optimal architectures under given  resource con
 </pre></div>
 
 #### ✨ explanation 解释
-The operator expands the user-defined macros in the LaTeX document, replacing each macro with its defined content. In this case, \theHalgorithm is replaced with \arabic{algorithm} and \alambic is replaced with \includegraphics[height=1.52ex]{img/alembic-crop.pdf}\xspace. The rest of the document remains unchanged.
-算子在LaTeX文档中扩展用户定义的宏，将每个宏替换为其定义的内容。在这个例子中，\theHalgorithm被替换为\arabic{algorithm}，而\alambic被替换为\includegraphics[height=1.52ex]{img/alembic-crop.pdf}\xspace。文档的其余部分保持不变。
+The operator expands the user-defined macros in a LaTeX document. It looks for \newcommand and \def without arguments and replaces them with their defined values. In this example, macros like \alambic, \cmark, \xmark, \Zerocost, and \imagenet are expanded to their corresponding definitions. The output data is not the direct result of the operator; it has been processed to compare with a target value to ensure the correctness of the expansion.
+算子在LaTeX文档中扩展用户定义的宏。它查找没有参数的\newcommand和\def，并用它们定义的值替换。在这个例子中，像\alambic, \cmark, \xmark, \Zerocost, 和\imagenet这样的宏被扩展成它们对应的定义。输出数据并不是算子的直接结果；它已经被处理过，用来与目标值进行比较，以确保扩展的正确性。
 
 
 ## 🔗 related links 相关链接

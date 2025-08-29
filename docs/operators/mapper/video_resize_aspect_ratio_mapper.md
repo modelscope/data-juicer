@@ -38,8 +38,8 @@ VideoResizeAspectRatioMapper(min_ratio='3/4', strategy='increase')
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[[(640, 360)], [(480, 640)], [(480, 640)]]</pre></div>
 
 #### ✨ explanation 解释
-The operator resizes videos to ensure their aspect ratios are at least 3/4. It increases the dimensions of videos with a lower ratio to match the minimum, while leaving others unchanged.
-算子调整视频尺寸，确保其宽高比至少为3/4。它会增加那些宽高比低于此值的视频尺寸以达到最小要求，而其他视频保持不变。
+This example demonstrates how the operator resizes videos to meet a minimum aspect ratio. If a video's aspect ratio is below the specified minimum (3/4 in this case), the operator will increase the video dimensions to match the minimum ratio. In this test, the third video (originally 181:320) is resized to 3:4 (480x640). Videos that already meet or exceed the minimum ratio are not changed.
+这个示例展示了算子如何调整视频以满足最小的宽高比。如果视频的宽高比低于指定的最小值（本例中为3/4），算子会增加视频的尺寸以匹配最小的宽高比。在这个测试中，第三个视频（原始宽高比为181:320）被调整为3:4（480x640）。已经满足或超过最小宽高比的视频不会被改变。
 
 ### test_max_ratio_decrease
 ```python
@@ -53,8 +53,8 @@ VideoResizeAspectRatioMapper(max_ratio='4/3', strategy='decrease')
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[[(480, 360)], [(480, 640)], [(362, 640)]]</pre></div>
 
 #### ✨ explanation 解释
-The operator resizes videos to ensure their aspect ratios do not exceed 4/3. It decreases the dimensions of videos with a higher ratio to match the maximum, while leaving others unchanged.
-算子调整视频尺寸，确保其宽高比不超过4/3。它会减小那些宽高比高于此值的视频尺寸以达到最大限制，而其他视频保持不变。
+This example shows the operator resizing videos to fit within a maximum aspect ratio. If a video's aspect ratio is above the specified maximum (4/3 in this case), the operator will decrease the video dimensions to match the maximum ratio. Here, the first video (originally 16:9) is resized to 4:3 (480x360). Videos that already have an aspect ratio less than or equal to the maximum are not changed.
+这个示例展示了算子如何调整视频以适应最大的宽高比。如果视频的宽高比高于指定的最大值（本例中为4/3），算子会减小视频的尺寸以匹配最大宽高比。在这里，第一个视频（原始宽高比为16:9）被调整为4:3（480x360）。宽高比已经小于或等于最大值的视频不会被改变。
 
 
 ## 🔗 related links 相关链接

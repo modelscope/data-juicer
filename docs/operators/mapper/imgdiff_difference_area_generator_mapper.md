@@ -23,9 +23,9 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `image_pair_similarity_filter_args` | typing.Optional[typing.Dict] | `{}` |  |
-| `image_segment_mapper_args` | typing.Optional[typing.Dict] | `{}` |  |
-| `image_text_matching_filter_args` | typing.Optional[typing.Dict] | `{}` |  |
+| `image_pair_similarity_filter_args` | typing.Optional[typing.Dict] | `{}` | Arguments for image pair similarity filter. |
+| `image_segment_mapper_args` | typing.Optional[typing.Dict] | `{}` | Arguments for image segmentation mapper. |
+| `image_text_matching_filter_args` | typing.Optional[typing.Dict] | `{}` | Arguments for image-text matching filter. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

@@ -38,8 +38,8 @@ Tags 标签: cpu, text
 </pre></div>
 
 #### ✨ explanation 解释
-The operator removes the bibliography section, including the \bibliographystyle and \bibliography commands, from the end of the LaTeX document, leaving only the initial part of the text up to where the bibliography starts.
-算子从LaTeX文档末尾移除参考文献部分，包括\bibliographystyle和\bibliography命令，只保留从文档开始到参考文献开始前的部分文本。
+This example shows how the operator removes a bibliography section marked by the \bibliography command. The input contains a LaTeX document with a bibliography at the end. After processing, the bibliography and everything after it is removed, leaving only the part of the document before the bibliography.
+这个例子展示了算子如何移除用\bibliography命令标记的参考文献部分。输入包含一个在末尾有参考文献的LaTeX文档。处理后，参考文献及其后面的所有内容都被移除，只保留了参考文献前的部分文档内容。
 
 ### test_ref_case
 
@@ -59,8 +59,8 @@ The operator removes the bibliography section, including the \bibliographystyle 
 </pre></div>
 
 #### ✨ explanation 解释
-The operator identifies and removes the bibliography section starting with \begin{references} until the end of the document, resulting in the removal of everything after \clearpage.
-算子识别并移除从\begin{references}开始直到文档末尾的参考文献部分，导致\clearpage之后的所有内容都被删除。
+This example demonstrates the operator's capability to remove a references section indicated by the \begin{references} command. The input text has a references section at the end. After the operator processes the data, the references section and all content following it are eliminated, preserving only the text prior to the references section.
+这个例子展示了算子移除用\begin{references}命令标记的参考文献部分的能力。输入文本在末尾有一个参考文献部分。经过算子处理后，参考文献部分及其后面的所有内容都被移除，只保留了参考文献前的部分文本。
 
 
 ## 🔗 related links 相关链接

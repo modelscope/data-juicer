@@ -39,8 +39,8 @@ AudioFFmpegWrappedMapper('atrim', filter_kwargs={'end': 6}, capture_stderr=False
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[[5.501678004535147, 6.0, 6.0]]</pre></div>
 
 #### ✨ explanation 解释
-The operator applies the 'atrim' filter with an end time of 6 seconds to each audio file, trimming any part of the audio that exceeds this duration. The resulting durations are [5.501678004535147, 6.0, 6.0] seconds, indicating that all audios have been trimmed to at most 6 seconds, with the first one being naturally shorter.
-算子对每个音频文件应用了'atrim'滤镜，并设置了结束时间为6秒，从而修剪掉超过这个时长的部分。结果的时长为[5.501678004535147, 6.0, 6.0]秒，表明所有音频都被裁剪至最多6秒，其中第一个音频自然较短。
+The operator trims the audio files to a maximum duration of 6 seconds. If an audio file is shorter than 6 seconds, it remains unchanged. In this case, the first audio file is already less than 6 seconds long, so its duration does not change. The second and third audio files are longer than 6 seconds, so they are trimmed to exactly 6 seconds. The output data shows the durations of the processed audio files, which now all have a maximum duration of 6 seconds.
+算子将音频文件裁剪到最多6秒的长度。如果音频文件短于6秒，则保持不变。在这种情况下，第一个音频文件已经不到6秒长，因此其持续时间没有变化。第二和第三个音频文件超过6秒，所以它们被裁剪成正好6秒。输出数据显示了处理后的音频文件的时长，现在所有音频文件的最大时长都为6秒。
 
 
 ## 🔗 related links 相关链接

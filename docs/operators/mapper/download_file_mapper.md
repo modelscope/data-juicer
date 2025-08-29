@@ -22,7 +22,7 @@ Tags 标签: cpu
 | `save_dir` | <class 'str'> | `None` | The directory to save downloaded files. |
 | `save_field` | <class 'str'> | `None` | The filed name to save the downloaded file content. |
 | `resume_download` | <class 'bool'> | `False` | Whether to resume download. if True, skip the sample if it exists. |
-| `timeout` | <class 'int'> | `30` |  |
+| `timeout` | <class 'int'> | `30` | Timeout for download. |
 | `max_concurrent` | <class 'int'> | `10` | Maximum concurrent downloads. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |

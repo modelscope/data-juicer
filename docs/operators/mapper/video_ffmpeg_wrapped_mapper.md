@@ -38,7 +38,8 @@ VideoFFmpegWrappedMapper('scale', filter_kwargs={'width': 400, 'height': 480}, c
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[[(400, 480), (400, 480), (400, 480)]]</pre></div>
 
 #### ✨ explanation 解释
-The operator resizes each video in the dataset to 400x480 pixels using the 'scale' FFmpeg filter, resulting in all videos having the same resolution.算子使用'scale'FFmpeg波淋，将数据集中的每个视频重新调整到400x480像素，使得所有视频具有相同的分辨率。
+This example demonstrates the use of the VideoFFmpegWrappedMapper operator to resize videos. The 'scale' filter is applied with a specified width and height, resulting in all videos being resized to 400x480 pixels. The original aspect ratio of the videos may be altered to fit the new dimensions. In this case, the output data shows that all three input videos have been resized to 400x480, as expected.
+此示例展示了使用VideoFFmpegWrappedMapper算子调整视频大小的功能。通过应用'scale'滤镜并指定宽度和高度，所有视频都被调整为400x480像素。原始视频的宽高比可能会被改变以适应新的尺寸。这里的结果数据显示，三个输入视频都已成功调整到了400x480，符合预期。
 
 
 ## 🔗 related links 相关链接

@@ -28,8 +28,8 @@ Tags 标签: cpu, text
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">,.,&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&#x27;::?!();- - . ~&#x27;...-&lt;&gt;[]%-</pre></div>
 
 #### ✨ explanation 解释
-This operator normalizes unicode punctuations to their English equivalents in the text. It replaces characters such as 。 with '.', ， with ',', and other similar substitutions, resulting in a string where all special unicode punctuation is converted to standard English punctuation.
-该算子将文本中的Unicode标点符号转换为它们对应的英文标点。例如，将。替换为'.'，将，替换为','等类似替换，最终结果是所有特殊的Unicode标点都转换成了标准的英文标点。
+This example demonstrates how the PunctuationNormalizationMapper converts various types of Unicode punctuation into their English equivalents. The input text contains a series of different Unicode punctuations, such as 。 for a full stop and ， for a comma. After processing, all these are replaced with their corresponding standard English punctuation marks. This ensures that the text is more consistent and readable in an English context, which can be particularly useful for downstream tasks that expect or require standardized punctuation.
+该示例展示了PunctuationNormalizationMapper如何将各种类型的Unicode标点转换为其英文等效标点。输入文本包含一系列不同的Unicode标点符号，如表示句号的。和表示逗号的，。处理后，所有这些都被替换为相应的标准英文标点符号。这确保了文本在英文上下文中更加一致且易于阅读，对于期望或需要标准化标点的下游任务特别有用。
 
 
 ## 🔗 related links 相关链接
