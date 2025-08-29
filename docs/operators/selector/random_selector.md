@@ -19,7 +19,7 @@ Tags 标签: cpu
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `select_ratio` | typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])]] | `None` | The ratio to select. When both |
-| `select_num` | typing.Annotated[int, Gt(gt=0)] | `None` | The number of samples to select. When both |
+| `select_num` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | The number of samples to select. When both |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

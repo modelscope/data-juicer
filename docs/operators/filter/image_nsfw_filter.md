@@ -18,7 +18,8 @@ Tags 标签: cpu, hf, image
 |--------|------|--------|------|
 | `hf_nsfw_model` | <class 'str'> | `'Falconsai/nsfw_image_detection'` | nsfw detection model name on huggingface. |
 | `trust_remote_code` | <class 'bool'> | `False` |  |
-| `max_score` | <class 'float'> | `0.5` | the nsfw score threshold for samples. |
+| `min_score` | <class 'float'> | `0.0` | the min nsfw score threshold for samples. |
+| `max_score` | <class 'float'> | `0.5` | the max nsfw score threshold for samples. |
 | `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |

@@ -43,7 +43,7 @@ Tags 标签: cpu, text
 | `max_pending_filter_tasks` | typing.Optional[int] | `20` | max number of pending filter ray |
 | `num_filter_task_returns` | typing.Optional[int] | `10` | number of filter tasks for `ray.wait` |
 | `merge_batch_size` | typing.Optional[int] | `1000` | batch size for BTS operations. Default |
-| `minhash_batch_size` | typing.Optional[int] | `'auto'` | batch size for MinHash computation. If "auto", |
+| `minhash_batch_size` | typing.Union[int, str, NoneType] | `'auto'` | batch size for MinHash computation. If "auto", |
 | `memory_per_sample` | typing.Optional[float] | `0.1` | estimated memory needed per sample in MB. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |

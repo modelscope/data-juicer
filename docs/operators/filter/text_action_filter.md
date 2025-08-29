@@ -16,7 +16,7 @@ Tags 标签: cpu, text
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `lang` | <class 'str'> | `'en'` | language of the text in the samples. 'en' for detection of |
-| `min_action_num` | <class 'int'> | `1` |  |
+| `min_action_num` | <class 'int'> | `1` | The min action number in the filtering. samples |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

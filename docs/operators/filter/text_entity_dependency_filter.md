@@ -19,7 +19,7 @@ Tags 标签: cpu, text
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `lang` | <class 'str'> | `'en'` | language of the text in the samples. 'en' for detection of |
-| `min_dependency_num` | <class 'int'> | `1` |  |
+| `min_dependency_num` | <class 'int'> | `1` | The min token number in the filtering. |
 | `any_or_all` | <class 'str'> | `'all'` | keep this sample with 'any' or 'all' strategy. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |

@@ -1,6 +1,6 @@
 # video_nsfw_filter
 
-Filter to keep samples whose videos have low NSFW scores.
+Filter to keep samples whose videos have nsfw scores in a specified range.
 
 This operator uses a Hugging Face model to detect NSFW content in video frames. It keeps
 samples where the NSFW score is below a specified threshold. The operator supports two
@@ -19,6 +19,7 @@ Tags 标签: cpu, hf, video
 |--------|------|--------|------|
 | `hf_nsfw_model` | <class 'str'> | `'Falconsai/nsfw_image_detection'` | nsfw detection model name on huggingface. |
 | `trust_remote_code` | <class 'bool'> | `False` |  |
+| `min_score` | <class 'float'> | `0.0` |  |
 | `max_score` | <class 'float'> | `0.5` | the nsfw score threshold for samples. |
 | `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame |
 | `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from |

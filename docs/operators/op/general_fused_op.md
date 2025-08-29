@@ -20,8 +20,8 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `batch_size` | <class 'int'> | `1` |  |
-| `fused_op_list` | typing.List | `None` |  |
+| `batch_size` | <class 'int'> | `1` | the batch size of the input samples. |
+| `fused_op_list` | typing.Optional[typing.List] | `None` | a list of OPs to be fused. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

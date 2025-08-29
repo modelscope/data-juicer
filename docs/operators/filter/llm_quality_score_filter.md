@@ -18,8 +18,9 @@ Tags 标签: cpu, vllm, hf, api
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `api_or_hf_model` | <class 'str'> | `'gpt-4o'` | API or huggingface model name. |
-| `min_score` | <class 'float'> | `0.5` | The lowest score threshold to keep |
-| `is_hf_model` | <class 'bool'> | `False` |  |
+| `min_score` | <class 'float'> | `0.5` | The min score threshold to keep the sample. |
+| `max_score` | <class 'float'> | `1.0` | The max score threshold to keep the sample. |
+| `is_hf_model` | <class 'bool'> | `False` | If true, use huggingface model. Otherwise, use API. |
 | `api_endpoint` | typing.Optional[str] | `None` | URL endpoint for the API. |
 | `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. |
 | `input_keys` | typing.List[str] | `['text']` | Sub set of keys in the sample. Support data with |

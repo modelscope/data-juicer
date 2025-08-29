@@ -1,6 +1,6 @@
 # perplexity_filter
 
-Filter to keep samples with a perplexity score below a specified maximum value.
+Filter to keep samples with perplexity score in a specified range.
 
 This operator computes the perplexity of text samples using a Hugging Face tokenizer and
 a KenLM language model. It retains samples with a perplexity score less than or equal to
@@ -17,7 +17,8 @@ Tags 标签: cpu, text
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `lang` | <class 'str'> | `'en'` | Compute perplexity for samples in which language. |
-| `max_ppl` | <class 'float'> | `1500` | The max filter perplexity in this op, samples |
+| `min_ppl` | <class 'float'> | `0` | The min filter perplexity in this op. |
+| `max_ppl` | <class 'float'> | `1500` | The max filter perplexity in this op. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

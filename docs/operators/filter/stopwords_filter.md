@@ -19,6 +19,7 @@ Tags 标签: cpu, text
 | `lang` | <class 'str'> | `'en'` | Consider stopwords in what language. If lang == |
 | `tokenization` | <class 'bool'> | `False` | whether to use model to tokenize documents |
 | `min_ratio` | <class 'float'> | `0.3` | The min filter ratio in this op. |
+| `max_ratio` | <class 'float'> | `1.0` | The max filter ratio in this op. |
 | `stopwords_dir` | <class 'str'> | `'/home/cmgzn/.cache/data_juicer/assets'` | The directory storing the stopwords |
 | `use_words_aug` | <class 'bool'> | `False` | Whether to augment words, especially for |
 | `words_aug_group_sizes` | typing.List[typing.Annotated[int, Gt(gt=0)]] | `[2]` | The group size of words to augment |

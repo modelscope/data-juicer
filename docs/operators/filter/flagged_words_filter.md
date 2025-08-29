@@ -21,6 +21,7 @@ Tags 标签: cpu, text
 |--------|------|--------|------|
 | `lang` | <class 'str'> | `'en'` | Consider flagged words in what language. If lang == |
 | `tokenization` | <class 'bool'> | `False` | Whether to use model to tokenize documents |
+| `min_ratio` | <class 'float'> | `0.0` | The min filter ratio in this op. |
 | `max_ratio` | <class 'float'> | `0.045` | The max filter ratio in this op. |
 | `flagged_words_dir` | <class 'str'> | `'/home/cmgzn/.cache/data_juicer/assets'` | The directory storing the |
 | `use_words_aug` | <class 'bool'> | `False` | Whether to augment words, especially for |

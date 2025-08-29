@@ -18,7 +18,7 @@ Tags 标签: cpu, image
 |--------|------|--------|------|
 | `backend` | <class 'str'> | `'ray_actor'` | the backend for dedup, either 'ray_actor' or 'redis' |
 | `redis_address` | <class 'str'> | `'redis://localhost:6379'` | the address of redis server |
-| `method` | <class 'str'> | `'phash'` |  |
+| `method` | <class 'str'> | `'phash'` | the hash method to use |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 
