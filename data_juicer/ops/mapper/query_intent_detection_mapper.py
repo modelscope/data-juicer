@@ -11,10 +11,13 @@ OP_NAME = "query_intent_detection_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class QueryIntentDetectionMapper(Mapper):
-    """
-    Mapper to predict user's Intent label in query. Input from query_key.
-    Output intent label and corresponding score for the query.
-    """
+    """Predicts the user's intent label and corresponding score for a given query. The operator
+    uses a Hugging Face model to classify the intent of the input query. If the query is in
+    Chinese, it can optionally be translated to English using another Hugging Face
+    translation model before classification. The predicted intent label and its confidence
+    score are stored in the meta field with the keys 'query_intent_label' and
+    'query_intent_score', respectively. If these keys already exist in the meta field, the
+    operator will skip processing for those samples."""
 
     _accelerator = "cuda"
     _batched_op = True

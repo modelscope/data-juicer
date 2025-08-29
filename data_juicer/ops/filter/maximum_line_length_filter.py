@@ -11,8 +11,14 @@ OP_NAME = "maximum_line_length_filter"
 @OPERATORS.register_module(OP_NAME)
 @INTER_LINES.register_module(OP_NAME)
 class MaximumLineLengthFilter(Filter):
-    """Filter to keep samples with maximum line length within a specific
-    range."""
+    """Filter to keep samples with a maximum line length within a specified range.
+
+    This operator filters out samples based on the length of their longest line. It retains
+    samples where the maximum line length is within the specified `min_len` and `max_len`
+    range. The maximum line length is computed by splitting the text into lines and
+    measuring the length of each line. If the context is provided, it uses precomputed lines
+    stored under the key 'lines' in the context. The maximum line length is cached in the
+    'max_line_length' field of the stats."""
 
     _batched_op = True
 

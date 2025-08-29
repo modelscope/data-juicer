@@ -22,7 +22,13 @@ OP_NAME = "image_face_blur_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageFaceBlurMapper(Mapper):
-    """Mapper to blur faces detected in images."""
+    """Mapper to blur faces detected in images.
+
+    This operator uses an OpenCV classifier to detect faces in images and applies a
+    specified blur type to the detected face regions. The blur types supported are 'mean',
+    'box', and 'gaussian'. The radius of the blur kernel can be adjusted. If no save
+    directory is provided, the modified images will be saved in the same directory as the
+    input files. The operator uses a Hugging Face tokenizer for text processing if needed."""
 
     _default_kwargs = {
         "scaleFactor": 1.1,

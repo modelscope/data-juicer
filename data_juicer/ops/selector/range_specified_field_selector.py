@@ -11,8 +11,15 @@ from ..base_op import OPERATORS, Selector
 
 @OPERATORS.register_module("range_specified_field_selector")
 class RangeSpecifiedFieldSelector(Selector):
-    """Selector to select a range of samples based on the sorted
-    specified field value from smallest to largest."""
+    """Selects a range of samples based on the sorted values of a specified field.
+
+    This operator selects samples whose values for a specified field fall within a given
+    range. The range can be defined using percentiles or ranks, and the operator will use
+    the more inclusive bounds if both are provided. The field values are first sorted in
+    ascending order, and then the samples are selected based on the lower and upper bounds.
+    If no bounds are provided, the original dataset is returned. The operator ensures that
+    the specified field exists in the dataset and handles multi-level fields by separating
+    keys with dots."""
 
     def __init__(
         self,

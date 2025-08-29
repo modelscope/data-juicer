@@ -10,7 +10,13 @@ OP_NAME = "suffix_filter"
 @NON_STATS_FILTERS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class SuffixFilter(Filter):
-    """Filter to keep samples with specified suffix."""
+    """Filter to keep samples with specified suffix.
+
+    This operator retains samples that have a suffix matching any of the provided suffixes.
+    If no suffixes are specified, all samples are kept. The key metric 'keep' is computed
+    based on whether the sample's suffix matches the specified list. The 'suffix' field of
+    each sample is checked against the list of allowed suffixes. If the suffix matches, the
+    sample is kept; otherwise, it is filtered out."""
 
     def __init__(self, suffixes: Union[str, List[str]] = [], *args, **kwargs):
         """

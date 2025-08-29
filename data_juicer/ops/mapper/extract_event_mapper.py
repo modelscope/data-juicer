@@ -18,9 +18,14 @@ OP_NAME = "extract_event_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractEventMapper(Mapper):
-    """
-    Extract events and relevant characters in the text
-    """
+    """Extracts events and relevant characters from the text.
+
+    This operator uses an API model to summarize the text into multiple events and extract
+    the relevant characters for each event. The summary and character extraction follow a
+    predefined format. The operator retries the API call up to a specified number of times
+    if there is an error. The extracted events and characters are stored in the meta field
+    of the samples. If no events are found, the original samples are returned. The operator
+    can optionally drop the original text after processing."""
 
     _batched_op = True
 

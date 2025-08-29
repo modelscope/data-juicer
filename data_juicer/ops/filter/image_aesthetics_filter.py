@@ -17,7 +17,15 @@ OP_NAME = "image_aesthetics_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageAestheticsFilter(Filter):
-    """Filter to keep samples with aesthetics scores within a specific range."""
+    """Filter to keep samples with aesthetics scores within a specific range.
+
+    This operator uses a Hugging Face model to predict the aesthetics score of images. It
+    keeps samples where the predicted scores fall within the specified min and max score
+    range. The operator supports two strategies: 'any' (keep if any image meets the
+    condition) and 'all' (keep only if all images meet the condition). Aesthetics scores are
+    cached in the 'image_aesthetics_scores' field. If no images are present, the sample is
+    kept. Scores are normalized by dividing by 10 if the model name includes
+    'shunk031/aesthetics-predictor'."""
 
     _accelerator = "cuda"
 

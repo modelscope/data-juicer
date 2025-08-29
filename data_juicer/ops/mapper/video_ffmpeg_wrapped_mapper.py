@@ -12,7 +12,14 @@ OP_NAME = "video_ffmpeg_wrapped_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class VideoFFmpegWrappedMapper(Mapper):
-    """Simple wrapper for FFmpeg video filters."""
+    """Wraps FFmpeg video filters for processing video files in a dataset.
+
+    This operator applies a specified FFmpeg video filter to each video file in the dataset.
+    It supports passing keyword arguments to the filter and global arguments to the FFmpeg
+    command line. The processed videos are saved in a specified directory or the same
+    directory as the input files. If no filter name is provided, the videos remain
+    unmodified. The operator updates the source file paths in the dataset to reflect any
+    changes."""
 
     def __init__(
         self,

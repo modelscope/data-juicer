@@ -28,10 +28,14 @@ def get_hash_method(method_name):
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class RayImageDeduplicator(RayBasicDeduplicator):
-    """
-    Deduplicator to deduplicate samples at document-level using exact matching
-    of images between documents.
-    """
+    """Deduplicates samples by exact matching of images using hash values.
+
+    This operator compares images within documents to identify and remove duplicates. It
+    uses a specified hashing method (default: 'phash') to generate hash values for each
+    image. If an image is missing or cannot be loaded, it assigns an empty hash value. The
+    deduplication process relies on the computed hash values to determine if two images are
+    identical. This operator supports both 'ray_actor' and 'redis' backends for distributed
+    processing."""
 
     def __init__(
         self,

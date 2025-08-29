@@ -19,8 +19,16 @@ OP_NAME = "text_pair_similarity_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class TextPairSimilarityFilter(Filter):
-    """Filter to keep text pairs with similarities between texts
-    within a specific range."""
+    """Filter to keep text pairs with similarities within a specific range.
+
+    This operator computes the similarity between two texts in a pair using a Hugging Face
+    CLIP model. It keeps samples where the similarity score falls within the specified min
+    and max thresholds. The key metric, 'text_pair_similarity', is computed as the cosine
+    similarity between the text embeddings. The operator supports two strategies for keeping
+    samples: 'any' (keep if any pair meets the condition) and 'all' (keep only if all pairs
+    meet the condition). If the second text key is not provided, the operator will raise an
+    error. The similarity scores are cached under the 'text_pair_similarity' field in the
+    sample's stats."""
 
     _accelerator = "cuda"
 

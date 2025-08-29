@@ -87,6 +87,7 @@ html_sidebars = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_css_files = ["sidebar-menu.css"]
 html_static_path = ["_static"]
+html_extra_path = ['extra']
 
 # -- Internationalization settings ------------------------------------------
 # Language settings

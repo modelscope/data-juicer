@@ -7,7 +7,20 @@ from ..base_op import OPERATORS, Mapper
 
 @OPERATORS.register_module("clean_ip_mapper")
 class CleanIpMapper(Mapper):
-    """Mapper to clean ipv4 and ipv6 address in text samples."""
+    """Cleans IPv4 and IPv6 addresses from text samples.
+
+    This operator removes or replaces IPv4 and IPv6 addresses in the text. It uses a regular
+    expression to identify and clean the IP addresses. By default, it replaces the IP
+    addresses with an empty string, effectively removing them. The operator can be
+    configured with a custom pattern and replacement string. If no pattern is provided, a
+    default pattern for both IPv4 and IPv6 addresses is used. The operator processes samples
+    in batches.
+
+    - Uses a regular expression to find and clean IP addresses.
+    - Replaces found IP addresses with a specified replacement string.
+    - Default replacement string is an empty string, which removes the IP addresses.
+    - Can use a custom regular expression pattern if provided.
+    - Processes samples in batches for efficiency."""
 
     _batched_op = True
 

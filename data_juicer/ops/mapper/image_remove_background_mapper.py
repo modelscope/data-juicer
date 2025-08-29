@@ -18,9 +18,16 @@ OP_NAME = "image_remove_background_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageRemoveBackgroundMapper(Mapper):
-    """
-    Mapper to remove background of images
-    """
+    """Mapper to remove the background of images.
+
+    This operator processes each image in the sample, removing its background. It uses the
+    `rembg` library to perform the background removal. If `alpha_matting` is enabled, it
+    applies alpha matting with specified thresholds and erosion size. The resulting images
+    are saved in PNG format. The `bgcolor` parameter can be set to specify a custom
+    background color for the cutout image. The processed images are stored in the directory
+    specified by `save_dir`, or in the same directory as the input files if `save_dir` is
+    not provided. The `source_file` field in the sample is updated to reflect the new file
+    paths."""
 
     def __init__(
         self,

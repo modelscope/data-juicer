@@ -9,7 +9,17 @@ OP_NAME = "python_file_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class PythonFileMapper(Mapper):
-    """Mapper for executing Python function defined in a file."""
+    """Executes a Python function defined in a file on input data.
+
+    This operator loads a specified Python function from a given file and applies it to the
+    input data. The function must take exactly one argument and return a dictionary. The
+    operator can process data either sample by sample or in batches, depending on the
+    `batched` parameter. If the file path is not provided, the operator acts as an identity
+    function, returning the input sample unchanged. The function is loaded dynamically, and
+    its name and file path are configurable. Important notes:
+    - The file must be a valid Python file (`.py`).
+    - The function must be callable and accept exactly one argument.
+    - The function's return value must be a dictionary."""
 
     def __init__(self, file_path: str = "", function_name: str = "process_single", batched: bool = False, **kwargs):
         """

@@ -15,12 +15,17 @@ OP_NAME = "dialog_sentiment_intensity_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class DialogSentimentIntensityMapper(Mapper):
-    """
-    Mapper to predict user's sentiment intensity (from -5 to 5 in default
-    prompt) in dialog. Input from history_key, query_key and
-    response_key. Output lists of intensities and analysis for queries in
-    the dialog.
-    """
+    """Mapper to predict user's sentiment intensity in a dialog, ranging from -5 to 5.
+
+    This operator analyzes the sentiment of user queries in a dialog and outputs a list of
+    sentiment intensities and corresponding analyses. The sentiment intensity ranges from -5
+    (extremely negative) to 5 (extremely positive), with 0 indicating a neutral sentiment.
+    The analysis is based on the provided history, query, and response keys. The default
+    system prompt and templates guide the sentiment analysis process. The results are stored
+    in the meta field under 'dialog_sentiment_intensity' for intensities and
+    'dialog_sentiment_intensity_analysis' for analyses. The operator uses an API model to
+    generate the sentiment analysis, with configurable retry attempts and sampling
+    parameters."""
 
     DEFAULT_SYSTEM_PROMPT = (
         "请判断用户和LLM多轮对话中用户的情绪变化。\n"

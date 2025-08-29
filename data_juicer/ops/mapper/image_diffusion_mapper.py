@@ -25,9 +25,17 @@ OP_NAME = "image_diffusion_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageDiffusionMapper(Mapper):
-    """
-    Generate image by diffusion model
-    """
+    """Generate images using a diffusion model based on provided captions.
+
+    This operator uses a Hugging Face diffusion model to generate images from given
+    captions. It supports different modes for retaining generated samples, including random
+    selection, similarity-based selection, and retaining all. The operator can also generate
+    captions if none are provided, using a Hugging Face image-to-sequence model. The
+    strength parameter controls the extent of transformation from the reference image, and
+    the guidance scale influences how closely the generated images match the text prompt.
+    Generated images can be saved in a specified directory or the same directory as the
+    input files. This is a batched operation, processing multiple samples at once and
+    producing a specified number of augmented images per sample."""
 
     _accelerator = "cuda"
     _batched_op = True

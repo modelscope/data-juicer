@@ -286,9 +286,25 @@ class GPUMinHashActor:
 
 @OPERATORS.register_module(OP_NAME)
 class RayBTSMinhashDeduplicator(Deduplicator):
-    """
-    A MinhashLSH deduplicator based on RAY.
-    """
+    """A deduplicator that uses MinHash LSH and RAY for efficient near-duplicate text detection
+    and removal.
+
+    This operator tokenizes input texts using the specified method, computes MinHash
+    signatures, and applies LSH to group similar documents. It then uses a union-find
+    algorithm to identify and remove duplicates based on the Jaccard similarity threshold.
+    The key metric, Jaccard similarity, is computed using the MinHash signatures. The
+    operator supports various tokenization methods, including space, punctuation, character,
+    and sentencepiece, with the latter requiring a Hugging Face tokenizer model. The
+    operator can run on both CPU and GPU, with automatic batch size adjustment based on
+    available memory. Important notes:
+    - The `ignore_pattern` parameter allows ignoring specific patterns during MinHash
+      computation.
+    - The `jaccard_threshold` determines the similarity level at which documents are
+      considered duplicates.
+    - The `num_bands` and `num_rows_per_band` parameters can be set manually or determined
+      automatically for optimal performance.
+    - The operator caches stats in fields like 'minhash', 'uid', and 'deduplication_status'.
+    - GPU support is only available for character tokenization."""
 
     # TODO: Set a more reasonable value
     EMPTY_HASH_VALUE = "EMPTY"

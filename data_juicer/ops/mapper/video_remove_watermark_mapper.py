@@ -30,9 +30,16 @@ OP_NAME = "video_remove_watermark_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoRemoveWatermarkMapper(Mapper):
-    """
-    Remove the watermarks in videos given regions.
-    """
+    """Remove watermarks from videos based on specified regions.
+
+    This operator removes watermarks from video frames by detecting and masking the
+    watermark areas. It supports two detection methods: 'pixel_value' and 'pixel_diversity'.
+    The regions of interest (ROIs) for watermark detection can be specified as either pixel
+    coordinates or ratios of the frame dimensions. The operator extracts a set number of
+    frames uniformly from the video to detect watermark pixels. A pixel is considered part
+    of a watermark if it meets the detection criteria in a minimum number of frames. The
+    cleaned video is saved in the specified directory or the same directory as the input
+    file if no save directory is provided."""
 
     def __init__(
         self,

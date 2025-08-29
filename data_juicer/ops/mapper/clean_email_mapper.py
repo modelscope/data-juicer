@@ -7,7 +7,14 @@ from ..base_op import OPERATORS, Mapper
 
 @OPERATORS.register_module("clean_email_mapper")
 class CleanEmailMapper(Mapper):
-    """Mapper to clean email in text samples."""
+    """Cleans email addresses from text samples using a regular expression.
+
+    This operator removes or replaces email addresses in the text based on a regular
+    expression pattern. By default, it uses a standard pattern to match email addresses, but
+    a custom pattern can be provided. The matched email addresses are replaced with a
+    specified replacement string, which defaults to an empty string. The operation is
+    applied to each text sample in the batch. If no email address is found in a sample, it
+    remains unchanged."""
 
     _batched_op = True
 

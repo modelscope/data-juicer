@@ -1,0 +1,64 @@
+# video_split_by_scene_mapper
+
+Splits videos into scene clips based on detected scene changes.
+
+This operator uses a specified scene detector to identify and split video scenes. It
+supports three types of detectors: ContentDetector, ThresholdDetector, and
+AdaptiveDetector. The operator processes each video in the sample, detects scenes, and
+splits the video into individual clips. The minimum length of a scene can be set, and
+progress can be shown during processing. The resulting clips are saved in the specified
+directory or the same directory as the input files if no save directory is provided. The
+operator also updates the text field in the sample to reflect the new video clips. If a
+video does not contain any scenes, it remains unchanged.
+
+Type 算子类型: **mapper**
+
+Tags 标签: cpu, multimodal
+
+## 🔧 Parameter Configuration 参数配置
+| name 参数名 | type 类型 | default 默认值 | desc 说明 |
+|--------|------|--------|------|
+| `detector` | <class 'str'> | `'ContentDetector'` | Algorithm from `scenedetect.detectors`. Should be one |
+| `threshold` | typing.Annotated[float, Ge(ge=0)] | `27.0` | Threshold passed to the detector. |
+| `min_scene_len` | typing.Annotated[int, Ge(ge=0)] | `15` | Minimum length of any scene. |
+| `show_progress` | <class 'bool'> | `False` | Whether to show progress from scenedetect. |
+| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. |
+| `args` |  | `''` | extra args |
+| `kwargs` |  | `''` | extra args |
+
+## 📊 Effect demonstration 效果演示
+### test_ContentDetector
+```python
+VideoSplitBySceneMapper(detector='ContentDetector', threshold=27.0, min_scene_len=15)
+```
+
+#### 📥 input data 输入数据
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> 1 video</div><div class="media-section" style="margin-bottom:8px;"><div class="media-label" style="font-size:0.85em; color:#666; margin-bottom:4px; font-weight:500;">video1.mp4:</div><div class="video-grid"><video src="../../../tests/ops/data/video1.mp4" controls width="320" style="margin:4px;"></video></div></div></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 2:</strong> 1 video</div><div class="media-section" style="margin-bottom:8px;"><div class="media-label" style="font-size:0.85em; color:#666; margin-bottom:4px; font-weight:500;">video2.mp4:</div><div class="video-grid"><video src="../../../tests/ops/data/video2.mp4" controls width="320" style="margin:4px;"></video></div></div></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 3:</strong> 1 video</div><div class="media-section" style="margin-bottom:8px;"><div class="media-label" style="font-size:0.85em; color:#666; margin-bottom:4px; font-weight:500;">video3.mp4:</div><div class="video-grid"><video src="../../../tests/ops/data/video3.mp4" controls width="320" style="margin:4px;"></video></div></div></div>
+
+#### 📤 output data 输出数据
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> empty</div><details style='margin-top:6px;'><summary style='cursor:pointer;'>other key</summary><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555;'>scene_num</td><td style='padding:4px 8px;'>3</td></tr></table></details></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 2:</strong> empty</div><details style='margin-top:6px;'><summary style='cursor:pointer;'>other key</summary><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555;'>scene_num</td><td style='padding:4px 8px;'>1</td></tr></table></details></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 3:</strong> empty</div><details style='margin-top:6px;'><summary style='cursor:pointer;'>other key</summary><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555;'>scene_num</td><td style='padding:4px 8px;'>2</td></tr></table></details></div>
+
+#### ✨ explanation 解释
+This example uses the ContentDetector to split videos into scenes. The operator splits each video into multiple clips based on detected scene changes, and the number of resulting scenes is counted. For instance, 'video1.mp4' is split into 3 scenes, 'video2.mp4' remains as a single scene, and 'video3.mp4' is split into 2 scenes. For clarity of presentation, the output data here shows the number of scenes per video, but the original output of the operator is the actual video clip.
+这个例子使用了ContentDetector来将视频分割成场景。算子根据检测到的场景变化将每个视频分割成多个片段，并计算结果场景的数量。例如，'video1.mp4'被分割成3个场景，'video2.mp4'保持为一个场景，而'video3.mp4'被分割成2个场景。出于展示的清晰起见，此处输出数据显示每个视频的场景数量，但算子原始输出是实际的视频片段。
+
+### test_default_with_text
+```python
+VideoSplitBySceneMapper()
+```
+
+#### 📥 input data 输入数据
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text | 1 video</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">&lt;__dj__video&gt; this is video1 &lt;|__dj__eoc|&gt;</pre><div class="media-section" style="margin-bottom:8px;"><div class="media-label" style="font-size:0.85em; color:#666; margin-bottom:4px; font-weight:500;">video1.mp4:</div><div class="video-grid"><video src="../../../tests/ops/data/video1.mp4" controls width="320" style="margin:4px;"></video></div></div></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 2:</strong> text | 1 video</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">&lt;__dj__video&gt; this is video2 &lt;|__dj__eoc|&gt;</pre><div class="media-section" style="margin-bottom:8px;"><div class="media-label" style="font-size:0.85em; color:#666; margin-bottom:4px; font-weight:500;">video2.mp4:</div><div class="video-grid"><video src="../../../tests/ops/data/video2.mp4" controls width="320" style="margin:4px;"></video></div></div></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 3:</strong> text | 1 video</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">&lt;__dj__video&gt; this is video3 &lt;|__dj__eoc|&gt;</pre><div class="media-section" style="margin-bottom:8px;"><div class="media-label" style="font-size:0.85em; color:#666; margin-bottom:4px; font-weight:500;">video3.mp4:</div><div class="video-grid"><video src="../../../tests/ops/data/video3.mp4" controls width="320" style="margin:4px;"></video></div></div></div>
+
+#### 📤 output data 输出数据
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">&lt;__dj__video&gt;&lt;__dj__video&gt;&lt;__dj__video&gt; this is video1 &lt;|__dj__eoc|&gt;</pre><details style='margin-top:6px;'><summary style='cursor:pointer;'>other key</summary><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555;'>scene_num</td><td style='padding:4px 8px;'>3</td></tr></table></details></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 2:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">&lt;__dj__video&gt; this is video2 &lt;|__dj__eoc|&gt;</pre><details style='margin-top:6px;'><summary style='cursor:pointer;'>other key</summary><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555;'>scene_num</td><td style='padding:4px 8px;'>1</td></tr></table></details></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 3:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">&lt;__dj__video&gt;&lt;__dj__video&gt; this is video3 &lt;|__dj__eoc|&gt;</pre><details style='margin-top:6px;'><summary style='cursor:pointer;'>other key</summary><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555;'>scene_num</td><td style='padding:4px 8px;'>2</td></tr></table></details></div>
+
+#### ✨ explanation 解释
+This example demonstrates the default behavior of the VideoSplitBySceneMapper, including updating the text field to reflect the new video clips. The operator splits each video into scenes and updates the text to include special tokens for each new video clip. For example, 'video1.mp4' is split into 3 scenes, so the text is updated to include three video tokens. Similarly, 'video2.mp4' remains as one scene, and 'video3.mp4' is split into 2 scenes, with the text updated accordingly. The output data shows the updated text and the number of scenes, but the actual raw output from the operator is the new video clips.
+这个例子展示了VideoSplitBySceneMapper的默认行为，包括更新文本字段以反映新的视频片段。算子将每个视频分割成场景，并更新文本以包含每个新视频片段的特殊标记。例如，'video1.mp4'被分割成3个场景，因此文本被更新为包含三个视频标记。同样，'video2.mp4'保持为一个场景，而'video3.mp4'被分割成2个场景，文本也相应地进行了更新。输出数据显示了更新后的文本和场景数量，但算子的实际原始输出是新的视频片段。
+
+
+## 🔗 related links 相关链接
+- [source code 源代码](../../../data_juicer/ops/mapper/video_split_by_scene_mapper.py)
+- [unit test 单元测试](../../../tests/ops/mapper/test_video_split_by_scene_mapper.py)
+- [Return operator list 返回算子列表](../../Operators.md)

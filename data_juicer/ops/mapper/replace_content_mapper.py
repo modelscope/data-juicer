@@ -7,9 +7,16 @@ from ..base_op import OPERATORS, Mapper
 
 @OPERATORS.register_module("replace_content_mapper")
 class ReplaceContentMapper(Mapper):
-    """Mapper to replace all content in the text that matches
-    a specific regular expression pattern with a designated
-    replacement string."""
+    """Replaces content in the text that matches a specific regular expression pattern with a
+    designated replacement string.
+
+    This operator processes text by searching for patterns defined in `pattern` and
+    replacing them with the corresponding `repl` string. If multiple patterns and
+    replacements are provided, each pattern is replaced by its respective replacement. The
+    operator supports both single and multiple patterns and replacements. The regular
+    expressions are compiled with the `re.DOTALL` flag to match across multiple lines. If
+    the length of the patterns and replacements do not match, a `ValueError` is raised. This
+    operation is batched, meaning it processes multiple samples at once."""
 
     _batched_op = True
 

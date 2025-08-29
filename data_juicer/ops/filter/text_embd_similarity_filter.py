@@ -21,8 +21,15 @@ OP_NAME = "text_embd_similarity_filter"
 @OPERATORS.register_module(OP_NAME)
 @ATTRIBUTION_FILTERS.register_module(OP_NAME)
 class TextEmbdSimilarityFilter(Filter):
-    """Filter to keep texts whose average embedding similarity to a set of given validation texts
-    falls within a specific range."""
+    """Filter to keep texts whose average embedding similarity to a set of given validation
+    texts falls within a specific range.
+
+    This operator computes the cosine similarity between the text embeddings and a set of
+    validation text embeddings. It keeps samples where the average similarity score is
+    within the specified range. The key metric, 'text_embd_similarity', is computed as the
+    mean cosine similarity. The operator supports both API-based and Hugging Face model-
+    based embeddings. If no valid dataset is provided, the `prepare_valid_feature` method
+    must be called manually before applying the filter."""
 
     # TODO: save embeddings in local cache to save computation for multiple validation samples
     # TODO: aggregation strategies

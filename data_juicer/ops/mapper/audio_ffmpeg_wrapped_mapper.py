@@ -13,7 +13,15 @@ OP_NAME = "audio_ffmpeg_wrapped_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class AudioFFmpegWrappedMapper(Mapper):
-    """Simple wrapper for FFmpeg audio filters."""
+    """Wraps FFmpeg audio filters for processing audio files in a dataset.
+
+    This operator applies specified FFmpeg audio filters to the audio files in the dataset.
+    It supports passing custom filter parameters and global arguments to the FFmpeg command
+    line. The processed audio files are saved to a specified directory or the same directory
+    as the input files if no save directory is provided. The `DJ_PRODUCED_DATA_DIR`
+    environment variable can also be used to set the save directory. If no filter name is
+    provided, the audio files remain unmodified. The operator updates the source file paths
+    in the dataset after processing."""
 
     def __init__(
         self,

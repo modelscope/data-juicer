@@ -15,7 +15,15 @@ OP_NAME = "audio_duration_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_AUDIOS.register_module(OP_NAME)
 class AudioDurationFilter(Filter):
-    """Keep data samples whose audios' durations are within a specified range."""
+    """Keep data samples whose audio durations are within a specified range.
+
+    This operator filters data samples based on the duration of their audio files. It keeps
+    samples where the audio duration is between a minimum and maximum value, in seconds. The
+    operator supports two strategies for keeping samples: 'any' (keep if any audio meets the
+    condition) or 'all' (keep only if all audios meet the condition). The audio duration is
+    computed using the `librosa` library. If the audio duration has already been computed,
+    it is retrieved from the sample's stats under the key 'audio_duration'. If no audio is
+    present in the sample, an empty array is stored in the stats."""
 
     def __init__(
         self, min_duration: int = 0, max_duration: int = sys.maxsize, any_or_all: str = "any", *args, **kwargs

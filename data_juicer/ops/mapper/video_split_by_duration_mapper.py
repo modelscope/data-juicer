@@ -30,7 +30,21 @@ OP_NAME = "video_split_by_duration_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoSplitByDurationMapper(Mapper):
-    """Mapper to split video by duration."""
+    """Splits videos into segments based on a specified duration.
+
+    This operator splits each video in the dataset into smaller segments, each with a fixed
+    duration. The last segment is discarded if its duration is less than the specified
+    minimum last split duration. The original sample can be kept or removed based on the
+    `keep_original_sample` parameter. The generated video files are saved in the specified
+    directory or, if not provided, in the same directory as the input files. The key metric
+    for this operation is the duration of each segment, which is character-based (seconds).
+
+    - Splits videos into segments of a specified duration.
+    - Discards the last segment if it is shorter than the minimum allowed duration.
+    - Keeps or removes the original sample based on the `keep_original_sample` parameter.
+    - Saves the generated video files in the specified directory or the input file's
+      directory.
+    - Uses the duration in seconds to determine the segment boundaries."""
 
     _batched_op = True
 

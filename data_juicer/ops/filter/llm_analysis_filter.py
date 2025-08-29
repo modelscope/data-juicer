@@ -23,10 +23,17 @@ OP_NAME = "llm_analysis_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class LLMAnalysisFilter(Filter):
-    """
-    Base filter class for leveraging LLMs to filter various samples. Provides
-    foundational functionality for dimensional scoring (0~5) and tagging.
-    """
+    """Base filter class for leveraging LLMs to analyze and filter data samples.
+
+    This operator uses a Hugging Face or API-based LLM to score and tag data samples across
+    multiple dimensions. It evaluates each sample on clarity, relevance, usefulness, and
+    fluency, providing scores from 1 to 5. The operator also assigns descriptive tags and
+    flags for further review. The average score is computed based on the specified required
+    keys, and samples with an average score below the minimum threshold are filtered out.
+    The analysis results, including scores, tags, and flags, are stored in the sample's
+    stats field under 'llm_analysis_score' and 'llm_analysis_record'. Samples are kept if
+    their average score meets or exceeds the minimum threshold; otherwise, they are
+    discarded."""
 
     # avoid leading whitespace
     DEFAULT_SYSTEM_PROMPT = """You are a meticulous data quality assessor for LLM training. Analyze each data sample across multiple quality dimensions and provide numerical scores, tags, and reasoning. Follow these guidelines:

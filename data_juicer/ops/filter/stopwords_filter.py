@@ -20,7 +20,14 @@ OP_NAME = "stopwords_filter"
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)
 class StopWordsFilter(Filter):
-    """Filter to keep samples with stopword ratio in a specified range."""
+    """Filter to keep samples with a stopword ratio greater than a specified minimum value.
+
+    This operator computes the ratio of stopwords in a sample and retains samples where this
+    ratio is above a given threshold. It supports multiple languages and can use a Hugging
+    Face tokenizer for tokenization. The stopword ratio is calculated as the number of
+    stopwords divided by the total number of words. If the ratio exceeds 1.0, it is capped
+    at 1.0. The key metric used is 'stopwords_ratio', which is cached in the sample's stats.
+    The operator also supports word augmentation for specific languages."""
 
     def __init__(
         self,

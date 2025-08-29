@@ -17,7 +17,16 @@ OP_NAME = "in_context_influence_filter"
 @OPERATORS.register_module(OP_NAME)
 @ATTRIBUTION_FILTERS.register_module(OP_NAME)
 class InContextInfluenceFilter(LLMPerplexityFilter):
-    """Filter to keep texts whose in-context influence upon validation set within a specific range."""
+    """Filter to keep texts based on their in-context influence on a validation set.
+
+    This operator calculates the in-context influence of each sample by comparing
+    perplexities with and without the sample as context. The influence score is computed as
+    the ratio of these perplexities. If `valid_as_demo` is True, the score is L(A|Q) /
+    L(A|task_desc, Q_v, A_v, Q). Otherwise, it is L(A_v|Q) / L(A_v|task_desc, Q, A, Q_v).
+    The operator retains samples whose in-context influence score is within a specified
+    range. The in-context influence score is stored in the 'in_context_influence' field of
+    the sample's stats. The validation set must be prepared using the
+    `prepare_valid_feature` method if not provided during initialization."""
 
     # This operator is currently under development and evaluation as part of an ongoing research project.
     # The Data-Juicer team retains full copyright over this operator.

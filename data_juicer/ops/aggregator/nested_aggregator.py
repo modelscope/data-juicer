@@ -17,10 +17,16 @@ OP_NAME = "nested_aggregator"
 # TODO: LLM-based inference.
 @OPERATORS.register_module(OP_NAME)
 class NestedAggregator(Aggregator):
-    """
-    Considering the limitation of input length, nested aggregate
-    contents for each given number of samples.
-    """
+    """Aggregates nested content from multiple samples into a single summary.
+
+    This operator uses a recursive summarization approach to aggregate content from multiple
+    samples. It processes the input text, which is split into sub-documents, and generates a
+    summary that maintains the average length of the original documents. The aggregation is
+    performed using an API model, and the process is guided by system prompts and templates.
+    The operator supports retrying the API call in case of errors and allows for
+    customization of the summarization process through various parameters. The default
+    system prompt and templates are provided in Chinese, and the final summary is expected
+    to be in the same language."""
 
     DEFAULT_SYSTEM_PROMPT = (
         "给定一些文档碎片，将这些文档整合成一个文档总结。\n"

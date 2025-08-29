@@ -23,8 +23,16 @@ def prepare_converter(mode):
 
 @OPERATORS.register_module(OP_NAME)
 class ChineseConvertMapper(Mapper):
-    """Mapper to convert Chinese between Traditional Chinese, Simplified Chinese
-    and Japanese Kanji."""
+    """Mapper to convert Chinese text between Traditional, Simplified, and Japanese Kanji.
+
+    This operator converts Chinese text based on the specified mode. It supports conversions
+    between Simplified Chinese, Traditional Chinese (including Taiwan and Hong Kong
+    variants), and Japanese Kanji. The conversion is performed using a pre-defined set of
+    rules. The available modes include 's2t' for Simplified to Traditional, 't2s' for
+    Traditional to Simplified, and other specific variants like 's2tw', 'tw2s', 's2hk',
+    'hk2s', 's2twp', 'tw2sp', 't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', and 'jp2t'. The
+    operator processes text in batches and applies the conversion to the specified text key
+    in the samples."""
 
     _batched_op = True
 

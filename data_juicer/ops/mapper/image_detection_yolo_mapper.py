@@ -19,7 +19,15 @@ ultralytics = LazyLoader("ultralytics")
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageDetectionYoloMapper(Mapper):
-    """Perform object detection (with YOLO) on images and return the bounding boxes and class labels."""
+    """Perform object detection using YOLO on images and return bounding boxes and class
+    labels.
+
+    This operator uses a YOLO model to detect objects in images. It processes each image in
+    the sample, returning the bounding boxes and class labels for detected objects. The
+    operator sets the `bbox_tag` and `class_label_tag` fields in the sample's metadata. If
+    no image is present or no objects are detected, it sets `bbox_tag` to an empty array and
+    `class_label_tag` to -1. The operator uses a confidence score threshold and IoU
+    (Intersection over Union) score threshold to filter detections."""
 
     _accelerator = "cuda"
 

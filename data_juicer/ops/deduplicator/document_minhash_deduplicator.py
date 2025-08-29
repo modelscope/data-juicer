@@ -98,12 +98,20 @@ def optimal_param(
 
 @OPERATORS.register_module(OP_NAME)
 class DocumentMinhashDeduplicator(Deduplicator):
-    """
-    Deduplicator to deduplicate samples at document-level using MinHashLSH.
+    """Deduplicates samples at the document level using MinHash LSH.
 
-    Different from simhash, minhash is stored as bytes, so they won't be
-    kept in the final dataset.
-    """
+    This operator computes MinHash values for each sample and uses Locality-Sensitive
+    Hashing (LSH) to identify and remove near-duplicate documents. The Jaccard similarity
+    threshold determines when two documents are considered duplicates. The tokenization
+    method can be customized, and a Hugging Face tokenizer can be used for 'sentencepiece'
+    tokenization. The minhash values are stored as bytes and are not kept in the final
+    dataset. The number of bands and rows per band in LSH can be set manually or determined
+    by an optimal parameter computation algorithm. Important notes:
+    - If using 'punctuation' tokenization with an ignore pattern, ensure the pattern does
+      not include punctuations.
+    - For 'sentencepiece' tokenization, a tokenizer model path is required.
+    - The deduplication process involves clustering and filtering, and only unique samples
+      or the first sample in a cluster are retained."""
 
     def __init__(
         self,

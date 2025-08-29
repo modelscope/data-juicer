@@ -10,7 +10,14 @@ OP_NAME = "extract_tables_from_html_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractTablesFromHtmlMapper(Mapper):
-    """Mapper to extract tables from HTML content."""
+    """Extracts tables from HTML content and stores them in a specified field.
+
+    This operator processes HTML content to extract tables. It can either retain or remove
+    HTML tags based on the `retain_html_tags` parameter. If `retain_html_tags` is False, it
+    can also include or exclude table headers based on the `include_header` parameter. The
+    extracted tables are stored in the `tables_field_name` field within the sample's
+    metadata. If no tables are found, an empty list is stored. If the tables have already
+    been extracted, the operator will not reprocess the sample."""
 
     def __init__(
         self,

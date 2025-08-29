@@ -11,12 +11,18 @@ OP_NAME = "query_topic_detection_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class QueryTopicDetectionMapper(Mapper):
-    """
-    Mapper to predict user's topic label in query. Input from query_key.
-    Output topic label and corresponding score for the query, which is
-    store in 'query_topic_label' and 'query_topic_label_score' in
-    Data-Juicer meta field.
-    """
+    """Predicts the topic label and its corresponding score for a given query. The input is
+    taken from the specified query key. The output, which includes the predicted topic label
+    and its score, is stored in the 'query_topic_label' and 'query_topic_label_score' fields
+    of the Data-Juicer meta field. This operator uses a Hugging Face model for topic
+    classification. If a Chinese to English translation model is provided, it will first
+    translate the query from Chinese to English before predicting the topic.
+
+    - Uses a Hugging Face model for topic classification.
+    - Optionally translates Chinese queries to English using another Hugging Face
+    model.
+    - Stores the predicted topic label in 'query_topic_label'.
+    - Stores the corresponding score in 'query_topic_label_score'."""
 
     _accelerator = "cuda"
     _batched_op = True

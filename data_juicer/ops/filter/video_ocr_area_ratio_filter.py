@@ -37,9 +37,16 @@ def triangle_area(p1, p2, p3):
 @LOADED_VIDEOS.register_module(OP_NAME)
 @INTER_SAMPLED_FRAMES.register_module(OP_NAME)
 class VideoOcrAreaRatioFilter(Filter):
-    """Keep data samples whose detected text area ratios for specified frames
-    in the video are within a specified range.
-    """
+    """Keep data samples whose detected text area ratios for specified frames in the video are
+    within a specified range.
+
+    This operator filters data based on the ratio of the detected text area to the total
+    frame area. It uses EasyOCR to detect text in the specified languages and calculates the
+    area ratio for each sampled frame. The operator then determines whether to keep a sample
+    based on the `any` or `all` strategy, which checks if any or all of the videos meet the
+    specified area ratio range. The key metric, `video_ocr_area_ratio`, is computed as the
+    mean of the text area ratios across the sampled frames. The number of sampled frames and
+    the specific frames to be sampled can be configured."""
 
     _accelerator = "cuda"
 

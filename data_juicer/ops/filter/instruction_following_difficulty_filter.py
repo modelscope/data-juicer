@@ -16,8 +16,14 @@ OP_NAME = "instruction_following_difficulty_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class InstructionFollowingDifficultyFilter(LLMPerplexityFilter):
-    """Filter to keep texts whose instruction follows difficulty (IFD, https://arxiv.org/abs/2308.12032)
-    falls within a specific range."""
+    """Filter to keep texts based on their instruction following difficulty (IFD) score.
+
+    This operator computes the IFD score for each text sample, which is the ratio of the
+    loss with the query to the loss without the query. The IFD score is used to determine
+    the difficulty of following an instruction. Samples are kept if their IFD score falls
+    within a specified range. The IFD score is cached in the 'ifd_score' field of the
+    sample's stats. This operator uses a Hugging Face tokenizer and model to compute the
+    losses."""
 
     _accelerator = "cuda"
 

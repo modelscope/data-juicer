@@ -3,12 +3,14 @@ import os
 import re
 import shutil
 import subprocess
+import argparse
 from pathlib import Path
 from packaging import version as pv
 
 # Repository structure and build configuration
 REPO_ROOT = Path(__file__).resolve().parents[2]   
 SITE_DIR = REPO_ROOT / "docs" / "sphinx_doc" / "build"            # Build output directory
+TEST_DATA_REL = Path("tests/ops/data")
 WORKTREES_DIR = REPO_ROOT / ".worktrees"          # Temporary worktree directory for version builds
 DOCS_REL = Path("docs/sphinx_doc")
 LANGS = ["en", "zh_CN"]                           # Supported documentation languages
@@ -73,8 +75,10 @@ def copy_markdown_files(wt_root: Path):
         target.parent.mkdir(parents=True, exist_ok=True)
         if not target.exists():
             shutil.copy2(md_file, target)
+    
+    shutil.copytree(wt_root / TEST_DATA_REL, wt_root / DOCS_REL / "source" / "extra" / TEST_DATA_REL, dirs_exist_ok=True)
 
-def build_one(ref: str, ref_label: str, available_versions: list[str]):
+def build_one(ref: str, ref_label: str, available_versions: list[str], enable_api_doc: bool = True):
     """Build documentation for a single version/branch"""
     # Create and setup worktree for the specific git reference
     wt = WORKTREES_DIR / ref_label
@@ -106,15 +110,16 @@ def build_one(ref: str, ref_label: str, available_versions: list[str]):
         env["REPO_ROOT"] = str(wt)                   # Version-specific repo root for copying markdown files
         env["CODE_ROOT"] = str(wt)                   # Version-specific code root for autodoc imports
         
-        # Generate the API rst files
-        api_cmd = [
-            "sphinx-apidoc",
-            "-o", str(wt / DOCS_REL / "source" / "api"),
-            str(wt / "data_juicer"),
-            "-t", "_templates",
-            "-e"
-        ]
-        run(api_cmd, env=env)
+        # Generate the API rst files (only if enabled)
+        if enable_api_doc:
+            api_cmd = [
+                "sphinx-apidoc",
+                "-o", str(wt / DOCS_REL / "source" / "api"),
+                str(wt / "data_juicer"),
+                "-t", "_templates",
+                "-e"
+            ]
+            run(api_cmd, env=env)
         
         # Execute Sphinx build command
         cmd = [
@@ -135,17 +140,78 @@ def build_one(ref: str, ref_label: str, available_versions: list[str]):
         except Exception:
             pass
 
+def parse_args():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description="Build multi-version documentation",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Example usage:
+  %(prog)s                                    # Default: build main branch with tags and API docs enabled
+  %(prog)s --no-api-doc                       # Disable API documentation generation
+  %(prog)s --no-tags                          # Build branches only, exclude tags
+  %(prog)s --branches main dev feature/new   # Specify branch list to build
+  %(prog)s --no-tags --branches main dev     # Build specified branches only, exclude tags
+        """
+    )
+    
+    parser.add_argument(
+        "--no-api-doc",
+        action="store_true",
+        help="Disable API documentation generation (default: API docs enabled)"
+    )
+    
+    parser.add_argument(
+        "--no-tags",
+        action="store_true", 
+        help="Exclude version tags, build branches only (default: include tags)"
+    )
+    
+    parser.add_argument(
+        "--branches",
+        nargs="+",
+        default=["main"],
+        help="Specify branch list to build (default: ['main'])"
+    )
+    
+    return parser.parse_args()
+
 def main():
     """Main entry point: build documentation for all versions"""
+    args = parse_args()
+    
+    print(f"[CONFIG] API documentation generation: {'Disabled' if args.no_api_doc else 'Enabled'}")
+    print(f"[CONFIG] Include version tags: {'No' if args.no_tags else 'Yes'}")
+    print(f"[CONFIG] Build branches: {args.branches}")
+    
     WORKTREES_DIR.mkdir(exist_ok=True)
-    tags = get_tags()
-    tags.sort(key=pv.parse, reverse=True)
-    versions = ["main"] + tags                      # Build main branch + all valid tags
-
-    # Build main branch first, then all tagged versions
-    build_one("main", "main", versions)
-    for t in tags:
-        build_one(t, t, versions)
+    
+    # Get version list
+    versions = list(args.branches)  # Start with branches specified from command line
+    
+    # If tags are enabled, get and add tags
+    if not args.no_tags:
+        tags = get_tags()
+        tags.sort(key=pv.parse, reverse=True)
+        versions.extend(tags)
+        print(f"[INFO] Found {len(tags)} valid tags")
+    
+    print(f"[INFO] Total {len(versions)} versions to build: {versions}")
+    
+    enable_api_doc = not args.no_api_doc
+    
+    # Build all specified branches
+    for branch in args.branches:
+        print(f"[BUILD] Building branch: {branch}")
+        build_one(branch, branch, versions, enable_api_doc)
+    
+    # If tags are enabled, build all tag versions
+    if not args.no_tags:
+        tags = get_tags()
+        tags.sort(key=pv.parse, reverse=True)
+        for t in tags:
+            print(f"[BUILD] Building tag: {t}")
+            build_one(t, t, versions, enable_api_doc)
 
 if __name__ == "__main__":
     main()

@@ -9,8 +9,13 @@ from ..base_op import OPERATORS, Mapper
 
 @OPERATORS.register_module("clean_copyright_mapper")
 class CleanCopyrightMapper(Mapper):
-    """Mapper to clean copyright comments at the beginning of the text
-    samples."""
+    """Cleans copyright comments at the beginning of text samples.
+
+    This operator removes copyright comments from the start of text samples. It identifies
+    and strips multiline comments that contain the word "copyright" using a regular
+    expression. It also greedily removes lines starting with comment markers like `//`, `#`,
+    or `--` at the beginning of the text, as these are often part of copyright headers. The
+    operator processes each sample individually but can handle batches for efficiency."""
 
     _batched_op = True
 

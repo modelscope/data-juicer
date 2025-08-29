@@ -10,7 +10,14 @@ from ..base_op import OPERATORS, Mapper
 
 @OPERATORS.register_module("clean_links_mapper")
 class CleanLinksMapper(Mapper):
-    """Mapper to clean links like http/https/ftp in text samples."""
+    """Mapper to clean links like http/https/ftp in text samples.
+
+    This operator removes or replaces URLs and other web links in the text. It uses a
+    regular expression pattern to identify and remove links. By default, it replaces the
+    identified links with an empty string, effectively removing them. The operator can be
+    customized with a different pattern and replacement string. It processes samples in
+    batches and modifies the text in place. If no links are found in a sample, it is left
+    unchanged."""
 
     _batched_op = True
 

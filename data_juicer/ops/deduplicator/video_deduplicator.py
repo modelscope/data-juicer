@@ -15,10 +15,15 @@ OP_NAME = "video_deduplicator"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoDeduplicator(Deduplicator):
-    """
-    Deduplicator to deduplicate samples at document-level using exact matching
-    of videos between documents.
-    """
+    """Deduplicates samples at the document level using exact matching of videos.
+
+    This operator computes a hash for each video in the sample and uses it to identify and
+    remove duplicate documents. If `consider_text` is set to True, it also considers the
+    text hash alongside the video hash for deduplication. The video hash is computed by
+    hashing the video data, including all video streams in the container. The operator
+    supports sampling and tracing of duplicate pairs when the `show_num` parameter is
+    greater than 0. Important fields used for caching include 'videohash' and optionally
+    'hash' if text is considered."""
 
     def __init__(self, consider_text: bool = False, *args, **kwargs):
         """

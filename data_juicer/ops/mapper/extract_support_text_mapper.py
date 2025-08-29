@@ -14,9 +14,14 @@ OP_NAME = "extract_support_text_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractSupportTextMapper(Mapper):
-    """
-    Extract support sub text for a summary.
-    """
+    """Extracts a supporting sub-text from the original text based on a given summary.
+
+    This operator uses an API model to identify and extract a segment of the original text
+    that best matches the provided summary. It leverages a system prompt and input template
+    to guide the extraction process. The extracted support text is stored in the specified
+    meta field key. If the extraction fails or returns an empty string, the original summary
+    is used as a fallback. The operator retries the extraction up to a specified number of
+    times in case of errors."""
 
     DEFAULT_SYSTEM_PROMPT = (
         "你将扮演一个文本摘录助手的角色。你的主要任务是基于给定"

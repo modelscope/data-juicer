@@ -15,7 +15,17 @@ OP_NAME = "nlpcda_zh_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class NlpcdaZhMapper(Mapper):
-    """Mapper to simply augment samples in Chinese based on nlpcda library."""
+    """Augments Chinese text samples using the nlpcda library.
+
+    This operator applies various augmentation methods to Chinese text, such as replacing
+    similar words, homophones, deleting random characters, swapping characters, and
+    replacing equivalent numbers. The number of augmented samples generated can be
+    controlled by the `aug_num` parameter. If `sequential` is set to True, the augmentation
+    methods are applied in sequence; otherwise, they are applied independently. The original
+    sample can be kept or removed based on the `keep_original_sample` flag. It is
+    recommended to use 1-3 augmentation methods at a time to avoid significant changes in
+    the semantics of the samples. Some augmentation methods may not work for special texts,
+    resulting in no augmented samples being generated."""
 
     _batched_op = True
 

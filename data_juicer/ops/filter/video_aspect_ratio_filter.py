@@ -13,8 +13,14 @@ from ..op_fusion import LOADED_VIDEOS
 @LOADED_VIDEOS.register_module("video_aspect_ratio_filter")
 class VideoAspectRatioFilter(Filter):
     """Filter to keep samples with video aspect ratio within a specific range.
-    AspectRatio = W / H.
-    """
+
+    This operator filters samples based on the aspect ratios of their videos. It keeps
+    samples where the video aspect ratios fall within a specified range. The aspect ratio is
+    calculated as the width divided by the height (W / H). The operator supports two
+    strategies for keeping samples: 'any' and 'all'. In 'any' mode, a sample is kept if at
+    least one video meets the aspect ratio condition. In 'all' mode, all videos in the
+    sample must meet the condition for the sample to be kept. The aspect ratios are computed
+    and stored in the 'video_aspect_ratios' field of the sample's stats."""
 
     def __init__(self, min_ratio: str = "9/21", max_ratio: str = "21/9", any_or_all: str = "any", *args, **kwargs):
         """

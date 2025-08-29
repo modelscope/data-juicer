@@ -19,7 +19,16 @@ ultralytics = LazyLoader("ultralytics")
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageSegmentMapper(Mapper):
-    """Perform segment-anything on images and return the bounding boxes."""
+    """Perform segment-anything on images and return the bounding boxes.
+
+    This operator uses a FastSAM model to detect and segment objects in images, returning
+    their bounding boxes. It processes each image in the sample, and stores the bounding
+    boxes in the 'bbox_tag' field under the 'meta' key. If no images are present in the
+    sample, an empty array is stored instead. The operator allows setting the image
+    resolution, confidence threshold, and IoU (Intersection over Union) score threshold for
+    the segmentation process. Bounding boxes are represented as N x M x 4 arrays, where N is
+    the number of images, M is the number of detected boxes, and 4 represents the
+    coordinates."""
 
     _accelerator = "cuda"
 

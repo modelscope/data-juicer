@@ -16,7 +16,22 @@ OP_NAME = "remove_words_with_incorrect_substrings_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
-    """Mapper to remove words with incorrect substrings."""
+    """Mapper to remove words containing specified incorrect substrings.
+
+    This operator processes text by removing words that contain any of the specified
+    incorrect substrings. By default, it removes words with substrings like "http", "www",
+    ".com", "href", and "//". The operator can operate in tokenized or non-tokenized mode.
+    In tokenized mode, it uses a Hugging Face tokenizer to tokenize the text before
+    processing. The key metric is not computed; this operator focuses on filtering out
+    specific words.
+
+    - If `tokenization` is True, the text is tokenized using a Hugging Face
+    tokenizer, and words are filtered based on the specified substrings.
+    - If `tokenization` is False, the text is split into sentences and words,
+    and words are filtered based on the specified substrings.
+    - The filtered text is then merged back into a single string.
+
+    The operator processes samples in batches and updates the text in place."""
 
     _batched_op = True
 

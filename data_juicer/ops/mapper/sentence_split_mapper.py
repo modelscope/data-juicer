@@ -9,7 +9,13 @@ OP_NAME = "sentence_split_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class SentenceSplitMapper(Mapper):
-    """Mapper to split text samples to sentences."""
+    """Splits text samples into individual sentences based on the specified language.
+
+    This operator uses an NLTK-based tokenizer to split the input text into sentences. The
+    language for the tokenizer is specified during initialization. The original text in each
+    sample is replaced with a list of sentences. This operator processes samples in batches
+    for efficiency. Ensure that the `lang` parameter is set to the appropriate language code
+    (e.g., "en" for English) to achieve accurate sentence splitting."""
 
     _batched_op = True
 

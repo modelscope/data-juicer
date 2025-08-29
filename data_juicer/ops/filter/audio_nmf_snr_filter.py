@@ -54,9 +54,17 @@ def compute_nmf_snr(audio_data, nmf_iter=500):
 @OPERATORS.register_module(OP_NAME)
 @LOADED_AUDIOS.register_module(OP_NAME)
 class AudioNMFSNRFilter(Filter):
-    """Keep data samples whose audios' SNRs (computed based on NMF) are within
-    a specified range.
-    """
+    """Keep data samples whose audio Signal-to-Noise Ratios (SNRs) are within a specified
+    range.
+
+    This operator computes the SNR of each audio in a sample using Non-negative Matrix
+    Factorization (NMF). It then filters the samples based on whether their SNRs fall within
+    the given minimum and maximum thresholds. The SNR is computed for each audio, and the
+    filtering strategy can be set to either 'any' or 'all'. In 'any' mode, a sample is kept
+    if at least one of its audios meets the SNR criteria. In 'all' mode, all audios must
+    meet the criteria for the sample to be kept. The NMF computation uses a specified number
+    of iterations. If no audio is present in the sample, the SNR is recorded as an empty
+    array. The key metric is stored in the 'audio_nmf_snr' field."""
 
     def __init__(
         self,

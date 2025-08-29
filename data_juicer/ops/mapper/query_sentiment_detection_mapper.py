@@ -11,13 +11,13 @@ OP_NAME = "query_sentiment_detection_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class QuerySentimentDetectionMapper(Mapper):
-    """
-    Mapper to predict user's sentiment label ('negative', 'neutral' and
-    'positive') in query. Input from query_key.
-    Output label and corresponding score for the query, which is
-    store in 'query_sentiment_label' and
-    'query_sentiment_label_score' in Data-Juicer meta field.
-    """
+    """Predicts user's sentiment label ('negative', 'neutral', 'positive') in a query.
+
+    This mapper takes input from the specified query key and outputs the predicted sentiment
+    label and its corresponding score. The results are stored in the Data-Juicer meta field
+    under 'query_sentiment_label' and 'query_sentiment_label_score'. It uses a Hugging Face
+    model for sentiment detection. If a Chinese-to-English translation model is provided, it
+    first translates the query from Chinese to English before performing sentiment analysis."""
 
     _accelerator = "cuda"
     _batched_op = True

@@ -9,8 +9,13 @@ from ..base_op import OPERATORS, Mapper
 
 @OPERATORS.register_module("expand_macro_mapper")
 class ExpandMacroMapper(Mapper):
-    """Mapper to expand macro definitions in the document body of Latex
-    samples."""
+    """Expands macro definitions in the document body of LaTeX samples.
+
+    This operator processes LaTeX documents to expand user-defined macros in the text. It
+    supports \\newcommand and \\def macros without arguments. Macros are identified and
+    expanded in the text, ensuring they are not part of longer alphanumeric words. The
+    operator currently does not support macros with arguments. The processed text is updated
+    in the samples."""
 
     _batched_op = True
 

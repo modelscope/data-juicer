@@ -15,11 +15,16 @@ OP_NAME = "dialog_sentiment_detection_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class DialogSentimentDetectionMapper(Mapper):
-    """
-    Mapper to generate user's sentiment labels in dialog. Input from
-    history_key, query_key and response_key. Output lists of
-    labels and analysis for queries in the dialog.
-    """
+    """Generates sentiment labels and analysis for user queries in a dialog.
+
+    This operator processes a dialog to detect and label the sentiments expressed by the
+    user. It uses the provided history, query, and response keys to construct prompts for an
+    API call. The API returns sentiment analysis and labels, which are then parsed and
+    stored in the sample's metadata under the 'dialog_sentiment_labels' and
+    'dialog_sentiment_labels_analysis' keys. The operator supports custom templates and
+    patterns for prompt construction and output parsing. If no sentiment candidates are
+    provided, it uses open-domain sentiment labels. The operator retries the API call up to
+    a specified number of times in case of errors."""
 
     DEFAULT_SYSTEM_PROMPT = (
         "请判断用户和LLM多轮对话中用户所具有的情绪。\n"

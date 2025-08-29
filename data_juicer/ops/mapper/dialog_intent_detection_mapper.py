@@ -15,11 +15,17 @@ OP_NAME = "dialog_intent_detection_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class DialogIntentDetectionMapper(Mapper):
-    """
-    Mapper to generate user's intent labels in dialog. Input from
-    history_key, query_key and response_key. Output lists of
-    labels and analysis for queries in the dialog.
-    """
+    """Generates user's intent labels in a dialog by analyzing the history, query, and
+    response.
+
+    This operator processes a dialog to identify and label the user's intent. It uses a
+    predefined system prompt and templates to build input prompts for an API call. The API
+    model (e.g., GPT-4) is used to analyze the dialog and generate intent labels and
+    analysis. The results are stored in the meta field under 'dialog_intent_labels' and
+    'dialog_intent_labels_analysis'. The operator supports customizing the system prompt,
+    templates, and patterns for parsing the API response. If the intent candidates are
+    provided, they are included in the input prompt. The operator retries the API call up to
+    a specified number of times if there are errors."""
 
     DEFAULT_SYSTEM_PROMPT = (
         "请判断用户和LLM多轮对话中用户的意图。\n"
