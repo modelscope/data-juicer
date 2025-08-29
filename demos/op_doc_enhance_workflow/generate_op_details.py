@@ -68,6 +68,14 @@ PROMPTS = {
         "{briefs}\n\n"
         "Please respond with a JSON in the following format only:\n"
         "{json_example}"
+        "Read the output data of the test file and candidate examples carefully. "
+        "If you find that the original output of the operator has been additionally processed in the test file "
+        "(such as calculating the size, transformation, etc.), "
+        "Please explain what transformations have been made so that users do not mistake output data for "
+        "the original output of the operator. "
+        "For example: 'For clarity, we show the (width, height) of each video in the raw output; "
+        "the actual raw output from the operator is four cropped videos.'"
+        "if output data is that original output of the operator, no additional specification is require"
     ),
     "select_json_example": (
         '{"selected": ["test_xxx", "test_yyy"], "explanations": {"test_xxx": "English explanation.\\n中文解释。", '
@@ -230,6 +238,8 @@ def parse_existing_op_md(md_text: str) -> dict:
 
 def load_existing_op_md(op_name: str, op_type: str):
     """Load and parse existing operator markdown if present."""
+    # if op_type == "mapper":
+    #     return None
     md_path = OPS_DOCS_DIR / op_type / f"{op_name}.md"
     if md_path.exists():
         try:
@@ -395,7 +405,7 @@ def process_example(examples, attr_map, op_info, test_file_full, existing_exampl
         # Selection + explanation via LLM based on full test file and pre-screened method names
         select_methods, explanations = select_and_explain_examples(
             usable,
-            op_desc=op_info["desc"],
+            op_info=op_info,
             test_file_full=test_file_full,
         )
 
@@ -413,7 +423,7 @@ def process_example(examples, attr_map, op_info, test_file_full, existing_exampl
     return examples_list
 
 
-def select_and_explain_examples(examples: dict, op_desc: str = "", test_file_full: str = ""):
+def select_and_explain_examples(examples: dict, op_info: dict, test_file_full: str = ""):
     """
     Drive LLM to select and explain examples.
 
@@ -428,7 +438,9 @@ def select_and_explain_examples(examples: dict, op_desc: str = "", test_file_ful
         return [], {}
 
     briefs = []
-    if op_desc:
+    op_desc = ""
+    if op_info.get("desc"):
+        op_desc = op_info.get("desc")
         briefs.append(f"op_desc: {op_desc}")
     for m, v in examples.items():
         briefs.append(_build_example_brief(m, v))
@@ -462,7 +474,7 @@ def select_and_explain_examples(examples: dict, op_desc: str = "", test_file_ful
         print(f"[LLM select+explain] selected: {selected}, explanations: {list(explanations.values())}")
         return selected, explanations
     except Exception as e:
-        print(f"[LLM select+explain] parse error: {e}")
+        print(f"[LLM select+explain] parse error: {e} op: {op_info['name']}")
         return [], {}
 
 def camel_to_snake(camel_str):

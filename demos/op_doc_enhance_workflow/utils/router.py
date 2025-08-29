@@ -88,6 +88,8 @@ def _to_samples(raw: Any, md_dir: Path) -> List[Dict[str, Any]]:
         # Handle single dictionary
         norm = _normalize_sample_dict(raw, md_dir)
         return [norm if norm else {"meta": raw}]
+    if isinstance(raw, list) and raw:
+        return [{"list": str(raw)}]
     # Fallback: convert to string
     return [{"text": str(raw)}]
 

@@ -67,6 +67,8 @@ def _render_sample_header(sample_idx: int, sample: Dict[str, Any]) -> str:
         content_types.append("text")
     if sample.get("answer"):
         content_types.append("answer")
+    if sample.get("list"):
+        content_types.append("list")
     if sample.get("images"):
         count = len(sample["images"])
         content_types.append(f"{count} image{'s' if count != 1 else ''}")
@@ -98,6 +100,10 @@ def _render_sample_card(sample: Dict[str, Any], sample_idx: int) -> str:
     # Handle text-only content
     elif sample.get("text"):
         parts.append(_render_text_block(str(sample["text"])))
+    
+    # Handle list-only content 
+    if sample.get("list"):
+        parts.append(_render_text_block(str(sample["list"])))
 
     # Handle media content with counts and labels
     if sample.get("images"):
