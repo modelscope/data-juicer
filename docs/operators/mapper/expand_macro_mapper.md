@@ -44,6 +44,28 @@ Tags 标签: cpu, text
 \setuptodonotes{inline}
 
 \usepackage{makecell}
+\newcomm...</pre><details style='margin:6px 0;'><summary style='cursor:pointer; color:#0366d6;'>Show more 展开更多 (2024 more chars)</summary><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">\documentclass{article}
+% Recommended, but optional, packages for figures and better typesetting:
+\usepackage{microtype}
+\usepackage{graphicx}
+
+% Attempt to make hyperref and algorithmic work together better:
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+% For theorems and such
+\usepackage{amsmath}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+
+\usepackage[textsize=small]{todonotes}
+\setuptodonotes{inline}
+
+\usepackage{makecell}
 \newcommand{\cmark}{\ding{51}\xspace}%
 \newcommand{\xmark}{\ding{55}\xspace}%
 
@@ -102,10 +124,32 @@ In the specialization stage, the optimal architectures under given  resource con
 \section{Regularization \&amp; Data Augmentation}\label{appendix:aug}
 \renewcommand{\arraystretch}{1.2}
 \end{document}
-</pre></div>
+</pre></details></div>
 
 #### 📤 output data 输出数据
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">\documentclass{article}
+% Recommended, but optional, packages for figures and better typesetting:
+\usepackage{microtype}
+\usepackage{graphicx}
+
+% Attempt to make hyperref and algorithmic work together better:
+\newcommand{\arabic{algorithm}}{\arabic{algorithm}}
+% For theorems and such
+\usepackage{amsmath}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+
+\usepackage[textsize=small]{todonotes}
+\setuptodonotes{inline}
+
+\usepackage{makecell}
+\new...</pre><details style='margin:6px 0;'><summary style='cursor:pointer; color:#0366d6;'>Show more 展开更多 (2080 more chars)</summary><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">\documentclass{article}
 % Recommended, but optional, packages for figures and better typesetting:
 \usepackage{microtype}
 \usepackage{graphicx}
@@ -185,7 +229,7 @@ In the specialization stage, the optimal architectures under given  resource con
 \section{Regularization \&amp; Data Augmentation}\label{appendix:aug}
 \renewcommand{\arraystretch}{1.2}
 \end{document}
-</pre></div>
+</pre></details></div>
 
 #### ✨ explanation 解释
 The operator expands the user-defined macros in a LaTeX document. It looks for \newcommand and \def without arguments and replaces them with their defined values. In this example, macros like \alambic, \cmark, \xmark, \Zerocost, and \imagenet are expanded to their corresponding definitions. The output data is not the direct result of the operator; it has been processed to compare with a target value to ensure the correctness of the expansion.

@@ -36,6 +36,19 @@ Tags 标签: cpu, text
 \title{Hierarchical Cross Contrastive Learning of Visual Representations}
 %%
 %% The &quot;author&quot; command and its associated commands are used to define
+%% the auth...</pre><details style='margin:6px 0;'><summary style='cursor:pointer; color:#0366d6;'>Show more 展开更多 (1972 more chars)</summary><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">%%
+%% This is file `sample-sigconf.tex&#x27;,
+%% The first command in your LaTeX source must be the \documentclass command.
+\documentclass[sigconf,review,anonymous]{acmart}
+%% NOTE that a single column version is required for 
+%% submission and peer review. This can be done by changing
+\input{math_commands.tex}
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+%% The &quot;title&quot; command has an optional parameter,
+\title{Hierarchical Cross Contrastive Learning of Visual Representations}
+%%
+%% The &quot;author&quot; command and its associated commands are used to define
 %% the authors and their affiliations.
 \author{Hesen Chen}
 \affiliation{%
@@ -94,10 +107,28 @@ We propose HCCL
 \endinput
 %%
 %% End of file `sample-sigconf.tex&#x27;.
-</pre></div>
+</pre></details></div>
 
 #### 📤 output data 输出数据
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">\section{Introduction}
+\begin{itemize}
+\end{itemize}
+\section{Related Work}
+\label{gen_inst} Self-supervised
+\section{Method}
+\label{method}In this section,
+\subsection{Framework} kkk
+\subsection{Cross Contrastive Loss}
+Since $\sZ^n$ are extracted
+\subsection{Implementation details}
+\textbf{Image augmentations} We use
+\textbf{Architecture} We use
+\textbf{Optimization} We adapt 
+\section{Experiments}
+\label{experiments}In this section
+\subsection{Linear and Semi-Supervised Evaluations on ImageNet}
+\textbf{Linear evaluation on ImageNet} We firs
+\textbf{Semi-supervised learning on ImageNet} We si...</pre><details style='margin:6px 0;'><summary style='cursor:pointer; color:#0366d6;'>Show more 展开更多 (747 more chars)</summary><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">\section{Introduction}
 \begin{itemize}
 \end{itemize}
 \section{Related Work}
@@ -136,7 +167,7 @@ We propose HCCL
 \endinput
 %%
 %% End of file `sample-sigconf.tex&#x27;.
-</pre></div>
+</pre></details></div>
 
 #### ✨ explanation 解释
 The operator removes the header content from the LaTeX document, including the preamble and title information, leaving only the main body of the text. The input data contains a full LaTeX document with headers, while the output data shows the document starting from the \section{Introduction} part, meaning all the preceding content (such as \documentclass, \title, \author, etc.) has been removed. In this case, the output data is the direct result of the operator's processing, without any further transformation.
