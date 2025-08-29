@@ -32,8 +32,8 @@ Tags 标签: cpu, text
 *ContactWelcome to My WebsiteLorem ipsum dolor sit amet, consectetur adipiscing elit.Learn More© 2021 My Website. All Rights Reserved.</pre></div>
 
 #### ✨ explanation 解释
-This example demonstrates how the operator cleans a complete HTML text, removing all HTML tags and preserving the text content. The <li> tags are replaced with bullet points to make the list items more readable. The output is a plain text version of the original HTML, which is easier to read and process.
-这个例子展示了算子如何清理完整的HTML文本，移除所有的HTML标签并保留文本内容。<li>标签被替换为项目符号，使列表项更易读。输出是原始HTML的纯文本版本，更易于阅读和处理。
+This example demonstrates the operator's ability to process a full HTML document, converting it into plain text. It removes all HTML tags and preserves the text content. The `<li>` tags are replaced with bullet points, and other elements like headers and paragraphs are flattened into a continuous string. This is useful for extracting readable text from web pages.
+此示例展示了算子处理完整HTML文档的能力，将其转换为纯文本。它移除所有HTML标签并保留文本内容。`<li>`标签被替换为项目符号，而其他如标题和段落的元素则被展平成连续的字符串。这对于从网页中提取可读文本非常有用。
 
 ### test_no_html_text
 
@@ -44,8 +44,8 @@ This example demonstrates how the operator cleans a complete HTML text, removing
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">This is a test</pre></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 2:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">这是个测试</pre></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 3:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">12345678</pre></div>
 
 #### ✨ explanation 解释
-In this example, the operator processes texts that do not contain any HTML tags. As there are no HTML elements to clean, the input and output texts remain the same. This shows that the operator can handle plain text without making any changes, ensuring that non-HTML content is left untouched.
-在这个例子中，算子处理不包含任何HTML标签的文本。由于没有需要清理的HTML元素，输入和输出文本保持不变。这表明算子可以处理纯文本而不做任何更改，确保非HTML内容不会受到影响。
+In this example, the input data does not contain any HTML tags. As a result, the operator simply returns the original text without making any changes. This case illustrates that the operator can handle plain text inputs effectively, ensuring that non-HTML content remains unchanged.
+在此示例中，输入数据不包含任何HTML标签。因此，算子直接返回原始文本，不做任何更改。这个案例说明了算子可以有效处理纯文本输入，确保非HTML内容保持不变。
 
 
 ## 🔗 related links 相关链接

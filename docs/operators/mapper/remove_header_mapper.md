@@ -139,8 +139,8 @@ We propose HCCL
 </pre></div>
 
 #### ✨ explanation 解释
-The operator removes the header and preamble sections from a LaTeX document, leaving only the main content. In this example, all the initial parts of the document such as the document class, title, author, and abstract are removed, and the text starting from the 'Introduction' section is kept. This is useful for processing documents where the focus is on the main body rather than the metadata or formatting commands.
-算子从LaTeX文档中移除标题和前言部分，只保留主要内容。在这个例子中，文档的初始部分如文档类、标题、作者和摘要都被移除了，而从'Introduction'章节开始的文本被保留下来。这对于处理关注主体内容而非元数据或格式命令的文档非常有用。
+The operator removes the header content from the LaTeX document, including the preamble and title information, leaving only the main body of the text. The input data contains a full LaTeX document with headers, while the output data shows the document starting from the \section{Introduction} part, meaning all the preceding content (such as \documentclass, \title, \author, etc.) has been removed. In this case, the output data is the direct result of the operator's processing, without any further transformation.
+算子从LaTeX文档中移除头部内容，包括前言和标题信息，仅留下正文部分。输入数据包含一个带有头部的完整LaTeX文档，而输出数据显示文档从\section{Introduction}部分开始，意味着所有前面的内容（如\documentclass、\title、\author等）已被移除。
 
 
 ## 🔗 related links 相关链接

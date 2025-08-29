@@ -41,8 +41,8 @@ VideoResizeResolutionMapper()
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[[(640, 360)], [(480, 640)], [(362, 640)]]</pre></div>
 
 #### ✨ explanation 解释
-This example shows the default behavior of the operator, where it does not change the resolution of the videos. The input and output resolutions are the same, meaning no resizing is applied.
-这个示例展示了算子的默认行为，它不会改变视频的分辨率。输入和输出的分辨率相同，这意味着没有进行任何调整。
+This example shows the operator's behavior when no specific width or height constraints are set. The original videos are not resized, and their dimensions remain the same. The output data here is a list of (width, height) tuples for each video, which is derived from the processed videos to help understand the result.
+此示例展示了当未设置特定的宽度或高度约束时，算子的行为。原始视频不会被调整大小，其尺寸保持不变。这里的输出数据是每个视频的（宽度，高度）元组列表，这是从处理后的视频中提取出来的，以帮助理解结果。
 
 ### test_keep_aspect_ratio_decrease_mapper
 ```python
@@ -56,8 +56,8 @@ VideoResizeResolutionMapper(min_width=400, max_width=480, min_height=480, max_he
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[[(480, 270)]]</pre></div>
 
 #### ✨ explanation 解释
-In this case, the operator resizes the video to fit within a specific width and height range (400-480 for both) while maintaining the original aspect ratio by decreasing the dimensions. This means the video is resized in such a way that its width and height are reduced but the ratio between them stays the same, ensuring the video looks the same just smaller.
-在这个例子中，算子在保持原始宽高比的情况下，通过减小尺寸将视频调整到特定的宽度和高度范围（宽度和高度都在400到480之间）。这意味着视频被调整为宽度和高度都减少，但它们之间的比例保持不变，确保视频看起来只是变小了，但形状没有变化。
+In this case, the operator resizes the videos while maintaining the original aspect ratio and ensuring that both the width and height fall within the specified limits. If the original dimensions exceed the maximum, the video is scaled down. The output data here is a list of (width, height) tuples for each video, which is derived from the processed videos to help understand the result.
+在这种情况下，算子在保持原始纵横比的同时调整视频大小，并确保宽度和高度都在指定范围内。如果原始尺寸超过最大值，则视频会被缩小。这里的输出数据是每个视频的（宽度，高度）元组列表，这是从处理后的视频中提取出来的，以帮助理解结果。
 
 
 ## 🔗 related links 相关链接

@@ -168,8 +168,8 @@ We propose HCCL
 </pre></div>
 
 #### ✨ explanation 解释
-The RemoveCommentsMapper operator is used to remove both inline and multiline comments from a TeX document. In this example, the operator is configured to remove both types of comments. The input text contains various comments, such as lines starting with '%%' and lines with '%' in the middle. After processing, all these comments are removed, leaving only the essential parts of the document, like LaTeX commands and content. This results in a cleaner, more readable version of the document without any of the original comments.
-RemoveCommentsMapper算子用于从TeX文档中移除行内和多行注释。在这个例子中，算子被配置为移除两种类型的注释。输入文本包含各种注释，比如以'%%'开头的行以及中间有'%'的行。处理后，所有这些注释都被移除，只保留了文档中的关键部分，如LaTeX命令和内容。这使得文档更干净、更易读，且不包含任何原始注释。
+The operator removes both inline and multiline comments from a LaTeX document. It identifies and deletes any text that starts with '%%' for multiline comments and '%' for inline comments, keeping the rest of the content intact. The result is a cleaned version of the input, where all comments have been removed, leaving only the essential LaTeX code and text.
+算子从LaTeX文档中删除单行和多行注释。它识别并删除以'%%'开头的多行注释和以'%'开头的单行注释，同时保留其余内容不变。结果是清理后的输入版本，其中所有注释都已被移除，仅留下必要的LaTeX代码和文本。
 
 
 ## 🔗 related links 相关链接

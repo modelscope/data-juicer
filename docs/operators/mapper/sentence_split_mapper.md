@@ -33,8 +33,8 @@ SentenceSplitMapper('en')
 The plant slaughters 19,500 pigs a day — 5 percent of U.S. pork.</pre></div>
 
 #### ✨ explanation 解释
-The operator splits the English text into sentences. In this case, it correctly identifies two sentences in the input and separates them with a newline character. The first sentence is about Smithfield's employment, and the second is about the plant's production capacity.
-算子将英文文本拆分成句子。在这个例子中，它正确地识别了输入中的两个句子，并用换行符将它们分隔开。第一个句子是关于史密斯菲尔德的雇佣情况，第二个句子是关于工厂的生产能力。
+The operator splits the English text into individual sentences, inserting a newline character (\n) between them. The input text contains two sentences: one about the number of people employed and another about the number of pigs slaughtered daily. The output shows these sentences separated by a newline, making it clear that the text has been split into its component sentences.
+算子将英文文本拆分成单独的句子，并在它们之间插入换行符（\n）。输入文本包含两个句子：一个是关于雇用人数，另一个是关于每天屠宰的猪的数量。输出显示这些句子被换行符分隔开，清楚地表明文本已被拆分为各个句子。
 
 ### test_fr_text
 ```python
@@ -49,8 +49,8 @@ SentenceSplitMapper('fr')
 L&#x27;usine abat 19 500 porcs par jour, soit 5 % du porc américain.</pre></div>
 
 #### ✨ explanation 解释
-The operator splits the French text into sentences. Here, it also recognizes two sentences in the input and separates them with a newline character. The first sentence is about Smithfield's employment, and the second is about the plant's production capacity.
-算子将法语文本拆分成句子。在这个例子中，它同样正确地识别了输入中的两个句子，并用换行符将它们分隔开。第一个句子是关于史密斯菲尔德的雇佣情况，第二个句子是关于工厂的生产能力。
+The operator splits the French text into individual sentences, inserting a newline character (\n) between them. The input text contains two sentences: one about the number of people employed and another about the number of pigs slaughtered daily. The output shows these sentences separated by a newline, making it clear that the text has been split into its component sentences.
+算子将法语文本拆分成单独的句子，并在它们之间插入换行符（\n）。输入文本包含两个句子：一个是关于雇用人数，另一个是关于每天屠宰的猪的数量。输出显示这些句子被换行符分隔开，清楚地表明文本已被拆分为各个句子。
 
 
 ## 🔗 related links 相关链接

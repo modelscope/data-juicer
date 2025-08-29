@@ -29,8 +29,8 @@ Tags 标签: cpu, text
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">x                       y</pre></div>
 
 #### ✨ explanation 解释
-This example shows how the operator transforms a text containing various types of whitespace characters, including tabs and different Unicode spaces, into a standard space. The input text has a mix of these special spaces between 'x' and 'y', and after processing, all these are converted to regular spaces, making the text more consistent and readable. The result is 'x' followed by 24 standard spaces, then 'y'.
-该示例展示了算子如何将包含各种空格字符（包括制表符和不同的Unicode空格）的文本转换为标准空格。输入文本在'x'和'y'之间混合了这些特殊空格，处理后，所有这些都被转换成了普通空格，使得文本更加一致且易于阅读。结果是'x'后面跟着24个标准空格，然后是'y'。
+This example demonstrates the operator's ability to convert various non-standard whitespace characters, such as tabs and special spaces, into a standard space. In this case, all the unusual whitespace characters between 'x' and 'y' are replaced with a series of standard spaces, resulting in 'x                       y'. This makes the text more consistent and readable.
+此示例展示了算子将各种非标准空白字符（例如制表符和特殊空格）转换为标准空格的能力。在这个例子中，'x' 和 'y' 之间的所有不寻常的空白字符都被替换为一系列的标准空格，结果是 'x                       y'。这使得文本更加一致且易于阅读。
 
 
 ## 🔗 related links 相关链接
