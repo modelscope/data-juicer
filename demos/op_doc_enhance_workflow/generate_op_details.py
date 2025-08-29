@@ -96,7 +96,10 @@ def _build_example_brief(method, vals):
         parts.append(f"input data: {vals.input}")
     if vals.output:
         parts.append(f"output data: {vals.output}")
-    return "\n".join(parts)
+    brief = "\n".join(parts)
+    if len(brief) > 2000:
+        return ""
+    return brief
 
 
 # -----------------------------------------------------------------------------
@@ -444,13 +447,17 @@ def select_and_explain_examples(examples: dict, op_info: dict, test_file_full: s
         briefs.append(f"op_desc: {op_desc}")
     for m, v in examples.items():
         briefs.append(_build_example_brief(m, v))
+        
+    briefs_string=PROMPT_BRIEF_DELIM.join(briefs)
+    if len(briefs_string) > 5000:
+        briefs_string=briefs_string[:5000] + "..." + "subsequent omission"
 
     methods_all = list(examples.keys())
 
     system = PROMPTS["select_system"]
     user = PROMPTS["select_user_template"].format(
         test_file_full=test_file_full,
-        briefs=PROMPT_BRIEF_DELIM.join(briefs),
+        briefs=briefs_string,
         json_example=PROMPTS["select_json_example"],
     )
 
@@ -511,7 +518,7 @@ def main():
         examples_list = []
         test_file = find_test_file(op_info["name"])
         if test_file:
-            test_file_full = test_file.read_text(encoding="utf-8")
+            test_file_full = test_file.read_text(encoding="utf-8")[:5000]
             attr_map = extract_class_attr_paths(test_file)
             examples = process_test_file(test_file)
             examples = {k: v for k, v in examples.items() if not any(x in k for x in ["parallel", "np"])}
