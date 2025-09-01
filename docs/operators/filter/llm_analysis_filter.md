@@ -2,15 +2,11 @@
 
 Base filter class for leveraging LLMs to analyze and filter data samples.
 
-This operator uses a Hugging Face or API-based LLM to score and tag data samples across
-multiple dimensions. It evaluates each sample on clarity, relevance, usefulness, and
-fluency, providing scores from 1 to 5. The operator also assigns descriptive tags and
-flags for further review. The average score is computed based on the specified required
-keys, and samples with an average score below the minimum threshold are filtered out.
-The analysis results, including scores, tags, and flags, are stored in the sample's
-stats field under 'llm_analysis_score' and 'llm_analysis_record'. Samples are kept if
-their average score meets or exceeds the minimum threshold; otherwise, they are
-discarded.
+This operator uses a Hugging Face or API-based LLM to score and tag data samples across multiple dimensions. It evaluates each sample on clarity, relevance, usefulness, and fluency, providing scores from 1 to 5. The operator also assigns descriptive tags and flags for further review. The average score is computed based on the specified required keys, and samples with an average score below the minimum threshold are filtered out. The analysis results, including scores, tags, and flags, are stored in the sample's stats field under 'llm_analysis_score' and 'llm_analysis_record'. Samples are kept if their average score meets or exceeds the minimum threshold; otherwise, they are discarded.
+
+用于利用LLMs分析和过滤数据样本的基本筛选器类。
+
+此运算符使用拥抱面或基于API的LLM对跨多个维度的数据样本进行评分和标记。它评估每个样本的清晰度，相关性，有用性和流畅性，提供1到5的分数。操作员还分配描述性标签和标志以供进一步检查。根据指定的所需键计算平均得分，并过滤出平均得分低于最小阈值的样本。分析结果 (包括分数、标记和标志) 存储在 “llm_analysis_score” 和 “llm_analysis_record” 下的样本统计字段中。如果样本的平均得分满足或超过最小阈值，则保留样本; 否则，丢弃它们。
 
 Type 算子类型: **filter**
 

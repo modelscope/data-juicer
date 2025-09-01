@@ -4,11 +4,19 @@ Extracts and ranks entities closely related to a given entity from provided text
 - The operator uses a language model API to identify and rank entities.
 - It filters out entities of the same type as the given entity.
 - The ranked list is sorted in descending order of importance.
-- The input texts are aggregated and passed to the model, with a token limit if
-specified.
+- The input texts are aggregated and passed to the model, with a token limit if specified.
 - The output is parsed using a regular expression to extract the relevant entities.
 - Results are stored in the batch metadata under the key 'most_relevant_entities'.
 - The operator retries the API call up to a specified number of times in case of errors.
+
+从提供的文本中提取与给定实体密切相关的实体并对其进行排名。
+- 操作员使用语言模型API来识别和排名实体。
+- 它过滤掉与给定实体相同类型的实体。
+- 排名列表按重要性的降序排序。
+- 输入文本被聚合并传递到模型，如果指定了令牌限制。
+- 使用正则表达式解析输出以提取相关实体。
+- 结果存储在键 “most_relevant_entities” 下的批处理元数据中。
+- 在出现错误的情况下，操作员重试API调用指定的次数。
 
 Type 算子类型: **aggregator**
 

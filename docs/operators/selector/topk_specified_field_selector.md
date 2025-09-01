@@ -2,13 +2,11 @@
 
 Selects top samples based on the sorted values of a specified field.
 
-This operator selects the top samples from a dataset based on the values of a specified
-field. The field can be multi-level, with keys separated by dots. The selection is based
-on either a specified ratio of the dataset or a fixed number of top samples. If both
-`top_ratio` and `topk` are provided, the one resulting in fewer samples is used. The
-sorting order can be ascending or descending, controlled by the `reverse` parameter. The
-key metric is the value of the specified field, and the operator uses this to determine
-which samples to keep.
+This operator selects the top samples from a dataset based on the values of a specified field. The field can be multi-level, with keys separated by dots. The selection is based on either a specified ratio of the dataset or a fixed number of top samples. If both `top_ratio` and `topk` are provided, the one resulting in fewer samples is used. The sorting order can be ascending or descending, controlled by the `reverse` parameter. The key metric is the value of the specified field, and the operator uses this to determine which samples to keep.
+
+根据指定字段的排序值选择顶部样本。
+
+此运算符根据指定字段的值从数据集中选择顶部样本。该字段可以是多级的，键由点分隔。该选择基于数据集的指定比率或顶部样本的固定数量。如果提供 “top_ratio” 和 “topk” 两者，则使用导致较少样本的那个。排序顺序可以是升序或降序，由 'reverse' 参数控制。关键指标是指定字段的值，运算符使用它来确定要保留哪些样本。
 
 Type 算子类型: **selector**
 

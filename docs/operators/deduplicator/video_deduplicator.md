@@ -2,13 +2,11 @@
 
 Deduplicates samples at the document level using exact matching of videos.
 
-This operator computes a hash for each video in the sample and uses it to identify and
-remove duplicate documents. If `consider_text` is set to True, it also considers the
-text hash alongside the video hash for deduplication. The video hash is computed by
-hashing the video data, including all video streams in the container. The operator
-supports sampling and tracing of duplicate pairs when the `show_num` parameter is
-greater than 0. Important fields used for caching include 'videohash' and optionally
-'hash' if text is considered.
+This operator computes a hash for each video in the sample and uses it to identify and remove duplicate documents. If `consider_text` is set to True, it also considers the text hash alongside the video hash for deduplication. The video hash is computed by hashing the video data, including all video streams in the container. The operator supports sampling and tracing of duplicate pairs when the `show_num` parameter is greater than 0. Important fields used for caching include 'videohash' and optionally 'hash' if text is considered.
+
+使用视频的精确匹配在文档级别删除重复的样本。
+
+此运算符为样本中的每个视频计算散列，并使用它来识别和删除重复的文档。如果 “consect_text” 设置为True，它还会在视频哈希旁边考虑文本哈希以进行重复数据删除。通过对视频数据 (包括容器中的所有视频流) 进行散列来计算视频散列。当 'show_num' 参数大于0时，该运算符支持重复对的采样和跟踪。用于缓存的重要字段包括 'videohash' 和可选的 'hash' (如果考虑文本)。
 
 Type 算子类型: **deduplicator**
 

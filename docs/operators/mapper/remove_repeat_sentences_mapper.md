@@ -2,13 +2,11 @@
 
 Mapper to remove repeat sentences in text samples.
 
-This operator processes text samples to remove duplicate sentences. It splits the text
-into lines and then further splits each line into sentences. Sentences are considered
-duplicates if they are identical after optional case normalization and special character
-removal. The operator uses a hash set to track unique sentences. Sentences shorter than
-`min_repeat_sentence_length` are not deduplicated. If `ignore_special_character` is
-enabled, special characters (all except Chinese, letters, and numbers) are ignored when
-checking for duplicates. The resulting text is reassembled with unique sentences.
+This operator processes text samples to remove duplicate sentences. It splits the text into lines and then further splits each line into sentences. Sentences are considered duplicates if they are identical after optional case normalization and special character removal. The operator uses a hash set to track unique sentences. Sentences shorter than `min_repeat_sentence_length` are not deduplicated. If `ignore_special_character` is enabled, special characters (all except Chinese, letters, and numbers) are ignored when checking for duplicates. The resulting text is reassembled with unique sentences.
+
+映射器删除文本样本中的重复句子。
+
+此运算符处理文本样本以删除重复的句子。它将文本拆分为行，然后进一步将每行拆分为句子。如果在可选的大小写规范化和特殊字符删除后相同，则句子被视为重复。运算符使用散列集来跟踪唯一的句子。短于 “min_repeat_sentence_length” 的句子不进行重复数据删除。如果启用了 “ignore_special_character”，则在检查重复项时将忽略特殊字符 (除中文、字母和数字以外的所有字符)。生成的文本与独特的句子重新组合。
 
 Type 算子类型: **mapper**
 

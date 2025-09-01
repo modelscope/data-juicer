@@ -4,15 +4,21 @@ Deduplicates samples at the document level by exact matching of images.
 
 This operator compares images across documents to identify and remove duplicates.
 - It uses a specified hash method (default is 'phash') to compute image hashes.
-- If `consider_text` is set, it also considers text content for deduplication,
-using a text deduplicator in conjunction with the image hashes.
-- The key metric, `imagehash`, is computed for each sample. If `consider_text`
-is enabled, an additional `hash` field is used.
-- Duplicates are identified by comparing these hash values. Samples with
-identical hashes are considered duplicates.
-- When `show_num` is greater than 0, the operator also returns a subset of
-duplicate pairs for tracing purposes.
+- If `consider_text` is set, it also considers text content for deduplication, using a text deduplicator in conjunction with the image hashes.
+- The key metric, `imagehash`, is computed for each sample. If `consider_text` is enabled, an additional `hash` field is used.
+- Duplicates are identified by comparing these hash values. Samples with identical hashes are considered duplicates.
+- When `show_num` is greater than 0, the operator also returns a subset of duplicate pairs for tracing purposes.
 - The operator caches the `imagehash` and, if applicable, the `hash` fields.
+
+通过图像的精确匹配在文档级别删除重复的样本。
+
+此运算符会跨文档比较图像，以识别和删除重复项。
+- 它使用指定的哈希方法 (默认为 'phash') 来计算图像哈希。
+- 如果设置了 “consume_text”，它还将文本重复数据删除器与图像哈希一起使用，从而考虑文本内容进行重复数据删除。
+- 为每个样本计算关键度量 “imagehash'”。如果启用了 “consume_text”，则使用附加的 “hash” 字段。
+- 通过比较这些哈希值来识别重复项。具有相同散列的样本被认为是重复的。
+- 当 “show_num” 大于0时，运算符还会返回重复对的子集以进行跟踪。
+- 运算符缓存 'imagehash' 和 'hash' 字段 (如果适用)。
 
 Type 算子类型: **deduplicator**
 

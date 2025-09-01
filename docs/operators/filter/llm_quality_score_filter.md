@@ -2,13 +2,11 @@
 
 Filter to keep samples with a high quality score estimated by an LLM.
 
-This operator uses a Hugging Face LLM to evaluate each sample across multiple quality
-dimensions, including accuracy, grammar, informativeness, and coherence. The LLM
-provides a numerical score for each dimension on a 1-5 scale, along with a rationale and
-recommendation. The overall quality score is then used to filter samples. Samples are
-kept if their quality score meets or exceeds the specified minimum score. The key metric
-is 'llm_quality_score', which is computed based on the LLM's evaluation. The LLM also
-provides a detailed record of its analysis, which is stored in 'llm_quality_record'.
+This operator uses a Hugging Face LLM to evaluate each sample across multiple quality dimensions, including accuracy, grammar, informativeness, and coherence. The LLM provides a numerical score for each dimension on a 1-5 scale, along with a rationale and recommendation. The overall quality score is then used to filter samples. Samples are kept if their quality score meets or exceeds the specified minimum score. The key metric is 'llm_quality_score', which is computed based on the LLM's evaluation. The LLM also provides a detailed record of its analysis, which is stored in 'llm_quality_record'.
+
+过滤器，以保持LLM估计的高质量分数的样本。
+
+此运算符使用拥抱面LLM在多个质量维度上评估每个样本，包括准确性，语法，信息性和连贯性。LLM在1-5量表上提供每个维度的数字分数，以及基本原理和建议。然后使用总体质量分数来过滤样本。如果样品的质量分数达到或超过指定的最低分数，则保留样品。关键指标是 “llm_quality_score”，它是根据LLM的评估计算得出的。LLM还提供了其分析的详细记录，该记录存储在 “llm_quality_record” 中。
 
 Type 算子类型: **filter**
 

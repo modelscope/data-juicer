@@ -5,11 +5,18 @@ Removes non-Chinese characters from text samples.
 This mapper removes all characters that are not part of the Chinese character set.
 - It can optionally keep alphabets, numbers, and punctuation based on the configuration.
 - The removal is done using a regular expression pattern.
-- The pattern is constructed to exclude or include alphabets, numbers, and punctuation
-as specified.
-- The key metric for this operation is the presence of non-Chinese characters, which are
-removed.
+- The pattern is constructed to exclude or include alphabets, numbers, and punctuation as specified.
+- The key metric for this operation is the presence of non-Chinese characters, which are removed.
 - The operator processes samples in a batched manner.
+
+从文本样本中删除非中文字符。
+
+此映射器删除不属于中文字符集的所有字符。
+- 它可以根据配置选择保留字母，数字和标点符号。
+- 删除是使用正则表达式模式完成的。
+- 模式被构造为排除或包括指定的字母、数字和标点符号。
+- 此操作的关键指标是非中文字符的存在，这些字符将被删除。
+- 操作员以批处理方式处理样本。
 
 Type 算子类型: **mapper**
 

@@ -1,15 +1,12 @@
 # video_ocr_area_ratio_filter
 
-Keep data samples whose detected text area ratios for specified frames in the video are
-within a specified range.
+Keep data samples whose detected text area ratios for specified frames in the video are within a specified range.
 
-This operator filters data based on the ratio of the detected text area to the total
-frame area. It uses EasyOCR to detect text in the specified languages and calculates the
-area ratio for each sampled frame. The operator then determines whether to keep a sample
-based on the `any` or `all` strategy, which checks if any or all of the videos meet the
-specified area ratio range. The key metric, `video_ocr_area_ratio`, is computed as the
-mean of the text area ratios across the sampled frames. The number of sampled frames and
-the specific frames to be sampled can be configured.
+This operator filters data based on the ratio of the detected text area to the total frame area. It uses EasyOCR to detect text in the specified languages and calculates the area ratio for each sampled frame. The operator then determines whether to keep a sample based on the `any` or `all` strategy, which checks if any or all of the videos meet the specified area ratio range. The key metric, `video_ocr_area_ratio`, is computed as the mean of the text area ratios across the sampled frames. The number of sampled frames and the specific frames to be sampled can be configured.
+
+保留检测到的视频中指定帧的文本面积比率在指定范围内的数据样本。
+
+该运算符基于检测到的文本区域与总帧区域的比率来过滤数据。它使用EasyOCR检测指定语言的文本，并计算每个采样帧的面积比。然后，操作员基于 “任何” 或 “全部” 策略来确定是否保留样本，该策略检查任何或所有视频是否满足指定的面积比范围。关键度量 “video_ocr_area_ratio” 被计算为跨采样帧的文本区域比率的平均值。可以配置采样帧的数量和要采样的特定帧。
 
 Type 算子类型: **filter**
 

@@ -2,15 +2,17 @@
 
 Filter to keep samples with a flagged-word ratio less than a specific maximum value.
 
-This operator filters out samples based on the ratio of flagged words. It computes the
-ratio of flagged words in each sample and keeps only those with a ratio below the
-specified `max_ratio`. The flagged words are loaded from a directory, and the ratio is
-computed character-based by default. If tokenization is enabled, it uses a Hugging Face
-tokenizer to tokenize the text. The key metric `flagged_words_ratio` is cached in the
-stats field. Important notes:
+This operator filters out samples based on the ratio of flagged words. It computes the ratio of flagged words in each sample and keeps only those with a ratio below the specified `max_ratio`. The flagged words are loaded from a directory, and the ratio is computed character-based by default. If tokenization is enabled, it uses a Hugging Face tokenizer to tokenize the text. The key metric `flagged_words_ratio` is cached in the stats field. Important notes:
 - The language for flagged words can be specified or set to "all" for a merged list.
 - Word augmentation can be applied, especially for Chinese and Vietnamese.
 - The ratio is clamped to 1.0 if it exceeds this value.
+
+过滤以保留标记词比率小于特定最大值的样本。
+
+该运算符基于标记词的比率过滤出样本。它计算每个样本中标记的单词的比率，并仅保留那些比率低于指定 “max_ratio” 的单词。标记的单词从目录加载，并且默认情况下基于字符计算比率。如果启用了标记化，它将使用拥抱面部标记器对文本进行标记化。关键指标 “flagged_words_ratio” 缓存在stats字段中。重要注意事项:
+- 对于合并的列表，标记的单词的语言可以被指定或设置为 “全部”。
+- 可以应用单词增强，尤其是中文和越南语。
+- 如果比率超过此值，则将其固定为1.0。
 
 Type 算子类型: **filter**
 

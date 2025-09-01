@@ -1,16 +1,12 @@
 # video_frames_text_similarity_filter
 
-Filter to keep samples based on the similarity between video frame images and text
-within a specific range.
+Filter to keep samples based on the similarity between video frame images and text within a specific range.
 
-This operator uses a Hugging Face CLIP model to compute the similarity between video
-frames and associated text. It keeps samples where the computed similarity scores fall
-within a specified range. The operator supports different frame sampling methods,
-including 'all_keyframes' and 'uniform', and allows for horizontal and vertical flipping
-of the frames. The similarity score is reduced using one of three modes: 'avg', 'max',
-or 'min'. The operator also supports two strategies for keeping samples: 'any' (keep if
-any video meets the condition) or 'all' (keep only if all videos meet the condition).
-The key metric is stored in the 'video_frames_text_similarity' field.
+This operator uses a Hugging Face CLIP model to compute the similarity between video frames and associated text. It keeps samples where the computed similarity scores fall within a specified range. The operator supports different frame sampling methods, including 'all_keyframes' and 'uniform', and allows for horizontal and vertical flipping of the frames. The similarity score is reduced using one of three modes: 'avg', 'max', or 'min'. The operator also supports two strategies for keeping samples: 'any' (keep if any video meets the condition) or 'all' (keep only if all videos meet the condition). The key metric is stored in the 'video_frames_text_similarity' field.
+
+根据视频帧图像和文本之间的相似性进行过滤，以保持样本在特定范围内。
+
+该运算符使用拥抱面部剪辑模型来计算视频帧和关联文本之间的相似性。它保存所计算的相似性得分落在指定范围内的样本。运算符支持不同的帧采样方法，包括 “all_keyframes” 和 “uniform”，并允许帧的水平和垂直翻转。使用三种模式中的一种来降低相似性得分: “avg” 、 “max” 或 “min”。运营商还支持两种保持样本的策略: “任何” (如果任何视频满足条件则保持) 或 “全部” (仅当所有视频满足条件时保持)。关键度量存储在 “video_frames_text_similarity” 字段中。
 
 Type 算子类型: **filter**
 

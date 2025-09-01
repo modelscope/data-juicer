@@ -2,11 +2,11 @@
 
 Filter to keep samples with a total token number within a specified range.
 
-This operator uses a Hugging Face tokenizer to count the number of tokens in each
-sample. It keeps samples where the token count is between the minimum and maximum
-thresholds. The token count is stored in the 'num_token' field of the sample's stats. If
-the token count is not already computed, it will be calculated using the specified
-tokenizer.
+This operator uses a Hugging Face tokenizer to count the number of tokens in each sample. It keeps samples where the token count is between the minimum and maximum thresholds. The token count is stored in the 'num_token' field of the sample's stats. If the token count is not already computed, it will be calculated using the specified tokenizer.
+
+筛选器将总令牌数的样本保留在指定范围内。
+
+此运算符使用拥抱面标记器来计算每个样本中的标记数。它保留令牌计数在最小和最大阈值之间的样本。令牌计数存储在样本统计信息的 “num_token” 字段中。如果尚未计算令牌计数，则将使用指定的令牌发生器计算令牌计数。
 
 Type 算子类型: **filter**
 

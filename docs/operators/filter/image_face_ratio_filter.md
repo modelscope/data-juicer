@@ -2,13 +2,11 @@
 
 Filter to keep samples with face area ratios within a specific range.
 
-This operator filters samples based on the ratio of the largest face area to the total
-image area. It uses an OpenCV classifier for face detection. The key metric,
-'face_ratios', is computed for each image in the sample. Samples are kept if the face
-area ratios fall within the specified min and max ratio range. The filtering strategy
-can be set to 'any' (keep if any image meets the condition) or 'all' (keep only if all
-images meet the condition). If no images are present in the sample, the sample is
-retained.
+This operator filters samples based on the ratio of the largest face area to the total image area. It uses an OpenCV classifier for face detection. The key metric, 'face_ratios', is computed for each image in the sample. Samples are kept if the face area ratios fall within the specified min and max ratio range. The filtering strategy can be set to 'any' (keep if any image meets the condition) or 'all' (keep only if all images meet the condition). If no images are present in the sample, the sample is retained.
+
+过滤以保持面面积比在特定范围内的样本。
+
+该算子基于最大面部面积与总图像面积的比率来过滤样本。它使用OpenCV分类器进行人脸检测。为样本中的每个图像计算关键度量 “face_ratio”。如果面面积比率在指定的最小和最大比率范围内，则保留样品。过滤策略可以设置为 “任意” (如果任何图像满足条件则保留) 或 “全部” (仅当所有图像满足条件时保留)。如果样品中不存在图像，则保留样品。
 
 Type 算子类型: **filter**
 

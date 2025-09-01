@@ -2,11 +2,11 @@
 
 Normalizes unicode punctuations to their English equivalents in text samples.
 
-This operator processes a batch of text samples and replaces any unicode punctuation
-with its corresponding English punctuation. The mapping includes common substitutions
-like "，" to ",", "。" to ".", and "“" to ". It iterates over each character in the text,
-replacing it if it is found in the predefined punctuation map. The result is a set of
-text samples with consistent punctuation formatting.
+This operator processes a batch of text samples and replaces any unicode punctuation with its corresponding English punctuation. The mapping includes common substitutions like "，" to ",", "。" to ".", and "“" to ". It iterates over each character in the text, replacing it if it is found in the predefined punctuation map. The result is a set of text samples with consistent punctuation formatting.
+
+将unicode标点规范化为文本示例中的英语等效项。
+
+此运算符处理一批文本样本，并将任何unicode标点符号替换为相应的英文标点符号。映射包括常见的替换，如 “，” 到 “，”，“。&quot; to &quot;.&quot; 和 &quot;&quot; to &quot;。它遍历文本中的每个字符，如果在预定义的标点符号映射中找到它，则将其替换。结果是一组具有一致标点符号格式的文本示例。
 
 Type 算子类型: **mapper**
 

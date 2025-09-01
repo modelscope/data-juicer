@@ -2,14 +2,11 @@
 
 Identify and filter text samples based on entity dependencies.
 
-This operator uses a spaCy model to detect entities in the text and evaluates their
-dependency relationships. It filters out samples where entities have fewer than a
-specified number of dependency edges. The key metric is 'num_dependency_edges', which
-counts the number of edges for each entity in the dependency tree. Samples with no
-detected entities are omitted. The operator supports 'any' or 'all' strategies: 'any'
-keeps samples if at least one entity meets the dependency threshold, while 'all'
-requires all entities to meet the threshold. Supported languages are English ('en') and
-Chinese ('zh').
+This operator uses a spaCy model to detect entities in the text and evaluates their dependency relationships. It filters out samples where entities have fewer than a specified number of dependency edges. The key metric is 'num_dependency_edges', which counts the number of edges for each entity in the dependency tree. Samples with no detected entities are omitted. The operator supports 'any' or 'all' strategies: 'any' keeps samples if at least one entity meets the dependency threshold, while 'all' requires all entities to meet the threshold. Supported languages are English ('en') and Chinese ('zh').
+
+根据实体依赖关系识别和过滤文本样本。
+
+此运算符使用spaCy模型来检测文本中的实体并评估其依赖关系。它过滤掉实体具有少于指定数量的依赖项边缘的样本。关键指标是 “num_dependency_edges”，它计算依赖关系树中每个实体的边数。没有检测到实体的样品被省略。运算符支持 “any” 或 “all” 策略: 如果至少一个实体满足依赖性阈值，则 “any” 保留样本，而 “all” 要求所有实体满足阈值。支持的语言是英语 ('en') 和中文 ('zh')。
 
 Type 算子类型: **filter**
 

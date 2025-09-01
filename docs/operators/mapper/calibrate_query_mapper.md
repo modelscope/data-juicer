@@ -2,12 +2,11 @@
 
 Calibrate query in question-answer pairs based on reference text.
 
-This operator adjusts the query (question) in a question-answer pair to be more detailed
-and accurate, while ensuring it can still be answered by the original answer. It uses a
-reference text to inform the calibration process. The calibration is guided by a system
-prompt, which instructs the model to refine the question without adding extraneous
-information. The output is parsed to extract the calibrated query, with any additional
-content removed.
+This operator adjusts the query (question) in a question-answer pair to be more detailed and accurate, while ensuring it can still be answered by the original answer. It uses a reference text to inform the calibration process. The calibration is guided by a system prompt, which instructs the model to refine the question without adding extraneous information. The output is parsed to extract the calibrated query, with any additional content removed.
+
+基于参考文本校准问答对中的查询。
+
+此运算符将问答对中的查询 (问题) 调整为更详细和准确，同时确保它仍然可以由原始答案回答。它使用参考文本来通知校准过程。校准由系统提示指导，该系统提示指示模型细化问题而不添加无关信息。对输出进行解析以提取经校准的查询，其中移除任何附加内容。
 
 Type 算子类型: **mapper**
 

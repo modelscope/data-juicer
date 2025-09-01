@@ -1,14 +1,12 @@
 # llm_perplexity_filter
 
-Filter to keep samples with perplexity scores within a specified range, computed using a
-specified LLM.
+Filter to keep samples with perplexity scores within a specified range, computed using a specified LLM.
 
-This operator computes the perplexity score for each sample using a Hugging Face LLM. It
-then filters the samples based on whether their perplexity scores fall within the
-specified minimum and maximum score range. The perplexity score is calculated as the
-exponential of the loss value from the LLM. The operator uses a query and response
-template to format the input text for the LLM. If the perplexity score is not already
-cached in the sample's stats under the key 'llm_perplexity', it will be computed.
+This operator computes the perplexity score for each sample using a Hugging Face LLM. It then filters the samples based on whether their perplexity scores fall within the specified minimum and maximum score range. The perplexity score is calculated as the exponential of the loss value from the LLM. The operator uses a query and response template to format the input text for the LLM. If the perplexity score is not already cached in the sample's stats under the key 'llm_perplexity', it will be computed.
+
+过滤器将困惑分数的样本保留在指定范围内，使用指定的LLM计算。
+
+该运算符使用拥抱面LLM计算每个样本的困惑度得分。然后，它根据样本的困惑度分数是否落在指定的最小和最大分数范围内对样本进行过滤。困惑分数被计算为来自LLM的损失值的指数。运算符使用查询和响应模板来格式化LLM的输入文本。如果困惑度分数尚未缓存在密钥 “llm_perplexity” 下的样本统计信息中，则将对其进行计算。
 
 Type 算子类型: **filter**
 

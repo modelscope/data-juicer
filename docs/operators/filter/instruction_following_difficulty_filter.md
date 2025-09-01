@@ -2,12 +2,11 @@
 
 Filter to keep texts based on their instruction following difficulty (IFD) score.
 
-This operator computes the IFD score for each text sample, which is the ratio of the
-loss with the query to the loss without the query. The IFD score is used to determine
-the difficulty of following an instruction. Samples are kept if their IFD score falls
-within a specified range. The IFD score is cached in the 'ifd_score' field of the
-sample's stats. This operator uses a Hugging Face tokenizer and model to compute the
-losses.
+This operator computes the IFD score for each text sample, which is the ratio of the loss with the query to the loss without the query. The IFD score is used to determine the difficulty of following an instruction. Samples are kept if their IFD score falls within a specified range. The IFD score is cached in the 'ifd_score' field of the sample's stats. This operator uses a Hugging Face tokenizer and model to compute the losses.
+
+过滤以根据其教学难度 (IFD) 分数保留文本。
+
+此运算符计算每个文本样本的IFD得分，这是有查询的损失与没有查询的损失之比。IFD分数用于确定遵循指令的难度。如果样品的IFD分数落在指定范围内，则保留样品。IFD分数缓存在样本统计信息的 “ifd_score” 字段中。该运算符使用拥抱面标记器和模型来计算损失。
 
 Type 算子类型: **filter**
 

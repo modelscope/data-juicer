@@ -2,19 +2,23 @@
 
 Filter to keep samples with video motion scores within a specified range.
 
-This operator uses the RAFT (Recurrent All-Pairs Field Transforms) model from
-torchvision to predict optical flow between video frames. It keeps samples where the
-video motion score is within the given min and max score range. The motion score is
-computed based on the optical flow between frames, which is estimated using the RAFT
-model. The operator can sample frames at a specified FPS and apply transformations to
-the frames before computing the flow.
+This operator uses the RAFT (Recurrent All-Pairs Field Transforms) model from torchvision to predict optical flow between video frames. It keeps samples where the video motion score is within the given min and max score range. The motion score is computed based on the optical flow between frames, which is estimated using the RAFT model. The operator can sample frames at a specified FPS and apply transformations to the frames before computing the flow.
 
 - The RAFT model is used to estimate the optical flow.
-- Frames are preprocessed using a series of transformations including normalization and
-color channel flipping.
+- Frames are preprocessed using a series of transformations including normalization and color channel flipping.
 - The motion score is calculated from the optical flow data.
 - The operator can be configured to filter based on any or all frames in the video.
 - The device for model inference (CPU or CUDA) is automatically detected and set.
+
+过滤器将视频运动分数的样本保持在指定范围内。
+
+该算子使用来自torchvision的RAFT (递归全对场变换) 模型来预测视频帧之间的光流。它保留视频运动分数在给定的最小和最大分数范围内的样本。基于帧之间的光流来计算运动分数，该光流是使用RAFT模型来估计的。操作者可以以指定的FPS对帧进行采样，并在计算流之前对帧应用变换。
+
+- 使用RAFT模型来估计光流。
+- 使用包括归一化和颜色通道翻转在内的一系列变换对帧进行预处理。
+- 根据光流数据计算运动分数。
+- 可以将操作员配置为基于视频中的任何或所有帧进行过滤。
+- 自动检测并设置用于模型推理的设备 (CPU或CUDA)。
 
 Type 算子类型: **filter**
 

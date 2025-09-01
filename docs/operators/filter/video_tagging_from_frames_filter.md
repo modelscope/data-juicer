@@ -2,14 +2,9 @@
 
 Filter to keep samples whose videos contain specified tags.
 
-This operator filters video samples based on the presence of given tags in the video
-frames. It uses a Hugging Face tokenizer to extract and tag frames. The filtering can be
-configured to require any or all of the specified tags to be present. The operator
-supports two frame sampling methods: "all_keyframes" and "uniform". When using
-"uniform", the number of frames to sample can be specified. The extracted tags are
-stored in the meta field with the key 'video_frame_tags' by default. The decision to
-keep a sample is based on whether any or all of the video frames meet the tag criteria,
-as specified by the 'any_or_all' parameter.
+This operator filters video samples based on the presence of given tags in the video frames. It uses a Hugging Face tokenizer to extract and tag frames. The filtering can be configured to require any or all of the specified tags to be present. The operator supports two frame sampling methods: "all_keyframes" and "uniform". When using "uniform", the number of frames to sample can be specified. The extracted tags are stored in the meta field with the key 'video_frame_tags' by default. The decision to keep a sample is based on whether any or all of the video frames meet the tag criteria, as specified by the 'any_or_all' parameter.
+
+
 
 Type 算子类型: **filter**
 

@@ -2,13 +2,11 @@
 
 Keep data samples whose audio durations are within a specified range.
 
-This operator filters data samples based on the duration of their audio files. It keeps
-samples where the audio duration is between a minimum and maximum value, in seconds. The
-operator supports two strategies for keeping samples: 'any' (keep if any audio meets the
-condition) or 'all' (keep only if all audios meet the condition). The audio duration is
-computed using the `librosa` library. If the audio duration has already been computed,
-it is retrieved from the sample's stats under the key 'audio_duration'. If no audio is
-present in the sample, an empty array is stored in the stats.
+This operator filters data samples based on the duration of their audio files. It keeps samples where the audio duration is between a minimum and maximum value, in seconds. The operator supports two strategies for keeping samples: 'any' (keep if any audio meets the condition) or 'all' (keep only if all audios meet the condition). The audio duration is computed using the `librosa` library. If the audio duration has already been computed, it is retrieved from the sample's stats under the key 'audio_duration'. If no audio is present in the sample, an empty array is stored in the stats.
+
+保留音频持续时间在指定范围内的数据样本。
+
+该运算符根据音频文件的持续时间过滤数据样本。它保留音频持续时间在最小值和最大值之间的样本，以秒为单位。运营商支持两种保持样本的策略: “任何” (如果任何音频满足条件则保持) 或 “全部” (仅当所有音频满足条件时保持)。使用 'librosa' 库计算音频持续时间。如果已经计算了音频持续时间，则从关键字 “audio_duration” 下的样本统计信息中检索音频持续时间。如果样本中没有音频，则会在统计信息中存储一个空数组。
 
 Type 算子类型: **filter**
 

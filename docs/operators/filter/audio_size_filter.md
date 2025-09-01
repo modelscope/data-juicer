@@ -2,13 +2,11 @@
 
 Keep data samples based on the size of their audio files.
 
-This operator filters data samples by checking if the size of their audio files falls
-within a specified range. The size can be in bytes, kilobytes, megabytes, or any other
-unit. The key metric used is 'audio_sizes', which is an array of file sizes in bytes. If
-no audio files are present, the 'audio_sizes' field will be an empty array. The operator
-supports two strategies for keeping samples: 'any' and 'all'. In 'any' mode, a sample is
-kept if at least one of its audio files meets the size criteria. In 'all' mode, all
-audio files must meet the size criteria for the sample to be kept.
+This operator filters data samples by checking if the size of their audio files falls within a specified range. The size can be in bytes, kilobytes, megabytes, or any other unit. The key metric used is 'audio_sizes', which is an array of file sizes in bytes. If no audio files are present, the 'audio_sizes' field will be an empty array. The operator supports two strategies for keeping samples: 'any' and 'all'. In 'any' mode, a sample is kept if at least one of its audio files meets the size criteria. In 'all' mode, all audio files must meet the size criteria for the sample to be kept.
+
+根据音频文件的大小保留数据样本。
+
+此运算符通过检查其音频文件的大小是否在指定范围内来过滤数据样本。大小可以是字节、千字节、兆字节或任何其他单位。使用的关键指标是 “audio_sizes”，它是一个以字节为单位的文件大小数组。如果不存在音频文件，则 “audio_sizes” 字段将为空数组。操作员支持两种保存样本的策略: “任何” 和 “所有”。在 “任意” 模式中，如果其音频文件中的至少一个满足大小标准，则保持样本。在 “全部” 模式下，所有音频文件必须满足要保留的样本的大小标准。
 
 Type 算子类型: **filter**
 

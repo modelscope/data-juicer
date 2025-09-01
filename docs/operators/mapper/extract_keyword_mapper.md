@@ -2,13 +2,11 @@
 
 Generate keywords for the text.
 
-This operator uses a specified API model to generate high-level keywords that summarize
-the main concepts, themes, or topics of the input text. The generated keywords are
-stored in the meta field under the key specified by `keyword_key`. The operator retries
-the API call up to `try_num` times in case of errors. If `drop_text` is set to True, the
-original text is removed from the sample after processing. The operator uses a default
-prompt template and completion delimiter, which can be customized. The output is parsed
-using a regular expression to extract the keywords.
+This operator uses a specified API model to generate high-level keywords that summarize the main concepts, themes, or topics of the input text. The generated keywords are stored in the meta field under the key specified by `keyword_key`. The operator retries the API call up to `try_num` times in case of errors. If `drop_text` is set to True, the original text is removed from the sample after processing. The operator uses a default prompt template and completion delimiter, which can be customized. The output is parsed using a regular expression to extract the keywords.
+
+为文本生成关键字。
+
+此运算符使用指定的API模型生成高级关键字，这些关键字概括了输入文本的主要概念、主题或主题。生成的关键字存储在由 'keyword_key' 指定的key下的meta字段中。在出现错误的情况下，操作员重试API调用直到 'try_num' 次。如果 “drop_text” 设置为True，则处理后将从样本中删除原始文本。运算符使用默认的提示模板和完成分隔符，可以自定义。使用正则表达式解析输出以提取关键字。
 
 Type 算子类型: **mapper**
 

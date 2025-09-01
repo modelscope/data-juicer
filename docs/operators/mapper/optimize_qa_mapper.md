@@ -2,11 +2,11 @@
 
 Mapper to optimize question-answer pairs.
 
-This operator refines and enhances the quality of question-answer pairs. It uses a
-Hugging Face model to generate more detailed and accurate questions and answers. The
-input is formatted using a template, and the output is parsed using a regular
-expression. The system prompt, input template, and output pattern can be customized. If
-VLLM is enabled, the operator accelerates inference on CUDA devices.
+This operator refines and enhances the quality of question-answer pairs. It uses a Hugging Face model to generate more detailed and accurate questions and answers. The input is formatted using a template, and the output is parsed using a regular expression. The system prompt, input template, and output pattern can be customized. If VLLM is enabled, the operator accelerates inference on CUDA devices.
+
+映射器来优化问题-答案对。
+
+该运算符改进并提高了问答对的质量。它使用拥抱面部模型来生成更详细和准确的问题和答案。输入使用模板进行格式化，输出使用正则表达式进行解析。可以自定义系统提示、输入模板和输出模式。如果启用了VLLM，operator将加速CUDA设备上的推理。
 
 Type 算子类型: **mapper**
 

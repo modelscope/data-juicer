@@ -2,14 +2,11 @@
 
 Splits videos into scene clips based on detected scene changes.
 
-This operator uses a specified scene detector to identify and split video scenes. It
-supports three types of detectors: ContentDetector, ThresholdDetector, and
-AdaptiveDetector. The operator processes each video in the sample, detects scenes, and
-splits the video into individual clips. The minimum length of a scene can be set, and
-progress can be shown during processing. The resulting clips are saved in the specified
-directory or the same directory as the input files if no save directory is provided. The
-operator also updates the text field in the sample to reflect the new video clips. If a
-video does not contain any scenes, it remains unchanged.
+This operator uses a specified scene detector to identify and split video scenes. It supports three types of detectors: ContentDetector, ThresholdDetector, and AdaptiveDetector. The operator processes each video in the sample, detects scenes, and splits the video into individual clips. The minimum length of a scene can be set, and progress can be shown during processing. The resulting clips are saved in the specified directory or the same directory as the input files if no save directory is provided. The operator also updates the text field in the sample to reflect the new video clips. If a video does not contain any scenes, it remains unchanged.
+
+根据检测到的场景变化将视频拆分为场景剪辑。
+
+该运算符使用指定的场景检测器来识别和分割视频场景。它支持三种类型的检测器: 内容检测器、阈值检测器和自适应检测器。操作员处理样本中的每个视频，检测场景，并将视频拆分为单独的剪辑。可以设置场景的最小长度，并且可以在处理期间显示进度。生成的剪辑将保存在指定的目录中，如果未提供保存目录，则保存在与输入文件相同的目录中。操作员还更新样本中的文本字段以反映新的视频剪辑。如果视频不包含任何场景，则其保持不变。
 
 Type 算子类型: **mapper**
 

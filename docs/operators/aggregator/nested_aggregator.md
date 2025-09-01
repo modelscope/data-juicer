@@ -2,14 +2,11 @@
 
 Aggregates nested content from multiple samples into a single summary.
 
-This operator uses a recursive summarization approach to aggregate content from multiple
-samples. It processes the input text, which is split into sub-documents, and generates a
-summary that maintains the average length of the original documents. The aggregation is
-performed using an API model, and the process is guided by system prompts and templates.
-The operator supports retrying the API call in case of errors and allows for
-customization of the summarization process through various parameters. The default
-system prompt and templates are provided in Chinese, and the final summary is expected
-to be in the same language.
+This operator uses a recursive summarization approach to aggregate content from multiple samples. It processes the input text, which is split into sub-documents, and generates a summary that maintains the average length of the original documents. The aggregation is performed using an API model, and the process is guided by system prompts and templates. The operator supports retrying the API call in case of errors and allows for customization of the summarization process through various parameters. The default system prompt and templates are provided in Chinese, and the final summary is expected to be in the same language.
+
+将多个示例中的嵌套内容聚合到单个摘要中。
+
+此运算符使用递归汇总方法来聚合来自多个样本的内容。它处理被分割成子文档的输入文本，并生成保持原始文档的平均长度的摘要。使用API模型执行聚合，并且该过程由系统提示和模板指导。操作员支持在错误的情况下重试API调用，并允许通过各种参数定制汇总过程。默认的系统提示和模板以中文提供，最终摘要预计使用相同的语言。
 
 Type 算子类型: **aggregator**
 

@@ -2,16 +2,19 @@
 
 Filter samples based on a specified numeric field value.
 
-This operator filters out samples if the numeric value in the specified field is not
-within the given range. The field can be multi-level, with keys separated by dots. The
-sample is kept if the numeric value is between the minimum and maximum values,
-inclusive. If the field key is not provided, all samples are retained. The operator
-ensures that the field exists in the sample and that its value is numeric before
-performing the comparison.
+This operator filters out samples if the numeric value in the specified field is not within the given range. The field can be multi-level, with keys separated by dots. The sample is kept if the numeric value is between the minimum and maximum values, inclusive. If the field key is not provided, all samples are retained. The operator ensures that the field exists in the sample and that its value is numeric before performing the comparison.
 
 - Uses the 'min_value' and 'max_value' to define the acceptable range.
 - Supports multi-level fields using dot-separated keys.
 - Returns False for non-numeric or out-of-range values, filtering the sample.
+
+根据指定的数值字段值筛选样本。
+
+如果指定字段中的数值不在给定范围内，则此运算符会筛选出样本。该字段可以是多级的，键由点分隔。如果数值在最小值和最大值之间 (包括最小值和最大值)，则保留样本。如果未提供字段键，则保留所有样本。运算符确保该字段存在于样本中，并且在执行比较之前其值为数字。
+
+- 使用 “min_value” 和 “max_value” 来定义可接受的范围。
+- 支持使用点分隔键的多级字段。
+- 对于非数值或超出范围的值，返回False，过滤样本。
 
 Type 算子类型: **filter**
 

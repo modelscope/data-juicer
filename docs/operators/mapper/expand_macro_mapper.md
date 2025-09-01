@@ -2,11 +2,11 @@
 
 Expands macro definitions in the document body of LaTeX samples.
 
-This operator processes LaTeX documents to expand user-defined macros in the text. It
-supports \newcommand and \def macros without arguments. Macros are identified and
-expanded in the text, ensuring they are not part of longer alphanumeric words. The
-operator currently does not support macros with arguments. The processed text is updated
-in the samples.
+This operator processes LaTeX documents to expand user-defined macros in the text. It supports \newcommand and \def macros without arguments. Macros are identified and expanded in the text, ensuring they are not part of longer alphanumeric words. The operator currently does not support macros with arguments. The processed text is updated in the samples.
+
+展开LaTeX示例文档主体中的宏定义。
+
+此运算符处理LaTeX文档以扩展文本中的用户定义的宏。它支持没有参数的 \ newcommand和 \ def宏。在文本中标识并扩展宏，确保它们不是较长的字母数字单词的一部分。运算符当前不支持带参数的宏。在样本中更新处理的文本。
 
 Type 算子类型: **mapper**
 

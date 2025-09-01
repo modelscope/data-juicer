@@ -2,19 +2,19 @@
 
 Deduplicates samples at the document level using SimHash.
 
-This operator computes SimHash values for each sample and removes duplicates based on a
-specified Hamming distance threshold. It supports different tokenization methods:
-'space', 'punctuation', and 'character'. The SimHash is computed over shingles of a
-given window size, and the deduplication process clusters similar documents and retains
-only one from each cluster. The default mode converts text to lowercase and can ignore
-specific patterns. The key metric, Hamming distance, is used to determine similarity
-between SimHash values. Important notes:
-- The `ignore_pattern` parameter can be used to exclude certain substrings during
-SimHash computation.
-- For punctuation-based tokenization, the `ignore_pattern` should not include
-punctuations to avoid conflicts.
+This operator computes SimHash values for each sample and removes duplicates based on a specified Hamming distance threshold. It supports different tokenization methods: 'space', 'punctuation', and 'character'. The SimHash is computed over shingles of a given window size, and the deduplication process clusters similar documents and retains only one from each cluster. The default mode converts text to lowercase and can ignore specific patterns. The key metric, Hamming distance, is used to determine similarity between SimHash values. Important notes:
+- The `ignore_pattern` parameter can be used to exclude certain substrings during SimHash computation.
+- For punctuation-based tokenization, the `ignore_pattern` should not include punctuations to avoid conflicts.
 - The `hamming_distance` must be less than the number of blocks (`num_blocks`).
 - Only the first sample in each cluster is retained by default.
+
+使用SimHash在文档级别删除重复的样本。
+
+该运算符计算每个样本的SimHash值，并基于指定的汉明距离阈值删除重复值。它支持不同的标记化方法: “空间”，“标点” 和 “字符”。SimHash是在给定窗口大小的带状疱疹上计算的，并且重复数据删除过程对类似文档进行聚类，并且仅保留来自每个聚类的一个文档。默认模式将文本转换为小写，并且可以忽略特定模式。关键度量 (汉明距离) 用于确定SimHash值之间的相似性。重要注意事项:
+- 'ignore_pattern' 参数可用于在SimHash计算期间排除某些子字符串。
+- 对于基于标点符号的标记化，“ignore_pattern” 不应包含标点符号以避免冲突。
+- 'hamming_distance' 必须小于块数 ('num_blocks')。
+- 默认情况下，仅保留每个集群中的第一个样本。
 
 Type 算子类型: **deduplicator**
 

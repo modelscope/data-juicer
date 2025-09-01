@@ -2,12 +2,11 @@
 
 Filter to keep samples in a specific language with a confidence score above a threshold.
 
-This operator uses a FastText model to identify the language of each sample. It keeps
-samples that are in the specified language(s) and have a language identification
-confidence score greater than or equal to the minimum score. If no specific language is
-provided, it only filters based on the confidence score. The language ID and its
-confidence score are stored in the 'lang' and 'lang_score' fields of the sample's stats,
-respectively.
+This operator uses a FastText model to identify the language of each sample. It keeps samples that are in the specified language(s) and have a language identification confidence score greater than or equal to the minimum score. If no specific language is provided, it only filters based on the confidence score. The language ID and its confidence score are stored in the 'lang' and 'lang_score' fields of the sample's stats, respectively.
+
+过滤器以保留置信度高于阈值的特定语言的样本。
+
+此运算符使用FastText模型来标识每个样本的语言。它保留指定语言的样本，并且语言识别置信度得分大于或等于最小得分。如果未提供特定语言，则它仅基于置信度得分进行过滤。语言ID及其置信度分数分别存储在样本统计信息的 “lang'” 和 “lang_score” 字段中。
 
 Type 算子类型: **filter**
 

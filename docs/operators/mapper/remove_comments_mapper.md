@@ -2,19 +2,25 @@
 
 Removes comments from documents, currently supporting only 'tex' format.
 
-This operator removes inline and multiline comments from text samples. It supports both
-inline and multiline comment removal, controlled by the `inline` and `multiline`
-parameters. Currently, it is designed to work with 'tex' documents. The operator
-processes each sample in the batch and applies regular expressions to remove comments.
-The processed text is then updated in the original samples.
+This operator removes inline and multiline comments from text samples. It supports both inline and multiline comment removal, controlled by the `inline` and `multiline` parameters. Currently, it is designed to work with 'tex' documents. The operator processes each sample in the batch and applies regular expressions to remove comments. The processed text is then updated in the original samples.
 
 - Inline comments are removed using the pattern `[^\]%.+$`.
-- Multiline comments are removed using the pattern `^%.*
-?`.
+- Multiline comments are removed using the pattern `^%.* ?`.
 
 Important notes:
 - Only 'tex' document type is supported at present.
 - The operator processes the text in place and updates the original samples.
+
+从文档中删除注释，当前仅支持 “文本” 格式。
+
+此运算符从文本示例中删除行内注释和多行注释。它支持内联和多行注释删除，由 “内联” 和 “多线” 参数控制。目前，它被设计为处理 “文本” 文档。该运算符处理批处理中的每个样本，并应用正则表达式来删除注释。然后在原始样本中更新处理后的文本。
+
+- 使用模式 “[^ \]%.+ $” 删除内联注释。
+- 使用模式 “^%.*？” 删除多行注释。
+
+重要注意事项:
+- 目前仅支持 “文本” 文档类型。
+- 操作员就地处理文本并更新原始样本。
 
 Type 算子类型: **mapper**
 

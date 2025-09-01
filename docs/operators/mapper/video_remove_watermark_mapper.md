@@ -2,14 +2,11 @@
 
 Remove watermarks from videos based on specified regions.
 
-This operator removes watermarks from video frames by detecting and masking the
-watermark areas. It supports two detection methods: 'pixel_value' and 'pixel_diversity'.
-The regions of interest (ROIs) for watermark detection can be specified as either pixel
-coordinates or ratios of the frame dimensions. The operator extracts a set number of
-frames uniformly from the video to detect watermark pixels. A pixel is considered part
-of a watermark if it meets the detection criteria in a minimum number of frames. The
-cleaned video is saved in the specified directory or the same directory as the input
-file if no save directory is provided.
+This operator removes watermarks from video frames by detecting and masking the watermark areas. It supports two detection methods: 'pixel_value' and 'pixel_diversity'. The regions of interest (ROIs) for watermark detection can be specified as either pixel coordinates or ratios of the frame dimensions. The operator extracts a set number of frames uniformly from the video to detect watermark pixels. A pixel is considered part of a watermark if it meets the detection criteria in a minimum number of frames. The cleaned video is saved in the specified directory or the same directory as the input file if no save directory is provided.
+
+根据指定区域从视频中删除水印。
+
+该运算符通过检测和掩蔽水印区域来从视频帧中去除水印。它支持两种检测方法: 'pixel_value' 和 'pixel_diversity'。用于水印检测的感兴趣区域 (roi) 可以被指定为像素坐标或帧尺寸的比率。操作者从视频中均匀地提取设定数量的帧以检测水印像素。如果像素在最小数量的帧中满足检测标准，则该像素被认为是水印的一部分。如果未提供保存目录，则将清理后的视频保存在指定目录或与输入文件相同的目录中。
 
 Type 算子类型: **mapper**
 

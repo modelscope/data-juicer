@@ -2,13 +2,11 @@
 
 Filter to keep samples with image-text similarity within a specified range.
 
-This operator uses a Hugging Face CLIP model to compute the similarity between images
-and text. It retains samples where the similarity scores fall within the given range.
-The similarity score is computed for each image-text pair, and the final score can be
-reduced using 'avg', 'max', or 'min' modes. The 'any' or 'all' strategy determines if at
-least one or all image-text pairs must meet the similarity criteria. The key metric
-'image_text_similarity' is cached in the sample's stats. Images can be flipped
-horizontally or vertically before computing the similarity.
+This operator uses a Hugging Face CLIP model to compute the similarity between images and text. It retains samples where the similarity scores fall within the given range. The similarity score is computed for each image-text pair, and the final score can be reduced using 'avg', 'max', or 'min' modes. The 'any' or 'all' strategy determines if at least one or all image-text pairs must meet the similarity criteria. The key metric 'image_text_similarity' is cached in the sample's stats. Images can be flipped horizontally or vertically before computing the similarity.
+
+过滤器将具有图像-文本相似性的样本保持在指定范围内。
+
+该算子使用拥抱面剪辑模型来计算图像和文本之间的相似性。它保留相似性得分落在给定范围内的样本。针对每个图像-文本对计算相似性得分，并且可以使用 “avg” 、 “max” 或 “min” 模式来降低最终得分。“任何” 或 “全部” 策略确定是否至少一个或所有图像-文本对必须满足相似性标准。关键指标 “image_text_similarity” 缓存在示例的统计信息中。在计算相似度之前，可以水平或垂直翻转图像。
 
 Type 算子类型: **filter**
 

@@ -2,14 +2,9 @@
 
 Filter to keep samples whose videos have no watermark with high probability.
 
-This operator uses a Hugging Face watermark detection model to predict the probability
-of watermarks in video frames. It keeps samples where the predicted watermark
-probability is below a specified threshold. The key metric, 'video_watermark_prob', is
-computed by extracting frames from the video using a specified sampling method and then
-averaging, maximizing, or minimizing the probabilities based on the reduce mode. If
-multiple videos are present, the operator can use either an 'any' or 'all' strategy to
-determine if the sample should be kept. The frame sampling method can be 'all_keyframes'
-or 'uniform', and the reduce mode can be 'avg', 'max', or 'min'.
+This operator uses a Hugging Face watermark detection model to predict the probability of watermarks in video frames. It keeps samples where the predicted watermark probability is below a specified threshold. The key metric, 'video_watermark_prob', is computed by extracting frames from the video using a specified sampling method and then averaging, maximizing, or minimizing the probabilities based on the reduce mode. If multiple videos are present, the operator can use either an 'any' or 'all' strategy to determine if the sample should be kept. The frame sampling method can be 'all_keyframes' or 'uniform', and the reduce mode can be 'avg', 'max', or 'min'.
+
+
 
 Type 算子类型: **filter**
 

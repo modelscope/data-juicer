@@ -2,12 +2,11 @@
 
 Deduplicates samples at the document level using exact matching.
 
-This operator calculates a hash for each document and uses it to identify and remove
-duplicate documents. The hash is computed based on the text content of the document,
-with options to convert the text to lowercase and to ignore non-alphabet characters
-(whitespaces, digits, and punctuation). The deduplication process can use either a Ray
-actor or Redis as the backend for managing the hashes. The key metric used is the exact
-match of the document text, which is character-based by default.
+This operator calculates a hash for each document and uses it to identify and remove duplicate documents. The hash is computed based on the text content of the document, with options to convert the text to lowercase and to ignore non-alphabet characters (whitespaces, digits, and punctuation). The deduplication process can use either a Ray actor or Redis as the backend for managing the hashes. The key metric used is the exact match of the document text, which is character-based by default.
+
+使用完全匹配在文档级别删除重复的样本。
+
+此运算符计算每个文档的哈希值，并使用它来识别和删除重复的文档。哈希是根据文档的文本内容计算的，具有将文本转换为小写并忽略非字母字符 (空格、数字和标点) 的选项。重复数据删除过程可以使用Ray actor或Redis作为管理哈希的后端。使用的关键指标是文档文本的精确匹配，默认情况下基于字符。
 
 Type 算子类型: **deduplicator**
 
