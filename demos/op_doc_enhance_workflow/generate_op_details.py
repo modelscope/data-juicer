@@ -31,7 +31,7 @@ TEMPLATE_DIR = Path(__file__).parent / "templates"
 
 MD_FLAGS = re.MULTILINE | re.DOTALL
 PROMPT_BRIEF_DELIM = "\n\n-----\n\n"
-NO_EXPLAIN_OPS = ["llm_task_relevance_filter"]
+NO_EXPLAIN_OPS = ["llm_task_relevance_filter", "in_context_influence_filter", "text_embd_similarity_filter"]
 
 env = Environment(
     loader=FileSystemLoader(str(TEMPLATE_DIR)),
@@ -344,13 +344,95 @@ def save_md_file(op_name, content, op_type=".", lan=""):
 # Translation (EN -> ZH)
 # -----------------------------------------------------------------------------
 
+import re
+
+
+def optimize_text(text):
+    """
+    Optimize text formatting:
+    - Merge ordinary newlines into one line
+    - Keep list items that start with '- '
+    - Keep blank lines (paragraph separation)
+    """
+    lines = text.split("\n")
+    result = []
+    i = 0
+
+    while i < len(lines):
+        current_line = lines[i].strip()
+
+        if not current_line:
+            result.append("")
+            i += 1
+            continue
+
+        merged_line = current_line
+        i += 1
+
+        while i < len(lines):
+            next_line = lines[i].strip()
+
+            if not next_line or next_line.startswith("- "):
+                break
+
+            merged_line += " " + next_line
+            i += 1
+
+        result.append(merged_line)
+
+    return "\n".join(result)
+
+
+def split_bilingual_text(text):
+
+    def contains_chinese(text):
+        """Detect whether text contains Chinese characters"""
+        chinese_pattern = re.compile(r"[\u4e00-\u9fff]")
+        return bool(chinese_pattern.search(text))
+
+    def is_chinese_start_line(line):
+        """Determine whether it is the beginning line of the Chinese version"""
+        line = line.strip()
+        if not line:
+            return False
+
+        first_five = line[:15]
+        return contains_chinese(first_five)
+
+    lines = text.split("\n")
+
+    chinese_start_index = -1
+
+    for i in range(len(lines)):
+        current_line = lines[i].strip()
+
+        if not current_line and i + 1 < len(lines):
+            next_line = lines[i + 1]
+            if is_chinese_start_line(next_line):
+                chinese_start_index = i + 1
+                break
+
+    if chinese_start_index == -1:
+        return text.strip(), ""
+
+    english_lines = lines[:chinese_start_index]
+    while english_lines and not english_lines[-1].strip():
+        english_lines.pop()
+
+    chinese_lines = lines[chinese_start_index:]
+
+    english_text = "\n".join(english_lines).strip()
+    chinese_text = "\n".join(chinese_lines).strip()
+
+    return english_text, chinese_text
+
 
 def get_op_desc_in_en_zh_batched(descs):
     """
     Translate a list of English descriptions to Chinese in batches and return
     merged bilingual descriptions. Batch split is based on length.
     """
-    separator = "\n\n------\n\n"
+    separator = "\n\n******\n\n"
     limit = int(5e3)
     batch = separator.join(descs)
     if len(batch) > limit:
@@ -361,18 +443,22 @@ def get_op_desc_in_en_zh_batched(descs):
     else:
         retry = 0
         res = None
-        while retry < 3:
+        while retry < 3 and not res:
             try:
                 res = ts.translate_text(batch, translator="alibaba", from_language="en", to_language="zh")
             except Exception as e:
-                print(f"❌: {e} retry {retry}")
+                print(f"❌: {e} retry {retry} len_batch: {len(batch)}")
+                print(f"{batch}")
                 retry += 1
     if not res:
-        zhs = ["暂无中文翻译"] * len(descs)
+        zhs = [""] * len(descs)
     else:
+        print(f"[Translate] ori_len: {len(batch)}")
+        res = re.sub(r"^-(?! )", "- ", res, flags=re.MULTILINE)
+        res = res.replace("&#39;[", "`").replace("]&#39;", "`").replace("&#39;", "'")
         zhs = res.split(separator)
     assert len(zhs) == len(descs)
-    return [desc + "\n" + zh.strip() for desc, zh in zip(descs, zhs)]
+    return [desc + "\n\n" + zh.strip() for desc, zh in zip(descs, zhs)]
 
 
 # -----------------------------------------------------------------------------
@@ -447,10 +533,10 @@ def select_and_explain_examples(examples: dict, op_info: dict, test_file_full: s
         briefs.append(f"op_desc: {op_desc}")
     for m, v in examples.items():
         briefs.append(_build_example_brief(m, v))
-        
-    briefs_string=PROMPT_BRIEF_DELIM.join(briefs)
+
+    briefs_string = PROMPT_BRIEF_DELIM.join(briefs)
     if len(briefs_string) > 5000:
-        briefs_string=briefs_string[:5000] + "..." + "subsequent omission"
+        briefs_string = briefs_string[:5000] + "..." + "subsequent omission"
 
     methods_all = list(examples.keys())
 
@@ -484,13 +570,15 @@ def select_and_explain_examples(examples: dict, op_info: dict, test_file_full: s
         print(f"[LLM select+explain] parse error: {e} op: {op_info['name']}")
         return [], {}
 
+
 def camel_to_snake(camel_str):
     """
     Convert camel naming to underscore naming
     For example: CsvFormatter -> csv_formatter
     """
-    snake_str = re.sub('([a-z0-9])([A-Z])', r'\1_\2', camel_str)
+    snake_str = re.sub("([a-z0-9])([A-Z])", r"\1_\2", camel_str)
     return snake_str.lower()
+
 
 # -----------------------------------------------------------------------------
 # Main
@@ -506,13 +594,10 @@ def main():
     op_detail_list = []
     original_descs = []
 
-    def handle_one(op_info):
+    def handle_one(op_info, existing_md=None):
         """Process a single operator into template-ready info and examples."""
         # Params
         params = param_signature_to_list(op_info["sig"], parse_param_desc(op_info["param_desc"]))
-
-        # Reuse existing markdown (if available)
-        existing_md = load_existing_op_md(op_info["name"], op_info["type"])
 
         # Tests and examples
         examples_list = []
@@ -549,18 +634,28 @@ def main():
         op_info = op_info.to_dict()
         if "Formatter" in op_name:
             op_info["name"] = camel_to_snake(op_name)
-        res = handle_one(op_info)
-        if res is None:
-            continue
+
+        # Reuse existing markdown (if available)
+        existing_md = load_existing_op_md(op_info["name"], op_info["type"])
+        res = handle_one(op_info, existing_md)
         _, op_info_tmpl, examples_list = res
         cleaned_desc = "\n".join([line.strip() for line in op_info["desc"].split("\n")])
-        original_descs.append(cleaned_desc)
+        cleaned_desc = optimize_text(cleaned_desc)
+        if existing_md and existing_md.get("desc"):
+            en_desc, zh_desc = split_bilingual_text(existing_md["desc"])
+            if cleaned_desc.strip() != en_desc.strip() or not zh_desc:
+                print(f"[Update] {op_info['name']}'s desc is updated")
+                original_descs.append(cleaned_desc)
+            else:
+                op_info_tmpl["desc"] = en_desc + "\n\n" + zh_desc
         op_detail_list.append((op_info["name"], op_info_tmpl, examples_list))
 
-    # bilingual_descs = get_op_desc_in_en_zh_batched(original_descs)
-    bilingual_descs = original_descs
-    for (op_name, op_info_tmpl, examples_list), desc in zip(op_detail_list, bilingual_descs):
-        op_info_tmpl["desc"] = desc
+    bilingual_descs = get_op_desc_in_en_zh_batched(original_descs)
+    # bilingual_descs = original_descs
+    iter_bilingual_descs = iter(bilingual_descs)
+    for op_name, op_info_tmpl, examples_list in op_detail_list:
+        if not op_info_tmpl.get("desc"):
+            op_info_tmpl["desc"] = next(iter_bilingual_descs)
         md_content = render_op_doc(op_info_tmpl, examples_list)
         save_md_file(op_name, md_content, op_info_tmpl["type"])
 
