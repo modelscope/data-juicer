@@ -2,13 +2,11 @@
 
 Filter to keep samples with video aspect ratio within a specific range.
 
-This operator filters samples based on the aspect ratios of their videos. It keeps
-samples where the video aspect ratios fall within a specified range. The aspect ratio is
-calculated as the width divided by the height (W / H). The operator supports two
-strategies for keeping samples: 'any' and 'all'. In 'any' mode, a sample is kept if at
-least one video meets the aspect ratio condition. In 'all' mode, all videos in the
-sample must meet the condition for the sample to be kept. The aspect ratios are computed
-and stored in the 'video_aspect_ratios' field of the sample's stats.
+This operator filters samples based on the aspect ratios of their videos. It keeps samples where the video aspect ratios fall within a specified range. The aspect ratio is calculated as the width divided by the height (W / H). The operator supports two strategies for keeping samples: 'any' and 'all'. In 'any' mode, a sample is kept if at least one video meets the aspect ratio condition. In 'all' mode, all videos in the sample must meet the condition for the sample to be kept. The aspect ratios are computed and stored in the 'video_aspect_ratios' field of the sample's stats.
+
+过滤器将视频纵横比的样本保持在特定范围内。
+
+该运算符根据视频的纵横比来过滤样本。它保留视频纵横比在指定范围内的样本。纵横比计算为宽度除以高度 (W/H)。操作员支持两种保存样本的策略: “任何” 和 “所有”。在 “任意” 模式中，如果至少一个视频满足纵横比条件，则保持样本。在 “全部” 模式下，样本中的所有视频都必须满足保留样本的条件。计算纵横比并将其存储在样本统计信息的 “video_aspect_raties” 字段中。
 
 Type 算子类型: **filter**
 

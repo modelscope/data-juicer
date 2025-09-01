@@ -2,17 +2,23 @@
 
 Extracts entities and relations from text to build a knowledge graph.
 
-- Identifies entities based on specified types and extracts their names, types, and
-descriptions.
-- Identifies relationships between the entities, including source and target entities,
-relationship descriptions, keywords, and strength scores.
-- Uses a Hugging Face tokenizer and a predefined prompt template to guide the extraction
-process.
-- Outputs entities and relations in a structured format, using delimiters for
-separation.
+- Identifies entities based on specified types and extracts their names, types, and descriptions.
+- Identifies relationships between the entities, including source and target entities, relationship descriptions, keywords, and strength scores.
+- Uses a Hugging Face tokenizer and a predefined prompt template to guide the extraction process.
+- Outputs entities and relations in a structured format, using delimiters for separation.
 - Caches the results in the sample's metadata under the keys 'entity' and 'relation'.
 - Supports multiple retries and gleaning to ensure comprehensive extraction.
 - The default entity types include 'organization', 'person', 'geo', and 'event'.
+
+从文本中提取实体和关系以构建知识图谱。
+
+- 根据指定的类型标识实体，并提取其名称、类型和描述。
+- 标识实体之间的关系，包括源和目标实体、关系描述、关键字和强度得分。
+- 使用拥抱面部标记器和预定义的提示模板来指导提取过程。
+- 以结构化格式输出实体和关系，使用分隔符进行分隔。
+- 在键 “entity” 和 “relation” 下将结果缓存在示例的元数据中。
+- 支持多次重试和收集，以确保全面提取。
+- 默认实体类型包括 “组织” 、 “人员” 、 “地理” 和 “事件”。
 
 Type 算子类型: **mapper**
 

@@ -2,14 +2,11 @@
 
 Generates sentiment labels and analysis for user queries in a dialog.
 
-This operator processes a dialog to detect and label the sentiments expressed by the
-user. It uses the provided history, query, and response keys to construct prompts for an
-API call. The API returns sentiment analysis and labels, which are then parsed and
-stored in the sample's metadata under the 'dialog_sentiment_labels' and
-'dialog_sentiment_labels_analysis' keys. The operator supports custom templates and
-patterns for prompt construction and output parsing. If no sentiment candidates are
-provided, it uses open-domain sentiment labels. The operator retries the API call up to
-a specified number of times in case of errors.
+This operator processes a dialog to detect and label the sentiments expressed by the user. It uses the provided history, query, and response keys to construct prompts for an API call. The API returns sentiment analysis and labels, which are then parsed and stored in the sample's metadata under the 'dialog_sentiment_labels' and 'dialog_sentiment_labels_analysis' keys. The operator supports custom templates and patterns for prompt construction and output parsing. If no sentiment candidates are provided, it uses open-domain sentiment labels. The operator retries the API call up to a specified number of times in case of errors.
+
+在对话框中为用户查询生成情绪标签和分析。
+
+此运算符处理对话以检测和标记用户表达的情绪。它使用提供的历史、查询和响应键来构造API调用的提示。API返回情感分析和标签，然后将其解析并存储在示例的元数据中的 “dialog_sentiment_labels” 和 “dialog_sentiment_labels_analysis” 键下。运算符支持用于提示构造和输出解析的自定义模板和模式。如果未提供情绪候选项，则它使用开放域情绪标签。如果出现错误，操作员将重试API调用指定的次数。
 
 Type 算子类型: **mapper**
 

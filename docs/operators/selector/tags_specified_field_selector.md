@@ -2,16 +2,19 @@
 
 Selector to filter samples based on the tags of a specified field.
 
-This operator selects samples where the value of the specified field matches one of the
-target tags. The field can be multi-level, with levels separated by dots (e.g.,
-'level1.level2'). The operator checks if the specified field exists in the dataset and
-if the field value is a string, number, or None. If the field value matches any of the
-target tags, the sample is kept. The selection is case-sensitive.
+This operator selects samples where the value of the specified field matches one of the target tags. The field can be multi-level, with levels separated by dots (e.g., 'level1.level2'). The operator checks if the specified field exists in the dataset and if the field value is a string, number, or None. If the field value matches any of the target tags, the sample is kept. The selection is case-sensitive.
 
 - The `field_key` parameter specifies the field to check.
 - The `target_tags` parameter is a list of tags to match against the field value.
-- If the dataset has fewer than two samples or if `field_key` is empty, the dataset is
-returned unchanged.
+- If the dataset has fewer than two samples or if `field_key` is empty, the dataset is returned unchanged.
+
+选择器根据指定字段的标签过滤样本。
+
+此运算符选择指定字段的值与目标标记之一匹配的样本。该场可以是多级的，其中由点 (例如，“level1.level2”) 分隔的级。运算符检查指定的字段是否存在于数据集中，以及字段值是否为字符串、数字或无。如果字段值与任何目标标记匹配，则保留样本。选择区分大小写。
+
+- 'field_key' 参数指定要检查的字段。
+- 'target_tags' 参数是要与字段值匹配的标签列表。
+- 如果数据集的样本数少于两个，或者如果 “field_key” 为空，则返回未更改的数据集。
 
 Type 算子类型: **selector**
 

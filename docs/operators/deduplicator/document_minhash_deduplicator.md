@@ -2,18 +2,17 @@
 
 Deduplicates samples at the document level using MinHash LSH.
 
-This operator computes MinHash values for each sample and uses Locality-Sensitive
-Hashing (LSH) to identify and remove near-duplicate documents. The Jaccard similarity
-threshold determines when two documents are considered duplicates. The tokenization
-method can be customized, and a Hugging Face tokenizer can be used for 'sentencepiece'
-tokenization. The minhash values are stored as bytes and are not kept in the final
-dataset. The number of bands and rows per band in LSH can be set manually or determined
-by an optimal parameter computation algorithm. Important notes:
-- If using 'punctuation' tokenization with an ignore pattern, ensure the pattern does
-not include punctuations.
+This operator computes MinHash values for each sample and uses Locality-Sensitive Hashing (LSH) to identify and remove near-duplicate documents. The Jaccard similarity threshold determines when two documents are considered duplicates. The tokenization method can be customized, and a Hugging Face tokenizer can be used for 'sentencepiece' tokenization. The minhash values are stored as bytes and are not kept in the final dataset. The number of bands and rows per band in LSH can be set manually or determined by an optimal parameter computation algorithm. Important notes:
+- If using 'punctuation' tokenization with an ignore pattern, ensure the pattern does not include punctuations.
 - For 'sentencepiece' tokenization, a tokenizer model path is required.
-- The deduplication process involves clustering and filtering, and only unique samples
-or the first sample in a cluster are retained.
+- The deduplication process involves clustering and filtering, and only unique samples or the first sample in a cluster are retained.
+
+使用MinHash LSH在文档级别删除重复的样本。
+
+该运算符计算每个样本的MinHash值，并使用位置敏感哈希 (LSH) 来识别和移除近似重复的文档。Jaccard相似性阈值确定何时将两个文档视为重复。可以自定义标记化方法，并且拥抱面部标记化器可以用于 “sentencepiece” 标记化。minhash值存储为字节，不保留在最终数据集中。LSH中每个带的带和行数可以手动设置或通过最佳参数计算算法确定。重要注意事项:
+- 如果将 “标点” 标记化与忽略模式一起使用，请确保该模式不包括标点。
+- 对于 “sentencepiece” 标记化，需要标记器模型路径。
+- 重复数据删除过程涉及聚类和过滤，并且仅保留唯一样本或集群中的第一个样本。
 
 Type 算子类型: **deduplicator**
 

@@ -1,8 +1,8 @@
 # video_captioning_from_audio_mapper
 
-Mapper to caption a video according to its audio streams based on
-Qwen-Audio model.
+Mapper to caption a video according to its audio streams based on Qwen-Audio model.
 
+映射器根据基于qwen-audio模型的音频流为视频添加字幕。
 
 Type 算子类型: **mapper**
 

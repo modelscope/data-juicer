@@ -2,16 +2,19 @@
 
 Filter samples based on the specified field information.
 
-This operator checks if the value of a specified field in each sample is within a given
-target value range. If the field value is not within the target range, the sample is
-filtered out. The field can be a multi-level key, with levels separated by dots. The
-target value is a list of acceptable values for the field. If the field value is not a
-list or tuple, it is converted to a list for comparison. Samples are retained if all
-values in the field match any of the target values.
+This operator checks if the value of a specified field in each sample is within a given target value range. If the field value is not within the target range, the sample is filtered out. The field can be a multi-level key, with levels separated by dots. The target value is a list of acceptable values for the field. If the field value is not a list or tuple, it is converted to a list for comparison. Samples are retained if all values in the field match any of the target values.
 
 - Uses the 'field_key' and 'target_value' parameters.
 - Supports multi-level field keys, e.g., 'level1.level2'.
 - Converts non-list/tuple field values to a list for comparison.
+
+根据指定的字段信息筛选样本。
+
+此运算符检查每个样本中指定字段的值是否在给定的目标值范围内。如果字段值不在目标范围内，则将样本过滤掉。该字段可以是多级键，其级别由点分隔。目标值是字段的可接受值的列表。如果字段值不是列表或元组，则将其转换为列表以进行比较。如果字段中的所有值都与任何目标值匹配，则保留样本。
+
+- 使用 'field_key' 和 'target_value' 参数。
+- 支持多级字段键，例如 'level1.level2'。
+- 将非列表/元组字段值转换为列表以进行比较。
 
 Type 算子类型: **filter**
 

@@ -2,13 +2,11 @@
 
 Blurs images in the dataset with a specified probability and blur type.
 
-This operator blurs images using one of three types: mean, box, or Gaussian. The
-probability of an image being blurred is controlled by the `p` parameter. The blur
-effect is applied using a kernel with a specified radius. Blurred images are saved to a
-directory, which can be specified or defaults to the input directory. If the save
-directory is not provided, the `DJ_PRODUCED_DATA_DIR` environment variable can be used
-to set it. The operator ensures that the blur type is one of the supported options and
-that the radius is non-negative.
+This operator blurs images using one of three types: mean, box, or Gaussian. The probability of an image being blurred is controlled by the `p` parameter. The blur effect is applied using a kernel with a specified radius. Blurred images are saved to a directory, which can be specified or defaults to the input directory. If the save directory is not provided, the `DJ_PRODUCED_DATA_DIR` environment variable can be used to set it. The operator ensures that the blur type is one of the supported options and that the radius is non-negative.
+
+使用指定的概率和模糊类型对数据集中的图像进行模糊处理。
+
+此运算符使用以下三种类型之一来模糊图像: 均值，框或高斯。图像被模糊的概率由 'p' 参数控制。使用具有指定半径的内核应用模糊效果。模糊图像将保存到一个目录中，该目录可以指定或默认为输入目录。如果未提供保存目录，则可以使用 'dj_producted_data_dir' 环境变量来设置它。该运算符确保 “模糊类型” 是受支持的选项之一，并且半径为非负。
 
 Type 算子类型: **mapper**
 

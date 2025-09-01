@@ -2,12 +2,11 @@
 
 Mapper to blur faces detected in videos.
 
-This operator uses an OpenCV classifier for face detection and applies a specified blur
-type to the detected faces. The default classifier is 'haarcascade_frontalface_alt.xml'.
-Supported blur types include 'mean', 'box', and 'gaussian'. The radius of the blur
-kernel can be adjusted. If a save directory is not provided, the processed videos will
-be saved in the same directory as the input files. The `DJ_PRODUCED_DATA_DIR`
-environment variable can also be used to specify the save directory.
+This operator uses an OpenCV classifier for face detection and applies a specified blur type to the detected faces. The default classifier is 'haarcascade_frontalface_alt.xml'. Supported blur types include 'mean', 'box', and 'gaussian'. The radius of the blur kernel can be adjusted. If a save directory is not provided, the processed videos will be saved in the same directory as the input files. The `DJ_PRODUCED_DATA_DIR` environment variable can also be used to specify the save directory.
+
+映射器模糊在视频中检测到的人脸。
+
+该运算符使用OpenCV分类器进行人脸检测，并将指定的模糊类型应用于检测到的人脸。默认分类器是 'haarcascarde_frontalface_alt.xml'。支持的模糊类型包括 'mean' 、 'box' 和 'gaussian'。可以调整模糊内核的半径。如果未提供保存目录，则处理后的视频将保存在与输入文件相同的目录中。'Dj_producted_data_dir' 环境变量也可用于指定保存目录。
 
 Type 算子类型: **mapper**
 

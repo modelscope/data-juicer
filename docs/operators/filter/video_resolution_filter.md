@@ -2,15 +2,19 @@
 
 Keep data samples whose videos' resolutions are within a specified range.
 
-This operator filters data samples based on the resolution of the videos they contain.
-It keeps samples if the video resolutions fall within the defined width and height
-ranges. The filtering strategy can be set to 'any' or 'all':
+This operator filters data samples based on the resolution of the videos they contain. It keeps samples if the video resolutions fall within the defined width and height ranges. The filtering strategy can be set to 'any' or 'all':
 - 'any': Keeps the sample if any video meets the resolution criteria.
 - 'all': Keeps the sample only if all videos meet the resolution criteria.
 
-The operator computes and caches the 'video_width' and 'video_height' for each video in
-the sample. If no videos are present, it sets these fields to empty arrays. These cached
-values are used to determine whether to keep or filter out the sample.
+The operator computes and caches the 'video_width' and 'video_height' for each video in the sample. If no videos are present, it sets these fields to empty arrays. These cached values are used to determine whether to keep or filter out the sample.
+
+保留视频分辨率在指定范围内的数据样本。
+
+该运算符根据数据样本包含的视频的分辨率对数据样本进行过滤。如果视频分辨率在定义的宽度和高度范围内，它会保留样本。过滤策略可以设置为 “any” 或 “all”:
+- 'any': 如果任何视频满足分辨率标准，则保留样本。
+- 'all': 仅当所有视频都符合分辨率标准时才保留样本。
+
+运算符为样本中的每个视频计算并缓存 “video_width” 和 “video_height”。如果没有视频，它会将这些字段设置为空数组。这些缓存的值用于确定是保留样本还是过滤掉样本。
 
 Type 算子类型: **filter**
 

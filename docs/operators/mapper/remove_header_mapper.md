@@ -2,11 +2,11 @@
 
 Removes headers at the beginning of documents in LaTeX samples.
 
-This operator identifies and removes headers such as chapter, part, section, subsection,
-subsubsection, paragraph, and subparagraph. It uses a regular expression to match these
-headers. If a sample does not contain any headers and `drop_no_head` is set to True, the
-sample text will be removed. Otherwise, the sample remains unchanged. The operator
-processes samples in batches for efficiency.
+This operator identifies and removes headers such as chapter, part, section, subsection, subsubsection, paragraph, and subparagraph. It uses a regular expression to match these headers. If a sample does not contain any headers and `drop_no_head` is set to True, the sample text will be removed. Otherwise, the sample remains unchanged. The operator processes samples in batches for efficiency.
+
+删除LaTeX示例中文档开头的标题。
+
+此运算符标识并删除标题，如章、部分、节、子节、段落和子节。它使用正则表达式来匹配这些标题。如果示例不包含任何标头，并且 “drop_no_head” 设置为True，则将删除示例文本。否则，样品保持不变。为了提高效率，操作员分批处理样品。
 
 Type 算子类型: **mapper**
 

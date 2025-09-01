@@ -2,13 +2,11 @@
 
 Selects a range of samples based on the sorted values of a specified field.
 
-This operator selects samples whose values for a specified field fall within a given
-range. The range can be defined using percentiles or ranks, and the operator will use
-the more inclusive bounds if both are provided. The field values are first sorted in
-ascending order, and then the samples are selected based on the lower and upper bounds.
-If no bounds are provided, the original dataset is returned. The operator ensures that
-the specified field exists in the dataset and handles multi-level fields by separating
-keys with dots.
+This operator selects samples whose values for a specified field fall within a given range. The range can be defined using percentiles or ranks, and the operator will use the more inclusive bounds if both are provided. The field values are first sorted in ascending order, and then the samples are selected based on the lower and upper bounds. If no bounds are provided, the original dataset is returned. The operator ensures that the specified field exists in the dataset and handles multi-level fields by separating keys with dots.
+
+根据指定字段的排序值选择采样范围。
+
+此运算符选择指定字段的值落在给定范围内的样本。可以使用百分位数或等级来定义范围，并且如果两者都被提供，则运算符将使用更具包容性的边界。字段值首先按升序排序，然后根据下限和上限选择样本。如果未提供边界，则返回原始数据集。运算符确保指定的字段存在于数据集中，并通过用点分隔键来处理多级字段。
 
 Type 算子类型: **selector**
 

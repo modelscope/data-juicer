@@ -2,12 +2,11 @@
 
 Generates image tags for each image in the sample.
 
-This operator processes images to generate descriptive tags. It uses a Hugging Face
-model to analyze the images and produce relevant tags. The tags are stored in the
-specified field, defaulting to 'image_tags'. If the tags are already present in the
-sample, the operator will not recompute them. For samples without images, an empty tag
-array is assigned. The generated tags are sorted by frequency and stored as a list of
-strings.
+This operator processes images to generate descriptive tags. It uses a Hugging Face model to analyze the images and produce relevant tags. The tags are stored in the specified field, defaulting to 'image_tags'. If the tags are already present in the sample, the operator will not recompute them. For samples without images, an empty tag array is assigned. The generated tags are sorted by frequency and stored as a list of strings.
+
+为样本中的每个图像生成图像标记。
+
+该操作员处理图像以生成描述性标签。它使用拥抱人脸模型来分析图像并生成相关标签。标签存储在指定的字段中，默认为 “image_tags”。如果标签已经存在于样本中，则操作员将不重新计算它们。对于没有图像的样本，分配空标签阵列。生成的标签按频率排序并存储为字符串列表。
 
 Type 算子类型: **mapper**
 

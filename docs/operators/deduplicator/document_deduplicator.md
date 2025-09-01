@@ -2,14 +2,11 @@
 
 Deduplicates samples at the document level using exact matching.
 
-This operator computes an MD5 hash for each sample's text. It can optionally convert the
-text to lowercase and ignore non-alphabet characters, including whitespaces, digits, and
-punctuation. The deduplication is based on the computed hash values, where samples with
-identical hashes are considered duplicates. The `compute_hash` method adds a 'hash' key
-to each sample, storing its MD5 hash. During processing, the first occurrence of each
-unique hash is kept, and subsequent duplicates are filtered out. If the `show_num`
-parameter is set, the operator also returns a specified number of duplicate pairs for
-inspection.
+This operator computes an MD5 hash for each sample's text. It can optionally convert the text to lowercase and ignore non-alphabet characters, including whitespaces, digits, and punctuation. The deduplication is based on the computed hash values, where samples with identical hashes are considered duplicates. The `compute_hash` method adds a 'hash' key to each sample, storing its MD5 hash. During processing, the first occurrence of each unique hash is kept, and subsequent duplicates are filtered out. If the `show_num` parameter is set, the operator also returns a specified number of duplicate pairs for inspection.
+
+使用完全匹配在文档级别删除重复的样本。
+
+此运算符为每个样本的文本计算MD5哈希。它可以选择将文本转换为小写，并忽略非字母字符，包括空格，数字和标点符号。重复数据删除基于计算的散列值，其中具有相同散列的样本被认为是重复的。'compute_hash' 方法向每个样本添加一个 'hash' 键，存储其MD5哈希。在处理期间，每个唯一散列的第一次出现被保留，并且随后的重复被过滤掉。如果设置了 “show_num” 参数，则运算符还返回指定数量的重复对以进行检查。
 
 Type 算子类型: **deduplicator**
 

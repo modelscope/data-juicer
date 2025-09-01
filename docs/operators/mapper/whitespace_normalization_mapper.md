@@ -2,12 +2,9 @@
 
 Normalizes various types of whitespace characters to standard spaces in text samples.
 
-This mapper converts all non-standard whitespace characters, such as tabs and newlines,
-to the standard space character (' ', 0x20). It also trims leading and trailing
-whitespace from the text. This ensures consistent spacing across all text samples,
-improving readability and consistency. The normalization process is based on a
-comprehensive list of whitespace characters, which can be found at
-https://en.wikipedia.org/wiki/Whitespace_character.
+This mapper converts all non-standard whitespace characters, such as tabs and newlines, to the standard space character (' ', 0x20). It also trims leading and trailing whitespace from the text. This ensures consistent spacing across all text samples, improving readability and consistency. The normalization process is based on a comprehensive list of whitespace characters, which can be found at https://en.wikipedia.org/wiki/Whitespace_character.
+
+
 
 Type 算子类型: **mapper**
 

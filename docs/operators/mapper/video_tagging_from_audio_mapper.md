@@ -2,13 +2,11 @@
 
 Generates video tags from audio streams using the Audio Spectrogram Transformer.
 
-This operator extracts audio streams from videos and uses a Hugging Face Audio
-Spectrogram Transformer (AST) model to generate tags. The tags are stored in the
-specified metadata field, defaulting to 'video_audio_tags'. If no valid audio stream is
-found, the tag is set to 'EMPTY'. The operator resamples audio to match the model's
-required sampling rate if necessary. The tags are inferred based on the highest logit
-value from the model's output. If the tags are already present in the sample, the
-operator skips processing for that sample.
+This operator extracts audio streams from videos and uses a Hugging Face Audio Spectrogram Transformer (AST) model to generate tags. The tags are stored in the specified metadata field, defaulting to 'video_audio_tags'. If no valid audio stream is found, the tag is set to 'EMPTY'. The operator resamples audio to match the model's required sampling rate if necessary. The tags are inferred based on the highest logit value from the model's output. If the tags are already present in the sample, the operator skips processing for that sample.
+
+使用音频频谱图转换器从音频流生成视频标签。
+
+该运算符从视频中提取音频流，并使用拥抱面部音频频谱图转换器 (AST) 模型来生成标签。标签存储在指定的元数据字段中，默认为 “video_audio_tags”。如果没有找到有效的音频流，则将标签设置为 “空”。如有必要，操作员将对音频进行重采样以匹配模型所需的采样率。根据模型输出的最高logit值推断标记。如果标签已经存在于样本中，则操作者跳过对该样本的处理。
 
 Type 算子类型: **mapper**
 

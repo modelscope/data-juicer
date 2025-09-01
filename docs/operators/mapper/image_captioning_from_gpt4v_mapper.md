@@ -2,15 +2,11 @@
 
 Generates text captions for images using the GPT-4 Vision model.
 
-This operator generates text based on the provided images and specified parameters. It
-supports different modes of text generation, including 'reasoning', 'description',
-'conversation', and 'custom'. The generated text can be added to the original sample or
-replace it, depending on the `keep_original_sample` parameter. The operator uses a
-Hugging Face tokenizer and the GPT-4 Vision API to generate the text. The `any_or_all`
-parameter determines whether all or any of the images in a sample must meet the
-generation criteria for the sample to be kept. If `user_prompt_key` is set, it will use
-the prompt from the sample; otherwise, it will use the `user_prompt` parameter. If both
-are set, `user_prompt_key` takes precedence.
+This operator generates text based on the provided images and specified parameters. It supports different modes of text generation, including 'reasoning', 'description', 'conversation', and 'custom'. The generated text can be added to the original sample or replace it, depending on the `keep_original_sample` parameter. The operator uses a Hugging Face tokenizer and the GPT-4 Vision API to generate the text. The `any_or_all` parameter determines whether all or any of the images in a sample must meet the generation criteria for the sample to be kept. If `user_prompt_key` is set, it will use the prompt from the sample; otherwise, it will use the `user_prompt` parameter. If both are set, `user_prompt_key` takes precedence.
+
+使用GPT-4视觉模型为图像生成文本标题。
+
+此运算符根据提供的图像和指定的参数生成文本。它支持不同的文本生成模式，包括 “推理”，“描述”，“对话” 和 “自定义”。生成的文本可以添加到原始样本或替换它，这取决于 'keep_original_sample' 参数。操作员使用拥抱面部标记器和GPT-4视觉API来生成文本。“any_or_all” 参数确定样本中的所有或任何图像是否必须满足要保留的样本的生成标准。如果设置了 “user_prompt_key”，它将使用示例中的提示; 否则，它将使用 “user_prompt” 参数。如果两者都设置了，则 'user_prompt_key' 优先。
 
 Type 算子类型: **mapper**
 

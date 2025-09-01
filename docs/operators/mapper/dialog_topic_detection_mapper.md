@@ -2,14 +2,11 @@
 
 Generates user's topic labels and analysis in a dialog.
 
-This operator processes a dialog to detect and label the topics discussed by the user.
-It takes input from `history_key`, `query_key`, and `response_key` and outputs lists of
-labels and analysis for each query in the dialog. The operator uses a predefined system
-prompt and templates to build the input prompt for the API call. It supports customizing
-the system prompt, templates, and patterns for parsing the API response. The results are
-stored in the `meta` field under the keys specified by `labels_key` and `analysis_key`.
-If these keys already exist in the `meta` field, the operator skips processing. The
-operator retries the API call up to `try_num` times in case of errors.
+This operator processes a dialog to detect and label the topics discussed by the user. It takes input from `history_key`, `query_key`, and `response_key` and outputs lists of labels and analysis for each query in the dialog. The operator uses a predefined system prompt and templates to build the input prompt for the API call. It supports customizing the system prompt, templates, and patterns for parsing the API response. The results are stored in the `meta` field under the keys specified by `labels_key` and `analysis_key`. If these keys already exist in the `meta` field, the operator skips processing. The operator retries the API call up to `try_num` times in case of errors.
+
+在对话框中生成用户的主题标签和分析。
+
+此运算符处理对话框以检测和标记用户讨论的主题。它从 'history_key' 、 'query_key' 和 'response_key' 获取输入，并输出对话框中每个查询的标签和分析列表。操作员使用预定义的系统提示和模板来构建API调用的输入提示。它支持自定义用于解析API响应的系统提示、模板和模式。结果存储在由 “labels_key” 和 “analysis_key” 指定的键下的 “meta” 字段中。如果这些键已经存在于 “meta” 字段中，则操作员跳过处理。在出现错误的情况下，操作员重试API调用直到 'try_num' 次。
 
 Type 算子类型: **mapper**
 

@@ -2,18 +2,23 @@
 
 Cleans IPv4 and IPv6 addresses from text samples.
 
-This operator removes or replaces IPv4 and IPv6 addresses in the text. It uses a regular
-expression to identify and clean the IP addresses. By default, it replaces the IP
-addresses with an empty string, effectively removing them. The operator can be
-configured with a custom pattern and replacement string. If no pattern is provided, a
-default pattern for both IPv4 and IPv6 addresses is used. The operator processes samples
-in batches.
+This operator removes or replaces IPv4 and IPv6 addresses in the text. It uses a regular expression to identify and clean the IP addresses. By default, it replaces the IP addresses with an empty string, effectively removing them. The operator can be configured with a custom pattern and replacement string. If no pattern is provided, a default pattern for both IPv4 and IPv6 addresses is used. The operator processes samples in batches.
 
 - Uses a regular expression to find and clean IP addresses.
 - Replaces found IP addresses with a specified replacement string.
 - Default replacement string is an empty string, which removes the IP addresses.
 - Can use a custom regular expression pattern if provided.
 - Processes samples in batches for efficiency.
+
+从文本示例中清除IPv4和IPv6地址。
+
+此运算符删除或替换文本中的IPv4和IPv6地址。它使用正则表达式来识别和清除ip地址。默认情况下，它用空字符串替换ip地址，有效地删除它们。运算符可以配置自定义模式和替换字符串。如果未提供模式，则使用IPv4和IPv6地址的默认模式。操作员批量处理样品。
+
+- 使用正则表达式查找和清理ip地址。
+- 用指定的替换字符串替换找到的IP地址。
+- 默认替换字符串是一个空字符串，它删除ip地址。
+- 可以使用自定义正则表达式模式 (如果提供)。
+- 批量处理样品以提高效率。
 
 Type 算子类型: **mapper**
 

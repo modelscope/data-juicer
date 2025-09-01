@@ -2,12 +2,11 @@
 
 Filter to keep samples with a total word count within a specified range.
 
-This operator filters samples based on the number of words they contain. It retains
-samples if their word count is within the given minimum and maximum limits. If
-tokenization is enabled, it uses a Hugging Face tokenizer to count words. The key metric
-`num_words` is computed and stored in the sample's stats under the `num_words` field. If
-the word count is already cached, it reuses the cached value to avoid redundant
-computation.
+This operator filters samples based on the number of words they contain. It retains samples if their word count is within the given minimum and maximum limits. If tokenization is enabled, it uses a Hugging Face tokenizer to count words. The key metric `num_words` is computed and stored in the sample's stats under the `num_words` field. If the word count is already cached, it reuses the cached value to avoid redundant computation.
+
+过滤器将样本的总字数保持在指定范围内。
+
+此运算符根据样本包含的字数过滤样本。如果它们的字数在给定的最小和最大限制内，则它保留样本。如果启用了标记化，则它使用拥抱面部标记器来计数单词。计算关键度量 “num_words” 并将其存储在 “num_words” 字段下的样本统计信息中。如果字计数已经被缓存，则它重用缓存的值以避免冗余计算。
 
 Type 算子类型: **filter**
 

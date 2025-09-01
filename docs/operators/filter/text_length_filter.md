@@ -2,11 +2,11 @@
 
 Filter to keep samples with total text length within a specific range.
 
-This operator filters out samples based on their total text length. It retains samples
-where the text length is between the specified minimum and maximum lengths. The text
-length is computed as the number of characters in the sample's text. If the 'text_len'
-key is already present in the sample's stats, it will be reused; otherwise, it will be
-computed. The operator processes samples in batches for efficiency.
+This operator filters out samples based on their total text length. It retains samples where the text length is between the specified minimum and maximum lengths. The text length is computed as the number of characters in the sample's text. If the 'text_len' key is already present in the sample's stats, it will be reused; otherwise, it will be computed. The operator processes samples in batches for efficiency.
+
+过滤以保持文本总长度在特定范围内的样本。
+
+此运算符根据样本的总文本长度过滤样本。它保留文本长度在指定的最小和最大长度之间的样本。文本长度计算为样本文本中的字符数。如果 'text_len' 键已经存在于样本的统计信息中，则将重用它; 否则，将计算它。为了提高效率，操作员分批处理样品。
 
 Type 算子类型: **filter**
 

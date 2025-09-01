@@ -1,24 +1,22 @@
 # ray_bts_minhash_deduplicator
 
-A deduplicator that uses MinHash LSH and RAY for efficient near-duplicate text detection
-and removal.
+A deduplicator that uses MinHash LSH and RAY for efficient near-duplicate text detection and removal.
 
-This operator tokenizes input texts using the specified method, computes MinHash
-signatures, and applies LSH to group similar documents. It then uses a union-find
-algorithm to identify and remove duplicates based on the Jaccard similarity threshold.
-The key metric, Jaccard similarity, is computed using the MinHash signatures. The
-operator supports various tokenization methods, including space, punctuation, character,
-and sentencepiece, with the latter requiring a Hugging Face tokenizer model. The
-operator can run on both CPU and GPU, with automatic batch size adjustment based on
-available memory. Important notes:
-- The `ignore_pattern` parameter allows ignoring specific patterns during MinHash
-computation.
-- The `jaccard_threshold` determines the similarity level at which documents are
-considered duplicates.
-- The `num_bands` and `num_rows_per_band` parameters can be set manually or determined
-automatically for optimal performance.
+This operator tokenizes input texts using the specified method, computes MinHash signatures, and applies LSH to group similar documents. It then uses a union-find algorithm to identify and remove duplicates based on the Jaccard similarity threshold. The key metric, Jaccard similarity, is computed using the MinHash signatures. The operator supports various tokenization methods, including space, punctuation, character, and sentencepiece, with the latter requiring a Hugging Face tokenizer model. The operator can run on both CPU and GPU, with automatic batch size adjustment based on available memory. Important notes:
+- The `ignore_pattern` parameter allows ignoring specific patterns during MinHash computation.
+- The `jaccard_threshold` determines the similarity level at which documents are considered duplicates.
+- The `num_bands` and `num_rows_per_band` parameters can be set manually or determined automatically for optimal performance.
 - The operator caches stats in fields like 'minhash', 'uid', and 'deduplication_status'.
 - GPU support is only available for character tokenization.
+
+使用MinHash LSH和RAY进行有效的近似重复文本检测和删除的deduplicator。
+
+此运算符使用指定的方法标记输入文本，计算MinHash签名，并应用LSH对类似文档进行分组。然后，它使用联合查找算法基于Jaccard相似性阈值来识别和删除重复项。使用MinHash签名计算关键度量Jaccard相似性。运算符支持各种标记化方法，包括空格，标点符号，字符和sentencepiece，后者需要拥抱面部标记器模型。操作员可以在CPU和GPU上运行，并根据可用内存自动调整批量大小。重要注意事项:
+- 'ignore_pattern' 参数允许在MinHash计算期间忽略特定模式。
+- 'jaccard_threshold' 确定文档被认为是重复的相似性级别。
+- 可以手动设置或自动确定 “num_bands” 和 “num_rows_per_band” 参数以获得最佳性能。
+- 运算符将统计信息缓存在 “minhash'” 、 “uid” 和 “deduplication_status” 等字段中。
+- GPU支持仅适用于字符标记化。
 
 Type 算子类型: **deduplicator**
 

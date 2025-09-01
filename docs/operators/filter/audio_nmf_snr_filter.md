@@ -1,16 +1,12 @@
 # audio_nmf_snr_filter
 
-Keep data samples whose audio Signal-to-Noise Ratios (SNRs) are within a specified
-range.
+Keep data samples whose audio Signal-to-Noise Ratios (SNRs) are within a specified range.
 
-This operator computes the SNR of each audio in a sample using Non-negative Matrix
-Factorization (NMF). It then filters the samples based on whether their SNRs fall within
-the given minimum and maximum thresholds. The SNR is computed for each audio, and the
-filtering strategy can be set to either 'any' or 'all'. In 'any' mode, a sample is kept
-if at least one of its audios meets the SNR criteria. In 'all' mode, all audios must
-meet the criteria for the sample to be kept. The NMF computation uses a specified number
-of iterations. If no audio is present in the sample, the SNR is recorded as an empty
-array. The key metric is stored in the 'audio_nmf_snr' field.
+This operator computes the SNR of each audio in a sample using Non-negative Matrix Factorization (NMF). It then filters the samples based on whether their SNRs fall within the given minimum and maximum thresholds. The SNR is computed for each audio, and the filtering strategy can be set to either 'any' or 'all'. In 'any' mode, a sample is kept if at least one of its audios meets the SNR criteria. In 'all' mode, all audios must meet the criteria for the sample to be kept. The NMF computation uses a specified number of iterations. If no audio is present in the sample, the SNR is recorded as an empty array. The key metric is stored in the 'audio_nmf_snr' field.
+
+保留音频信噪比 (snr) 在指定范围内的数据样本。
+
+该算子使用非负矩阵分解 (NMF) 来计算样本中的每个音频的SNR。然后，它基于样本的snr是否落在给定的最小和最大阈值内来对样本进行滤波。针对每个音频计算SNR，并且可以将滤波策略设置为 “任意” 或 “全部”。在 “任意” 模式中，如果其音频中的至少一个满足SNR标准，则保持样本。在 “全部” 模式下，所有音频必须满足要保留的样本的标准。NMF计算使用指定的迭代次数。如果样本中不存在音频，则将SNR记录为空数组。密钥度量存储在 “audio_nmf_snr” 字段中。
 
 Type 算子类型: **filter**
 

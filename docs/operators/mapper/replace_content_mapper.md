@@ -1,15 +1,12 @@
 # replace_content_mapper
 
-Replaces content in the text that matches a specific regular expression pattern with a
-designated replacement string.
+Replaces content in the text that matches a specific regular expression pattern with a designated replacement string.
 
-This operator processes text by searching for patterns defined in `pattern` and
-replacing them with the corresponding `repl` string. If multiple patterns and
-replacements are provided, each pattern is replaced by its respective replacement. The
-operator supports both single and multiple patterns and replacements. The regular
-expressions are compiled with the `re.DOTALL` flag to match across multiple lines. If
-the length of the patterns and replacements do not match, a `ValueError` is raised. This
-operation is batched, meaning it processes multiple samples at once.
+This operator processes text by searching for patterns defined in `pattern` and replacing them with the corresponding `repl` string. If multiple patterns and replacements are provided, each pattern is replaced by its respective replacement. The operator supports both single and multiple patterns and replacements. The regular expressions are compiled with the `re.DOTALL` flag to match across multiple lines. If the length of the patterns and replacements do not match, a `ValueError` is raised. This operation is batched, meaning it processes multiple samples at once.
+
+用指定的替换字符串替换与特定正则表达式模式匹配的文本中的内容。
+
+此运算符通过搜索 “pattern” 中定义的模式并将其替换为相应的 “repl'” 字符串来处理文本。如果提供了多个图案和替换，则每个图案由其相应的替换来替换。操作员支持单个和多个模式和替换。正则表达式使用 “是”.DOTALL' 标志进行编译，以跨多行进行匹配。如果模式和替换的长度不匹配，则引发 “valueerror'”。此操作是批处理的，这意味着它一次处理多个样本。
 
 Type 算子类型: **mapper**
 

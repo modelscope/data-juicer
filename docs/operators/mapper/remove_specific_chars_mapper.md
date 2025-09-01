@@ -2,11 +2,11 @@
 
 Removes specific characters from text samples.
 
-This operator removes specified characters from the text. The characters to be removed
-can be provided as a string or a list of strings. If no characters are specified, the
-default set includes special and non-alphanumeric characters. The operator processes the
-text using a regular expression pattern that matches any of the specified characters and
-replaces them with an empty string. This is done in a batched manner for efficiency.
+This operator removes specified characters from the text. The characters to be removed can be provided as a string or a list of strings. If no characters are specified, the default set includes special and non-alphanumeric characters. The operator processes the text using a regular expression pattern that matches any of the specified characters and replaces them with an empty string. This is done in a batched manner for efficiency.
+
+从文本示例中删除特定字符。
+
+此运算符从文本中删除指定的字符。要移除的字符可以作为字符串或字符串列表来提供。如果未指定字符，则默认设置包括特殊字符和非字母数字字符。该运算符使用与任何指定字符匹配的正则表达式模式处理文本，并将其替换为空字符串。这是为了效率而以批处理的方式完成的。
 
 Type 算子类型: **mapper**
 

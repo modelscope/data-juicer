@@ -2,20 +2,23 @@
 
 Mapper to remove words containing specified incorrect substrings.
 
-This operator processes text by removing words that contain any of the specified
-incorrect substrings. By default, it removes words with substrings like "http", "www",
-".com", "href", and "//". The operator can operate in tokenized or non-tokenized mode.
-In tokenized mode, it uses a Hugging Face tokenizer to tokenize the text before
-processing. The key metric is not computed; this operator focuses on filtering out
-specific words.
+This operator processes text by removing words that contain any of the specified incorrect substrings. By default, it removes words with substrings like "http", "www", ".com", "href", and "//". The operator can operate in tokenized or non-tokenized mode. In tokenized mode, it uses a Hugging Face tokenizer to tokenize the text before processing. The key metric is not computed; this operator focuses on filtering out specific words.
 
-- If `tokenization` is True, the text is tokenized using a Hugging Face
-tokenizer, and words are filtered based on the specified substrings.
-- If `tokenization` is False, the text is split into sentences and words,
-and words are filtered based on the specified substrings.
+- If `tokenization` is True, the text is tokenized using a Hugging Face tokenizer, and words are filtered based on the specified substrings.
+- If `tokenization` is False, the text is split into sentences and words, and words are filtered based on the specified substrings.
 - The filtered text is then merged back into a single string.
 
 The operator processes samples in batches and updates the text in place.
+
+映射程序删除包含指定的不正确子字符串的单词。
+
+此运算符通过删除包含任何指定的不正确子字符串的单词来处理文本。默认情况下，它会删除带有 “http” 、 “www” 、 “.com” 、 “href” 和 “//” 等子字符串的单词。操作员可以在令牌化或非令牌化模式下操作。在标记化模式下，它使用拥抱面部标记器在处理之前对文本进行标记化。不计算关键指标; 此运算符专注于过滤掉特定的单词。
+
+- 如果 'tokenization' 为True，则使用拥抱面部标记器对文本进行标记化，并根据指定的子字符串过滤单词。
+- 如果 'tokenization' 为False，则将文本拆分为句子和单词，并根据指定的子字符串过滤单词。
+- 然后将过滤的文本合并回单个字符串。
+
+操作员批量处理样本并就地更新文本。
 
 Type 算子类型: **mapper**
 

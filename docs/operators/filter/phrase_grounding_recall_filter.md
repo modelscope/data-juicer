@@ -1,16 +1,12 @@
 # phrase_grounding_recall_filter
 
-Filter to keep samples based on the phrase grounding recall of phrases extracted from
-text in images.
+Filter to keep samples based on the phrase grounding recall of phrases extracted from text in images.
 
-This operator uses a Hugging Face Owl-ViT model to locate phrases extracted from the
-text within the images. It keeps samples where the phrase grounding recall is within a
-specified range. The recall is computed by comparing the number of correctly located
-phrases to the total number of phrases. The operator can handle multiple images per text
-chunk and supports different strategies for reducing the recall values (e.g., average,
-max, min). It also allows for flipping images horizontally or vertically. The key metric
-'phrase_grounding_recall' is computed and stored in the sample's stats. If no images are
-present, the recall is set to an empty array.
+This operator uses a Hugging Face Owl-ViT model to locate phrases extracted from the text within the images. It keeps samples where the phrase grounding recall is within a specified range. The recall is computed by comparing the number of correctly located phrases to the total number of phrases. The operator can handle multiple images per text chunk and supports different strategies for reducing the recall values (e.g., average, max, min). It also allows for flipping images horizontally or vertically. The key metric 'phrase_grounding_recall' is computed and stored in the sample's stats. If no images are present, the recall is set to an empty array.
+
+根据从图像中的文本中提取的短语接地召回来过滤以保留样本。
+
+该操作员使用拥抱脸owl-vit模型来定位从图像中的文本中提取的短语。它会保留短语 “接地召回” 在指定范围内的样本。通过将正确定位的短语的数量与短语的总数进行比较来计算召回。操作者可以处理每个文本块的多个图像，并且支持用于减少召回值 (例如，平均值、最大值、最小值) 的不同策略。它还允许水平或垂直翻转图像。计算关键指标 “phrase_grounding_recall” 并将其存储在样本的统计信息中。如果不存在图像，则将调用设置为空数组。
 
 Type 算子类型: **filter**
 

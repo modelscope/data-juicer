@@ -2,12 +2,11 @@
 
 Wraps FFmpeg video filters for processing video files in a dataset.
 
-This operator applies a specified FFmpeg video filter to each video file in the dataset.
-It supports passing keyword arguments to the filter and global arguments to the FFmpeg
-command line. The processed videos are saved in a specified directory or the same
-directory as the input files. If no filter name is provided, the videos remain
-unmodified. The operator updates the source file paths in the dataset to reflect any
-changes.
+This operator applies a specified FFmpeg video filter to each video file in the dataset. It supports passing keyword arguments to the filter and global arguments to the FFmpeg command line. The processed videos are saved in a specified directory or the same directory as the input files. If no filter name is provided, the videos remain unmodified. The operator updates the source file paths in the dataset to reflect any changes.
+
+包装FFmpeg视频过滤器，用于处理数据集中的视频文件。
+
+该运算符将指定的FFmpeg视频过滤器应用于数据集中的每个视频文件。它支持将关键字参数传递到过滤器，并将全局参数传递到FFmpeg命令行。处理后的视频保存在指定目录或与输入文件相同的目录中。如果未提供过滤器名称，则视频保持未修改。运算符更新数据集中的源文件路径以反映任何更改。
 
 Type 算子类型: **mapper**
 

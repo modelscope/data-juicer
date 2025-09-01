@@ -1,13 +1,8 @@
 # sentence_augmentation_mapper
 
-Augments sentences by generating enhanced versions using a Hugging Face model. This
-operator enhances input sentences by generating new, augmented versions. It is designed
-to work best with individual sentences rather than full documents. For optimal results,
-ensure the input text is at the sentence level. The augmentation process uses a Hugging
-Face model, such as `lmsys/vicuna-13b-v1.5` or `Qwen/Qwen2-7B-Instruct`. The operator
-requires specifying both the primary and secondary text keys, where the augmented
-sentence will be stored in the secondary key. The generation process can be customized
-with parameters like temperature, top-p sampling, and beam search size.
+Augments sentences by generating enhanced versions using a Hugging Face model. This operator enhances input sentences by generating new, augmented versions. It is designed to work best with individual sentences rather than full documents. For optimal results, ensure the input text is at the sentence level. The augmentation process uses a Hugging Face model, such as `lmsys/vicuna-13b-v1.5` or `Qwen/Qwen2-7B-Instruct`. The operator requires specifying both the primary and secondary text keys, where the augmented sentence will be stored in the secondary key. The generation process can be customized with parameters like temperature, top-p sampling, and beam search size.
+
+通过使用拥抱面部模型生成增强版本来增强句子。该运算符通过生成新的增强版本来增强输入句子。它的目的是最好的工作与个别句子，而不是完整的文件。为获得最佳结果，请确保输入文本处于句子级别。增强过程使用拥抱面部模型，例如 “lmsys/vicuna-13b-v1.5” 或 “qwen/Qwen2-7B-Instruct”。操作员需要指定主要和次要文本键，其中增广句子将存储在次要键中。可以使用温度、top-p采样和光束搜索大小等参数来定制生成过程。
 
 Type 算子类型: **mapper**
 

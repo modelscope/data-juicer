@@ -1,9 +1,8 @@
 # video_captioning_from_summarizer_mapper
 
+Mapper to generate video captions by summarizing several kinds of generated texts (captions from video/audio/frames, tags from audio/frames, ...)
 
-Mapper to generate video captions by summarizing several kinds of generated
-texts (captions from video/audio/frames, tags from audio/frames, ...)
-
+映射器通过总结几种生成的文本来生成视频字幕 (来自视频/音频/帧的字幕，来自音频/帧的标签，...)
 
 Type 算子类型: **mapper**
 

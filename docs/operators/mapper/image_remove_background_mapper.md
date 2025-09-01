@@ -2,14 +2,11 @@
 
 Mapper to remove the background of images.
 
-This operator processes each image in the sample, removing its background. It uses the
-`rembg` library to perform the background removal. If `alpha_matting` is enabled, it
-applies alpha matting with specified thresholds and erosion size. The resulting images
-are saved in PNG format. The `bgcolor` parameter can be set to specify a custom
-background color for the cutout image. The processed images are stored in the directory
-specified by `save_dir`, or in the same directory as the input files if `save_dir` is
-not provided. The `source_file` field in the sample is updated to reflect the new file
-paths.
+This operator processes each image in the sample, removing its background. It uses the `rembg` library to perform the background removal. If `alpha_matting` is enabled, it applies alpha matting with specified thresholds and erosion size. The resulting images are saved in PNG format. The `bgcolor` parameter can be set to specify a custom background color for the cutout image. The processed images are stored in the directory specified by `save_dir`, or in the same directory as the input files if `save_dir` is not provided. The `source_file` field in the sample is updated to reflect the new file paths.
+
+映射器删除图像的背景。
+
+该算子处理样本中的每个图像，去除其背景。它使用 “rembg” 库来执行背景去除。如果启用了 “alpha_matting”，它将应用具有指定阈值和腐蚀大小的alpha matting。生成的图像以PNG格式保存。“Bgcolor” 参数可以设置为指定剪切图像的自定义背景颜色。处理后的图像存储在由 “save_dir” 指定的目录中，如果未提供 “save_dir”，则存储在与输入文件相同的目录中。示例中的 “source_file” 字段已更新以反映新的文件路径。
 
 Type 算子类型: **mapper**
 

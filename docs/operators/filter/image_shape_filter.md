@@ -2,13 +2,11 @@
 
 Filter to keep samples with image shape (width, height) within specific ranges.
 
-This operator filters samples based on the width and height of images. It keeps samples
-where the image dimensions fall within the specified ranges. The operator supports two
-strategies: 'any' and 'all'. In 'any' mode, a sample is kept if at least one image meets
-the criteria. In 'all' mode, all images in the sample must meet the criteria for the
-sample to be kept. The image width and height are stored in the 'image_width' and
-'image_height' fields of the sample's stats. If no images are present in the sample, the
-corresponding stats fields will be empty arrays.
+This operator filters samples based on the width and height of images. It keeps samples where the image dimensions fall within the specified ranges. The operator supports two strategies: 'any' and 'all'. In 'any' mode, a sample is kept if at least one image meets the criteria. In 'all' mode, all images in the sample must meet the criteria for the sample to be kept. The image width and height are stored in the 'image_width' and 'image_height' fields of the sample's stats. If no images are present in the sample, the corresponding stats fields will be empty arrays.
+
+过滤器，以保持样本的图像形状 (宽度，高度) 在特定的范围内。
+
+此运算符根据图像的宽度和高度过滤样本。它保留图像尺寸在指定范围内的样本。运算符支持两种策略: “any” 和 “all”。在 “任意” 模式中，如果至少一个图像满足标准，则保持样本。在 “全部” 模式下，样本中的所有图像必须满足要保留的样本的标准。图像宽度和高度存储在样本统计信息的 “image_width” 和 “image_height” 字段中。如果样本中没有图像，则相应的stats字段将为空数组。
 
 Type 算子类型: **filter**
 

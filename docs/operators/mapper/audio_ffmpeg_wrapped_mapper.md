@@ -2,13 +2,11 @@
 
 Wraps FFmpeg audio filters for processing audio files in a dataset.
 
-This operator applies specified FFmpeg audio filters to the audio files in the dataset.
-It supports passing custom filter parameters and global arguments to the FFmpeg command
-line. The processed audio files are saved to a specified directory or the same directory
-as the input files if no save directory is provided. The `DJ_PRODUCED_DATA_DIR`
-environment variable can also be used to set the save directory. If no filter name is
-provided, the audio files remain unmodified. The operator updates the source file paths
-in the dataset after processing.
+This operator applies specified FFmpeg audio filters to the audio files in the dataset. It supports passing custom filter parameters and global arguments to the FFmpeg command line. The processed audio files are saved to a specified directory or the same directory as the input files if no save directory is provided. The `DJ_PRODUCED_DATA_DIR` environment variable can also be used to set the save directory. If no filter name is provided, the audio files remain unmodified. The operator updates the source file paths in the dataset after processing.
+
+包装FFmpeg音频过滤器，用于处理数据集中的音频文件。
+
+此运算符将指定的FFmpeg音频过滤器应用于数据集中的音频文件。它支持将自定义过滤器参数和全局参数传递到FFmpeg命令行。如果未提供保存目录，则将处理后的音频文件保存到指定目录或与输入文件相同的目录。'Dj_producted_data_dir' 环境变量也可用于设置保存目录。如果未提供过滤器名称，则音频文件保持不变。运算符在处理后更新数据集中的源文件路径。
 
 Type 算子类型: **mapper**
 

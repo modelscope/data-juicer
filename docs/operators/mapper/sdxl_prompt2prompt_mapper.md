@@ -2,12 +2,11 @@
 
 Generates pairs of similar images using the SDXL model.
 
-This operator uses a Hugging Face diffusion model to generate image pairs based on two
-text prompts. The quality and similarity of the generated images are controlled by
-parameters such as `num_inference_steps` and `guidance_scale`. The first and second text
-prompts are specified using `text_key` and `text_key_second`, respectively. The
-generated images are saved in the specified `output_dir` with unique filenames. The
-operator requires both text keys to be set for processing.
+This operator uses a Hugging Face diffusion model to generate image pairs based on two text prompts. The quality and similarity of the generated images are controlled by parameters such as `num_inference_steps` and `guidance_scale`. The first and second text prompts are specified using `text_key` and `text_key_second`, respectively. The generated images are saved in the specified `output_dir` with unique filenames. The operator requires both text keys to be set for processing.
+
+使用SDXL模型生成成对的相似图像。
+
+该算子使用拥抱面扩散模型基于两个文本提示生成图像对。生成的图像的质量和相似性由诸如 “num_inference_steps” 和 “guidance_scale” 的参数控制。分别使用 “text_key” 和 “text_key_second” 指定第一个和第二个文本提示。生成的图像以唯一的文件名保存在指定的 “output_dir” 中。操作员需要设置两个文本键以进行处理。
 
 Type 算子类型: **mapper**
 

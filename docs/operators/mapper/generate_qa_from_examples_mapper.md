@@ -2,15 +2,11 @@
 
 Generates question and answer pairs from examples using a Hugging Face model.
 
-This operator generates QA pairs based on provided seed examples. The number of
-generated samples is determined by the length of the empty dataset configured in the
-YAML file. The operator uses a Hugging Face model to generate new QA pairs, which are
-then filtered based on their similarity to the seed examples. Samples with a similarity
-score below the specified threshold are kept. The similarity is computed using the
-ROUGE-L metric. The operator requires a seed file in chatml format, which provides the
-initial QA examples. The generated QA pairs must follow specific formatting rules, such
-as maintaining the same format as the input examples and ensuring that questions and
-answers are paired correctly.
+This operator generates QA pairs based on provided seed examples. The number of generated samples is determined by the length of the empty dataset configured in the YAML file. The operator uses a Hugging Face model to generate new QA pairs, which are then filtered based on their similarity to the seed examples. Samples with a similarity score below the specified threshold are kept. The similarity is computed using the ROUGE-L metric. The operator requires a seed file in chatml format, which provides the initial QA examples. The generated QA pairs must follow specific formatting rules, such as maintaining the same format as the input examples and ensuring that questions and answers are paired correctly.
+
+使用拥抱面部模型从示例生成问题和答案对。
+
+该运算符基于提供的种子示例生成QA对。生成的样本数由YAML文件中配置的空数据集的长度决定。操作员使用拥抱人脸模型来生成新的QA对，然后根据它们与种子示例的相似性对其进行过滤。具有低于指定阈值的相似性得分的样本被保留。使用ROUGE-L度量来计算相似性。运算符需要chatml格式的种子文件，该文件提供了初始QA示例。生成的QA对必须遵循特定的格式规则，例如保持与输入示例相同的格式，并确保问题和答案正确配对。
 
 Type 算子类型: **mapper**
 

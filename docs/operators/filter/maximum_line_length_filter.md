@@ -2,12 +2,11 @@
 
 Filter to keep samples with a maximum line length within a specified range.
 
-This operator filters out samples based on the length of their longest line. It retains
-samples where the maximum line length is within the specified `min_len` and `max_len`
-range. The maximum line length is computed by splitting the text into lines and
-measuring the length of each line. If the context is provided, it uses precomputed lines
-stored under the key 'lines' in the context. The maximum line length is cached in the
-'max_line_length' field of the stats.
+This operator filters out samples based on the length of their longest line. It retains samples where the maximum line length is within the specified `min_len` and `max_len` range. The maximum line length is computed by splitting the text into lines and measuring the length of each line. If the context is provided, it uses precomputed lines stored under the key 'lines' in the context. The maximum line length is cached in the 'max_line_length' field of the stats.
+
+筛选器将最大行长度的样本保持在指定范围内。
+
+此运算符根据样本最长行的长度过滤样本。它保留最大行长度在指定的 “min_len” 和 “max_len” 范围内的样本。通过将文本拆分为行并测量每行的长度来计算最大行长度。如果提供了上下文，则它使用存储在上下文中的键 “lines” 下的预先计算的行。最大行长度缓存在stats的 'max_line_length' 字段中。
 
 Type 算子类型: **filter**
 

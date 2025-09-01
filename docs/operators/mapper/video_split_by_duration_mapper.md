@@ -2,19 +2,23 @@
 
 Splits videos into segments based on a specified duration.
 
-This operator splits each video in the dataset into smaller segments, each with a fixed
-duration. The last segment is discarded if its duration is less than the specified
-minimum last split duration. The original sample can be kept or removed based on the
-`keep_original_sample` parameter. The generated video files are saved in the specified
-directory or, if not provided, in the same directory as the input files. The key metric
-for this operation is the duration of each segment, which is character-based (seconds).
+This operator splits each video in the dataset into smaller segments, each with a fixed duration. The last segment is discarded if its duration is less than the specified minimum last split duration. The original sample can be kept or removed based on the `keep_original_sample` parameter. The generated video files are saved in the specified directory or, if not provided, in the same directory as the input files. The key metric for this operation is the duration of each segment, which is character-based (seconds).
 
 - Splits videos into segments of a specified duration.
 - Discards the last segment if it is shorter than the minimum allowed duration.
 - Keeps or removes the original sample based on the `keep_original_sample` parameter.
-- Saves the generated video files in the specified directory or the input file's
-directory.
+- Saves the generated video files in the specified directory or the input file's directory.
 - Uses the duration in seconds to determine the segment boundaries.
+
+根据指定的持续时间将视频拆分为段。
+
+此运算符将数据集中的每个视频分割成较小的片段，每个片段具有固定的持续时间。如果最后一段的持续时间小于指定的最小最后分割持续时间，则丢弃该最后一段。可以基于 'keep_original_sample' 参数来保留或移除原始样本。生成的视频文件保存在指定的目录中，或者如果未提供，则保存在与输入文件相同的目录中。此操作的关键指标是每个段的持续时间，这是基于字符的 (秒)。
+
+- 将视频分割成指定持续时间的片段。
+- 如果最后一段短于允许的最小持续时间，则丢弃它。
+- 根据 'keep_original_sample' 参数保留或删除原始样本。
+- 将生成的视频文件保存在指定的目录或输入文件的目录中。
+- 使用以秒为单位的持续时间来确定段边界。
 
 Type 算子类型: **mapper**
 

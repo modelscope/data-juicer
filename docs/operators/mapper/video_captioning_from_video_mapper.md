@@ -1,16 +1,12 @@
 # video_captioning_from_video_mapper
 
-Generates video captions using a Hugging Face video-to-text model and sampled video
-frames.
+Generates video captions using a Hugging Face video-to-text model and sampled video frames.
 
-This operator processes video samples to generate captions based on the provided video
-frames. It uses a Hugging Face video-to-text model, such as 'kpyu/video-blip-
-opt-2.7b-ego4d', to generate multiple caption candidates for each video. The number of
-generated captions and the strategy to keep or filter these candidates can be
-configured. The operator supports different frame sampling methods, including extracting
-all keyframes or uniformly sampling a specified number of frames. Additionally, it
-allows for horizontal and vertical flipping of the frames. The final output can include
-both the original sample and the generated captions, depending on the configuration.
+This operator processes video samples to generate captions based on the provided video frames. It uses a Hugging Face video-to-text model, such as 'kpyu/video-blip- opt-2.7b-ego4d', to generate multiple caption candidates for each video. The number of generated captions and the strategy to keep or filter these candidates can be configured. The operator supports different frame sampling methods, including extracting all keyframes or uniformly sampling a specified number of frames. Additionally, it allows for horizontal and vertical flipping of the frames. The final output can include both the original sample and the generated captions, depending on the configuration.
+
+使用拥抱面部视频到文本模型和采样视频帧生成视频字幕。
+
+该操作器处理视频样本以基于所提供的视频帧生成字幕。它使用拥抱面部视频到文本模型，例如 “kpyu/视频-blip- opt-2.7b-ego4d”，为每个视频生成多个字幕候选。可以配置生成的字幕的数量以及保留或过滤这些候选的策略。运算符支持不同的帧采样方法，包括提取所有关键帧或均匀采样指定数量的帧。此外，它允许框架的水平和垂直翻转。最终输出可以包括原始样本和生成的字幕，具体取决于配置。
 
 Type 算子类型: **mapper**
 

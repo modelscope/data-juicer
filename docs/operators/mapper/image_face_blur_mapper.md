@@ -2,11 +2,11 @@
 
 Mapper to blur faces detected in images.
 
-This operator uses an OpenCV classifier to detect faces in images and applies a
-specified blur type to the detected face regions. The blur types supported are 'mean',
-'box', and 'gaussian'. The radius of the blur kernel can be adjusted. If no save
-directory is provided, the modified images will be saved in the same directory as the
-input files. The operator uses a Hugging Face tokenizer for text processing if needed.
+This operator uses an OpenCV classifier to detect faces in images and applies a specified blur type to the detected face regions. The blur types supported are 'mean', 'box', and 'gaussian'. The radius of the blur kernel can be adjusted. If no save directory is provided, the modified images will be saved in the same directory as the input files. The operator uses a Hugging Face tokenizer for text processing if needed.
+
+映射器模糊图像中检测到的人脸。
+
+该运算符使用OpenCV分类器来检测图像中的人脸，并将指定的模糊类型应用于检测到的人脸区域。支持的模糊类型为 “mean” 、 “box” 和 “gaussian”。可以调整模糊内核的半径。如果未提供保存目录，则修改后的图像将保存在与输入文件相同的目录中。如果需要，操作员使用拥抱面标记器进行文本处理。
 
 Type 算子类型: **mapper**
 

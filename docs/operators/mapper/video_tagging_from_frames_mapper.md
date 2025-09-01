@@ -2,18 +2,12 @@
 
 Generates video tags from frames extracted from videos.
 
-This operator extracts frames from videos and generates tags based on the
-content of these frames. The frame extraction method can be either
-"all_keyframes" or "uniform". For "all_keyframes", all keyframes are
-extracted, while for "uniform", a specified number of frames are
-extracted uniformly across the video. The tags are generated using a
-pre-trained model and stored in the specified field name. If the tags
-are already present in the sample, the operator skips processing.
-Important notes:
+This operator extracts frames from videos and generates tags based on the content of these frames. The frame extraction method can be either "all_keyframes" or "uniform". For "all_keyframes", all keyframes are extracted, while for "uniform", a specified number of frames are extracted uniformly across the video. The tags are generated using a pre-trained model and stored in the specified field name. If the tags are already present in the sample, the operator skips processing. Important notes:
 - Uses a Hugging Face tokenizer and a pre-trained model for tag generation.
 - If no video is present in the sample, an empty tag array is stored.
-- Frame tensors are processed to generate tags, which are then sorted by
-frequency and stored.
+- Frame tensors are processed to generate tags, which are then sorted by frequency and stored.
+
+
 
 Type 算子类型: **mapper**
 

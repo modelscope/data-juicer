@@ -2,12 +2,11 @@
 
 Deduplicates samples by comparing exact video matches between documents.
 
-This operator deduplicates samples at the document level by computing the MD5 hash of
-video content. It uses the `video_key` to identify and load videos from each sample. The
-MD5 hash is calculated based on the video packets, considering multiple video streams
-within a single container. If no video is found in a sample, it assigns an empty hash
-value. The deduplication process is managed using a specified backend, either
-'ray_actor' or 'redis', with the latter requiring a Redis server address.
+This operator deduplicates samples at the document level by computing the MD5 hash of video content. It uses the `video_key` to identify and load videos from each sample. The MD5 hash is calculated based on the video packets, considering multiple video streams within a single container. If no video is found in a sample, it assigns an empty hash value. The deduplication process is managed using a specified backend, either 'ray_actor' or 'redis', with the latter requiring a Redis server address.
+
+通过比较文档之间的精确视频匹配来消除重复样本。
+
+该运算符通过计算视频内容的MD5散列来在文档级别对样本进行重复数据删除。它使用 “video_key” 来识别和加载来自每个样本的视频。考虑单个容器内的多个视频流，基于视频分组计算MD5散列。如果在样本中没有找到视频，则分配空散列值。重复数据删除过程使用指定的后端 “ray_actor” 或 “Redis” 进行管理，后者需要Redis服务器地址。
 
 Type 算子类型: **deduplicator**
 
