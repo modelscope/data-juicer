@@ -20,7 +20,7 @@ class TextActionFilter(Filter):
 
         :param lang: language of the text in the samples. 'en' for detection of
             actions in English and 'zh' for detection of actions in Chinese.
-        :param mini_action_num: The min action number in the filtering. samples
+        :param min_action_num: The min action number in the filtering. samples
             will be filtered if their action number in the text is below this
             parameter.
         """
@@ -57,7 +57,4 @@ class TextActionFilter(Filter):
 
     def process_single(self, sample):
         num_action = sample[Fields.stats][StatsKeys.num_action]
-        if self.min_action_num <= num_action:
-            return True
-        else:
-            return False
+        return self.get_keep_boolean(num_action, self.min_action_num)

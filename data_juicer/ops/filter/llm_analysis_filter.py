@@ -101,6 +101,7 @@ json
         self,
         api_or_hf_model: str = "gpt-4o",
         min_score: float = 0.5,
+        max_score: float = 1.0,
         is_hf_model: bool = False,
         *,
         api_endpoint: Optional[str] = None,
@@ -121,8 +122,9 @@ json
         Initialization method.
 
         :param api_or_hf_model: API or huggingface model name.
-        :param min_score: The lowest score threshold to keep
-            the sample.
+        :param min_score: The min score threshold to keep the sample.
+        :param max_score: The max score threshold to keep the sample.
+        :param is_hf_model: If true, use huggingface model. Otherwise, use API.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -155,6 +157,7 @@ json
         self.dim_required_keys = dim_required_keys or self.DEFAULT_DIM_REQUIRED_KEYS
 
         self.min_score = min_score
+        self.max_score = max_score
         self.try_num = try_num
 
         self.enable_vllm = enable_vllm
@@ -294,7 +297,7 @@ json
     def process_single(self, sample, rank=None):
         itm_score = sample[Fields.stats].get(StatsKeys.llm_analysis_score)
         if itm_score:
-            return itm_score >= self.min_score
+            return self.get_keep_boolean(itm_score, self.min_score, self.max_score)
         else:
             # disable the dimension score filter
             return True

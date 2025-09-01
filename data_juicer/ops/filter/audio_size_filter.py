@@ -51,7 +51,9 @@ class AudioSizeFilter(Filter):
 
     def process_single(self, sample):
         audio_sizes = sample[Fields.stats][StatsKeys.audio_sizes]
-        keep_bools = np.array([self.min_size <= audio_size <= self.max_size for audio_size in audio_sizes])
+        keep_bools = np.array(
+            [self.get_keep_boolean(audio_size, self.min_size, self.max_size) for audio_size in audio_sizes]
+        )
         if len(keep_bools) <= 0:
             return True
 

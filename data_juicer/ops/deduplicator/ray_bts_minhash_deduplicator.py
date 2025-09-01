@@ -312,7 +312,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         max_pending_filter_tasks: Optional[int] = 20,
         num_filter_task_returns: Optional[int] = 10,
         merge_batch_size: Optional[int] = 1000,
-        minhash_batch_size: Optional[int] = "auto",
+        minhash_batch_size: Optional[Union[int, str]] = "auto",
         memory_per_sample: Optional[float] = 0.1,  # MB per sample
         *args,
         **kwargs,

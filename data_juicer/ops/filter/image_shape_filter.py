@@ -78,7 +78,11 @@ class ImageShapeFilter(Filter):
         if len(ws) <= 0:
             return True
         keep_bools = np.array(
-            [self.min_width <= w <= self.max_width and self.min_height <= h <= self.max_height for w, h in zip(ws, hs)]
+            [
+                self.get_keep_boolean(w, self.min_width, self.max_width)
+                and self.get_keep_boolean(h, self.min_height, self.max_height)
+                for w, h in zip(ws, hs)
+            ]
         )
 
         # different strategies

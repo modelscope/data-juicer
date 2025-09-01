@@ -36,17 +36,17 @@ class ImageRemoveBackgroundMapper(Mapper):
         """
         Initialization method.
 
-        alpha_matting (bool, optional):
+        :param alpha_matting: (bool, optional)
             Flag indicating whether to use alpha matting. Defaults to False.
-        alpha_matting_foreground_threshold (int, optional):
+        :param alpha_matting_foreground_threshold: (int, optional)
             Foreground threshold for alpha matting. Defaults to 240.
-        alpha_matting_background_threshold (int, optional):
+        :param alpha_matting_background_threshold: (int, optional)
             Background threshold for alpha matting. Defaults to 10.
-        alpha_matting_erode_size (int, optional):
+        :param alpha_matting_erode_size: (int, optional)
             Erosion size for alpha matting. Defaults to 10.
-        bgcolor (Optional[Tuple[int, int, int, int]], optional):
+        :param bgcolor: (Optional[Tuple[int, int, int, int]], optional)
             Background color for the cutout image. Defaults to None.
-        save_dir: The directory where generated image files will be stored.
+        :param save_dir: The directory where generated image files will be stored.
             If not specified, outputs will be saved in the same directory as their corresponding input files.
             This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         *args (Optional[Any]): Additional positional arguments.

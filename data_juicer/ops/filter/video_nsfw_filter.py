@@ -24,7 +24,7 @@ OP_NAME = "video_nsfw_filter"
 @LOADED_VIDEOS.register_module(OP_NAME)
 @INTER_SAMPLED_FRAMES.register_module(OP_NAME)
 class VideoNSFWFilter(Filter):
-    """Filter to keep samples whose videos have low nsfw scores."""
+    """Filter to keep samples whose videos have nsfw scores in a specified range."""
 
     _accelerator = "cuda"
 
@@ -32,6 +32,7 @@ class VideoNSFWFilter(Filter):
         self,
         hf_nsfw_model: str = "Falconsai/nsfw_image_detection",
         trust_remote_code: bool = False,
+        min_score: float = 0.0,
         max_score: float = 0.5,
         frame_sampling_method: str = "all_keyframes",
         frame_num: PositiveInt = 3,
@@ -73,6 +74,7 @@ class VideoNSFWFilter(Filter):
         """
         kwargs["mem_required"] = "1GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
+        self.min_score = min_score
         self.max_score = max_score
         if frame_sampling_method not in ["all_keyframes", "uniform"]:
             raise ValueError(
@@ -168,7 +170,9 @@ class VideoNSFWFilter(Filter):
         if len(itm_scores) <= 0:
             return True
 
-        keep_bools = np.array([itm_score < self.max_score for itm_score in itm_scores])
+        keep_bools = np.array(
+            [self.get_keep_boolean(itm_score, self.min_score, self.max_score) for itm_score in itm_scores]
+        )
 
         # different strategies
         if self.any:

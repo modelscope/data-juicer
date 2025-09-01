@@ -16,7 +16,7 @@ OP_NAME = "image_nsfw_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageNSFWFilter(Filter):
-    """Filter to keep samples whose images have low nsfw scores."""
+    """Filter to keep samples whose images have nsfw scores in a specified range."""
 
     _accelerator = "cuda"
 
@@ -24,6 +24,7 @@ class ImageNSFWFilter(Filter):
         self,
         hf_nsfw_model: str = "Falconsai/nsfw_image_detection",
         trust_remote_code: bool = False,
+        min_score: float = 0.0,
         max_score: float = 0.5,
         any_or_all: str = "any",
         *args,
@@ -33,9 +34,10 @@ class ImageNSFWFilter(Filter):
         Initialization method.
 
         :param hf_nsfw_model: nsfw detection model name on huggingface.
-        :param max_score: the nsfw score threshold for samples.
-            range from 0 to 1. Samples with nsfw score less than this threshold
-            will be kept.
+        :param min_score: the min nsfw score threshold for samples.
+            range from 0 to 1.
+        :param max_score: the max nsfw score threshold for samples.
+            range from 0 to 1.
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
             condition. 'all': keep this sample only if all images meet the
@@ -45,6 +47,7 @@ class ImageNSFWFilter(Filter):
         """
         kwargs["mem_required"] = "1GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
+        self.min_score = min_score
         self.max_score = max_score
         if any_or_all not in ["any", "all"]:
             raise ValueError(f"Keep strategy [{any_or_all}] is not supported. " f'Can only be one of ["any", "all"].')
@@ -87,7 +90,9 @@ class ImageNSFWFilter(Filter):
         if len(itm_scores) <= 0:
             return True
 
-        keep_bools = np.array([itm_score < self.max_score for itm_score in itm_scores])
+        keep_bools = np.array(
+            [self.get_keep_boolean(itm_score, self.min_score, self.max_score) for itm_score in itm_scores]
+        )
 
         # different strategies
         if self.any:

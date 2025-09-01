@@ -306,7 +306,7 @@ class PhraseGroundingRecallFilter(Filter):
         if len(recalls) <= 0:
             return True
 
-        keep_bools = np.array([self.min_recall <= recall <= self.max_recall for recall in recalls])
+        keep_bools = np.array([self.get_keep_boolean(recall, self.min_recall, self.max_recall) for recall in recalls])
 
         # different strategies
         if self.any:

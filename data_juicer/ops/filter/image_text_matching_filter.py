@@ -144,7 +144,9 @@ class ImageTextMatchingFilter(Filter):
         if len(itm_scores) <= 0:
             return True
 
-        keep_bools = np.array([self.min_score <= itm_score <= self.max_score for itm_score in itm_scores])
+        keep_bools = np.array(
+            [self.get_keep_boolean(itm_score, self.min_score, self.max_score) for itm_score in itm_scores]
+        )
 
         # different strategies
         if self.any:
