@@ -66,6 +66,7 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
             partial(convert_to_absolute_paths, dataset_dir=dataset_dir, path_keys=path_keys),
             batch_format="pyarrow",
             zero_copy_batch=True,
+            batch_size=1000,
         )
     return dataset
 
@@ -162,7 +163,7 @@ class RayDataset(DJDataset):
                 new_table = table.append_column(Fields.meta, [new_column_data])
                 return new_table
 
-            self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow")
+            self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow", batch_size=1000)
 
         try:
             batch_size = getattr(op, "batch_size", 1) if op.is_batched_op() else 1
@@ -193,7 +194,7 @@ class RayDataset(DJDataset):
                         new_talbe = table.append_column(Fields.stats, [new_column_data])
                         return new_talbe
 
-                    self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow")
+                    self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow", batch_size=1000)
                 if op.use_cuda():
                     op_kwargs = op._op_cfg[op._name]
                     self.data = self.data.map_batches(
