@@ -766,30 +766,27 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             partition_checkpoint_dir = os.path.join(self.checkpoint_dir, f"partition_{partition_id:06d}")
             os.makedirs(partition_checkpoint_dir, exist_ok=True)
 
-            # Process operations using RayDataset.process method
-            op_start_time = time.time()
+            # Process operations step by step for proper checkpointing
             input_rows = current_dataset.data.count()
 
-            # Note: Ray tasks are automatically terminated when the main process is killed
-            # No need to track individual Ray job IDs
-
-            # Apply all operations at once using RayDataset.process
-            current_dataset.process(ops_to_process)
-
-            op_duration = time.time() - op_start_time
-            output_rows = current_dataset.data.count()
-
-            # Log operation completion for all operations
             for op_idx, op in enumerate(ops_to_process):
                 actual_op_idx = latest_op_idx + 1 + op_idx if latest_op_idx is not None else op_idx
 
                 # Log operation start
                 self.log_op_start(partition_id, op._name, actual_op_idx, {})
 
-                # Determine checkpoint path
+                # Process single operation
+                op_start_time = time.time()
+                current_dataset.process([op])  # Process only this operation
+                op_duration = time.time() - op_start_time
+
+                # Get row count after this operation
+                output_rows = current_dataset.data.count()
+
+                # Determine checkpoint path and save if needed
                 checkpoint_path = None
                 if self._should_checkpoint(actual_op_idx, op._name, partition_id):
-                    # Always save operation checkpoints to checkpoint directory
+                    # Save operation checkpoint to checkpoint directory
                     checkpoint_path = os.path.join(
                         partition_checkpoint_dir, f"op_{actual_op_idx:03d}_{op._name}.parquet"
                     )
@@ -809,6 +806,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                     input_rows,
                     output_rows,
                 )
+
+                # Update input_rows for next operation
+                input_rows = output_rows
 
             # Write final output
             output_path = os.path.join(self.results_dir, f"partition_{partition_id:06d}.parquet")
