@@ -26,7 +26,7 @@ Tags 标签: cpu, hf, image
 ## 📊 Effect demonstration 效果演示
 ### test_filter_small
 ```python
-ImageAestheticsFilter(hf_scorer_model=self.model_id, min_score=0.55, max_score=1.0)
+ImageAestheticsFilter(hf_scorer_model='shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE', min_score=0.55, max_score=1.0)
 ```
 
 #### 📥 input data 输入数据
@@ -41,7 +41,7 @@ The operator filters out images with aesthetics scores outside the 0.55-1.0 rang
 
 ### test_all
 ```python
-ImageAestheticsFilter(hf_scorer_model=self.model_id, any_or_all='all')
+ImageAestheticsFilter(hf_scorer_model='shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE', any_or_all='all')
 ```
 
 #### 📥 input data 输入数据

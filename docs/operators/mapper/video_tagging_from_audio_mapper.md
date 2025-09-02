@@ -24,7 +24,7 @@ Tags 标签: cpu, hf, video
 ## 📊 Effect demonstration 效果演示
 ### test
 ```python
-VideoTaggingFromAudioMapper(self.hf_ast)
+VideoTaggingFromAudioMapper('MIT/ast-finetuned-audioset-10-10-0.4593')
 ```
 
 #### 📥 input data 输入数据
@@ -39,7 +39,7 @@ This example demonstrates the typical usage of the operator, where it processes 
 
 ### test_no_audio
 ```python
-VideoTaggingFromAudioMapper(self.hf_ast)
+VideoTaggingFromAudioMapper('MIT/ast-finetuned-audioset-10-10-0.4593')
 ```
 
 #### 📥 input data 输入数据

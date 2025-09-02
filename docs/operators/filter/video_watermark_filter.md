@@ -26,7 +26,7 @@ Tags 标签: cpu, hf, video
 ## 📊 Effect demonstration 效果演示
 ### test_all_keyframes
 ```python
-VideoWatermarkFilter(hf_watermark_model=self.hf_watermark_model, prob_threshold=0.8, frame_sampling_method='all_keyframes')
+VideoWatermarkFilter(hf_watermark_model='amrul-hzz/watermark_detector', prob_threshold=0.8, frame_sampling_method='all_keyframes')
 ```
 
 #### 📥 input data 输入数据
@@ -41,7 +41,7 @@ This operator filters out samples where the probability of watermarks in video f
 
 ### test_reduce_max
 ```python
-VideoWatermarkFilter(hf_watermark_model=self.hf_watermark_model, prob_threshold=0.9, frame_sampling_method='all_keyframes', reduce_mode='max')
+VideoWatermarkFilter(hf_watermark_model='amrul-hzz/watermark_detector', prob_threshold=0.9, frame_sampling_method='all_keyframes', reduce_mode='max')
 ```
 
 #### 📥 input data 输入数据

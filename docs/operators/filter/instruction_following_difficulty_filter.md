@@ -27,7 +27,7 @@ Tags 标签: cpu, hf
 ## 📊 Effect demonstration 效果演示
 ### test_rft_data
 ```python
-InstructionFollowingDifficultyFilter(hf_model=self._hf_model, min_score=0.2, max_score=0.9, query_template='Question: {text}', response_template='Answer: {answer}')
+InstructionFollowingDifficultyFilter(hf_model='Qwen/Qwen2.5-0.5B', min_score=0.2, max_score=0.9, query_template='Question: {text}', response_template='Answer: {answer}')
 ```
 
 #### 📥 input data 输入数据

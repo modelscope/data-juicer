@@ -49,7 +49,7 @@ Tags 标签: cpu, text
 ## 📊 Effect demonstration 效果演示
 ### test_english_deduplication
 ```python
-RayBTSMinhashDeduplicator(ignore_pattern='\\p{P}', work_dir=work_dir)
+RayBTSMinhashDeduplicator(ignore_pattern='\\p{P}', work_dir=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'english_dedup'))
 ```
 
 #### 📥 input data 输入数据
@@ -310,7 +310,7 @@ The operator tokenizes the input texts, computes MinHash signatures, and applies
 
 ### test_chinese_deduplication
 ```python
-RayBTSMinhashDeduplicator(tokenization='character', ignore_pattern='\\p{P}', work_dir=work_dir)
+RayBTSMinhashDeduplicator(tokenization='character', ignore_pattern='\\p{P}', work_dir=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'chinese_dedup'))
 ```
 
 #### 📥 input data 输入数据

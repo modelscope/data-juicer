@@ -31,7 +31,7 @@ Tags 标签: cpu, hf, multimodal
 ## 📊 Effect demonstration 效果演示
 ### test_default_filter
 ```python
-VideoFramesTextSimilarityFilter(self.hf_clip)
+VideoFramesTextSimilarityFilter('openai/clip-vit-base-patch32')
 ```
 
 #### 📥 input data 输入数据
@@ -46,7 +46,7 @@ The operator computes the similarity between video frames and text, keeping all 
 
 ### test_any
 ```python
-VideoFramesTextSimilarityFilter(self.hf_clip, min_score=0.26, max_score=0.3, frame_sampling_method='uniform', frame_num=2, any_or_all='any')
+VideoFramesTextSimilarityFilter('openai/clip-vit-base-patch32', min_score=0.26, max_score=0.3, frame_sampling_method='uniform', frame_num=2, any_or_all='any')
 ```
 
 #### 📥 input data 输入数据

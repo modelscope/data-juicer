@@ -27,7 +27,7 @@ Tags 标签: cpu, hf
 ## 📊 Effect demonstration 效果演示
 ### test_hf_model
 ```python
-LLMPerplexityFilter(hf_model=self._hf_model, min_score=1, max_score=50)
+LLMPerplexityFilter(hf_model='Qwen/Qwen2.5-0.5B', min_score=1, max_score=50)
 ```
 
 #### 📥 input data 输入数据
@@ -42,7 +42,7 @@ The operator calculates the perplexity score for each text sample and retains on
 
 ### test_rft_data
 ```python
-LLMPerplexityFilter(hf_model=self._hf_model, min_score=1, max_score=5, query_template='Question: {text}', response_template='Answer: {answer}')
+LLMPerplexityFilter(hf_model='Qwen/Qwen2.5-0.5B', min_score=1, max_score=5, query_template='Question: {text}', response_template='Answer: {answer}')
 ```
 
 #### 📥 input data 输入数据

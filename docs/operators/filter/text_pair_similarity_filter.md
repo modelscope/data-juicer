@@ -27,7 +27,7 @@ Tags 标签: cpu, hf, text
 ## 📊 Effect demonstration 效果演示
 ### test_no_eoc_special_token
 ```python
-TextPairSimilarityFilter(hf_clip=self.hf_clip, any_or_all='any', min_score=0.85, max_score=0.99, text_key_second=self.text_key_second)
+TextPairSimilarityFilter(hf_clip='openai/clip-vit-base-patch32', any_or_all='any', min_score=0.85, max_score=0.99, text_key_second='target_text')
 ```
 
 #### 📥 input data 输入数据

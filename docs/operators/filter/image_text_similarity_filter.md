@@ -29,7 +29,7 @@ Tags 标签: cpu, hf, multimodal
 ## 📊 Effect demonstration 效果演示
 ### test_keep_any
 ```python
-ImageTextSimilarityFilter(hf_clip=self.hf_clip, reduce_mode='avg', any_or_all='any', horizontal_flip=False, vertical_flip=False, min_score=0.2, max_score=0.9)
+ImageTextSimilarityFilter(hf_clip='openai/clip-vit-base-patch32', reduce_mode='avg', any_or_all='any', horizontal_flip=False, vertical_flip=False, min_score=0.2, max_score=0.9)
 ```
 
 #### 📥 input data 输入数据
@@ -44,7 +44,7 @@ The operator retains samples where at least one image-text pair meets the simila
 
 ### test_reduce_min
 ```python
-ImageTextSimilarityFilter(hf_clip=self.hf_clip, reduce_mode='min', any_or_all='any', horizontal_flip=False, vertical_flip=False, min_score=0.1, max_score=0.9)
+ImageTextSimilarityFilter(hf_clip='openai/clip-vit-base-patch32', reduce_mode='min', any_or_all='any', horizontal_flip=False, vertical_flip=False, min_score=0.1, max_score=0.9)
 ```
 
 #### 📥 input data 输入数据
