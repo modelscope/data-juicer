@@ -6,7 +6,6 @@ import subprocess
 import unittest
 
 import numpy
-import ray
 from loguru import logger
 
 from data_juicer.core.data import DJDataset, NestedDataset
@@ -88,7 +87,12 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         if current_tag.startswith("ray"):
             ray = LazyLoader("ray")
             logger.info(f">>>>>>>>>>>>>>>>>>>> [Init Ray]: dj_dist_unittest_{cls.__name__}")
-            ray.init("auto", ignore_reinit_error=True, namespace=f"dj_dist_unittest_{cls.__name__}")
+            ray.init(
+                "auto",
+                object_store_memory=256 * 1024 * 1024 * 1024,  # 256GB
+                ignore_reinit_error=True,
+                namespace=f"dj_dist_unittest_{cls.__name__}",
+            )
 
             # erase existing resources
             cls._cleanup_ray_data_state()
@@ -119,7 +123,6 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         if current_tag.startswith("ray"):
             cls._cleanup_ray_data_state()
             gc.collect()
-            ray.shutdown()
 
     @classmethod
     def _cleanup_ray_data_state(cls):
