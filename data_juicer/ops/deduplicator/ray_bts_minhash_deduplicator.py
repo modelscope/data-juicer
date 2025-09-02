@@ -12,7 +12,7 @@ from typing_extensions import Annotated
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
-from data_juicer.utils.resource_utils import ray_available_gpu_memories, ray_gpu_count
+from data_juicer.utils.ray_utils import ray_available_gpu_memories, ray_gpu_count
 
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
@@ -632,6 +632,9 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             logger.info("Using GPU for MinHash computation")
             # Get available GPU count and set concurrency
             gpu_count = ray_gpu_count()
+            if gpu_count == 0:
+                logger.error("No GPUs available in Ray cluster")
+                raise RuntimeError("No GPUs available in Ray cluster")
 
             concurrency = max(1, gpu_count)  # Ensure at least 1 concurrent task
             logger.info(f"Setting GPU concurrency to {concurrency} based on available GPUs")

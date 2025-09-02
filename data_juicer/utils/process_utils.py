@@ -110,8 +110,10 @@ def calculate_np(name, mem_required, cpu_required, num_proc=None, use_cuda=False
 
         op_proc = num_proc
         mems_available = [m / 1024 for m in available_memories()]  # GB
-        auto_proc = sum([math.floor(mem_available / (mem_required + eps)) for mem_available in mems_available])
-        op_proc = min(op_proc, auto_proc)
+        auto_proc_from_mem = sum([math.floor(mem_available / (mem_required + eps)) for mem_available in mems_available])
+        auto_proc_from_cpu = math.floor(cpu_num / (cpu_required + eps))
+
+        op_proc = min(op_proc, auto_proc_from_mem, auto_proc_from_cpu)
 
         if op_proc < 1.0:
             logger.warning(

@@ -7,7 +7,7 @@ import torch
 import ray
 
 from data_juicer.utils.process_utils import setup_mp, get_min_cuda_memory, calculate_np
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 from data_juicer.utils.constant import RAY_JOB_ENV_VAR
 
 class ProcessUtilsTest(DataJuicerTestCaseBase):
@@ -47,6 +47,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
         os.environ[RAY_JOB_ENV_VAR] = '1'
         ray.init(address='auto', ignore_reinit_error=True)
 
+    @TEST_TAG('ray')
     def test_cuda_mem_required_zero_and_num_proc_not_given(self):
         logger = MagicMock()
         with patch(f"{self._patch_ray_module}.get_ray_nodes_info") as mock_ray_nodes_info, \
@@ -73,6 +74,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
                 "Set the `num_proc` to number of GPUs 2."
             )
 
+    @TEST_TAG('ray')
     def test_cuda_auto_less_than_device_count(self):
         logger = MagicMock()
         with patch(f"{self._patch_ray_module}.get_ray_nodes_info") as mock_ray_nodes_info, \
@@ -92,6 +94,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
                 "require more resource to run."
             )
 
+    @TEST_TAG('ray')
     def test_cuda_num_proc_exceeds_auto(self):
         logger = MagicMock()
         with patch(f"{self._patch_module}.available_gpu_memories") as mock_avail_gpu, \
