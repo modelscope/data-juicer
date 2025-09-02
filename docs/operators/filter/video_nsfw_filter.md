@@ -29,7 +29,7 @@ Tags 标签: cpu, hf, video
 ## 📊 Effect demonstration 效果演示
 ### test_all_keyframes
 ```python
-VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model, max_score=0.1, frame_sampling_method='all_keyframes')
+VideoNSFWFilter(hf_nsfw_model='Falconsai/nsfw_image_detection', max_score=0.1, frame_sampling_method='all_keyframes')
 ```
 
 #### 📥 input data 输入数据
@@ -44,7 +44,7 @@ This operator filters out videos with a high NSFW score, keeping only those belo
 
 ### test_any
 ```python
-VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model, max_score=0.01, frame_sampling_method='all_keyframes', any_or_all='any')
+VideoNSFWFilter(hf_nsfw_model='Falconsai/nsfw_image_detection', max_score=0.01, frame_sampling_method='all_keyframes', any_or_all='any')
 ```
 
 #### 📥 input data 输入数据

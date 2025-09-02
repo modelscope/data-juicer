@@ -26,7 +26,7 @@ Tags 标签: cpu, hf, image
 ## 📊 Effect demonstration 效果演示
 ### test_nsfw_filter
 ```python
-ImageNSFWFilter(hf_nsfw_model=self.hf_nsfw_model, max_score=0.0005)
+ImageNSFWFilter(hf_nsfw_model='Falconsai/nsfw_image_detection', max_score=0.0005)
 ```
 
 #### 📥 input data 输入数据
@@ -41,7 +41,7 @@ The operator filters out samples with images having NSFW scores above 0.0005, ke
 
 ### test_all
 ```python
-ImageNSFWFilter(hf_nsfw_model=self.hf_nsfw_model, max_score=0.0005, any_or_all='all')
+ImageNSFWFilter(hf_nsfw_model='Falconsai/nsfw_image_detection', max_score=0.0005, any_or_all='all')
 ```
 
 #### 📥 input data 输入数据

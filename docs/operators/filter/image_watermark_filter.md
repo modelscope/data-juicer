@@ -25,7 +25,7 @@ Tags 标签: cpu, hf, image
 ## 📊 Effect demonstration 效果演示
 ### test_watermark_filter
 ```python
-ImageWatermarkFilter(hf_watermark_model=self.hf_watermark_model, prob_threshold=0.8)
+ImageWatermarkFilter(hf_watermark_model='amrul-hzz/watermark_detector', prob_threshold=0.8)
 ```
 
 #### 📥 input data 输入数据
@@ -40,7 +40,7 @@ The operator filters out samples with a high probability of containing watermark
 
 ### test_any
 ```python
-ImageWatermarkFilter(hf_watermark_model=self.hf_watermark_model, prob_threshold=0.4, any_or_all='any')
+ImageWatermarkFilter(hf_watermark_model='amrul-hzz/watermark_detector', prob_threshold=0.4, any_or_all='any')
 ```
 
 #### 📥 input data 输入数据

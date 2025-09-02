@@ -20,44 +20,30 @@ Tags 标签: cpu, text
 
 ## 📊 Effect demonstration 效果演示
 ### test_bibliography_case
+```python
+RemoveBibliographyMapper()
+```
 
 #### 📥 input data 输入数据
-<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">%%
-%% This is file `sample-sigconf.tex\clearpage
-\bibliographystyle{ACM-Reference-Format}
-\bibliography{sample-base}
-\end{document}
-\endinput
-%%
-%% End of file `sample-sigconf.tex&#x27;.
-</pre></div>
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> list</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[&quot;%%\n%% This is file `sample-sigconf.tex\\clearpage\n\\bibliographystyle{ACM-Reference-Format}\n\\bibliography{sample-base}\n\\end{document}\n\\endinput\n%%\n%% End of file `sample-sigconf.tex&#x27;.\n&quot;]</pre></div>
 
 #### 📤 output data 输出数据
-<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">%%
-%% This is file `sample-sigconf.tex\clearpage
-\bibliographystyle{ACM-Reference-Format}
-</pre></div>
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> list</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[&#x27;%%\n%% This is file `sample-sigconf.tex\\clearpage\n\\bibliographystyle{ACM-Reference-Format}\n&#x27;]</pre></div>
 
 #### ✨ explanation 解释
 This example shows how the operator removes a bibliography section marked by the \bibliography command. The input contains a LaTeX document with a bibliography at the end. After processing, the bibliography and everything after it is removed, leaving only the part of the document before the bibliography.
 这个例子展示了算子如何移除用\bibliography命令标记的参考文献部分。输入包含一个在末尾有参考文献的LaTeX文档。处理后，参考文献及其后面的所有内容都被移除，只保留了参考文献前的部分文档内容。
 
 ### test_ref_case
+```python
+RemoveBibliographyMapper()
+```
 
 #### 📥 input data 输入数据
-<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">%%
-%% This is file `sample-sigconf.tex\clearpage
-\begin{references}
-\end{document}
-\endinput
-%%
-%% End of file `sample-sigconf.tex&#x27;.
-</pre></div>
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> list</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[&quot;%%\n%% This is file `sample-sigconf.tex\\clearpage\n\\begin{references}\n\\end{document}\n\\endinput\n%%\n%% End of file `sample-sigconf.tex&#x27;.\n&quot;]</pre></div>
 
 #### 📤 output data 输出数据
-<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">%%
-%% This is file `sample-sigconf.tex\clearpage
-</pre></div>
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> list</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[&#x27;%%\n%% This is file `sample-sigconf.tex\\clearpage\n&#x27;]</pre></div>
 
 #### ✨ explanation 解释
 This example demonstrates the operator's capability to remove a references section indicated by the \begin{references} command. The input text has a references section at the end. After the operator processes the data, the references section and all content following it are eliminated, preserving only the text prior to the references section.

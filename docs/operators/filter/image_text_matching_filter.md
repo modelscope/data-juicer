@@ -29,7 +29,7 @@ Tags 标签: cpu, hf, multimodal
 ## 📊 Effect demonstration 效果演示
 ### test_keep_any
 ```python
-ImageTextMatchingFilter(hf_blip=self.hf_blip, reduce_mode='avg', any_or_all='any', min_score=0.003, max_score=1.0)
+ImageTextMatchingFilter(hf_blip='Salesforce/blip-itm-base-coco', reduce_mode='avg', any_or_all='any', min_score=0.003, max_score=1.0)
 ```
 
 #### 📥 input data 输入数据
@@ -44,7 +44,7 @@ The operator keeps samples if any of the image-text pairs have a matching score 
 
 ### test_keep_all
 ```python
-ImageTextMatchingFilter(hf_blip=self.hf_blip, reduce_mode='avg', any_or_all='all', min_score=0.003, max_score=1.0)
+ImageTextMatchingFilter(hf_blip='Salesforce/blip-itm-base-coco', reduce_mode='avg', any_or_all='all', min_score=0.003, max_score=1.0)
 ```
 
 #### 📥 input data 输入数据

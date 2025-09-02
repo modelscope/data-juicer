@@ -32,7 +32,7 @@ Tags 标签: cpu, hf, multimodal
 ## 📊 Effect demonstration 效果演示
 ### test_general
 ```python
-PhraseGroundingRecallFilter(hf_owlvit=self.hf_owlvit, reduce_mode='avg', any_or_all='any', min_recall=0.5, max_recall=1.0)
+PhraseGroundingRecallFilter(hf_owlvit='google/owlvit-base-patch32', reduce_mode='avg', any_or_all='any', min_recall=0.5, max_recall=1.0)
 ```
 
 #### 📥 input data 输入数据
@@ -47,7 +47,7 @@ The operator keeps all samples where the phrase grounding recall is between 0.5 
 
 ### test_high_area_ratio
 ```python
-PhraseGroundingRecallFilter(hf_owlvit=self.hf_owlvit, reduce_mode='avg', any_or_all='any', min_recall=0.5, max_recall=1.0, large_area_ratio_thr=0.99)
+PhraseGroundingRecallFilter(hf_owlvit='google/owlvit-base-patch32', reduce_mode='avg', any_or_all='any', min_recall=0.5, max_recall=1.0, large_area_ratio_thr=0.99)
 ```
 
 #### 📥 input data 输入数据
