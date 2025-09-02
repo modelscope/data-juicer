@@ -61,8 +61,8 @@ def run_snapshot_analysis(job_id, work_dir="./outputs/partition-checkpoint-event
     print("=" * 60)
     
     # Run the snapshot utility
-    cmd = ["python", "-m", "data_juicer.utils.job.snapshot", 
-           os.path.join(work_dir, job_id)]
+    job_dir = os.path.join(work_dir, job_id)
+    cmd = ["python", "-m", "data_juicer.utils.job.snapshot", job_dir]
     
     try:
         result = subprocess.run(cmd, capture_output=True, text=True)

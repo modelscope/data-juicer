@@ -440,16 +440,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 abs_file_path, num_rows_per_file=self.parquet_batch_size, compression=self.storage_compression
             )
         elif format_type == "arrow":
-            # Convert to pandas and then to Arrow format
-            import pyarrow as pa
-            import pyarrow.feather as feather
-
-            # Convert to pandas DataFrame first, then to Arrow table
-            df = ray_dataset.to_pandas()
-            table = pa.Table.from_pandas(df)
-
-            # Write as Feather format
-            feather.write_feather(table, abs_file_path)
+            # OPTIMIZATION: Use Ray's built-in Arrow writing instead of materializing to Arrow table
+            # This eliminates the memory overhead of converting to Arrow format
+            # and keeps data distributed throughout the process
+            ray_dataset.write_arrow(abs_file_path)
         else:  # jsonl
             ray_dataset.write_json(abs_file_path, force_ascii=False)
 
@@ -488,17 +482,23 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         # Save partitions to disk with metadata
         partition_paths = []
 
-        # Convert dataset to list for custom partitioning
-        all_data = dataset.data.to_pandas().to_dict("records")
+        # Use Ray's distributed split instead of materializing everything in memory
+        # This keeps data distributed and is much more memory efficient
+        #
+        # Note: We're using take(skip=start_idx) approach here because we need exact partition sizes
+        # and precise control over the start/end indices. An alternative approach would be to use:
+        # partitions = ray_dataset.repartition(partition_count)
+        # for i, partition in enumerate(partitions):
+        #     partition.write_parquet(partition_path)
+        ray_dataset = dataset.data
 
-        # Create partitions with exact sizes
+        # Create partitions with exact sizes using Ray's capabilities
+        # We'll use a more efficient approach that avoids materializing the entire dataset
+        # and keeps data as Ray datasets throughout the process for maximum memory efficiency
         start_idx = 0
         for i in range(partition_count):
             partition_size = partition_sizes[i]
             end_idx = start_idx + partition_size
-
-            # Extract partition data
-            partition_data = all_data[start_idx:end_idx]
 
             # Create partition path
             partition_path = os.path.join(self.partitions_dir, f"partition_{i:06d}.parquet")
@@ -521,12 +521,18 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 )
             )
 
+            # Extract partition data using Ray's slice operation
+            # This is much more memory efficient than converting to pandas
+            # We need to materialize just this partition, not the entire dataset
+            partition_data = ray_dataset.take(partition_size, skip=start_idx)
+
             # Save partition to disk using configurable format
             if self.storage_format == "parquet":
                 # Use Parquet for best performance and compression
                 # Use absolute path to avoid Ray worker file system issues
                 partition_path_abs = os.path.abspath(partition_path)
                 os.makedirs(partition_path_abs, exist_ok=True)
+                # Create a new Ray dataset from the partition data
                 partition_dataset = ray.data.from_items(partition_data)
                 # Use configurable batch size for optimal file sizes
                 partition_dataset.write_parquet(
@@ -540,25 +546,21 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 # Ensure directory exists before writing
                 os.makedirs(os.path.dirname(partition_path), exist_ok=True)
 
-                # Convert to pandas and then to Arrow format
-                import pyarrow as pa
-                import pyarrow.feather as feather
-
+                # OPTIMIZATION: Avoid materializing to Arrow table - write directly from Ray dataset
+                # This eliminates the memory overhead of converting to Arrow format
                 partition_dataset = ray.data.from_items(partition_data)
-                df = partition_dataset.to_pandas()
-                table = pa.Table.from_pandas(df)
-                feather.write_feather(table, partition_path)
+                # Use Ray's built-in Arrow writing capability for maximum efficiency
+                partition_dataset.write_arrow(partition_path)
             else:
                 # Fallback to JSONL for compatibility
                 partition_path = partition_path + ".jsonl"
-                with open(partition_path, "w") as f:
-                    for sample in partition_data:
-                        f.write(json.dumps(sample) + "\n")
+                partition_dataset = ray.data.from_items(partition_data)
+                partition_dataset.write_json(partition_path, force_ascii=False)
 
             # Get file size
             file_size = os.path.getsize(partition_path)
 
-            # Calculate checksum
+            # Calculate checksum - we already have the partition data
             checksum = self._calculate_checksum(partition_data)
 
             # Create partition metadata
@@ -566,7 +568,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 partition_id=i,
                 original_start_idx=start_idx,
                 original_end_idx=end_idx,
-                sample_count=len(partition_data),
+                sample_count=partition_size,
                 file_size_bytes=file_size,
                 checksum=checksum,
                 created_timestamp=time.time(),
@@ -578,7 +580,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
 
             logger.info(
                 f"Created partition {i+1}/{partition_count}: {partition_path} "
-                f"({len(partition_data)} samples, {file_size} bytes)"
+                f"({partition_size} samples, {file_size} bytes)"
             )
 
             # Log individual partition creation complete
@@ -590,16 +592,14 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                     event_type="partition_creation_complete",
                     timestamp=partition_creation_complete,
                     partition_id=i,
-                    message=f"Partition {i} creation completed - {len(partition_data)} samples in {partition_creation_duration:.2f}s",
+                    message=f"Partition {i} creation completed - {partition_size} samples in {partition_creation_duration:.2f}s",
                     metadata={
                         "partition_id": i,
                         "partition_path": partition_path,
-                        "sample_count": len(partition_data),
+                        "sample_count": partition_size,
                         "file_size_bytes": file_size,
                         "checksum": checksum,
                         "duration_seconds": partition_creation_duration,
-                        "original_start_idx": start_idx,
-                        "original_end_idx": end_idx,
                     },
                 )
             )
@@ -607,9 +607,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             # Update start index for next partition
             start_idx = end_idx
 
-        # Save dataset mapping
-        self._save_dataset_mapping()
-
+        logger.info(f"Successfully created {len(partition_paths)} partitions")
         return partition_paths, self.dataset_mapping
 
     def _calculate_partition_sizes(self, total_samples: int) -> Tuple[int, List[int]]:
