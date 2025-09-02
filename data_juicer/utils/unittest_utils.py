@@ -6,6 +6,7 @@ import subprocess
 import unittest
 
 import numpy
+import ray
 from loguru import logger
 
 from data_juicer.core.data import DJDataset, NestedDataset
@@ -118,6 +119,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         if current_tag.startswith("ray"):
             cls._cleanup_ray_data_state()
             gc.collect()
+            ray.shutdown()
 
     @classmethod
     def _cleanup_ray_data_state(cls):
