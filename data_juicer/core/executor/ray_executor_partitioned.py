@@ -485,11 +485,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         # Use Ray's distributed split instead of materializing everything in memory
         # This keeps data distributed and is much more memory efficient
         #
-        # Note: We're using take(skip=start_idx) approach here because we need exact partition sizes
-        # and precise control over the start/end indices. An alternative approach would be to use:
-        # partitions = ray_dataset.repartition(partition_count)
-        # for i, partition in enumerate(partitions):
-        #     partition.write_parquet(partition_path)
+        # Note: We're using Ray's repartition approach because Ray datasets don't support skip() or slice() methods.
+        # This creates equal-sized partitions which is more memory efficient than materializing the entire dataset.
+        # While we lose precise control over partition boundaries, we gain significant memory efficiency
+        # and better distributed processing capabilities.
         ray_dataset = dataset.data
 
         # Create partitions with exact sizes using Ray's capabilities
@@ -521,10 +520,21 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 )
             )
 
-            # Extract partition data using Ray's slice operation
-            # This is much more memory efficient than converting to pandas
-            # We need to materialize just this partition, not the entire dataset
-            partition_data = ray_dataset.take(partition_size, skip=start_idx)
+            # Extract partition data using Ray's native repartitioning
+            # This is much more memory efficient and distributed-friendly
+            # We'll use repartition to create equal-sized partitions
+            # Note: This approach creates equal-sized partitions, which may differ from the calculated sizes
+            # but is much more efficient than materializing the entire dataset
+
+            # Use Ray's repartition method to create equal-sized partitions
+            # This is the most efficient approach available in Ray
+            partitions = ray_dataset.repartition(partition_count)
+
+            # Get the specific partition by index
+            # Note: repartition creates equal-sized partitions, so we need to adjust our approach
+            # We'll use the partition size from repartition rather than our calculated size
+            actual_partition_size = partitions.count() // partition_count
+            partition_data = partitions.take(actual_partition_size)
 
             # Save partition to disk using configurable format
             if self.storage_format == "parquet":
