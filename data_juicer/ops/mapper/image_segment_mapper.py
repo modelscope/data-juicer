@@ -34,7 +34,7 @@ class ImageSegmentMapper(Mapper):
             one of ['FastSAM-x.pt', 'FastSAM-s.pt'].
 
         """
-        kwargs.setdefault("mem_required", "800MB")
+        kwargs["mem_required"] = "800MB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
 
         self.imgsz = imgsz

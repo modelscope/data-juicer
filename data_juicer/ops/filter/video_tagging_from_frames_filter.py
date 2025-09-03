@@ -63,7 +63,7 @@ class VideoTaggingFromFramesFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "9GB")
+        kwargs["mem_required"] = "9GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         if contain not in ["any", "all"]:
             raise ValueError(

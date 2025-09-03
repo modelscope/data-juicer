@@ -12,7 +12,7 @@ from typing_extensions import Annotated
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
-from data_juicer.utils.resource_utils import get_ray_gpu_count, get_ray_gpu_memory
+from data_juicer.utils.ray_utils import ray_available_gpu_memories, ray_gpu_count
 
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
@@ -631,7 +631,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         if self.use_cuda():
             logger.info("Using GPU for MinHash computation")
             # Get available GPU count and set concurrency
-            gpu_count = get_ray_gpu_count()
+            gpu_count = ray_gpu_count()
             if gpu_count == 0:
                 logger.error("No GPUs available in Ray cluster")
                 raise RuntimeError("No GPUs available in Ray cluster")
@@ -640,9 +640,9 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             logger.info(f"Setting GPU concurrency to {concurrency} based on available GPUs")
 
             # Get available GPU memory and set batch size
-            gpu_memory = get_ray_gpu_memory()
-            if gpu_memory:
-                min_memory = min(gpu_memory.values())
+            gpu_memory = ray_available_gpu_memories()
+            if len(gpu_memory):
+                min_memory = min(gpu_memory)
                 # Use 80% of available memory to leave room for overhead
                 safe_memory = min_memory * 0.8
                 estimated_batch_size = int(safe_memory / self.memory_per_sample)
