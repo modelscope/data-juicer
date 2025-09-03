@@ -11,15 +11,16 @@ OP_NAME = "llm_quality_score_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class LLMQualityScoreFilter(LLMAnalysisFilter):
-    """Filter to keep samples with a high quality score estimated by an LLM.
+    """Filter to keep samples with a high quality score estimated by a language model.
 
-    This operator uses a Hugging Face LLM to evaluate each sample across multiple quality
-    dimensions, including accuracy, grammar, informativeness, and coherence. The LLM
-    provides a numerical score for each dimension on a 1-5 scale, along with a rationale and
-    recommendation. The overall quality score is then used to filter samples. Samples are
-    kept if their quality score meets or exceeds the specified minimum score. The key metric
-    is 'llm_quality_score', which is computed based on the LLM's evaluation. The LLM also
-    provides a detailed record of its analysis, which is stored in 'llm_quality_record'."""
+    This operator uses a language model to evaluate the quality of each sample across
+    multiple dimensions, including accuracy, grammar, informativeness, and coherence. The
+    LLM provides a numerical score for each dimension on a 1-5 scale, where 1 is the lowest
+    and 5 is the highest. The overall quality score is used to decide whether to keep or
+    filter out the sample based on the specified minimum and maximum score thresholds. The
+    evaluation results are cached in the 'llm_quality_score' and 'llm_quality_record'
+    fields. Important flags and tags from the LLM's analysis may also be stored in the
+    sample's stats."""
 
     # avoid leading whitespace
     DEFAULT_SYSTEM_PROMPT = """
