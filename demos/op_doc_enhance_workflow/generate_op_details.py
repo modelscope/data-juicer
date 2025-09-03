@@ -4,7 +4,6 @@ Script to auto-generate operator documentation.
 Extracts information from operator source code and test files to generate Markdown documentation.
 """
 
-import ast
 import json
 import os
 import re
@@ -13,7 +12,8 @@ from pathlib import Path
 import translators as ts
 from jinja2 import Environment, FileSystemLoader
 from utils.model import chat
-from utils.parse_class import TestCaseExtractor, extract_class_attr_paths
+from utils.parse_class import extract_class_attr_paths
+from utils.extractor import extract_test_info_from_path
 from utils.router import route
 from utils.view_model import to_legacy_view
 
@@ -309,14 +309,9 @@ def param_signature_to_list(sig, param_docs):
 # Test processing
 # -----------------------------------------------------------------------------
 
-
 def process_test_file(pyfile: Path):
     """Parse a test file and extract test case information."""
-    src = pyfile.read_text(encoding="utf-8")
-    tree = ast.parse(src)
-    extractor = TestCaseExtractor(src)
-    extractor.visit(tree)
-    return extractor.methods
+    return extract_test_info_from_path(pyfile)
 
 
 def find_test_file(op_name):
@@ -343,8 +338,6 @@ def save_md_file(op_name, content, op_type=".", lan=""):
 # -----------------------------------------------------------------------------
 # Translation (EN -> ZH)
 # -----------------------------------------------------------------------------
-
-import re
 
 
 def optimize_text(text):
