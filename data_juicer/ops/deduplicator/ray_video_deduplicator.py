@@ -12,14 +12,13 @@ OP_NAME = "ray_video_deduplicator"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class RayVideoDeduplicator(RayBasicDeduplicator):
-    """Deduplicates samples by comparing exact video matches between documents.
+    """Deduplicates samples at document-level using exact matching of videos in Ray distributed mode.
 
-    This operator deduplicates samples at the document level by computing the MD5 hash of
-    video content. It uses the `video_key` to identify and load videos from each sample. The
-    MD5 hash is calculated based on the video packets, considering multiple video streams
-    within a single container. If no video is found in a sample, it assigns an empty hash
-    value. The deduplication process is managed using a specified backend, either
-    'ray_actor' or 'redis', with the latter requiring a Redis server address."""
+    This operator computes the MD5 hash of video streams in each sample and compares them to
+    identify duplicates. It uses Ray distributed mode for parallel processing. The hash is
+    computed by demuxing the video streams and updating the MD5 hash with each video packet.
+    If a sample does not contain a valid video, it is assigned an empty hash value. The
+    operator supports 'ray_actor' or 'redis' backends for deduplication."""
 
     def __init__(self, backend: str = "ray_actor", redis_address: str = "redis://localhost:6379", *args, **kwargs):
         """
