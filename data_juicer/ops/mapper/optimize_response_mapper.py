@@ -4,7 +4,6 @@ from data_juicer.ops.mapper.optimize_qa_mapper import OptimizeQAMapper
 OP_NAME = "optimize_response_mapper"
 
 
-# TODO: Extend LLM-based OPs into API-based implementation.
 @OPERATORS.register_module(OP_NAME)
 class OptimizeResponseMapper(OptimizeQAMapper):
     """
