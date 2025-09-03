@@ -345,12 +345,24 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>data_juicer.utils.resource_utils 源代码</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.availability_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_is_package_available</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.ray_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_and_initialize_ray</span><span class="p">,</span>
+    <span class="n">ray_available_gpu_memories</span><span class="p">,</span>
+    <span class="n">ray_available_memories</span><span class="p">,</span>
+    <span class="n">ray_cpu_count</span><span class="p">,</span>
+    <span class="n">ray_gpu_count</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">torch</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
 
 <span class="n">ray</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;ray&quot;</span><span class="p">)</span>
 
@@ -388,13 +400,6 @@
 
 
 
-<div class="viewcode-block" id="get_cpu_count">
-<a class="viewcode-back" href="../../../api/data_juicer.utils.resource_utils.html#data_juicer.utils.resource_utils.get_cpu_count">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_cpu_count</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span></div>
-
-
-
 <div class="viewcode-block" id="get_cpu_utilization">
 <a class="viewcode-back" href="../../../api/data_juicer.utils.resource_utils.html#data_juicer.utils.resource_utils.get_cpu_utilization">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_cpu_utilization</span><span class="p">():</span>
@@ -414,72 +419,77 @@
 
 
 
-<div class="viewcode-block" id="get_ray_gpu_count">
-<a class="viewcode-back" href="../../../api/data_juicer.utils.resource_utils.html#data_juicer.utils.resource_utils.get_ray_gpu_count">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_ray_gpu_count</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get the number of available GPUs in the Ray cluster.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_cuda_device_count</span><span class="p">():</span>
+    <span class="n">_torch_available</span> <span class="o">=</span> <span class="n">_is_package_available</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        int: Number of available GPUs, or 0 if no GPUs are available or Ray is not initialized</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">check_and_initialize_ray</span><span class="p">():</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">ray_gpu_count</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">_torch_available</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span>
+
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ray</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ray is not initialized. Call ray.init() first.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">0</span>
+        <span class="n">nvidia_smi_output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;nvidia-smi&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">],</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">all_devices</span> <span class="o">=</span> <span class="n">nvidia_smi_output</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Get available resources</span>
-        <span class="n">resources</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">available_resources</span><span class="p">()</span>
-        <span class="n">gpu_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GPU&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">cuda_visible_devices</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CUDA_VISIBLE_DEVICES&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cuda_visible_devices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;CUDA_VISIBLE_DEVICES is ignored when torch is unavailable. &quot;</span> <span class="s2">&quot;All detected GPUs will be used.&quot;</span>
+            <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">gpu_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No GPUs available in Ray cluster&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">gpu_count</span><span class="si">}</span><span class="s2"> GPUs in Ray cluster&quot;</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">gpu_count</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error getting Ray GPU count: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="mi">0</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_devices</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># nvidia-smi not found or other error</span>
+        <span class="k">return</span> <span class="mi">0</span>
 
 
+<div class="viewcode-block" id="cuda_device_count">
+<a class="viewcode-back" href="../../../api/data_juicer.utils.resource_utils.html#data_juicer.utils.resource_utils.cuda_device_count">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cuda_device_count</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">_cuda_device_count</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="get_ray_gpu_memory">
-<a class="viewcode-back" href="../../../api/data_juicer.utils.resource_utils.html#data_juicer.utils.resource_utils.get_ray_gpu_memory">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_ray_gpu_memory</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get the available GPU memory in the Ray cluster.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        dict: Dictionary mapping GPU indices to available memory in MB, or empty dict if no GPUs available</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="is_cuda_available">
+<a class="viewcode-back" href="../../../api/data_juicer.utils.resource_utils.html#data_juicer.utils.resource_utils.is_cuda_available">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_cuda_available</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">cuda_device_count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+
+
+<div class="viewcode-block" id="cpu_count">
+<a class="viewcode-back" href="../../../api/data_juicer.utils.resource_utils.html#data_juicer.utils.resource_utils.cpu_count">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cpu_count</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">check_and_initialize_ray</span><span class="p">():</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">ray_cpu_count</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="available_memories">
+<a class="viewcode-back" href="../../../api/data_juicer.utils.resource_utils.html#data_juicer.utils.resource_utils.available_memories">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">available_memories</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Available memory for each node in MB.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">check_and_initialize_ray</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">ray_available_memories</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">available</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">2</span><span class="p">))]</span></div>
+
+
+
+<div class="viewcode-block" id="available_gpu_memories">
+<a class="viewcode-back" href="../../../api/data_juicer.utils.resource_utils.html#data_juicer.utils.resource_utils.available_gpu_memories">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">available_gpu_memories</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Available gpu memory of each gpu card for each alive node in MB.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">check_and_initialize_ray</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">ray_available_gpu_memories</span><span class="p">()</span>
+
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ray</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ray is not initialized. Call ray.init() first.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">{}</span>
-
-        <span class="c1"># Get available resources</span>
-        <span class="n">resources</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">available_resources</span><span class="p">()</span>
-        <span class="n">gpu_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GPU&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="n">gpu_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No GPUs available in Ray cluster&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">{}</span>
-
-        <span class="c1"># Get memory info for each GPU</span>
-        <span class="n">gpu_memory</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">gpu_count</span><span class="p">):</span>
-            <span class="n">memory</span> <span class="o">=</span> <span class="n">query_cuda_info</span><span class="p">(</span><span class="s2">&quot;memory.free&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">memory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">memory</span><span class="p">):</span>
-                <span class="n">gpu_memory</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">memory</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GPU </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">memory</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">MB free memory&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not get memory info for GPU </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">gpu_memory</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error getting Ray GPU memory: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{}</span></div>
+        <span class="k">return</span> <span class="n">query_cuda_info</span><span class="p">(</span><span class="s2">&quot;memory.free&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
 
 </pre></div>
         </article>

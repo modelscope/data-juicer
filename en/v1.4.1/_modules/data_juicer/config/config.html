@@ -368,6 +368,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops.base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops.op_fusion</span><span class="w"> </span><span class="kn">import</span> <span class="n">FUSION_STRATEGIES</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">RAY_JOB_ENV_VAR</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.logger_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecialTokens</span>
 
@@ -920,6 +921,9 @@
             <span class="k">with</span> <span class="n">timing_context</span><span class="p">(</span><span class="s2">&quot;Parsing arguments&quot;</span><span class="p">):</span>
                 <span class="n">cfg</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
 
+                <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">executor_type</span> <span class="o">==</span> <span class="s2">&quot;ray&quot;</span><span class="p">:</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">RAY_JOB_ENV_VAR</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+
                 <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">custom_operator_paths</span><span class="p">:</span>
                     <span class="n">load_custom_operators</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">custom_operator_paths</span><span class="p">)</span>
 
@@ -1024,8 +1028,10 @@
         <span class="p">)</span>
 
     <span class="c1"># check number of processes np</span>
-    <span class="n">sys_cpu_count</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;np&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.resource_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">cpu_count</span>
+
+    <span class="n">sys_cpu_count</span> <span class="o">=</span> <span class="n">cpu_count</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;np&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">cfg</span><span class="o">.</span><span class="n">np</span> <span class="o">=</span> <span class="n">sys_cpu_count</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Number of processes `np` is not set, &quot;</span> <span class="sa">f</span><span class="s2">&quot;set it to cpu count [</span><span class="si">{</span><span class="n">sys_cpu_count</span><span class="si">}</span><span class="s2">] as default value.&quot;</span>

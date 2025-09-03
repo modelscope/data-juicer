@@ -347,7 +347,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_context</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.resource_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">get_cpu_count</span><span class="p">,</span>
+    <span class="n">cpu_count</span><span class="p">,</span>
     <span class="n">get_cpu_utilization</span><span class="p">,</span>
     <span class="n">query_cuda_info</span><span class="p">,</span>
     <span class="n">query_mem_info</span><span class="p">,</span>
@@ -449,7 +449,7 @@
         <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
         <span class="c1"># CPU</span>
-        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;CPU count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_cpu_count</span><span class="p">()</span>
+        <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;CPU count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpu_count</span><span class="p">()</span>
         <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;CPU util.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_cpu_utilization</span><span class="p">()</span> <span class="o">/</span> <span class="mf">100.0</span>
         <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;Total mem.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_mem_info</span><span class="p">(</span><span class="s2">&quot;total&quot;</span><span class="p">)</span>
         <span class="n">resource_dict</span><span class="p">[</span><span class="s2">&quot;Used mem.&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_mem_info</span><span class="p">(</span><span class="s2">&quot;used&quot;</span><span class="p">)</span>

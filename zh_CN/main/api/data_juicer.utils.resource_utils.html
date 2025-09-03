@@ -359,11 +359,6 @@
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.utils.resource_utils.get_cpu_count">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.resource_utils.</span></span><span class="sig-name descname"><span class="pre">get_cpu_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/resource_utils.html#get_cpu_count"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.resource_utils.get_cpu_count" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.resource_utils.get_cpu_utilization">
 <span class="sig-prename descclassname"><span class="pre">data_juicer.utils.resource_utils.</span></span><span class="sig-name descname"><span class="pre">get_cpu_utilization</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/resource_utils.html#get_cpu_utilization"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.resource_utils.get_cpu_utilization" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -374,31 +369,30 @@
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.utils.resource_utils.get_ray_gpu_count">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.resource_utils.</span></span><span class="sig-name descname"><span class="pre">get_ray_gpu_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/resource_utils.html#get_ray_gpu_count"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.resource_utils.get_ray_gpu_count" title="Link to this definition">¶</a></dt>
-<dd><p>Get the number of available GPUs in the Ray cluster.</p>
-<dl class="field-list simple">
-<dt class="field-odd">返回<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Number of available GPUs, or 0 if no GPUs are available or Ray is not initialized</p>
-</dd>
-<dt class="field-even">返回类型<span class="colon">:</span></dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="data_juicer.utils.resource_utils.cuda_device_count">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.resource_utils.</span></span><span class="sig-name descname"><span class="pre">cuda_device_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/resource_utils.html#cuda_device_count"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.resource_utils.cuda_device_count" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.resource_utils.is_cuda_available">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.resource_utils.</span></span><span class="sig-name descname"><span class="pre">is_cuda_available</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/resource_utils.html#is_cuda_available"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.resource_utils.is_cuda_available" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.resource_utils.cpu_count">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.resource_utils.</span></span><span class="sig-name descname"><span class="pre">cpu_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/resource_utils.html#cpu_count"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.resource_utils.cpu_count" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.resource_utils.available_memories">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.resource_utils.</span></span><span class="sig-name descname"><span class="pre">available_memories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/data_juicer/utils/resource_utils.html#available_memories"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.resource_utils.available_memories" title="Link to this definition">¶</a></dt>
+<dd><p>Available memory for each node in MB.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.utils.resource_utils.get_ray_gpu_memory">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.resource_utils.</span></span><span class="sig-name descname"><span class="pre">get_ray_gpu_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/resource_utils.html#get_ray_gpu_memory"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.resource_utils.get_ray_gpu_memory" title="Link to this definition">¶</a></dt>
-<dd><p>Get the available GPU memory in the Ray cluster.</p>
-<dl class="field-list simple">
-<dt class="field-odd">返回<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dictionary mapping GPU indices to available memory in MB, or empty dict if no GPUs available</p>
-</dd>
-<dt class="field-even">返回类型<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="data_juicer.utils.resource_utils.available_gpu_memories">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.resource_utils.</span></span><span class="sig-name descname"><span class="pre">available_gpu_memories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/data_juicer/utils/resource_utils.html#available_gpu_memories"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.resource_utils.available_gpu_memories" title="Link to this definition">¶</a></dt>
+<dd><p>Available gpu memory of each gpu card for each alive node in MB.</p>
 </dd></dl>
 
 </section>
@@ -442,11 +436,13 @@
             <ul>
 <li><a class="reference internal" href="#">data_juicer.utils.resource_utils module</a><ul>
 <li><a class="reference internal" href="#data_juicer.utils.resource_utils.query_cuda_info"><code class="docutils literal notranslate"><span class="pre">query_cuda_info()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.utils.resource_utils.get_cpu_count"><code class="docutils literal notranslate"><span class="pre">get_cpu_count()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.resource_utils.get_cpu_utilization"><code class="docutils literal notranslate"><span class="pre">get_cpu_utilization()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.resource_utils.query_mem_info"><code class="docutils literal notranslate"><span class="pre">query_mem_info()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.utils.resource_utils.get_ray_gpu_count"><code class="docutils literal notranslate"><span class="pre">get_ray_gpu_count()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.utils.resource_utils.get_ray_gpu_memory"><code class="docutils literal notranslate"><span class="pre">get_ray_gpu_memory()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.resource_utils.cuda_device_count"><code class="docutils literal notranslate"><span class="pre">cuda_device_count()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.resource_utils.is_cuda_available"><code class="docutils literal notranslate"><span class="pre">is_cuda_available()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.resource_utils.cpu_count"><code class="docutils literal notranslate"><span class="pre">cpu_count()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.resource_utils.available_memories"><code class="docutils literal notranslate"><span class="pre">available_memories()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.resource_utils.available_gpu_memories"><code class="docutils literal notranslate"><span class="pre">available_gpu_memories()</span></code></a></li>
 </ul>
 </li>
 </ul>

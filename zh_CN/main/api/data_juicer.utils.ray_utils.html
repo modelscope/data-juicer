@@ -2,10 +2,11 @@
 <html class="no-js" lang="zh-CN" data-content_root="../">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="索引" href="../genindex.html" /><link rel="search" title="搜索" href="../search.html" />
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="索引" href="../genindex.html" /><link rel="search" title="搜索" href="../search.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>data_juicer - Data Juicer</title>
+        <title>data_juicer.utils.ray_utils module - Data Juicer</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -181,7 +182,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -238,6 +239,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../tools/hpo/README_ZH.html">数据菜谱的自动化超参优化</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/vbench_metrics/README_ZH.html">VBench metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/postprocess/README_ZH.html">Postprocess tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/preprocess/README_ZH.html">预处理工具</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/quality_classifier/README_ZH.html">给数据打分</a></li>
@@ -250,23 +252,23 @@
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
 </ul>
 </li>
 </ul>
 
 </div></div><div class="sidebar-bottom-menu">
   <div class="current-info">
-    <span class="current-lang">zh-CN</span>|<span class="current-version">v1.4.2</span>
+    <span class="current-lang">zh-CN</span>|<span class="current-version">main</span>
   </div>
   <div class="dropdown-panel">
     
@@ -274,12 +276,12 @@
       <dt>Language</dt>
       <dd>
         
-        <a href="../../../en/v1.4.2/_modules/data_juicer.html"
+        <a href="../../../en/main/api/data_juicer.utils.ray_utils.html"
           >
           English
         </a>
         
-        <a href="../../../zh_CN/v1.4.2/_modules/data_juicer_ZH.html"
+        <a href="../../../zh_CN/main/api/data_juicer.utils.ray_utils.html"
           >
           简体中文
         </a>
@@ -293,19 +295,19 @@
       <dt>Version</dt>
       <dd>
         
-        <a href="../../main/_modules/data_juicer.html" >
+        <a href="../../main/api/data_juicer.utils.ray_utils.html" class="active" >
           main
         </a>
         
-        <a href="../../v1.4.2/_modules/data_juicer.html" class="active" >
+        <a href="../../v1.4.2/api/data_juicer.utils.ray_utils.html" >
           v1.4.2
         </a>
         
-        <a href="../../v1.4.1/_modules/data_juicer.html" >
+        <a href="../../v1.4.1/api/data_juicer.utils.ray_utils.html" >
           v1.4.1
         </a>
         
-        <a href="../../v1.4.0/_modules/data_juicer.html" >
+        <a href="../../v1.4.0/api/data_juicer.utils.ray_utils.html" >
           v1.4.0
         </a>
         
@@ -328,7 +330,13 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/api/data_juicer.utils.ray_utils.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
@@ -337,71 +345,58 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>data_juicer 源代码</h1><div class="highlight"><pre>
-<span></span><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.4.2&quot;</span>
+          <section id="module-data_juicer.utils.ray_utils">
+<span id="data-juicer-utils-ray-utils-module"></span><h1>data_juicer.utils.ray_utils module<a class="headerlink" href="#module-data_juicer.utils.ray_utils" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.ray_utils.is_ray_mode">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.ray_utils.</span></span><span class="sig-name descname"><span class="pre">is_ray_mode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/ray_utils.html#is_ray_mode"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.ray_utils.is_ray_mode" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.ray_utils.initialize_ray">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.ray_utils.</span></span><span class="sig-name descname"><span class="pre">initialize_ray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/ray_utils.html#initialize_ray"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.ray_utils.initialize_ray" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.ray_utils.check_and_initialize_ray">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.ray_utils.</span></span><span class="sig-name descname"><span class="pre">check_and_initialize_ray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/ray_utils.html#check_and_initialize_ray"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.ray_utils.check_and_initialize_ray" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<span class="c1"># allow loading truncated images for some too large images.</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageFile</span>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.ray_utils.get_ray_nodes_info">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.ray_utils.</span></span><span class="sig-name descname"><span class="pre">get_ray_nodes_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/ray_utils.html#get_ray_nodes_info"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.ray_utils.get_ray_nodes_info" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.availability_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_is_package_available</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.ray_utils.ray_cpu_count">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.ray_utils.</span></span><span class="sig-name descname"><span class="pre">ray_cpu_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/ray_utils.html#ray_cpu_count"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.ray_utils.ray_cpu_count" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<span class="n">torch</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
-<span class="n">ImageFile</span><span class="o">.</span><span class="n">LOAD_TRUNCATED_IMAGES</span> <span class="o">=</span> <span class="kc">True</span>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.ray_utils.ray_gpu_count">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.ray_utils.</span></span><span class="sig-name descname"><span class="pre">ray_gpu_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/ray_utils.html#ray_gpu_count"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.ray_utils.ray_gpu_count" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<span class="c1"># For now, only INFO will be shown. Later the severity level will be changed</span>
-<span class="c1"># when setup_logger is called to initialize the logger.</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">)</span>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.ray_utils.ray_available_memories">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.ray_utils.</span></span><span class="sig-name descname"><span class="pre">ray_available_memories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/ray_utils.html#ray_available_memories"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.ray_utils.ray_available_memories" title="Link to this definition">¶</a></dt>
+<dd><p>Available memory for each alive node in MB.</p>
+</dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.ray_utils.ray_available_gpu_memories">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.ray_utils.</span></span><span class="sig-name descname"><span class="pre">ray_available_gpu_memories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/ray_utils.html#ray_available_gpu_memories"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.ray_utils.ray_available_gpu_memories" title="Link to this definition">¶</a></dt>
+<dd><p>Available gpu memory of each gpu card for each alive node in MB.</p>
+</dd></dl>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_cuda_device_count</span><span class="p">():</span>
-    <span class="n">_torch_available</span> <span class="o">=</span> <span class="n">_is_package_available</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
+</section>
 
-    <span class="k">if</span> <span class="n">_torch_available</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span>
-
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">nvidia_smi_output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;nvidia-smi&quot;</span><span class="p">,</span> <span class="s2">&quot;-L&quot;</span><span class="p">],</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">all_devices</span> <span class="o">=</span> <span class="n">nvidia_smi_output</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="n">cuda_visible_devices</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CUDA_VISIBLE_DEVICES&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">cuda_visible_devices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;CUDA_VISIBLE_DEVICES is ignored when torch is unavailable. &quot;</span> <span class="s2">&quot;All detected GPUs will be used.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_devices</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="c1"># nvidia-smi not found or other error</span>
-        <span class="k">return</span> <span class="mi">0</span>
-
-
-<div class="viewcode-block" id="cuda_device_count">
-<a class="viewcode-back" href="../api/data_juicer.html#data_juicer.cuda_device_count">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">cuda_device_count</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">_cuda_device_count</span><span class="p">()</span></div>
-
-
-
-<div class="viewcode-block" id="is_cuda_available">
-<a class="viewcode-back" href="../api/data_juicer.html#data_juicer.is_cuda_available">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">is_cuda_available</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">cuda_device_count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
-
-</pre></div>
         </article>
       </div>
       <footer>
@@ -427,8 +422,34 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">data_juicer.utils.ray_utils module</a><ul>
+<li><a class="reference internal" href="#data_juicer.utils.ray_utils.is_ray_mode"><code class="docutils literal notranslate"><span class="pre">is_ray_mode()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.ray_utils.initialize_ray"><code class="docutils literal notranslate"><span class="pre">initialize_ray()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.ray_utils.check_and_initialize_ray"><code class="docutils literal notranslate"><span class="pre">check_and_initialize_ray()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.ray_utils.get_ray_nodes_info"><code class="docutils literal notranslate"><span class="pre">get_ray_nodes_info()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.ray_utils.ray_cpu_count"><code class="docutils literal notranslate"><span class="pre">ray_cpu_count()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.ray_utils.ray_gpu_count"><code class="docutils literal notranslate"><span class="pre">ray_gpu_count()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.ray_utils.ray_available_memories"><code class="docutils literal notranslate"><span class="pre">ray_available_memories()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.ray_utils.ray_available_gpu_memories"><code class="docutils literal notranslate"><span class="pre">ray_available_gpu_memories()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
