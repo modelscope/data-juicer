@@ -1,12 +1,12 @@
 # instruction_following_difficulty_filter
 
-Filter to keep texts based on their instruction following difficulty (IFD) score.
+Filter to keep texts based on their instruction following difficulty (IFD, https://arxiv.org/abs/2308.12032) score.
 
-This operator computes the IFD score for each text sample, which is the ratio of the loss with the query to the loss without the query. The IFD score is used to determine the difficulty of following an instruction. Samples are kept if their IFD score falls within a specified range. The IFD score is cached in the 'ifd_score' field of the sample's stats. This operator uses a Hugging Face tokenizer and model to compute the losses.
+This operator computes the IFD score for each sample, which is the ratio of the loss with and without the query. It keeps samples where the IFD score falls within a specified range. The IFD score is calculated using a Hugging Face tokenizer and model. If the IFD score is already cached in the 'ifd_score' field, it will be reused. The operator decides to keep or filter samples based on the provided minimum and maximum IFD score thresholds.
 
-根据指令跟随难度（IFD）分数筛选保留文本。
+根据文本的指令跟随难度（IFD，https://arxiv.org/abs/2308.12032）分数来过滤保留文本。
 
-该算子计算每个文本样本的IFD分数，即带查询的损失与不带查询的损失之比。IFD分数用于确定遵循指令的难度。如果样本的IFD分数落在指定范围内，则保留该样本。IFD分数缓存在样本的stats字段中的'ifd_score'字段中。该算子使用Hugging Face的分词器和模型来计算损失。
+该算子为每个样本计算IFD分数，即有无查询时的损失比率。它保留IFD分数在指定范围内的样本。IFD分数是使用Hugging Face的tokenizer和模型计算的。如果IFD分数已经缓存在'ifd_score'字段中，则会重用该分数。该算子根据提供的最小和最大IFD分数阈值来决定保留或过滤样本。
 
 Type 算子类型: **filter**
 

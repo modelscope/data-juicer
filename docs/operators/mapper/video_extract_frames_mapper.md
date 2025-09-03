@@ -2,23 +2,29 @@
 
 Mapper to extract frames from video files according to specified methods.
 
-- Extracts frames based on the chosen method: 'all_keyframes' or 'uniform'.
-- For 'all_keyframes', extracts all keyframes. For 'uniform', extracts a specified number of frames uniformly.
-- If 'duration' is set, the video is segmented, and frames are extracted from each segment.
-- The extracted frames are saved in a directory, and the paths are stored in a dictionary.
-- The dictionary maps video keys to their respective frame directories.
-- If 'frame_dir' is not provided, a default directory based on the video file path is used.
-- The resulting dictionary is saved under the specified 'frame_key' in the sample's metadata.
+Extracts frames from video files using either all keyframes or a uniform sampling method. The extracted frames are saved in a directory, and the mapping from video keys to frame directories is stored in the sample's metadata. The data format for the extracted frames is a dictionary mapping video keys to their respective frame directories:
+- "video_key_1": "/${frame_dir}/video_key_1_filename/"
+- "video_key_2": "/${frame_dir}/video_key_2_filename/"
 
-根据指定的方法从视频文件中提取帧的映射器。
+- **Frame Sampling Methods**:
+- "all_keyframes": Extracts all keyframes from the video.
+- "uniform": Extracts a specified number of frames uniformly from the video.
+- If `duration` is set, the video is segmented into multiple segments based on the duration, and frames are extracted from each segment.
+- The output directory for the frames can be specified; otherwise, a default directory is used.
+- The field name in the sample's metadata where the frame information is stored can be customized.
 
-- 根据选择的方法提取帧：'all_keyframes' 或 'uniform'。
-- 对于 'all_keyframes'，提取所有关键帧。对于 'uniform'，均匀提取指定数量的帧。
-- 如果设置了 'duration'，则将视频分段，并从每一段中提取帧。
-- 提取的帧保存在目录中，并将路径存储在字典中。
-- 字典将视频键映射到其相应的帧目录。
-- 如果未提供 'frame_dir'，则使用基于视频文件路径的默认目录。
-- 最终的字典保存在样本元数据中指定的 'frame_key' 下。
+映射器根据指定方法从视频文件中提取帧。
+
+使用所有关键帧或均匀采样方法从视频文件中提取帧。提取的帧保存在一个目录中，并将视频键到帧目录的映射存储在样本的元数据中。提取帧的数据格式是一个字典，将视频键映射到其相应的帧目录：
+- "video_key_1": "/${frame_dir}/video_key_1_filename/"
+- "video_key_2": "/${frame_dir}/video_key_2_filename/"
+
+- **帧采样方法**：
+- "all_keyframes"：从视频中提取所有关键帧。
+- "uniform"：从视频中均匀提取指定数量的帧。
+- 如果设置了 `duration`，则根据持续时间将视频分割成多个片段，并从每个片段中提取帧。
+- 可以指定帧的输出目录；否则，使用默认目录。
+- 可以自定义样本元数据中存储帧信息的字段名称。
 
 Type 算子类型: **mapper**
 

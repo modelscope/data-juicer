@@ -1,12 +1,12 @@
 # llm_difficulty_score_filter
 
-Filter to keep samples with a high difficulty score estimated by an LLM.
+Filter to keep samples with high difficulty scores estimated by an LLM.
 
-This operator evaluates the difficulty of each sample using a large language model (LLM) and retains only those with a difficulty score above a specified threshold. The LLM analyzes the sample across multiple dimensions, including linguistic complexity, conceptual depth, prior knowledge, step complexity, and ambiguity. Each dimension is scored on a 1-5 scale, where 1 is novice-friendly and 5 is expert-level. The overall difficulty score is computed as the average of these dimension scores. The operator uses a Hugging Face tokenizer for text processing. The difficulty score is cached in the 'llm_difficulty_score' field, and detailed analysis is stored in 'llm_difficulty_record'.
+This operator uses a Hugging Face LLM to evaluate the difficulty of each sample. The LLM analyzes the sample across multiple dimensions, including linguistic complexity, conceptual depth, prior knowledge, step complexity, and ambiguity. Each dimension is scored on a 1-5 scale, with 5 being the highest difficulty. The final difficulty score is computed as the average of these dimension scores. Samples are kept if their difficulty score falls within the specified range (min_score to max_score). The key metric 'llm_difficulty_score' is stored in the sample's stats, along with detailed records and flags.
 
-筛选并保留LLM估计的高难度分数的样本。
+过滤保留由大型语言模型估计出高难度分数的样本。
 
-该算子使用大型语言模型（LLM）评估每个样本的难度，并仅保留难度分数高于指定阈值的样本。LLM从多个维度分析样本，包括语言复杂性、概念深度、先验知识、步骤复杂性和模糊性。每个维度按1-5的评分，其中1为新手友好，5为专家级别。整体难度分数是这些维度分数的平均值。该算子使用Hugging Face分词器进行文本处理。难度分数缓存在'llm_difficulty_score'字段中，详细分析存储在'llm_difficulty_record'中。
+该算子使用Hugging Face的大型语言模型评估每个样本的难度。LLM从多个维度分析样本，包括语言复杂性、概念深度、先验知识、步骤复杂性和模糊性。每个维度的评分范围为1-5分，5分为最高难度。最终的难度分数是这些维度分数的平均值。如果样本的难度分数在指定范围内（min_score到max_score），则保留该样本。关键指标'llm_difficulty_score'存储在样本的stats中，同时还有详细的记录和标志。
 
 Type 算子类型: **filter**
 

@@ -1,22 +1,12 @@
 # most_relevant_entities_aggregator
 
 Extracts and ranks entities closely related to a given entity from provided texts.
-- The operator uses a language model API to identify and rank entities.
-- It filters out entities of the same type as the given entity.
-- The ranked list is sorted in descending order of importance.
-- The input texts are aggregated and passed to the model, with a token limit if specified.
-- The output is parsed using a regular expression to extract the relevant entities.
-- Results are stored in the batch metadata under the key 'most_relevant_entities'.
-- The operator retries the API call up to a specified number of times in case of errors.
 
-从提供的文本中提取并与给定实体密切相关的实体并进行排名。
-- 该算子使用语言模型API来识别和排名实体。
-- 它过滤掉与给定实体类型相同的实体。
-- 排名列表按重要性降序排列。
-- 输入文本被汇总并传递给模型，如果指定了token限制则遵守该限制。
-- 使用正则表达式解析输出以提取相关实体。
-- 结果存储在批次元数据中，键为'most_relevant_entities'。
-- 该算子在出现错误时最多重试指定次数的API调用。
+The operator uses a language model API to identify and rank entities, filtering out entities of the same type as the given entity. The ranked list is sorted in descending order of importance. Input texts are aggregated and passed to the model, with an optional token limit. The output is parsed using a regular expression to extract the relevant entities. Results are stored in the batch metadata under the key 'most_relevant_entities'. The operator retries the API call up to a specified number of times in case of errors. The system prompt, input template, and output pattern can be customized.
+
+从提供的文本中提取并排序与给定实体密切相关的实体。
+
+该算子使用语言模型 API 来识别和排序实体，过滤掉与给定实体类型相同的实体。排名列表按重要性降序排列。输入文本被聚合并传递给模型，可选设置 token 限制。输出使用正则表达式解析以提取相关实体。结果存储在批处理元数据中的 'most_relevant_entities' 键下。该算子在出错时最多重试指定次数的 API 调用。系统提示、输入模板和输出模式可以自定义。
 
 Type 算子类型: **aggregator**
 

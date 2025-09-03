@@ -2,11 +2,11 @@
 
 Aggregates nested content from multiple samples into a single summary.
 
-This operator uses a recursive summarization approach to aggregate content from multiple samples. It processes the input text, which is split into sub-documents, and generates a summary that maintains the average length of the original documents. The aggregation is performed using an API model, and the process is guided by system prompts and templates. The operator supports retrying the API call in case of errors and allows for customization of the summarization process through various parameters. The default system prompt and templates are provided in Chinese, and the final summary is expected to be in the same language.
+This operator uses a recursive summarization approach to aggregate content from multiple samples. It processes the input text, which is split into sub-documents, and generates a summary that maintains the average length of the original documents. The aggregation is performed using an API model, guided by system prompts and templates. The operator supports retrying the API call in case of errors and allows for customization of the summarization process through various parameters. The default system prompt and templates are provided in Chinese, but they can be customized. The operator uses a Hugging Face tokenizer to handle tokenization.
 
-将多个样本中的嵌套内容汇总成一个摘要。
+聚合来自多个样本的嵌套内容，生成单一摘要。
 
-该算子使用递归汇总的方法来汇总来自多个样本的内容。它处理输入文本，将其拆分为子文档，并生成保持原始文档平均长度的摘要。汇总过程使用API模型进行，并由系统提示和模板指导。该算子支持在出现错误时重试API调用，并允许通过各种参数自定义汇总过程。默认的系统提示和模板提供为中文，最终摘要也应为同一种语言。
+该算子使用递归汇总方法来聚合来自多个样本的内容。它处理被分割成子文档的输入文本，并生成一个保持原始文档平均长度的摘要。聚合过程使用 API 模型进行，由系统提示和模板指导。该算子支持在出错时重试 API 调用，并允许通过各种参数自定义汇总过程。默认的系统提示和模板以中文提供，但可以自定义。该算子使用 Hugging Face 分词器来处理分词。
 
 Type 算子类型: **aggregator**
 
