@@ -1,12 +1,12 @@
 # ray_video_deduplicator
 
-Deduplicates samples by comparing exact video matches between documents.
+Deduplicates samples at document-level using exact matching of videos in Ray distributed mode.
 
-This operator deduplicates samples at the document level by computing the MD5 hash of video content. It uses the `video_key` to identify and load videos from each sample. The MD5 hash is calculated based on the video packets, considering multiple video streams within a single container. If no video is found in a sample, it assigns an empty hash value. The deduplication process is managed using a specified backend, either 'ray_actor' or 'redis', with the latter requiring a Redis server address.
+This operator computes the MD5 hash of video streams in each sample and compares them to identify duplicates. It uses Ray distributed mode for parallel processing. The hash is computed by demuxing the video streams and updating the MD5 hash with each video packet. If a sample does not contain a valid video, it is assigned an empty hash value. The operator supports 'ray_actor' or 'redis' backends for deduplication.
 
-通过比较文档之间的视频精确匹配来去重样本。
+在 Ray 分布式模式下，使用视频的精确匹配在文档级别去重样本。
 
-该算子通过计算视频内容的 MD5 哈希值来进行文档级别的去重。它使用 `video_key` 来识别并从每个样本中加载视频。MD5 哈希值基于视频数据包计算，考虑单个容器内的多个视频流。如果样本中没有找到视频，则分配一个空哈希值。去重过程使用指定的后端进行管理，可以是 'ray_actor' 或 'redis'，后者需要 Redis 服务器地址。
+该算子计算每个样本中视频流的 MD5 哈希值，并通过比较这些哈希值来识别重复项。它使用 Ray 分布式模式进行并行处理。哈希值通过解复用视频流并对每个视频包更新 MD5 哈希值来计算。如果样本不包含有效的视频，则分配一个空的哈希值。该算子支持 'ray_actor' 或 'redis' 后端进行去重。
 
 Type 算子类型: **deduplicator**
 

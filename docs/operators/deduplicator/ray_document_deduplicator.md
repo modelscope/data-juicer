@@ -1,12 +1,12 @@
 # ray_document_deduplicator
 
-Deduplicates samples at the document level using exact matching.
+Deduplicates samples at the document level using exact matching in Ray distributed mode.
 
-This operator calculates a hash for each document and uses it to identify and remove duplicate documents. The hash is computed based on the text content of the document, with options to convert the text to lowercase and to ignore non-alphabet characters (whitespaces, digits, and punctuation). The deduplication process can use either a Ray actor or Redis as the backend for managing the hashes. The key metric used is the exact match of the document text, which is character-based by default.
+This operator computes a hash for each document and filters out duplicates based on exact matches. The hash is calculated from the text content, which can be optionally converted to lowercase and stripped of non-alphabet characters. The key metric used for deduplication is the MD5 hash of the processed text. If the `lowercase` parameter is set, the text is converted to lowercase before hashing. If `ignore_non_character` is enabled, all non-alphabet characters, including whitespaces, digits, and punctuation, are removed. The operator supports two backends: 'ray_actor' and 'redis', with the default being 'ray_actor'.
 
-在文档级别使用精确匹配去重样本。
+在 Ray 分布式模式下，使用精确匹配在文档级别去重样本。
 
-该算子为每个文档计算一个哈希值，并使用它来识别和删除重复的文档。哈希值基于文档的文本内容计算，可以选择将文本转换为小写并忽略非字母字符（空格、数字和标点符号）。去重过程可以使用 Ray actor 或 Redis 作为管理哈希值的后端。使用的关键指标是文档文本的精确匹配，默认情况下是基于字符的。
+该算子为每个文档计算一个哈希值，并基于精确匹配过滤掉重复项。哈希值是从文本内容计算得出的，可以选择将文本转换为小写并去除非字母字符。用于去重的关键指标是处理后的文本的 MD5 哈希值。如果设置了 `lowercase` 参数，则在哈希之前将文本转换为小写。如果启用了 `ignore_non_character`，则会移除所有非字母字符，包括空格、数字和标点符号。该算子支持两种后端：'ray_actor' 和 'redis'，默认为 'ray_actor'。
 
 Type 算子类型: **deduplicator**
 

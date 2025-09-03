@@ -2,7 +2,7 @@
 
 Filter to keep samples with video motion scores within a specified range.
 
-This operator uses the RAFT (Recurrent All-Pairs Field Transforms) model from torchvision to predict optical flow between video frames. It keeps samples where the video motion score is within the given min and max score range. The motion score is computed based on the optical flow between frames, which is estimated using the RAFT model. The operator can sample frames at a specified FPS and apply transformations to the frames before computing the flow.
+This operator utilizes the RAFT (Recurrent All-Pairs Field Transforms) model from torchvision to predict optical flow between video frames. It keeps samples where the video motion score is within the given min and max score range. The motion score is computed based on the optical flow between frames, which is estimated using the RAFT model. The operator can sample frames at a specified FPS and apply transformations to the frames before computing the flow.
 
 - The RAFT model is used to estimate the optical flow.
 - Frames are preprocessed using a series of transformations including normalization and color channel flipping.
@@ -10,15 +10,23 @@ This operator uses the RAFT (Recurrent All-Pairs Field Transforms) model from to
 - The operator can be configured to filter based on any or all frames in the video.
 - The device for model inference (CPU or CUDA) is automatically detected and set.
 
+For further details, refer to the official torchvision documentation: https://pytorch.org/vision/main/models/raft.html
+
+The original paper on RAFT is available here: https://arxiv.org/abs/2003.12039
+
+
 过滤保留视频运动得分在指定范围内的样本。
 
-该算子使用 torchvision 中的 RAFT（Recurrent All-Pairs Field Transforms）模型来预测视频帧之间的光流。它保留视频运动得分在给定的最小和最大得分范围内的样本。运动得分基于帧之间的光流计算，光流使用 RAFT 模型估计。该算子可以在指定的 FPS 下采样帧，并在计算光流之前对帧应用变换。
-
+该算子利用 torchvision 中的 RAFT（Recurrent All-Pairs Field Transforms）模型来预测视频帧之间的光流。它保留视频运动得分在给定最小和最大得分范围内的样本。运动得分基于帧间的光流计算，该光流使用 RAFT 模型估计。该算子可以在指定 FPS 下采样帧，并在计算光流之前对帧应用变换。
 - 使用 RAFT 模型估计光流。
 - 帧经过一系列变换预处理，包括归一化和颜色通道翻转。
-- 从光流数据中计算运动得分。
+- 从光流数据计算运动得分。
 - 该算子可以配置为基于视频中的任何或所有帧进行过滤。
 - 自动检测并设置模型推理的设备（CPU 或 CUDA）。
+
+更多详情，请参阅官方 torchvision 文档：https://pytorch.org/vision/main/models/raft.html
+
+RAFT 的原始论文可在此处找到：https://arxiv.org/abs/2003.12039
 
 Type 算子类型: **filter**
 

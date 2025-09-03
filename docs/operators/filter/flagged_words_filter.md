@@ -1,18 +1,12 @@
 # flagged_words_filter
 
-Filter to keep samples with a flagged-word ratio less than a specific maximum value.
+Filter to keep samples with flagged-word ratio in a specified range.
 
-This operator filters out samples based on the ratio of flagged words. It computes the ratio of flagged words in each sample and keeps only those with a ratio below the specified `max_ratio`. The flagged words are loaded from a directory, and the ratio is computed character-based by default. If tokenization is enabled, it uses a Hugging Face tokenizer to tokenize the text. The key metric `flagged_words_ratio` is cached in the stats field. Important notes:
-- The language for flagged words can be specified or set to "all" for a merged list.
-- Word augmentation can be applied, especially for Chinese and Vietnamese.
-- The ratio is clamped to 1.0 if it exceeds this value.
+This operator filters out samples based on the ratio of flagged words. It uses a list of flagged words, which can be language-specific or combined from multiple languages. The flagged-word ratio is computed as the number of flagged words divided by the total number of words in the sample. If tokenization is enabled, a Hugging Face tokenizer is used to split the text into words. The operator supports word augmentation for certain languages, which can be configured. The key metric, 'flagged_words_ratio', is cached and reused if already computed. Samples are kept if their flagged-word ratio falls within the specified min and max ratio.
 
-过滤出标记词比例小于特定最大值的样本。
+筛选出标记词比率在指定范围内的样本。
 
-该算子根据标记词的比例来过滤样本。它计算每个样本中标记词的比例，并仅保留比例低于指定 `max_ratio` 的样本。标记词从一个目录中加载，默认情况下按字符计算比例。如果启用了分词，则使用 Hugging Face 分词器对文本进行分词。关键指标 `flagged_words_ratio` 会缓存在 stats 字段中。重要说明：
-- 可以指定标记词的语言，或设置为 "all" 以合并列表。
-- 可以应用词增强，特别是对于中文和越南语。
-- 如果比例超过 1.0，则会被限制为 1.0。
+该算子根据标记词的比例筛选样本。它使用一个标记词列表，该列表可以是特定语言的或来自多种语言的组合。标记词比率计算为标记词数量除以样本中的总词数。如果启用了分词，则使用 Hugging Face 分词器将文本拆分为单词。该算子支持某些语言的词增强，可以进行配置。关键指标 'flagged_words_ratio' 如果已经计算过则会被缓存并重用。如果样本的标记词比率落在指定的最小和最大比率范围内，则保留该样本。
 
 Type 算子类型: **filter**
 

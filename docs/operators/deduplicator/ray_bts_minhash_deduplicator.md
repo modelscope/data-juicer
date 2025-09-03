@@ -1,22 +1,12 @@
 # ray_bts_minhash_deduplicator
 
-A deduplicator that uses MinHash LSH and RAY for efficient near-duplicate text detection and removal.
+A MinhashLSH deduplicator that operates in Ray distributed mode.
 
-This operator tokenizes input texts using the specified method, computes MinHash signatures, and applies LSH to group similar documents. It then uses a union-find algorithm to identify and remove duplicates based on the Jaccard similarity threshold. The key metric, Jaccard similarity, is computed using the MinHash signatures. The operator supports various tokenization methods, including space, punctuation, character, and sentencepiece, with the latter requiring a Hugging Face tokenizer model. The operator can run on both CPU and GPU, with automatic batch size adjustment based on available memory. Important notes:
-- The `ignore_pattern` parameter allows ignoring specific patterns during MinHash computation.
-- The `jaccard_threshold` determines the similarity level at which documents are considered duplicates.
-- The `num_bands` and `num_rows_per_band` parameters can be set manually or determined automatically for optimal performance.
-- The operator caches stats in fields like 'minhash', 'uid', and 'deduplication_status'.
-- GPU support is only available for character tokenization.
+This operator uses the MinHash LSH technique to identify and remove near-duplicate samples from a dataset. It supports various tokenization methods, including space, punctuation, character, and sentencepiece. The Jaccard similarity threshold is used to determine if two samples are considered duplicates. If the Jaccard similarity of two samples is greater than or equal to the specified threshold, one of the samples is filtered out. The operator computes the MinHash values for each sample and uses a union- find algorithm to group similar samples. The key metric, Jaccard similarity, is computed based on the shingling of the text. The operator can run on both CPU and GPU, with specific batch size and memory configurations for each.
 
-一个使用MinHash LSH和RAY进行高效近似重复文本检测和移除的去重器。
+一个在 Ray 分布式模式下运行的 MinhashLSH 去重器。
 
-该算子使用指定的方法对输入文本进行分词，计算MinHash签名，并应用LSH来对相似文档进行分组。然后使用并查集算法基于Jaccard相似度阈值识别并移除重复项。关键指标Jaccard相似度使用MinHash签名计算。该算子支持多种分词方法，包括空格、标点符号、字符和sentencepiece，后者需要Hugging Face分词器模型。该算子可以在CPU和GPU上运行，并根据可用内存自动调整批量大小。重要提示：
-- `ignore_pattern`参数允许在MinHash计算过程中忽略特定模式。
-- `jaccard_threshold`决定了文档被视为重复时的相似度水平。
-- `num_bands`和`num_rows_per_band`参数可以手动设置或自动确定以获得最佳性能。
-- 该算子在字段如'minhash'、'uid'和'deduplication_status'中缓存统计信息。
-- GPU支持仅适用于字符分词。
+该算子使用 MinHash LSH 技术来识别并从数据集中删除近似重复样本。它支持多种分词方法，包括空格、标点符号、字符和 sentencepiece。Jaccard 相似度阈值用于确定两个样本是否被视为重复。如果两个样本的 Jaccard 相似度大于或等于指定阈值，则其中一个样本将被过滤掉。该算子计算每个样本的 MinHash 值，并使用并查集算法对相似样本进行分组。关键指标 Jaccard 相似度基于文本的 shingling 计算。该算子可以在 CPU 和 GPU 上运行，每种情况都有特定的批量大小和内存配置。
 
 Type 算子类型: **deduplicator**
 

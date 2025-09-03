@@ -1,12 +1,12 @@
 # stopwords_filter
 
-Filter to keep samples with a stopword ratio greater than a specified minimum value.
+Filter to keep samples with stopword ratio within a specified range.
 
-This operator computes the ratio of stopwords in a sample and retains samples where this ratio is above a given threshold. It supports multiple languages and can use a Hugging Face tokenizer for tokenization. The stopword ratio is calculated as the number of stopwords divided by the total number of words. If the ratio exceeds 1.0, it is capped at 1.0. The key metric used is 'stopwords_ratio', which is cached in the sample's stats. The operator also supports word augmentation for specific languages.
+This operator calculates the ratio of stopwords in a sample and keeps samples where this ratio is between the specified minimum and maximum values. The stopword ratio is computed as the number of stopwords divided by the total number of words. If the `tokenization` parameter is set, a Hugging Face tokenizer is used to tokenize the text. The stopwords are loaded from a directory, and if the language is set to "all", it merges stopwords from all available languages. The key metric is `stopwords_ratio`, which is character-based by default. The operator also supports word augmentation for specific languages.
 
-过滤以保留停用词比率大于指定最小值的样本。
+过滤保留停用词比率在指定范围内的样本。
 
-该算子计算样本中的停用词比率，并保留比率高于给定阈值的样本。它支持多种语言，并可以使用 Hugging Face 分词器进行分词。停用词比率计算为停用词数量除以总词数。如果比率超过 1.0，则将其限制为 1.0。使用的关键指标是 'stopwords_ratio'，该指标缓存在样本的统计信息中。算子还支持特定语言的词增强。
+该算子计算样本中停用词的比例，并保留该比例在指定最小值和最大值范围内的样本。停用词比率计算为停用词数量除以总词数。如果设置了 `tokenization` 参数，则使用 Hugging Face 分词器对文本进行分词。停用词从一个目录中加载，如果语言设置为 "all"，则合并所有可用语言的停用词。关键指标是 `stopwords_ratio`，默认情况下是基于字符的。该算子还支持特定语言的词增强。
 
 Type 算子类型: **filter**
 
