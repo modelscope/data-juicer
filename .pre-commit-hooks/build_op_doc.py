@@ -573,7 +573,6 @@ def main():
         generate_new_doc(updated_op_record_list)
         print("Operator document is updated.")
         exit(1)
-    # generate_new_doc(new_op_record_list)
 
 
 if __name__ == "__main__":

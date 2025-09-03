@@ -1,6 +1,6 @@
 # DataJuicer-Agent
 
-This Demo has been migrated to the dj_agent branch. Please go to:
+This Demo has been migrated to the dj_agents branch. Please go to:
 
 https://github.com/modelscope/data-juicer/tree/dj_agents/demos/interactive_recipe
 

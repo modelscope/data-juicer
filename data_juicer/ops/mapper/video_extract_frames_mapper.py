@@ -29,18 +29,23 @@ OP_NAME = "video_extract_frames_mapper"
 class VideoExtractFramesMapper(Mapper):
     """Mapper to extract frames from video files according to specified methods.
 
-    - Extracts frames based on the chosen method: 'all_keyframes' or 'uniform'.
-    - For 'all_keyframes', extracts all keyframes. For 'uniform', extracts a specified
-      number of frames uniformly.
-    - If 'duration' is set, the video is segmented, and frames are extracted from each
-      segment.
-    - The extracted frames are saved in a directory, and the paths are stored in a
-      dictionary.
-    - The dictionary maps video keys to their respective frame directories.
-    - If 'frame_dir' is not provided, a default directory based on the video file path is
-      used.
-    - The resulting dictionary is saved under the specified 'frame_key' in the sample's
-      metadata."""
+    Extracts frames from video files using either all keyframes or a uniform sampling
+    method. The extracted frames are saved in a directory, and the mapping from video keys
+    to frame directories is stored in the sample's metadata. The data format for the
+    extracted frames is a dictionary mapping video keys to their respective frame
+    directories:
+    - "video_key_1": "/${frame_dir}/video_key_1_filename/"
+    - "video_key_2": "/${frame_dir}/video_key_2_filename/"
+
+    - **Frame Sampling Methods**:
+    - "all_keyframes": Extracts all keyframes from the video.
+    - "uniform": Extracts a specified number of frames uniformly from the video.
+    - If `duration` is set, the video is segmented into multiple segments based on the
+      duration, and frames are extracted from each segment.
+    - The output directory for the frames can be specified; otherwise, a default directory
+      is used.
+    - The field name in the sample's metadata where the frame information is stored can be
+      customized."""
 
     _batched_op = True
 

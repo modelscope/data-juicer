@@ -1,6 +1,6 @@
 # DataJuicer-Agent
 
-本 Demo 已迁移至 dj_agent 分支。请前往：
+本 Demo 已迁移至 dj_agents 分支。请前往：
 
 https://github.com/modelscope/data-juicer/tree/dj_agents/demos/interactive_recipe
 

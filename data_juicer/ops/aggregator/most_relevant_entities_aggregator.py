@@ -19,14 +19,15 @@ OP_NAME = "most_relevant_entities_aggregator"
 @OPERATORS.register_module(OP_NAME)
 class MostRelevantEntitiesAggregator(Aggregator):
     """Extracts and ranks entities closely related to a given entity from provided texts.
-    - The operator uses a language model API to identify and rank entities.
-    - It filters out entities of the same type as the given entity.
-    - The ranked list is sorted in descending order of importance.
-    - The input texts are aggregated and passed to the model, with a token limit if
-      specified.
-    - The output is parsed using a regular expression to extract the relevant entities.
-    - Results are stored in the batch metadata under the key 'most_relevant_entities'.
-    - The operator retries the API call up to a specified number of times in case of errors."""
+
+    The operator uses a language model API to identify and rank entities, filtering out
+    entities of the same type as the given entity. The ranked list is sorted in descending
+    order of importance. Input texts are aggregated and passed to the model, with an
+    optional token limit. The output is parsed using a regular expression to extract the
+    relevant entities. Results are stored in the batch metadata under the key
+    'most_relevant_entities'. The operator retries the API call up to a specified number of
+    times in case of errors. The system prompt, input template, and output pattern can be
+    customized."""
 
     DEFAULT_SYSTEM_TEMPLATE = (
         "给定与`{entity}`相关的一些文档，"
