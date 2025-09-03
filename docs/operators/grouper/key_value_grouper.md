@@ -4,9 +4,9 @@ Groups samples into batches based on values in specified keys.
 
 This operator groups samples by the values of the given keys, which can be nested. If no keys are provided, it defaults to using the text key. It uses a naive grouping strategy to batch samples with identical key values. The resulting dataset is a list of batched samples, where each batch contains samples that share the same key values. This is useful for organizing data by specific attributes or features.
 
-根据指定键中的值将样本分组为批处理。
+根据指定键的值对样本进行分组。
 
-此运算符按可嵌套的给定键的值对样本进行分组。如果未提供任何键，则默认使用文本键。它使用朴素的分组策略来批处理具有相同键值的样本。生成的数据集是批处理样本的列表，其中每个批处理包含共享相同键值的样本。这对于按特定属性或特征组织数据很有用。
+该算子根据给定键的值对样本进行分组，这些键可以是嵌套的。如果没有提供键，则默认使用文本键。它使用一种简单的分组策略来将具有相同键值的样本分批。生成的数据集是一个批次样本列表，每个批次包含具有相同键值的样本。这对于按特定属性或特征组织数据非常有用。
 
 Type 算子类型: **grouper**
 

@@ -4,9 +4,9 @@ Removes specific characters from text samples.
 
 This operator removes specified characters from the text. The characters to be removed can be provided as a string or a list of strings. If no characters are specified, the default set includes special and non-alphanumeric characters. The operator processes the text using a regular expression pattern that matches any of the specified characters and replaces them with an empty string. This is done in a batched manner for efficiency.
 
-从文本示例中删除特定字符。
+移除文本样本中的特定字符。
 
-此运算符从文本中删除指定的字符。要移除的字符可以作为字符串或字符串列表来提供。如果未指定字符，则默认设置包括特殊字符和非字母数字字符。该运算符使用与任何指定字符匹配的正则表达式模式处理文本，并将其替换为空字符串。这是为了效率而以批处理的方式完成的。
+该算子从文本中移除指定的字符。要移除的字符可以作为字符串或字符串列表提供。如果没有指定字符，默认设置包括特殊字符和非字母数字字符。该算子使用正则表达式模式匹配任何指定的字符，并将其替换为空字符串。为了提高效率，这以批量方式进行。
 
 Type 算子类型: **mapper**
 

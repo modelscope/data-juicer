@@ -2,7 +2,7 @@
 
 Predicts the user's intent label and corresponding score for a given query. The operator uses a Hugging Face model to classify the intent of the input query. If the query is in Chinese, it can optionally be translated to English using another Hugging Face translation model before classification. The predicted intent label and its confidence score are stored in the meta field with the keys 'query_intent_label' and 'query_intent_score', respectively. If these keys already exist in the meta field, the operator will skip processing for those samples.
 
-预测给定查询的用户意图标签和相应分数。操作员使用拥抱面模型对输入查询的意图进行分类。如果查询是中文的，则可以在分类之前使用另一个拥抱脸翻译模型将其可选地翻译成英文。预测的意图标签及其置信度分数分别存储在具有键 “query_intent_label” 和 “query_intent_score” 的元字段中。如果这些键已经存在于元字段中，则操作员将跳过对这些样本的处理。
+预测给定查询的用户意图标签及其对应分数。该算子使用 Hugging Face 模型对输入查询的意图进行分类。如果查询是中文，可以使用另一个 Hugging Face 翻译模型将其翻译成英文后再进行分类。预测的意图标签及其置信分数分别存储在 meta 字段中的 'query_intent_label' 和 'query_intent_score' 键下。如果这些键已经存在于 meta 字段中，算子将跳过这些样本的处理。
 
 Type 算子类型: **mapper**
 

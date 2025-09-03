@@ -4,9 +4,9 @@ Mapper to remove long words within a specific range.
 
 This operator filters out words in the text that are either shorter than the specified minimum length or longer than the specified maximum length. Words are first checked with their original length, and if they do not meet the criteria, they are stripped of special characters and re-evaluated. The key metric used is the character-based length of each word. The processed text retains only the words that fall within the defined length range. This operator processes text in batches for efficiency.
 
-映射器删除特定范围内的长词。
+映射器，移除特定范围内的长词。
 
-此运算符筛选出文本中短于指定最小长度或长于指定最大长度的单词。首先检查单词的原始长度，如果它们不符合标准，则将其去除特殊字符并重新评估。使用的关键度量是每个单词的基于字符的长度。经处理的文本仅保留落入所定义的长度范围内的单词。为了提高效率，此运算符会批量处理文本。
+该算子过滤掉文本中长度短于指定最小长度或长于指定最大长度的单词。首先检查单词的原始长度，如果不满足条件，则剥离特殊字符后重新评估。使用的关键指标是每个单词基于字符的长度。处理后的文本只保留符合定义长度范围的单词。该算子批量处理文本以提高效率。
 
 Type 算子类型: **mapper**
 

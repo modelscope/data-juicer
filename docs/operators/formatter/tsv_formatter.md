@@ -4,9 +4,9 @@ The class is used to load and format tsv-type files.
 
 Default suffixes is `['.tsv']`
 
-该类用于加载和格式化tsv类型的文件。
+该类用于加载和格式化 tsv 类型的文件。
 
-默认后缀为 “['.tsv']”
+默认后缀是 `['.tsv']`
 
 Type 算子类型: **formatter**
 

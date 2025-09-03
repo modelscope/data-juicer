@@ -4,9 +4,9 @@ Mapper to construct paired preference samples by generating a rejected response 
 
 This operator uses an API model to generate a new response that is opposite in style, factuality, or stance to the original response. The generated response and the reason for its generation are stored in the sample. The default system prompt and input template are provided, but can be customized. The output is parsed using a regular expression to extract the new response and the reason. If parsing fails, the operator retries up to a specified number of times. The generated response and reason are stored in the sample under the keys 'rejected_response' and 'reason', respectively.
 
-Mapper通过生成拒绝响应及其原因来构造成对的偏好样本。
+构造配对偏好样本的映射器，通过生成一个被拒绝的回答及其原因。
 
-此运算符使用API模型生成与原始响应在样式，事实或立场上相反的新响应。生成的响应及其生成原因存储在样本中。提供了默认的系统提示和输入模板，但可以自定义。使用正则表达式解析输出，以提取新的响应和原因。如果解析失败，运算符将重试指定的次数。生成的响应和原因分别存储在sample中的键 “rejected_response” 和 “reason” 下。
+该算子使用API模型生成与原始回答在风格、事实性或立场上相反的新回答。生成的回答及其生成原因会被存储在样本中。提供了默认的系统提示和输入模板，但可以自定义。输出使用正则表达式解析以提取新回答和原因。如果解析失败，算子将重试指定次数。生成的回答和原因分别存储在样本的'rejected_response'和'reason'键下。
 
 Type 算子类型: **mapper**
 

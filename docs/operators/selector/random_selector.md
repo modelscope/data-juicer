@@ -8,13 +8,13 @@ This operator randomly selects a subset of samples based on either a specified r
 - `select_num`: The exact number of samples to select.
 - If neither `select_ratio` nor `select_num` is set, the dataset remains unchanged.
 
-从数据集中随机选择样本子集。
+从数据集中随机选择一部分样本。
 
-该运算符根据指定的比率或固定数量随机选择样本子集。如果同时提供 “select_ratio” 和 “select_num”，则使用产生较少样本的那个。如果数据集只有一个样本或没有样本，则跳过选择。'random_sample' 函数用于执行实际采样。
+该算子根据指定的比例或固定数量随机选择一部分样本。如果同时提供了 `select_ratio` 和 `select_num`，则使用导致样本数量较少的那个。如果数据集中只有一个或没有样本，则跳过选择。实际采样使用 `random_sample` 函数执行。
 
-- 'select_ratio': 要选择的样本的比率 (0到1)。
-- 'select_num': 要选择的样本的确切数目。
-- 如果未设置 “select_ratio” 和 “select_num”，则数据集保持不变。
+- `select_ratio`：要选择的样本比例（0 到 1）。
+- `select_num`：要选择的确切样本数量。
+- 如果既未设置 `select_ratio` 也未设置 `select_num`，则数据集保持不变。
 
 Type 算子类型: **selector**
 

@@ -4,9 +4,9 @@ Optimize response in question-answer pairs to be more detailed and specific.
 
 This operator enhances the responses in question-answer pairs, making them more detailed and specific while ensuring they still address the original question. It uses a predefined system prompt for optimization. The optimized response is stripped of any leading or trailing whitespace before being returned. This mapper leverages a Hugging Face model for the optimization process, which is accelerated using CUDA.
 
-优化问答对中的响应，使其更加详细和具体。
+优化问答对中的回答，使其更加详细和具体。
 
-此运算符增强了问答对中的响应，使它们更加详细和具体，同时确保它们仍然解决原始问题。它使用预定义的系统提示进行优化。优化的响应在返回之前被去除任何前导或尾随空格。此映射器利用拥抱面模型进行优化过程，使用CUDA加速。
+该算子增强问答对中的回答，使其更加详细和具体，同时确保仍然回答原始问题。它使用预定义的系统提示进行优化。优化后的回答在返回前会去除任何前导或尾随的空白字符。此映射器利用Hugging Face模型进行优化过程，并使用CUDA加速。
 
 Type 算子类型: **mapper**
 

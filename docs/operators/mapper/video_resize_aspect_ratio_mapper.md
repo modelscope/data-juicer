@@ -2,7 +2,7 @@
 
 Resizes videos to fit within a specified aspect ratio range. This operator adjusts the dimensions of videos to ensure their aspect ratios fall within a defined range. It can either increase or decrease the video dimensions based on the specified strategy. The aspect ratio is calculated as width divided by height. If a video's aspect ratio is outside the given range, it will be resized to match the closest boundary (either the minimum or maximum ratio). The `min_ratio` and `max_ratio` should be provided as strings in the format "9:21" or "9/21". The resizing process uses the `ffmpeg` library to handle the actual video scaling. Videos that do not need resizing are left unchanged. The operator supports saving the modified videos to a specified directory or the same directory as the input files.
 
-调整视频大小以适应指定的宽高比范围。此运算符调整视频的尺寸，以确保其纵横比在定义的范围内。它可以根据指定的策略增加或减少视频维度。长宽比计算为宽度除以高度。如果视频的宽高比在给定范围之外，它将被调整大小以匹配最近的边界 (最小或最大比率)。'min_ratio' 和 'max_ratio' 应以字符串的形式提供，格式为 “9:21” 或 “9/21”。调整大小过程使用 “ffmpeg” 库来处理实际的视频缩放。不需要调整大小的视频保持不变。运营商支持将修改后的视频保存到指定目录或与输入文件相同的目录。
+调整视频尺寸以适应指定的宽高比范围。此算子调整视频的尺寸，以确保其宽高比在定义的范围内。根据指定的策略，它可以增加或减少视频的尺寸。宽高比计算为宽度除以高度。如果视频的宽高比超出给定范围，它将被调整到最接近的边界（最小或最大比率）。`min_ratio` 和 `max_ratio` 应以 "9:21" 或 "9/21" 格式的字符串提供。调整过程使用 `ffmpeg` 库来处理实际的视频缩放。不需要调整尺寸的视频保持不变。该算子支持将修改后的视频保存到指定目录或与输入文件相同的目录。
 
 Type 算子类型: **mapper**
 

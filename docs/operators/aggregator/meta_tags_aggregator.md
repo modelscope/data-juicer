@@ -8,13 +8,13 @@ This operator aggregates and consolidates similar meta tags from the input data.
 
 The operator uses a language model (default: gpt-4o) to analyze and merge the tags. The system prompt, input template, and output pattern can be customized. The aggregated tags are then updated in the input sample's metadata.
 
-将类似的元标记合并到一个统一的标记中。
+将相似的元标签合并为一个统一的标签。
 
-此运算符从输入数据中聚合并相似的元标记。它可以处理两种情况:
-- 当提供一组目标标签时，它将原始标签映射到这些预定义的类别。如果包含 “杂项” 或 “其他” 类别，则不适合指定类别的任何标签都将在此标签下分组。
-- 当没有提供目标标签时，它会根据输入标签的相似性和频率生成合理的类别。
+该算子聚合并整合输入数据中的相似元标签。它可以处理两种情况：
+- 当提供了一组目标标签时，它将原始标签映射到这些预定义类别。如果包含“杂项”或“其他”类别，则任何不符合指定类别的标签将被归入此类别。
+- 当没有提供目标标签时，它根据输入标签的相似性和频率生成合理的类别。
 
-运算符使用语言模型 (默认: gpt-4o) 来分析和合并标签。可以自定义系统提示、输入模板和输出模式。然后在输入样本的元数据中更新聚合的标签。
+该算子使用语言模型（默认：gpt-4o）来分析和合并标签。可以自定义系统提示、输入模板和输出模式。聚合后的标签将更新到输入样本的元数据中。
 
 Type 算子类型: **aggregator**
 

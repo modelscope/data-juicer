@@ -4,7 +4,9 @@ Filter to keep samples whose videos have no watermark with high probability.
 
 This operator uses a Hugging Face watermark detection model to predict the probability of watermarks in video frames. It keeps samples where the predicted watermark probability is below a specified threshold. The key metric, 'video_watermark_prob', is computed by extracting frames from the video using a specified sampling method and then averaging, maximizing, or minimizing the probabilities based on the reduce mode. If multiple videos are present, the operator can use either an 'any' or 'all' strategy to determine if the sample should be kept. The frame sampling method can be 'all_keyframes' or 'uniform', and the reduce mode can be 'avg', 'max', or 'min'.
 
+筛选出高概率没有水印的视频样本。
 
+该算子使用 Hugging Face 水印检测模型预测视频帧中水印的概率。它保留预测水印概率低于指定阈值的样本。关键指标 'video_watermark_prob' 通过使用指定的采样方法从视频中提取帧，然后根据减少模式对概率进行平均、最大化或最小化来计算。如果有多个视频存在，该算子可以使用 'any' 或 'all' 策略来确定是否保留样本。帧采样方法可以是 'all_keyframes' 或 'uniform'，减少模式可以是 'avg'、'max' 或 'min'。
 
 Type 算子类型: **filter**
 

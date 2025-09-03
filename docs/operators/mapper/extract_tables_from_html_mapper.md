@@ -4,9 +4,9 @@ Extracts tables from HTML content and stores them in a specified field.
 
 This operator processes HTML content to extract tables. It can either retain or remove HTML tags based on the `retain_html_tags` parameter. If `retain_html_tags` is False, it can also include or exclude table headers based on the `include_header` parameter. The extracted tables are stored in the `tables_field_name` field within the sample's metadata. If no tables are found, an empty list is stored. If the tables have already been extracted, the operator will not reprocess the sample.
 
-从HTML内容中提取表并将其存储在指定字段中。
+从HTML内容中提取表格并存储在指定字段中。
 
-此运算符处理HTML内容以提取表。它可以根据 'retain_html_tags' 参数保留或删除HTML标记。如果 “retain_html_tags” 为False，则它还可以基于 “include_header” 参数包含或排除表头。提取的表存储在示例元数据中的 “tables_field_name” 字段中。如果没有找到表，则存储空列表。如果已经提取了表，则操作员将不重新处理样本。
+此算子处理HTML内容以提取表格。根据`retain_html_tags`参数，它可以保留或移除HTML标签。如果`retain_html_tags`为False，还可以根据`include_header`参数选择包含或排除表格标题。提取的表格将存储在样本元数据中的`tables_field_name`字段内。如果没有找到表格，则会存储一个空列表。如果表格已经被提取，算子将不会重新处理样本。
 
 Type 算子类型: **mapper**
 

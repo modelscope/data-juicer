@@ -4,9 +4,9 @@ Operator for human preference annotation using Label Studio.
 
 This operator formats and presents pairs of answers to a prompt for human evaluation. It uses a default or custom Label Studio configuration to display the prompt and answer options. The operator processes the annotations to determine the preferred answer, updating the sample with the chosen and rejected answers. The operator requires specific keys in the samples for the prompt and answer options. If these keys are missing, it logs warnings and uses placeholder text. The annotated results are processed to update the sample with the chosen and rejected answers.
 
-使用Label Studio进行人工偏好注释的运算符。
+使用Label Studio进行人类偏好标注的算子。
 
-此运算符格式化并呈现对人类评估提示的答案。它使用默认或自定义Label Studio配置来显示提示和应答选项。操作员处理注释以确定优选答案，用选择的和拒绝的答案更新样本。操作员需要样本中的特定键用于提示和应答选项。如果缺少这些键，它会记录警告并使用占位符文本。处理注释的结果以用选择的和拒绝的答案更新样本。
+该算子格式化并呈现一对答案供人类评估。它使用默认或自定义的Label Studio配置来显示提示和答案选项。算子处理注释以确定首选答案，并更新带有选择和拒绝答案的样本。算子需要样本中具有提示和答案选项的特定键。如果缺少这些键，它会记录警告并使用占位符文本。注释结果被处理以更新带有选择和拒绝答案的样本。
 
 Type 算子类型: **mapper**
 

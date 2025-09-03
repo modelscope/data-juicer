@@ -9,14 +9,14 @@ This mapper removes all characters that are not part of the Chinese character se
 - The key metric for this operation is the presence of non-Chinese characters, which are removed.
 - The operator processes samples in a batched manner.
 
-从文本样本中删除非中文字符。
+移除文本样本中的非汉字字符。
 
-此映射器删除不属于中文字符集的所有字符。
-- 它可以根据配置选择保留字母，数字和标点符号。
-- 删除是使用正则表达式模式完成的。
-- 模式被构造为排除或包括指定的字母、数字和标点符号。
-- 此操作的关键指标是非中文字符的存在，这些字符将被删除。
-- 操作员以批处理方式处理样本。
+该映射器移除所有不属于汉字字符集的字符。
+- 可根据配置选择性保留字母、数字和标点符号。
+- 移除操作使用正则表达式模式进行。
+- 模式构建时会根据指定情况排除或包含字母、数字和标点符号。
+- 该操作的关键指标是存在非汉字字符，这些字符将被移除。
+- 该算子以批量方式处理样本。
 
 Type 算子类型: **mapper**
 

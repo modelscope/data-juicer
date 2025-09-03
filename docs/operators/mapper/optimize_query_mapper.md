@@ -4,9 +4,9 @@ Optimize queries in question-answer pairs to make them more specific and detaile
 
 This mapper refines the questions in a QA pair, making them more specific and detailed while ensuring that the original answer can still address the optimized question. It uses a predefined system prompt for the optimization process. The optimized query is extracted from the raw output by stripping any leading or trailing whitespace. The mapper utilizes a CUDA accelerator for faster processing.
 
-优化问答对中的查询，使其更加具体和详细。
+优化问答对中的查询，使其更具体和详细。
 
-这个映射器细化了QA对中的问题，使它们更加具体和详细，同时确保原始答案仍然可以解决优化的问题。它使用预定义的系统提示进行优化过程。通过剥离任何前导或尾随空格，从原始输出中提取优化的查询。映射器利用CUDA加速器进行更快的处理。
+该映射器改进问答对中的问题，使其更具体和详细，同时确保原始答案仍能回答优化后的问题。它使用预定义的系统提示进行优化过程。优化后的查询通过去除任何前导或尾随空格从原始输出中提取。映射器利用CUDA加速器进行更快的处理。
 
 Type 算子类型: **mapper**
 

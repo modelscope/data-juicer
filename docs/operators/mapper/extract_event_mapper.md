@@ -4,9 +4,9 @@ Extracts events and relevant characters from the text.
 
 This operator uses an API model to summarize the text into multiple events and extract the relevant characters for each event. The summary and character extraction follow a predefined format. The operator retries the API call up to a specified number of times if there is an error. The extracted events and characters are stored in the meta field of the samples. If no events are found, the original samples are returned. The operator can optionally drop the original text after processing.
 
-从文本中提取事件和相关字符。
+从文本中提取事件和相关角色。
 
-此运算符使用API模型将文本汇总为多个事件，并提取每个事件的相关字符。摘要和字符提取遵循预定义的格式。如果出现错误，操作员将重试API调用指定的次数。提取的事件和字符存储在样本的元字段中。如果未找到事件，则返回原始样本。操作员可以选择在处理之后丢弃原始文本。
+此算子使用 API 模型将文本总结为多个事件，并提取每个事件的相关角色。摘要和角色提取遵循预定义的格式。如果出现错误，该算子将重试 API 调用最多指定次数。提取的事件和角色存储在样本的 meta 字段中。如果没有找到事件，则返回原始样本。该算子可以选择在处理后删除原始文本。
 
 Type 算子类型: **mapper**
 

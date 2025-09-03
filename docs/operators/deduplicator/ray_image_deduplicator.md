@@ -4,9 +4,9 @@ Deduplicates samples by exact matching of images using hash values.
 
 This operator compares images within documents to identify and remove duplicates. It uses a specified hashing method (default: 'phash') to generate hash values for each image. If an image is missing or cannot be loaded, it assigns an empty hash value. The deduplication process relies on the computed hash values to determine if two images are identical. This operator supports both 'ray_actor' and 'redis' backends for distributed processing.
 
-通过使用哈希值精确匹配图像来消除重复样本。
+通过使用哈希值进行图像的精确匹配来去重样本。
 
-此运算符比较文档中的图像以识别和删除重复项。它使用指定的哈希方法 (默认: 'phash') 为每个图像生成哈希值。如果图像丢失或无法加载，它将分配一个空的哈希值。重复数据删除过程依赖于计算出的散列值来确定两个映像是否相同。此运算符支持用于分布式处理的 “ray_actor” 和 “rediss” 后端。
+该算子比较文档中的图像以识别和删除重复项。它使用指定的哈希方法（默认：'phash'）为每张图像生成哈希值。如果图像缺失或无法加载，则分配一个空哈希值。去重过程依赖于计算出的哈希值来确定两张图像是否相同。该算子支持 'ray_actor' 和 'redis' 后端进行分布式处理。
 
 Type 算子类型: **deduplicator**
 

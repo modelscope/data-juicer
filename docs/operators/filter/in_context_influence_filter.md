@@ -4,9 +4,9 @@ Filter to keep texts based on their in-context influence on a validation set.
 
 This operator calculates the in-context influence of each sample by comparing perplexities with and without the sample as context. The influence score is computed as the ratio of these perplexities. If `valid_as_demo` is True, the score is L(A|Q) / L(A|task_desc, Q_v, A_v, Q). Otherwise, it is L(A_v|Q) / L(A_v|task_desc, Q, A, Q_v). The operator retains samples whose in-context influence score is within a specified range. The in-context influence score is stored in the 'in_context_influence' field of the sample's stats. The validation set must be prepared using the `prepare_valid_feature` method if not provided during initialization.
 
-过滤以根据文本在上下文中对验证集的影响来保留文本。
+根据文本在验证集上的上下文影响过滤保留文本。
 
-该运算符通过比较具有和不具有样本作为上下文的困惑来计算每个样本的上下文影响。影响分数被计算为这些困惑的比率。如果 “valid_as_demo” 为真，则得分为L(A | Q) / L(A | task_desc，Q_v，A_v，Q)。否则，它是L(A_v | Q) / L(A_v | task_desc，Q，A，Q_v)。运算符保留其上下文内影响分数在指定范围内的样本。上下文中影响分数存储在样本统计信息的 “in_context_inpection” 字段中。如果在初始化期间未提供验证集，则必须使用 'prepare_valid_feature' 方法准备验证集。
+该算子通过比较有无样本作为上下文时的困惑度来计算每个样本的上下文影响。影响分数计算为这些困惑度的比率。如果 `valid_as_demo` 为 True，分数为 L(A|Q) / L(A|task_desc, Q_v, A_v, Q)。否则，它为 L(A_v|Q) / L(A_v|task_desc, Q, A, Q_v)。该算子保留上下文影响分数在指定范围内的样本。上下文影响分数存储在样本统计信息的 'in_context_influence' 字段中。如果初始化时未提供，验证集必须使用 `prepare_valid_feature` 方法准备。
 
 Type 算子类型: **filter**
 

@@ -4,9 +4,9 @@ Cleans HTML code from text samples, converting HTML to plain text.
 
 This operator processes text samples by removing HTML tags and converting HTML elements to a more readable format. Specifically, it replaces `<li>` and `<ol>` tags with newline and bullet points. The Selectolax HTML parser is used to extract the text content from the HTML. This operation is performed in a batched manner, making it efficient for large datasets.
 
-从文本示例中清除HTML代码，将HTML转换为纯文本。
+将HTML代码从文本样本中清理，将HTML转换为纯文本。
 
-此运算符通过删除HTML标记并将HTML元素转换为更易读的格式来处理文本示例。具体来说，它用换行符和项目符号替换 '&lt;li&gt;' 和 '&lt;ol&gt;' 标签。Selectolax HTML解析器用于从HTML中提取文本内容。此操作以批处理方式执行，因此对于大型数据集非常有效。
+此算子通过删除HTML标签并将HTML元素转换为更易读的格式来处理文本样本。具体来说，它将`<li>`和`<ol>`标签替换为换行符和项目符号。使用Selectolax HTML解析器从HTML中提取文本内容。此操作以批量方式执行，使其适用于大型数据集。
 
 Type 算子类型: **mapper**
 

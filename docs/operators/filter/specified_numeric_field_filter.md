@@ -8,13 +8,13 @@ This operator filters out samples if the numeric value in the specified field is
 - Supports multi-level fields using dot-separated keys.
 - Returns False for non-numeric or out-of-range values, filtering the sample.
 
-根据指定的数值字段值筛选样本。
+根据指定的数值字段值过滤样本。
 
-如果指定字段中的数值不在给定范围内，则此运算符会筛选出样本。该字段可以是多级的，键由点分隔。如果数值在最小值和最大值之间 (包括最小值和最大值)，则保留样本。如果未提供字段键，则保留所有样本。运算符确保该字段存在于样本中，并且在执行比较之前其值为数字。
+该算子会过滤掉不在给定范围内的数值字段的样本。字段可以是多级的，键之间用点分隔。如果数值在最小值和最大值之间（包括最小值和最大值），则保留样本。如果没有提供字段键，则保留所有样本。算子在进行比较之前会确保样本中存在该字段且其值为数值类型。
 
-- 使用 “min_value” 和 “max_value” 来定义可接受的范围。
+- 使用 'min_value' 和 'max_value' 来定义可接受的范围。
 - 支持使用点分隔键的多级字段。
-- 对于非数值或超出范围的值，返回False，过滤样本。
+- 对于非数值或超出范围的值返回 False，从而过滤样本。
 
 Type 算子类型: **filter**
 

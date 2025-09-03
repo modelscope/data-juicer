@@ -9,14 +9,14 @@ This operator tokenizes input texts using the specified method, computes MinHash
 - The operator caches stats in fields like 'minhash', 'uid', and 'deduplication_status'.
 - GPU support is only available for character tokenization.
 
-使用MinHash LSH和RAY进行有效的近似重复文本检测和删除的deduplicator。
+一个使用MinHash LSH和RAY进行高效近似重复文本检测和移除的去重器。
 
-此运算符使用指定的方法标记输入文本，计算MinHash签名，并应用LSH对类似文档进行分组。然后，它使用联合查找算法基于Jaccard相似性阈值来识别和删除重复项。使用MinHash签名计算关键度量Jaccard相似性。运算符支持各种标记化方法，包括空格，标点符号，字符和sentencepiece，后者需要拥抱面部标记器模型。操作员可以在CPU和GPU上运行，并根据可用内存自动调整批量大小。重要注意事项:
-- 'ignore_pattern' 参数允许在MinHash计算期间忽略特定模式。
-- 'jaccard_threshold' 确定文档被认为是重复的相似性级别。
-- 可以手动设置或自动确定 “num_bands” 和 “num_rows_per_band” 参数以获得最佳性能。
-- 运算符将统计信息缓存在 “minhash'” 、 “uid” 和 “deduplication_status” 等字段中。
-- GPU支持仅适用于字符标记化。
+该算子使用指定的方法对输入文本进行分词，计算MinHash签名，并应用LSH来对相似文档进行分组。然后使用并查集算法基于Jaccard相似度阈值识别并移除重复项。关键指标Jaccard相似度使用MinHash签名计算。该算子支持多种分词方法，包括空格、标点符号、字符和sentencepiece，后者需要Hugging Face分词器模型。该算子可以在CPU和GPU上运行，并根据可用内存自动调整批量大小。重要提示：
+- `ignore_pattern`参数允许在MinHash计算过程中忽略特定模式。
+- `jaccard_threshold`决定了文档被视为重复时的相似度水平。
+- `num_bands`和`num_rows_per_band`参数可以手动设置或自动确定以获得最佳性能。
+- 该算子在字段如'minhash'、'uid'和'deduplication_status'中缓存统计信息。
+- GPU支持仅适用于字符分词。
 
 Type 算子类型: **deduplicator**
 

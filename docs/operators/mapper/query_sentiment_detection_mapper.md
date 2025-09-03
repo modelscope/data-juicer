@@ -4,9 +4,9 @@ Predicts user's sentiment label ('negative', 'neutral', 'positive') in a query.
 
 This mapper takes input from the specified query key and outputs the predicted sentiment label and its corresponding score. The results are stored in the Data-Juicer meta field under 'query_sentiment_label' and 'query_sentiment_label_score'. It uses a Hugging Face model for sentiment detection. If a Chinese-to-English translation model is provided, it first translates the query from Chinese to English before performing sentiment analysis.
 
-在查询中预测用户的情绪标签 (“负面” 、 “中性” 、 “正面”)。
+预测查询中的用户情感标签（'negative', 'neutral', 'positive'）。
 
-此映射器从指定的查询键获取输入，并输出预测的情感标签及其相应的分数。结果存储在 “query_sentiment_label” 和 “query_sentiment_label_score” 下的数据榨汁机元字段中。它使用拥抱人脸模型进行情绪检测。如果提供了中英文翻译模型，则它首先将查询从中文翻译成英文，然后执行情感分析。
+此映射器从指定的查询键获取输入，并输出预测的情感标签及其对应的分数。结果存储在 Data-Juicer meta 字段下的 'query_sentiment_label' 和 'query_sentiment_label_score' 中。它使用 Hugging Face 模型进行情感检测。如果提供了中文到英文的翻译模型，它会先将查询从中文翻译成英文再进行情感分析。
 
 Type 算子类型: **mapper**
 

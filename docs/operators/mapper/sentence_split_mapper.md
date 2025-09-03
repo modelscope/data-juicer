@@ -4,9 +4,9 @@ Splits text samples into individual sentences based on the specified language.
 
 This operator uses an NLTK-based tokenizer to split the input text into sentences. The language for the tokenizer is specified during initialization. The original text in each sample is replaced with a list of sentences. This operator processes samples in batches for efficiency. Ensure that the `lang` parameter is set to the appropriate language code (e.g., "en" for English) to achieve accurate sentence splitting.
 
-根据指定的语言将文本样本拆分为单个句子。
+将文本样本根据指定的语言拆分成单独的句子。
 
-此运算符使用基于NLTK的标记器将输入文本拆分为句子。tokenizer的语言是在初始化期间指定的。每个样本中的原始文本被替换为句子列表。该操作员批量处理样品以提高效率。确保将 'lang' 参数设置为适当的语言代码 (例如，“en” 表示英语)，以实现准确的句子拆分。
+该算子使用基于NLTK的分词器将输入文本拆分成句子。在初始化时指定分词器的语言。每个样本中的原始文本将被替换为句子列表。为了提高效率，该算子以批次方式处理样本。请确保将`lang`参数设置为适当的语言代码（例如，“en”表示英语），以实现准确的句子拆分。
 
 Type 算子类型: **mapper**
 

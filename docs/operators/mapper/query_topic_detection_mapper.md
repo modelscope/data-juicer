@@ -7,11 +7,11 @@ Predicts the topic label and its corresponding score for a given query. The inpu
 - Stores the predicted topic label in 'query_topic_label'.
 - Stores the corresponding score in 'query_topic_label_score'.
 
-预测给定查询的主题标签及其相应的分数。输入取自指定的查询键。包括预测的主题标签及其得分的输出存储在数据榨汁机元字段的 “query_topic_label” 和 “query_topic_label_score” 字段中。该运算符使用拥抱面模型进行主题分类。如果提供了中文到英文的翻译模型，它将首先将查询从中文翻译成英文，然后再预测主题。
+预测给定查询的主题标签及其对应分数。输入来自指定的查询键。输出包括预测的主题标签及其分数，存储在 Data-Juicer meta 字段的 'query_topic_label' 和 'query_topic_label_score' 字段中。此算子使用 Hugging Face 模型进行主题分类。如果提供了中文到英文的翻译模型，它会先将查询从中文翻译成英文再预测主题。
 
-- 使用拥抱脸模型进行主题分类。
-- 可选地使用另一个拥抱脸模型将中文查询翻译成英文。
-- 将预测的主题标签存储在 “query_topic_label” 中。
+- 使用 Hugging Face 模型进行主题分类。
+- 可选地使用另一个 Hugging Face 模型将中文查询翻译成英文。
+- 将预测的主题标签存储在 'query_topic_label' 中。
 - 将相应的分数存储在 'query_topic_label_score' 中。
 
 Type 算子类型: **mapper**

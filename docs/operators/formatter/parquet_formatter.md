@@ -4,9 +4,9 @@ The class is used to load and format parquet-type files.
 
 Default suffixes is `['.parquet']`
 
-该类用于加载和格式化镶木地板类型的文件。
+该类用于加载和格式化 parquet 类型的文件。
 
-默认后缀为 `'.parquet'`
+默认后缀是 `['.parquet']`
 
 Type 算子类型: **formatter**
 
