@@ -1,7 +1,5 @@
 __version__ = "1.4.2"
 
-import os
-import subprocess
 import sys
 
 from loguru import logger
@@ -9,10 +7,10 @@ from loguru import logger
 # allow loading truncated images for some too large images.
 from PIL import ImageFile
 
-from data_juicer.utils.availability_utils import _is_package_available
-from data_juicer.utils.lazy_loader import LazyLoader
+from data_juicer.utils.common_utils import deprecated
+from data_juicer.utils.resource_utils import cuda_device_count as _count_cuda
+from data_juicer.utils.resource_utils import is_cuda_available as _check_cuda
 
-torch = LazyLoader("torch")
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # For now, only INFO will be shown. Later the severity level will be changed
@@ -21,31 +19,9 @@ logger.remove()
 logger.add(sys.stderr, level="INFO")
 
 
-def _cuda_device_count():
-    _torch_available = _is_package_available("torch")
-
-    if _torch_available:
-        return torch.cuda.device_count()
-
-    try:
-        nvidia_smi_output = subprocess.check_output(["nvidia-smi", "-L"], text=True)
-        all_devices = nvidia_smi_output.strip().split("\n")
-
-        cuda_visible_devices = os.getenv("CUDA_VISIBLE_DEVICES")
-        if cuda_visible_devices is not None:
-            logger.warning(
-                "CUDA_VISIBLE_DEVICES is ignored when torch is unavailable. " "All detected GPUs will be used."
-            )
-
-        return len(all_devices)
-    except Exception:
-        # nvidia-smi not found or other error
-        return 0
-
-
-def cuda_device_count():
-    return _cuda_device_count()
-
-
-def is_cuda_available():
-    return cuda_device_count() > 0
+cuda_device_count = deprecated(
+    "`data_juicer.cuda_device_count` will be deprecated, please use `from data_juicer.utils.resource_utils import cuda_device_count`"
+)(_count_cuda)
+is_cuda_available = deprecated(
+    "`data_juicer.is_cuda_available` will be deprecated, please use `from data_juicer.utils.resource_utils import is_cuda_available`"
+)(_check_cuda)
