@@ -22,11 +22,11 @@ class NestedAggregator(Aggregator):
     This operator uses a recursive summarization approach to aggregate content from multiple
     samples. It processes the input text, which is split into sub-documents, and generates a
     summary that maintains the average length of the original documents. The aggregation is
-    performed using an API model, and the process is guided by system prompts and templates.
-    The operator supports retrying the API call in case of errors and allows for
-    customization of the summarization process through various parameters. The default
-    system prompt and templates are provided in Chinese, and the final summary is expected
-    to be in the same language."""
+    performed using an API model, guided by system prompts and templates. The operator
+    supports retrying the API call in case of errors and allows for customization of the
+    summarization process through various parameters. The default system prompt and
+    templates are provided in Chinese, but they can be customized. The operator uses a
+    Hugging Face tokenizer to handle tokenization."""
 
     DEFAULT_SYSTEM_PROMPT = (
         "给定一些文档碎片，将这些文档整合成一个文档总结。\n"

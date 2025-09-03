@@ -21,7 +21,7 @@ OP_NAME = "video_motion_score_raft_filter"
 class VideoMotionScoreRaftFilter(VideoMotionScoreFilter):
     """Filter to keep samples with video motion scores within a specified range.
 
-    This operator uses the RAFT (Recurrent All-Pairs Field Transforms) model from
+    This operator utilizes the RAFT (Recurrent All-Pairs Field Transforms) model from
     torchvision to predict optical flow between video frames. It keeps samples where the
     video motion score is within the given min and max score range. The motion score is
     computed based on the optical flow between frames, which is estimated using the RAFT
@@ -33,7 +33,14 @@ class VideoMotionScoreRaftFilter(VideoMotionScoreFilter):
       color channel flipping.
     - The motion score is calculated from the optical flow data.
     - The operator can be configured to filter based on any or all frames in the video.
-    - The device for model inference (CPU or CUDA) is automatically detected and set."""
+    - The device for model inference (CPU or CUDA) is automatically detected and set.
+
+    For further details, refer to the official torchvision documentation:
+    https://pytorch.org/vision/main/models/raft.html
+
+    The original paper on RAFT is available here:
+    https://arxiv.org/abs/2003.12039
+    """
 
     _accelerator = "cuda"
     _default_kwargs = {}
