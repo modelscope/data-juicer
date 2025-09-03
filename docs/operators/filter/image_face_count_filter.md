@@ -4,9 +4,9 @@ Filter to keep samples with the number of faces within a specific range.
 
 This operator uses an OpenCV classifier for face detection. It filters samples based on the number of faces detected in the images, keeping only those with a face count within the specified range. The operator supports two strategies: 'any' (keep if any image meets the condition) and 'all' (keep only if all images meet the condition). The face counts are cached in the 'face_counts' field. If no images are present in the sample, the face count is set to an empty array.
 
-过滤以保持样本的面数在特定范围内。
+过滤出人脸数量在特定范围内的样本。
 
-该运算符使用OpenCV分类器进行人脸检测。它根据图像中检测到的人脸数量过滤样本，仅保留人脸数量在指定范围内的人脸。操作员支持两种策略: “任何” (如果任何图像满足条件，则保留) 和 “全部” (仅当所有图像满足条件时保留)。面部计数缓存在 “face_counts” 字段中。如果样本中不存在图像，则将面部计数设置为空数组。
+该算子使用 OpenCV 分类器进行面部检测。它根据图像中检测到的人脸数量来过滤样本，仅保留人脸数量在指定范围内的样本。该算子支持两种策略：'any'（只要有任何一张图片符合条件就保留）和 'all'（只有当所有图片都符合条件时才保留）。人脸数量会被缓存在 'face_counts' 字段中。如果样本中没有图片，则人脸数量会被设置为空数组。
 
 Type 算子类型: **filter**
 

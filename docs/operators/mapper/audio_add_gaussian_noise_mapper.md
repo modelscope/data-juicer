@@ -4,9 +4,9 @@ Mapper to add Gaussian noise to audio samples.
 
 This operator adds Gaussian noise to audio data with a specified probability. The amplitude of the noise is randomly chosen between `min_amplitude` and `max_amplitude`. If `save_dir` is provided, the modified audio files are saved in that directory; otherwise, they are saved in the same directory as the input files. The `p` parameter controls the probability of applying this transformation to each sample. If no audio is present in the sample, it is returned unchanged.
 
-映射器将高斯噪声添加到音频样本。
+向音频样本添加高斯噪声的映射器。
 
-该算子以指定的概率将高斯噪声添加到音频数据。噪声的幅度在 “min_amplitude” 和 “max_amplitude” 之间随机选择。如果提供了 “save_dir”，则修改后的音频文件将保存在该目录中; 否则，它们将保存在与输入文件相同的目录中。“P” 参数控制将该变换应用于每个样本的概率。如果样本中不存在音频，则将其原封不动地返回。
+该算子以指定的概率向音频数据添加高斯噪声。噪声的幅度在`min_amplitude`和`max_amplitude`之间随机选择。如果提供了`save_dir`，则修改后的音频文件将保存在该目录中；否则，它们将保存在与输入文件相同的目录中。`p`参数控制对每个样本应用此转换的概率。如果样本中没有音频，则原样返回。
 
 Type 算子类型: **mapper**
 

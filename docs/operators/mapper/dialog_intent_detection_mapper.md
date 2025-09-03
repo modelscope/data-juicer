@@ -4,9 +4,9 @@ Generates user's intent labels in a dialog by analyzing the history, query, and 
 
 This operator processes a dialog to identify and label the user's intent. It uses a predefined system prompt and templates to build input prompts for an API call. The API model (e.g., GPT-4) is used to analyze the dialog and generate intent labels and analysis. The results are stored in the meta field under 'dialog_intent_labels' and 'dialog_intent_labels_analysis'. The operator supports customizing the system prompt, templates, and patterns for parsing the API response. If the intent candidates are provided, they are included in the input prompt. The operator retries the API call up to a specified number of times if there are errors.
 
-通过分析历史记录、查询和响应，在对话框中生成用户的意图标签。
+通过分析历史记录、查询和响应，在对话中生成用户的意图标签。
 
-该运算符处理对话以识别和标记用户的意图。它使用预定义的系统提示和模板来构建API调用的输入提示。API模型 (例如，GPT-4) 用于分析对话并生成意图标签和分析。结果存储在 'dialog_intent_labels' 和 'dialog_intent_labels_analysis' 下的元字段中。该运算符支持自定义系统提示、模板和用于解析API响应的模式。如果提供了意图候选，则它们被包括在输入提示中。如果有错误，操作员将重试API调用指定的次数。
+此算子处理对话以识别并标记用户的意图。它使用预定义的系统提示和模板构建API调用的输入提示。使用API模型（例如GPT-4）分析对话并生成意图标签和分析。结果存储在元字段下的'dialog_intent_labels'和'dialog_intent_labels_analysis'中。算子支持自定义系统提示、模板和解析API响应的模式。如果提供了意图候选，则将其包含在输入提示中。如果出现错误，算子将重试API调用最多指定次数。
 
 Type 算子类型: **mapper**
 

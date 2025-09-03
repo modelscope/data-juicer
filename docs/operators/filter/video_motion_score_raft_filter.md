@@ -10,15 +10,15 @@ This operator uses the RAFT (Recurrent All-Pairs Field Transforms) model from to
 - The operator can be configured to filter based on any or all frames in the video.
 - The device for model inference (CPU or CUDA) is automatically detected and set.
 
-过滤器将视频运动分数的样本保持在指定范围内。
+过滤保留视频运动得分在指定范围内的样本。
 
-该算子使用来自torchvision的RAFT (递归全对场变换) 模型来预测视频帧之间的光流。它保留视频运动分数在给定的最小和最大分数范围内的样本。基于帧之间的光流来计算运动分数，该光流是使用RAFT模型来估计的。操作者可以以指定的FPS对帧进行采样，并在计算流之前对帧应用变换。
+该算子使用 torchvision 中的 RAFT（Recurrent All-Pairs Field Transforms）模型来预测视频帧之间的光流。它保留视频运动得分在给定的最小和最大得分范围内的样本。运动得分基于帧之间的光流计算，光流使用 RAFT 模型估计。该算子可以在指定的 FPS 下采样帧，并在计算光流之前对帧应用变换。
 
-- 使用RAFT模型来估计光流。
-- 使用包括归一化和颜色通道翻转在内的一系列变换对帧进行预处理。
-- 根据光流数据计算运动分数。
-- 可以将操作员配置为基于视频中的任何或所有帧进行过滤。
-- 自动检测并设置用于模型推理的设备 (CPU或CUDA)。
+- 使用 RAFT 模型估计光流。
+- 帧经过一系列变换预处理，包括归一化和颜色通道翻转。
+- 从光流数据中计算运动得分。
+- 该算子可以配置为基于视频中的任何或所有帧进行过滤。
+- 自动检测并设置模型推理的设备（CPU 或 CUDA）。
 
 Type 算子类型: **filter**
 

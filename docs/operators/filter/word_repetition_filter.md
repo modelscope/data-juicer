@@ -4,7 +4,9 @@ Filter to keep samples with word-level n-gram repetition ratio within a specific
 
 This operator calculates the word-level n-gram repetition ratio for each sample and filters out those that do not fall within the specified range. The n-gram length and the min/max ratio thresholds are configurable. If tokenization is enabled, a Hugging Face tokenizer is used to tokenize the text. The key metric, `word_rep_ratio`, is computed as the ratio of repeated n-grams to the total number of n-grams. This ratio is then compared against the min and max ratio thresholds to decide whether to keep or filter the sample. If the ratio is outside the specified range, the sample is filtered out.
 
+筛选单词级 n-gram 重复比率在特定范围内的样本。
 
+该算子计算每个样本的单词级 n-gram 重复比率，并过滤掉不在指定范围内的样本。n-gram 长度和最小/最大比率阈值是可配置的。如果启用分词，则使用 Hugging Face 分词器对文本进行分词。关键指标 `word_rep_ratio` 计算为重复 n-gram 与总 n-gram 数量的比率。然后将此比率与最小和最大比率阈值进行比较，以决定是否保留或过滤样本。如果比率超出指定范围，则过滤掉样本。
 
 Type 算子类型: **filter**
 

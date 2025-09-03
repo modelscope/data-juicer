@@ -4,9 +4,9 @@ Filter to keep samples with aesthetics scores within a specific range.
 
 This operator uses a Hugging Face model to predict the aesthetics score of images. It keeps samples where the predicted scores fall within the specified min and max score range. The operator supports two strategies: 'any' (keep if any image meets the condition) and 'all' (keep only if all images meet the condition). Aesthetics scores are cached in the 'image_aesthetics_scores' field. If no images are present, the sample is kept. Scores are normalized by dividing by 10 if the model name includes 'shunk031/aesthetics-predictor'.
 
-过滤以保持美学分数在特定范围内的样品。
+过滤出美学评分在特定范围内的样本。
 
-该算子使用拥抱面部模型来预测图像的美学得分。它会保留预测分数在指定的最小和最大分数范围内的样本。操作员支持两种策略: “任何” (如果任何图像满足条件，则保留) 和 “全部” (仅当所有图像满足条件时保留)。美学分数缓存在 “image_aesthestics_scores” 字段中。如果不存在图像，则保留样品。如果模型名称包括 “shunk031/美学预测器”，则分数除以10进行归一化。
+该算子使用 Hugging Face 模型来预测图像的美学评分。它保留那些预测评分落在指定最小和最大评分范围内的样本。该算子支持两种策略：'any'（只要有任何一张图片符合条件就保留）和 'all'（只有当所有图片都符合条件时才保留）。美学评分会被缓存在 'image_aesthetics_scores' 字段中。如果没有图片，样本也会被保留。如果模型名称包含 'shunk031/aesthetics-predictor'，则分数会被除以 10 进行归一化。
 
 Type 算子类型: **filter**
 

@@ -4,9 +4,9 @@ Mapper to convert Chinese text between Traditional, Simplified, and Japanese Kan
 
 This operator converts Chinese text based on the specified mode. It supports conversions between Simplified Chinese, Traditional Chinese (including Taiwan and Hong Kong variants), and Japanese Kanji. The conversion is performed using a pre-defined set of rules. The available modes include 's2t' for Simplified to Traditional, 't2s' for Traditional to Simplified, and other specific variants like 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp', 't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', and 'jp2t'. The operator processes text in batches and applies the conversion to the specified text key in the samples.
 
-映射器在繁体、简体和日文汉字之间转换中文文本。
+转换中文文本在繁体、简体和日文汉字之间的映射器。
 
-此运算符根据指定的模式转换中文文本。它支持简体中文、繁体中文 (包括台湾和香港变体) 和日语汉字之间的转换。使用预定义的规则集来执行转换。可用的模式包括 “s2t” 简化为传统，“t2s” 简化为传统，以及其他特定的变体，如 “s2tw”，“tw2s”，“s2hk”，“hk2s”，“s2twp”，“tw2sp”，“t2tw”，“tw2t”，“hk2t” 、 “t2hk” 、 “t2jp” 和 “jp2t”。运算符批量处理文本，并将转换应用于示例中的指定文本键。
+该算子根据指定的模式转换中文文本。它支持简体中文、繁体中文（包括台湾和香港变体）以及日文汉字之间的转换。转换使用预定义的一组规则进行。可用模式包括：'s2t' 从简体到繁体，'t2s' 从繁体到简体，以及其他特定变体如 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp', 't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', 和 'jp2t'。该算子批量处理文本，并对样本中指定的文本键应用转换。
 
 Type 算子类型: **mapper**
 

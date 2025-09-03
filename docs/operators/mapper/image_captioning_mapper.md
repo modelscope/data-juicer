@@ -4,9 +4,9 @@ Generates image captions using a Hugging Face model and appends them to samples.
 
 This operator generates captions for images in the input samples using a specified Hugging Face model. It can generate multiple captions per image and apply different strategies to retain the generated captions. The operator supports three retention modes: 'random_any', 'similar_one_simhash', and 'all'. In 'random_any' mode, a random caption is retained. In 'similar_one_simhash' mode, the most similar caption to the original text (based on SimHash) is retained. In 'all' mode, all generated captions are concatenated and retained. The operator can also keep or discard the original sample based on the `keep_original_sample` parameter. If both `prompt` and `prompt_key` are set, the `prompt_key` takes precedence.
 
-使用拥抱面部模型生成图像标题，并将其附加到样本中。
+使用 Hugging Face 模型生成图像描述并将其附加到样本中。
 
-该运算符使用指定的拥抱面部模型为输入样本中的图像生成字幕。它可以为每个图像生成多个字幕，并应用不同的策略来保留生成的字幕。该运算符支持三种保留模式: “random_any” 、 “similar_one_simhash” 和 “all”。在 “random_any” 模式中，保留随机字幕。在 “similar_one_simhash” 模式下，保留与原始文本 (基于SimHash) 最相似的标题。在 “全部” 模式下，所有生成的字幕都被连接并保留。操作员还可以基于 “keep_original_sample” 参数保留或丢弃原始样本。如果同时设置了 “prompt” 和 “prompt_key”，则 “prompt_key” 优先。
+该算子使用指定的 Hugging Face 模型为输入样本中的图像生成描述。它可以为每张图像生成多个描述，并应用不同的策略来保留生成的描述。该算子支持三种保留模式：'random_any'、'similar_one_simhash' 和 'all'。在 'random_any' 模式下，随机保留一个描述。在 'similar_one_simhash' 模式下，保留与原始文本最相似的描述（基于 SimHash）。在 'all' 模式下，所有生成的描述被连接并保留。该算子还可以根据 `keep_original_sample` 参数保留或丢弃原始样本。如果同时设置了 `prompt` 和 `prompt_key`，则 `prompt_key` 优先。
 
 Type 算子类型: **mapper**
 

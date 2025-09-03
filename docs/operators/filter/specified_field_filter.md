@@ -8,13 +8,13 @@ This operator checks if the value of a specified field in each sample is within 
 - Supports multi-level field keys, e.g., 'level1.level2'.
 - Converts non-list/tuple field values to a list for comparison.
 
-根据指定的字段信息筛选样本。
+根据指定字段信息过滤样本。
 
-此运算符检查每个样本中指定字段的值是否在给定的目标值范围内。如果字段值不在目标范围内，则将样本过滤掉。该字段可以是多级键，其级别由点分隔。目标值是字段的可接受值的列表。如果字段值不是列表或元组，则将其转换为列表以进行比较。如果字段中的所有值都与任何目标值匹配，则保留样本。
+该算子检查每个样本中指定字段的值是否在给定的目标值范围内。如果字段值不在目标范围内，则过滤掉该样本。字段可以是多级键，级别之间用点分隔。目标值是字段的可接受值列表。如果字段值不是列表或元组，则将其转换为列表进行比较。如果字段中的所有值都匹配任何目标值，则保留样本。
 
 - 使用 'field_key' 和 'target_value' 参数。
 - 支持多级字段键，例如 'level1.level2'。
-- 将非列表/元组字段值转换为列表以进行比较。
+- 将非列表/元组字段值转换为列表进行比较。
 
 Type 算子类型: **filter**
 

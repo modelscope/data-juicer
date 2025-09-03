@@ -4,9 +4,9 @@ Filter to keep samples with special-character ratio within a specific range.
 
 This operator filters out samples based on the ratio of special characters in the text. It keeps samples where the special-character ratio is within the specified minimum and maximum thresholds. The special-character ratio is computed as the number of special characters divided by the total number of characters in the text. If the 'special_char_ratio' is already cached in the stats, it will be reused. Otherwise, it will be computed and stored in the 'special_char_ratio' field.
 
-过滤器将具有特殊字符比率的样本保持在特定范围内。
+过滤出特殊字符比率在特定范围内的样本。
 
-该运算符根据文本中特殊字符的比例过滤样本。它保留特殊字符比率在指定的最小和最大阈值内的样本。特殊字符比率被计算为特殊字符的数目除以文本中字符的总数。如果 'special_char_ratio' 已经缓存在统计信息中，它将被重用。否则，它将被计算并存储在 'special_char_ratio' 字段中。
+该算子根据文本中特殊字符的比例来过滤样本。它保留特殊字符比例在指定最小值和最大值阈值范围内的样本。特殊字符比例计算为特殊字符数量除以文本中的总字符数。如果 'special_char_ratio' 已经缓存在 stats 中，将重用该值。否则，将计算并存储在 'special_char_ratio' 字段中。
 
 Type 算子类型: **filter**
 

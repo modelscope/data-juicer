@@ -4,9 +4,9 @@ Calibrates question-answer pairs based on reference text using an API model.
 
 This operator uses a specified API model to calibrate question-answer pairs, making them more detailed and accurate. It constructs the input prompt by combining the reference text and the question-answer pair, then sends it to the API for calibration. The output is parsed to extract the calibrated question and answer. The operator retries the API call and parsing up to a specified number of times in case of errors. The default system prompt, input templates, and output pattern can be customized. The operator supports additional parameters for model initialization and sampling.
 
-使用API模型根据参考文本校准问答对。
+根据参考文本使用API模型校准问答对。
 
-此运算符使用指定的API模型来校准问题-答案对，使其更加详细和准确。它通过组合参考文本和问题-答案对来构造输入提示，然后将其发送到API以进行校准。解析输出以提取校准的问题和答案。如果出现错误，操作员会重试API调用和解析，直到指定的次数。可以自定义默认的系统提示、输入模板和输出模式。运算符支持用于模型初始化和采样的其他参数。
+该算子使用指定的API模型来校准问答对，使其更加详细和准确。它通过将参考文本和问答对结合起来构建输入提示，然后将其发送到API进行校准。输出被解析以提取校准后的问题和答案。如果出现错误，算子会重试API调用和解析，最多重试指定次数。默认的系统提示、输入模板和输出模式可以自定义。该算子支持用于模型初始化和采样的附加参数。
 
 Type 算子类型: **mapper**
 

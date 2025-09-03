@@ -4,9 +4,9 @@ Resizes video resolution based on specified width and height constraints.
 
 This operator resizes videos to fit within the provided minimum and maximum width and height limits. It can optionally maintain the original aspect ratio by adjusting the dimensions accordingly. The resized videos are saved in the specified directory or the same directory as the input if no save directory is provided. The key metric for resizing is the video's width and height, which are adjusted to meet the constraints while maintaining the aspect ratio if configured. The `force_divisible_by` parameter ensures that the output dimensions are divisible by a specified integer, which must be a positive even number when used with aspect ratio adjustments.
 
-根据指定的宽度和高度限制调整视频分辨率。
+根据指定的宽度和高度约束调整视频分辨率。
 
-此运算符会调整视频大小，以适应所提供的最小和最大宽度和高度限制。它可以通过相应地调整尺寸来可选地保持原始纵横比。如果未提供保存目录，调整后的视频将保存在指定目录或与输入相同的目录中。调整大小的关键指标是视频的宽度和高度，如果已配置，则会对其进行调整以满足约束，同时保持纵横比。'force_divisible_by' 参数可确保输出维度可被指定的整数整除，该整数在与纵横比调整一起使用时必须为正偶数。
+此算子调整视频尺寸以适应提供的最小和最大宽度和高度限制。它可以选择性地通过相应调整尺寸来保持原始宽高比。调整后的视频保存在指定目录中，如果没有提供保存目录，则保存在与输入文件相同的目录中。调整的关键指标是视频的宽度和高度，它们会根据约束进行调整，并在配置时保持宽高比。`force_divisible_by` 参数确保输出尺寸可以被指定的整数整除，当与宽高比调整一起使用时，该整数必须是正偶数。
 
 Type 算子类型: **mapper**
 

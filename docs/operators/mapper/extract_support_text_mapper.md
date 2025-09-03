@@ -4,9 +4,9 @@ Extracts a supporting sub-text from the original text based on a given summary.
 
 This operator uses an API model to identify and extract a segment of the original text that best matches the provided summary. It leverages a system prompt and input template to guide the extraction process. The extracted support text is stored in the specified meta field key. If the extraction fails or returns an empty string, the original summary is used as a fallback. The operator retries the extraction up to a specified number of times in case of errors.
 
-根据给定的摘要从原始文本中提取支持子文本。
+根据给定的摘要从原始文本中提取支持性的子文本。
 
-此运算符使用API模型来识别和提取与提供的摘要最匹配的原始文本片段。它利用系统提示和输入模板来指导提取过程。提取的支持文本存储在指定的元字段关键字中。如果提取失败或返回空字符串，则使用原始摘要作为回退。在错误的情况下，操作员重试提取直到指定的次数。
+此算子使用 API 模型识别并提取与提供的摘要最匹配的原始文本段落。它利用系统提示和输入模板来指导提取过程。提取的支持文本存储在指定的 meta 字段键中。如果提取失败或返回空字符串，则使用原始摘要作为后备。如果出现错误，该算子将重试提取最多指定次数。
 
 Type 算子类型: **mapper**
 

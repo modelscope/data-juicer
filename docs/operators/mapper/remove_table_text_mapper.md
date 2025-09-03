@@ -4,9 +4,9 @@ Mapper to remove table texts from text samples.
 
 This operator uses regular expressions to identify and remove tables from the text. It targets tables with a specified range of columns, defined by the minimum and maximum number of columns. The operator iterates over each sample, applying the regex pattern to remove tables that match the column criteria. The processed text, with tables removed, is then stored back in the sample. This operation is batched for efficiency.
 
-映射器从文本样本中删除表文本。
+用于从文本样本中移除表格文本的映射器。
 
-此运算符使用正则表达式从文本中标识和删除表。它以具有指定列范围的表为目标，由最小和最大列数定义。该运算符迭代每个样本，应用正则表达式模式删除与列条件匹配的表。然后将已处理的文本 (其中删除了表) 存储回样本中。为了提高效率，此操作是批处理的。
+该算子使用正则表达式来识别并移除文本中的表格。它针对具有指定列数范围的表格，该范围由最小和最大列数定义。算子遍历每个样本，应用正则表达式模式以移除符合列标准的表格。处理后的文本（已移除表格）将存回样本中。此操作为了效率进行了批处理。
 
 Type 算子类型: **mapper**
 

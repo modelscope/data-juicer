@@ -4,9 +4,9 @@ Filter to keep samples whose images have low NSFW scores.
 
 This operator uses a Hugging Face model to detect and score the NSFW content in images. It keeps samples if their image NSFW scores are below a specified threshold. The filtering strategy can be set to 'any' (keep if any image meets the condition) or 'all' (keep only if all images meet the condition). The key metric is the NSFW score, computed for each image and stored in the 'image_nsfw_score' field. If no images are present, an empty array is stored.
 
-过滤器保留图像具有低NSFW分数的样本。
+过滤保留图像NSFW分数低的样本。
 
-该操作员使用拥抱人脸模型来检测图像中的NSFW内容并对其进行评分。如果他们的图像NSFW分数低于指定的阈值，它会保留样本。过滤策略可以设置为 “任意” (如果任何图像满足条件则保留) 或 “全部” (仅当所有图像满足条件时保留)。关键度量是NSFW分数，为每个图像计算并存储在 “image_nsfw_score” 字段中。如果不存在图像，则存储空数组。
+该算子使用Hugging Face模型来检测和评分图像中的NSFW内容。如果图像的NSFW分数低于指定阈值，则保留样本。过滤策略可以设置为'any'（如果有任何图像满足条件则保留）或'all'（只有当所有图像都满足条件时才保留）。关键指标是NSFW分数，为每张图像计算并存储在'image_nsfw_score'字段中。如果没有图像存在，则存储一个空数组。
 
 Type 算子类型: **filter**
 

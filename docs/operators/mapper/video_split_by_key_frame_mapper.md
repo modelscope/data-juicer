@@ -4,9 +4,9 @@ Splits a video into segments based on key frames.
 
 This operator processes video data by splitting it into multiple segments at key frame boundaries. It uses the key frames to determine where to make the splits. The original sample can be kept or discarded based on the `keep_original_sample` parameter. If `save_dir` is specified, the split video files will be saved in that directory; otherwise, they will be saved in the same directory as the input files. The operator processes each video in the sample and updates the sample with the new video keys and text placeholders. The `Fields.source_file` field is updated to reflect the new video segments. This operator works in batch mode, processing multiple samples at once.
 
-根据关键帧将视频分割为多个片段。
+根据关键帧将视频分割成片段。
 
-该算子通过在关键帧边界处将视频数据分成多个段来处理视频数据。它使用关键帧来确定在何处进行拆分。可以基于 “keep_original_sample” 参数保留或丢弃原始样本。如果指定了 “save_dir”，则拆分的视频文件将保存在该目录中; 否则，它们将与输入文件保存在同一目录中。操作员处理样本中的每个视频，并用新的视频键和文本占位符更新样本。“Fields.source_file” 字段被更新以反映新的视频片段。此操作员在批处理模式下工作，一次处理多个样品。
+此算子通过在关键帧边界处将视频分割成多个片段来处理视频数据。它使用关键帧来确定分割的位置。根据 `keep_original_sample` 参数，可以选择保留或丢弃原始样本。如果指定了 `save_dir`，则分割后的视频文件将保存在该目录中；否则，它们将保存在与输入文件相同的目录中。该算子处理样本中的每个视频，并更新样本的新视频键和文本占位符。`Fields.source_file` 字段更新以反映新的视频片段。此算子以批处理模式运行，一次处理多个样本。
 
 Type 算子类型: **mapper**
 

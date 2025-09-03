@@ -4,9 +4,9 @@ The class is used to load and format csv-type files.
 
 Default suffixes is `['.csv']`
 
-类用于加载和格式化csv类型的文件。
+该类用于加载和格式化 csv 类型的文件。
 
-默认后缀为 “['.csv']”
+默认后缀是 `['.csv']`
 
 Type 算子类型: **formatter**
 

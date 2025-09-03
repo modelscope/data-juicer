@@ -4,9 +4,9 @@ Filter to keep samples based on a general field filter condition.
 
 The filter condition is a string that can include logical operators (and/or) and chain comparisons. For example: "10 < num <= 30 and text != 'nothing here' and __dj__meta__.a == 3". The condition is evaluated for each sample, and only samples that meet the condition are kept. The result of the filter condition is stored in the sample's stats under the key 'general_field_filter_condition'. If the filter condition is empty or already computed, the sample is not re-evaluated.
 
-根据常规字段筛选条件保留样本。
+基于通用字段过滤条件来保留样本。
 
-过滤条件是可以包括逻辑运算符 (and/or) 和链比较的字符串。例如: “10 &lt;num &lt;= 30 and text != '这里什么都没有' 和 __dj__meta__.a = = 3”。针对每个样本评估条件，并且仅保留满足条件的样本。过滤条件的结果存储在密钥 “general_field_filter_condition” 下的样本统计信息中。如果筛选条件为空或已计算，则不重新评估样本。
+过滤条件是一个字符串，可以包含逻辑运算符（and/or）和链式比较。例如："10 < num <= 30 and text != 'nothing here' and __dj__meta__.a == 3"。该条件会对每个样本进行评估，只有满足条件的样本才会被保留。过滤条件的结果存储在样本的 stats 字段中，键名为 'general_field_filter_condition'。如果过滤条件为空或已经计算过，则不会重新评估样本。
 
 Type 算子类型: **filter**
 

@@ -7,12 +7,12 @@ This operator computes MinHash values for each sample and uses Locality-Sensitiv
 - For 'sentencepiece' tokenization, a tokenizer model path is required.
 - The deduplication process involves clustering and filtering, and only unique samples or the first sample in a cluster are retained.
 
-使用MinHash LSH在文档级别删除重复的样本。
+使用MinHash LSH在文档级别去重样本。
 
-该运算符计算每个样本的MinHash值，并使用位置敏感哈希 (LSH) 来识别和移除近似重复的文档。Jaccard相似性阈值确定何时将两个文档视为重复。可以自定义标记化方法，并且拥抱面部标记化器可以用于 “sentencepiece” 标记化。minhash值存储为字节，不保留在最终数据集中。LSH中每个带的带和行数可以手动设置或通过最佳参数计算算法确定。重要注意事项:
-- 如果将 “标点” 标记化与忽略模式一起使用，请确保该模式不包括标点。
-- 对于 “sentencepiece” 标记化，需要标记器模型路径。
-- 重复数据删除过程涉及聚类和过滤，并且仅保留唯一样本或集群中的第一个样本。
+该算子为每个样本计算MinHash值，并使用局部敏感哈希（LSH）来识别和删除近似重复的文档。Jaccard相似度阈值决定了两个文档何时被视为重复。可以自定义分词方法，并且可以使用Hugging Face的分词器进行'sentencepiece'分词。MinHash值以字节形式存储，不会保留在最终数据集中。可以在LSH中手动设置或通过最优参数计算算法确定区段数和每区段行数。重要提示：
+- 如果使用带有忽略模式的'punctuation'分词，请确保该模式不包括标点符号。
+- 对于'sentencepiece'分词，需要提供一个分词器模型路径。
+- 去重过程涉及聚类和过滤，仅保留唯一样本或每个聚类中的第一个样本。
 
 Type 算子类型: **deduplicator**
 

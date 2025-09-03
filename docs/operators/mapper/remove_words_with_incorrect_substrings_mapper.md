@@ -10,15 +10,15 @@ This operator processes text by removing words that contain any of the specified
 
 The operator processes samples in batches and updates the text in place.
 
-映射程序删除包含指定的不正确子字符串的单词。
+用于移除包含指定错误子字符串的单词的映射器。
 
-此运算符通过删除包含任何指定的不正确子字符串的单词来处理文本。默认情况下，它会删除带有 “http” 、 “www” 、 “.com” 、 “href” 和 “//” 等子字符串的单词。操作员可以在令牌化或非令牌化模式下操作。在标记化模式下，它使用拥抱面部标记器在处理之前对文本进行标记化。不计算关键指标; 此运算符专注于过滤掉特定的单词。
+该算子通过移除包含任何指定错误子字符串的单词来处理文本。默认情况下，它移除包含 "http", "www", ".com", "href", 和 "//" 等子字符串的单词。算子可以在分词或非分词模式下运行。在分词模式下，它使用 Hugging Face 分词器对文本进行分词后再处理。关键指标不计算；此算子专注于过滤特定单词。
 
-- 如果 'tokenization' 为True，则使用拥抱面部标记器对文本进行标记化，并根据指定的子字符串过滤单词。
-- 如果 'tokenization' 为False，则将文本拆分为句子和单词，并根据指定的子字符串过滤单词。
-- 然后将过滤的文本合并回单个字符串。
+- 如果 `tokenization` 为 True，则使用 Hugging Face 分词器对文本进行分词，并基于指定的子字符串过滤单词。
+- 如果 `tokenization` 为 False，则将文本拆分为句子和单词，并基于指定的子字符串过滤单词。
+- 过滤后的文本然后合并成一个字符串。
 
-操作员批量处理样本并就地更新文本。
+算子批量处理样本并在原地更新文本。
 
 Type 算子类型: **mapper**
 

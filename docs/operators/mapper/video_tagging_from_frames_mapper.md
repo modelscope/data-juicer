@@ -7,7 +7,12 @@ This operator extracts frames from videos and generates tags based on the conten
 - If no video is present in the sample, an empty tag array is stored.
 - Frame tensors are processed to generate tags, which are then sorted by frequency and stored.
 
+从视频中提取的帧生成视频标签。
 
+该算子从视频中提取帧，并根据这些帧的内容生成标签。帧提取方法可以是 "all_keyframes" 或 "uniform"。对于 "all_keyframes"，提取所有关键帧，而对于 "uniform"，则均匀地从视频中提取指定数量的帧。标签使用预训练模型生成并存储在指定的字段名称中。如果样本中已经存在标签，则该算子跳过处理。重要说明：
+- 使用 Hugging Face 的分词器和预训练模型生成标签。
+- 如果样本中没有视频，则存储一个空的标签数组。
+- 处理帧张量以生成标签，然后按频率排序并存储。
 
 Type 算子类型: **mapper**
 

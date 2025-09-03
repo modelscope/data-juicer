@@ -4,7 +4,9 @@ Normalizes various types of whitespace characters to standard spaces in text sam
 
 This mapper converts all non-standard whitespace characters, such as tabs and newlines, to the standard space character (' ', 0x20). It also trims leading and trailing whitespace from the text. This ensures consistent spacing across all text samples, improving readability and consistency. The normalization process is based on a comprehensive list of whitespace characters, which can be found at https://en.wikipedia.org/wiki/Whitespace_character.
 
+将文本样本中的各种空白字符标准化为空格。
 
+该映射器将所有非标准空白字符（如制表符和换行符）转换为标准空格字符 (' ', 0x20)。它还修剪文本前后的空白。这确保了所有文本样本的一致间距，提高了可读性和一致性。规范化过程基于全面的空白字符列表，可以在 https://en.wikipedia.org/wiki/Whitespace_character 找到。
 
 Type 算子类型: **mapper**
 

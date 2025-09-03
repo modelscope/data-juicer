@@ -4,9 +4,9 @@ Mapper to clean links like http/https/ftp in text samples.
 
 This operator removes or replaces URLs and other web links in the text. It uses a regular expression pattern to identify and remove links. By default, it replaces the identified links with an empty string, effectively removing them. The operator can be customized with a different pattern and replacement string. It processes samples in batches and modifies the text in place. If no links are found in a sample, it is left unchanged.
 
-映射器来清理链接，如文本示例中的http/https/ftp。
+映射器用于清理文本样本中的http/https/ftp等链接。
 
-此运算符删除或替换文本中的url和其他web链接。它使用正则表达式模式来识别和删除链接。默认情况下，它用空字符串替换标识的链接，从而有效地删除它们。操作员可以用不同的模式和替换字符串进行自定义。它批量处理样品并就地修改文本。如果在样本中找不到链接，则保持不变。
+此算子删除或替换文本中的URL和其他网络链接。它使用正则表达式模式来识别和删除链接。默认情况下，它将识别到的链接替换为空字符串，从而删除它们。可以通过不同的模式和替换字符串自定义算子。它以批量方式处理样本并在原地修改文本。如果样本中没有找到链接，则保持不变。
 
 Type 算子类型: **mapper**
 

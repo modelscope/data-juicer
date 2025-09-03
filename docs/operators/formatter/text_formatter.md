@@ -4,9 +4,9 @@ The class is used to load and format text-type files.
 
 e.g. `['.txt', '.pdf', '.cpp', '.docx']`
 
-类用于加载和格式化文本类型文件。
+该类用于加载和格式化文本类型的文件。
 
-例如 `'.txt '，'.pdf'，'.Cpp'，'.docx'`
+例如 `['.txt', '.pdf', '.cpp', '.docx']`
 
 Type 算子类型: **formatter**
 

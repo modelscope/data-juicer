@@ -4,7 +4,9 @@ Filter to keep samples whose videos contain specified tags.
 
 This operator filters video samples based on the presence of given tags in the video frames. It uses a Hugging Face tokenizer to extract and tag frames. The filtering can be configured to require any or all of the specified tags to be present. The operator supports two frame sampling methods: "all_keyframes" and "uniform". When using "uniform", the number of frames to sample can be specified. The extracted tags are stored in the meta field with the key 'video_frame_tags' by default. The decision to keep a sample is based on whether any or all of the video frames meet the tag criteria, as specified by the 'any_or_all' parameter.
 
+筛选包含指定标签的视频样本。
 
+该算子根据视频帧中是否存在给定标签来筛选视频样本。它使用 Hugging Face 分词器提取和标记帧。可以配置筛选条件，要求存在任何一个或所有指定的标签。该算子支持两种帧采样方法："all_keyframes" 和 "uniform"。当使用 "uniform" 时，可以指定要采样的帧数。提取的标签默认存储在 meta 字段中，键为 'video_frame_tags'。是否保留样本的决定基于视频帧是否满足标签条件，由 'any_or_all' 参数指定。
 
 Type 算子类型: **filter**
 

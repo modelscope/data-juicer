@@ -2,7 +2,7 @@
 
 The class is used to create empty data.
 
-类用于创建空数据。
+该类用于创建空数据。
 
 Type 算子类型: **formatter**
 

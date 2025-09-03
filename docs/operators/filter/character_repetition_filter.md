@@ -4,9 +4,9 @@ Filter to keep samples with character-level n-gram repetition ratio within a spe
 
 This operator calculates the character-level n-gram repetition ratio for each sample and filters out samples that do not fall within the specified range. The repetition ratio is computed based on the frequency of n-grams in the text. The key metric 'char_rep_ratio' is cached in the stats field. Samples are kept if their 'char_rep_ratio' is between the specified min and max ratios. The n-gram length, minimum, and maximum ratios are configurable.
 
-过滤器将具有字符级n-gram重复比的样本保持在特定范围内。
+保留字符级n-gram重复率在特定范围内的样本。
 
-此运算符计算每个样本的字符级n-gram重复比，并过滤掉不在指定范围内的样本。重复率是基于文本中n-gram的频率计算的。关键指标 “char_rep_ratio” 缓存在stats字段中。如果样本的 'char_rep_ratio' 在指定的最小和最大比率之间，则保留样本。N-gram长度、最小和最大比率是可配置的。
+该算子计算每个样本的字符级n-gram重复率，并过滤掉不在指定范围内的样本。重复率基于文本中n-gram的频率计算。关键指标'char_rep_ratio'缓存在统计字段中。如果样本的'char_rep_ratio'在指定的最小值和最大值之间，则保留该样本。n-gram长度、最小值和最大值比率是可配置的。
 
 Type 算子类型: **filter**
 

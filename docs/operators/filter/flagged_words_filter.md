@@ -7,12 +7,12 @@ This operator filters out samples based on the ratio of flagged words. It comput
 - Word augmentation can be applied, especially for Chinese and Vietnamese.
 - The ratio is clamped to 1.0 if it exceeds this value.
 
-过滤以保留标记词比率小于特定最大值的样本。
+过滤出标记词比例小于特定最大值的样本。
 
-该运算符基于标记词的比率过滤出样本。它计算每个样本中标记的单词的比率，并仅保留那些比率低于指定 “max_ratio” 的单词。标记的单词从目录加载，并且默认情况下基于字符计算比率。如果启用了标记化，它将使用拥抱面部标记器对文本进行标记化。关键指标 “flagged_words_ratio” 缓存在stats字段中。重要注意事项:
-- 对于合并的列表，标记的单词的语言可以被指定或设置为 “全部”。
-- 可以应用单词增强，尤其是中文和越南语。
-- 如果比率超过此值，则将其固定为1.0。
+该算子根据标记词的比例来过滤样本。它计算每个样本中标记词的比例，并仅保留比例低于指定 `max_ratio` 的样本。标记词从一个目录中加载，默认情况下按字符计算比例。如果启用了分词，则使用 Hugging Face 分词器对文本进行分词。关键指标 `flagged_words_ratio` 会缓存在 stats 字段中。重要说明：
+- 可以指定标记词的语言，或设置为 "all" 以合并列表。
+- 可以应用词增强，特别是对于中文和越南语。
+- 如果比例超过 1.0，则会被限制为 1.0。
 
 Type 算子类型: **filter**
 

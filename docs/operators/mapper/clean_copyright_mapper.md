@@ -4,9 +4,9 @@ Cleans copyright comments at the beginning of text samples.
 
 This operator removes copyright comments from the start of text samples. It identifies and strips multiline comments that contain the word "copyright" using a regular expression. It also greedily removes lines starting with comment markers like `//`, `#`, or `--` at the beginning of the text, as these are often part of copyright headers. The operator processes each sample individually but can handle batches for efficiency.
 
-清除文本示例开头的版权注释。
+清理文本样本开头的版权声明。
 
-此运算符从文本样本的开头删除版权注释。它使用正则表达式识别并剥离包含单词 “版权” 的多行注释。它还会贪婪地删除以文本开头的注释标记 (如 “//”，“ # ”或“ -- ”) 开头的行，因为这些通常是版权标题的一部分。操作员单独处理每个样品，但可以处理批次以提高效率。
+该算子从文本样本的开头删除版权声明。它使用正则表达式识别并删除包含“copyright”一词的多行注释。它还贪婪地删除文本开头以注释标记如 `//`, `#` 或 `--` 开头的行，因为这些通常是版权声明的一部分。该算子单独处理每个样本，但为了效率也可以批量处理。
 
 Type 算子类型: **mapper**
 

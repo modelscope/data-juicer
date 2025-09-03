@@ -4,9 +4,9 @@ Identify the relation between two entities in a given text.
 
 This operator uses an API model to analyze the relationship between two specified entities in the text. It constructs a prompt with the provided system and input templates, then sends it to the API model for analysis. The output is parsed using a regular expression to extract the relationship. If the two entities are the same, the relationship is identified as "another identity." The result is stored in the meta field under the key 'role_relation' by default. The operator retries the API call up to a specified number of times in case of errors. If `drop_text` is set to True, the original text is removed from the sample after processing.
 
-确定给定文本中两个实体之间的关系。
+识别给定文本中两个实体之间的关系。
 
-此运算符使用API模型来分析文本中两个指定实体之间的关系。它使用提供的系统和输入模板构建提示，然后将其发送到API模型进行分析。使用正则表达式解析输出以提取关系。如果两个实体相同，则关系被标识为 “另一身份”。默认情况下，结果存储在键 “role_relation” 下的元字段中。如果出现错误，操作员将重试API调用指定的次数。如果 “drop_text” 设置为True，则处理后将从样本中删除原始文本。
+此算子使用 API 模型分析文本中两个指定实体之间的关系。它使用提供的系统和输入模板构建提示，然后发送给 API 模型进行分析。输出通过正则表达式解析以提取关系。如果两个实体相同，则关系被识别为 "another identity"。结果默认存储在 meta 字段的 'role_relation' 键下。算子在出现错误时最多重试 API 调用指定次数。如果 `drop_text` 设置为 True，在处理后将从样本中移除原始文本。
 
 Type 算子类型: **mapper**
 

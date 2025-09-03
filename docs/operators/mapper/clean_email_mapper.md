@@ -4,9 +4,9 @@ Cleans email addresses from text samples using a regular expression.
 
 This operator removes or replaces email addresses in the text based on a regular expression pattern. By default, it uses a standard pattern to match email addresses, but a custom pattern can be provided. The matched email addresses are replaced with a specified replacement string, which defaults to an empty string. The operation is applied to each text sample in the batch. If no email address is found in a sample, it remains unchanged.
 
-使用正则表达式从文本示例中清除电子邮件地址。
+使用正则表达式从文本样本中清理电子邮件地址。
 
-此运算符根据正则表达式模式删除或替换文本中的电子邮件地址。默认情况下，它使用标准模式来匹配电子邮件地址，但可以提供自定义模式。匹配的电子邮件地址将替换为指定的替换字符串，该字符串默认为空字符串。该操作将应用于批处理中的每个文本示例。如果在示例中找不到电子邮件地址，它将保持不变。
+此算子基于正则表达式模式删除或替换文本中的电子邮件地址。默认情况下，它使用标准模式匹配电子邮件地址，但可以提供自定义模式。匹配到的电子邮件地址将被替换为指定的替换字符串，默认为空字符串。该操作应用于批次中的每个文本样本。如果样本中没有找到电子邮件地址，则保持不变。
 
 Type 算子类型: **mapper**
 

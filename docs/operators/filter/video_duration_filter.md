@@ -6,11 +6,11 @@ This operator filters data samples based on the duration of their associated vid
 - 'any': Keep the sample if any of its videos meet the duration criteria.
 - 'all': Keep the sample only if all of its videos meet the duration criteria. The video durations are computed and stored in the 'video_duration' field of the sample's stats. If no videos are present, an empty array is stored.
 
-保留视频持续时间在指定范围内的数据样本。
+保留视频时长在指定范围内的数据样本。
 
-该运算符基于其相关联的视频的持续时间来过滤数据样本。它保留视频持续时间落在指定的最小和最大范围内的样本。过滤策略可以设置为 “any” 或 “all”:
-- 'any': 如果任何视频符合持续时间标准，请保留样本。
-- 'all': 仅当所有视频都符合持续时间标准时才保留样本。视频持续时间被计算并存储在样本的统计信息的 “video_duration” 字段中。如果不存在视频，则存储空数组。
+该算子根据关联视频的时长过滤数据样本。它保留视频时长在指定最小和最大范围内的样本。过滤策略可以设置为 'any' 或 'all':
+- 'any': 如果样本中的任何视频满足时长条件，则保留该样本。
+- 'all': 只有当样本中的所有视频都满足时长条件时，才保留该样本。视频时长被计算并存储在样本的 stats 中的 'video_duration' 字段中。如果没有视频存在，则存储一个空数组。
 
 Type 算子类型: **filter**
 

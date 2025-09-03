@@ -2,7 +2,7 @@
 
 Mapper to use MLLMs for visual question answering tasks. This operator uses a Hugging Face model to generate answers based on input text and images. It supports models like `llava-hf/llava-v1.6-vicuna-7b-hf` and `Qwen/Qwen2-VL-7B-Instruct`. The operator processes each sample, loading and processing images, and generating responses using the specified model. The generated responses are appended to the sample's text field. The key parameters include the model ID, maximum new tokens, temperature, top-p sampling, and beam search size, which control the generation process.
 
-Mapper使用MLLMs进行视觉问答任务。该操作员使用拥抱面部模型来基于输入文本和图像生成答案。它支持 “lava-hf/llava-v1.6-vicuna-7b-hf” 和 “qwen/Qwen2-VL-7B-Instruct” 等型号。操作员处理每个样本，加载和处理图像，并使用指定的模型生成响应。生成的响应将附加到示例的文本字段。关键参数包括控制生成过程的模型ID、最大新令牌、温度、top-p采样和光束搜索大小。
+用于视觉问答任务的映射器，使用MLLMs。该算子使用Hugging Face模型根据输入文本和图像生成答案。它支持诸如`llava-hf/llava-v1.6-vicuna-7b-hf`和`Qwen/Qwen2-VL-7B-Instruct`等模型。算子处理每个样本，加载和处理图像，并使用指定的模型生成响应。生成的响应被追加到样本的文本字段中。关键参数包括模型ID、最大新token数、温度、top-p采样和束搜索大小，这些参数控制生成过程。
 
 Type 算子类型: **mapper**
 

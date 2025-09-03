@@ -4,9 +4,9 @@ Filter to keep samples with image aspect ratio within a specific range.
 
 The operator computes the aspect ratio for each image in the sample, defined as the width divided by the height (W / H). It caches the computed aspect ratios in the 'aspect_ratios' field. Samples are kept if their images' aspect ratios fall within the specified minimum and maximum range. The 'any_or_all' parameter determines the strategy: 'any' keeps samples if at least one image meets the criteria, while 'all' requires all images to meet the criteria. If no images are present in a sample, the sample is not filtered out.
 
-过滤器，以保持样本的图像纵横比在特定范围内。
+过滤出图像宽高比在特定范围内的样本。
 
-运算符计算样本中每个图像的纵横比，定义为宽度除以高度 (W/H)。它将计算的纵横比缓存在 'aspect_raties' 字段中。如果其图像的纵横比落在指定的最小和最大范围内，则保留样本。“any_or_all” 参数确定策略: 如果至少一个图像满足标准，则 “any” 保持采样，而 “all” 要求所有图像满足标准。如果在样本中不存在图像，则不滤出样本。
+该算子计算样本中每张图像的宽高比，定义为宽度除以高度（W / H）。它将计算出的宽高比缓存在 'aspect_ratios' 字段中。如果样本中的图像宽高比落在指定的最小和最大范围内，则保留这些样本。'any_or_all' 参数决定了策略：'any' 表示只要有至少一张图片符合条件就保留，而 'all' 则要求所有图片都符合条件。如果样本中没有图片，则不会过滤掉该样本。
 
 Type 算子类型: **filter**
 

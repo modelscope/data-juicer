@@ -2,7 +2,7 @@
 
 The class is used to create empty data for ray.
 
-类用于为ray创建空数据。
+该类用于为 ray 创建空数据。
 
 Type 算子类型: **formatter**
 

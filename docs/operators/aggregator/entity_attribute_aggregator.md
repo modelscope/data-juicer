@@ -10,15 +10,15 @@ Summarizes a given attribute of an entity from a set of documents.
 - If the input key or required fields are missing, the operator logs a warning and returns the sample unchanged.
 - The summary is stored in the batch metadata under the specified output key.
 
-汇总一组文档中实体的给定属性。
+从一组文档中总结给定实体的特定属性。
 
-- 运算符从提供的文档中提取并汇总给定实体的指定属性。
-- 它使用系统提示，示例提示和输入模板来生成摘要。
-- 输出的格式为markdown样式的摘要，带有明确标记的实体和属性。
-- 摘要限制为指定数量的单词 (默认为100)。
-- 操作员使用拥抱面标记器来处理标记限制，并在必要时拆分文档。
-- 如果缺少输入键或必填字段，则操作员会记录警告并返回未更改的示例。
-- 摘要存储在指定输出键下的批处理元数据中。
+- 该算子从提供的文档中提取并总结给定实体的指定属性。
+- 它使用系统提示、示例提示和输入模板生成摘要。
+- 输出格式为markdown风格的摘要，其中实体和属性清晰标注。
+- 摘要限制在指定的字数内（默认为100字）。
+- 该算子使用Hugging Face tokenizer来处理token限制并在必要时拆分文档。
+- 如果缺少输入键或必需字段，算子会记录警告并返回未更改的样本。
+- 摘要存储在批次元数据中指定的输出键下。
 
 Type 算子类型: **aggregator**
 

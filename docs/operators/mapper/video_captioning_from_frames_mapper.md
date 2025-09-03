@@ -11,15 +11,15 @@ Generates video captions from sampled frames using an image-to-text model. Capti
 - Generates a specified number of candidate captions per video, which can be reduced based on the selected retention strategy.
 - The number of output samples depends on the retention strategy and whether original samples are kept.
 
-使用图像到文本模型从采样帧生成视频字幕。来自不同帧的字幕连接成一个字符串。
+使用图像到文本模型从采样的帧中生成视频字幕。来自不同帧的字幕被连接成一个字符串。
 
-- 使用拥抱面部图像到文本模型为采样的视频帧生成字幕。
-- 支持不同的帧采样方法: 'all_keyframes' 或 'uniform'。
-- 可以在字幕之前将水平和垂直翻转应用于帧。
-- 提供多种策略来保留生成的字幕: 'random_any' 、 'similar_one_simhash' 或 'all'。
-- 可选地将原始样本保留在最终数据集中。
-- 允许设置全局提示或每个样本提示以指导字幕生成。
-- 为每个视频生成指定数量的候选字幕，可以根据所选的保留策略减少该数量。
+- 使用Hugging Face图像到文本模型为采样的视频帧生成字幕。
+- 支持不同的帧采样方法：'all_keyframes'或'uniform'。
+- 可以在字幕前对帧进行水平和垂直翻转。
+- 提供多种保留生成字幕的策略：'random_any'、'similar_one_simhash'或'all'。
+- 可选地在最终数据集中保留原始样本。
+- 允许设置全局提示或每个样本的提示来指导字幕生成。
+- 为每个视频生成指定数量的候选字幕，可以根据选定的保留策略进行减少。
 - 输出样本的数量取决于保留策略以及是否保留原始样本。
 
 Type 算子类型: **mapper**

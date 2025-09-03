@@ -8,13 +8,13 @@ This operator computes SimHash values for each sample and removes duplicates bas
 - The `hamming_distance` must be less than the number of blocks (`num_blocks`).
 - Only the first sample in each cluster is retained by default.
 
-使用SimHash在文档级别删除重复的样本。
+使用SimHash在文档级别去重样本。
 
-该运算符计算每个样本的SimHash值，并基于指定的汉明距离阈值删除重复值。它支持不同的标记化方法: “空间”，“标点” 和 “字符”。SimHash是在给定窗口大小的带状疱疹上计算的，并且重复数据删除过程对类似文档进行聚类，并且仅保留来自每个聚类的一个文档。默认模式将文本转换为小写，并且可以忽略特定模式。关键度量 (汉明距离) 用于确定SimHash值之间的相似性。重要注意事项:
-- 'ignore_pattern' 参数可用于在SimHash计算期间排除某些子字符串。
-- 对于基于标点符号的标记化，“ignore_pattern” 不应包含标点符号以避免冲突。
-- 'hamming_distance' 必须小于块数 ('num_blocks')。
-- 默认情况下，仅保留每个集群中的第一个样本。
+该算子为每个样本计算SimHash值，并根据指定的汉明距离阈值移除重复项。它支持不同的分词方法：'space'、'punctuation'和'character'。SimHash是在给定窗口大小的片段上计算的，去重过程将相似文档聚类并从每个聚类中仅保留一个。默认模式将文本转换为小写，并可以忽略特定模式。关键指标汉明距离用于确定SimHash值之间的相似性。重要提示：
+- 可以使用`ignore_pattern`参数在SimHash计算过程中排除某些子字符串。
+- 对于基于标点符号的分词，`ignore_pattern`不应包含标点符号以避免冲突。
+- `hamming_distance`必须小于区块数（`num_blocks`）。
+- 默认情况下，仅保留每个聚类中的第一个样本。
 
 Type 算子类型: **deduplicator**
 

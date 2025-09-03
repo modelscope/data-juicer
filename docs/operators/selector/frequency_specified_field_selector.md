@@ -4,9 +4,9 @@ Selector to filter samples based on the frequency of a specified field.
 
 This operator selects samples based on the frequency of values in a specified field. The field can be multi-level, with keys separated by dots. It supports filtering by either a top ratio or a fixed number (topk) of the most frequent values. If both top_ratio and topk are provided, the one resulting in fewer samples is used. The sorting order can be controlled with the reverse parameter. The operator processes the dataset and returns a new dataset containing only the selected samples.
 
-选择器根据指定字段的频率过滤样本。
+根据指定字段的频率筛选样本的选择器。
 
-此运算符根据指定字段中值的频率选择样本。该字段可以是多级的，键由点分隔。它支持按最高比率或最频繁值的固定数量 (topk) 进行过滤。如果提供了top_ratio和topk，则使用产生较少样本的那个。可以使用reverse参数控制排序顺序。运算符处理数据集并返回仅包含选定样本的新数据集。
+该算子根据指定字段的值频率选择样本。字段可以是多级的，键之间用点分隔。它支持按顶部比例或固定数量（topk）的最频繁值进行筛选。如果同时提供了 top_ratio 和 topk，则使用导致样本较少的那个。可以通过 reverse 参数控制排序顺序。该算子处理数据集并返回仅包含所选样本的新数据集。
 
 Type 算子类型: **selector**
 

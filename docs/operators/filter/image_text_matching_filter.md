@@ -4,9 +4,9 @@ Filter to keep samples with image-text matching scores within a specific range.
 
 This operator uses a Hugging Face BLIP model to compute the matching score between images and text. It keeps samples where the matching score falls within the specified `min_score` and `max_score` range. The key metric, `image_text_matching_score`, is computed for each image-text pair. If multiple images are associated with a single text, the scores can be reduced using 'avg', 'max', or 'min' modes. The operator supports horizontal and vertical flipping of images. Samples are kept based on either 'any' or 'all' strategy: 'any' keeps the sample if any image meets the condition, while 'all' keeps the sample only if all images meet the condition.
 
-过滤器将图像文本匹配分数的样本保持在特定范围内。
+过滤保留图像-文本匹配分数在特定范围内的样本。
 
-该算子使用拥抱面部BLIP模型来计算图像和文本之间的匹配分数。它会保留匹配分数在指定的 “min_score” 和 “max_score” 范围内的样本。为每个图像-文本对计算关键度量 “image_text_matching_score”。如果多个图像与单个文本相关联，则可以使用 “avg” 、 “max” 或 “min” 模式来降低分数。操作员支持图像的水平和垂直翻转。基于 “任何” 或 “全部” 策略保持样本: 如果任何图像满足条件，则 “任何” 保持样本，而 “全部” 仅在所有图像满足条件时保持样本。
+该算子使用 Hugging Face BLIP 模型计算图像和文本之间的匹配分数。它保留匹配分数落在指定 `min_score` 和 `max_score` 范围内的样本。关键指标 `image_text_matching_score` 为每个图像-文本对计算。如果多个图像与单个文本相关联，可以使用 'avg'、'max' 或 'min' 模式来减少分数。该算子支持图像的水平和垂直翻转。根据 'any' 或 'all' 策略保留样本：'any' 表示只要有任何一个图像满足条件就保留样本，而 'all' 则表示只有当所有图像都满足条件时才保留样本。
 
 Type 算子类型: **filter**
 

@@ -4,9 +4,9 @@ Filter to keep samples with a stopword ratio greater than a specified minimum va
 
 This operator computes the ratio of stopwords in a sample and retains samples where this ratio is above a given threshold. It supports multiple languages and can use a Hugging Face tokenizer for tokenization. The stopword ratio is calculated as the number of stopwords divided by the total number of words. If the ratio exceeds 1.0, it is capped at 1.0. The key metric used is 'stopwords_ratio', which is cached in the sample's stats. The operator also supports word augmentation for specific languages.
 
-过滤器以保留停止词比率大于指定最小值的样本。
+过滤以保留停用词比率大于指定最小值的样本。
 
-该运算符计算样本中停用词的比率，并保留该比率高于给定阈值的样本。它支持多种语言，并且可以使用拥抱面部标记器进行标记化。停用词比率被计算为停用词的数目除以词的总数。如果该比率超过1.0，则上限为1.0。使用的关键指标是 “stopwords_ratio”，它缓存在示例的统计信息中。该运算符还支持特定语言的单词增强。
+该算子计算样本中的停用词比率，并保留比率高于给定阈值的样本。它支持多种语言，并可以使用 Hugging Face 分词器进行分词。停用词比率计算为停用词数量除以总词数。如果比率超过 1.0，则将其限制为 1.0。使用的关键指标是 'stopwords_ratio'，该指标缓存在样本的统计信息中。算子还支持特定语言的词增强。
 
 Type 算子类型: **filter**
 

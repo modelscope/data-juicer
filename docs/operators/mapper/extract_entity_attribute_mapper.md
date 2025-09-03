@@ -4,9 +4,9 @@ Extracts attributes for given entities from the text and stores them in the samp
 
 This operator uses an API model to extract specified attributes for given entities from the input text. It constructs prompts based on provided templates and parses the model's output to extract attribute descriptions and supporting text. The extracted data is stored in the sample's metadata under the specified keys. If the required metadata fields already exist, the operator skips processing for that sample. The operator retries the API call and parsing up to a specified number of times in case of errors. The default system prompt, input template, and parsing patterns are used if not provided.
 
-从文本中提取给定实体的属性，并将其存储在示例的元数据中。
+从文本中提取给定实体的属性，并将其存储在样本的元数据中。
 
-此运算符使用API模型从输入文本中提取给定实体的指定属性。它根据提供的模板构造提示，并解析模型的输出以提取属性描述和支持文本。提取的数据存储在指定键下的示例元数据中。如果所需的元数据字段已经存在，则操作员跳过对该样本的处理。如果出现错误，操作员会重试API调用和解析，直到指定的次数。如果未提供，则使用默认的系统提示、输入模板和解析模式。
+该算子使用API模型从输入文本中提取给定实体的指定属性。它基于提供的模板构建提示，并解析模型的输出以提取属性描述和支持文本。提取的数据存储在样本的元数据中指定的键下。如果所需的元数据字段已经存在，该算子将跳过对该样本的处理。该算子在出现错误时最多重试指定次数的API调用和解析。如果没有提供默认系统提示、输入模板和解析模式，则使用默认值。
 
 Type 算子类型: **mapper**
 
