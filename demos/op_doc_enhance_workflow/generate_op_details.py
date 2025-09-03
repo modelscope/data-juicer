@@ -81,6 +81,30 @@ PROMPTS = {
         '{"selected": ["test_xxx", "test_yyy"], "explanations": {"test_xxx": "English explanation.\\n中文解释。", '
         '"test_yyy": "English explanation.\\n中文解释。"}}'
     ),
+    "translate_system": (
+        "You are a professional bilingual technical translator (English -> Simplified Chinese) "
+        "for machine learning documentation. Translate accurately and fluently for Chinese ML engineers.\n"
+        "Requirements:\n"
+        "- Keep Markdown formatting, lists, headings, indentation, and line breaks.\n"
+        "- Do NOT translate any code, inline code in backticks, URLs, environment variables, CLI flags, API names, or model names.\n"
+        "- Terminology constraints:\n"
+        "  * 'operator' -> '算子' (case-insensitive when used as the ML operator term)\n"
+        "  * 'Hugging Face' -> keep in English\n"
+        "  * 'token' -> keep in English\n"
+        "- Preserve technical accuracy; keep proper nouns and product names unchanged unless specified above.\n"
+        "- Do not add any explanations or extra text.\n"
+        "- Output only the translations, in the same order as input, and separated by the exact separator token provided.\n"
+        "- Do not wrap output in quotes or code fences; do not add leading or trailing separators."
+    ),
+    "translate_user_template": (
+        "You will receive multiple English text blocks that must be translated into Simplified Chinese.\n"
+        "Blocks are separated by the exact separator token shown below. Translate each block independently.\n"
+        "Return only the translated blocks, in the same order, separated by the exact same separator.\n"
+        "Separator token:\n"
+        "{separator}\n\n"
+        "English blocks:\n"
+        "{batch}\n"
+    ),
 }
 
 
@@ -309,6 +333,7 @@ def param_signature_to_list(sig, param_docs):
 # Test processing
 # -----------------------------------------------------------------------------
 
+
 def process_test_file(pyfile: Path):
     """Parse a test file and extract test case information."""
     return extract_test_info_from_path(pyfile)
@@ -422,11 +447,48 @@ def split_bilingual_text(text):
 
 def get_op_desc_in_en_zh_batched(descs):
     """
-    Translate a list of English descriptions to Chinese in batches and return
-    merged bilingual descriptions. Batch split is based on length.
+    Translate a list of English descriptions to Chinese in batches using LLM
+    and return merged bilingual descriptions. Batch split is based on length.
+    Terminology rules:
+      - operator -> 算子
+      - Hugging Face -> keep English
+      - token -> keep English
     """
+    if not descs:
+        return []
     separator = "\n\n******\n\n"
     limit = int(5e3)
+
+    def _translate_batch_with_llm(batch_text, sep):
+        system = PROMPTS.get("translate_system") or (
+            "You are a professional bilingual technical translator (English -> Simplified Chinese)."
+        )
+        user = PROMPTS.get("translate_user_template", "Translate with separator {separator}:\n{batch}").format(
+            separator=sep,
+            batch=batch_text,
+        )
+
+        retry = 0
+        last_err = None
+        while retry < 3:
+            try:
+                content = chat(
+                    [
+                        {"role": "system", "content": system},
+                        {"role": "user", "content": user},
+                    ]
+                )
+                if isinstance(content, str):
+                    return content
+                else:
+                    last_err = RuntimeError(f"Unexpected response type: {type(content)}, content={content}")
+            except Exception as e:
+                last_err = e
+                print(f"[LLM translate] error: {e} retry={retry} len_batch={len(batch_text)}")
+            retry += 1
+        print(f"[LLM translate] failed after retries. last_err={last_err}")
+        return None
+
     batch = separator.join(descs)
     if len(batch) > limit:
         split_idx = int(len(descs) / 2)
@@ -434,22 +496,15 @@ def get_op_desc_in_en_zh_batched(descs):
         res2 = get_op_desc_in_en_zh_batched(descs[split_idx:])
         return res1 + res2
     else:
-        retry = 0
-        res = None
-        while retry < 3 and not res:
-            try:
-                res = ts.translate_text(batch, translator="alibaba", from_language="en", to_language="zh")
-            except Exception as e:
-                print(f"❌: {e} retry {retry} len_batch: {len(batch)}")
-                print(f"{batch}")
-                retry += 1
+        res = _translate_batch_with_llm(batch, separator)
+
     if not res:
         zhs = [""] * len(descs)
     else:
-        print(f"[Translate] ori_len: {len(batch)}")
-        res = re.sub(r"^-(?! )", "- ", res, flags=re.MULTILINE)
-        res = res.replace("&#39;[", "`").replace("]&#39;", "`").replace("&#39;", "'")
+        print(f"[LLM Translate] ori_len: {len(batch)}")
         zhs = res.split(separator)
+        assert len(zhs) == len(descs)
+
     assert len(zhs) == len(descs)
     return [desc + "\n\n" + zh.strip() for desc, zh in zip(descs, zhs)]
 

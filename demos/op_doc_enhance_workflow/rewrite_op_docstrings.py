@@ -3,6 +3,9 @@
 import ast
 import glob
 import json
+import subprocess
+from pathlib import Path
+
 import os
 import shutil
 import textwrap
@@ -203,8 +206,10 @@ DEFAULT_SYSTEM_PROMPT = (
     "- Hard wrap lines at 72 characters.\n"
     "- Preserve all substantive information from the original docstring; "
     "do not omit unique caveats or modes.\n"
+    "- Preserve all links, references, citations, and documentation URLs from the original docstring.\n"
+    "- If the operator name contains 'ray', explicitly mention it operates in Ray distributed mode.\n"
     "- Add a blank line after the first summary sentence.\n"
-    "- If external models/tokenizers are used, mention them at a high level (“uses a Hugging Face tokenizer”), without specific model IDs unless strictly necessary.\n"
+    "- If external models/tokenizers are used, mention them at a high level ('uses a Hugging Face tokenizer'), without specific model IDs unless strictly necessary.\n"
     "- Do not include triple quotes or code fences; return only the docstring body text."
 )
 
@@ -430,6 +435,50 @@ def run_workflow(
 # main
 # ---------------------------
 
+def get_git_modified_files():
+    """Get the list of files that have been modified but not submitted in git"""
+    try:
+        result = subprocess.run(
+            ['git', 'diff', '--name-only', 'HEAD'],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        modified_files = result.stdout.strip().split('\n') if result.stdout.strip() else []
+        
+        result_new = subprocess.run(
+            ['git', 'ls-files', '--others', '--exclude-standard'],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        new_files = result_new.stdout.strip().split('\n') if result_new.stdout.strip() else []
+        
+        return modified_files + new_files
+    except subprocess.CalledProcessError:
+        print("Warning: Unable to get git status, may not be in git repository")
+        return []
+
+def is_operator_file(file_path):
+    path = Path(file_path)
+    
+    if path.suffix != '.py':
+        return False
+    
+    return (
+        'ops' in path.parts and 'data_juicer' in path.parents
+    )
+
+def get_modified_operator_files():
+    """Get locally modified operator files list"""
+    modified_files = get_git_modified_files()
+    operator_files = []
+    
+    for file_path in modified_files:
+        if file_path and is_operator_file(file_path) and os.path.exists(file_path):
+            operator_files.append(file_path)
+    
+    return operator_files
 
 def main():
     ops_dir = "data_juicer/ops"
@@ -445,5 +494,27 @@ def main():
     print(json.dumps(results, ensure_ascii=False, indent=2))
 
 
+def update_modified_operator_docstrings():
+    # Get locally modified operator files
+    modified_operator_files = get_modified_operator_files()
+    
+    if not modified_operator_files:
+        print("No locally modified operator file found")
+        return
+    
+    print(f"Found {len(modified_operator_files)} modified operator files:")
+    for file_path in modified_operator_files:
+        print(f"  - {file_path}")
+    
+    # Process each file
+    for file_path in modified_operator_files:
+        print(f"\nProcessing file: {file_path}")
+        try:
+            rewrite_file_ops(file_path, chat, dry_run=False, backup=False)
+            print(f"✅ Successfully updated: {file_path}")
+        except Exception as e:
+            print(f"❌ Failed to process {file_path}: {e}")
+
+
 if __name__ == "__main__":
-    main()
+    update_modified_operator_docstrings()
