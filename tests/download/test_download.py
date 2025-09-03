@@ -9,8 +9,9 @@ from data_juicer.download.wikipedia import (
     get_wikipedia_urls, download_wikipedia,
     WikipediaDownloader, WikipediaIterator, WikipediaExtractor
 )
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-class TestDownload(unittest.TestCase):
+class TestDownload(DataJuicerTestCaseBase):
     def setUp(self):
         super().setUp()
         # Creates a temporary directory that persists until you delete it

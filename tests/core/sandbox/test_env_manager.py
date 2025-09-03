@@ -3,9 +3,10 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from data_juicer.core.sandbox.env_manager import CondaEnv, VirtualEnv
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class TestCondaEnv(unittest.TestCase):
+class TestCondaEnv(DataJuicerTestCaseBase):
     def setUp(self):
         super().setUp()
 
@@ -132,7 +133,7 @@ class TestCondaEnv(unittest.TestCase):
         self.assertTrue(mock_run.called)
 
 
-class TestVirtualEnv(unittest.TestCase):
+class TestVirtualEnv(DataJuicerTestCaseBase):
     def setUp(self):
         super().setUp()
 

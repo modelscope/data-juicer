@@ -10,7 +10,13 @@ from jsonargparse import dict_to_namespace, namespace_to_dict
 from loguru import logger
 
 from data_juicer.config import merge_config, prepare_side_configs
+from data_juicer.core.sandbox.context_infos import (
+    ContextInfos,
+    GlobalContextInfos,
+    PipelineInfos,
+)
 from data_juicer.core.sandbox.hooks import register_hook
+from data_juicer.core.sandbox.utils import validate_hook_output
 from data_juicer.utils.constant import JobRequiredKeys
 
 
@@ -104,6 +110,60 @@ class SandBoxWatcher:
         wandb.config.update(merged_cfgs)
 
 
+class Target:
+
+    SUPPORT_OPS = ["==", ">=", "<=", ">", "<"]
+
+    key: str
+    op: str
+    tgt_val: float
+
+    def __init__(self, iter_target_str: str = None, key: str = None, op: str = None, tgt_val: float = None):
+        if iter_target_str is not None:
+            self.parse_iter_targets(iter_target_str)
+        else:
+            self.key = key
+            self.op = op
+            self.tgt_val = tgt_val
+
+    def parse_iter_targets(self, iter_target_str):
+        for op in self.SUPPORT_OPS:
+            if op in iter_target_str:
+                target_key, target_value = [s.strip() for s in iter_target_str.split(op)]
+                # check if the target value is a number
+                try:
+                    target_value = float(target_value)
+                except:  # noqa: E722
+                    logger.error(
+                        f"Invalid iter_targets [{iter_target_str}]: The target value [{target_value}] "
+                        "is not a valid number."
+                    )
+                    exit(1)
+                self.key = target_key
+                self.op = op
+                self.tgt_val = target_value
+                break
+        else:
+            logger.error(
+                f"Invalid iter_targets [{iter_target_str}]: No valid comparators are found."
+                f"Only support {self.SUPPORT_OPS}"
+            )
+            exit(1)
+
+    def check_target(self, context_infos: ContextInfos):
+        curr_val = context_infos[self.key]
+        try:
+            logger.debug(f"Checking {curr_val} {self.op} {self.tgt_val}")
+            ret = eval(f"{curr_val} {self.op} {self.tgt_val}")
+        except:  # noqa: E722
+            logger.error(f"Invalid iter_targets [{str(self)}]: The target value [{curr_val}] " "is not a valid number.")
+            return False
+        return ret
+
+    def __str__(self):
+        return f"{self.key} {self.op} {self.tgt_val}"
+
+
 class SandboxPipeline:
     def __init__(self, pipeline_name="anonymous", pipeline_cfg=None, watcher=None):
         """
@@ -139,17 +199,17 @@ class SandboxPipeline:
         for job_cfg in self.cfg.get("evaluation_job_configs", []):
             self.evaluation_jobs.append(register_hook(job_cfg, self.watcher))
 
-    def run(self, **pipeline_infos):
+    def run(self, context_infos: ContextInfos):
         """
         Running the sandbox pipeline at once or in HPO style.
         """
         if self.cfg.hpo_config is not None:
             # execute_hpo_wandb contains running one_trail with HPO scheduler
-            return self.execute_hpo_wandb(**pipeline_infos)
+            return self.execute_hpo_wandb(context_infos)
         else:
-            return self.one_trial(**pipeline_infos)
+            return self.one_trial(context_infos)
 
-    def one_trial(self, **context_infos):
+    def one_trial(self, context_infos: ContextInfos):
         """
         Running the sandbox pipeline at once.
          Users can flexibly conduct some steps of the whole sandbox pipeline
@@ -164,37 +224,50 @@ class SandboxPipeline:
             self.cfg = merge_config(self.cfg, wandb.config)
             self.watcher.watch_cfgs([self.cfg, "after_hpo"])
 
-        if self.name in context_infos:
+        if self.name in context_infos.pipeline_names:
             raise ValueError(f"There are different pipelines with the same pipeline name {self.name}.")
-        context_infos[self.name] = []
+        pipeline_infos = PipelineInfos(self.name)
+        context_infos.record_pipeline_infos(pipeline_infos)
 
         # ====== Data & model probe ======
         for probe_hook in self.probe_jobs:
-            logger.info(f"======= Pipeline [{self.name}]: Start Probe Hook [{probe_hook.meta_name}] =======")
-            new_job_infos = probe_hook.run(**context_infos)
-            context_infos[self.name].append(new_job_infos)
+            logger.info(
+                f"======= Iter [{context_infos.iter}] - Pipeline [{self.name}]: Start Probe Hook [{probe_hook.meta_name}] ======="
+            )
+            new_job_infos = probe_hook.run(context_infos)
+            context_infos[self.name].record_job_infos(new_job_infos)
+            logger.debug(f"Context Infos: {context_infos.to_dict()}")
 
         # ====== Data-model recipes iteration based on probe results ======
         for refine_hook in self.refine_recipe_jobs:
-            logger.info(f"======= Pipeline [{self.name}]: Start Refine Hook [{refine_hook.meta_name}] =======")
-            new_job_infos = refine_hook.run(**context_infos)
-            context_infos[self.name].append(new_job_infos)
+            logger.info(
+                f"======= Iter [{context_infos.iter}] - Pipeline [{self.name}]: Start Refine Hook [{refine_hook.meta_name}] ======="
+            )
+            new_job_infos = refine_hook.run(context_infos)
+            context_infos[self.name].record_job_infos(new_job_infos)
+            logger.debug(f"Context Infos: {context_infos.to_dict()}")
 
         # ====== Data processing & model training ======
         for exec_hook in self.execution_jobs:
-            logger.info(f"======= Pipeline [{self.name}]: Start Execution Hook [{exec_hook.meta_name}] =======")
-            new_job_infos = exec_hook.run(**context_infos)
-            context_infos[self.name].append(new_job_infos)
+            logger.info(
+                f"======= Iter [{context_infos.iter}] - Pipeline [{self.name}]: Start Execution Hook [{exec_hook.meta_name}] ======="
+            )
+            new_job_infos = exec_hook.run(context_infos)
+            context_infos[self.name].record_job_infos(new_job_infos)
+            logger.debug(f"Context Infos: {context_infos.to_dict()}")
 
         # ====== Evaluation on processed data or trained model ======
         for eval_hook in self.evaluation_jobs:
-            logger.info(f"======= Pipeline [{self.name}]: Start Evaluation Hook [{eval_hook.meta_name}] =======")
-            new_job_infos = eval_hook.run(**context_infos)
-            context_infos[self.name].append(new_job_infos)
+            logger.info(
+                f"======= Iter [{context_infos.iter}] - Pipeline [{self.name}]: Start Evaluation Hook [{eval_hook.meta_name}] ======="
+            )
+            new_job_infos = eval_hook.run(context_infos)
+            context_infos[self.name].record_job_infos(new_job_infos)
+            logger.debug(f"Context Infos: {context_infos.to_dict()}")
 
         return context_infos
 
-    def execute_hpo_wandb(self, **pipeline_infos):
+    def execute_hpo_wandb(self, context_infos):
         """
         Running the sandbox pipeline in HPO style.
          Users can flexibly conduct some steps of the whole sandbox pipeline
@@ -244,6 +317,39 @@ class SandBoxExecutor:
 
         self.resume = self.cfg.get("resume", False)
 
+        # iterative related
+        self.max_iter_num = self.cfg.get("max_iter_num", 1)
+        init_targets = self.cfg.get("iter_targets", [])
+        # if both of them are not set
+        if self.max_iter_num < 0:
+            logger.error(f"Argument 'max_iter_num' must be 0 or a positive number. Got [{self.max_iter_num}].")
+            exit(1)
+        if not isinstance(init_targets, list):
+            init_targets = [init_targets]
+        if self.max_iter_num == 0 and len(init_targets) == 0:
+            logger.error(
+                "Either 'max_iter_num' must be > 0 or 'iter_targets' must be set. "
+                "If you want to run the pipeline without iterative, please leave both arguments at their default values"
+                " or set 'max_iter_num' to 1."
+            )
+            exit(1)
+
+        init_targets = [Target(iter_target_str=iter_target_str) for iter_target_str in init_targets]
+
+        self.iter_targets = []
+        for target in init_targets:
+            if not validate_hook_output(self.pipelines, target.key):
+                logger.error(
+                    f"Invalid iter_targets [{str(target)}]: "
+                    f"The target metric key [{target.key}] can not found in the pipelines."
+                )
+            self.iter_targets.append(target)
+
+        self.iter_targets_mode = self.cfg.get("iter_targets_mode", "all")
+
+        # iterative updater for config arguments
+        self.iter_updater = self.cfg.get("iter_updater", {})
+
     def parse_pipelines(self, cfg):
         """
         Parse the pipeline configs.
@@ -273,6 +379,43 @@ class SandBoxExecutor:
             pipeline = SandboxPipeline(pipeline_cfg=self.specify_jobs_configs(cfg), watcher=self.watcher)
             pipelines.append(pipeline)
         return pipelines
+
+    def iterative_update_pipelines(self, current_pipelines: List[SandboxPipeline], last_context_infos: ContextInfos):
+        if current_pipelines is None:
+            return None
+        if last_context_infos is None or len(last_context_infos) == 0:
+            return current_pipelines
+
+        # get the pipeline configs
+        for from_key, target_key in self.iter_updater.items():
+            from_value = last_context_infos[from_key]
+            if from_value is not None:
+                cfg_levels = target_key.split(".")
+                if len(cfg_levels) < 4:
+                    raise ValueError(
+                        f"The target key [{target_key}] must be in the format of "
+                        f"<pipeline_name>.<hook_meta_name>.[extra_configs|dj_configs].<hook_cfg_key1>[.<hook_cfg_keyn>]."
+                    )
+                tgt_pipeline_name = cfg_levels[0]
+                tgt_hook_meta_name = cfg_levels[1]
+                tgt_local_key = ".".join(cfg_levels[2:])
+                for i in range(len(current_pipelines)):
+                    current_pipeline = current_pipelines[i]
+                    if current_pipeline.name == tgt_pipeline_name:
+                        all_hooks = (
+                            current_pipeline.probe_jobs
+                            + current_pipeline.refine_recipe_jobs
+                            + current_pipeline.execution_jobs
+                            + current_pipeline.evaluation_jobs
+                        )
+                        for hook in all_hooks:
+                            if hook.meta_name == tgt_hook_meta_name:
+                                # put the updated configs key/values into the local settings
+                                hook.local_settings[tgt_local_key] = from_value
+                    current_pipelines[i] = current_pipeline
+            else:
+                logger.warning(f"The iter_updater [{from_key}] is not found in the last context infos.")
+        return current_pipelines
 
     def specify_job_configs(self, ori_config):
         config = prepare_side_configs(ori_config)
@@ -313,38 +456,85 @@ class SandBoxExecutor:
 
     def run(self):
         context_infos_path = os.path.join(self.cfg.work_dir, "context_infos.json")
+        num_pipeline_skip = 0
+        last_context_infos = ContextInfos(iter=0)
         if self.resume and os.path.exists(context_infos_path):
             # load context infos from the existing one
-            context_infos = json.load(open(context_infos_path, "r"))
-            # find those finished pipelines
-            finished_pipelines = set(context_infos.keys())
-            left_pipelines = []
-            for pipeline in self.pipelines:
-                # check if the pipeline is already existing in the context infos
-                if pipeline.name in finished_pipelines:
-                    # check if the number of job infos is the same as the number of all kinds of jobs,
-                    # which means all jobs are finished
-                    num_job_infos = len(context_infos[pipeline.name])
-                    num_jobs = (
-                        len(pipeline.probe_jobs)
-                        + len(pipeline.refine_recipe_jobs)
-                        + len(pipeline.execution_jobs)
-                        + len(pipeline.evaluation_jobs)
-                    )
-                    if num_job_infos == num_jobs:
-                        logger.info(
-                            f"Pipeline {pipeline.name} is finished and loaded from the existing context infos. Skip it!"
+            context_infos_list = json.load(open(context_infos_path, "r"))
+            context_infos_list = GlobalContextInfos.from_list(context_infos_list)
+            current_iter = len(context_infos_list)
+            if current_iter == 0:
+                logger.info("The context infos file is empty. Start from the first iter.")
+            else:
+                logger.info(f"Continue from the iter {current_iter}.")
+                current_iter -= 1
+                last_context_infos = context_infos_list[-1]
+                context_infos_list = context_infos_list[:-1]
+                # find those finished pipelines
+                finished_pipelines = set(last_context_infos.pipeline_names)
+                for pipeline in self.pipelines:
+                    # check if the pipeline is already existing in the context infos
+                    if pipeline.name in finished_pipelines:
+                        # check if the number of job infos is the same as the number of all kinds of jobs,
+                        # which means all jobs are finished
+                        num_job_infos = len(last_context_infos[pipeline.name])
+                        num_jobs = (
+                            len(pipeline.probe_jobs)
+                            + len(pipeline.refine_recipe_jobs)
+                            + len(pipeline.execution_jobs)
+                            + len(pipeline.evaluation_jobs)
                         )
-                        continue
-                left_pipelines.append(pipeline)
-            self.pipelines = left_pipelines
+                        if num_job_infos == num_jobs:
+                            logger.info(
+                                f"Pipeline {pipeline.name} is finished and loaded from the existing context infos. Skip it!"
+                            )
+                            num_pipeline_skip += 1
+                            continue
         else:
-            context_infos = {}
+            context_infos_list = GlobalContextInfos()
+            current_iter = 0
 
         try:
-            for pipeline in self.pipelines:
-                context_infos = pipeline.run(**context_infos)
+            current_pipelines = deepcopy(self.pipelines)
+            while True:
+                current_iter += 1
+                logger.info(f"============== Starting the iter {current_iter} ==============")
+                if num_pipeline_skip > 0:
+                    context_infos = last_context_infos
+                else:
+                    context_infos = ContextInfos(iter=current_iter)
+                for pipeline in current_pipelines:
+                    if num_pipeline_skip > 0:
+                        num_pipeline_skip -= 1
+                        continue
+                    context_infos = pipeline.run(context_infos)
+                context_infos_list.record_context_infos(context_infos)
+
+                # check if the pipelines reach the max number of iterations
+                if 0 < self.max_iter_num <= current_iter:
+                    break
+                # check if the running meet the targets
+                if len(self.iter_targets) > 0:
+                    curr_target_results = [iter_target.check_target(context_infos) for iter_target in self.iter_targets]
+                    if self.iter_targets_mode == "all":
+                        if all(curr_target_results):
+                            logger.info("All targets are satisfied.")
+                            break
+                    elif self.iter_targets_mode == "any":
+                        if any(curr_target_results):
+                            satisfied_idxes = [
+                                idx for idx, curr_target_result in enumerate(curr_target_results) if curr_target_result
+                            ]
+                            satisfied_targets = [str(self.iter_targets[idx]) for idx in satisfied_idxes]
+                            logger.info(f"Targets {satisfied_targets} are satisfied.")
+                            break
+
+                # check if there are any arguments to be updated from the last iteration
+                if len(self.iter_updater) > 0:
+                    logger.info("Updating arguments across iterations...")
+                    current_pipelines = deepcopy(self.pipelines)
+                    current_pipelines = self.iterative_update_pipelines(current_pipelines, context_infos)
         finally:
             # export context infos
             with open(context_infos_path, "w") as fout:
-                json.dump(context_infos, fout, indent=4)
+                json.dump(context_infos_list.to_list(), fout, indent=4)
