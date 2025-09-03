@@ -466,7 +466,7 @@ def is_operator_file(file_path):
         return False
     
     return (
-        'ops' in path.parts and 'data_juicer' in path.parents
+        'ops' in path.parts and 'data_juicer' in path.parts
     )
 
 def get_modified_operator_files():
