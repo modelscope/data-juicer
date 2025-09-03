@@ -3,10 +3,14 @@ import os
 import subprocess
 
 import multiprocess as mp
-import psutil
 from loguru import logger
 
-from data_juicer import cuda_device_count
+from data_juicer.utils.resource_utils import (
+    available_gpu_memories,
+    available_memories,
+    cpu_count,
+    cuda_device_count,
+)
 
 
 def setup_mp(method=None):
@@ -54,7 +58,7 @@ def calculate_np(name, mem_required, cpu_required, num_proc=None, use_cuda=False
 
     if use_cuda:
         auto_num_proc = None
-        cuda_mem_available = get_min_cuda_memory() / 1024
+        cuda_mems_available = [m / 1024 for m in available_gpu_memories()]  # GB
         if mem_required == 0:
             logger.warning(
                 f"The required cuda memory of Op[{name}] "
@@ -66,12 +70,14 @@ def calculate_np(name, mem_required, cpu_required, num_proc=None, use_cuda=False
                 f"config_all.yaml file."
             )
         else:
-            auto_num_proc = math.floor(cuda_mem_available / mem_required) * cuda_device_count()
-            if cuda_mem_available / mem_required < 1.0:
+            auto_num_proc = sum(
+                [math.floor(cuda_mem_available / mem_required) for cuda_mem_available in cuda_mems_available]
+            )
+            if auto_num_proc < cuda_device_count():
                 logger.warning(
                     f"The required cuda memory:{mem_required}GB might "
-                    f"be more than the available cuda memory:"
-                    f"{cuda_mem_available}GB."
+                    f"be more than the available cuda devices memory list:"
+                    f"{cuda_mems_available}GB."
                     f"This Op[{name}] might "
                     f"require more resource to run."
                 )
@@ -85,35 +91,39 @@ def calculate_np(name, mem_required, cpu_required, num_proc=None, use_cuda=False
                     f"on the mem_required of Op[{name}]. "
                     f"Set the `num_proc` to {auto_num_proc}."
                 )
-        elif not auto_num_proc and not num_proc:
+        elif auto_num_proc is None and num_proc is None:
             op_proc = cuda_device_count()
             logger.warning(
                 f"Both mem_required and num_proc of Op[{name}] are not set."
                 f"Set the `num_proc` to number of GPUs {op_proc}."
             )
         else:
-            op_proc = auto_num_proc if auto_num_proc else num_proc
+            op_proc = auto_num_proc if auto_num_proc is not None else num_proc
 
-        op_proc = max(op_proc, 1)
+        if op_proc <= 1:
+            op_proc = len(available_memories())  # number of processes is equal to the number of nodes
         return op_proc
     else:
+        cpu_num = cpu_count()
         if num_proc is None:
-            num_proc = psutil.cpu_count()
+            num_proc = cpu_num
 
         op_proc = num_proc
-        cpu_available = psutil.cpu_count()
-        mem_available = psutil.virtual_memory().available
-        mem_available = mem_available / 1024**3
-        op_proc = min(op_proc, math.floor(cpu_available / cpu_required + eps))
-        op_proc = min(op_proc, math.floor(mem_available / (mem_required + eps)))
+        mems_available = [m / 1024 for m in available_memories()]  # GB
+        auto_proc_from_mem = sum([math.floor(mem_available / (mem_required + eps)) for mem_available in mems_available])
+        auto_proc_from_cpu = math.floor(cpu_num / (cpu_required + eps))
+
+        op_proc = min(op_proc, auto_proc_from_mem, auto_proc_from_cpu)
+
         if op_proc < 1.0:
             logger.warning(
                 f"The required CPU number:{cpu_required} "
                 f"and memory:{mem_required}GB might "
-                f"be more than the available CPU:{cpu_available} "
-                f"and memory :{mem_available}GB."
+                f"be more than the available CPU:{cpu_num} "
+                f"and memory :{mems_available}GB."
                 f"This Op [{name}] might "
                 f"require more resource to run."
             )
-        op_proc = max(op_proc, 1)
+        if op_proc <= 1:
+            op_proc = len(available_memories())  # number of processes is equal to the number of nodes
         return op_proc

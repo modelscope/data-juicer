@@ -90,7 +90,7 @@ class RequiredFieldsValidatorTest(DataJuicerTestCaseBase):
         from data_juicer.core.data.ray_dataset import RayDataset
         
         # Create ray dataset
-        self.ray_dataset = RayDataset(ray.data.from_items(self.data))    
+        ray_dataset = RayDataset(ray.data.from_items(self.data))
 
         """Test validation with RayDataset"""
         config = {
@@ -104,7 +104,7 @@ class RequiredFieldsValidatorTest(DataJuicerTestCaseBase):
         validator = RequiredFieldsValidator(config)
         
         # Should pass
-        validator.validate(self.ray_dataset)
+        validator.validate(ray_dataset)
 
     def test_invalid_dataset_type(self):
         """Test validation with unsupported dataset type"""
@@ -133,12 +133,12 @@ class RequiredFieldsValidatorTest(DataJuicerTestCaseBase):
         from data_juicer.core.data.ray_dataset import RayDataset
 
         # Create ray dataset
-        self.ray_dataset = RayDataset(ray.data.from_items(self.data))    
+        ray_dataset = RayDataset(ray.data.from_items(self.data))
 
         """Test validation works with different dataset types"""
         datasets_to_test = [
             ('nested', self.dataset),
-            ('ray', self.ray_dataset)
+            ('ray', ray_dataset)
         ]
         
         config = {
