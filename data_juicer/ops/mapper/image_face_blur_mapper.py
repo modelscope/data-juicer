@@ -28,7 +28,7 @@ class ImageFaceBlurMapper(Mapper):
     specified blur type to the detected face regions. The blur types supported are 'mean',
     'box', and 'gaussian'. The radius of the blur kernel can be adjusted. If no save
     directory is provided, the modified images will be saved in the same directory as the
-    input files. The operator uses a Hugging Face tokenizer for text processing if needed."""
+    input files."""
 
     _default_kwargs = {
         "scaleFactor": 1.1,

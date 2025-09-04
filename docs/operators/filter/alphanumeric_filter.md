@@ -4,7 +4,7 @@ Filter to keep samples with an alphabet/numeric ratio within a specific range.
 
 This operator filters samples based on the ratio of alphanumeric characters or tokens. It keeps samples where the ratio of alphanumeric characters (or tokens) to the total number of characters (or tokens) is within the specified range. The ratio is computed either character-based or token-based, depending on the `tokenization` parameter. If `tokenization` is True, it uses a Hugging Face tokenizer to count tokens. The key metric used for filtering is 'alpha_token_ratio' if tokenization is enabled, otherwise 'alnum_ratio'. The operator caches these metrics in the stats field for each sample.
 
-过滤保留字母/数字比例在特定范围内的样本。
+用来保留字母/数字比例在特定范围内的样本的过滤器。
 
 该算子根据字母数字字符或 token 的比例来过滤样本。它保留字母数字字符（或 token）与总字符（或 token）数的比例在指定范围内的样本。比例根据 `tokenization` 参数计算，可以是基于字符的或基于 token 的。如果 `tokenization` 为 True，则使用 Hugging Face 分词器来计数 token。用于过滤的关键指标是启用分词时的 'alpha_token_ratio'，否则为 'alnum_ratio'。该算子在每个样本的 stats 字段中缓存这些指标。
 

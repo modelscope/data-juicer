@@ -4,7 +4,7 @@ Filter to keep texts based on their instruction following difficulty (IFD, https
 
 This operator computes the IFD score for each sample, which is the ratio of the loss with and without the query. It keeps samples where the IFD score falls within a specified range. The IFD score is calculated using a Hugging Face tokenizer and model. If the IFD score is already cached in the 'ifd_score' field, it will be reused. The operator decides to keep or filter samples based on the provided minimum and maximum IFD score thresholds.
 
-根据文本的指令跟随难度（IFD，https://arxiv.org/abs/2308.12032）分数来过滤保留文本。
+根据文本的指令跟随难度 (IFD，https://arxiv.org/abs/2308.12032) 分数来过滤保留文本。
 
 该算子为每个样本计算IFD分数，即有无查询时的损失比率。它保留IFD分数在指定范围内的样本。IFD分数是使用Hugging Face的tokenizer和模型计算的。如果IFD分数已经缓存在'ifd_score'字段中，则会重用该分数。该算子根据提供的最小和最大IFD分数阈值来决定保留或过滤样本。
 

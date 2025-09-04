@@ -4,7 +4,7 @@ Filter to keep samples with perplexity score in a specified range.
 
 This operator computes the perplexity of text samples using a Hugging Face tokenizer and a KenLM language model. It keeps samples with perplexity scores within the specified minimum and maximum values. The perplexity is calculated character-based by default. If the perplexity is already computed, it will be reused from the 'perplexity' field in the sample's stats. The operator supports batched operations for efficiency.
 
-过滤保留指定困惑度范围内的样本。
+用于保留指定困惑度范围内的样本的过滤器。
 
 该算子使用 Hugging Face 分词器和 KenLM 语言模型计算文本样本的困惑度。它保留困惑度分数在指定最小值和最大值范围内的样本。默认情况下，困惑度是基于字符计算的。如果困惑度已经计算过，则会从样本的 stats 中的 'perplexity' 字段重用。该算子支持批量操作以提高效率。
 

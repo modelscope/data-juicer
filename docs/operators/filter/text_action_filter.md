@@ -4,7 +4,7 @@ Filter to keep texts that contain a minimum number of actions.
 
 This operator uses a Spacy model to detect actions in the text. It keeps samples if the number of detected actions meets or exceeds the specified minimum. The supported languages are English ('en') and Chinese ('zh'). The 'num_action' statistic is computed and cached for each sample. Actions are identified based on part-of-speech (POS) tags and specific tags for verbs.
 
-过滤以保留包含最少动作数量的文本。
+用于保留包含最少动作数量的文本的过滤器。
 
 该算子使用 Spacy 模型检测文本中的动作。如果检测到的动作数量达到或超过指定的最小值，则保留样本。支持的语言是英语 ('en') 和中文 ('zh')。'num_action' 统计数据为每个样本计算并缓存。动作基于词性 (POS) 标签和特定动词标签进行识别。
 

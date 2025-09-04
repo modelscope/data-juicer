@@ -4,7 +4,7 @@ Filter to keep texts whose average embedding similarity to a set of given valida
 
 This operator computes the cosine similarity between the text embeddings and a set of validation text embeddings. It keeps samples where the average similarity score is within the specified range. The key metric, 'text_embd_similarity', is computed as the mean cosine similarity. The operator supports both API-based and Hugging Face model- based embeddings. If no valid dataset is provided, the `prepare_valid_feature` method must be called manually before applying the filter.
 
-过滤以保留与一组给定验证文本的平均嵌入相似度在特定范围内的文本。
+用于保留与一组给定验证文本的平均嵌入相似度在特定范围内的文本的过滤器。
 
 该算子计算文本嵌入与一组验证文本嵌入之间的余弦相似度。如果平均相似度得分在指定范围内，则保留样本。关键指标 'text_embd_similarity' 计算为平均余弦相似度。算子支持基于 API 和基于 Hugging Face 模型的嵌入。如果没有提供有效的数据集，则必须在应用过滤之前手动调用 `prepare_valid_feature` 方法。
 

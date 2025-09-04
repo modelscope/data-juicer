@@ -4,9 +4,9 @@ Filter to keep data samples with aesthetics scores for specified frames in the v
 
 This operator evaluates the aesthetic quality of video frames using a Hugging Face model. It keeps samples where the aesthetics scores of the specified frames fall within a given range. The key metric, 'video_frames_aesthetics_score', is computed by averaging, taking the max, or min of the frame scores, depending on the reduce mode. Frame sampling can be done uniformly or by extracting all keyframes. The filter applies a 'any' or 'all' strategy to decide if a sample should be kept based on the scores of multiple videos.
 
-过滤以保留视频中指定帧的美学评分在特定范围内的数据样本。
+用于保留视频中指定帧的美学评分在特定范围内的数据样本的过滤器。
 
-该算子使用Hugging Face模型评估视频帧的美学质量。它保留指定帧的美学评分在给定范围内的样本。关键指标'video_frames_aesthetics_score'通过平均、取最大值或最小值的方式计算帧评分，具体取决于减少模式。帧采样可以均匀进行或提取所有关键帧。该过滤器应用'any'或'all'策略来决定是否根据多个视频的评分保留样本。
+该算子使用Hugging Face模型评估视频帧的美学质量。它保留指定帧的美学评分在给定范围内的样本。关键指标'video_frames_aesthetics_score'通过平均、取最大值或最小值的方式计算帧评分，具体取决于归约模式。帧采样可以均匀进行或提取所有关键帧。该过滤器应用'any'或'all'策略来决定是否根据多个视频的评分保留样本。
 
 Type 算子类型: **filter**
 

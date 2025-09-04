@@ -4,7 +4,7 @@ Filter to keep samples with perplexity scores within a specified range, computed
 
 This operator computes the perplexity score for each sample using a Hugging Face LLM. It then filters the samples based on whether their perplexity scores fall within the specified minimum and maximum score range. The perplexity score is calculated as the exponential of the loss value from the LLM. The operator uses a query and response template to format the input text for the LLM. If the perplexity score is not already cached in the sample's stats under the key 'llm_perplexity', it will be computed.
 
-过滤保留使用指定 LLM 计算出的困惑度分数在指定范围内的样本。
+用于保留使用指定 LLM 计算出的困惑度分数在指定范围内的样本的过滤器。
 
 该算子使用 Hugging Face LLM 为每个样本计算困惑度分数。然后根据困惑度分数是否落在指定的最小和最大分数范围内来过滤样本。困惑度分数计算为 LLM 损失值的指数。该算子使用查询和响应模板来格式化输入 LLM 的文本。如果困惑度分数尚未缓存在样本的统计信息中 'llm_perplexity' 键下，则会进行计算。
 

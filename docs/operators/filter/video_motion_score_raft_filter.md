@@ -14,7 +14,7 @@ For further details, refer to the official torchvision documentation: https://py
 
 The original paper on RAFT is available here: https://arxiv.org/abs/2003.12039
 
-过滤保留视频运动得分在指定范围内的样本。
+用于保留视频运动得分在指定范围内的样本的过滤器。
 
 该算子利用 torchvision 中的 RAFT（Recurrent All-Pairs Field Transforms）模型来预测视频帧之间的光流。它保留视频运动得分在给定最小和最大得分范围内的样本。运动得分基于帧间的光流计算，该光流使用 RAFT 模型估计。该算子可以在指定 FPS 下采样帧，并在计算光流之前对帧应用变换。
 - 使用 RAFT 模型估计光流。

@@ -4,7 +4,7 @@ Filter to keep samples with video motion scores within a specific range.
 
 The operator uses Farneback's algorithm from OpenCV to compute dense optical flow. It calculates the average motion score for each video and retains samples based on the specified minimum and maximum score thresholds. The 'any' or 'all' strategy determines whether to keep a sample if any or all videos meet the criteria. The motion score is computed as the mean magnitude of the optical flow, which can be normalized relative to the frame's diagonal length. The stats are cached under the key 'video_motion_score'.
 
-过滤保留视频运动得分在特定范围内的样本。
+用于保留视频运动得分在特定范围内的样本的过滤器。
 
 该算子使用 OpenCV 中的 Farneback 算法来计算密集光流。它计算每个视频的平均运动得分，并根据指定的最小和最大得分阈值保留样本。'any' 或 'all' 策略决定了是否在有任何或所有视频满足条件时保留样本。运动得分计算为光流的平均幅度，可以相对于帧的对角线长度进行归一化。统计数据缓存在 'video_motion_score' 键下。
 

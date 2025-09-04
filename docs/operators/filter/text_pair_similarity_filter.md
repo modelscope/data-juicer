@@ -4,7 +4,7 @@ Filter to keep text pairs with similarities within a specific range.
 
 This operator computes the similarity between two texts in a pair using a Hugging Face CLIP model. It keeps samples where the similarity score falls within the specified min and max thresholds. The key metric, 'text_pair_similarity', is computed as the cosine similarity between the text embeddings. The operator supports two strategies for keeping samples: 'any' (keep if any pair meets the condition) and 'all' (keep only if all pairs meet the condition). If the second text key is not provided, the operator will raise an error. The similarity scores are cached under the 'text_pair_similarity' field in the sample's stats.
 
-过滤以保留相似度在特定范围内的文本对。
+用于保留相似度在特定范围内的文本对的过滤器。
 
 该算子使用Hugging Face CLIP模型计算一对文本之间的相似度。它保留相似度得分在指定最小值和最大值之间的样本。关键指标'text_pair_similarity'计算为文本嵌入之间的余弦相似度。该算子支持两种保留样本的策略：'any'（只要有任何一对满足条件就保留）和'all'（只有当所有对都满足条件时才保留）。如果不提供第二个文本键，该算子将引发错误。相似度分数会被缓存在样本统计信息的'text_pair_similarity'字段中。
 
