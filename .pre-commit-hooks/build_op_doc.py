@@ -477,7 +477,6 @@ def parse_op_record_from_current_doc():
     """
     # patterns
     tab_pattern = r"\| +(.*?) +\| +(.*?) +\| +(.*?) +\| +(.*?) +\| +(.*?) +\|"
-    link_pattern = r"\[.*?\]\((.*?)\)"
 
     if os.path.exists(DOC_PATH):
         op_record_list = []
@@ -493,7 +492,6 @@ def parse_op_record_from_current_doc():
                 tags = [remove_emojis(tag.lower()) for tag in tags.split(" ")]
                 # only need English description
                 desc = desc.split(". ")[0] + "."
-                ref = re.findall(link_pattern, ref)
                 test_path = os.path.join(OP_TEST_PREFIX, type, f"test_{name}.py")
                 op_record_list.append(
                     OPRecord(
