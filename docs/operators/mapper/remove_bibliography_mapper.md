@@ -2,11 +2,11 @@
 
 Removes bibliography sections at the end of LaTeX documents.
 
-This operator identifies and removes bibliography sections in LaTeX documents. It uses a regular expression to match common bibliography commands such as ppendix, egin{references}, egin{thebibliography}, and ibliography. The matched sections are removed from the text. The operator processes samples in batch mode for efficiency.
+This operator identifies and removes bibliography sections in LaTeX documents. It uses a regular expression to match common bibliography commands such as \appendix, \begin{references}, \begin{thebibliography}, and \bibliography. The matched sections are removed from the text. The operator processes samples in batch mode for efficiency.
 
-删除 LaTeX 文档末尾的参考文献部分。
+移除LaTeX文档末尾的参考文献部分。
 
-此算子识别并删除 LaTeX 文档中的参考文献部分。它使用正则表达式匹配常见的参考文献命令，如 ppendix, egin{references}, egin{thebibliography} 和 ibliography。匹配的部分将从文本中删除。算子以批量模式处理样本以提高效率。
+该算子识别并移除LaTeX文档中的参考文献部分。它使用正则表达式匹配常见的参考文献命令，如\appendix、\begin{references}、\begin{thebibliography}和\bibliography。匹配的部分将从文本中删除。该算子以批量模式处理样本以提高效率。
 
 Type 算子类型: **mapper**
 

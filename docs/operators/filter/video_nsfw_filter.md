@@ -4,9 +4,9 @@ Filter to keep samples whose videos have nsfw scores in a specified range.
 
 This operator uses a Hugging Face model to detect NSFW content in video frames. It keeps samples where the NSFW score is below a specified threshold. The operator supports two frame sampling methods: "all_keyframes" and "uniform". For "uniform", it extracts a specified number of frames. The NSFW scores are reduced using one of three modes: "avg", "max", or "min". The key metric, 'video_nsfw_score', is computed for each video and stored in the sample's stats. The operator can use either an "any" or "all" strategy to decide if a sample should be kept based on the NSFW scores of its videos.
 
-过滤保留视频 NSFW 得分在指定范围内的样本。
+用于保留视频 NSFW 得分在指定范围内的样本的过滤器。
 
-该算子使用 Hugging Face 模型来检测视频帧中的 NSFW 内容。它保留 NSFW 得分低于指定阈值的样本。该算子支持两种帧采样方法："all_keyframes" 和 "uniform"。对于 "uniform"，它提取指定数量的帧。NSFW 得分通过三种模式之一进行缩减："avg"、"max" 或 "min"。关键指标 'video_nsfw_score' 对每个视频进行计算并存储在样本的 stats 中。该算子可以使用 "any" 或 "all" 策略来决定是否基于其视频的 NSFW 得分保留样本。
+该算子使用 Hugging Face 模型来检测视频帧中的 NSFW 内容。它保留 NSFW 得分低于指定阈值的样本。该算子支持两种帧采样方法："all_keyframes" 和 "uniform"。对于 "uniform"，它提取指定数量的帧。NSFW 得分通过三种模式之一进行归约："avg"、"max" 或 "min"。关键指标 'video_nsfw_score' 对每个视频进行计算并存储在样本的 stats 中。该算子可以使用 "any" 或 "all" 策略来决定是否基于其视频的 NSFW 得分保留样本。
 
 Type 算子类型: **filter**
 

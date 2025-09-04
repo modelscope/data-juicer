@@ -4,7 +4,7 @@ Keep data samples whose audio durations are within a specified range.
 
 This operator filters data samples based on the duration of their audio files. It keeps samples where the audio duration is between a minimum and maximum value, in seconds. The operator supports two strategies for keeping samples: 'any' (keep if any audio meets the condition) or 'all' (keep only if all audios meet the condition). The audio duration is computed using the `librosa` library. If the audio duration has already been computed, it is retrieved from the sample's stats under the key 'audio_duration'. If no audio is present in the sample, an empty array is stored in the stats.
 
-保留音频时长在指定范围内的数据样本。
+用来保留音频时长在指定范围内的数据样本的过滤器。
 
 该算子根据音频文件的时长来过滤数据样本。它保留音频时长在最小值和最大值之间的样本，单位为秒。该算子支持两种保留样本的策略：'any'（如果有任意一个音频满足条件则保留）或'all'（只有当所有音频都满足条件时才保留）。音频时长使用`librosa`库计算。如果音频时长已经计算过，则从样本的统计信息中通过键'audio_duration'获取。如果样本中没有音频，则在统计信息中存储一个空数组。
 

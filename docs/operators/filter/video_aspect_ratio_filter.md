@@ -4,7 +4,7 @@ Filter to keep samples with video aspect ratio within a specific range.
 
 This operator filters samples based on the aspect ratios of their videos. It keeps samples where the video aspect ratios fall within a specified range. The aspect ratio is calculated as the width divided by the height (W / H). The operator supports two strategies for keeping samples: 'any' and 'all'. In 'any' mode, a sample is kept if at least one video meets the aspect ratio condition. In 'all' mode, all videos in the sample must meet the condition for the sample to be kept. The aspect ratios are computed and stored in the 'video_aspect_ratios' field of the sample's stats.
 
-过滤保留视频宽高比在特定范围内的样本。
+用于保留视频宽高比在特定范围内的样本的过滤器。
 
 该算子根据视频的宽高比过滤样本。它保留视频宽高比在指定范围内的样本。宽高比计算为宽度除以高度（W / H）。该算子支持两种保留样本的策略：'any' 和 'all'。在 'any' 模式下，如果至少有一个视频满足宽高比条件，则保留该样本。在 'all' 模式下，样本中的所有视频都必须满足条件才能保留该样本。宽高比被计算并存储在样本的 stats 中的 'video_aspect_ratios' 字段中。
 

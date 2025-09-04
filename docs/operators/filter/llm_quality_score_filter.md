@@ -4,7 +4,7 @@ Filter to keep samples with a high quality score estimated by a language model.
 
 This operator uses a language model to evaluate the quality of each sample across multiple dimensions, including accuracy, grammar, informativeness, and coherence. The LLM provides a numerical score for each dimension on a 1-5 scale, where 1 is the lowest and 5 is the highest. The overall quality score is used to decide whether to keep or filter out the sample based on the specified minimum and maximum score thresholds. The evaluation results are cached in the 'llm_quality_score' and 'llm_quality_record' fields. Important flags and tags from the LLM's analysis may also be stored in the sample's stats.
 
-过滤保留由语言模型估计出高质量分数的样本。
+用于保留由语言模型估计出高质量分数的样本的过滤器。
 
 该算子使用语言模型评估每个样本在多个维度上的质量，包括准确性、语法、信息量和连贯性。LLM为每个维度提供一个1-5分的数值评分，其中1分最低，5分最高。总体质量分数用于根据指定的最小和最大分数阈值来决定是否保留或过滤掉样本。评估结果缓存在'llm_quality_score'和'llm_quality_record'字段中。LLM分析的重要标志和标签也可能存储在样本的stats中。
 

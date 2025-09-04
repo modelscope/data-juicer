@@ -536,6 +536,7 @@ def check_and_update_op_record(old_op_record_list, new_op_record_list):
     usability_tag_set = set(ALL_TAG_MAPPING["Usability Tags"].keys())
     old_op_record_dict = {record.name: record for record in old_op_record_list}
     updated_op_record_list = []
+
     for record in new_op_record_list:
         # check unittest
         test = record.test
@@ -543,6 +544,7 @@ def check_and_update_op_record(old_op_record_list, new_op_record_list):
             usability_tag = "alpha"
         else:
             usability_tag = "beta"
+
         if record.name in old_op_record_dict:
             # get the old usability tag
             old_record = old_op_record_dict[record.name]
@@ -554,9 +556,18 @@ def check_and_update_op_record(old_op_record_list, new_op_record_list):
             if old_usability_tag and old_usability_tag == "stable" and usability_tag == "beta":
                 print(f"{record.name} kept stable")
                 usability_tag = "stable"
+
+            new_ref = record.ref if record.ref is not None else "-"
+            old_ref = old_record.ref if old_record.ref is not None else "-"
+            if (new_ref == "-" or new_ref == "") and (old_ref != "-" and old_ref != ""):
+                record.ref = old_ref
+        else:
+            pass
+
         curr_tags = [tag for tag in record.tags if tag not in usability_tag_set]
         curr_tags.append(usability_tag)
         record.tags = curr_tags
+
         updated_op_record_list.append(record)
 
     return updated_op_record_list

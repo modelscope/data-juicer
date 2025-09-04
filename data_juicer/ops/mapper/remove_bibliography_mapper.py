@@ -12,8 +12,8 @@ class RemoveBibliographyMapper(Mapper):
     """Removes bibliography sections at the end of LaTeX documents.
 
     This operator identifies and removes bibliography sections in LaTeX documents. It uses a
-    regular expression to match common bibliography commands such as \appendix,
-    \begin{references}, \begin{thebibliography}, and \bibliography. The matched sections are
+    regular expression to match common bibliography commands such as \\appendix,
+    \\begin{references}, \\begin{thebibliography}, and \\bibliography. The matched sections are
     removed from the text. The operator processes samples in batch mode for efficiency."""
 
     _batched_op = True

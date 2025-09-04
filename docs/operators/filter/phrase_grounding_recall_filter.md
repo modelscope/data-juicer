@@ -4,9 +4,9 @@ Filter to keep samples based on the phrase grounding recall of phrases extracted
 
 This operator uses a Hugging Face Owl-ViT model to locate phrases extracted from the text within the images. It keeps samples where the phrase grounding recall is within a specified range. The recall is computed by comparing the number of correctly located phrases to the total number of phrases. The operator can handle multiple images per text chunk and supports different strategies for reducing the recall values (e.g., average, max, min). It also allows for flipping images horizontally or vertically. The key metric 'phrase_grounding_recall' is computed and stored in the sample's stats. If no images are present, the recall is set to an empty array.
 
-根据从图像中文本提取的短语的短语定位召回率来过滤样本。
+根据从图像中文本提取的短语的定位召回率来过滤样本。
 
-该算子使用 Hugging Face Owl-ViT 模型来定位从文本中提取的短语在图像中的位置。它保留短语定位召回率在指定范围内的样本。召回率通过比较正确定位的短语数量与总短语数量来计算。该算子可以处理每个文本块中的多张图像，并支持不同的召回值减少策略（例如，平均值、最大值、最小值）。它还允许水平或垂直翻转图像。关键指标 'phrase_grounding_recall' 将被计算并存储在样本的 stats 中。如果没有图像，则召回率设置为空数组。
+该算子使用 Hugging Face Owl-ViT 模型来定位从文本中提取的短语在图像中的位置。它保留短语定位召回率在指定范围内的样本。召回率通过比较正确定位的短语数量与总短语数量来计算。该算子可以处理每个文本块中的多张图像，并支持不同的召回值归约策略（例如，平均值、最大值、最小值）。它还允许水平或垂直翻转图像。关键指标 'phrase_grounding_recall' 将被计算并存储在样本的 stats 中。如果没有图像，则召回率设置为空数组。
 
 Type 算子类型: **filter**
 

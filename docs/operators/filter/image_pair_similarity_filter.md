@@ -4,7 +4,7 @@ Filter to keep image pairs with similarities between images within a specific ra
 
 This operator uses a Hugging Face CLIP model to compute the cosine similarity between two images in each sample. It retains samples where the similarity score falls within the specified minimum and maximum thresholds. The 'any' strategy keeps a sample if any of the image pairs meet the condition, while the 'all' strategy requires all image pairs to meet the condition. The similarity scores are cached in the 'image_pair_similarity' field. Each sample must include exactly two distinct images.
 
-过滤保留图像之间相似度在特定范围内的图像对。
+用于保留图像之间相似度在特定范围内的图像对的过滤器。
 
 该算子使用Hugging Face CLIP模型来计算每个样本中两张图像之间的余弦相似度。如果相似度得分落在指定的最小和最大阈值范围内，则保留样本。'any'策略要求至少有一对图像满足条件即可保留样本，而'all'策略要求所有图像对都必须满足条件才能保留样本。相似度得分缓存在'image_pair_similarity'字段中。每个样本必须包含两张不同的图像。
 

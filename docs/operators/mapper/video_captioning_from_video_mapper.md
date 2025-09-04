@@ -2,11 +2,11 @@
 
 Generates video captions using a Hugging Face video-to-text model and sampled video frames.
 
-This operator processes video samples to generate captions based on the provided video frames. It uses a Hugging Face video-to-text model, such as 'kpyu/video-blip- opt-2.7b-ego4d', to generate multiple caption candidates for each video. The number of generated captions and the strategy to keep or filter these candidates can be configured. The operator supports different frame sampling methods, including extracting all keyframes or uniformly sampling a specified number of frames. Additionally, it allows for horizontal and vertical flipping of the frames. The final output can include both the original sample and the generated captions, depending on the configuration.
+This operator processes video samples to generate captions based on the provided video frames. It uses a Hugging Face video-to-text model, such as 'kpyu/video-blip-opt-2.7b-ego4d', to generate multiple caption candidates for each video. The number of generated captions and the strategy to keep or filter these candidates can be configured. The operator supports different frame sampling methods, including extracting all keyframes or uniformly sampling a specified number of frames. Additionally, it allows for horizontal and vertical flipping of the frames. The final output can include both the original sample and the generated captions, depending on the configuration.
 
 使用 Hugging Face 视频转文本模型和采样的视频帧生成视频字幕。
 
-该算子处理视频样本，基于提供的视频帧生成字幕。它使用 Hugging Face 视频转文本模型（如 'kpyu/video-blip- opt-2.7b-ego4d'）为每个视频生成多个字幕候选。可以配置生成的字幕数量和保留或筛选这些候选字幕的策略。该算子支持不同的帧采样方法，包括提取所有关键帧或均匀采样指定数量的帧。此外，还允许对帧进行水平和垂直翻转。最终输出可以包括原始样本和生成的字幕，具体取决于配置。
+该算子处理视频样本，基于提供的视频帧生成字幕。它使用 Hugging Face 视频转文本模型（如 'kpyu/video-blip-opt-2.7b-ego4d'）为每个视频生成多个字幕候选。可以配置生成的字幕数量和保留或筛选这些候选字幕的策略。该算子支持不同的帧采样方法，包括提取所有关键帧或均匀采样指定数量的帧。此外，还允许对帧进行水平和垂直翻转。最终输出可以包括原始样本和生成的字幕，具体取决于配置。
 
 Type 算子类型: **mapper**
 

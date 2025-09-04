@@ -6,7 +6,7 @@ This operator uses a Hugging Face CLIP model to compute the similarity between v
 
 基于视频帧图像与文本之间的相似度在特定范围内的过滤保留样本。
 
-该算子使用 Hugging Face CLIP 模型来计算视频帧与关联文本之间的相似度。它保留计算出的相似度得分在指定范围内的样本。该算子支持不同的帧采样方法，包括 'all_keyframes' 和 'uniform'，并且允许对帧进行水平和垂直翻转。相似度得分通过三种模式之一进行缩减：'avg'、'max' 或 'min'。该算子还支持两种保留样本的策略：'any'（如果有任何视频满足条件则保留）或 'all'（只有当所有视频都满足条件时才保留）。关键指标存储在 'video_frames_text_similarity' 字段中。
+该算子使用 Hugging Face CLIP 模型来计算视频帧与关联文本之间的相似度。它保留计算出的相似度得分在指定范围内的样本。该算子支持不同的帧采样方法，包括 'all_keyframes' 和 'uniform'，并且允许对帧进行水平和垂直翻转。相似度得分通过三种模式之一进行归约：'avg'、'max' 或 'min'。该算子还支持两种保留样本的策略：'any'（如果有任何视频满足条件则保留）或 'all'（只有当所有视频都满足条件时才保留）。关键指标存储在 'video_frames_text_similarity' 字段中。
 
 Type 算子类型: **filter**
 

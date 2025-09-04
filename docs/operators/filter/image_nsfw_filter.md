@@ -4,7 +4,7 @@ Filter to keep samples whose images have nsfw scores in a specified range.
 
 This operator uses a Hugging Face model to compute the nsfw scores for each image in a sample. It keeps samples based on the specified `min_score` and `max_score` thresholds. The operator supports two strategies: 'any' (keep the sample if any image meets the condition) or 'all' (keep the sample only if all images meet the condition). The nsfw scores are cached in the 'image_nsfw_score' field of the sample's stats.
 
-过滤保留图像的nsfw分数在指定范围内的样本。
+用于保留图像的nsfw分数在指定范围内的样本的过滤器。
 
 该算子使用Hugging Face模型计算样本中每个图像的nsfw分数。它根据指定的`min_score`和`max_score`阈值来保留样本。该算子支持两种策略：'any'（如果任何图像满足条件则保留样本）或'all'（只有当所有图像都满足条件时才保留样本）。nsfw分数被缓存在样本的stats中的'image_nsfw_score'字段。
 

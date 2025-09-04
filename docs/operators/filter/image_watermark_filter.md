@@ -4,7 +4,7 @@ Filter to keep samples whose images have no watermark with high probability.
 
 This operator uses a Hugging Face watermark detection model to filter samples based on the presence of watermarks in their images. It keeps samples where the predicted watermark probability is below a specified threshold. The operator supports two strategies: 'any' (keep if any image meets the condition) and 'all' (keep only if all images meet the condition). The key metric 'image_watermark_prob' is computed for each image, representing the probability that the image contains a watermark. If no images are present in the sample, the metric is set to an empty array.
 
-过滤保留图像中没有高概率水印的样本。
+筛选出高概率没有水印的图片样本。
 
 该算子使用 Hugging Face 水印检测模型基于图像中的水印存在情况过滤样本。它保留预测水印概率低于指定阈值的样本。该算子支持两种策略：'any'（如果有任何图像满足条件则保留）和 'all'（只有当所有图像都满足条件时才保留）。关键指标 'image_watermark_prob' 为每个图像计算，表示图像包含水印的概率。如果样本中没有图像，则该指标设置为空数组。
 

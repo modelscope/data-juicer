@@ -38,13 +38,14 @@ class VideoCaptioningFromVideoMapper(Mapper):
     frames.
 
     This operator processes video samples to generate captions based on the provided video
-    frames. It uses a Hugging Face video-to-text model, such as 'kpyu/video-blip-
-    opt-2.7b-ego4d', to generate multiple caption candidates for each video. The number of
-    generated captions and the strategy to keep or filter these candidates can be
-    configured. The operator supports different frame sampling methods, including extracting
-    all keyframes or uniformly sampling a specified number of frames. Additionally, it
-    allows for horizontal and vertical flipping of the frames. The final output can include
-    both the original sample and the generated captions, depending on the configuration."""
+    frames.
+    It uses a Hugging Face video-to-text model, such as 'kpyu/video-blip-opt-2.7b-ego4d',
+    to generate multiple caption candidates for each video. The number of generated
+    captions and the strategy to keep or filter these candidates can be configured. The
+    operator supports different frame sampling methods, including extracting all
+    keyframes or uniformly sampling a specified number of frames. Additionally, it allows
+    for horizontal and vertical flipping of the frames. The final output can include both
+    the original sample and the generated captions, depending on the configuration."""
 
     _accelerator = 'cuda'
     _batched_op = True
