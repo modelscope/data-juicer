@@ -6,7 +6,7 @@ This operator uses a Hugging Face CLIP model to compute the similarity between i
 
 用于保留图像-文本相似度在指定范围内的样本的过滤器。
 
-该算子使用 Hugging Face CLIP 模型计算图像和文本之间的相似度。它保留相似度分数落在给定范围内的样本。为每个图像-文本对计算相似度分数，最终分数可以使用 'avg'、'max' 或 'min' 模式来减少。'any' 或 'all' 策略决定了至少有一个或所有图像-文本对必须满足相似度标准。关键指标 'image_text_similarity' 缓存在样本的统计信息中。可以在计算相似度之前水平或垂直翻转图像。
+该算子使用 Hugging Face CLIP 模型计算图像和文本之间的相似度。它保留相似度分数落在给定范围内的样本。为每个图像-文本对计算相似度分数，最终分数可以使用 'avg'、'max' 或 'min' 模式来归约。'any' 或 'all' 策略决定了至少有一个或所有图像-文本对必须满足相似度标准。关键指标 'image_text_similarity' 缓存在样本的统计信息中。可以在计算相似度之前水平或垂直翻转图像。
 
 Type 算子类型: **filter**
 
@@ -55,7 +55,7 @@ ImageTextSimilarityFilter(hf_clip='openai/clip-vit-base-patch32', reduce_mode='m
 
 #### ✨ explanation 解释
 The operator uses the 'min' reduce mode to compute the minimum similarity score among all image-text pairs in a sample. If the minimum score is within the specified range, the sample is kept; otherwise, it is removed. In this test, the sample is initially kept because the minimum score is 0.1, which is within the range. However, when the min_score is set to 0.2, the sample is removed as the minimum score no longer meets the new threshold.
-算子使用'min'减少模式来计算样本中所有图像-文本对之间的最小相似度分数。如果最小分数在指定范围内，则保留该样本；否则，将其移除。在此测试中，样本最初被保留，因为最小分数为0.1，在范围内。但是，当将min_score设置为0.2时，由于最小分数不再达到新的阈值，样本被移除。
+算子使用'min'归约模式来计算样本中所有图像-文本对之间的最小相似度分数。如果最小分数在指定范围内，则保留该样本；否则，将其移除。在此测试中，样本最初被保留，因为最小分数为0.1，在范围内。但是，当将min_score设置为0.2时，由于最小分数不再达到新的阈值，样本被移除。
 
 
 ## 🔗 related links 相关链接

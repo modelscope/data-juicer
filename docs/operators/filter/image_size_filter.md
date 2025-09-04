@@ -1,12 +1,12 @@
 # image_size_filter
 
-Keep data samples whose image sizes are within a specific range.
+Keep data samples whose image size (in Bytes/KB/MB/...) is within a specific range.
 
-This operator filters data samples based on the size of their images. It retains samples if the image sizes fall within the specified minimum and maximum size range. The `any_or_all` parameter determines the filtering strategy: 'any' keeps the sample if any image meets the size criteria, while 'all' keeps the sample only if all images meet the criteria. The key metric `image_sizes` is computed in bytes. If the image sizes are already cached in the `image_sizes` field, they are reused. Otherwise, the operator calculates the sizes from the image byte data or file paths.
+This operator filters data samples based on the size of their images. It keeps samples if the image sizes fall within the specified minimum and maximum size range. The operator supports two strategies: 'any'(keep the sample if any image meets the size condition) and 'all' (keep the sample only if all images meet the size condition). If no images are present in the sample, the 'image_sizes' field will be an empty array.
 
-保留图像大小在特定范围内的数据样本。
+保留图像大小（以字节/KB/MB等为单位）在特定范围内的数据样本。
 
-该算子根据图像的大小来过滤数据样本。如果图像大小落在指定的最小和最大大小范围内，则保留样本。`any_or_all`参数确定过滤策略：'any'表示如果有任何图像满足大小标准则保留样本，而'all'表示只有当所有图像都满足标准时才保留样本。关键指标`image_sizes`以字节为单位计算。如果图像大小已经缓存在`image_sizes`字段中，则会重用这些数据。否则，算子会从图像字节数据或文件路径中计算大小。
+该算子根据图像的大小筛选数据样本。如果图像大小在指定的最小和最大尺寸范围内，它将保留这些样本。该算子支持两种策略：'any'（如果有任意一张图像满足尺寸条件，则保留该样本）和'all'（只有当所有图像都满足尺寸条件时才保留该样本）。如果样本中没有图像，则'image_sizes'字段将是一个空数组。
 
 Type 算子类型: **filter**
 
