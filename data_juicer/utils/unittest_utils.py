@@ -90,7 +90,6 @@ class DataJuicerTestCaseBase(unittest.TestCase):
                 logger.info(f">>>>>>>>>>>>>>>>>>>> [Init Ray]: dj_dist_unittest_{cls.__name__}")
                 ray.init(
                     "auto",
-                    object_store_memory=256 * 1024 * 1024 * 1024,  # 256GB
                     ignore_reinit_error=True,
                     namespace=f"dj_dist_unittest_{cls.__name__}",
                 )
