@@ -52,78 +52,63 @@ def get_min_cuda_memory():
     return min_cuda_memory
 
 
-def calculate_np(name, mem_required, cpu_required, num_proc=None, use_cuda=False):
+def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=0):
     """Calculate the optimum number of processes for the given OP"""
+
+    if not use_cuda and gpu_required > 0:
+        raise ValueError(
+            f'Op[{name}] attempted to request GPU resources (gpu_required={gpu_required}), \
+            but appears to lack GPU support. If you have verified this operator support GPU acceleration, \
+            please explicitly set its property: `_accelerator = "cuda"`'
+        )
+
     eps = 1e-9  # about 1 byte
 
     if use_cuda:
-        auto_num_proc = None
         cuda_mems_available = [m / 1024 for m in available_gpu_memories()]  # GB
-        if mem_required == 0:
+        gpu_count = cuda_device_count()
+
+        if not mem_required and not gpu_required:
+            auto_num_proc = gpu_count
             logger.warning(
-                f"The required cuda memory of Op[{name}] "
+                f"The required cuda memory and gpu of Op[{name}] "
                 f"has not been specified. "
-                f"Please specify the mem_required field in the "
-                f"config file, or you might encounter CUDA "
-                f"out of memory error. You can reference "
-                f"the mem_required field in the "
-                f"config_all.yaml file."
+                f"Please specify the mem_required field or gpu_required field in the "
+                f"config file. You can reference the config_all.yaml file."
+                f"Set the `num_proc` to number of GPUs {auto_num_proc}."
             )
         else:
-            auto_num_proc = sum(
-                [math.floor(cuda_mem_available / mem_required) for cuda_mem_available in cuda_mems_available]
+            auto_proc_from_mem = sum(
+                [math.floor(mem_available / (mem_required + eps)) for mem_available in cuda_mems_available]
             )
-            if auto_num_proc < cuda_device_count():
-                logger.warning(
-                    f"The required cuda memory:{mem_required}GB might "
-                    f"be more than the available cuda devices memory list:"
-                    f"{cuda_mems_available}GB."
-                    f"This Op[{name}] might "
-                    f"require more resource to run."
-                )
+            auto_proc_from_gpu = math.floor(gpu_count / (gpu_required + eps))
+            auto_num_proc = min(auto_proc_from_mem, auto_proc_from_gpu)
+            if auto_num_proc <= 1:
+                auto_num_proc = len(available_memories())  # set to the number of available nodes
 
-        if auto_num_proc and num_proc:
-            op_proc = min(auto_num_proc, num_proc)
-            if num_proc > auto_num_proc:
-                logger.warning(
-                    f"The given num_proc: {num_proc} is greater than "
-                    f"the value {auto_num_proc} auto calculated based "
-                    f"on the mem_required of Op[{name}]. "
-                    f"Set the `num_proc` to {auto_num_proc}."
-                )
-        elif auto_num_proc is None and num_proc is None:
-            op_proc = cuda_device_count()
-            logger.warning(
-                f"Both mem_required and num_proc of Op[{name}] are not set."
-                f"Set the `num_proc` to number of GPUs {op_proc}."
+            logger.info(
+                f"Set the `num_proc` to {auto_num_proc} of Op[{name}] based on the "
+                f"required cuda memory: {mem_required}"
+                f"and required gpu: {gpu_required} "
             )
-        else:
-            op_proc = auto_num_proc if auto_num_proc is not None else num_proc
-
-        if op_proc <= 1:
-            op_proc = len(available_memories())  # number of processes is equal to the number of nodes
-        return op_proc
+        return auto_num_proc
     else:
         cpu_num = cpu_count()
-        if num_proc is None:
-            num_proc = cpu_num
-
-        op_proc = num_proc
         mems_available = [m / 1024 for m in available_memories()]  # GB
         auto_proc_from_mem = sum([math.floor(mem_available / (mem_required + eps)) for mem_available in mems_available])
         auto_proc_from_cpu = math.floor(cpu_num / (cpu_required + eps))
 
-        op_proc = min(op_proc, auto_proc_from_mem, auto_proc_from_cpu)
+        auto_num_proc = min(cpu_num, auto_proc_from_mem, auto_proc_from_cpu)
 
-        if op_proc < 1.0:
+        if auto_num_proc < 1.0:
+            auto_num_proc = len(available_memories())  # number of processes is equal to the number of nodes
             logger.warning(
                 f"The required CPU number:{cpu_required} "
                 f"and memory:{mem_required}GB might "
                 f"be more than the available CPU:{cpu_num} "
                 f"and memory :{mems_available}GB."
                 f"This Op [{name}] might "
-                f"require more resource to run."
+                f"require more resource to run. "
+                f"Set num_proc to available nodes number {auto_num_proc}."
             )
-        if op_proc <= 1:
-            op_proc = len(available_memories())  # number of processes is equal to the number of nodes
-        return op_proc
+        return auto_num_proc
