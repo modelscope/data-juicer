@@ -11,7 +11,7 @@ from loguru import logger
 from data_juicer.core.data import DJDataset
 from data_juicer.core.data.schema import Schema
 from data_juicer.ops import Deduplicator, Filter, Mapper
-from data_juicer.ops.base_op import TAGGING_OPS
+from data_juicer.ops.base_op import DEFAULT_BATCH_SIZE, TAGGING_OPS
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import is_remote_path
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -66,6 +66,7 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
             partial(convert_to_absolute_paths, dataset_dir=dataset_dir, path_keys=path_keys),
             batch_format="pyarrow",
             zero_copy_batch=True,
+            batch_size=DEFAULT_BATCH_SIZE,
         )
     return dataset
 
@@ -91,7 +92,7 @@ def filter_batch(batch, filter_func):
 class RayDataset(DJDataset):
     def __init__(self, dataset: ray.data.Dataset, dataset_path: str = None, cfg: Optional[Namespace] = None) -> None:
         self.data = preprocess_dataset(dataset, dataset_path, cfg)
-        self.num_proc = getattr(cfg, "np", getattr(cfg, "num_proc", None)) if cfg else None
+        self.np = getattr(cfg, "np", None) if cfg else None
 
     def schema(self) -> Schema:
         """Get dataset schema.
@@ -152,8 +153,13 @@ class RayDataset(DJDataset):
         return self
 
     def _run_single_op(self, op):
-        op_proc = calculate_np(op._name, op.mem_required, op.cpu_required, self.num_proc, op.use_cuda())
-        num_gpus = get_num_gpus(op, op_proc)
+        auto_parallel = False
+        if self.op.num_proc:
+            op_proc = self.op.num_proc
+        else:
+            auto_parallel = True
+            op_proc = calculate_np(op._name, op.mem_required, op.cpu_required, op.use_cuda(), op.gpu_required)
+        num_gpus = self.op.gpu_required if self.op.gpu_required else get_num_gpus(op, op_proc)
 
         if op._name in TAGGING_OPS.modules and Fields.meta not in self.data.columns():
 
@@ -162,7 +168,9 @@ class RayDataset(DJDataset):
                 new_table = table.append_column(Fields.meta, [new_column_data])
                 return new_table
 
-            self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow")
+            self.data = self.data.map_batches(
+                process_batch_arrow, batch_format="pyarrow", batch_size=DEFAULT_BATCH_SIZE
+            )
 
         try:
             batch_size = getattr(op, "batch_size", 1) if op.is_batched_op() else 1
@@ -176,13 +184,20 @@ class RayDataset(DJDataset):
                         fn_constructor_args=None,
                         fn_constructor_kwargs=op_kwargs,
                         batch_size=batch_size,
+                        num_cpus=op.cpu_required,
                         num_gpus=num_gpus,
                         concurrency=op_proc,
                         batch_format="pyarrow",
                     )
                 else:
                     self.data = self.data.map_batches(
-                        op.process, batch_size=batch_size, batch_format="pyarrow", num_gpus=num_gpus
+                        op.process,
+                        batch_size=batch_size,
+                        batch_format="pyarrow",
+                        num_cpus=op.cpu_required,
+                        concurrency=(
+                            None if auto_parallel else op_proc
+                        ),  # use ray default parallelism in cpu mode if num_proc is not specified
                     )
             elif isinstance(op, Filter):
                 columns = self.data.columns()
@@ -193,7 +208,9 @@ class RayDataset(DJDataset):
                         new_talbe = table.append_column(Fields.stats, [new_column_data])
                         return new_talbe
 
-                    self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow")
+                    self.data = self.data.map_batches(
+                        process_batch_arrow, batch_format="pyarrow", batch_size=DEFAULT_BATCH_SIZE
+                    )
                 if op.use_cuda():
                     op_kwargs = op._op_cfg[op._name]
                     self.data = self.data.map_batches(
@@ -203,30 +220,39 @@ class RayDataset(DJDataset):
                         fn_constructor_args=None,
                         fn_constructor_kwargs=op_kwargs,
                         batch_size=batch_size,
+                        num_cpus=op.cpu_required,
                         num_gpus=num_gpus,
                         concurrency=op_proc,
                         batch_format="pyarrow",
                     )
                 else:
                     self.data = self.data.map_batches(
-                        op.compute_stats, batch_size=batch_size, batch_format="pyarrow", num_gpus=num_gpus
+                        op.compute_stats,
+                        batch_size=batch_size,
+                        batch_format="pyarrow",
+                        num_cpus=op.cpu_required,
+                        concurrency=(
+                            None if auto_parallel else op_proc
+                        ),  # use ray default parallelism in cpu mode if num_proc is not specified
                     )
                 if op.stats_export_path is not None:
                     self.data.write_json(op.stats_export_path, force_ascii=False)
                 if op.is_batched_op():
+                    # The core computation have been done in compute_stats,
+                    # and the filter process only performs simple filtering.
+                    # cpu and parallelism are not set here
                     self.data = self.data.map_batches(
                         partial(filter_batch, filter_func=op.process),
                         batch_format="pyarrow",
-                        batch_size=batch_size,
-                        num_gpus=num_gpus,
                         zero_copy_batch=True,
+                        batch_size=DEFAULT_BATCH_SIZE,
                     )
                 else:
                     self.data = self.data.filter(op.process)
             elif isinstance(op, Deduplicator):
                 self.data = op.run(self.data)
             else:
-                logger.error("Ray executor only support Filter and Mapper OPs for now")
+                logger.error("Ray executor only support Filter, Mapper and Deduplicator OPs for now")
                 raise NotImplementedError
         except:  # noqa: E722
             logger.error(f"An error occurred during Op [{op._name}].")
