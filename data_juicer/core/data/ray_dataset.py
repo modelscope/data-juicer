@@ -20,6 +20,7 @@ from data_juicer.utils.resource_utils import cuda_device_count
 from data_juicer.utils.webdataset_utils import _custom_default_decoder
 
 ray = LazyLoader("ray")
+_DEFAULT_RAY_BATCH_SIZE = 1000
 
 
 def get_abs_path(path, dataset_dir):
@@ -66,6 +67,7 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
             partial(convert_to_absolute_paths, dataset_dir=dataset_dir, path_keys=path_keys),
             batch_format="pyarrow",
             zero_copy_batch=True,
+            batch_size=_DEFAULT_RAY_BATCH_SIZE,
         )
     return dataset
 
@@ -162,7 +164,9 @@ class RayDataset(DJDataset):
                 new_table = table.append_column(Fields.meta, [new_column_data])
                 return new_table
 
-            self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow")
+            self.data = self.data.map_batches(
+                process_batch_arrow, batch_format="pyarrow", batch_size=_DEFAULT_RAY_BATCH_SIZE
+            )
 
         try:
             batch_size = getattr(op, "batch_size", 1) if op.is_batched_op() else 1
@@ -193,7 +197,9 @@ class RayDataset(DJDataset):
                         new_talbe = table.append_column(Fields.stats, [new_column_data])
                         return new_talbe
 
-                    self.data = self.data.map_batches(process_batch_arrow, batch_format="pyarrow")
+                    self.data = self.data.map_batches(
+                        process_batch_arrow, batch_format="pyarrow", batch_size=_DEFAULT_RAY_BATCH_SIZE
+                    )
                 if op.use_cuda():
                     op_kwargs = op._op_cfg[op._name]
                     self.data = self.data.map_batches(
@@ -226,7 +232,7 @@ class RayDataset(DJDataset):
             elif isinstance(op, Deduplicator):
                 self.data = op.run(self.data)
             else:
-                logger.error("Ray executor only support Filter and Mapper OPs for now")
+                logger.error("Ray executor only support Filter, Mapper and Deduplicator OPs for now")
                 raise NotImplementedError
         except:  # noqa: E722
             logger.error(f"An error occurred during Op [{op._name}].")
