@@ -529,27 +529,21 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 help="Preserve intermediate data for debugging (legacy flat config)",
             )
 
-            # Nested partition configuration (new structure)
+            # partition configuration
             parser.add_argument(
-                "--partition.auto_configure",
-                type=bool,
-                default=False,
-                help="Automatically determine optimal partition size based on data modality (nested partition config)",
+                "--partition.rows",
+                type=int,
+                default=50000,
+                help="Number of rows per partition (nested partition config, used when auto_configure=false)",
             )
             parser.add_argument(
-                "--partition.size",
+                "--partition.size_in_mb",
                 type=int,
-                default=10000,
-                help="Number of samples per partition (nested partition config, used when auto_configure=false)",
-            )
-            parser.add_argument(
-                "--partition.max_size_mb",
-                type=int,
-                default=128,
-                help="Maximum partition size in MB (nested partition config)",
+                default=256,
+                help="Target partition size in MB (nested partition config, alternative to partition.rows)",
             )
 
-            # Resource optimization configuration (nested structure)
+            # Resource optimization configuration
             parser.add_argument(
                 "--resource_optimization.auto_configure",
                 type=bool,
@@ -557,7 +551,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 help="Enable automatic optimization of partition size, worker count, and other resource-dependent settings (nested resource_optimization config)",
             )
 
-            # Intermediate storage configuration (nested structure)
+            # Intermediate storage configuration
             parser.add_argument(
                 "--intermediate_storage.preserve_intermediate_data",
                 type=bool,
@@ -605,11 +599,12 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 choices=["snappy", "gzip", "none"],
                 help="Compression format for storage files (nested intermediate_storage config)",
             )
+
             parser.add_argument(
-                "--intermediate_storage.parquet_batch_size",
-                type=int,
-                default=10000,
-                help="Number of rows per parquet file for optimal file sizes (nested intermediate_storage config)",
+                "--intermediate_storage.write_partitions",
+                type=bool,
+                default=True,
+                help="Whether to write intermediate partition files to disk (nested intermediate_storage config). Set to false for better performance when intermediate files aren't needed.",
             )
 
             parser.add_argument(
