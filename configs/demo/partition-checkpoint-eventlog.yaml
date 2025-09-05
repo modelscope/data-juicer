@@ -44,17 +44,11 @@ checkpoint_dir: "{work_dir}/checkpoints"  # Optional: separate large storage for
 
 # Resource optimization configuration
 resource_optimization:
-  auto_configure: true  # Enable automatic optimization of partition size, worker count, and other resource-dependent settings
-  # Manual configuration (used when auto_configure: false)
-  # partition:
-  #   size: 10000  # Number of samples per partition
-  #   max_size_mb: 128  # Maximum partition size in MB
-  # np: 2  # Number of Ray workers
+  auto_configure: false  # Enable automatic optimization of partition size, worker count, and other resource-dependent settings
 
-# Partition configuration (used when resource_optimization.auto_configure: false)
 partition:
-  # size: 10000  # Number of samples per partition
-  # max_size_mb: 128  # Maximum partition size in MB
+  rows: 50000  # Number of rows per partition (main config)
+  # size_in_mb: 256  # Target partition size in MB (alternative to rows)
 
 # Checkpoint configuration
 checkpoint:
@@ -65,8 +59,8 @@ checkpoint:
 
 # Intermediate storage configuration (includes file lifecycle management)
 intermediate_storage:
-  format: "parquet"  # parquet, arrow, jsonl
-  parquet_batch_size: 10000  # Number of rows per parquet file
+  format: "parquet"  # parquet, arrow, jsonl; defaults to parquet
+  write_partitions: true
 
 # Event logging configuration
 event_logging:
