@@ -360,8 +360,15 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.alphanumeric_filter.html#data_juicer.ops.filter.AlphanumericFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;alphanumeric_filter&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">AlphanumericFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with alphabet/numeric ratio within a specific</span>
-<span class="sd">    range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with an alphabet/numeric ratio within a specific range.</span>
+
+<span class="sd">    This operator filters samples based on the ratio of alphanumeric characters or tokens.</span>
+<span class="sd">    It keeps samples where the ratio of alphanumeric characters (or tokens) to the total</span>
+<span class="sd">    number of characters (or tokens) is within the specified range. The ratio is computed</span>
+<span class="sd">    either character-based or token-based, depending on the `tokenization` parameter. If</span>
+<span class="sd">    `tokenization` is True, it uses a Hugging Face tokenizer to count tokens. The key metric</span>
+<span class="sd">    used for filtering is &#39;alpha_token_ratio&#39; if tokenization is enabled, otherwise</span>
+<span class="sd">    &#39;alnum_ratio&#39;. The operator caches these metrics in the stats field for each sample.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

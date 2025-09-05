@@ -353,7 +353,7 @@
 
 
 <div class="viewcode-block" id="Tracer">
-<a class="viewcode-back" href="../../../api/data_juicer.core.tracer.html#data_juicer.core.tracer.Tracer">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.core.tracer.html#data_juicer.core.Tracer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Tracer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The tracer to trace the sample changes before and after an operator</span>
@@ -363,7 +363,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Tracer.__init__">
-<a class="viewcode-back" href="../../../api/data_juicer.core.tracer.html#data_juicer.core.tracer.Tracer.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.core.tracer.html#data_juicer.core.Tracer.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work_dir</span><span class="p">,</span> <span class="n">op_list_to_trace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_num</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
@@ -387,7 +387,7 @@
 
 
 <div class="viewcode-block" id="Tracer.trace_mapper">
-<a class="viewcode-back" href="../../../api/data_juicer.core.tracer.html#data_juicer.core.tracer.Tracer.trace_mapper">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.core.tracer.html#data_juicer.core.Tracer.trace_mapper">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">trace_mapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">previous_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">processed_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compare datasets before and after a Mapper.</span>
@@ -445,7 +445,7 @@
 
 
 <div class="viewcode-block" id="Tracer.trace_batch_mapper">
-<a class="viewcode-back" href="../../../api/data_juicer.core.tracer.html#data_juicer.core.tracer.Tracer.trace_batch_mapper">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.core.tracer.html#data_juicer.core.Tracer.trace_batch_mapper">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">trace_batch_mapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">previous_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">processed_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compare datasets before and after a BatchMapper.</span>
@@ -481,7 +481,7 @@
 
 
 <div class="viewcode-block" id="Tracer.trace_filter">
-<a class="viewcode-back" href="../../../api/data_juicer.core.tracer.html#data_juicer.core.tracer.Tracer.trace_filter">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.core.tracer.html#data_juicer.core.Tracer.trace_filter">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">trace_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">previous_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">processed_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compare datasets before and after a Filter.</span>
@@ -541,7 +541,7 @@
 
 
 <div class="viewcode-block" id="Tracer.trace_deduplicator">
-<a class="viewcode-back" href="../../../api/data_juicer.core.tracer.html#data_juicer.core.tracer.Tracer.trace_deduplicator">[docs]</a>
+<a class="viewcode-back" href="../../../api/data_juicer.core.tracer.html#data_juicer.core.Tracer.trace_deduplicator">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">trace_deduplicator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dup_pairs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compare datasets before and after a Deduplicator.</span>

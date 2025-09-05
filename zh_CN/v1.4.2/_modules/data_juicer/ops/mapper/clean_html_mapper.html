@@ -361,7 +361,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.clean_html_mapper.html#data_juicer.ops.mapper.clean_html_mapper.CleanHtmlMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CleanHtmlMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to clean html code in text samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cleans HTML code from text samples, converting HTML to plain text.</span>
+
+<span class="sd">    This operator processes text samples by removing HTML tags and converting HTML elements</span>
+<span class="sd">    to a more readable format. Specifically, it replaces `&lt;li&gt;` and `&lt;ol&gt;` tags with newline</span>
+<span class="sd">    and bullet points. The Selectolax HTML parser is used to extract the text content from</span>
+<span class="sd">    the HTML. This operation is performed in a batched manner, making it efficient for large</span>
+<span class="sd">    datasets.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

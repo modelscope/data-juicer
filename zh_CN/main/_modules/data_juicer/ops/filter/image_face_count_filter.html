@@ -364,12 +364,19 @@
 
 
 <div class="viewcode-block" id="ImageFaceCountFilter">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_face_count_filter.html#data_juicer.ops.filter.image_face_count_filter.ImageFaceCountFilter">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_face_count_filter.html#data_juicer.ops.filter.ImageFaceCountFilter">[文档]</a>
 <span class="nd">@UNFORKABLE</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageFaceCountFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with the number of faces within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with the number of faces within a specific range.</span>
+
+<span class="sd">    This operator uses an OpenCV classifier for face detection. It filters samples based on</span>
+<span class="sd">    the number of faces detected in the images, keeping only those with a face count within</span>
+<span class="sd">    the specified range. The operator supports two strategies: &#39;any&#39; (keep if any image</span>
+<span class="sd">    meets the condition) and &#39;all&#39; (keep only if all images meet the condition). The face</span>
+<span class="sd">    counts are cached in the &#39;face_counts&#39; field. If no images are present in the sample,</span>
+<span class="sd">    the face count is set to an empty array.&quot;&quot;&quot;</span>
 
     <span class="n">_default_kwargs</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;scaleFactor&quot;</span><span class="p">:</span> <span class="mf">1.1</span><span class="p">,</span>
@@ -379,7 +386,7 @@
     <span class="p">}</span>
 
 <div class="viewcode-block" id="ImageFaceCountFilter.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_face_count_filter.html#data_juicer.ops.filter.image_face_count_filter.ImageFaceCountFilter.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_face_count_filter.html#data_juicer.ops.filter.ImageFaceCountFilter.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">cv_classifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -424,7 +431,7 @@
 
 
 <div class="viewcode-block" id="ImageFaceCountFilter.compute_stats_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_face_count_filter.html#data_juicer.ops.filter.image_face_count_filter.ImageFaceCountFilter.compute_stats_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_face_count_filter.html#data_juicer.ops.filter.ImageFaceCountFilter.compute_stats_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
         <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">face_ratios</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
@@ -458,7 +465,7 @@
 
 
 <div class="viewcode-block" id="ImageFaceCountFilter.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_face_count_filter.html#data_juicer.ops.filter.image_face_count_filter.ImageFaceCountFilter.process_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_face_count_filter.html#data_juicer.ops.filter.ImageFaceCountFilter.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="n">face_counts</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">face_counts</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">face_counts</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>

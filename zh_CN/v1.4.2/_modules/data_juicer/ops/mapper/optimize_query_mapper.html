@@ -355,9 +355,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.optimize_query_mapper.html#data_juicer.ops.mapper.optimize_query_mapper.OptimizeQueryMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">OptimizeQueryMapper</span><span class="p">(</span><span class="n">OptimizeQAMapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to optimize query in question-answer pairs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Optimize queries in question-answer pairs to make them more specific and detailed.</span>
+
+<span class="sd">    This mapper refines the questions in a QA pair, making them more specific and detailed</span>
+<span class="sd">    while ensuring that the original answer can still address the optimized question. It</span>
+<span class="sd">    uses a predefined system prompt for the optimization process. The optimized query is</span>
+<span class="sd">    extracted from the raw output by stripping any leading or trailing whitespace. The</span>
+<span class="sd">    mapper utilizes a CUDA accelerator for faster processing.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="s2">&quot;优化问答对中的【问题】，将其更加详细具体，但仍可以由原答案回答。只输出优化后的【问题】，不要输出多余内容。&quot;</span>  <span class="c1"># noqa: E501</span>
 

@@ -369,9 +369,17 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.aggregator.entity_attribute_aggregator.html#data_juicer.ops.aggregator.EntityAttributeAggregator">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">EntityAttributeAggregator</span><span class="p">(</span><span class="n">Aggregator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return conclusion of the given entity&#39;s attribute from some docs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Summarizes a given attribute of an entity from a set of documents.</span>
+
+<span class="sd">    The operator extracts and summarizes the specified attribute of a given entity from the</span>
+<span class="sd">    provided documents. It uses a system prompt, example prompt, and input template to</span>
+<span class="sd">    generate the summary. The output is formatted as a markdown-style summary with the</span>
+<span class="sd">    entity and attribute clearly labeled. The summary is limited to a specified number of</span>
+<span class="sd">    words (default is 100). The operator uses a Hugging Face tokenizer to handle token</span>
+<span class="sd">    limits and splits documents if necessary. If the input key or required fields are</span>
+<span class="sd">    missing, the operator logs a warning and returns the sample unchanged. The summary is</span>
+<span class="sd">    stored in the batch metadata under the specified output key. The system prompt, input</span>
+<span class="sd">    template, example prompt, and output pattern can be customized.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_TEMPLATE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;给定与`</span><span class="si">{entity}</span><span class="s2">`相关的一些文档，总结`</span><span class="si">{entity}</span><span class="s2">`的`</span><span class="si">{attribute}</span><span class="s2">`。</span><span class="se">\n</span><span class="s2">&quot;</span>

@@ -359,11 +359,20 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_comments_mapper.html#data_juicer.ops.mapper.remove_comments_mapper.RemoveCommentsMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;remove_comments_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveCommentsMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to remove comments in different kinds of documents.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes comments from documents, currently supporting only &#39;tex&#39; format.</span>
 
-<span class="sd">    Only support &#39;tex&#39; for now.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    This operator removes inline and multiline comments from text samples. It supports both</span>
+<span class="sd">    inline and multiline comment removal, controlled by the `inline` and `multiline`</span>
+<span class="sd">    parameters. Currently, it is designed to work with &#39;tex&#39; documents. The operator</span>
+<span class="sd">    processes each sample in the batch and applies regular expressions to remove comments.</span>
+<span class="sd">    The processed text is then updated in the original samples.</span>
+
+<span class="sd">    - Inline comments are removed using the pattern `[^\\]%.+$`.</span>
+<span class="sd">    - Multiline comments are removed using the pattern `^%.*\n?`.</span>
+
+<span class="sd">    Important notes:</span>
+<span class="sd">    - Only &#39;tex&#39; document type is supported at present.</span>
+<span class="sd">    - The operator processes the text in place and updates the original samples.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

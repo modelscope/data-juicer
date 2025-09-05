@@ -359,18 +359,24 @@
 
 
 <div class="viewcode-block" id="VideoTaggingFromAudioMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_tagging_from_audio_mapper.html#data_juicer.ops.mapper.video_tagging_from_audio_mapper.VideoTaggingFromAudioMapper">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoTaggingFromAudioMapper">[文档]</a>
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoTaggingFromAudioMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to generate video tags from audio streams extracted by video</span>
-<span class="sd">    using the Audio Spectrogram Transformer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates video tags from audio streams using the Audio Spectrogram Transformer.</span>
+
+<span class="sd">    This operator extracts audio streams from videos and uses a Hugging Face Audio</span>
+<span class="sd">    Spectrogram Transformer (AST) model to generate tags. The tags are stored in the</span>
+<span class="sd">    specified metadata field, defaulting to &#39;video_audio_tags&#39;. If no valid audio stream is</span>
+<span class="sd">    found, the tag is set to &#39;EMPTY&#39;. The operator resamples audio to match the model&#39;s</span>
+<span class="sd">    required sampling rate if necessary. The tags are inferred based on the highest logit</span>
+<span class="sd">    value from the model&#39;s output. If the tags are already present in the sample, the</span>
+<span class="sd">    operator skips processing for that sample.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
 <div class="viewcode-block" id="VideoTaggingFromAudioMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_tagging_from_audio_mapper.html#data_juicer.ops.mapper.video_tagging_from_audio_mapper.VideoTaggingFromAudioMapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoTaggingFromAudioMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hf_ast</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MIT/ast-finetuned-audioset-10-10-0.4593&quot;</span><span class="p">,</span>
@@ -401,7 +407,7 @@
 
 
 <div class="viewcode-block" id="VideoTaggingFromAudioMapper.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_tagging_from_audio_mapper.html#data_juicer.ops.mapper.video_tagging_from_audio_mapper.VideoTaggingFromAudioMapper.process_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoTaggingFromAudioMapper.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s generated already</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_field_name</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]:</span>

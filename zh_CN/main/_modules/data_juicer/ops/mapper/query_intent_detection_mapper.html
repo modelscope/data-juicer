@@ -356,20 +356,23 @@
 
 
 <div class="viewcode-block" id="QueryIntentDetectionMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.query_intent_detection_mapper.html#data_juicer.ops.mapper.query_intent_detection_mapper.QueryIntentDetectionMapper">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.QueryIntentDetectionMapper">[文档]</a>
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">QueryIntentDetectionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to predict user&#39;s Intent label in query. Input from query_key.</span>
-<span class="sd">    Output intent label and corresponding score for the query.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Predicts the user&#39;s intent label and corresponding score for a given query. The operator</span>
+<span class="sd">    uses a Hugging Face model to classify the intent of the input query. If the query is in</span>
+<span class="sd">    Chinese, it can optionally be translated to English using another Hugging Face</span>
+<span class="sd">    translation model before classification. The predicted intent label and its confidence</span>
+<span class="sd">    score are stored in the meta field with the keys &#39;query_intent_label&#39; and</span>
+<span class="sd">    &#39;query_intent_score&#39;, respectively. If these keys already exist in the meta field, the</span>
+<span class="sd">    operator will skip processing for those samples.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="QueryIntentDetectionMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.query_intent_detection_mapper.html#data_juicer.ops.mapper.query_intent_detection_mapper.QueryIntentDetectionMapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.QueryIntentDetectionMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hf_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bespin-global/klue-roberta-small-3i4k-intent-classification&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501 E131</span>
@@ -422,7 +425,7 @@
 
 
 <div class="viewcode-block" id="QueryIntentDetectionMapper.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.query_intent_detection_mapper.html#data_juicer.ops.mapper.query_intent_detection_mapper.QueryIntentDetectionMapper.process_batched">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.QueryIntentDetectionMapper.process_batched">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">metas</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_key</span> <span class="ow">in</span> <span class="n">metas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">score_key</span> <span class="ow">in</span> <span class="n">metas</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>

@@ -364,7 +364,13 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageNSFWFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples whose images have nsfw scores in a specified range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples whose images have nsfw scores in a specified range.</span>
+
+<span class="sd">    This operator uses a Hugging Face model to compute the nsfw scores for each image in a</span>
+<span class="sd">    sample. It keeps samples based on the specified `min_score` and `max_score` thresholds.</span>
+<span class="sd">    The operator supports two strategies: &#39;any&#39; (keep the sample if any image meets the</span>
+<span class="sd">    condition) or &#39;all&#39; (keep the sample only if all images meet the condition). The nsfw</span>
+<span class="sd">    scores are cached in the &#39;image_nsfw_score&#39; field of the sample&#39;s stats.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

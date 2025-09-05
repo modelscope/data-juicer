@@ -372,7 +372,21 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.document_simhash_deduplicator.html#data_juicer.ops.deduplicator.DocumentSimhashDeduplicator">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DocumentSimhashDeduplicator</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deduplicator to deduplicate samples at document-level using SimHash.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deduplicates samples at the document level using SimHash.</span>
+
+<span class="sd">    This operator computes SimHash values for each sample and removes duplicates based on a</span>
+<span class="sd">    specified Hamming distance threshold. It supports different tokenization methods:</span>
+<span class="sd">    &#39;space&#39;, &#39;punctuation&#39;, and &#39;character&#39;. The SimHash is computed over shingles of a</span>
+<span class="sd">    given window size, and the deduplication process clusters similar documents and retains</span>
+<span class="sd">    only one from each cluster. The default mode converts text to lowercase and can ignore</span>
+<span class="sd">    specific patterns. The key metric, Hamming distance, is used to determine similarity</span>
+<span class="sd">    between SimHash values. Important notes:</span>
+<span class="sd">    - The `ignore_pattern` parameter can be used to exclude certain substrings during</span>
+<span class="sd">      SimHash computation.</span>
+<span class="sd">    - For punctuation-based tokenization, the `ignore_pattern` should not include</span>
+<span class="sd">      punctuations to avoid conflicts.</span>
+<span class="sd">    - The `hamming_distance` must be less than the number of blocks (`num_blocks`).</span>
+<span class="sd">    - Only the first sample in each cluster is retained by default.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="DocumentSimhashDeduplicator.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.document_simhash_deduplicator.html#data_juicer.ops.deduplicator.DocumentSimhashDeduplicator.__init__">[文档]</a>

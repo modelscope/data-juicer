@@ -358,12 +358,13 @@
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">MllmMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to use MLLMs for visual question answering tasks.</span>
-<span class="sd">    Recommended model list: [</span>
-<span class="sd">        llava-hf/llava-v1.6-vicuna-7b-hf,</span>
-<span class="sd">        Qwen/Qwen2-VL-7B-Instruct,</span>
-<span class="sd">    ]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to use MLLMs for visual question answering tasks. This operator uses a Hugging</span>
+<span class="sd">    Face model to generate answers based on input text and images. It supports models like</span>
+<span class="sd">    `llava-hf/llava-v1.6-vicuna-7b-hf` and `Qwen/Qwen2-VL-7B-Instruct`. The operator</span>
+<span class="sd">    processes each sample, loading and processing images, and generating responses using the</span>
+<span class="sd">    specified model. The generated responses are appended to the sample&#39;s text field. The</span>
+<span class="sd">    key parameters include the model ID, maximum new tokens, temperature, top-p sampling,</span>
+<span class="sd">    and beam search size, which control the generation process.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

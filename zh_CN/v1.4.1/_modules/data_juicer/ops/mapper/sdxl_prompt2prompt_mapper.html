@@ -370,9 +370,14 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SDXLPrompt2PromptMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate pairs of similar images by the SDXL model</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates pairs of similar images using the SDXL model.</span>
+
+<span class="sd">    This operator uses a Hugging Face diffusion model to generate image pairs based on two</span>
+<span class="sd">    text prompts. The quality and similarity of the generated images are controlled by</span>
+<span class="sd">    parameters such as `num_inference_steps` and `guidance_scale`. The first and second text</span>
+<span class="sd">    prompts are specified using `text_key` and `text_key_second`, respectively. The</span>
+<span class="sd">    generated images are saved in the specified `output_dir` with unique filenames. The</span>
+<span class="sd">    operator requires both text keys to be set for processing.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

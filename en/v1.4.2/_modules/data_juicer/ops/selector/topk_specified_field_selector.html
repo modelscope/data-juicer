@@ -357,8 +357,15 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.selector.topk_specified_field_selector.html#data_juicer.ops.selector.TopkSpecifiedFieldSelector">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;topk_specified_field_selector&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TopkSpecifiedFieldSelector</span><span class="p">(</span><span class="n">Selector</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Selector to select top samples based on the sorted specified field</span>
-<span class="sd">    value.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Selects top samples based on the sorted values of a specified field.</span>
+
+<span class="sd">    This operator selects the top samples from a dataset based on the values of a specified</span>
+<span class="sd">    field. The field can be multi-level, with keys separated by dots. The selection is based</span>
+<span class="sd">    on either a specified ratio of the dataset or a fixed number of top samples. If both</span>
+<span class="sd">    `top_ratio` and `topk` are provided, the one resulting in fewer samples is used. The</span>
+<span class="sd">    sorting order can be ascending or descending, controlled by the `reverse` parameter. The</span>
+<span class="sd">    key metric is the value of the specified field, and the operator uses this to determine</span>
+<span class="sd">    which samples to keep.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TopkSpecifiedFieldSelector.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.selector.topk_specified_field_selector.html#data_juicer.ops.selector.TopkSpecifiedFieldSelector.__init__">[docs]</a>

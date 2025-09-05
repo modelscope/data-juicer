@@ -373,7 +373,7 @@
 
 
 <div class="viewcode-block" id="call_gpt_vision_api">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.html#data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.call_gpt_vision_api">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.html#data_juicer.ops.mapper.call_gpt_vision_api">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">call_gpt_vision_api</span><span class="p">(</span>
     <span class="n">api_key</span><span class="p">,</span> <span class="n">system_prompt</span><span class="p">,</span> <span class="n">user_prompt</span><span class="p">,</span> <span class="n">base64_image</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4-vision-preview&quot;</span>
 <span class="p">):</span>
@@ -430,17 +430,26 @@
 
 
 <div class="viewcode-block" id="ImageCaptioningFromGPT4VMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.html#data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.ImageCaptioningFromGPT4VMapper">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageCaptioningFromGPT4VMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;image_captioning_from_gpt4v_mapper&quot;</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;image_captioning_from_gpt4v_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageCaptioningFromGPT4VMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to generate samples whose texts are generated based on</span>
-<span class="sd">    gpt-4-vision and the image.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates text captions for images using the GPT-4 Vision model.</span>
+
+<span class="sd">    This operator generates text based on the provided images and specified parameters. It</span>
+<span class="sd">    supports different modes of text generation, including &#39;reasoning&#39;, &#39;description&#39;,</span>
+<span class="sd">    &#39;conversation&#39;, and &#39;custom&#39;. The generated text can be added to the original sample or</span>
+<span class="sd">    replace it, depending on the `keep_original_sample` parameter. The operator uses a</span>
+<span class="sd">    Hugging Face tokenizer and the GPT-4 Vision API to generate the text. The `any_or_all`</span>
+<span class="sd">    parameter determines whether all or any of the images in a sample must meet the</span>
+<span class="sd">    generation criteria for the sample to be kept. If `user_prompt_key` is set, it will use</span>
+<span class="sd">    the prompt from the sample; otherwise, it will use the `user_prompt` parameter. If both</span>
+<span class="sd">    are set, `user_prompt_key` takes precedence.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="ImageCaptioningFromGPT4VMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.html#data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.ImageCaptioningFromGPT4VMapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageCaptioningFromGPT4VMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span>
@@ -593,7 +602,7 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">generated_sample</span><span class="p">]</span>
 
 <div class="viewcode-block" id="ImageCaptioningFromGPT4VMapper.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.html#data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.ImageCaptioningFromGPT4VMapper.process_batched">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageCaptioningFromGPT4VMapper.process_batched">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="c1"># reconstruct samples from &quot;dict of lists&quot; to &quot;list of dicts&quot;</span>
         <span class="n">reconstructed_samples</span> <span class="o">=</span> <span class="p">[]</span>

@@ -358,7 +358,22 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.text_chunk_mapper.html#data_juicer.ops.mapper.text_chunk_mapper.TextChunkMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TextChunkMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split input text to chunks.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split input text into chunks based on specified criteria.</span>
+
+<span class="sd">    - Splits the input text into multiple chunks using a specified maximum length and a</span>
+<span class="sd">      split pattern.</span>
+<span class="sd">    - If `max_len` is provided, the text is split into chunks with a maximum length of</span>
+<span class="sd">      `max_len`.</span>
+<span class="sd">    - If `split_pattern` is provided, the text is split at occurrences of the pattern. If</span>
+<span class="sd">      the length exceeds `max_len`, it will force a cut.</span>
+<span class="sd">    - The `overlap_len` parameter specifies the overlap length between consecutive chunks if</span>
+<span class="sd">      the split does not occur at the pattern.</span>
+<span class="sd">    - Uses a Hugging Face tokenizer to calculate the text length in tokens if a tokenizer</span>
+<span class="sd">      name is provided; otherwise, it uses the string length.</span>
+<span class="sd">    - Caches the following stats: &#39;chunk_count&#39; (number of chunks generated for each</span>
+<span class="sd">      sample).</span>
+<span class="sd">    - Raises a `ValueError` if both `max_len` and `split_pattern` are `None` or if</span>
+<span class="sd">      `overlap_len` is greater than or equal to `max_len`.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

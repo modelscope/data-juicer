@@ -355,7 +355,12 @@
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.clean_html_mapper.CleanHtmlMapper">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.clean_html_mapper.</span></span><span class="sig-name descname"><span class="pre">CleanHtmlMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/clean_html_mapper.html#CleanHtmlMapper"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.clean_html_mapper.CleanHtmlMapper" title="Link to this definition">¶</a></dt>
 <dd><p>基类：<a class="reference internal" href="data_juicer.ops.base_op.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
-<p>Mapper to clean html code in text samples.</p>
+<p>Cleans HTML code from text samples, converting HTML to plain text.</p>
+<p>This operator processes text samples by removing HTML tags and converting HTML elements
+to a more readable format. Specifically, it replaces <cite>&lt;li&gt;</cite> and <cite>&lt;ol&gt;</cite> tags with newline
+and bullet points. The Selectolax HTML parser is used to extract the text content from
+the HTML. This operation is performed in a batched manner, making it efficient for large
+datasets.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.clean_html_mapper.CleanHtmlMapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/clean_html_mapper.html#CleanHtmlMapper.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.clean_html_mapper.CleanHtmlMapper.__init__" title="Link to this definition">¶</a></dt>

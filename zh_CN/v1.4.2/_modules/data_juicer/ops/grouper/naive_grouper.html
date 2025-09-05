@@ -351,7 +351,12 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.grouper.naive_grouper.html#data_juicer.ops.grouper.NaiveGrouper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;naive_grouper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">NaiveGrouper</span><span class="p">(</span><span class="n">Grouper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Group all samples to one batched sample.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Group all samples in a dataset into a single batched sample.</span>
+
+<span class="sd">    This operator takes a dataset and combines all its samples into one batched sample. If</span>
+<span class="sd">    the input dataset is empty, it returns an empty dataset. The resulting batched sample is</span>
+<span class="sd">    a dictionary where each key corresponds to a list of values from all samples in the</span>
+<span class="sd">    dataset.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="NaiveGrouper.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.grouper.naive_grouper.html#data_juicer.ops.grouper.NaiveGrouper.__init__">[文档]</a>

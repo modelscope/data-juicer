@@ -357,8 +357,14 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.SpecialCharactersFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;special_characters_filter&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpecialCharactersFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with special-char ratio within a specific</span>
-<span class="sd">    range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with special-character ratio within a specific range.</span>
+
+<span class="sd">    This operator filters out samples based on the ratio of special characters in the text.</span>
+<span class="sd">    It keeps samples where the special-character ratio is within the specified minimum and</span>
+<span class="sd">    maximum thresholds. The special-character ratio is computed as the number of special</span>
+<span class="sd">    characters divided by the total number of characters in the text. If the</span>
+<span class="sd">    &#39;special_char_ratio&#39; is already cached in the stats, it will be reused. Otherwise, it</span>
+<span class="sd">    will be computed and stored in the &#39;special_char_ratio&#39; field.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

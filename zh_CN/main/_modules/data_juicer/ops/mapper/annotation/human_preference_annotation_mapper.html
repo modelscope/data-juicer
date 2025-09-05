@@ -358,10 +358,18 @@
 
 
 <div class="viewcode-block" id="HumanPreferenceAnnotationMapper">
-<a class="viewcode-back" href="../../../../../api/data_juicer.ops.mapper.annotation.human_preference_annotation_mapper.html#data_juicer.ops.mapper.annotation.human_preference_annotation_mapper.HumanPreferenceAnnotationMapper">[文档]</a>
+<a class="viewcode-back" href="../../../../../api/data_juicer.ops.mapper.annotation.human_preference_annotation_mapper.html#data_juicer.ops.mapper.HumanPreferenceAnnotationMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;human_preference_annotation_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">HumanPreferenceAnnotationMapper</span><span class="p">(</span><span class="n">LabelStudioAnnotationMapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Operator for human preference annotation using Label Studio.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Operator for human preference annotation using Label Studio.</span>
+
+<span class="sd">    This operator formats and presents pairs of answers to a prompt for human evaluation. It</span>
+<span class="sd">    uses a default or custom Label Studio configuration to display the prompt and answer</span>
+<span class="sd">    options. The operator processes the annotations to determine the preferred answer,</span>
+<span class="sd">    updating the sample with the chosen and rejected answers. The operator requires specific</span>
+<span class="sd">    keys in the samples for the prompt and answer options. If these keys are missing, it</span>
+<span class="sd">    logs warnings and uses placeholder text. The annotated results are processed to update</span>
+<span class="sd">    the sample with the chosen and rejected answers.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_LABEL_CONFIG</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">    &lt;View className=&quot;root&quot;&gt;</span>
@@ -447,7 +455,7 @@
 <span class="s2">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
 <div class="viewcode-block" id="HumanPreferenceAnnotationMapper.__init__">
-<a class="viewcode-back" href="../../../../../api/data_juicer.ops.mapper.annotation.human_preference_annotation_mapper.html#data_juicer.ops.mapper.annotation.human_preference_annotation_mapper.HumanPreferenceAnnotationMapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../../api/data_juicer.ops.mapper.annotation.human_preference_annotation_mapper.html#data_juicer.ops.mapper.HumanPreferenceAnnotationMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">label_config_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

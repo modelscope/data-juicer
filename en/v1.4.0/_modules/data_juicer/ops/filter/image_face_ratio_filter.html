@@ -365,7 +365,15 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageFaceRatioFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with face area ratios within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with face area ratios within a specific range.</span>
+
+<span class="sd">    This operator filters samples based on the ratio of the largest face area to the total</span>
+<span class="sd">    image area. It uses an OpenCV classifier for face detection. The key metric,</span>
+<span class="sd">    &#39;face_ratios&#39;, is computed for each image in the sample. Samples are kept if the face</span>
+<span class="sd">    area ratios fall within the specified min and max ratio range. The filtering strategy</span>
+<span class="sd">    can be set to &#39;any&#39; (keep if any image meets the condition) or &#39;all&#39; (keep only if all</span>
+<span class="sd">    images meet the condition). If no images are present in the sample, the sample is</span>
+<span class="sd">    retained.&quot;&quot;&quot;</span>
 
     <span class="n">_default_kwargs</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;scaleFactor&quot;</span><span class="p">:</span> <span class="mf">1.1</span><span class="p">,</span>

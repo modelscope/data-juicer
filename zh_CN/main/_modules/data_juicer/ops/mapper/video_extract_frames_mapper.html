@@ -371,27 +371,35 @@
 
 
 <div class="viewcode-block" id="VideoExtractFramesMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_extract_frames_mapper.html#data_juicer.ops.mapper.video_extract_frames_mapper.VideoExtractFramesMapper">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoExtractFramesMapper">[文档]</a>
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoExtractFramesMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to extract frames from video files according to specified methods.</span>
-<span class="sd">    Extracted Frames Data Format:</span>
-<span class="sd">        The data format for the extracted frames is a dictionary mapping</span>
-<span class="sd">        video key to extracted frames directory where the extracted</span>
-<span class="sd">        frames are saved. The dictionary follows the structure:</span>
-<span class="sd">        {</span>
-<span class="sd">            &quot;video_key_1&quot;: &quot;/${frame_dir}/video_key_1_filename/&quot;,</span>
-<span class="sd">            &quot;video_key_2&quot;: &quot;/${frame_dir}/video_key_2_filename/&quot;,</span>
-<span class="sd">            ...</span>
-<span class="sd">        }</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="sd">    Extracts frames from video files using either all keyframes or a uniform sampling</span>
+<span class="sd">    method. The extracted frames are saved in a directory, and the mapping from video keys</span>
+<span class="sd">    to frame directories is stored in the sample&#39;s metadata. The data format for the</span>
+<span class="sd">    extracted frames is a dictionary mapping video keys to their respective frame</span>
+<span class="sd">    directories:</span>
+<span class="sd">    - &quot;video_key_1&quot;: &quot;/${frame_dir}/video_key_1_filename/&quot;</span>
+<span class="sd">    - &quot;video_key_2&quot;: &quot;/${frame_dir}/video_key_2_filename/&quot;</span>
+
+<span class="sd">    - **Frame Sampling Methods**:</span>
+<span class="sd">    - &quot;all_keyframes&quot;: Extracts all keyframes from the video.</span>
+<span class="sd">    - &quot;uniform&quot;: Extracts a specified number of frames uniformly from the video.</span>
+<span class="sd">    - If `duration` is set, the video is segmented into multiple segments based on the</span>
+<span class="sd">      duration, and frames are extracted from each segment.</span>
+<span class="sd">    - The output directory for the frames can be specified; otherwise, a default directory</span>
+<span class="sd">      is used.</span>
+<span class="sd">    - The field name in the sample&#39;s metadata where the frame information is stored can be</span>
+<span class="sd">      customized.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="VideoExtractFramesMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_extract_frames_mapper.html#data_juicer.ops.mapper.video_extract_frames_mapper.VideoExtractFramesMapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoExtractFramesMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">frame_sampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all_keyframes&quot;</span><span class="p">,</span>
@@ -459,7 +467,7 @@
         <span class="k">return</span> <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">saved_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">original_filename</span><span class="si">}</span><span class="s2">__dj_hash_#</span><span class="si">{</span><span class="n">hash_val</span><span class="si">}</span><span class="s2">#&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="VideoExtractFramesMapper.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_extract_frames_mapper.html#data_juicer.ops.mapper.video_extract_frames_mapper.VideoExtractFramesMapper.process_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoExtractFramesMapper.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s generated already</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]:</span>

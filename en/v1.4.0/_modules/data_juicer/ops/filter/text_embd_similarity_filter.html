@@ -366,8 +366,15 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@ATTRIBUTION_FILTERS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TextEmbdSimilarityFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep texts whose average embedding similarity to a set of given validation texts</span>
-<span class="sd">    falls within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep texts whose average embedding similarity to a set of given validation</span>
+<span class="sd">    texts falls within a specific range.</span>
+
+<span class="sd">    This operator computes the cosine similarity between the text embeddings and a set of</span>
+<span class="sd">    validation text embeddings. It keeps samples where the average similarity score is</span>
+<span class="sd">    within the specified range. The key metric, &#39;text_embd_similarity&#39;, is computed as the</span>
+<span class="sd">    mean cosine similarity. The operator supports both API-based and Hugging Face model-</span>
+<span class="sd">    based embeddings. If no valid dataset is provided, the `prepare_valid_feature` method</span>
+<span class="sd">    must be called manually before applying the filter.&quot;&quot;&quot;</span>
 
     <span class="c1"># TODO: save embeddings in local cache to save computation for multiple validation samples</span>
     <span class="c1"># TODO: aggregation strategies</span>

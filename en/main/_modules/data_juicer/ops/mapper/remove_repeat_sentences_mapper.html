@@ -349,7 +349,7 @@
 
 
 <div class="viewcode-block" id="split_sentence">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_repeat_sentences_mapper.html#data_juicer.ops.mapper.remove_repeat_sentences_mapper.split_sentence">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_repeat_sentences_mapper.html#data_juicer.ops.mapper.split_sentence">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">split_sentence</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;([.。！!？\?])([^’”])&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1\n\2&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>  <span class="c1"># noqa</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;(\.</span><span class="si">{6}</span><span class="s2">)([^’”])&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1\n\2&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>  <span class="c1"># noqa</span>
@@ -360,15 +360,23 @@
 
 
 <div class="viewcode-block" id="RemoveRepeatSentencesMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_repeat_sentences_mapper.html#data_juicer.ops.mapper.remove_repeat_sentences_mapper.RemoveRepeatSentencesMapper">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveRepeatSentencesMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;remove_repeat_sentences_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveRepeatSentencesMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove repeat sentences in text samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove repeat sentences in text samples.</span>
+
+<span class="sd">    This operator processes text samples to remove duplicate sentences. It splits the text</span>
+<span class="sd">    into lines and then further splits each line into sentences. Sentences are considered</span>
+<span class="sd">    duplicates if they are identical after optional case normalization and special character</span>
+<span class="sd">    removal. The operator uses a hash set to track unique sentences. Sentences shorter than</span>
+<span class="sd">    `min_repeat_sentence_length` are not deduplicated. If `ignore_special_character` is</span>
+<span class="sd">    enabled, special characters (all except Chinese, letters, and numbers) are ignored when</span>
+<span class="sd">    checking for duplicates. The resulting text is reassembled with unique sentences.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="RemoveRepeatSentencesMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_repeat_sentences_mapper.html#data_juicer.ops.mapper.remove_repeat_sentences_mapper.RemoveRepeatSentencesMapper.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveRepeatSentencesMapper.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">lowercase</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -400,7 +408,7 @@
 
 
 <div class="viewcode-block" id="RemoveRepeatSentencesMapper.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_repeat_sentences_mapper.html#data_juicer.ops.mapper.remove_repeat_sentences_mapper.RemoveRepeatSentencesMapper.process_batched">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveRepeatSentencesMapper.process_batched">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]):</span>
             <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)]</span>

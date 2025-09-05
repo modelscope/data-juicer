@@ -450,8 +450,17 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PhraseGroundingRecallFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples whose locating recalls of phrases extracted</span>
-<span class="sd">    from text in the images are within a specified range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples based on the phrase grounding recall of phrases extracted from</span>
+<span class="sd">    text in images.</span>
+
+<span class="sd">    This operator uses a Hugging Face Owl-ViT model to locate phrases extracted from the</span>
+<span class="sd">    text within the images. It keeps samples where the phrase grounding recall is within a</span>
+<span class="sd">    specified range. The recall is computed by comparing the number of correctly located</span>
+<span class="sd">    phrases to the total number of phrases. The operator can handle multiple images per text</span>
+<span class="sd">    chunk and supports different strategies for reducing the recall values (e.g., average,</span>
+<span class="sd">    max, min). It also allows for flipping images horizontally or vertically. The key metric</span>
+<span class="sd">    &#39;phrase_grounding_recall&#39; is computed and stored in the sample&#39;s stats. If no images are</span>
+<span class="sd">    present, the recall is set to an empty array.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

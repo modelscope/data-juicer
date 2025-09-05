@@ -400,9 +400,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_resize_aspect_ratio_mapper.html#data_juicer.ops.mapper.video_resize_aspect_ratio_mapper.VideoResizeAspectRatioMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoResizeAspectRatioMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to resize videos by aspect ratio.</span>
-<span class="sd">    AspectRatio = W / H.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resizes videos to fit within a specified aspect ratio range. This operator adjusts the</span>
+<span class="sd">    dimensions of videos to ensure their aspect ratios fall within a defined range. It can</span>
+<span class="sd">    either increase or decrease the video dimensions based on the specified strategy. The</span>
+<span class="sd">    aspect ratio is calculated as width divided by height. If a video&#39;s aspect ratio is</span>
+<span class="sd">    outside the given range, it will be resized to match the closest boundary (either the</span>
+<span class="sd">    minimum or maximum ratio). The `min_ratio` and `max_ratio` should be provided as strings</span>
+<span class="sd">    in the format &quot;9:21&quot; or &quot;9/21&quot;. The resizing process uses the `ffmpeg` library to handle</span>
+<span class="sd">    the actual video scaling. Videos that do not need resizing are left unchanged. The</span>
+<span class="sd">    operator supports saving the modified videos to a specified directory or the same</span>
+<span class="sd">    directory as the input files.&quot;&quot;&quot;</span>
 
     <span class="n">STRATEGY</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;decrease&quot;</span><span class="p">,</span> <span class="s2">&quot;increase&quot;</span><span class="p">]</span>
 

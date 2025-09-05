@@ -362,17 +362,25 @@
 
 
 <div class="viewcode-block" id="ImageTextMatchingFilter">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.ImageTextMatchingFilter">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_text_matching_filter.html#data_juicer.ops.filter.ImageTextMatchingFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageTextMatchingFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples those matching score between image and text</span>
-<span class="sd">    within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with image-text matching scores within a specific range.</span>
+
+<span class="sd">    This operator uses a Hugging Face BLIP model to compute the matching score between</span>
+<span class="sd">    images and text. It keeps samples where the matching score falls within the specified</span>
+<span class="sd">    `min_score` and `max_score` range. The key metric, `image_text_matching_score`, is</span>
+<span class="sd">    computed for each image-text pair. If multiple images are associated with a single text,</span>
+<span class="sd">    the scores can be reduced using &#39;avg&#39;, &#39;max&#39;, or &#39;min&#39; modes. The operator supports</span>
+<span class="sd">    horizontal and vertical flipping of images. Samples are kept based on either &#39;any&#39; or</span>
+<span class="sd">    &#39;all&#39; strategy: &#39;any&#39; keeps the sample if any image meets the condition, while &#39;all&#39;</span>
+<span class="sd">    keeps the sample only if all images meet the condition.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
 <div class="viewcode-block" id="ImageTextMatchingFilter.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.ImageTextMatchingFilter.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_text_matching_filter.html#data_juicer.ops.filter.ImageTextMatchingFilter.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hf_blip</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Salesforce/blip-itm-base-coco&quot;</span><span class="p">,</span>
@@ -427,7 +435,7 @@
 
 
 <div class="viewcode-block" id="ImageTextMatchingFilter.compute_stats_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.ImageTextMatchingFilter.compute_stats_single">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_text_matching_filter.html#data_juicer.ops.filter.ImageTextMatchingFilter.compute_stats_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
         <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_text_matching_score</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
@@ -493,7 +501,7 @@
 
 
 <div class="viewcode-block" id="ImageTextMatchingFilter.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.ImageTextMatchingFilter.process_single">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_text_matching_filter.html#data_juicer.ops.filter.ImageTextMatchingFilter.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">itm_scores</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_text_matching_score</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">itm_scores</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>

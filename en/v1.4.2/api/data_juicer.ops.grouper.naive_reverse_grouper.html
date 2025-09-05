@@ -354,7 +354,16 @@
 <dt class="sig sig-object py" id="data_juicer.ops.grouper.naive_reverse_grouper.NaiveReverseGrouper">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.grouper.naive_reverse_grouper.</span></span><span class="sig-name descname"><span class="pre">NaiveReverseGrouper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_meta_export_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/grouper/naive_reverse_grouper.html#NaiveReverseGrouper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.grouper.naive_reverse_grouper.NaiveReverseGrouper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.base_op.html#data_juicer.ops.base_op.Grouper" title="data_juicer.ops.base_op.Grouper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grouper</span></code></a></p>
-<p>Split batched samples to samples.</p>
+<p>Split batched samples into individual samples.</p>
+<p>This operator processes a dataset by splitting each batched sample into
+individual samples. It also handles and optionally exports batch metadata.
+- If a sample contains ‘batch_meta’, it is separated and can be exported
+to a specified path.
+- The operator converts the remaining data from a dictionary of lists
+to a list of dictionaries, effectively unbatching the samples.
+- If <cite>batch_meta_export_path</cite> is provided, the batch metadata is written
+to this file in JSON format, one entry per line.
+- If no samples are present in the dataset, the original dataset is returned.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.grouper.naive_reverse_grouper.NaiveReverseGrouper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_meta_export_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/grouper/naive_reverse_grouper.html#NaiveReverseGrouper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.grouper.naive_reverse_grouper.NaiveReverseGrouper.__init__" title="Link to this definition">¶</a></dt>

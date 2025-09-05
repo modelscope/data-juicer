@@ -358,8 +358,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.token_num_filter.html#data_juicer.ops.filter.token_num_filter.TokenNumFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TokenNumFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with total token number within a specific</span>
-<span class="sd">    range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with a total token number within a specified range.</span>
+
+<span class="sd">    This operator uses a Hugging Face tokenizer to count the number of tokens in each</span>
+<span class="sd">    sample. It keeps samples where the token count is between the minimum and maximum</span>
+<span class="sd">    thresholds. The token count is stored in the &#39;num_token&#39; field of the sample&#39;s stats. If</span>
+<span class="sd">    the token count is not already computed, it will be calculated using the specified</span>
+<span class="sd">    tokenizer.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TokenNumFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.token_num_filter.html#data_juicer.ops.filter.token_num_filter.TokenNumFilter.__init__">[文档]</a>

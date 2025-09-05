@@ -370,9 +370,16 @@
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_SAMPLED_FRAMES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoAestheticsFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep data samples with aesthetics scores for specified frames</span>
-<span class="sd">    in the videos within a specific range.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep data samples with aesthetics scores for specified frames in the videos</span>
+<span class="sd">    within a specific range.</span>
+
+<span class="sd">    This operator evaluates the aesthetic quality of video frames using a Hugging Face</span>
+<span class="sd">    model. It keeps samples where the aesthetics scores of the specified frames fall within</span>
+<span class="sd">    a given range. The key metric, &#39;video_frames_aesthetics_score&#39;, is computed by</span>
+<span class="sd">    averaging, taking the max, or min of the frame scores, depending on the reduce mode.</span>
+<span class="sd">    Frame sampling can be done uniformly or by extracting all keyframes. The filter applies</span>
+<span class="sd">    a &#39;any&#39; or &#39;all&#39; strategy to decide if a sample should be kept based on the scores of</span>
+<span class="sd">    multiple videos.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

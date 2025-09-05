@@ -364,7 +364,17 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.NlpaugEnMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">NlpaugEnMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to simply augment samples in English based on nlpaug library.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Augments English text samples using various methods from the nlpaug library.</span>
+
+<span class="sd">    This operator applies a series of text augmentation techniques to generate new samples.</span>
+<span class="sd">    It supports both word-level and character-level augmentations, such as deleting,</span>
+<span class="sd">    swapping, and inserting words or characters. The number of augmented samples can be</span>
+<span class="sd">    controlled, and the original samples can be kept or removed. When multiple augmentation</span>
+<span class="sd">    methods are enabled, they can be applied sequentially or independently. Sequential</span>
+<span class="sd">    application means each sample is augmented by all enabled methods in sequence, while</span>
+<span class="sd">    independent application generates multiple augmented samples for each method. We</span>
+<span class="sd">    recommend using 1-3 augmentation methods at a time to avoid significant changes in</span>
+<span class="sd">    sample semantics.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

@@ -353,8 +353,11 @@
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.remove_bibliography_mapper.</span></span><span class="sig-name descname"><span class="pre">RemoveBibliographyMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/remove_bibliography_mapper.html#RemoveBibliographyMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.base_op.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
-<p>Mapper to remove bibliography at the end of documents in Latex
-samples.</p>
+<p>Removes bibliography sections at the end of LaTeX documents.</p>
+<p>This operator identifies and removes bibliography sections in LaTeX documents. It uses a
+regular expression to match common bibliography commands such as appendix,
+begin{references}, begin{thebibliography}, and bibliography. The matched sections are
+removed from the text. The operator processes samples in batch mode for efficiency.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/remove_bibliography_mapper.html#RemoveBibliographyMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper.__init__" title="Link to this definition">¶</a></dt>

@@ -365,7 +365,14 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageTaggingMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to generate image tags.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates image tags for each image in the sample.</span>
+
+<span class="sd">    This operator processes images to generate descriptive tags. It uses a Hugging Face</span>
+<span class="sd">    model to analyze the images and produce relevant tags. The tags are stored in the</span>
+<span class="sd">    specified field, defaulting to &#39;image_tags&#39;. If the tags are already present in the</span>
+<span class="sd">    sample, the operator will not recompute them. For samples without images, an empty tag</span>
+<span class="sd">    array is assigned. The generated tags are sorted by frequency and stored as a list of</span>
+<span class="sd">    strings.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

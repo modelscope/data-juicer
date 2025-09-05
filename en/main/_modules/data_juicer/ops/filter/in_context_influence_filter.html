@@ -360,11 +360,20 @@
 
 
 <div class="viewcode-block" id="InContextInfluenceFilter">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.InContextInfluenceFilter">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.in_context_influence_filter.html#data_juicer.ops.filter.InContextInfluenceFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@ATTRIBUTION_FILTERS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">InContextInfluenceFilter</span><span class="p">(</span><span class="n">LLMPerplexityFilter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep texts whose in-context influence upon validation set within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep texts based on their in-context influence on a validation set.</span>
+
+<span class="sd">    This operator calculates the in-context influence of each sample by comparing</span>
+<span class="sd">    perplexities with and without the sample as context. The influence score is computed as</span>
+<span class="sd">    the ratio of these perplexities. If `valid_as_demo` is True, the score is L(A|Q) /</span>
+<span class="sd">    L(A|task_desc, Q_v, A_v, Q). Otherwise, it is L(A_v|Q) / L(A_v|task_desc, Q, A, Q_v).</span>
+<span class="sd">    The operator retains samples whose in-context influence score is within a specified</span>
+<span class="sd">    range. The in-context influence score is stored in the &#39;in_context_influence&#39; field of</span>
+<span class="sd">    the sample&#39;s stats. The validation set must be prepared using the</span>
+<span class="sd">    `prepare_valid_feature` method if not provided during initialization.&quot;&quot;&quot;</span>
 
     <span class="c1"># This operator is currently under development and evaluation as part of an ongoing research project.</span>
     <span class="c1"># The Data-Juicer team retains full copyright over this operator.</span>
@@ -372,7 +381,7 @@
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
 <div class="viewcode-block" id="InContextInfluenceFilter.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.InContextInfluenceFilter.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.in_context_influence_filter.html#data_juicer.ops.filter.InContextInfluenceFilter.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">valid_dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -410,7 +419,7 @@
         <span class="k">return</span> <span class="s2">&quot;valid_samples&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_feature</span> <span class="ow">and</span> <span class="s2">&quot;valid_losses&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_feature</span>
 
 <div class="viewcode-block" id="InContextInfluenceFilter.prepare_valid_feature">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.InContextInfluenceFilter.prepare_valid_feature">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.in_context_influence_filter.html#data_juicer.ops.filter.InContextInfluenceFilter.prepare_valid_feature">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prepare_valid_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">task_desc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_shot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">n_shot</span> <span class="o">=</span> <span class="n">n_shot</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">valid_feature</span><span class="p">[</span><span class="s2">&quot;valid_samples&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -425,7 +434,7 @@
 
 
 <div class="viewcode-block" id="InContextInfluenceFilter.compute_stats_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.InContextInfluenceFilter.compute_stats_single">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.in_context_influence_filter.html#data_juicer.ops.filter.InContextInfluenceFilter.compute_stats_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
         <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">in_context_influence</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
@@ -458,7 +467,7 @@
 
 
 <div class="viewcode-block" id="InContextInfluenceFilter.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.InContextInfluenceFilter.process_single">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.in_context_influence_filter.html#data_juicer.ops.filter.InContextInfluenceFilter.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="n">score</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">in_context_influence</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">score</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

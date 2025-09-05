@@ -361,12 +361,17 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DialogSentimentIntensityMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to predict user&#39;s sentiment intensity (from -5 to 5 in default</span>
-<span class="sd">    prompt) in dialog. Input from history_key, query_key and</span>
-<span class="sd">    response_key. Output lists of intensities and analysis for queries in</span>
-<span class="sd">    the dialog.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to predict user&#39;s sentiment intensity in a dialog, ranging from -5 to 5.</span>
+
+<span class="sd">    This operator analyzes the sentiment of user queries in a dialog and outputs a list of</span>
+<span class="sd">    sentiment intensities and corresponding analyses. The sentiment intensity ranges from -5</span>
+<span class="sd">    (extremely negative) to 5 (extremely positive), with 0 indicating a neutral sentiment.</span>
+<span class="sd">    The analysis is based on the provided history, query, and response keys. The default</span>
+<span class="sd">    system prompt and templates guide the sentiment analysis process. The results are stored</span>
+<span class="sd">    in the meta field under &#39;dialog_sentiment_intensity&#39; for intensities and</span>
+<span class="sd">    &#39;dialog_sentiment_intensity_analysis&#39; for analyses. The operator uses an API model to</span>
+<span class="sd">    generate the sentiment analysis, with configurable retry attempts and sampling</span>
+<span class="sd">    parameters.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;请判断用户和LLM多轮对话中用户的情绪变化。</span><span class="se">\n</span><span class="s2">&quot;</span>

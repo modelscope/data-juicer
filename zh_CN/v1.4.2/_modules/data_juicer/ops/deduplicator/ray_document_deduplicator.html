@@ -359,9 +359,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.ray_document_deduplicator.html#data_juicer.ops.deduplicator.RayDocumentDeduplicator">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RayDocumentDeduplicator</span><span class="p">(</span><span class="n">RayBasicDeduplicator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Deduplicator to deduplicate samples at document-level using exact matching.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deduplicates samples at the document level using exact matching in Ray distributed mode.</span>
+
+<span class="sd">    This operator computes a hash for each document and filters out duplicates based on</span>
+<span class="sd">    exact matches. The hash is calculated from the text content, which can be optionally</span>
+<span class="sd">    converted to lowercase and stripped of non-alphabet characters. The key metric used for</span>
+<span class="sd">    deduplication is the MD5 hash of the processed text. If the `lowercase` parameter is</span>
+<span class="sd">    set, the text is converted to lowercase before hashing. If `ignore_non_character` is</span>
+<span class="sd">    enabled, all non-alphabet characters, including whitespaces, digits, and punctuation,</span>
+<span class="sd">    are removed. The operator supports two backends: &#39;ray_actor&#39; and &#39;redis&#39;, with the</span>
+<span class="sd">    default being &#39;ray_actor&#39;.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="RayDocumentDeduplicator.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.ray_document_deduplicator.html#data_juicer.ops.deduplicator.RayDocumentDeduplicator.__init__">[文档]</a>

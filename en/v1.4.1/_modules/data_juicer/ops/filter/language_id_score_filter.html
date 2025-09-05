@@ -355,8 +355,14 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.language_id_score_filter.html#data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LanguageIDScoreFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples in a specific language with confidence score</span>
-<span class="sd">    larger than a specific min value.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples in a specific language with a confidence score above a threshold.</span>
+
+<span class="sd">    This operator uses a FastText model to identify the language of each sample. It keeps</span>
+<span class="sd">    samples that are in the specified language(s) and have a language identification</span>
+<span class="sd">    confidence score greater than or equal to the minimum score. If no specific language is</span>
+<span class="sd">    provided, it only filters based on the confidence score. The language ID and its</span>
+<span class="sd">    confidence score are stored in the &#39;lang&#39; and &#39;lang_score&#39; fields of the sample&#39;s stats,</span>
+<span class="sd">    respectively.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="LanguageIDScoreFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.language_id_score_filter.html#data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter.__init__">[docs]</a>

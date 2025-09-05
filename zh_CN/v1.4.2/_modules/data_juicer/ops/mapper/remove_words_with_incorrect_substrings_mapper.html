@@ -364,7 +364,22 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.html#data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.RemoveWordsWithIncorrectSubstringsMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveWordsWithIncorrectSubstringsMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove words with incorrect substrings.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove words containing specified incorrect substrings.</span>
+
+<span class="sd">    This operator processes text by removing words that contain any of the specified</span>
+<span class="sd">    incorrect substrings. By default, it removes words with substrings like &quot;http&quot;, &quot;www&quot;,</span>
+<span class="sd">    &quot;.com&quot;, &quot;href&quot;, and &quot;//&quot;. The operator can operate in tokenized or non-tokenized mode.</span>
+<span class="sd">    In tokenized mode, it uses a Hugging Face tokenizer to tokenize the text before</span>
+<span class="sd">    processing. The key metric is not computed; this operator focuses on filtering out</span>
+<span class="sd">    specific words.</span>
+
+<span class="sd">    - If `tokenization` is True, the text is tokenized using a Hugging Face</span>
+<span class="sd">    tokenizer, and words are filtered based on the specified substrings.</span>
+<span class="sd">    - If `tokenization` is False, the text is split into sentences and words,</span>
+<span class="sd">    and words are filtered based on the specified substrings.</span>
+<span class="sd">    - The filtered text is then merged back into a single string.</span>
+
+<span class="sd">    The operator processes samples in batches and updates the text in place.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

@@ -367,8 +367,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.TextPairSimilarityFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TextPairSimilarityFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep text pairs with similarities between texts</span>
-<span class="sd">    within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep text pairs with similarities within a specific range.</span>
+
+<span class="sd">    This operator computes the similarity between two texts in a pair using a Hugging Face</span>
+<span class="sd">    CLIP model. It keeps samples where the similarity score falls within the specified min</span>
+<span class="sd">    and max thresholds. The key metric, &#39;text_pair_similarity&#39;, is computed as the cosine</span>
+<span class="sd">    similarity between the text embeddings. The operator supports two strategies for keeping</span>
+<span class="sd">    samples: &#39;any&#39; (keep if any pair meets the condition) and &#39;all&#39; (keep only if all pairs</span>
+<span class="sd">    meet the condition). If the second text key is not provided, the operator will raise an</span>
+<span class="sd">    error. The similarity scores are cached under the &#39;text_pair_similarity&#39; field in the</span>
+<span class="sd">    sample&#39;s stats.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

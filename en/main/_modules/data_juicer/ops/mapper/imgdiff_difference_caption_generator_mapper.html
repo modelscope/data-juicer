@@ -370,8 +370,22 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Difference_Caption_Generator_Mapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A fused operator for OPs that is used to run sequential OPs on</span>
-<span class="sd">    the same batch to allow fine-grained control on data processing.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates difference captions for bounding box regions in two images.</span>
+
+<span class="sd">    This operator processes pairs of images and generates captions for the differences in</span>
+<span class="sd">    their bounding box regions. It uses a multi-step process:</span>
+<span class="sd">    - Describes the content of each bounding box region using a Hugging Face model.</span>
+<span class="sd">    - Crops the bounding box regions from both images.</span>
+<span class="sd">    - Checks if the cropped regions match the generated captions.</span>
+<span class="sd">    - Determines if there are differences between the two captions.</span>
+<span class="sd">    - Marks the difference area with a red box.</span>
+<span class="sd">    - Generates difference captions for the marked areas.</span>
+<span class="sd">    - The key metric is the similarity score between the captions, computed using a CLIP</span>
+<span class="sd">      model.</span>
+<span class="sd">    - If no valid bounding boxes or differences are found, it returns empty captions and</span>
+<span class="sd">      zeroed bounding boxes.</span>
+<span class="sd">    - Uses &#39;cuda&#39; as the accelerator if any of the fused operations support it.</span>
+<span class="sd">    - Caches temporary images during processing and clears them afterward.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

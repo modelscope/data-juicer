@@ -361,13 +361,20 @@
 
 <span class="c1"># TODO: LLM-based inference.</span>
 <div class="viewcode-block" id="ExtractNicknameMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.extract_nickname_mapper.html#data_juicer.ops.mapper.extract_nickname_mapper.ExtractNicknameMapper">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractNicknameMapper">[文档]</a>
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExtractNicknameMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extract nickname relationship in the text.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts nickname relationships in the text using a language model.</span>
+
+<span class="sd">    This operator uses a language model to identify and extract nickname relationships from</span>
+<span class="sd">    the input text. It follows specific instructions to ensure accurate extraction, such as</span>
+<span class="sd">    identifying the speaker, the person being addressed, and the nickname used. The</span>
+<span class="sd">    extracted relationships are stored in the meta field under the specified key. The</span>
+<span class="sd">    operator uses a default system prompt, input template, and output pattern, but these can</span>
+<span class="sd">    be customized. The results are parsed and validated to ensure they meet the required</span>
+<span class="sd">    format. If the text already contains the nickname information, it is not processed</span>
+<span class="sd">    again. The operator retries the API call a specified number of times if an error occurs.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;给定你一段文本，你的任务是将人物之间的称呼方式（昵称）提取出来。</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -401,7 +408,7 @@
 <span class="s2">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ExtractNicknameMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.extract_nickname_mapper.html#data_juicer.ops.mapper.extract_nickname_mapper.ExtractNicknameMapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractNicknameMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
@@ -455,7 +462,7 @@
 
 
 <div class="viewcode-block" id="ExtractNicknameMapper.parse_output">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.extract_nickname_mapper.html#data_juicer.ops.mapper.extract_nickname_mapper.ExtractNicknameMapper.parse_output">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractNicknameMapper.parse_output">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_output</span><span class="p">):</span>
         <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
         <span class="n">matches</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">raw_output</span><span class="p">)</span>
@@ -492,7 +499,7 @@
 
 
 <div class="viewcode-block" id="ExtractNicknameMapper.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.extract_nickname_mapper.html#data_juicer.ops.mapper.extract_nickname_mapper.ExtractNicknameMapper.process_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractNicknameMapper.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s generated already</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nickname_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]:</span>

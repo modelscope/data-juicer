@@ -382,10 +382,19 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageDeduplicator</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Deduplicator to deduplicate samples at document-level using exact matching</span>
-<span class="sd">    of images between documents.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deduplicates samples at the document level by exact matching of images.</span>
+
+<span class="sd">    This operator compares images across documents to identify and remove duplicates.</span>
+<span class="sd">    - It uses a specified hash method (default is &#39;phash&#39;) to compute image hashes.</span>
+<span class="sd">    - If `consider_text` is set, it also considers text content for deduplication,</span>
+<span class="sd">    using a text deduplicator in conjunction with the image hashes.</span>
+<span class="sd">    - The key metric, `imagehash`, is computed for each sample. If `consider_text`</span>
+<span class="sd">    is enabled, an additional `hash` field is used.</span>
+<span class="sd">    - Duplicates are identified by comparing these hash values. Samples with</span>
+<span class="sd">    identical hashes are considered duplicates.</span>
+<span class="sd">    - When `show_num` is greater than 0, the operator also returns a subset of</span>
+<span class="sd">    duplicate pairs for tracing purposes.</span>
+<span class="sd">    - The operator caches the `imagehash` and, if applicable, the `hash` fields.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ImageDeduplicator.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.image_deduplicator.html#data_juicer.ops.deduplicator.ImageDeduplicator.__init__">[文档]</a>

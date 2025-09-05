@@ -360,7 +360,15 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageBlurMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to blur images.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Blurs images in the dataset with a specified probability and blur type.</span>
+
+<span class="sd">    This operator blurs images using one of three types: mean, box, or Gaussian. The</span>
+<span class="sd">    probability of an image being blurred is controlled by the `p` parameter. The blur</span>
+<span class="sd">    effect is applied using a kernel with a specified radius. Blurred images are saved to a</span>
+<span class="sd">    directory, which can be specified or defaults to the input directory. If the save</span>
+<span class="sd">    directory is not provided, the `DJ_PRODUCED_DATA_DIR` environment variable can be used</span>
+<span class="sd">    to set it. The operator ensures that the blur type is one of the supported options and</span>
+<span class="sd">    that the radius is non-negative.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ImageBlurMapper.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.image_blur_mapper.html#data_juicer.ops.mapper.image_blur_mapper.ImageBlurMapper.__init__">[docs]</a>

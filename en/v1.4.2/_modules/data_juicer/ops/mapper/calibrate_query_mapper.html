@@ -353,9 +353,14 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.calibrate_query_mapper.html#data_juicer.ops.mapper.calibrate_query_mapper.CalibrateQueryMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CalibrateQueryMapper</span><span class="p">(</span><span class="n">CalibrateQAMapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to calibrate query in question-answer pairs based on reference text.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calibrate query in question-answer pairs based on reference text.</span>
+
+<span class="sd">    This operator adjusts the query (question) in a question-answer pair to be more detailed</span>
+<span class="sd">    and accurate, while ensuring it can still be answered by the original answer. It uses a</span>
+<span class="sd">    reference text to inform the calibration process. The calibration is guided by a system</span>
+<span class="sd">    prompt, which instructs the model to refine the question without adding extraneous</span>
+<span class="sd">    information. The output is parsed to extract the calibrated query, with any additional</span>
+<span class="sd">    content removed.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="s2">&quot;请根据提供的【参考信息】对问答对中的【问题】进行校准，</span><span class="se">\</span>
 <span class="s2">        使其更加详细、准确，且仍可以由原答案回答。只输出校准后的问题，不要输出多余内容。&quot;</span>

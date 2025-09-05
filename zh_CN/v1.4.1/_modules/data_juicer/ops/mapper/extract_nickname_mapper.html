@@ -363,9 +363,16 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExtractNicknameMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extract nickname relationship in the text.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts nickname relationships in the text using a language model.</span>
+
+<span class="sd">    This operator uses a language model to identify and extract nickname relationships from</span>
+<span class="sd">    the input text. It follows specific instructions to ensure accurate extraction, such as</span>
+<span class="sd">    identifying the speaker, the person being addressed, and the nickname used. The</span>
+<span class="sd">    extracted relationships are stored in the meta field under the specified key. The</span>
+<span class="sd">    operator uses a default system prompt, input template, and output pattern, but these can</span>
+<span class="sd">    be customized. The results are parsed and validated to ensure they meet the required</span>
+<span class="sd">    format. If the text already contains the nickname information, it is not processed</span>
+<span class="sd">    again. The operator retries the API call a specified number of times if an error occurs.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;给定你一段文本，你的任务是将人物之间的称呼方式（昵称）提取出来。</span><span class="se">\n</span><span class="s2">&quot;</span>

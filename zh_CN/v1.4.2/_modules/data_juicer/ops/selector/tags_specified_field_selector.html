@@ -354,8 +354,18 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.selector.tags_specified_field_selector.html#data_juicer.ops.selector.TagsSpecifiedFieldSelector">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;tags_specified_field_selector&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TagsSpecifiedFieldSelector</span><span class="p">(</span><span class="n">Selector</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Selector to select samples based on the tags of specified</span>
-<span class="sd">    field.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Selector to filter samples based on the tags of a specified field.</span>
+
+<span class="sd">    This operator selects samples where the value of the specified field matches one of the</span>
+<span class="sd">    target tags. The field can be multi-level, with levels separated by dots (e.g.,</span>
+<span class="sd">    &#39;level1.level2&#39;). The operator checks if the specified field exists in the dataset and</span>
+<span class="sd">    if the field value is a string, number, or None. If the field value matches any of the</span>
+<span class="sd">    target tags, the sample is kept. The selection is case-sensitive.</span>
+
+<span class="sd">    - The `field_key` parameter specifies the field to check.</span>
+<span class="sd">    - The `target_tags` parameter is a list of tags to match against the field value.</span>
+<span class="sd">    - If the dataset has fewer than two samples or if `field_key` is empty, the dataset is</span>
+<span class="sd">      returned unchanged.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TagsSpecifiedFieldSelector.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.selector.tags_specified_field_selector.html#data_juicer.ops.selector.TagsSpecifiedFieldSelector.__init__">[文档]</a>

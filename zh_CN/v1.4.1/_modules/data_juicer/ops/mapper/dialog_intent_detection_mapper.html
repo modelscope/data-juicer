@@ -362,11 +362,17 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DialogIntentDetectionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to generate user&#39;s intent labels in dialog. Input from</span>
-<span class="sd">    history_key, query_key and response_key. Output lists of</span>
-<span class="sd">    labels and analysis for queries in the dialog.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates user&#39;s intent labels in a dialog by analyzing the history, query, and</span>
+<span class="sd">    response.</span>
+
+<span class="sd">    This operator processes a dialog to identify and label the user&#39;s intent. It uses a</span>
+<span class="sd">    predefined system prompt and templates to build input prompts for an API call. The API</span>
+<span class="sd">    model (e.g., GPT-4) is used to analyze the dialog and generate intent labels and</span>
+<span class="sd">    analysis. The results are stored in the meta field under &#39;dialog_intent_labels&#39; and</span>
+<span class="sd">    &#39;dialog_intent_labels_analysis&#39;. The operator supports customizing the system prompt,</span>
+<span class="sd">    templates, and patterns for parsing the API response. If the intent candidates are</span>
+<span class="sd">    provided, they are included in the input prompt. The operator retries the API call up to</span>
+<span class="sd">    a specified number of times if there are errors.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;请判断用户和LLM多轮对话中用户的意图。</span><span class="se">\n</span><span class="s2">&quot;</span>

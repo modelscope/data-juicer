@@ -377,9 +377,16 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoRemoveWatermarkMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Remove the watermarks in videos given regions.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove watermarks from videos based on specified regions.</span>
+
+<span class="sd">    This operator removes watermarks from video frames by detecting and masking the</span>
+<span class="sd">    watermark areas. It supports two detection methods: &#39;pixel_value&#39; and &#39;pixel_diversity&#39;.</span>
+<span class="sd">    The regions of interest (ROIs) for watermark detection can be specified as either pixel</span>
+<span class="sd">    coordinates or ratios of the frame dimensions. The operator extracts a set number of</span>
+<span class="sd">    frames uniformly from the video to detect watermark pixels. A pixel is considered part</span>
+<span class="sd">    of a watermark if it meets the detection criteria in a minimum number of frames. The</span>
+<span class="sd">    cleaned video is saved in the specified directory or the same directory as the input</span>
+<span class="sd">    file if no save directory is provided.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="VideoRemoveWatermarkMapper.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_remove_watermark_mapper.html#data_juicer.ops.mapper.video_remove_watermark_mapper.VideoRemoveWatermarkMapper.__init__">[文档]</a>

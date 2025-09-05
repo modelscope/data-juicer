@@ -359,9 +359,14 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExtractSupportTextMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extract support sub text for a summary.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts a supporting sub-text from the original text based on a given summary.</span>
+
+<span class="sd">    This operator uses an API model to identify and extract a segment of the original text</span>
+<span class="sd">    that best matches the provided summary. It leverages a system prompt and input template</span>
+<span class="sd">    to guide the extraction process. The extracted support text is stored in the specified</span>
+<span class="sd">    meta field key. If the extraction fails or returns an empty string, the original summary</span>
+<span class="sd">    is used as a fallback. The operator retries the extraction up to a specified number of</span>
+<span class="sd">    times in case of errors.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;你将扮演一个文本摘录助手的角色。你的主要任务是基于给定&quot;</span>

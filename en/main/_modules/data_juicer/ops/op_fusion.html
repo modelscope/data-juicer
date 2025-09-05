@@ -547,9 +547,18 @@
 <a class="viewcode-back" href="../../../api/data_juicer.ops.op_fusion.html#data_juicer.ops.op_fusion.GeneralFusedOP">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;general_fused_op&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">GeneralFusedOP</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An explicitly fused operator designed to execute multiple sequential</span>
-<span class="sd">    operations (OPs) on the same batch, enabling fine-grained control over</span>
-<span class="sd">    data processing.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An explicitly fused operator designed to execute multiple sequential operations (OPs) on</span>
+<span class="sd">    the same batch, enabling fine-grained control over data processing.</span>
+
+<span class="sd">    This operator allows for the chaining of multiple data processing steps, such as mappers</span>
+<span class="sd">    and filters, into a single pass. It processes each batch of samples sequentially through</span>
+<span class="sd">    the defined operations, ensuring that all specified transformations are applied in</span>
+<span class="sd">    order. The operator supports both mappers, which transform data, and filters, which</span>
+<span class="sd">    remove or keep samples based on computed statistics. Context variables can be passed</span>
+<span class="sd">    between operations if needed. The accelerator is set to &#39;cuda&#39; if any of the fused</span>
+<span class="sd">    operations use it. The number of processes is determined by the minimum value among all</span>
+<span class="sd">    fused operations. After processing, any temporary context variables, such as those used</span>
+<span class="sd">    for video containers, are cleaned up.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

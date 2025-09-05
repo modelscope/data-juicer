@@ -362,8 +362,14 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_WORDS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">WordsNumFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with total words number within a specific</span>
-<span class="sd">    range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with a total word count within a specified range.</span>
+
+<span class="sd">    This operator filters samples based on the number of words they contain. It retains</span>
+<span class="sd">    samples if their word count is within the given minimum and maximum limits. If</span>
+<span class="sd">    tokenization is enabled, it uses a Hugging Face tokenizer to count words. The key metric</span>
+<span class="sd">    `num_words` is computed and stored in the sample&#39;s stats under the `num_words` field. If</span>
+<span class="sd">    the word count is already cached, it reuses the cached value to avoid redundant</span>
+<span class="sd">    computation.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

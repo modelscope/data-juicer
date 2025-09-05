@@ -360,11 +360,16 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DialogTopicDetectionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to generate user&#39;s topic labels in dialog. Input from</span>
-<span class="sd">    history_key, query_key and response_key. Output lists of</span>
-<span class="sd">    labels and analysis for queries in the dialog.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates user&#39;s topic labels and analysis in a dialog.</span>
+
+<span class="sd">    This operator processes a dialog to detect and label the topics discussed by the user.</span>
+<span class="sd">    It takes input from `history_key`, `query_key`, and `response_key` and outputs lists of</span>
+<span class="sd">    labels and analysis for each query in the dialog. The operator uses a predefined system</span>
+<span class="sd">    prompt and templates to build the input prompt for the API call. It supports customizing</span>
+<span class="sd">    the system prompt, templates, and patterns for parsing the API response. The results are</span>
+<span class="sd">    stored in the `meta` field under the keys specified by `labels_key` and `analysis_key`.</span>
+<span class="sd">    If these keys already exist in the `meta` field, the operator skips processing. The</span>
+<span class="sd">    operator retries the API call up to `try_num` times in case of errors.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;请判断用户和LLM多轮对话中用户所讨论的话题。</span><span class="se">\n</span><span class="s2">&quot;</span>

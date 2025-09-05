@@ -364,9 +364,17 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExtractEntityAttributeMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extract attributes for given entities from the text</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts attributes for given entities from the text and stores them in the sample&#39;s</span>
+<span class="sd">    metadata.</span>
+
+<span class="sd">    This operator uses an API model to extract specified attributes for given entities from</span>
+<span class="sd">    the input text. It constructs prompts based on provided templates and parses the model&#39;s</span>
+<span class="sd">    output to extract attribute descriptions and supporting text. The extracted data is</span>
+<span class="sd">    stored in the sample&#39;s metadata under the specified keys. If the required metadata</span>
+<span class="sd">    fields already exist, the operator skips processing for that sample. The operator</span>
+<span class="sd">    retries the API call and parsing up to a specified number of times in case of errors.</span>
+<span class="sd">    The default system prompt, input template, and parsing patterns are used if not</span>
+<span class="sd">    provided.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT_TEMPLATE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;给定一段文本，从文本中总结</span><span class="si">{entity}</span><span class="s2">的</span><span class="si">{attribute}</span><span class="s2">，并且从原文摘录最能说明该</span><span class="si">{attribute}</span><span class="s2">的代表性示例。</span><span class="se">\n</span><span class="s2">&quot;</span>

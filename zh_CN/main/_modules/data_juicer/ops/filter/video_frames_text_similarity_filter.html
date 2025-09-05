@@ -373,8 +373,17 @@
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_SAMPLED_FRAMES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoFramesTextSimilarityFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples those similarities between sampled video frame</span>
-<span class="sd">    images and text within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples based on the similarity between video frame images and text</span>
+<span class="sd">    within a specific range.</span>
+
+<span class="sd">    This operator uses a Hugging Face CLIP model to compute the similarity between video</span>
+<span class="sd">    frames and associated text. It keeps samples where the computed similarity scores fall</span>
+<span class="sd">    within a specified range. The operator supports different frame sampling methods,</span>
+<span class="sd">    including &#39;all_keyframes&#39; and &#39;uniform&#39;, and allows for horizontal and vertical flipping</span>
+<span class="sd">    of the frames. The similarity score is reduced using one of three modes: &#39;avg&#39;, &#39;max&#39;,</span>
+<span class="sd">    or &#39;min&#39;. The operator also supports two strategies for keeping samples: &#39;any&#39; (keep if</span>
+<span class="sd">    any video meets the condition) or &#39;all&#39; (keep only if all videos meet the condition).</span>
+<span class="sd">    The key metric is stored in the &#39;video_frames_text_similarity&#39; field.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

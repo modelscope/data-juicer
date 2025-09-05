@@ -355,18 +355,24 @@
 
 
 <div class="viewcode-block" id="ImageAspectRatioFilter">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_aspect_ratio_filter.html#data_juicer.ops.filter.image_aspect_ratio_filter.ImageAspectRatioFilter">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_aspect_ratio_filter.html#data_juicer.ops.filter.ImageAspectRatioFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;image_aspect_ratio_filter&quot;</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;image_aspect_ratio_filter&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageAspectRatioFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with image aspect ratio within a specific range.</span>
-<span class="sd">    AspectRatio = W / H.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="sd">    The operator computes the aspect ratio for each image in the sample, defined as the</span>
+<span class="sd">    width divided by the height (W / H). It caches the computed aspect ratios in the</span>
+<span class="sd">    &#39;aspect_ratios&#39; field. Samples are kept if their images&#39; aspect ratios fall within the</span>
+<span class="sd">    specified minimum and maximum range. The &#39;any_or_all&#39; parameter determines the strategy:</span>
+<span class="sd">    &#39;any&#39; keeps samples if at least one image meets the criteria, while &#39;all&#39; requires all</span>
+<span class="sd">    images to meet the criteria. If no images are present in a sample, the sample is not</span>
+<span class="sd">    filtered out.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="ImageAspectRatioFilter.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_aspect_ratio_filter.html#data_juicer.ops.filter.image_aspect_ratio_filter.ImageAspectRatioFilter.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_aspect_ratio_filter.html#data_juicer.ops.filter.ImageAspectRatioFilter.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.333</span><span class="p">,</span> <span class="n">max_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">3.0</span><span class="p">,</span> <span class="n">any_or_all</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
@@ -389,7 +395,7 @@
 
 
 <div class="viewcode-block" id="ImageAspectRatioFilter.compute_stats_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_aspect_ratio_filter.html#data_juicer.ops.filter.image_aspect_ratio_filter.ImageAspectRatioFilter.compute_stats_batched">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_aspect_ratio_filter.html#data_juicer.ops.filter.ImageAspectRatioFilter.compute_stats_batched">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">image_list</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span>
         <span class="n">samples_stats</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]</span>
@@ -418,7 +424,7 @@
 
 
 <div class="viewcode-block" id="ImageAspectRatioFilter.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_aspect_ratio_filter.html#data_juicer.ops.filter.image_aspect_ratio_filter.ImageAspectRatioFilter.process_batched">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_aspect_ratio_filter.html#data_juicer.ops.filter.ImageAspectRatioFilter.process_batched">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
             <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">get_keep_boolean</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">])</span>

@@ -459,8 +459,21 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Difference_Area_Generator_Mapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A fused operator for OPs that is used to run sequential OPs on</span>
-<span class="sd">    the same batch to allow fine-grained control on data processing.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates and filters bounding boxes for image pairs based on similarity, segmentation,</span>
+<span class="sd">    and text matching.</span>
+
+<span class="sd">    This operator processes image pairs to identify and filter regions with significant</span>
+<span class="sd">    differences. It uses a sequence of operations:</span>
+<span class="sd">    - Filters out image pairs with large differences.</span>
+<span class="sd">    - Segments the images to identify potential objects.</span>
+<span class="sd">    - Crops sub-images based on bounding boxes.</span>
+<span class="sd">    - Determines if the sub-images contain valid objects using image-text matching.</span>
+<span class="sd">    - Filters out sub-images that are too similar.</span>
+<span class="sd">    - Removes overlapping bounding boxes.</span>
+<span class="sd">    - Uses Hugging Face models for similarity and text matching, and FastSAM for</span>
+<span class="sd">      segmentation.</span>
+<span class="sd">    - Caches intermediate results in `DATA_JUICER_ASSETS_CACHE`.</span>
+<span class="sd">    - Returns the filtered bounding boxes in the `MetaKeys.bbox_tag` field.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

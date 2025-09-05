@@ -362,7 +362,15 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_AUDIOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">AudioDurationFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep data samples whose audios&#39; durations are within a specified range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep data samples whose audio durations are within a specified range.</span>
+
+<span class="sd">    This operator filters data samples based on the duration of their audio files. It keeps</span>
+<span class="sd">    samples where the audio duration is between a minimum and maximum value, in seconds. The</span>
+<span class="sd">    operator supports two strategies for keeping samples: &#39;any&#39; (keep if any audio meets the</span>
+<span class="sd">    condition) or &#39;all&#39; (keep only if all audios meet the condition). The audio duration is</span>
+<span class="sd">    computed using the `librosa` library. If the audio duration has already been computed,</span>
+<span class="sd">    it is retrieved from the sample&#39;s stats under the key &#39;audio_duration&#39;. If no audio is</span>
+<span class="sd">    present in the sample, an empty array is stored in the stats.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AudioDurationFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.audio_duration_filter.html#data_juicer.ops.filter.AudioDurationFilter.__init__">[文档]</a>

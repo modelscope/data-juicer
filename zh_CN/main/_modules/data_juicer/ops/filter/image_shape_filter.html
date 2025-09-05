@@ -357,16 +357,24 @@
 
 
 <div class="viewcode-block" id="ImageShapeFilter">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_shape_filter.html#data_juicer.ops.filter.image_shape_filter.ImageShapeFilter">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_shape_filter.html#data_juicer.ops.filter.ImageShapeFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;image_shape_filter&quot;</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;image_shape_filter&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageShapeFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with image shape (w, h) within specific ranges.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with image shape (width, height) within specific ranges.</span>
+
+<span class="sd">    This operator filters samples based on the width and height of images. It keeps samples</span>
+<span class="sd">    where the image dimensions fall within the specified ranges. The operator supports two</span>
+<span class="sd">    strategies: &#39;any&#39; and &#39;all&#39;. In &#39;any&#39; mode, a sample is kept if at least one image meets</span>
+<span class="sd">    the criteria. In &#39;all&#39; mode, all images in the sample must meet the criteria for the</span>
+<span class="sd">    sample to be kept. The image width and height are stored in the &#39;image_width&#39; and</span>
+<span class="sd">    &#39;image_height&#39; fields of the sample&#39;s stats. If no images are present in the sample, the</span>
+<span class="sd">    corresponding stats fields will be empty arrays.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="ImageShapeFilter.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_shape_filter.html#data_juicer.ops.filter.image_shape_filter.ImageShapeFilter.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_shape_filter.html#data_juicer.ops.filter.ImageShapeFilter.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">min_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -402,7 +410,7 @@
 
 
 <div class="viewcode-block" id="ImageShapeFilter.compute_stats_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_shape_filter.html#data_juicer.ops.filter.image_shape_filter.ImageShapeFilter.compute_stats_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_shape_filter.html#data_juicer.ops.filter.ImageShapeFilter.compute_stats_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
         <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_width</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]</span> <span class="ow">and</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_height</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
@@ -428,7 +436,7 @@
 
 
 <div class="viewcode-block" id="ImageShapeFilter.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_shape_filter.html#data_juicer.ops.filter.image_shape_filter.ImageShapeFilter.process_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_shape_filter.html#data_juicer.ops.filter.ImageShapeFilter.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="n">ws</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_width</span><span class="p">]</span>
         <span class="n">hs</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_height</span><span class="p">]</span>

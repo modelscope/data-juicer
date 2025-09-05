@@ -355,7 +355,13 @@
 <span class="nd">@NON_STATS_FILTERS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SuffixFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with specified suffix.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with specified suffix.</span>
+
+<span class="sd">    This operator retains samples that have a suffix matching any of the provided suffixes.</span>
+<span class="sd">    If no suffixes are specified, all samples are kept. The key metric &#39;keep&#39; is computed</span>
+<span class="sd">    based on whether the sample&#39;s suffix matches the specified list. The &#39;suffix&#39; field of</span>
+<span class="sd">    each sample is checked against the list of allowed suffixes. If the suffix matches, the</span>
+<span class="sd">    sample is kept; otherwise, it is filtered out.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SuffixFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.suffix_filter.html#data_juicer.ops.filter.suffix_filter.SuffixFilter.__init__">[docs]</a>

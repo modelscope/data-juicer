@@ -372,8 +372,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.chinese_convert_mapper.html#data_juicer.ops.mapper.chinese_convert_mapper.ChineseConvertMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ChineseConvertMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to convert Chinese between Traditional Chinese, Simplified Chinese</span>
-<span class="sd">    and Japanese Kanji.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to convert Chinese text between Traditional, Simplified, and Japanese Kanji.</span>
+
+<span class="sd">    This operator converts Chinese text based on the specified mode. It supports conversions</span>
+<span class="sd">    between Simplified Chinese, Traditional Chinese (including Taiwan and Hong Kong</span>
+<span class="sd">    variants), and Japanese Kanji. The conversion is performed using a pre-defined set of</span>
+<span class="sd">    rules. The available modes include &#39;s2t&#39; for Simplified to Traditional, &#39;t2s&#39; for</span>
+<span class="sd">    Traditional to Simplified, and other specific variants like &#39;s2tw&#39;, &#39;tw2s&#39;, &#39;s2hk&#39;,</span>
+<span class="sd">    &#39;hk2s&#39;, &#39;s2twp&#39;, &#39;tw2sp&#39;, &#39;t2tw&#39;, &#39;tw2t&#39;, &#39;hk2t&#39;, &#39;t2hk&#39;, &#39;t2jp&#39;, and &#39;jp2t&#39;. The</span>
+<span class="sd">    operator processes text in batches and applies the conversion to the specified text key</span>
+<span class="sd">    in the samples.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

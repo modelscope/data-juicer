@@ -366,9 +366,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.optimize_qa_mapper.html#data_juicer.ops.mapper.optimize_qa_mapper.OptimizeQAMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">OptimizeQAMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to optimize question-answer pairs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to optimize question-answer pairs.</span>
+
+<span class="sd">    This operator refines and enhances the quality of question-answer pairs. It uses a</span>
+<span class="sd">    Hugging Face model to generate more detailed and accurate questions and answers. The</span>
+<span class="sd">    input is formatted using a template, and the output is parsed using a regular</span>
+<span class="sd">    expression. The system prompt, input template, and output pattern can be customized. If</span>
+<span class="sd">    VLLM is enabled, the operator accelerates inference on CUDA devices.&quot;&quot;&quot;</span>
 
     <span class="c1"># avoid leading whitespace</span>
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>

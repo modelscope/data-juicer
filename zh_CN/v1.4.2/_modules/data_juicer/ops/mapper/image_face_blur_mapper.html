@@ -370,7 +370,13 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageFaceBlurMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to blur faces detected in images.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to blur faces detected in images.</span>
+
+<span class="sd">    This operator uses an OpenCV classifier to detect faces in images and applies a</span>
+<span class="sd">    specified blur type to the detected face regions. The blur types supported are &#39;mean&#39;,</span>
+<span class="sd">    &#39;box&#39;, and &#39;gaussian&#39;. The radius of the blur kernel can be adjusted. If no save</span>
+<span class="sd">    directory is provided, the modified images will be saved in the same directory as the</span>
+<span class="sd">    input files.&quot;&quot;&quot;</span>
 
     <span class="n">_default_kwargs</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;scaleFactor&quot;</span><span class="p">:</span> <span class="mf">1.1</span><span class="p">,</span>

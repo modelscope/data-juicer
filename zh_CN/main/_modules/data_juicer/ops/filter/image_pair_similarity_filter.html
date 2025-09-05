@@ -361,17 +361,23 @@
 
 
 <div class="viewcode-block" id="ImagePairSimilarityFilter">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_pair_similarity_filter.html#data_juicer.ops.filter.image_pair_similarity_filter.ImagePairSimilarityFilter">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_pair_similarity_filter.html#data_juicer.ops.filter.ImagePairSimilarityFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImagePairSimilarityFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep image pairs with similarities between images</span>
-<span class="sd">    within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep image pairs with similarities between images within a specific range.</span>
+
+<span class="sd">    This operator uses a Hugging Face CLIP model to compute the cosine similarity between</span>
+<span class="sd">    two images in each sample. It retains samples where the similarity score falls within</span>
+<span class="sd">    the specified minimum and maximum thresholds. The &#39;any&#39; strategy keeps a sample if any</span>
+<span class="sd">    of the image pairs meet the condition, while the &#39;all&#39; strategy requires all image pairs</span>
+<span class="sd">    to meet the condition. The similarity scores are cached in the &#39;image_pair_similarity&#39;</span>
+<span class="sd">    field. Each sample must include exactly two distinct images.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
 <div class="viewcode-block" id="ImagePairSimilarityFilter.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_pair_similarity_filter.html#data_juicer.ops.filter.image_pair_similarity_filter.ImagePairSimilarityFilter.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_pair_similarity_filter.html#data_juicer.ops.filter.ImagePairSimilarityFilter.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hf_clip</span><span class="o">=</span><span class="s2">&quot;openai/clip-vit-base-patch32&quot;</span><span class="p">,</span>
@@ -408,7 +414,7 @@
 
 
 <div class="viewcode-block" id="ImagePairSimilarityFilter.compute_stats_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_pair_similarity_filter.html#data_juicer.ops.filter.image_pair_similarity_filter.ImagePairSimilarityFilter.compute_stats_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_pair_similarity_filter.html#data_juicer.ops.filter.ImagePairSimilarityFilter.compute_stats_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
         <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_pair_similarity</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
@@ -445,7 +451,7 @@
 
 
 <div class="viewcode-block" id="ImagePairSimilarityFilter.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_pair_similarity_filter.html#data_juicer.ops.filter.image_pair_similarity_filter.ImagePairSimilarityFilter.process_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_pair_similarity_filter.html#data_juicer.ops.filter.ImagePairSimilarityFilter.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">similarity</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_pair_similarity</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">similarity</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>

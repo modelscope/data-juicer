@@ -354,9 +354,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.optimize_response_mapper.html#data_juicer.ops.mapper.optimize_response_mapper.OptimizeResponseMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">OptimizeResponseMapper</span><span class="p">(</span><span class="n">OptimizeQAMapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to optimize response in question-answer pairs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Optimize response in question-answer pairs to be more detailed and specific.</span>
+
+<span class="sd">    This operator enhances the responses in question-answer pairs, making them more detailed</span>
+<span class="sd">    and specific while ensuring they still address the original question. It uses a</span>
+<span class="sd">    predefined system prompt for optimization. The optimized response is stripped of any</span>
+<span class="sd">    leading or trailing whitespace before being returned. This mapper leverages a Hugging</span>
+<span class="sd">    Face model for the optimization process, which is accelerated using CUDA.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;请优化问答对中的回答，将其更加详细具体，但仍可以回答原问题。只输出优化后的回答，不要输出多余内容。&quot;</span>

@@ -362,7 +362,13 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_WORDS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PerplexityFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with perplexity score in a specified range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with perplexity score in a specified range.</span>
+
+<span class="sd">    This operator computes the perplexity of text samples using a Hugging Face tokenizer and</span>
+<span class="sd">    a KenLM language model. It keeps samples with perplexity scores within the specified</span>
+<span class="sd">    minimum and maximum values. The perplexity is calculated character-based by default. If</span>
+<span class="sd">    the perplexity is already computed, it will be reused from the &#39;perplexity&#39; field in the</span>
+<span class="sd">    sample&#39;s stats. The operator supports batched operations for efficiency.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

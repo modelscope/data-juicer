@@ -371,7 +371,15 @@
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_SAMPLED_FRAMES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoNSFWFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples whose videos have nsfw scores in a specified range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples whose videos have nsfw scores in a specified range.</span>
+
+<span class="sd">    This operator uses a Hugging Face model to detect NSFW content in video frames. It keeps</span>
+<span class="sd">    samples where the NSFW score is below a specified threshold. The operator supports two</span>
+<span class="sd">    frame sampling methods: &quot;all_keyframes&quot; and &quot;uniform&quot;. For &quot;uniform&quot;, it extracts a</span>
+<span class="sd">    specified number of frames. The NSFW scores are reduced using one of three modes: &quot;avg&quot;,</span>
+<span class="sd">    &quot;max&quot;, or &quot;min&quot;. The key metric, &#39;video_nsfw_score&#39;, is computed for each video and</span>
+<span class="sd">    stored in the sample&#39;s stats. The operator can use either an &quot;any&quot; or &quot;all&quot; strategy to</span>
+<span class="sd">    decide if a sample should be kept based on the NSFW scores of its videos.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

@@ -356,8 +356,12 @@
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.expand_macro_mapper.</span></span><span class="sig-name descname"><span class="pre">ExpandMacroMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/expand_macro_mapper.html#ExpandMacroMapper"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper" title="Link to this definition">¶</a></dt>
 <dd><p>基类：<a class="reference internal" href="data_juicer.ops.base_op.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
-<p>Mapper to expand macro definitions in the document body of Latex
-samples.</p>
+<p>Expands macro definitions in the document body of LaTeX samples.</p>
+<p>This operator processes LaTeX documents to expand user-defined macros in the text. It
+supports newcommand and def macros without arguments. Macros are identified and
+expanded in the text, ensuring they are not part of longer alphanumeric words. The
+operator currently does not support macros with arguments. The processed text is updated
+in the samples.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/expand_macro_mapper.html#ExpandMacroMapper.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper.__init__" title="Link to this definition">¶</a></dt>

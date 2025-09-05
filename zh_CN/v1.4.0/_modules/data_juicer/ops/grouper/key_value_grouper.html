@@ -355,7 +355,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.grouper.key_value_grouper.html#data_juicer.ops.grouper.KeyValueGrouper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;key_value_grouper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">KeyValueGrouper</span><span class="p">(</span><span class="n">Grouper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Group samples to batched samples according values in given keys.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Groups samples into batches based on values in specified keys.</span>
+
+<span class="sd">    This operator groups samples by the values of the given keys, which can be nested. If no</span>
+<span class="sd">    keys are provided, it defaults to using the text key. It uses a naive grouping strategy</span>
+<span class="sd">    to batch samples with identical key values. The resulting dataset is a list of batched</span>
+<span class="sd">    samples, where each batch contains samples that share the same key values. This is</span>
+<span class="sd">    useful for organizing data by specific attributes or features.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="KeyValueGrouper.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.grouper.key_value_grouper.html#data_juicer.ops.grouper.KeyValueGrouper.__init__">[文档]</a>

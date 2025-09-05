@@ -371,18 +371,17 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.generate_qa_from_examples_mapper.html#data_juicer.ops.mapper.generate_qa_from_examples_mapper.GenerateQAFromExamplesMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">GenerateQAFromExamplesMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to generate question and answer pairs from examples.</span>
-<span class="sd">    You should configure an empty dataset in your yaml config file:</span>
-<span class="sd">    ```</span>
-<span class="sd">    generated_dataset_config:</span>
-<span class="sd">      type: &#39;EmptyFormatter&#39;  # use `RayEmptyFormatter` when enable ray</span>
-<span class="sd">      length: ${The number of generated samples}</span>
-<span class="sd">      feature_keys: ${text key}</span>
-<span class="sd">    ```</span>
-<span class="sd">    The number of samples generated is determined by</span>
-<span class="sd">    the length of the empty dataset.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates question and answer pairs from examples using a Hugging Face model.</span>
+
+<span class="sd">    This operator generates QA pairs based on provided seed examples. The number of</span>
+<span class="sd">    generated samples is determined by the length of the empty dataset configured in the</span>
+<span class="sd">    YAML file. The operator uses a Hugging Face model to generate new QA pairs, which are</span>
+<span class="sd">    then filtered based on their similarity to the seed examples. Samples with a similarity</span>
+<span class="sd">    score below the specified threshold are kept. The similarity is computed using the</span>
+<span class="sd">    ROUGE-L metric. The operator requires a seed file in chatml format, which provides the</span>
+<span class="sd">    initial QA examples. The generated QA pairs must follow specific formatting rules, such</span>
+<span class="sd">    as maintaining the same format as the input examples and ensuring that questions and</span>
+<span class="sd">    answers are paired correctly.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;请你仔细观察多个示例数据的输入和输出，按照你的理解，总结出相应规矩，然后写出一个新的【问题】和【回答】。&quot;</span>

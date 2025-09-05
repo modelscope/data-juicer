@@ -354,8 +354,12 @@
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.punctuation_normalization_mapper.</span></span><span class="sig-name descname"><span class="pre">PunctuationNormalizationMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/punctuation_normalization_mapper.html#PunctuationNormalizationMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.base_op.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
-<p>Mapper to normalize unicode punctuations to English punctuations in text
-samples.</p>
+<p>Normalizes unicode punctuations to their English equivalents in text samples.</p>
+<p>This operator processes a batch of text samples and replaces any unicode punctuation
+with its corresponding English punctuation. The mapping includes common substitutions
+like “，” to “,”, “。” to “.”, and ““” to “. It iterates over each character in the text,
+replacing it if it is found in the predefined punctuation map. The result is a set of
+text samples with consistent punctuation formatting.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/punctuation_normalization_mapper.html#PunctuationNormalizationMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper.__init__" title="Link to this definition">¶</a></dt>

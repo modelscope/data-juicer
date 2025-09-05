@@ -362,18 +362,26 @@
 
 
 <div class="viewcode-block" id="ImageDetectionYoloMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.image_detection_yolo_mapper.html#data_juicer.ops.mapper.image_detection_yolo_mapper.ImageDetectionYoloMapper">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageDetectionYoloMapper">[文档]</a>
 <span class="nd">@UNFORKABLE</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageDetectionYoloMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform object detection (with YOLO) on images and return the bounding boxes and class labels.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform object detection using YOLO on images and return bounding boxes and class</span>
+<span class="sd">    labels.</span>
+
+<span class="sd">    This operator uses a YOLO model to detect objects in images. It processes each image in</span>
+<span class="sd">    the sample, returning the bounding boxes and class labels for detected objects. The</span>
+<span class="sd">    operator sets the `bbox_tag` and `class_label_tag` fields in the sample&#39;s metadata. If</span>
+<span class="sd">    no image is present or no objects are detected, it sets `bbox_tag` to an empty array and</span>
+<span class="sd">    `class_label_tag` to -1. The operator uses a confidence score threshold and IoU</span>
+<span class="sd">    (Intersection over Union) score threshold to filter detections.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
 <div class="viewcode-block" id="ImageDetectionYoloMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.image_detection_yolo_mapper.html#data_juicer.ops.mapper.image_detection_yolo_mapper.ImageDetectionYoloMapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageDetectionYoloMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imgsz</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span> <span class="n">conf</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">iou</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;yolo11n.pt&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
@@ -395,7 +403,7 @@
 
 
 <div class="viewcode-block" id="ImageDetectionYoloMapper.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.image_detection_yolo_mapper.html#data_juicer.ops.mapper.image_detection_yolo_mapper.ImageDetectionYoloMapper.process_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageDetectionYoloMapper.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># there is no image in this sample</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]:</span>

@@ -356,8 +356,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_header_mapper.html#data_juicer.ops.mapper.remove_header_mapper.RemoveHeaderMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;remove_header_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveHeaderMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove headers at the beginning of documents in Latex</span>
-<span class="sd">    samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes headers at the beginning of documents in LaTeX samples.</span>
+
+<span class="sd">    This operator identifies and removes headers such as chapter, part, section, subsection,</span>
+<span class="sd">    subsubsection, paragraph, and subparagraph. It uses a regular expression to match these</span>
+<span class="sd">    headers. If a sample does not contain any headers and `drop_no_head` is set to True, the</span>
+<span class="sd">    sample text will be removed. Otherwise, the sample remains unchanged. The operator</span>
+<span class="sd">    processes samples in batches for efficiency.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

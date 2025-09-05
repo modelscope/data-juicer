@@ -353,9 +353,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_size_filter.html#data_juicer.ops.filter.image_size_filter.ImageSizeFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;image_size_filter&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageSizeFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep data samples whose image size (in Bytes/KB/MB/...) within a</span>
-<span class="sd">    specific range.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep data samples whose image size (in Bytes/KB/MB/...) is within a specific range.</span>
+
+<span class="sd">    This operator filters data samples based on the size of their images. It keeps samples</span>
+<span class="sd">    if the image sizes fall within the specified minimum and maximum size range. The operator</span>
+<span class="sd">    supports two strategies: &#39;any&#39;(keep the sample if any image meets the size condition) and</span>
+<span class="sd">    &#39;all&#39; (keep the sample only if all images meet the size condition). If no images are</span>
+<span class="sd">    present in the sample, the &#39;image_sizes&#39; field will be an empty array.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

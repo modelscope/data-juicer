@@ -354,9 +354,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.replace_content_mapper.html#data_juicer.ops.mapper.replace_content_mapper.ReplaceContentMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;replace_content_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ReplaceContentMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to replace all content in the text that matches</span>
-<span class="sd">    a specific regular expression pattern with a designated</span>
-<span class="sd">    replacement string.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Replaces content in the text that matches a specific regular expression pattern with a</span>
+<span class="sd">    designated replacement string.</span>
+
+<span class="sd">    This operator processes text by searching for patterns defined in `pattern` and</span>
+<span class="sd">    replacing them with the corresponding `repl` string. If multiple patterns and</span>
+<span class="sd">    replacements are provided, each pattern is replaced by its respective replacement. The</span>
+<span class="sd">    operator supports both single and multiple patterns and replacements. The regular</span>
+<span class="sd">    expressions are compiled with the `re.DOTALL` flag to match across multiple lines. If</span>
+<span class="sd">    the length of the patterns and replacements do not match, a `ValueError` is raised. This</span>
+<span class="sd">    operation is batched, meaning it processes multiple samples at once.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

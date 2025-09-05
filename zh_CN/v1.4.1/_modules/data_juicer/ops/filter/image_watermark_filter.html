@@ -363,10 +363,15 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageWatermarkFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter to keep samples whose images have no watermark with high</span>
-<span class="sd">    probability.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples whose images have no watermark with high probability.</span>
+
+<span class="sd">    This operator uses a Hugging Face watermark detection model to filter samples based on</span>
+<span class="sd">    the presence of watermarks in their images. It keeps samples where the predicted</span>
+<span class="sd">    watermark probability is below a specified threshold. The operator supports two</span>
+<span class="sd">    strategies: &#39;any&#39; (keep if any image meets the condition) and &#39;all&#39; (keep only if all</span>
+<span class="sd">    images meet the condition). The key metric &#39;image_watermark_prob&#39; is computed for each</span>
+<span class="sd">    image, representing the probability that the image contains a watermark. If no images</span>
+<span class="sd">    are present in the sample, the metric is set to an empty array.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

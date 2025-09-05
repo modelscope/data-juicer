@@ -356,14 +356,20 @@
 
 
 <div class="viewcode-block" id="LanguageIDScoreFilter">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.language_id_score_filter.html#data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.language_id_score_filter.html#data_juicer.ops.filter.LanguageIDScoreFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LanguageIDScoreFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples in a specific language with confidence score</span>
-<span class="sd">    larger than a specific min value.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples in a specific language with a confidence score above a threshold.</span>
+
+<span class="sd">    This operator uses a FastText model to identify the language of each sample. It keeps</span>
+<span class="sd">    samples that are in the specified language(s) and have a language identification</span>
+<span class="sd">    confidence score greater than or equal to the minimum score. If no specific language is</span>
+<span class="sd">    provided, it only filters based on the confidence score. The language ID and its</span>
+<span class="sd">    confidence score are stored in the &#39;lang&#39; and &#39;lang_score&#39; fields of the sample&#39;s stats,</span>
+<span class="sd">    respectively.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="LanguageIDScoreFilter.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.language_id_score_filter.html#data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.language_id_score_filter.html#data_juicer.ops.filter.LanguageIDScoreFilter.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">min_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
@@ -389,7 +395,7 @@
 
 
 <div class="viewcode-block" id="LanguageIDScoreFilter.compute_stats_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.language_id_score_filter.html#data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter.compute_stats_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.language_id_score_filter.html#data_juicer.ops.filter.LanguageIDScoreFilter.compute_stats_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
         <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">lang</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]</span> <span class="ow">and</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">lang_score</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
@@ -411,7 +417,7 @@
 
 
 <div class="viewcode-block" id="LanguageIDScoreFilter.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.language_id_score_filter.html#data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter.process_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.language_id_score_filter.html#data_juicer.ops.filter.LanguageIDScoreFilter.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">lang</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keep_boolean</span><span class="p">(</span>

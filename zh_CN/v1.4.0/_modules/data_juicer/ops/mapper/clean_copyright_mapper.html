@@ -356,8 +356,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.clean_copyright_mapper.html#data_juicer.ops.mapper.clean_copyright_mapper.CleanCopyrightMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;clean_copyright_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CleanCopyrightMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to clean copyright comments at the beginning of the text</span>
-<span class="sd">    samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cleans copyright comments at the beginning of text samples.</span>
+
+<span class="sd">    This operator removes copyright comments from the start of text samples. It identifies</span>
+<span class="sd">    and strips multiline comments that contain the word &quot;copyright&quot; using a regular</span>
+<span class="sd">    expression. It also greedily removes lines starting with comment markers like `//`, `#`,</span>
+<span class="sd">    or `--` at the beginning of the text, as these are often part of copyright headers. The</span>
+<span class="sd">    operator processes each sample individually but can handle batches for efficiency.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

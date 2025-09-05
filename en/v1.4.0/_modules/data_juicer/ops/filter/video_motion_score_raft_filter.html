@@ -365,8 +365,20 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoMotionScoreRaftFilter</span><span class="p">(</span><span class="n">VideoMotionScoreFilter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with video motion scores within a specified range.</span>
-<span class="sd">    This operator utilizes the RAFT (Recurrent All-Pairs Field Transforms)</span>
-<span class="sd">    model from torchvision to predict optical flow between video frames.</span>
+
+<span class="sd">    This operator utilizes the RAFT (Recurrent All-Pairs Field Transforms) model from</span>
+<span class="sd">    torchvision to predict optical flow between video frames. It keeps samples where the</span>
+<span class="sd">    video motion score is within the given min and max score range. The motion score is</span>
+<span class="sd">    computed based on the optical flow between frames, which is estimated using the RAFT</span>
+<span class="sd">    model. The operator can sample frames at a specified FPS and apply transformations to</span>
+<span class="sd">    the frames before computing the flow.</span>
+
+<span class="sd">    - The RAFT model is used to estimate the optical flow.</span>
+<span class="sd">    - Frames are preprocessed using a series of transformations including normalization and</span>
+<span class="sd">      color channel flipping.</span>
+<span class="sd">    - The motion score is calculated from the optical flow data.</span>
+<span class="sd">    - The operator can be configured to filter based on any or all frames in the video.</span>
+<span class="sd">    - The device for model inference (CPU or CUDA) is automatically detected and set.</span>
 
 <span class="sd">    For further details, refer to the official torchvision documentation:</span>
 <span class="sd">    https://pytorch.org/vision/main/models/raft.html</span>

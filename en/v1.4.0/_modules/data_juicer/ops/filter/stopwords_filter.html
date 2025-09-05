@@ -365,7 +365,16 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_WORDS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">StopWordsFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with stopword ratio in a specified range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with stopword ratio within a specified range.</span>
+
+<span class="sd">    This operator calculates the ratio of stopwords in a sample and keeps samples where this</span>
+<span class="sd">    ratio is between the specified minimum and maximum values. The stopword ratio is</span>
+<span class="sd">    computed as the number of stopwords divided by the total number of words. If the</span>
+<span class="sd">    `tokenization` parameter is set, a Hugging Face tokenizer is used to tokenize the text.</span>
+<span class="sd">    The stopwords are loaded from a directory, and if the language is set to &quot;all&quot;, it</span>
+<span class="sd">    merges stopwords from all available languages. The key metric is `stopwords_ratio`,</span>
+<span class="sd">    which is character-based by default. The operator also supports word augmentation for</span>
+<span class="sd">    specific languages.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="StopWordsFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.stopwords_filter.html#data_juicer.ops.filter.stopwords_filter.StopWordsFilter.__init__">[docs]</a>

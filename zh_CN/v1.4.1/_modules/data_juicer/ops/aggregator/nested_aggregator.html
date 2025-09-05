@@ -364,10 +364,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.aggregator.nested_aggregator.html#data_juicer.ops.aggregator.NestedAggregator">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">NestedAggregator</span><span class="p">(</span><span class="n">Aggregator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Considering the limitation of input length, nested aggregate</span>
-<span class="sd">    contents for each given number of samples.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Aggregates nested content from multiple samples into a single summary.</span>
+
+<span class="sd">    This operator uses a recursive summarization approach to aggregate content from multiple</span>
+<span class="sd">    samples. It processes the input text, which is split into sub-documents, and generates a</span>
+<span class="sd">    summary that maintains the average length of the original documents. The aggregation is</span>
+<span class="sd">    performed using an API model, guided by system prompts and templates. The operator</span>
+<span class="sd">    supports retrying the API call in case of errors and allows for customization of the</span>
+<span class="sd">    summarization process through various parameters. The default system prompt and</span>
+<span class="sd">    templates are provided in Chinese, but they can be customized. The operator uses a</span>
+<span class="sd">    Hugging Face tokenizer to handle tokenization.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;给定一些文档碎片，将这些文档整合成一个文档总结。</span><span class="se">\n</span><span class="s2">&quot;</span>

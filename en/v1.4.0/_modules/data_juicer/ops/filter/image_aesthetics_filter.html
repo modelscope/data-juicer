@@ -362,7 +362,15 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageAestheticsFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with aesthetics scores within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with aesthetics scores within a specific range.</span>
+
+<span class="sd">    This operator uses a Hugging Face model to predict the aesthetics score of images. It</span>
+<span class="sd">    keeps samples where the predicted scores fall within the specified min and max score</span>
+<span class="sd">    range. The operator supports two strategies: &#39;any&#39; (keep if any image meets the</span>
+<span class="sd">    condition) and &#39;all&#39; (keep only if all images meet the condition). Aesthetics scores are</span>
+<span class="sd">    cached in the &#39;image_aesthetics_scores&#39; field. If no images are present, the sample is</span>
+<span class="sd">    kept. Scores are normalized by dividing by 10 if the model name includes</span>
+<span class="sd">    &#39;shunk031/aesthetics-predictor&#39;.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

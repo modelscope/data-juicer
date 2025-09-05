@@ -379,7 +379,16 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoSplitByKeyFrameMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to split video by key frame.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Splits a video into segments based on key frames.</span>
+
+<span class="sd">    This operator processes video data by splitting it into multiple segments at key frame</span>
+<span class="sd">    boundaries. It uses the key frames to determine where to make the splits. The original</span>
+<span class="sd">    sample can be kept or discarded based on the `keep_original_sample` parameter. If</span>
+<span class="sd">    `save_dir` is specified, the split video files will be saved in that directory;</span>
+<span class="sd">    otherwise, they will be saved in the same directory as the input files. The operator</span>
+<span class="sd">    processes each video in the sample and updates the sample with the new video keys and</span>
+<span class="sd">    text placeholders. The `Fields.source_file` field is updated to reflect the new video</span>
+<span class="sd">    segments. This operator works in batch mode, processing multiple samples at once.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

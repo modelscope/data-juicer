@@ -356,9 +356,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_difficulty_score_filter.html#data_juicer.ops.filter.llm_difficulty_score_filter.LLMDifficultyScoreFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LLMDifficultyScoreFilter</span><span class="p">(</span><span class="n">LLMAnalysisFilter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter to keep sample with high difficulty score estimated by LLM.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with high difficulty scores estimated by an LLM.</span>
+
+<span class="sd">    This operator uses a Hugging Face LLM to evaluate the difficulty of each sample. The LLM</span>
+<span class="sd">    analyzes the sample across multiple dimensions, including linguistic complexity,</span>
+<span class="sd">    conceptual depth, prior knowledge, step complexity, and ambiguity. Each dimension is</span>
+<span class="sd">    scored on a 1-5 scale, with 5 being the highest difficulty. The final difficulty score</span>
+<span class="sd">    is computed as the average of these dimension scores. Samples are kept if their</span>
+<span class="sd">    difficulty score falls within the specified range (min_score to max_score). The key</span>
+<span class="sd">    metric &#39;llm_difficulty_score&#39; is stored in the sample&#39;s stats, along with detailed</span>
+<span class="sd">    records and flags.&quot;&quot;&quot;</span>
 
     <span class="c1"># avoid leading whitespace</span>
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>

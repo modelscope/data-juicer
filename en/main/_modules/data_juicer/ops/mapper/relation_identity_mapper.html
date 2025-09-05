@@ -358,13 +358,20 @@
 
 <span class="c1"># TODO: LLM-based inference.</span>
 <div class="viewcode-block" id="RelationIdentityMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.relation_identity_mapper.html#data_juicer.ops.mapper.relation_identity_mapper.RelationIdentityMapper">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RelationIdentityMapper">[docs]</a>
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RelationIdentityMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    identify relation between two entity in the text.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Identify the relation between two entities in a given text.</span>
+
+<span class="sd">    This operator uses an API model to analyze the relationship between two specified</span>
+<span class="sd">    entities in the text. It constructs a prompt with the provided system and input</span>
+<span class="sd">    templates, then sends it to the API model for analysis. The output is parsed using a</span>
+<span class="sd">    regular expression to extract the relationship. If the two entities are the same, the</span>
+<span class="sd">    relationship is identified as &quot;another identity.&quot; The result is stored in the meta field</span>
+<span class="sd">    under the key &#39;role_relation&#39; by default. The operator retries the API call up to a</span>
+<span class="sd">    specified number of times in case of errors. If `drop_text` is set to True, the original</span>
+<span class="sd">    text is removed from the sample after processing.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT_TEMPLATE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;给定关于</span><span class="si">{entity1}</span><span class="s2">和</span><span class="si">{entity2}</span><span class="s2">的文本信息。&quot;</span>
@@ -386,7 +393,7 @@
 <span class="s2">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="RelationIdentityMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.relation_identity_mapper.html#data_juicer.ops.mapper.relation_identity_mapper.RelationIdentityMapper.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RelationIdentityMapper.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
@@ -455,7 +462,7 @@
 
 
 <div class="viewcode-block" id="RelationIdentityMapper.parse_output">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.relation_identity_mapper.html#data_juicer.ops.mapper.relation_identity_mapper.RelationIdentityMapper.parse_output">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RelationIdentityMapper.parse_output">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_output</span><span class="p">):</span>
         <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
         <span class="n">matches</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">raw_output</span><span class="p">)</span>
@@ -470,7 +477,7 @@
 
 
 <div class="viewcode-block" id="RelationIdentityMapper.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.relation_identity_mapper.html#data_juicer.ops.mapper.relation_identity_mapper.RelationIdentityMapper.process_single">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RelationIdentityMapper.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_key</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>

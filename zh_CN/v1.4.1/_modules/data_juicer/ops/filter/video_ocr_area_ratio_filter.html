@@ -387,9 +387,16 @@
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_SAMPLED_FRAMES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoOcrAreaRatioFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep data samples whose detected text area ratios for specified frames</span>
-<span class="sd">    in the video are within a specified range.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep data samples whose detected text area ratios for specified frames in the video are</span>
+<span class="sd">    within a specified range.</span>
+
+<span class="sd">    This operator filters data based on the ratio of the detected text area to the total</span>
+<span class="sd">    frame area. It uses EasyOCR to detect text in the specified languages and calculates the</span>
+<span class="sd">    area ratio for each sampled frame. The operator then determines whether to keep a sample</span>
+<span class="sd">    based on the `any` or `all` strategy, which checks if any or all of the videos meet the</span>
+<span class="sd">    specified area ratio range. The key metric, `video_ocr_area_ratio`, is computed as the</span>
+<span class="sd">    mean of the text area ratios across the sampled frames. The number of sampled frames and</span>
+<span class="sd">    the specific frames to be sampled can be configured.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

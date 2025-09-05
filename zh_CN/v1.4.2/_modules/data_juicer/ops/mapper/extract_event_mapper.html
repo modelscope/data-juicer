@@ -366,9 +366,14 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExtractEventMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extract events and relevant characters in the text</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts events and relevant characters from the text.</span>
+
+<span class="sd">    This operator uses an API model to summarize the text into multiple events and extract</span>
+<span class="sd">    the relevant characters for each event. The summary and character extraction follow a</span>
+<span class="sd">    predefined format. The operator retries the API call up to a specified number of times</span>
+<span class="sd">    if there is an error. The extracted events and characters are stored in the meta field</span>
+<span class="sd">    of the samples. If no events are found, the original samples are returned. The operator</span>
+<span class="sd">    can optionally drop the original text after processing.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

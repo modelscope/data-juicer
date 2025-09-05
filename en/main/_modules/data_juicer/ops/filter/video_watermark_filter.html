@@ -371,10 +371,16 @@
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_SAMPLED_FRAMES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoWatermarkFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter to keep samples whose videos have no watermark with high</span>
-<span class="sd">    probability.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples whose videos have no watermark with high probability.</span>
+
+<span class="sd">    This operator uses a Hugging Face watermark detection model to predict the probability</span>
+<span class="sd">    of watermarks in video frames. It keeps samples where the predicted watermark</span>
+<span class="sd">    probability is below a specified threshold. The key metric, &#39;video_watermark_prob&#39;, is</span>
+<span class="sd">    computed by extracting frames from the video using a specified sampling method and then</span>
+<span class="sd">    averaging, maximizing, or minimizing the probabilities based on the reduce mode. If</span>
+<span class="sd">    multiple videos are present, the operator can use either an &#39;any&#39; or &#39;all&#39; strategy to</span>
+<span class="sd">    determine if the sample should be kept. The frame sampling method can be &#39;all_keyframes&#39;</span>
+<span class="sd">    or &#39;uniform&#39;, and the reduce mode can be &#39;avg&#39;, &#39;max&#39;, or &#39;min&#39;.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

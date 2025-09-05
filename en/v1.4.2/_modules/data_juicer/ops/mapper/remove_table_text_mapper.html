@@ -353,12 +353,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_table_text_mapper.html#data_juicer.ops.mapper.remove_table_text_mapper.RemoveTableTextMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;remove_table_text_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveTableTextMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to remove table texts from text samples.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove table texts from text samples.</span>
 
-<span class="sd">    Regular expression is used to remove tables in the range of column</span>
-<span class="sd">    number of tables.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    This operator uses regular expressions to identify and remove tables from the text. It</span>
+<span class="sd">    targets tables with a specified range of columns, defined by the minimum and maximum</span>
+<span class="sd">    number of columns. The operator iterates over each sample, applying the regex pattern to</span>
+<span class="sd">    remove tables that match the column criteria. The processed text, with tables removed,</span>
+<span class="sd">    is then stored back in the sample. This operation is batched for efficiency.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

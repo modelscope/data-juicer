@@ -353,9 +353,15 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.calibrate_response_mapper.html#data_juicer.ops.mapper.calibrate_response_mapper.CalibrateResponseMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CalibrateResponseMapper</span><span class="p">(</span><span class="n">CalibrateQAMapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to calibrate response in question-answer pairs based on reference text.</span>
-<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calibrate response in question-answer pairs based on reference text.</span>
+
+<span class="sd">    This mapper calibrates the &#39;response&#39; part of a question-answer pair by using a</span>
+<span class="sd">    reference text. It aims to make the response more detailed and accurate while ensuring</span>
+<span class="sd">    it still answers the original question. The calibration process uses a default system</span>
+<span class="sd">    prompt, which can be customized. The output is stripped of any leading or trailing</span>
+<span class="sd">    whitespace.&quot;&quot;&quot;</span>
+
+    <span class="c1"># noqa: E501</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="s2">&quot;请根据提供的【参考信息】对问答对中的【回答】进行校准，</span><span class="se">\</span>
 <span class="s2">        使其更加详细、准确，且仍可以回答原问题。只输出校准后的回答，不要输出多余内容。&quot;</span>

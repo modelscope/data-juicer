@@ -353,7 +353,14 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.clean_email_mapper.html#data_juicer.ops.mapper.clean_email_mapper.CleanEmailMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;clean_email_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CleanEmailMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to clean email in text samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cleans email addresses from text samples using a regular expression.</span>
+
+<span class="sd">    This operator removes or replaces email addresses in the text based on a regular</span>
+<span class="sd">    expression pattern. By default, it uses a standard pattern to match email addresses, but</span>
+<span class="sd">    a custom pattern can be provided. The matched email addresses are replaced with a</span>
+<span class="sd">    specified replacement string, which defaults to an empty string. The operation is</span>
+<span class="sd">    applied to each text sample in the batch. If no email address is found in a sample, it</span>
+<span class="sd">    remains unchanged.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

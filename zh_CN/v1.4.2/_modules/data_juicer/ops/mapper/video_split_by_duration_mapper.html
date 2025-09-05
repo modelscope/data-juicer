@@ -381,7 +381,21 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoSplitByDurationMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to split video by duration.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Splits videos into segments based on a specified duration.</span>
+
+<span class="sd">    This operator splits each video in the dataset into smaller segments, each with a fixed</span>
+<span class="sd">    duration. The last segment is discarded if its duration is less than the specified</span>
+<span class="sd">    minimum last split duration. The original sample can be kept or removed based on the</span>
+<span class="sd">    `keep_original_sample` parameter. The generated video files are saved in the specified</span>
+<span class="sd">    directory or, if not provided, in the same directory as the input files. The key metric</span>
+<span class="sd">    for this operation is the duration of each segment, which is character-based (seconds).</span>
+
+<span class="sd">    - Splits videos into segments of a specified duration.</span>
+<span class="sd">    - Discards the last segment if it is shorter than the minimum allowed duration.</span>
+<span class="sd">    - Keeps or removes the original sample based on the `keep_original_sample` parameter.</span>
+<span class="sd">    - Saves the generated video files in the specified directory or the input file&#39;s</span>
+<span class="sd">      directory.</span>
+<span class="sd">    - Uses the duration in seconds to determine the segment boundaries.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

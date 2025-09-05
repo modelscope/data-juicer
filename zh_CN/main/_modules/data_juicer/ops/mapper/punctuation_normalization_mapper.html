@@ -353,16 +353,21 @@
 
 
 <div class="viewcode-block" id="PunctuationNormalizationMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.punctuation_normalization_mapper.html#data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.PunctuationNormalizationMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;punctuation_normalization_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PunctuationNormalizationMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to normalize unicode punctuations to English punctuations in text</span>
-<span class="sd">    samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalizes unicode punctuations to their English equivalents in text samples.</span>
+
+<span class="sd">    This operator processes a batch of text samples and replaces any unicode punctuation</span>
+<span class="sd">    with its corresponding English punctuation. The mapping includes common substitutions</span>
+<span class="sd">    like &quot;，&quot; to &quot;,&quot;, &quot;。&quot; to &quot;.&quot;, and &quot;“&quot; to &quot;. It iterates over each character in the text,</span>
+<span class="sd">    replacing it if it is found in the predefined punctuation map. The result is a set of</span>
+<span class="sd">    text samples with consistent punctuation formatting.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="PunctuationNormalizationMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.punctuation_normalization_mapper.html#data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.PunctuationNormalizationMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
@@ -410,7 +415,7 @@
 
 
 <div class="viewcode-block" id="PunctuationNormalizationMapper.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.punctuation_normalization_mapper.html#data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper.process_batched">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.PunctuationNormalizationMapper.process_batched">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">punctuation_unicode</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">text</span><span class="p">])</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>

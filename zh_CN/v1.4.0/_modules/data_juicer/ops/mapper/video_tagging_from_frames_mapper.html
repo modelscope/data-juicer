@@ -371,7 +371,20 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoTaggingFromFramesMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to generate video tags from frames extract by video.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates video tags from frames extracted from videos.</span>
+
+<span class="sd">    This operator extracts frames from videos and generates tags based on the</span>
+<span class="sd">    content of these frames. The frame extraction method can be either</span>
+<span class="sd">    &quot;all_keyframes&quot; or &quot;uniform&quot;. For &quot;all_keyframes&quot;, all keyframes are</span>
+<span class="sd">    extracted, while for &quot;uniform&quot;, a specified number of frames are</span>
+<span class="sd">    extracted uniformly across the video. The tags are generated using a</span>
+<span class="sd">    pre-trained model and stored in the specified field name. If the tags</span>
+<span class="sd">    are already present in the sample, the operator skips processing.</span>
+<span class="sd">    Important notes:</span>
+<span class="sd">    - Uses a Hugging Face tokenizer and a pre-trained model for tag generation.</span>
+<span class="sd">    - If no video is present in the sample, an empty tag array is stored.</span>
+<span class="sd">    - Frame tensors are processed to generate tags, which are then sorted by</span>
+<span class="sd">    frequency and stored.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

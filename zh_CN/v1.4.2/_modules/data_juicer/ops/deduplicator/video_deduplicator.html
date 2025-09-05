@@ -363,10 +363,15 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoDeduplicator</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Deduplicator to deduplicate samples at document-level using exact matching</span>
-<span class="sd">    of videos between documents.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deduplicates samples at the document level using exact matching of videos.</span>
+
+<span class="sd">    This operator computes a hash for each video in the sample and uses it to identify and</span>
+<span class="sd">    remove duplicate documents. If `consider_text` is set to True, it also considers the</span>
+<span class="sd">    text hash alongside the video hash for deduplication. The video hash is computed by</span>
+<span class="sd">    hashing the video data, including all video streams in the container. The operator</span>
+<span class="sd">    supports sampling and tracing of duplicate pairs when the `show_num` parameter is</span>
+<span class="sd">    greater than 0. Important fields used for caching include &#39;videohash&#39; and optionally</span>
+<span class="sd">    &#39;hash&#39; if text is considered.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="VideoDeduplicator.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.video_deduplicator.html#data_juicer.ops.deduplicator.VideoDeduplicator.__init__">[文档]</a>

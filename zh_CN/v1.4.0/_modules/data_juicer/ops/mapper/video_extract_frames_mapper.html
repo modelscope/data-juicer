@@ -375,16 +375,24 @@
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoExtractFramesMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to extract frames from video files according to specified methods.</span>
-<span class="sd">    Extracted Frames Data Format:</span>
-<span class="sd">        The data format for the extracted frames is a dictionary mapping</span>
-<span class="sd">        video key to extracted frames directory where the extracted</span>
-<span class="sd">        frames are saved. The dictionary follows the structure:</span>
-<span class="sd">        {</span>
-<span class="sd">            &quot;video_key_1&quot;: &quot;/${frame_dir}/video_key_1_filename/&quot;,</span>
-<span class="sd">            &quot;video_key_2&quot;: &quot;/${frame_dir}/video_key_2_filename/&quot;,</span>
-<span class="sd">            ...</span>
-<span class="sd">        }</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="sd">    Extracts frames from video files using either all keyframes or a uniform sampling</span>
+<span class="sd">    method. The extracted frames are saved in a directory, and the mapping from video keys</span>
+<span class="sd">    to frame directories is stored in the sample&#39;s metadata. The data format for the</span>
+<span class="sd">    extracted frames is a dictionary mapping video keys to their respective frame</span>
+<span class="sd">    directories:</span>
+<span class="sd">    - &quot;video_key_1&quot;: &quot;/${frame_dir}/video_key_1_filename/&quot;</span>
+<span class="sd">    - &quot;video_key_2&quot;: &quot;/${frame_dir}/video_key_2_filename/&quot;</span>
+
+<span class="sd">    - **Frame Sampling Methods**:</span>
+<span class="sd">    - &quot;all_keyframes&quot;: Extracts all keyframes from the video.</span>
+<span class="sd">    - &quot;uniform&quot;: Extracts a specified number of frames uniformly from the video.</span>
+<span class="sd">    - If `duration` is set, the video is segmented into multiple segments based on the</span>
+<span class="sd">      duration, and frames are extracted from each segment.</span>
+<span class="sd">    - The output directory for the frames can be specified; otherwise, a default directory</span>
+<span class="sd">      is used.</span>
+<span class="sd">    - The field name in the sample&#39;s metadata where the frame information is stored can be</span>
+<span class="sd">      customized.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

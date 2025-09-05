@@ -358,9 +358,15 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.calibrate_qa_mapper.html#data_juicer.ops.mapper.CalibrateQAMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CalibrateQAMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to calibrate question-answer pairs based on reference text.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calibrates question-answer pairs based on reference text using an API model.</span>
+
+<span class="sd">    This operator uses a specified API model to calibrate question-answer pairs, making them</span>
+<span class="sd">    more detailed and accurate. It constructs the input prompt by combining the reference</span>
+<span class="sd">    text and the question-answer pair, then sends it to the API for calibration. The output</span>
+<span class="sd">    is parsed to extract the calibrated question and answer. The operator retries the API</span>
+<span class="sd">    call and parsing up to a specified number of times in case of errors. The default system</span>
+<span class="sd">    prompt, input templates, and output pattern can be customized. The operator supports</span>
+<span class="sd">    additional parameters for model initialization and sampling.&quot;&quot;&quot;</span>
 
     <span class="c1"># avoid leading whitespace</span>
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>

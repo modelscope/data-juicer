@@ -366,7 +366,14 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageFaceCountFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with the number of faces within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with the number of faces within a specific range.</span>
+
+<span class="sd">    This operator uses an OpenCV classifier for face detection. It filters samples based on</span>
+<span class="sd">    the number of faces detected in the images, keeping only those with a face count within</span>
+<span class="sd">    the specified range. The operator supports two strategies: &#39;any&#39; (keep if any image</span>
+<span class="sd">    meets the condition) and &#39;all&#39; (keep only if all images meet the condition). The face</span>
+<span class="sd">    counts are cached in the &#39;face_counts&#39; field. If no images are present in the sample,</span>
+<span class="sd">    the face count is set to an empty array.&quot;&quot;&quot;</span>
 
     <span class="n">_default_kwargs</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;scaleFactor&quot;</span><span class="p">:</span> <span class="mf">1.1</span><span class="p">,</span>

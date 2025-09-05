@@ -364,7 +364,16 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageSegmentMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform segment-anything on images and return the bounding boxes.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform segment-anything on images and return the bounding boxes.</span>
+
+<span class="sd">    This operator uses a FastSAM model to detect and segment objects in images, returning</span>
+<span class="sd">    their bounding boxes. It processes each image in the sample, and stores the bounding</span>
+<span class="sd">    boxes in the &#39;bbox_tag&#39; field under the &#39;meta&#39; key. If no images are present in the</span>
+<span class="sd">    sample, an empty array is stored instead. The operator allows setting the image</span>
+<span class="sd">    resolution, confidence threshold, and IoU (Intersection over Union) score threshold for</span>
+<span class="sd">    the segmentation process. Bounding boxes are represented as N x M x 4 arrays, where N is</span>
+<span class="sd">    the number of images, M is the number of detected boxes, and 4 represents the</span>
+<span class="sd">    coordinates.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

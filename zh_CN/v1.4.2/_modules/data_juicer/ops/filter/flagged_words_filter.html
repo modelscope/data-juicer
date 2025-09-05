@@ -368,7 +368,16 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_WORDS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">FlaggedWordFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with flagged-word ratio in a specified range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with flagged-word ratio in a specified range.</span>
+
+<span class="sd">    This operator filters out samples based on the ratio of flagged words. It uses a list of</span>
+<span class="sd">    flagged words, which can be language-specific or combined from multiple languages. The</span>
+<span class="sd">    flagged-word ratio is computed as the number of flagged words divided by the total</span>
+<span class="sd">    number of words in the sample. If tokenization is enabled, a Hugging Face tokenizer is</span>
+<span class="sd">    used to split the text into words. The operator supports word augmentation for certain</span>
+<span class="sd">    languages, which can be configured. The key metric, &#39;flagged_words_ratio&#39;, is cached and</span>
+<span class="sd">    reused if already computed. Samples are kept if their flagged-word ratio falls within</span>
+<span class="sd">    the specified min and max ratio.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

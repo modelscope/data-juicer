@@ -361,7 +361,14 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_long_words_mapper.html#data_juicer.ops.mapper.remove_long_words_mapper.RemoveLongWordsMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;remove_long_words_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveLongWordsMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove long words within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove long words within a specific range.</span>
+
+<span class="sd">    This operator filters out words in the text that are either shorter than the specified</span>
+<span class="sd">    minimum length or longer than the specified maximum length. Words are first checked with</span>
+<span class="sd">    their original length, and if they do not meet the criteria, they are stripped of</span>
+<span class="sd">    special characters and re-evaluated. The key metric used is the character-based length</span>
+<span class="sd">    of each word. The processed text retains only the words that fall within the defined</span>
+<span class="sd">    length range. This operator processes text in batches for efficiency.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

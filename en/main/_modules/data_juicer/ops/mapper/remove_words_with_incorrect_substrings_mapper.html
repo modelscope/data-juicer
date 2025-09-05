@@ -360,15 +360,30 @@
 
 
 <div class="viewcode-block" id="RemoveWordsWithIncorrectSubstringsMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.html#data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.RemoveWordsWithIncorrectSubstringsMapper">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveWordsWithIncorrectSubstringsMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveWordsWithIncorrectSubstringsMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove words with incorrect substrings.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove words containing specified incorrect substrings.</span>
+
+<span class="sd">    This operator processes text by removing words that contain any of the specified</span>
+<span class="sd">    incorrect substrings. By default, it removes words with substrings like &quot;http&quot;, &quot;www&quot;,</span>
+<span class="sd">    &quot;.com&quot;, &quot;href&quot;, and &quot;//&quot;. The operator can operate in tokenized or non-tokenized mode.</span>
+<span class="sd">    In tokenized mode, it uses a Hugging Face tokenizer to tokenize the text before</span>
+<span class="sd">    processing. The key metric is not computed; this operator focuses on filtering out</span>
+<span class="sd">    specific words.</span>
+
+<span class="sd">    - If `tokenization` is True, the text is tokenized using a Hugging Face</span>
+<span class="sd">    tokenizer, and words are filtered based on the specified substrings.</span>
+<span class="sd">    - If `tokenization` is False, the text is split into sentences and words,</span>
+<span class="sd">    and words are filtered based on the specified substrings.</span>
+<span class="sd">    - The filtered text is then merged back into a single string.</span>
+
+<span class="sd">    The operator processes samples in batches and updates the text in place.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="RemoveWordsWithIncorrectSubstringsMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.html#data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.RemoveWordsWithIncorrectSubstringsMapper.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveWordsWithIncorrectSubstringsMapper.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">tokenization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">substrings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
@@ -392,7 +407,7 @@
 
 
 <div class="viewcode-block" id="RemoveWordsWithIncorrectSubstringsMapper.should_keep_word_with_incorrect_substrings">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.html#data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.RemoveWordsWithIncorrectSubstringsMapper.should_keep_word_with_incorrect_substrings">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveWordsWithIncorrectSubstringsMapper.should_keep_word_with_incorrect_substrings">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">should_keep_word_with_incorrect_substrings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="p">,</span> <span class="n">substrings</span><span class="p">):</span>
         <span class="n">word</span> <span class="o">=</span> <span class="n">strip</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">SPECIAL_CHARACTERS</span><span class="p">)</span>
         <span class="n">should_keep</span> <span class="o">=</span> <span class="nb">all</span><span class="p">([(</span><span class="n">i_substr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">word</span><span class="p">)</span> <span class="k">for</span> <span class="n">i_substr</span> <span class="ow">in</span> <span class="n">substrings</span><span class="p">])</span>
@@ -400,7 +415,7 @@
 
 
 <div class="viewcode-block" id="RemoveWordsWithIncorrectSubstringsMapper.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.html#data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.RemoveWordsWithIncorrectSubstringsMapper.process_batched">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveWordsWithIncorrectSubstringsMapper.process_batched">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span><span class="p">:</span>

@@ -361,7 +361,15 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_repeat_sentences_mapper.html#data_juicer.ops.mapper.remove_repeat_sentences_mapper.RemoveRepeatSentencesMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;remove_repeat_sentences_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveRepeatSentencesMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove repeat sentences in text samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove repeat sentences in text samples.</span>
+
+<span class="sd">    This operator processes text samples to remove duplicate sentences. It splits the text</span>
+<span class="sd">    into lines and then further splits each line into sentences. Sentences are considered</span>
+<span class="sd">    duplicates if they are identical after optional case normalization and special character</span>
+<span class="sd">    removal. The operator uses a hash set to track unique sentences. Sentences shorter than</span>
+<span class="sd">    `min_repeat_sentence_length` are not deduplicated. If `ignore_special_character` is</span>
+<span class="sd">    enabled, special characters (all except Chinese, letters, and numbers) are ignored when</span>
+<span class="sd">    checking for duplicates. The resulting text is reassembled with unique sentences.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

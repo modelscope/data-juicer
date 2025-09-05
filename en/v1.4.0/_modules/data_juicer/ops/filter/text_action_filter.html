@@ -355,9 +355,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.text_action_filter.html#data_juicer.ops.filter.text_action_filter.TextActionFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TextActionFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter to keep texts those contain actions in the text.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep texts that contain a minimum number of actions.</span>
+
+<span class="sd">    This operator uses a Spacy model to detect actions in the text. It keeps samples if the</span>
+<span class="sd">    number of detected actions meets or exceeds the specified minimum. The supported</span>
+<span class="sd">    languages are English (&#39;en&#39;) and Chinese (&#39;zh&#39;). The &#39;num_action&#39; statistic is computed</span>
+<span class="sd">    and cached for each sample. Actions are identified based on part-of-speech (POS) tags</span>
+<span class="sd">    and specific tags for verbs.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TextActionFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.text_action_filter.html#data_juicer.ops.filter.text_action_filter.TextActionFilter.__init__">[docs]</a>

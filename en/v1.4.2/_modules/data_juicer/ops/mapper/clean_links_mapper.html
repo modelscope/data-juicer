@@ -356,7 +356,14 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.clean_links_mapper.html#data_juicer.ops.mapper.clean_links_mapper.CleanLinksMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;clean_links_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CleanLinksMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to clean links like http/https/ftp in text samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to clean links like http/https/ftp in text samples.</span>
+
+<span class="sd">    This operator removes or replaces URLs and other web links in the text. It uses a</span>
+<span class="sd">    regular expression pattern to identify and remove links. By default, it replaces the</span>
+<span class="sd">    identified links with an empty string, effectively removing them. The operator can be</span>
+<span class="sd">    customized with a different pattern and replacement string. It processes samples in</span>
+<span class="sd">    batches and modifies the text in place. If no links are found in a sample, it is left</span>
+<span class="sd">    unchanged.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

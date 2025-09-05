@@ -359,9 +359,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.pair_preference_mapper.html#data_juicer.ops.mapper.pair_preference_mapper.PairPreferenceMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PairPreferenceMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to construct paired preference samples.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to construct paired preference samples by generating a rejected response and its</span>
+<span class="sd">    reason.</span>
+
+<span class="sd">    This operator uses an API model to generate a new response that is opposite in style,</span>
+<span class="sd">    factuality, or stance to the original response. The generated response and the reason</span>
+<span class="sd">    for its generation are stored in the sample. The default system prompt and input</span>
+<span class="sd">    template are provided, but can be customized. The output is parsed using a regular</span>
+<span class="sd">    expression to extract the new response and the reason. If parsing fails, the operator</span>
+<span class="sd">    retries up to a specified number of times. The generated response and reason are stored</span>
+<span class="sd">    in the sample under the keys &#39;rejected_response&#39; and &#39;reason&#39;, respectively.&quot;&quot;&quot;</span>
 
     <span class="c1"># avoid leading whitespace</span>
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>

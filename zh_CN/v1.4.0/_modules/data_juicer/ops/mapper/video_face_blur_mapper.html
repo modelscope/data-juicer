@@ -374,7 +374,14 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoFaceBlurMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to blur faces detected in videos.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to blur faces detected in videos.</span>
+
+<span class="sd">    This operator uses an OpenCV classifier for face detection and applies a specified blur</span>
+<span class="sd">    type to the detected faces. The default classifier is &#39;haarcascade_frontalface_alt.xml&#39;.</span>
+<span class="sd">    Supported blur types include &#39;mean&#39;, &#39;box&#39;, and &#39;gaussian&#39;. The radius of the blur</span>
+<span class="sd">    kernel can be adjusted. If a save directory is not provided, the processed videos will</span>
+<span class="sd">    be saved in the same directory as the input files. The `DJ_PRODUCED_DATA_DIR`</span>
+<span class="sd">    environment variable can also be used to specify the save directory.&quot;&quot;&quot;</span>
 
     <span class="n">_default_kwargs</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;scaleFactor&quot;</span><span class="p">:</span> <span class="mf">1.1</span><span class="p">,</span>

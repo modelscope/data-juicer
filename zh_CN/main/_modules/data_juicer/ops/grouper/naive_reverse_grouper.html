@@ -358,7 +358,17 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.grouper.naive_reverse_grouper.html#data_juicer.ops.grouper.NaiveReverseGrouper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;naive_reverse_grouper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">NaiveReverseGrouper</span><span class="p">(</span><span class="n">Grouper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split batched samples to samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split batched samples into individual samples.</span>
+
+<span class="sd">    This operator processes a dataset by splitting each batched sample into</span>
+<span class="sd">    individual samples. It also handles and optionally exports batch metadata.</span>
+<span class="sd">    - If a sample contains &#39;batch_meta&#39;, it is separated and can be exported</span>
+<span class="sd">    to a specified path.</span>
+<span class="sd">    - The operator converts the remaining data from a dictionary of lists</span>
+<span class="sd">    to a list of dictionaries, effectively unbatching the samples.</span>
+<span class="sd">    - If `batch_meta_export_path` is provided, the batch metadata is written</span>
+<span class="sd">    to this file in JSON format, one entry per line.</span>
+<span class="sd">    - If no samples are present in the dataset, the original dataset is returned.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="NaiveReverseGrouper.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.grouper.naive_reverse_grouper.html#data_juicer.ops.grouper.NaiveReverseGrouper.__init__">[文档]</a>

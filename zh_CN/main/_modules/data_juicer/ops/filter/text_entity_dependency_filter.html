@@ -361,10 +361,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.TextEntityDependencyFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TextEntityDependencyFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Identify the entities in the text which are independent with other token,</span>
-<span class="sd">    and filter them. The text containing no entities will be omitted.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Identify and filter text samples based on entity dependencies.</span>
+
+<span class="sd">    This operator uses a spaCy model to detect entities in the text and evaluates their</span>
+<span class="sd">    dependency relationships. It filters out samples where entities have fewer than a</span>
+<span class="sd">    specified number of dependency edges. The key metric is &#39;num_dependency_edges&#39;, which</span>
+<span class="sd">    counts the number of edges for each entity in the dependency tree. Samples with no</span>
+<span class="sd">    detected entities are omitted. The operator supports &#39;any&#39; or &#39;all&#39; strategies: &#39;any&#39;</span>
+<span class="sd">    keeps samples if at least one entity meets the dependency threshold, while &#39;all&#39;</span>
+<span class="sd">    requires all entities to meet the threshold. Supported languages are English (&#39;en&#39;) and</span>
+<span class="sd">    Chinese (&#39;zh&#39;).&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TextEntityDependencyFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.TextEntityDependencyFilter.__init__">[文档]</a>

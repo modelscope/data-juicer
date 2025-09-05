@@ -356,7 +356,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.FixUnicodeMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">FixUnicodeMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to fix unicode errors in text samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fixes unicode errors in text samples.</span>
+
+<span class="sd">    This operator corrects common unicode errors and normalizes the text to a specified</span>
+<span class="sd">    Unicode normalization form. The default normalization form is &#39;NFC&#39;, but it can be set</span>
+<span class="sd">    to &#39;NFKC&#39;, &#39;NFD&#39;, or &#39;NFKD&#39; during initialization. It processes text samples in batches,</span>
+<span class="sd">    applying the specified normalization to each sample. If an unsupported normalization</span>
+<span class="sd">    form is provided, a ValueError is raised.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

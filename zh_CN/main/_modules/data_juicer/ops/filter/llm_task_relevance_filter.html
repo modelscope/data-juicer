@@ -362,13 +362,22 @@
 
 
 <div class="viewcode-block" id="LLMTaskRelevanceFilter">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_task_relevance_filter.html#data_juicer.ops.filter.llm_task_relevance_filter.LLMTaskRelevanceFilter">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_task_relevance_filter.html#data_juicer.ops.filter.LLMTaskRelevanceFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@ATTRIBUTION_FILTERS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LLMTaskRelevanceFilter</span><span class="p">(</span><span class="n">LLMAnalysisFilter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter to keep sample with high relevance score to validation tasks estimated by LLM.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with high relevance scores to validation tasks estimated by an</span>
+<span class="sd">    LLM.</span>
+
+<span class="sd">    This operator evaluates the relevance of each sample to a specified validation task</span>
+<span class="sd">    using an LLM. The LLM scores the sample on multiple dimensions, including topical</span>
+<span class="sd">    relevance, linguistic style match, task match, knowledge alignment, and potential</span>
+<span class="sd">    utility. Each dimension is scored on a 1-5 scale, with 5 being the highest. The key</span>
+<span class="sd">    metric, &#39;llm_task_relevance&#39;, is the average score across these dimensions. Samples are</span>
+<span class="sd">    kept if their average score meets or exceeds the specified minimum threshold. The</span>
+<span class="sd">    operator uses either an API or a Hugging Face model for evaluation. If no validation</span>
+<span class="sd">    dataset or task description is provided, the &#39;prepare_valid_feature&#39; method must be</span>
+<span class="sd">    called manually before applying the filter.&quot;&quot;&quot;</span>
 
     <span class="c1"># TODO: fix dataset cast error</span>
 
@@ -425,7 +434,7 @@
     <span class="p">]</span>
 
 <div class="viewcode-block" id="LLMTaskRelevanceFilter.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_task_relevance_filter.html#data_juicer.ops.filter.llm_task_relevance_filter.LLMTaskRelevanceFilter.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_task_relevance_filter.html#data_juicer.ops.filter.LLMTaskRelevanceFilter.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">api_or_hf_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
@@ -465,7 +474,7 @@
         <span class="k">return</span> <span class="s2">&quot;valid_info&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_feature</span>
 
 <div class="viewcode-block" id="LLMTaskRelevanceFilter.prepare_valid_feature">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_task_relevance_filter.html#data_juicer.ops.filter.llm_task_relevance_filter.LLMTaskRelevanceFilter.prepare_valid_feature">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_task_relevance_filter.html#data_juicer.ops.filter.LLMTaskRelevanceFilter.prepare_valid_feature">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prepare_valid_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">task_desc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_shot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">valid_data_block</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -500,7 +509,7 @@
 
 
 <div class="viewcode-block" id="LLMTaskRelevanceFilter.build_input">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_task_relevance_filter.html#data_juicer.ops.filter.llm_task_relevance_filter.LLMTaskRelevanceFilter.build_input">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_task_relevance_filter.html#data_juicer.ops.filter.LLMTaskRelevanceFilter.build_input">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_keys</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not all input keys </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">input_keys</span><span class="si">}</span><span class="s2"> are in the sample!&quot;</span><span class="p">)</span>
@@ -516,7 +525,7 @@
 
 
 <div class="viewcode-block" id="LLMTaskRelevanceFilter.compute_stats_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_task_relevance_filter.html#data_juicer.ops.filter.llm_task_relevance_filter.LLMTaskRelevanceFilter.compute_stats_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_task_relevance_filter.html#data_juicer.ops.filter.LLMTaskRelevanceFilter.compute_stats_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
         <span class="k">if</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_task_relevance</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
@@ -537,7 +546,7 @@
 
 
 <div class="viewcode-block" id="LLMTaskRelevanceFilter.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_task_relevance_filter.html#data_juicer.ops.filter.llm_task_relevance_filter.LLMTaskRelevanceFilter.process_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_task_relevance_filter.html#data_juicer.ops.filter.LLMTaskRelevanceFilter.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">itm_score</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_task_relevance</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">itm_score</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

@@ -355,16 +355,21 @@
 
 
 <div class="viewcode-block" id="CleanCopyrightMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.clean_copyright_mapper.html#data_juicer.ops.mapper.clean_copyright_mapper.CleanCopyrightMapper">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.CleanCopyrightMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;clean_copyright_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CleanCopyrightMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to clean copyright comments at the beginning of the text</span>
-<span class="sd">    samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cleans copyright comments at the beginning of text samples.</span>
+
+<span class="sd">    This operator removes copyright comments from the start of text samples. It identifies</span>
+<span class="sd">    and strips multiline comments that contain the word &quot;copyright&quot; using a regular</span>
+<span class="sd">    expression. It also greedily removes lines starting with comment markers like `//`, `#`,</span>
+<span class="sd">    or `--` at the beginning of the text, as these are often part of copyright headers. The</span>
+<span class="sd">    operator processes each sample individually but can handle batches for efficiency.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="CleanCopyrightMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.clean_copyright_mapper.html#data_juicer.ops.mapper.clean_copyright_mapper.CleanCopyrightMapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.CleanCopyrightMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
@@ -406,7 +411,7 @@
         <span class="k">return</span> <span class="n">sample</span>
 
 <div class="viewcode-block" id="CleanCopyrightMapper.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.clean_copyright_mapper.html#data_juicer.ops.mapper.clean_copyright_mapper.CleanCopyrightMapper.process_batched">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.CleanCopyrightMapper.process_batched">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_process_single_sample</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]]</span>
         <span class="k">return</span> <span class="n">samples</span></div>

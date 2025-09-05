@@ -367,7 +367,7 @@
 
 
 <div class="viewcode-block" id="is_noun">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.html#data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.is_noun">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.html#data_juicer.ops.mapper.is_noun">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">is_noun</span><span class="p">(</span><span class="n">word</span><span class="p">):</span>
     <span class="c1"># print(word)</span>
     <span class="n">pos_tagged</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">pos_tag</span><span class="p">([</span><span class="n">word</span><span class="p">])</span>
@@ -381,7 +381,7 @@
 
 
 <div class="viewcode-block" id="compare_text_index">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.html#data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.compare_text_index">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.html#data_juicer.ops.mapper.compare_text_index">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compare_text_index</span><span class="p">(</span><span class="n">text1</span><span class="p">,</span> <span class="n">text2</span><span class="p">):</span>
     <span class="n">text1_split</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">text2_split</span> <span class="o">=</span> <span class="p">[]</span>
@@ -418,7 +418,7 @@
 
 
 <div class="viewcode-block" id="iou_filter">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.html#data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.iou_filter">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.html#data_juicer.ops.mapper.iou_filter">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">iou_filter</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">iou_thresh</span><span class="p">):</span>
     <span class="n">x1</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
     <span class="n">y1</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
@@ -455,19 +455,32 @@
 
 
 <div class="viewcode-block" id="Difference_Area_Generator_Mapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.html#data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.Difference_Area_Generator_Mapper">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.Difference_Area_Generator_Mapper">[文档]</a>
 <span class="nd">@UNFORKABLE</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Difference_Area_Generator_Mapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A fused operator for OPs that is used to run sequential OPs on</span>
-<span class="sd">    the same batch to allow fine-grained control on data processing.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates and filters bounding boxes for image pairs based on similarity, segmentation,</span>
+<span class="sd">    and text matching.</span>
+
+<span class="sd">    This operator processes image pairs to identify and filter regions with significant</span>
+<span class="sd">    differences. It uses a sequence of operations:</span>
+<span class="sd">    - Filters out image pairs with large differences.</span>
+<span class="sd">    - Segments the images to identify potential objects.</span>
+<span class="sd">    - Crops sub-images based on bounding boxes.</span>
+<span class="sd">    - Determines if the sub-images contain valid objects using image-text matching.</span>
+<span class="sd">    - Filters out sub-images that are too similar.</span>
+<span class="sd">    - Removes overlapping bounding boxes.</span>
+<span class="sd">    - Uses Hugging Face models for similarity and text matching, and FastSAM for</span>
+<span class="sd">      segmentation.</span>
+<span class="sd">    - Caches intermediate results in `DATA_JUICER_ASSETS_CACHE`.</span>
+<span class="sd">    - Returns the filtered bounding boxes in the `MetaKeys.bbox_tag` field.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
 <div class="viewcode-block" id="Difference_Area_Generator_Mapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.html#data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.Difference_Area_Generator_Mapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.Difference_Area_Generator_Mapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">image_pair_similarity_filter_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
@@ -548,7 +561,7 @@
         <span class="k">return</span> <span class="n">args_dict</span>
 
 <div class="viewcode-block" id="Difference_Area_Generator_Mapper.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.html#data_juicer.ops.mapper.imgdiff_difference_area_generator_mapper.Difference_Area_Generator_Mapper.process_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.Difference_Area_Generator_Mapper.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">random_num</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">())</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fused_ops</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_pair_similarity_filter_args</span><span class="p">[</span><span class="s2">&quot;min_score_1&quot;</span><span class="p">]</span>

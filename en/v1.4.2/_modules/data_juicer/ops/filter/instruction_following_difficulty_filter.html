@@ -362,8 +362,15 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.instruction_following_difficulty_filter.html#data_juicer.ops.filter.instruction_following_difficulty_filter.InstructionFollowingDifficultyFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">InstructionFollowingDifficultyFilter</span><span class="p">(</span><span class="n">LLMPerplexityFilter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep texts whose instruction follows difficulty (IFD, https://arxiv.org/abs/2308.12032)</span>
-<span class="sd">    falls within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep texts based on their instruction following difficulty (IFD,</span>
+<span class="sd">        https://arxiv.org/abs/2308.12032) score.</span>
+
+<span class="sd">    This operator computes the IFD score for each sample, which is the ratio of the loss</span>
+<span class="sd">    with and without the query. It keeps samples where the IFD score falls within a</span>
+<span class="sd">    specified range. The IFD score is calculated using a Hugging Face tokenizer and model.</span>
+<span class="sd">    If the IFD score is already cached in the &#39;ifd_score&#39; field, it will be reused. The</span>
+<span class="sd">    operator decides to keep or filter samples based on the provided minimum and maximum IFD</span>
+<span class="sd">    score thresholds.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

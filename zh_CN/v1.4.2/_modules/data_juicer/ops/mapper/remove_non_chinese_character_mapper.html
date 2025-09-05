@@ -353,7 +353,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_non_chinese_character_mapper.html#data_juicer.ops.mapper.remove_non_chinese_character_mapper.RemoveNonChineseCharacterlMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;remove_non_chinese_character_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveNonChineseCharacterlMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove non chinese Character in text samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes non-Chinese characters from text samples.</span>
+
+<span class="sd">    This mapper removes all characters that are not part of the Chinese character set.</span>
+<span class="sd">    - It can optionally keep alphabets, numbers, and punctuation based on the configuration.</span>
+<span class="sd">    - The removal is done using a regular expression pattern.</span>
+<span class="sd">    - The pattern is constructed to exclude or include alphabets, numbers, and punctuation</span>
+<span class="sd">      as specified.</span>
+<span class="sd">    - The key metric for this operation is the presence of non-Chinese characters, which are</span>
+<span class="sd">      removed.</span>
+<span class="sd">    - The operator processes samples in a batched manner.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

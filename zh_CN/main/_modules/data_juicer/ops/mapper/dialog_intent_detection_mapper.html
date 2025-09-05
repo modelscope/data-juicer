@@ -360,15 +360,21 @@
 
 <span class="c1"># TODO: LLM-based inference.</span>
 <div class="viewcode-block" id="DialogIntentDetectionMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.dialog_intent_detection_mapper.html#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogIntentDetectionMapper">[文档]</a>
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DialogIntentDetectionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to generate user&#39;s intent labels in dialog. Input from</span>
-<span class="sd">    history_key, query_key and response_key. Output lists of</span>
-<span class="sd">    labels and analysis for queries in the dialog.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates user&#39;s intent labels in a dialog by analyzing the history, query, and</span>
+<span class="sd">    response.</span>
+
+<span class="sd">    This operator processes a dialog to identify and label the user&#39;s intent. It uses a</span>
+<span class="sd">    predefined system prompt and templates to build input prompts for an API call. The API</span>
+<span class="sd">    model (e.g., GPT-4) is used to analyze the dialog and generate intent labels and</span>
+<span class="sd">    analysis. The results are stored in the meta field under &#39;dialog_intent_labels&#39; and</span>
+<span class="sd">    &#39;dialog_intent_labels_analysis&#39;. The operator supports customizing the system prompt,</span>
+<span class="sd">    templates, and patterns for parsing the API response. If the intent candidates are</span>
+<span class="sd">    provided, they are included in the input prompt. The operator retries the API call up to</span>
+<span class="sd">    a specified number of times if there are errors.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;请判断用户和LLM多轮对话中用户的意图。</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -404,7 +410,7 @@
     <span class="n">DEFAULT_LABELS_PATTERN</span> <span class="o">=</span> <span class="s2">&quot;意图类别：(.*?)($|</span><span class="se">\n</span><span class="s2">)&quot;</span>
 
 <div class="viewcode-block" id="DialogIntentDetectionMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.dialog_intent_detection_mapper.html#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogIntentDetectionMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
@@ -492,7 +498,7 @@
 
 
 <div class="viewcode-block" id="DialogIntentDetectionMapper.build_input">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.dialog_intent_detection_mapper.html#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.build_input">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogIntentDetectionMapper.build_input">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">history</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">intent_candidates</span><span class="p">:</span>
             <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">candidate_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">candidate_str</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intent_candidates</span><span class="p">))</span>
@@ -508,7 +514,7 @@
 
 
 <div class="viewcode-block" id="DialogIntentDetectionMapper.parse_output">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.dialog_intent_detection_mapper.html#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.parse_output">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogIntentDetectionMapper.parse_output">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
         <span class="n">analysis</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -525,7 +531,7 @@
 
 
 <div class="viewcode-block" id="DialogIntentDetectionMapper.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.dialog_intent_detection_mapper.html#data_juicer.ops.mapper.dialog_intent_detection_mapper.DialogIntentDetectionMapper.process_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogIntentDetectionMapper.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels_key</span> <span class="ow">in</span> <span class="n">meta</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis_key</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>

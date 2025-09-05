@@ -367,7 +367,16 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoTaggingFromFramesFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples whose videos contain the given tags.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples whose videos contain specified tags.</span>
+
+<span class="sd">    This operator filters video samples based on the presence of given tags in the video</span>
+<span class="sd">    frames. It uses a Hugging Face tokenizer to extract and tag frames. The filtering can be</span>
+<span class="sd">    configured to require any or all of the specified tags to be present. The operator</span>
+<span class="sd">    supports two frame sampling methods: &quot;all_keyframes&quot; and &quot;uniform&quot;. When using</span>
+<span class="sd">    &quot;uniform&quot;, the number of frames to sample can be specified. The extracted tags are</span>
+<span class="sd">    stored in the meta field with the key &#39;video_frame_tags&#39; by default. The decision to</span>
+<span class="sd">    keep a sample is based on whether any or all of the video frames meet the tag criteria,</span>
+<span class="sd">    as specified by the &#39;any_or_all&#39; parameter.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

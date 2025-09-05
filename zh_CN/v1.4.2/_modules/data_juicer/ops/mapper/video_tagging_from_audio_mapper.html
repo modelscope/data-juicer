@@ -362,9 +362,15 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoTaggingFromAudioMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to generate video tags from audio streams extracted by video</span>
-<span class="sd">    using the Audio Spectrogram Transformer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates video tags from audio streams using the Audio Spectrogram Transformer.</span>
+
+<span class="sd">    This operator extracts audio streams from videos and uses a Hugging Face Audio</span>
+<span class="sd">    Spectrogram Transformer (AST) model to generate tags. The tags are stored in the</span>
+<span class="sd">    specified metadata field, defaulting to &#39;video_audio_tags&#39;. If no valid audio stream is</span>
+<span class="sd">    found, the tag is set to &#39;EMPTY&#39;. The operator resamples audio to match the model&#39;s</span>
+<span class="sd">    required sampling rate if necessary. The tags are inferred based on the highest logit</span>
+<span class="sd">    value from the model&#39;s output. If the tags are already present in the sample, the</span>
+<span class="sd">    operator skips processing for that sample.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

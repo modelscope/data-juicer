@@ -359,13 +359,13 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">QuerySentimentDetectionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to predict user&#39;s sentiment label (&#39;negative&#39;, &#39;neutral&#39; and</span>
-<span class="sd">    &#39;positive&#39;) in query. Input from query_key.</span>
-<span class="sd">    Output label and corresponding score for the query, which is</span>
-<span class="sd">    store in &#39;query_sentiment_label&#39; and</span>
-<span class="sd">    &#39;query_sentiment_label_score&#39; in Data-Juicer meta field.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Predicts user&#39;s sentiment label (&#39;negative&#39;, &#39;neutral&#39;, &#39;positive&#39;) in a query.</span>
+
+<span class="sd">    This mapper takes input from the specified query key and outputs the predicted sentiment</span>
+<span class="sd">    label and its corresponding score. The results are stored in the Data-Juicer meta field</span>
+<span class="sd">    under &#39;query_sentiment_label&#39; and &#39;query_sentiment_label_score&#39;. It uses a Hugging Face</span>
+<span class="sd">    model for sentiment detection. If a Chinese-to-English translation model is provided, it</span>
+<span class="sd">    first translates the query from Chinese to English before performing sentiment analysis.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>

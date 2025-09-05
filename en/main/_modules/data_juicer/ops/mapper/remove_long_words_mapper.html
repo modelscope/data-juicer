@@ -359,15 +359,22 @@
 
 
 <div class="viewcode-block" id="RemoveLongWordsMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_long_words_mapper.html#data_juicer.ops.mapper.remove_long_words_mapper.RemoveLongWordsMapper">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveLongWordsMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;remove_long_words_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveLongWordsMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove long words within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove long words within a specific range.</span>
+
+<span class="sd">    This operator filters out words in the text that are either shorter than the specified</span>
+<span class="sd">    minimum length or longer than the specified maximum length. Words are first checked with</span>
+<span class="sd">    their original length, and if they do not meet the criteria, they are stripped of</span>
+<span class="sd">    special characters and re-evaluated. The key metric used is the character-based length</span>
+<span class="sd">    of each word. The processed text retains only the words that fall within the defined</span>
+<span class="sd">    length range. This operator processes text in batches for efficiency.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="RemoveLongWordsMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_long_words_mapper.html#data_juicer.ops.mapper.remove_long_words_mapper.RemoveLongWordsMapper.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveLongWordsMapper.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
@@ -385,7 +392,7 @@
 
 
 <div class="viewcode-block" id="RemoveLongWordsMapper.should_keep_long_word">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_long_words_mapper.html#data_juicer.ops.mapper.remove_long_words_mapper.RemoveLongWordsMapper.should_keep_long_word">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveLongWordsMapper.should_keep_long_word">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">should_keep_long_word</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_len</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_len</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
@@ -396,7 +403,7 @@
 
 
 <div class="viewcode-block" id="RemoveLongWordsMapper.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_long_words_mapper.html#data_juicer.ops.mapper.remove_long_words_mapper.RemoveLongWordsMapper.process_batched">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveLongWordsMapper.process_batched">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]):</span>
             <span class="n">sentences</span> <span class="o">=</span> <span class="n">split_on_newline_tab_whitespace</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>

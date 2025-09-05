@@ -424,13 +424,16 @@ visit the competition’s official websites, FT-Data Ranker (<a class="reference
 <section id="why-data-juicer">
 <h2>Why Data-Juicer?<a class="headerlink" href="#why-data-juicer" title="Link to this heading">¶</a></h2>
 <img src="https://img.alicdn.com/imgextra/i4/O1CN015URK6i21KU3XdkUpK_!!6000000006966-2-tps-3994-3956.png" align="center" width="500" />
-<ul class="simple">
+<ul>
 <li><p><strong>Systematic &amp; Reusable</strong>:
 Empowering users with a systematic library of 100+ core <a class="reference internal" href="docs/Operators.html"><span class="std std-doc">OPs</span></a>, and 50+ reusable config recipes and
 dedicated toolkits, designed to
 function independently of specific multimodal LLM datasets and processing pipelines. Supporting data analysis, cleaning, and synthesis in pre-training, post-tuning, en, zh, and more scenarios.</p></li>
 <li><p><strong>User-Friendly &amp; Extensible</strong>:
-Designed for simplicity and flexibility, with easy-start <a class="reference internal" href="docs/tutorial/QuickStart.html"><span class="std std-doc">guides</span></a>, and <a class="reference internal" href="docs/tutorial/DJ-Cookbook.html"><span class="std std-doc">DJ-Cookbook</span></a> containing fruitful demo usages. Feel free to <a class="reference internal" href="docs/DeveloperGuide.html#build-your-own-ops"><span class="std std-ref">implement your own OPs</span></a> for customizable data processing.</p></li>
+Designed for simplicity and flexibility, with easy-start <a class="reference internal" href="docs/tutorial/QuickStart.html"><span class="std std-doc">guides</span></a>, and <a class="reference internal" href="docs/tutorial/DJ-Cookbook.html"><span class="std std-doc">DJ-Cookbook</span></a> containing fruitful demo usages. Feel free to <a class="reference internal" href="docs/DeveloperGuide.html#build-your-own-ops"><span class="std std-ref">implement your own OPs</span></a> for customizable data processing.</p>
+<p>Data-Juicer now uses AI to automatically rewrite and optimize operator docstrings, generating detailed operator documentation to help users quickly understand the functionality and usage of each operator.
+For details about the implementation of this documentation enhancement workflow, please visit the <a class="reference external" href="https://github.com/modelscope/data-juicer/tree/dj_agents/demos/op_doc_enhance_workflow">demos/op_doc_enhance_workflow folder under the <code class="docutils literal notranslate"><span class="pre">dj_agents</span></code> branch</a>.</p>
+</li>
 <li><p><strong>Efficient &amp; Robust</strong>: Providing performance-optimized <a class="reference internal" href="docs/Distributed.html"><span class="std std-doc">parallel data processing</span></a> (Aliyun-PAI\Ray\CUDA\OP Fusion),
 faster with less resource usage, verified in large-scale production environments.</p></li>
 <li><p><strong>Effect-Proven &amp; Sandbox</strong>: Supporting data-model co-development, enabling rapid iteration

@@ -359,8 +359,15 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.character_repetition_filter.html#data_juicer.ops.filter.CharacterRepetitionFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;character_repetition_filter&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CharacterRepetitionFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with char-level n-gram repetition ratio within a</span>
-<span class="sd">    specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with character-level n-gram repetition ratio within a specific</span>
+<span class="sd">    range.</span>
+
+<span class="sd">    This operator calculates the character-level n-gram repetition ratio for each sample and</span>
+<span class="sd">    filters out samples that do not fall within the specified range. The repetition ratio is</span>
+<span class="sd">    computed based on the frequency of n-grams in the text. The key metric &#39;char_rep_ratio&#39;</span>
+<span class="sd">    is cached in the stats field. Samples are kept if their &#39;char_rep_ratio&#39; is between the</span>
+<span class="sd">    specified min and max ratios. The n-gram length, minimum, and maximum ratios are</span>
+<span class="sd">    configurable.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

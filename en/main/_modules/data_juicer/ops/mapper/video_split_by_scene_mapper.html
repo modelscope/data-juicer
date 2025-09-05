@@ -362,7 +362,7 @@
 
 
 <div class="viewcode-block" id="replace_func">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_split_by_scene_mapper.html#data_juicer.ops.mapper.video_split_by_scene_mapper.replace_func">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_split_by_scene_mapper.html#data_juicer.ops.mapper.replace_func">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">replace_func</span><span class="p">(</span><span class="n">match</span><span class="p">,</span> <span class="n">scene_counts_iter</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">count</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">scene_counts_iter</span><span class="p">)</span>
@@ -373,10 +373,19 @@
 
 
 <div class="viewcode-block" id="VideoSplitBySceneMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_split_by_scene_mapper.html#data_juicer.ops.mapper.video_split_by_scene_mapper.VideoSplitBySceneMapper">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoSplitBySceneMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoSplitBySceneMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to cut videos into scene clips.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Splits videos into scene clips based on detected scene changes.</span>
+
+<span class="sd">    This operator uses a specified scene detector to identify and split video scenes. It</span>
+<span class="sd">    supports three types of detectors: ContentDetector, ThresholdDetector, and</span>
+<span class="sd">    AdaptiveDetector. The operator processes each video in the sample, detects scenes, and</span>
+<span class="sd">    splits the video into individual clips. The minimum length of a scene can be set, and</span>
+<span class="sd">    progress can be shown during processing. The resulting clips are saved in the specified</span>
+<span class="sd">    directory or the same directory as the input files if no save directory is provided. The</span>
+<span class="sd">    operator also updates the text field in the sample to reflect the new video clips. If a</span>
+<span class="sd">    video does not contain any scenes, it remains unchanged.&quot;&quot;&quot;</span>
 
     <span class="c1"># Define shared detector keys and their properties</span>
     <span class="n">avaliable_detectors</span> <span class="o">=</span> <span class="p">{</span>
@@ -394,7 +403,7 @@
     <span class="p">}</span>
 
 <div class="viewcode-block" id="VideoSplitBySceneMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_split_by_scene_mapper.html#data_juicer.ops.mapper.video_split_by_scene_mapper.VideoSplitBySceneMapper.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoSplitBySceneMapper.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">detector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ContentDetector&quot;</span><span class="p">,</span>
@@ -442,7 +451,7 @@
 
 
 <div class="viewcode-block" id="VideoSplitBySceneMapper.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.video_split_by_scene_mapper.html#data_juicer.ops.mapper.video_split_by_scene_mapper.VideoSplitBySceneMapper.process_single">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoSplitBySceneMapper.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># there is no video in this sample</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]:</span>

@@ -409,9 +409,17 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_AUDIOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">AudioNMFSNRFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep data samples whose audios&#39; SNRs (computed based on NMF) are within</span>
-<span class="sd">    a specified range.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep data samples whose audio Signal-to-Noise Ratios (SNRs) are within a specified</span>
+<span class="sd">    range.</span>
+
+<span class="sd">    This operator computes the SNR of each audio in a sample using Non-negative Matrix</span>
+<span class="sd">    Factorization (NMF). It then filters the samples based on whether their SNRs fall within</span>
+<span class="sd">    the given minimum and maximum thresholds. The SNR is computed for each audio, and the</span>
+<span class="sd">    filtering strategy can be set to either &#39;any&#39; or &#39;all&#39;. In &#39;any&#39; mode, a sample is kept</span>
+<span class="sd">    if at least one of its audios meets the SNR criteria. In &#39;all&#39; mode, all audios must</span>
+<span class="sd">    meet the criteria for the sample to be kept. The NMF computation uses a specified number</span>
+<span class="sd">    of iterations. If no audio is present in the sample, the SNR is recorded as an empty</span>
+<span class="sd">    array. The key metric is stored in the &#39;audio_nmf_snr&#39; field.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AudioNMFSNRFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.audio_nmf_snr_filter.html#data_juicer.ops.filter.AudioNMFSNRFilter.__init__">[文档]</a>

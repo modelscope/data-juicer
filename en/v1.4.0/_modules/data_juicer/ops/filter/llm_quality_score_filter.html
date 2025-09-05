@@ -356,9 +356,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_quality_score_filter.html#data_juicer.ops.filter.llm_quality_score_filter.LLMQualityScoreFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LLMQualityScoreFilter</span><span class="p">(</span><span class="n">LLMAnalysisFilter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter to keep sample with high quality score estimated by LLM.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with a high quality score estimated by a language model.</span>
+
+<span class="sd">    This operator uses a language model to evaluate the quality of each sample across</span>
+<span class="sd">    multiple dimensions, including accuracy, grammar, informativeness, and coherence. The</span>
+<span class="sd">    LLM provides a numerical score for each dimension on a 1-5 scale, where 1 is the lowest</span>
+<span class="sd">    and 5 is the highest. The overall quality score is used to decide whether to keep or</span>
+<span class="sd">    filter out the sample based on the specified minimum and maximum score thresholds. The</span>
+<span class="sd">    evaluation results are cached in the &#39;llm_quality_score&#39; and &#39;llm_quality_record&#39;</span>
+<span class="sd">    fields. Important flags and tags from the LLM&#39;s analysis may also be stored in the</span>
+<span class="sd">    sample&#39;s stats.&quot;&quot;&quot;</span>
 
     <span class="c1"># avoid leading whitespace</span>
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>

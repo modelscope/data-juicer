@@ -364,7 +364,16 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@ATTRIBUTION_FILTERS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">InContextInfluenceFilter</span><span class="p">(</span><span class="n">LLMPerplexityFilter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep texts whose in-context influence upon validation set within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep texts based on their in-context influence on a validation set.</span>
+
+<span class="sd">    This operator calculates the in-context influence of each sample by comparing</span>
+<span class="sd">    perplexities with and without the sample as context. The influence score is computed as</span>
+<span class="sd">    the ratio of these perplexities. If `valid_as_demo` is True, the score is L(A|Q) /</span>
+<span class="sd">    L(A|task_desc, Q_v, A_v, Q). Otherwise, it is L(A_v|Q) / L(A_v|task_desc, Q, A, Q_v).</span>
+<span class="sd">    The operator retains samples whose in-context influence score is within a specified</span>
+<span class="sd">    range. The in-context influence score is stored in the &#39;in_context_influence&#39; field of</span>
+<span class="sd">    the sample&#39;s stats. The validation set must be prepared using the</span>
+<span class="sd">    `prepare_valid_feature` method if not provided during initialization.&quot;&quot;&quot;</span>
 
     <span class="c1"># This operator is currently under development and evaluation as part of an ongoing research project.</span>
     <span class="c1"># The Data-Juicer team retains full copyright over this operator.</span>

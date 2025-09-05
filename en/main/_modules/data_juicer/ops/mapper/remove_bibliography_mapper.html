@@ -353,16 +353,20 @@
 
 
 <div class="viewcode-block" id="RemoveBibliographyMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_bibliography_mapper.html#data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveBibliographyMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;remove_bibliography_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveBibliographyMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove bibliography at the end of documents in Latex</span>
-<span class="sd">    samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes bibliography sections at the end of LaTeX documents.</span>
+
+<span class="sd">    This operator identifies and removes bibliography sections in LaTeX documents. It uses a</span>
+<span class="sd">    regular expression to match common bibliography commands such as \\appendix,</span>
+<span class="sd">    \\begin{references}, \\begin{thebibliography}, and \\bibliography. The matched sections are</span>
+<span class="sd">    removed from the text. The operator processes samples in batch mode for efficiency.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="RemoveBibliographyMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_bibliography_mapper.html#data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveBibliographyMapper.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
@@ -380,7 +384,7 @@
 
 
 <div class="viewcode-block" id="RemoveBibliographyMapper.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_bibliography_mapper.html#data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper.process_batched">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveBibliographyMapper.process_batched">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">,</span> <span class="n">repl</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>

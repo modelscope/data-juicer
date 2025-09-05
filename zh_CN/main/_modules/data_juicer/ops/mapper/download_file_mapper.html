@@ -363,15 +363,24 @@
 
 
 <div class="viewcode-block" id="DownloadFileMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.download_file_mapper.html#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DownloadFileMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DownloadFileMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to download url files to local files or load them into memory.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to download URL files to local files or load them into memory.</span>
+
+<span class="sd">    This operator downloads files from URLs and can either save them to a specified</span>
+<span class="sd">    directory or load the contents directly into memory. It supports downloading multiple</span>
+<span class="sd">    files concurrently and can resume downloads if the `resume_download` flag is set. The</span>
+<span class="sd">    operator processes nested lists of URLs, flattening them for batch processing and then</span>
+<span class="sd">    reconstructing the original structure in the output. If both `save_dir` and `save_field`</span>
+<span class="sd">    are not specified, it defaults to saving the content under the key `image_bytes`. The</span>
+<span class="sd">    operator logs any failed download attempts and provides error messages for</span>
+<span class="sd">    troubleshooting.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="DownloadFileMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.download_file_mapper.html#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DownloadFileMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">download_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -415,7 +424,7 @@
 
 
 <div class="viewcode-block" id="DownloadFileMapper.download_files_async">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.download_file_mapper.html#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.download_files_async">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DownloadFileMapper.download_files_async">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">download_files_async</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urls</span><span class="p">,</span> <span class="n">return_contents</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_download_file</span><span class="p">(</span>
@@ -525,7 +534,7 @@
         <span class="k">return</span> <span class="n">save_field_contents</span>
 
 <div class="viewcode-block" id="DownloadFileMapper.download_nested_urls">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.download_file_mapper.html#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.download_nested_urls">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DownloadFileMapper.download_nested_urls">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">download_nested_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nested_urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span> <span class="n">save_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_field_contents</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">flat_urls</span><span class="p">,</span> <span class="n">structure_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flat_urls</span><span class="p">(</span><span class="n">nested_urls</span><span class="p">)</span>
 
@@ -572,7 +581,7 @@
 
 
 <div class="viewcode-block" id="DownloadFileMapper.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.download_file_mapper.html#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.process_batched">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DownloadFileMapper.process_batched">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">download_field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">samples</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">download_field</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">samples</span>

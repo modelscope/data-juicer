@@ -355,9 +355,15 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.audio_size_filter.html#data_juicer.ops.filter.AudioSizeFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;audio_size_filter&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">AudioSizeFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep data samples whose audio size (in bytes/kb/MB/...) within a</span>
-<span class="sd">    specific range.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep data samples based on the size of their audio files.</span>
+
+<span class="sd">    This operator filters data samples by checking if the size of their audio files falls</span>
+<span class="sd">    within a specified range. The size can be in bytes, kilobytes, megabytes, or any other</span>
+<span class="sd">    unit. The key metric used is &#39;audio_sizes&#39;, which is an array of file sizes in bytes. If</span>
+<span class="sd">    no audio files are present, the &#39;audio_sizes&#39; field will be an empty array. The operator</span>
+<span class="sd">    supports two strategies for keeping samples: &#39;any&#39; and &#39;all&#39;. In &#39;any&#39; mode, a sample is</span>
+<span class="sd">    kept if at least one of its audio files meets the size criteria. In &#39;all&#39; mode, all</span>
+<span class="sd">    audio files must meet the size criteria for the sample to be kept.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AudioSizeFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.audio_size_filter.html#data_juicer.ops.filter.AudioSizeFilter.__init__">[文档]</a>

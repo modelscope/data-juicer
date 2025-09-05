@@ -365,7 +365,15 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.LLMPerplexityFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LLMPerplexityFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with perplexity score, computed using a specified llm, within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with perplexity scores within a specified range, computed using a</span>
+<span class="sd">    specified LLM.</span>
+
+<span class="sd">    This operator computes the perplexity score for each sample using a Hugging Face LLM. It</span>
+<span class="sd">    then filters the samples based on whether their perplexity scores fall within the</span>
+<span class="sd">    specified minimum and maximum score range. The perplexity score is calculated as the</span>
+<span class="sd">    exponential of the loss value from the LLM. The operator uses a query and response</span>
+<span class="sd">    template to format the input text for the LLM. If the perplexity score is not already</span>
+<span class="sd">    cached in the sample&#39;s stats under the key &#39;llm_perplexity&#39;, it will be computed.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

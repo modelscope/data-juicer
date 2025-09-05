@@ -363,11 +363,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.document_deduplicator.html#data_juicer.ops.deduplicator.DocumentDeduplicator">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;document_deduplicator&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DocumentDeduplicator</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Deduplicator to deduplicate samples at document-level using exact matching.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deduplicates samples at the document level using exact matching.</span>
 
-<span class="sd">    Using md5 hash to deduplicate samples.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    This operator computes an MD5 hash for each sample&#39;s text. It can optionally convert the</span>
+<span class="sd">    text to lowercase and ignore non-alphabet characters, including whitespaces, digits, and</span>
+<span class="sd">    punctuation. The deduplication is based on the computed hash values, where samples with</span>
+<span class="sd">    identical hashes are considered duplicates. The `compute_hash` method adds a &#39;hash&#39; key</span>
+<span class="sd">    to each sample, storing its MD5 hash. During processing, the first occurrence of each</span>
+<span class="sd">    unique hash is kept, and subsequent duplicates are filtered out. If the `show_num`</span>
+<span class="sd">    parameter is set, the operator also returns a specified number of duplicate pairs for</span>
+<span class="sd">    inspection.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="DocumentDeduplicator.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.document_deduplicator.html#data_juicer.ops.deduplicator.DocumentDeduplicator.__init__">[docs]</a>

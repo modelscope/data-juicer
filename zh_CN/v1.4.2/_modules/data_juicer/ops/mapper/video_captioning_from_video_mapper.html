@@ -382,8 +382,18 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoCaptioningFromVideoMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to generate samples whose captions are generated based on</span>
-<span class="sd">    a video-to-text model and sampled video frame.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates video captions using a Hugging Face video-to-text model and sampled video</span>
+<span class="sd">    frames.</span>
+
+<span class="sd">    This operator processes video samples to generate captions based on the provided video</span>
+<span class="sd">    frames.</span>
+<span class="sd">    It uses a Hugging Face video-to-text model, such as &#39;kpyu/video-blip-opt-2.7b-ego4d&#39;,</span>
+<span class="sd">    to generate multiple caption candidates for each video. The number of generated</span>
+<span class="sd">    captions and the strategy to keep or filter these candidates can be configured. The</span>
+<span class="sd">    operator supports different frame sampling methods, including extracting all</span>
+<span class="sd">    keyframes or uniformly sampling a specified number of frames. Additionally, it allows</span>
+<span class="sd">    for horizontal and vertical flipping of the frames. The final output can include both</span>
+<span class="sd">    the original sample and the generated captions, depending on the configuration.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>

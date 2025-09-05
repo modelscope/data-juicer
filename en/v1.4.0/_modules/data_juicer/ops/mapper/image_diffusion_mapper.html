@@ -370,9 +370,17 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageDiffusionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate image by diffusion model</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate images using a diffusion model based on provided captions.</span>
+
+<span class="sd">    This operator uses a Hugging Face diffusion model to generate images from given</span>
+<span class="sd">    captions. It supports different modes for retaining generated samples, including random</span>
+<span class="sd">    selection, similarity-based selection, and retaining all. The operator can also generate</span>
+<span class="sd">    captions if none are provided, using a Hugging Face image-to-sequence model. The</span>
+<span class="sd">    strength parameter controls the extent of transformation from the reference image, and</span>
+<span class="sd">    the guidance scale influences how closely the generated images match the text prompt.</span>
+<span class="sd">    Generated images can be saved in a specified directory or the same directory as the</span>
+<span class="sd">    input files. This is a batched operation, processing multiple samples at once and</span>
+<span class="sd">    producing a specified number of augmented images per sample.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>

@@ -361,19 +361,24 @@
 
 
 <div class="viewcode-block" id="ImageWatermarkFilter">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_watermark_filter.html#data_juicer.ops.filter.image_watermark_filter.ImageWatermarkFilter">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_watermark_filter.html#data_juicer.ops.filter.ImageWatermarkFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageWatermarkFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter to keep samples whose images have no watermark with high</span>
-<span class="sd">    probability.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples whose images have no watermark with high probability.</span>
+
+<span class="sd">    This operator uses a Hugging Face watermark detection model to filter samples based on</span>
+<span class="sd">    the presence of watermarks in their images. It keeps samples where the predicted</span>
+<span class="sd">    watermark probability is below a specified threshold. The operator supports two</span>
+<span class="sd">    strategies: &#39;any&#39; (keep if any image meets the condition) and &#39;all&#39; (keep only if all</span>
+<span class="sd">    images meet the condition). The key metric &#39;image_watermark_prob&#39; is computed for each</span>
+<span class="sd">    image, representing the probability that the image contains a watermark. If no images</span>
+<span class="sd">    are present in the sample, the metric is set to an empty array.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
 <div class="viewcode-block" id="ImageWatermarkFilter.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_watermark_filter.html#data_juicer.ops.filter.image_watermark_filter.ImageWatermarkFilter.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_watermark_filter.html#data_juicer.ops.filter.ImageWatermarkFilter.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hf_watermark_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;amrul-hzz/watermark_detector&quot;</span><span class="p">,</span>
@@ -412,7 +417,7 @@
 
 
 <div class="viewcode-block" id="ImageWatermarkFilter.compute_stats_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_watermark_filter.html#data_juicer.ops.filter.image_watermark_filter.ImageWatermarkFilter.compute_stats_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_watermark_filter.html#data_juicer.ops.filter.ImageWatermarkFilter.compute_stats_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
         <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_watermark_prob</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
@@ -443,7 +448,7 @@
 
 
 <div class="viewcode-block" id="ImageWatermarkFilter.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_watermark_filter.html#data_juicer.ops.filter.image_watermark_filter.ImageWatermarkFilter.process_single">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.image_watermark_filter.html#data_juicer.ops.filter.ImageWatermarkFilter.process_single">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">itm_probs</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_watermark_prob</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">itm_probs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>

@@ -361,11 +361,16 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DialogSentimentDetectionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to generate user&#39;s sentiment labels in dialog. Input from</span>
-<span class="sd">    history_key, query_key and response_key. Output lists of</span>
-<span class="sd">    labels and analysis for queries in the dialog.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates sentiment labels and analysis for user queries in a dialog.</span>
+
+<span class="sd">    This operator processes a dialog to detect and label the sentiments expressed by the</span>
+<span class="sd">    user. It uses the provided history, query, and response keys to construct prompts for an</span>
+<span class="sd">    API call. The API returns sentiment analysis and labels, which are then parsed and</span>
+<span class="sd">    stored in the sample&#39;s metadata under the &#39;dialog_sentiment_labels&#39; and</span>
+<span class="sd">    &#39;dialog_sentiment_labels_analysis&#39; keys. The operator supports custom templates and</span>
+<span class="sd">    patterns for prompt construction and output parsing. If no sentiment candidates are</span>
+<span class="sd">    provided, it uses open-domain sentiment labels. The operator retries the API call up to</span>
+<span class="sd">    a specified number of times in case of errors.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;请判断用户和LLM多轮对话中用户所具有的情绪。</span><span class="se">\n</span><span class="s2">&quot;</span>

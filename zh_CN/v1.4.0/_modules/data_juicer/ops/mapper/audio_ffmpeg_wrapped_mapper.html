@@ -360,7 +360,15 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.audio_ffmpeg_wrapped_mapper.html#data_juicer.ops.mapper.AudioFFmpegWrappedMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">AudioFFmpegWrappedMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple wrapper for FFmpeg audio filters.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps FFmpeg audio filters for processing audio files in a dataset.</span>
+
+<span class="sd">    This operator applies specified FFmpeg audio filters to the audio files in the dataset.</span>
+<span class="sd">    It supports passing custom filter parameters and global arguments to the FFmpeg command</span>
+<span class="sd">    line. The processed audio files are saved to a specified directory or the same directory</span>
+<span class="sd">    as the input files if no save directory is provided. The `DJ_PRODUCED_DATA_DIR`</span>
+<span class="sd">    environment variable can also be used to set the save directory. If no filter name is</span>
+<span class="sd">    provided, the audio files remain unmodified. The operator updates the source file paths</span>
+<span class="sd">    in the dataset after processing.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AudioFFmpegWrappedMapper.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.audio_ffmpeg_wrapped_mapper.html#data_juicer.ops.mapper.AudioFFmpegWrappedMapper.__init__">[文档]</a>

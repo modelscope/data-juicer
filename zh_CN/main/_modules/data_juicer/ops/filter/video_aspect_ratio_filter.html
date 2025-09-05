@@ -362,8 +362,14 @@
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;video_aspect_ratio_filter&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoAspectRatioFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with video aspect ratio within a specific range.</span>
-<span class="sd">    AspectRatio = W / H.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="sd">    This operator filters samples based on the aspect ratios of their videos. It keeps</span>
+<span class="sd">    samples where the video aspect ratios fall within a specified range. The aspect ratio is</span>
+<span class="sd">    calculated as the width divided by the height (W / H). The operator supports two</span>
+<span class="sd">    strategies for keeping samples: &#39;any&#39; and &#39;all&#39;. In &#39;any&#39; mode, a sample is kept if at</span>
+<span class="sd">    least one video meets the aspect ratio condition. In &#39;all&#39; mode, all videos in the</span>
+<span class="sd">    sample must meet the condition for the sample to be kept. The aspect ratios are computed</span>
+<span class="sd">    and stored in the &#39;video_aspect_ratios&#39; field of the sample&#39;s stats.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="VideoAspectRatioFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.VideoAspectRatioFilter.__init__">[文档]</a>

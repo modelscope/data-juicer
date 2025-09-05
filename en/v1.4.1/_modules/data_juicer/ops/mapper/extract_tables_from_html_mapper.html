@@ -355,7 +355,14 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExtractTablesFromHtmlMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to extract tables from HTML content.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts tables from HTML content and stores them in a specified field.</span>
+
+<span class="sd">    This operator processes HTML content to extract tables. It can either retain or remove</span>
+<span class="sd">    HTML tags based on the `retain_html_tags` parameter. If `retain_html_tags` is False, it</span>
+<span class="sd">    can also include or exclude table headers based on the `include_header` parameter. The</span>
+<span class="sd">    extracted tables are stored in the `tables_field_name` field within the sample&#39;s</span>
+<span class="sd">    metadata. If no tables are found, an empty list is stored. If the tables have already</span>
+<span class="sd">    been extracted, the operator will not reprocess the sample.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ExtractTablesFromHtmlMapper.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.extract_tables_from_html_mapper.html#data_juicer.ops.mapper.extract_tables_from_html_mapper.ExtractTablesFromHtmlMapper.__init__">[docs]</a>

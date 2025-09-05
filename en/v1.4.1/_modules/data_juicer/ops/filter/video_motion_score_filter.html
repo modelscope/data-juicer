@@ -376,9 +376,14 @@
 <span class="nd">@UNFORKABLE</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoMotionScoreFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with video motion scores within a specific range. The</span>
-<span class="sd">    Farneback&#39;s algorithm from OpenCV is used to compute dense optical flow.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with video motion scores within a specific range.</span>
+
+<span class="sd">    The operator uses Farneback&#39;s algorithm from OpenCV to compute dense optical flow. It</span>
+<span class="sd">    calculates the average motion score for each video and retains samples based on the</span>
+<span class="sd">    specified minimum and maximum score thresholds. The &#39;any&#39; or &#39;all&#39; strategy determines</span>
+<span class="sd">    whether to keep a sample if any or all videos meet the criteria. The motion score is</span>
+<span class="sd">    computed as the mean magnitude of the optical flow, which can be normalized relative to</span>
+<span class="sd">    the frame&#39;s diagonal length. The stats are cached under the key &#39;video_motion_score&#39;.&quot;&quot;&quot;</span>
 
     <span class="n">_default_kwargs</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;pyr_scale&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>

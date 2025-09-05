@@ -356,7 +356,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.sentence_split_mapper.html#data_juicer.ops.mapper.sentence_split_mapper.SentenceSplitMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SentenceSplitMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to split text samples to sentences.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Splits text samples into individual sentences based on the specified language.</span>
+
+<span class="sd">    This operator uses an NLTK-based tokenizer to split the input text into sentences. The</span>
+<span class="sd">    language for the tokenizer is specified during initialization. The original text in each</span>
+<span class="sd">    sample is replaced with a list of sentences. This operator processes samples in batches</span>
+<span class="sd">    for efficiency. Ensure that the `lang` parameter is set to the appropriate language code</span>
+<span class="sd">    (e.g., &quot;en&quot; for English) to achieve accurate sentence splitting.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

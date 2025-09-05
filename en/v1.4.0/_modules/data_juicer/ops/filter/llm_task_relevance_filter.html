@@ -362,9 +362,18 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@ATTRIBUTION_FILTERS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LLMTaskRelevanceFilter</span><span class="p">(</span><span class="n">LLMAnalysisFilter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter to keep sample with high relevance score to validation tasks estimated by LLM.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with high relevance scores to validation tasks estimated by an</span>
+<span class="sd">    LLM.</span>
+
+<span class="sd">    This operator evaluates the relevance of each sample to a specified validation task</span>
+<span class="sd">    using an LLM. The LLM scores the sample on multiple dimensions, including topical</span>
+<span class="sd">    relevance, linguistic style match, task match, knowledge alignment, and potential</span>
+<span class="sd">    utility. Each dimension is scored on a 1-5 scale, with 5 being the highest. The key</span>
+<span class="sd">    metric, &#39;llm_task_relevance&#39;, is the average score across these dimensions. Samples are</span>
+<span class="sd">    kept if their average score meets or exceeds the specified minimum threshold. The</span>
+<span class="sd">    operator uses either an API or a Hugging Face model for evaluation. If no validation</span>
+<span class="sd">    dataset or task description is provided, the &#39;prepare_valid_feature&#39; method must be</span>
+<span class="sd">    called manually before applying the filter.&quot;&quot;&quot;</span>
 
     <span class="c1"># TODO: fix dataset cast error</span>
 

@@ -382,9 +382,20 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoCaptioningFromFramesMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to generate samples whose captions are generated based on</span>
-<span class="sd">    an image-to-text model and sampled video frames. Captions from different</span>
-<span class="sd">    frames will be concatenated to a single string.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates video captions from sampled frames using an image-to-text model. Captions from</span>
+<span class="sd">    different frames are concatenated into a single string.</span>
+
+<span class="sd">    - Uses a Hugging Face image-to-text model to generate captions for sampled video frames.</span>
+<span class="sd">    - Supports different frame sampling methods: &#39;all_keyframes&#39; or &#39;uniform&#39;.</span>
+<span class="sd">    - Can apply horizontal and vertical flips to the frames before captioning.</span>
+<span class="sd">    - Offers multiple strategies for retaining generated captions: &#39;random_any&#39;,</span>
+<span class="sd">    &#39;similar_one_simhash&#39;, or &#39;all&#39;.</span>
+<span class="sd">    - Optionally keeps the original sample in the final dataset.</span>
+<span class="sd">    - Allows setting a global prompt or per-sample prompts to guide caption generation.</span>
+<span class="sd">    - Generates a specified number of candidate captions per video, which can be reduced</span>
+<span class="sd">    based on the selected retention strategy.</span>
+<span class="sd">    - The number of output samples depends on the retention strategy and whether original</span>
+<span class="sd">    samples are kept.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>

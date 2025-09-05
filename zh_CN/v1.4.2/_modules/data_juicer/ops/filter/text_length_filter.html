@@ -355,8 +355,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.TextLengthFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;text_length_filter&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TextLengthFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with total text length within a specific</span>
-<span class="sd">    range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with total text length within a specific range.</span>
+
+<span class="sd">    This operator filters out samples based on their total text length. It retains samples</span>
+<span class="sd">    where the text length is between the specified minimum and maximum lengths. The text</span>
+<span class="sd">    length is computed as the number of characters in the sample&#39;s text. If the &#39;text_len&#39;</span>
+<span class="sd">    key is already present in the sample&#39;s stats, it will be reused; otherwise, it will be</span>
+<span class="sd">    computed. The operator processes samples in batches for efficiency.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

@@ -355,12 +355,18 @@
 <span class="nd">@NON_STATS_FILTERS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpecifiedFieldFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter based on specified field information.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter samples based on the specified field information.</span>
 
-<span class="sd">    If the specified field information in the sample is not within the</span>
-<span class="sd">    specified target value, the sample will be filtered.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    This operator checks if the value of a specified field in each sample is within a given</span>
+<span class="sd">    target value range. If the field value is not within the target range, the sample is</span>
+<span class="sd">    filtered out. The field can be a multi-level key, with levels separated by dots. The</span>
+<span class="sd">    target value is a list of acceptable values for the field. If the field value is not a</span>
+<span class="sd">    list or tuple, it is converted to a list for comparison. Samples are retained if all</span>
+<span class="sd">    values in the field match any of the target values.</span>
+
+<span class="sd">    - Uses the &#39;field_key&#39; and &#39;target_value&#39; parameters.</span>
+<span class="sd">    - Supports multi-level field keys, e.g., &#39;level1.level2&#39;.</span>
+<span class="sd">    - Converts non-list/tuple field values to a list for comparison.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SpecifiedFieldFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.specified_field_filter.html#data_juicer.ops.filter.specified_field_filter.SpecifiedFieldFilter.__init__">[docs]</a>

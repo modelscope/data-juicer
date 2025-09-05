@@ -366,8 +366,15 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_WORDS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">WordRepetitionFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with word-level n-gram repetition ratio within a</span>
-<span class="sd">    specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with word-level n-gram repetition ratio within a specific range.</span>
+
+<span class="sd">    This operator calculates the word-level n-gram repetition ratio for each sample and</span>
+<span class="sd">    filters out those that do not fall within the specified range. The n-gram length and the</span>
+<span class="sd">    min/max ratio thresholds are configurable. If tokenization is enabled, a Hugging Face</span>
+<span class="sd">    tokenizer is used to tokenize the text. The key metric, `word_rep_ratio`, is computed as</span>
+<span class="sd">    the ratio of repeated n-grams to the total number of n-grams. This ratio is then</span>
+<span class="sd">    compared against the min and max ratio thresholds to decide whether to keep or filter</span>
+<span class="sd">    the sample. If the ratio is outside the specified range, the sample is filtered out.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

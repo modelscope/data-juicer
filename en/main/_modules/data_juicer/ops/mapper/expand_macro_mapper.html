@@ -353,16 +353,21 @@
 
 
 <div class="viewcode-block" id="ExpandMacroMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.expand_macro_mapper.html#data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExpandMacroMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;expand_macro_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExpandMacroMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to expand macro definitions in the document body of Latex</span>
-<span class="sd">    samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expands macro definitions in the document body of LaTeX samples.</span>
+
+<span class="sd">    This operator processes LaTeX documents to expand user-defined macros in the text. It</span>
+<span class="sd">    supports \\newcommand and \\def macros without arguments. Macros are identified and</span>
+<span class="sd">    expanded in the text, ensuring they are not part of longer alphanumeric words. The</span>
+<span class="sd">    operator currently does not support macros with arguments. The processed text is updated</span>
+<span class="sd">    in the samples.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="ExpandMacroMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.expand_macro_mapper.html#data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExpandMacroMapper.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
@@ -408,7 +413,7 @@
         <span class="k">return</span> <span class="n">macros</span>
 
 <div class="viewcode-block" id="ExpandMacroMapper.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.expand_macro_mapper.html#data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper.process_batched">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExpandMacroMapper.process_batched">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]):</span>
             <span class="n">non_arg_macros</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_non_arg_macros_dict</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>

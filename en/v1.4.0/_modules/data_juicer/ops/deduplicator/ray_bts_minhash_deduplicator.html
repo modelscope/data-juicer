@@ -712,9 +712,17 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator.html#data_juicer.ops.deduplicator.RayBTSMinhashDeduplicator">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RayBTSMinhashDeduplicator</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A MinhashLSH deduplicator based on RAY.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A MinhashLSH deduplicator that operates in Ray distributed mode.</span>
+
+<span class="sd">    This operator uses the MinHash LSH technique to identify and remove near-duplicate</span>
+<span class="sd">    samples from a dataset. It supports various tokenization methods, including space,</span>
+<span class="sd">    punctuation, character, and sentencepiece. The Jaccard similarity threshold is used to</span>
+<span class="sd">    determine if two samples are considered duplicates. If the Jaccard similarity of two</span>
+<span class="sd">    samples is greater than or equal to the specified threshold, one of the samples is</span>
+<span class="sd">    filtered out. The operator computes the MinHash values for each sample and uses a union-</span>
+<span class="sd">    find algorithm to group similar samples. The key metric, Jaccard similarity, is computed</span>
+<span class="sd">    based on the shingling of the text. The operator can run on both CPU and GPU, with</span>
+<span class="sd">    specific batch size and memory configurations for each.&quot;&quot;&quot;</span>
 
     <span class="c1"># TODO: Set a more reasonable value</span>
     <span class="n">EMPTY_HASH_VALUE</span> <span class="o">=</span> <span class="s2">&quot;EMPTY&quot;</span>

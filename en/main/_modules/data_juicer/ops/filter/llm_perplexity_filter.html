@@ -364,15 +364,23 @@
 
 
 <div class="viewcode-block" id="LLMPerplexityFilter">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.LLMPerplexityFilter">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_perplexity_filter.html#data_juicer.ops.filter.LLMPerplexityFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LLMPerplexityFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with perplexity score, computed using a specified llm, within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with perplexity scores within a specified range, computed using a</span>
+<span class="sd">    specified LLM.</span>
+
+<span class="sd">    This operator computes the perplexity score for each sample using a Hugging Face LLM. It</span>
+<span class="sd">    then filters the samples based on whether their perplexity scores fall within the</span>
+<span class="sd">    specified minimum and maximum score range. The perplexity score is calculated as the</span>
+<span class="sd">    exponential of the loss value from the LLM. The operator uses a query and response</span>
+<span class="sd">    template to format the input text for the LLM. If the perplexity score is not already</span>
+<span class="sd">    cached in the sample&#39;s stats under the key &#39;llm_perplexity&#39;, it will be computed.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
 <div class="viewcode-block" id="LLMPerplexityFilter.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.LLMPerplexityFilter.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_perplexity_filter.html#data_juicer.ops.filter.LLMPerplexityFilter.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hf_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Qwen/Qwen2.5-0.5B&quot;</span><span class="p">,</span>
@@ -437,7 +445,7 @@
         <span class="k">return</span> <span class="n">loss</span>
 
 <div class="viewcode-block" id="LLMPerplexityFilter.sample_with_messages">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.LLMPerplexityFilter.sample_with_messages">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_perplexity_filter.html#data_juicer.ops.filter.LLMPerplexityFilter.sample_with_messages">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sample_with_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">system_prompt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="s2">&quot;messages&quot;</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sample</span>
@@ -452,7 +460,7 @@
 
 
 <div class="viewcode-block" id="LLMPerplexityFilter.compute_stats_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.LLMPerplexityFilter.compute_stats_single">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_perplexity_filter.html#data_juicer.ops.filter.LLMPerplexityFilter.compute_stats_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="c1"># check if it&#39;s computed already</span>
@@ -467,7 +475,7 @@
 
 
 <div class="viewcode-block" id="LLMPerplexityFilter.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.LLMPerplexityFilter.process_single">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.llm_perplexity_filter.html#data_juicer.ops.filter.LLMPerplexityFilter.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="n">ppl</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_perplexity</span><span class="p">]</span>
 

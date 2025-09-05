@@ -360,8 +360,13 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_LINES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">AverageLineLengthFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with average line length within a specific</span>
-<span class="sd">    range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with average line length within a specific range.</span>
+
+<span class="sd">    This operator filters out samples based on their average line length. It keeps samples</span>
+<span class="sd">    where the average line length is between the specified minimum and maximum values. The</span>
+<span class="sd">    average line length is calculated as the total text length divided by the number of</span>
+<span class="sd">    lines. If the context is provided, it uses precomputed lines from the context. The</span>
+<span class="sd">    computed average line length is stored in the &#39;avg_line_length&#39; key in the stats field.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

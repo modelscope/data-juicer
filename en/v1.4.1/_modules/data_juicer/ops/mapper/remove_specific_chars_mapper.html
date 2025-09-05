@@ -352,7 +352,13 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.remove_specific_chars_mapper.html#data_juicer.ops.mapper.remove_specific_chars_mapper.RemoveSpecificCharsMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;remove_specific_chars_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveSpecificCharsMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to clean specific chars in text samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes specific characters from text samples.</span>
+
+<span class="sd">    This operator removes specified characters from the text. The characters to be removed</span>
+<span class="sd">    can be provided as a string or a list of strings. If no characters are specified, the</span>
+<span class="sd">    default set includes special and non-alphanumeric characters. The operator processes the</span>
+<span class="sd">    text using a regular expression pattern that matches any of the specified characters and</span>
+<span class="sd">    replaces them with an empty string. This is done in a batched manner for efficiency.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

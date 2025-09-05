@@ -363,8 +363,14 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImagePairSimilarityFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep image pairs with similarities between images</span>
-<span class="sd">    within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep image pairs with similarities between images within a specific range.</span>
+
+<span class="sd">    This operator uses a Hugging Face CLIP model to compute the cosine similarity between</span>
+<span class="sd">    two images in each sample. It retains samples where the similarity score falls within</span>
+<span class="sd">    the specified minimum and maximum thresholds. The &#39;any&#39; strategy keeps a sample if any</span>
+<span class="sd">    of the image pairs meet the condition, while the &#39;all&#39; strategy requires all image pairs</span>
+<span class="sd">    to meet the condition. The similarity scores are cached in the &#39;image_pair_similarity&#39;</span>
+<span class="sd">    field. Each sample must include exactly two distinct images.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

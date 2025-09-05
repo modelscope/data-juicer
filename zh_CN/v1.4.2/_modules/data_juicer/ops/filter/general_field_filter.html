@@ -357,10 +357,14 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.general_field_filter.html#data_juicer.ops.filter.GeneralFieldFilter">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">GeneralFieldFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter to keep samples based on a general field filter condition.</span>
-<span class="sd">    The filter condition is a string that can include logical operators and chain comparisons.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples based on a general field filter condition.</span>
+
+<span class="sd">    The filter condition is a string that can include logical operators (and/or) and chain</span>
+<span class="sd">    comparisons. For example: &quot;10 &lt; num &lt;= 30 and text != &#39;nothing here&#39; and __dj__meta__.a</span>
+<span class="sd">    == 3&quot;. The condition is evaluated for each sample, and only samples that meet the</span>
+<span class="sd">    condition are kept. The result of the filter condition is stored in the sample&#39;s stats</span>
+<span class="sd">    under the key &#39;general_field_filter_condition&#39;. If the filter condition is empty or</span>
+<span class="sd">    already computed, the sample is not re-evaluated.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="GeneralFieldFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.general_field_filter.html#data_juicer.ops.filter.GeneralFieldFilter.__init__">[文档]</a>

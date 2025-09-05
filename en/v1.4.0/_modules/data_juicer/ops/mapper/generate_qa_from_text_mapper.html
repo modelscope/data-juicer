@@ -366,19 +366,15 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.generate_qa_from_text_mapper.html#data_juicer.ops.mapper.generate_qa_from_text_mapper.GenerateQAFromTextMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">GenerateQAFromTextMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to generate question and answer pairs from text.</span>
-<span class="sd">    Recommended model list: [</span>
-<span class="sd">        &#39;alibaba-pai/pai-llama3-8b-doc2qa&#39;,</span>
-<span class="sd">        &#39;alibaba-pai/pai-baichuan2-7b-doc2qa&#39;,</span>
-<span class="sd">        &#39;alibaba-pai/pai-qwen1_5-4b-doc2qa&#39;,</span>
-<span class="sd">        &#39;alibaba-pai/pai-qwen1_5-7b-doc2qa&#39;,</span>
-<span class="sd">        &#39;alibaba-pai/pai-qwen1_5-1b8-doc2qa&#39;,</span>
-<span class="sd">        &#39;alibaba-pai/pai-qwen1_5-0b5-doc2qa&#39;</span>
-<span class="sd">    ]</span>
-<span class="sd">    These recommended models are all trained with Chinese data</span>
-<span class="sd">    and are suitable for Chinese.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates question and answer pairs from text using a specified model.</span>
+
+<span class="sd">    This operator uses a Hugging Face model to generate QA pairs from the input text. It</span>
+<span class="sd">    supports both Hugging Face and vLLM models for inference. The recommended models, such</span>
+<span class="sd">    as &#39;alibaba-pai/pai-llama3-8b-doc2qa&#39;, are trained on Chinese data and are suitable for</span>
+<span class="sd">    Chinese text. The operator can limit the number of generated QA pairs per text and</span>
+<span class="sd">    allows custom output patterns for parsing the model&#39;s response. By default, it uses a</span>
+<span class="sd">    regular expression to extract questions and answers from the model&#39;s output. If no QA</span>
+<span class="sd">    pairs are extracted, a warning is logged.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>

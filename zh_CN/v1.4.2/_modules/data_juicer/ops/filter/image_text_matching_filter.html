@@ -367,8 +367,16 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageTextMatchingFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples those matching score between image and text</span>
-<span class="sd">    within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with image-text matching scores within a specific range.</span>
+
+<span class="sd">    This operator uses a Hugging Face BLIP model to compute the matching score between</span>
+<span class="sd">    images and text. It keeps samples where the matching score falls within the specified</span>
+<span class="sd">    `min_score` and `max_score` range. The key metric, `image_text_matching_score`, is</span>
+<span class="sd">    computed for each image-text pair. If multiple images are associated with a single text,</span>
+<span class="sd">    the scores can be reduced using &#39;avg&#39;, &#39;max&#39;, or &#39;min&#39; modes. The operator supports</span>
+<span class="sd">    horizontal and vertical flipping of images. Samples are kept based on either &#39;any&#39; or</span>
+<span class="sd">    &#39;all&#39; strategy: &#39;any&#39; keeps the sample if any image meets the condition, while &#39;all&#39;</span>
+<span class="sd">    keeps the sample only if all images meet the condition.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 

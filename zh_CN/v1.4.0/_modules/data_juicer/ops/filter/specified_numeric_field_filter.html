@@ -371,12 +371,18 @@
 <span class="nd">@NON_STATS_FILTERS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpecifiedNumericFieldFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter based on specified numeric field information.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter samples based on a specified numeric field value.</span>
 
-<span class="sd">    If the specified numeric information in the sample is not within the</span>
-<span class="sd">    specified range, the sample will be filtered.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    This operator filters out samples if the numeric value in the specified field is not</span>
+<span class="sd">    within the given range. The field can be multi-level, with keys separated by dots. The</span>
+<span class="sd">    sample is kept if the numeric value is between the minimum and maximum values,</span>
+<span class="sd">    inclusive. If the field key is not provided, all samples are retained. The operator</span>
+<span class="sd">    ensures that the field exists in the sample and that its value is numeric before</span>
+<span class="sd">    performing the comparison.</span>
+
+<span class="sd">    - Uses the &#39;min_value&#39; and &#39;max_value&#39; to define the acceptable range.</span>
+<span class="sd">    - Supports multi-level fields using dot-separated keys.</span>
+<span class="sd">    - Returns False for non-numeric or out-of-range values, filtering the sample.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SpecifiedNumericFieldFilter.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.specified_numeric_field_filter.html#data_juicer.ops.filter.specified_numeric_field_filter.SpecifiedNumericFieldFilter.__init__">[文档]</a>

@@ -358,10 +358,13 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">QueryIntentDetectionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to predict user&#39;s Intent label in query. Input from query_key.</span>
-<span class="sd">    Output intent label and corresponding score for the query.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Predicts the user&#39;s intent label and corresponding score for a given query. The operator</span>
+<span class="sd">    uses a Hugging Face model to classify the intent of the input query. If the query is in</span>
+<span class="sd">    Chinese, it can optionally be translated to English using another Hugging Face</span>
+<span class="sd">    translation model before classification. The predicted intent label and its confidence</span>
+<span class="sd">    score are stored in the meta field with the keys &#39;query_intent_label&#39; and</span>
+<span class="sd">    &#39;query_intent_score&#39;, respectively. If these keys already exist in the meta field, the</span>
+<span class="sd">    operator will skip processing for those samples.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>

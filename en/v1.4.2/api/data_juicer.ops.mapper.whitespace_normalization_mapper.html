@@ -354,10 +354,13 @@
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.whitespace_normalization_mapper.WhitespaceNormalizationMapper">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.whitespace_normalization_mapper.</span></span><span class="sig-name descname"><span class="pre">WhitespaceNormalizationMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/whitespace_normalization_mapper.html#WhitespaceNormalizationMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.whitespace_normalization_mapper.WhitespaceNormalizationMapper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.base_op.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
-<p>Mapper to normalize different kinds of whitespaces to whitespace ‘ ‘ (0x20)
-in text samples.</p>
-<p>Different kinds of whitespaces can be found here:
-<a class="reference external" href="https://en.wikipedia.org/wiki/Whitespace_character">https://en.wikipedia.org/wiki/Whitespace_character</a></p>
+<p>Normalizes various types of whitespace characters to standard spaces in text samples.</p>
+<p>This mapper converts all non-standard whitespace characters, such as tabs and newlines,
+to the standard space character (’ ‘, 0x20). It also trims leading and trailing
+whitespace from the text. This ensures consistent spacing across all text samples,
+improving readability and consistency. The normalization process is based on a
+comprehensive list of whitespace characters, which can be found at
+<a class="reference external" href="https://en.wikipedia.org/wiki/Whitespace_character">https://en.wikipedia.org/wiki/Whitespace_character</a>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.whitespace_normalization_mapper.WhitespaceNormalizationMapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/whitespace_normalization_mapper.html#WhitespaceNormalizationMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.whitespace_normalization_mapper.WhitespaceNormalizationMapper.__init__" title="Link to this definition">¶</a></dt>

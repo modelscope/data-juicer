@@ -363,10 +363,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.aggregator.most_relevant_entities_aggregator.html#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">MostRelevantEntitiesAggregator</span><span class="p">(</span><span class="n">Aggregator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extract entities closely related to a given entity from some texts,</span>
-<span class="sd">    and sort them in descending order of importance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts and ranks entities closely related to a given entity from provided texts.</span>
+
+<span class="sd">    The operator uses a language model API to identify and rank entities, filtering out</span>
+<span class="sd">    entities of the same type as the given entity. The ranked list is sorted in descending</span>
+<span class="sd">    order of importance. Input texts are aggregated and passed to the model, with an</span>
+<span class="sd">    optional token limit. The output is parsed using a regular expression to extract the</span>
+<span class="sd">    relevant entities. Results are stored in the batch metadata under the key</span>
+<span class="sd">    &#39;most_relevant_entities&#39;. The operator retries the API call up to a specified number of</span>
+<span class="sd">    times in case of errors. The system prompt, input template, and output pattern can be</span>
+<span class="sd">    customized.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_TEMPLATE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;给定与`</span><span class="si">{entity}</span><span class="s2">`相关的一些文档，&quot;</span>

@@ -351,15 +351,28 @@
 
 
 <div class="viewcode-block" id="CleanIpMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.clean_ip_mapper.html#data_juicer.ops.mapper.clean_ip_mapper.CleanIpMapper">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.CleanIpMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;clean_ip_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CleanIpMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to clean ipv4 and ipv6 address in text samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cleans IPv4 and IPv6 addresses from text samples.</span>
+
+<span class="sd">    This operator removes or replaces IPv4 and IPv6 addresses in the text. It uses a regular</span>
+<span class="sd">    expression to identify and clean the IP addresses. By default, it replaces the IP</span>
+<span class="sd">    addresses with an empty string, effectively removing them. The operator can be</span>
+<span class="sd">    configured with a custom pattern and replacement string. If no pattern is provided, a</span>
+<span class="sd">    default pattern for both IPv4 and IPv6 addresses is used. The operator processes samples</span>
+<span class="sd">    in batches.</span>
+
+<span class="sd">    - Uses a regular expression to find and clean IP addresses.</span>
+<span class="sd">    - Replaces found IP addresses with a specified replacement string.</span>
+<span class="sd">    - Default replacement string is an empty string, which removes the IP addresses.</span>
+<span class="sd">    - Can use a custom regular expression pattern if provided.</span>
+<span class="sd">    - Processes samples in batches for efficiency.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="CleanIpMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.clean_ip_mapper.html#data_juicer.ops.mapper.clean_ip_mapper.CleanIpMapper.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.CleanIpMapper.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">repl</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
@@ -387,7 +400,7 @@
 
 
 <div class="viewcode-block" id="CleanIpMapper.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.clean_ip_mapper.html#data_juicer.ops.mapper.clean_ip_mapper.CleanIpMapper.process_batched">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.CleanIpMapper.process_batched">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">):</span>

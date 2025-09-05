@@ -362,7 +362,16 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.download_file_mapper.html#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DownloadFileMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to download url files to local files or load them into memory.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to download URL files to local files or load them into memory.</span>
+
+<span class="sd">    This operator downloads files from URLs and can either save them to a specified</span>
+<span class="sd">    directory or load the contents directly into memory. It supports downloading multiple</span>
+<span class="sd">    files concurrently and can resume downloads if the `resume_download` flag is set. The</span>
+<span class="sd">    operator processes nested lists of URLs, flattening them for batch processing and then</span>
+<span class="sd">    reconstructing the original structure in the output. If both `save_dir` and `save_field`</span>
+<span class="sd">    are not specified, it defaults to saving the content under the key `image_bytes`. The</span>
+<span class="sd">    operator logs any failed download attempts and provides error messages for</span>
+<span class="sd">    troubleshooting.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

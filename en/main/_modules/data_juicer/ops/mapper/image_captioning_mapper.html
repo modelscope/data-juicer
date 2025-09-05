@@ -375,8 +375,17 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageCaptioningMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to generate samples whose captions are generated based on</span>
-<span class="sd">    another model and the figure.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates image captions using a Hugging Face model and appends them to samples.</span>
+
+<span class="sd">    This operator generates captions for images in the input samples using a specified</span>
+<span class="sd">    Hugging Face model. It can generate multiple captions per image and apply different</span>
+<span class="sd">    strategies to retain the generated captions. The operator supports three retention</span>
+<span class="sd">    modes: &#39;random_any&#39;, &#39;similar_one_simhash&#39;, and &#39;all&#39;. In &#39;random_any&#39; mode, a random</span>
+<span class="sd">    caption is retained. In &#39;similar_one_simhash&#39; mode, the most similar caption to the</span>
+<span class="sd">    original text (based on SimHash) is retained. In &#39;all&#39; mode, all generated captions are</span>
+<span class="sd">    concatenated and retained. The operator can also keep or discard the original sample</span>
+<span class="sd">    based on the `keep_original_sample` parameter. If both `prompt` and `prompt_key` are</span>
+<span class="sd">    set, the `prompt_key` takes precedence.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>

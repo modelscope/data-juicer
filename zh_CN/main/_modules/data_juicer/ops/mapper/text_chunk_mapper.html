@@ -359,15 +359,30 @@
 
 
 <div class="viewcode-block" id="TextChunkMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.text_chunk_mapper.html#data_juicer.ops.mapper.text_chunk_mapper.TextChunkMapper">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.TextChunkMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TextChunkMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split input text to chunks.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split input text into chunks based on specified criteria.</span>
+
+<span class="sd">    - Splits the input text into multiple chunks using a specified maximum length and a</span>
+<span class="sd">      split pattern.</span>
+<span class="sd">    - If `max_len` is provided, the text is split into chunks with a maximum length of</span>
+<span class="sd">      `max_len`.</span>
+<span class="sd">    - If `split_pattern` is provided, the text is split at occurrences of the pattern. If</span>
+<span class="sd">      the length exceeds `max_len`, it will force a cut.</span>
+<span class="sd">    - The `overlap_len` parameter specifies the overlap length between consecutive chunks if</span>
+<span class="sd">      the split does not occur at the pattern.</span>
+<span class="sd">    - Uses a Hugging Face tokenizer to calculate the text length in tokens if a tokenizer</span>
+<span class="sd">      name is provided; otherwise, it uses the string length.</span>
+<span class="sd">    - Caches the following stats: &#39;chunk_count&#39; (number of chunks generated for each</span>
+<span class="sd">      sample).</span>
+<span class="sd">    - Raises a `ValueError` if both `max_len` and `split_pattern` are `None` or if</span>
+<span class="sd">      `overlap_len` is greater than or equal to `max_len`.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="TextChunkMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.text_chunk_mapper.html#data_juicer.ops.mapper.text_chunk_mapper.TextChunkMapper.__init__">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.TextChunkMapper.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">max_len</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -418,7 +433,7 @@
 
 
 <div class="viewcode-block" id="TextChunkMapper.recursively_chunk">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.text_chunk_mapper.html#data_juicer.ops.mapper.text_chunk_mapper.TextChunkMapper.recursively_chunk">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.TextChunkMapper.recursively_chunk">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">recursively_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">)</span>
@@ -448,7 +463,7 @@
 
 
 <div class="viewcode-block" id="TextChunkMapper.get_text_chunks">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.text_chunk_mapper.html#data_juicer.ops.mapper.text_chunk_mapper.TextChunkMapper.get_text_chunks">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.TextChunkMapper.get_text_chunks">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_text_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_len</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">chunks</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">split_pattern</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
@@ -475,7 +490,7 @@
 
 
 <div class="viewcode-block" id="TextChunkMapper.process_batched">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.text_chunk_mapper.html#data_juicer.ops.mapper.text_chunk_mapper.TextChunkMapper.process_batched">[文档]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.TextChunkMapper.process_batched">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">sample_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])</span>
 

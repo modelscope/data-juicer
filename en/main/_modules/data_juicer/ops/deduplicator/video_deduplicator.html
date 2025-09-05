@@ -358,17 +358,22 @@
 
 
 <div class="viewcode-block" id="VideoDeduplicator">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.video_deduplicator.html#data_juicer.ops.deduplicator.VideoDeduplicator">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.VideoDeduplicator">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VideoDeduplicator</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Deduplicator to deduplicate samples at document-level using exact matching</span>
-<span class="sd">    of videos between documents.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deduplicates samples at the document level using exact matching of videos.</span>
+
+<span class="sd">    This operator computes a hash for each video in the sample and uses it to identify and</span>
+<span class="sd">    remove duplicate documents. If `consider_text` is set to True, it also considers the</span>
+<span class="sd">    text hash alongside the video hash for deduplication. The video hash is computed by</span>
+<span class="sd">    hashing the video data, including all video streams in the container. The operator</span>
+<span class="sd">    supports sampling and tracing of duplicate pairs when the `show_num` parameter is</span>
+<span class="sd">    greater than 0. Important fields used for caching include &#39;videohash&#39; and optionally</span>
+<span class="sd">    &#39;hash&#39; if text is considered.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="VideoDeduplicator.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.video_deduplicator.html#data_juicer.ops.deduplicator.VideoDeduplicator.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.VideoDeduplicator.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">consider_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization.</span>
@@ -386,7 +391,7 @@
 
 
 <div class="viewcode-block" id="VideoDeduplicator.compute_hash">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.video_deduplicator.html#data_juicer.ops.deduplicator.VideoDeduplicator.compute_hash">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.VideoDeduplicator.compute_hash">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># get hash of text first</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">consider_text</span><span class="p">:</span>
@@ -420,7 +425,7 @@
 
 
 <div class="viewcode-block" id="VideoDeduplicator.process">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.video_deduplicator.html#data_juicer.ops.deduplicator.VideoDeduplicator.process">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.VideoDeduplicator.process">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">show_num</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For doc-level, dataset --&gt; dataset.</span>

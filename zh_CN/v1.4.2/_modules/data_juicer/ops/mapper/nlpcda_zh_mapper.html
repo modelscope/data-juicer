@@ -363,7 +363,17 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.nlpcda_zh_mapper.html#data_juicer.ops.mapper.nlpcda_zh_mapper.NlpcdaZhMapper">[文档]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">NlpcdaZhMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to simply augment samples in Chinese based on nlpcda library.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Augments Chinese text samples using the nlpcda library.</span>
+
+<span class="sd">    This operator applies various augmentation methods to Chinese text, such as replacing</span>
+<span class="sd">    similar words, homophones, deleting random characters, swapping characters, and</span>
+<span class="sd">    replacing equivalent numbers. The number of augmented samples generated can be</span>
+<span class="sd">    controlled by the `aug_num` parameter. If `sequential` is set to True, the augmentation</span>
+<span class="sd">    methods are applied in sequence; otherwise, they are applied independently. The original</span>
+<span class="sd">    sample can be kept or removed based on the `keep_original_sample` flag. It is</span>
+<span class="sd">    recommended to use 1-3 augmentation methods at a time to avoid significant changes in</span>
+<span class="sd">    the semantics of the samples. Some augmentation methods may not work for special texts,</span>
+<span class="sd">    resulting in no augmented samples being generated.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

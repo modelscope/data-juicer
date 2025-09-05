@@ -353,13 +353,14 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.whitespace_normalization_mapper.html#data_juicer.ops.mapper.whitespace_normalization_mapper.WhitespaceNormalizationMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s2">&quot;whitespace_normalization_mapper&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">WhitespaceNormalizationMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to normalize different kinds of whitespaces to whitespace &#39; &#39; (0x20)</span>
-<span class="sd">    in text samples.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalizes various types of whitespace characters to standard spaces in text samples.</span>
 
-<span class="sd">    Different kinds of whitespaces can be found here:</span>
-<span class="sd">    https://en.wikipedia.org/wiki/Whitespace_character</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    This mapper converts all non-standard whitespace characters, such as tabs and newlines,</span>
+<span class="sd">    to the standard space character (&#39; &#39;, 0x20). It also trims leading and trailing</span>
+<span class="sd">    whitespace from the text. This ensures consistent spacing across all text samples,</span>
+<span class="sd">    improving readability and consistency. The normalization process is based on a</span>
+<span class="sd">    comprehensive list of whitespace characters, which can be found at</span>
+<span class="sd">    https://en.wikipedia.org/wiki/Whitespace_character.&quot;&quot;&quot;</span>
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 

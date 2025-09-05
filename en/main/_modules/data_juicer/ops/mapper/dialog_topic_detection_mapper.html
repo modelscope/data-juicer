@@ -358,15 +358,20 @@
 
 <span class="c1"># TODO: LLM-based inference.</span>
 <div class="viewcode-block" id="DialogTopicDetectionMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.dialog_topic_detection_mapper.html#data_juicer.ops.mapper.dialog_topic_detection_mapper.DialogTopicDetectionMapper">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogTopicDetectionMapper">[docs]</a>
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DialogTopicDetectionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to generate user&#39;s topic labels in dialog. Input from</span>
-<span class="sd">    history_key, query_key and response_key. Output lists of</span>
-<span class="sd">    labels and analysis for queries in the dialog.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates user&#39;s topic labels and analysis in a dialog.</span>
+
+<span class="sd">    This operator processes a dialog to detect and label the topics discussed by the user.</span>
+<span class="sd">    It takes input from `history_key`, `query_key`, and `response_key` and outputs lists of</span>
+<span class="sd">    labels and analysis for each query in the dialog. The operator uses a predefined system</span>
+<span class="sd">    prompt and templates to build the input prompt for the API call. It supports customizing</span>
+<span class="sd">    the system prompt, templates, and patterns for parsing the API response. The results are</span>
+<span class="sd">    stored in the `meta` field under the keys specified by `labels_key` and `analysis_key`.</span>
+<span class="sd">    If these keys already exist in the `meta` field, the operator skips processing. The</span>
+<span class="sd">    operator retries the API call up to `try_num` times in case of errors.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;请判断用户和LLM多轮对话中用户所讨论的话题。</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -401,7 +406,7 @@
     <span class="n">DEFAULT_LABELS_PATTERN</span> <span class="o">=</span> <span class="s2">&quot;话题类别：(.*?)($|</span><span class="se">\n</span><span class="s2">)&quot;</span>
 
 <div class="viewcode-block" id="DialogTopicDetectionMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.dialog_topic_detection_mapper.html#data_juicer.ops.mapper.dialog_topic_detection_mapper.DialogTopicDetectionMapper.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogTopicDetectionMapper.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
@@ -489,7 +494,7 @@
 
 
 <div class="viewcode-block" id="DialogTopicDetectionMapper.build_input">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.dialog_topic_detection_mapper.html#data_juicer.ops.mapper.dialog_topic_detection_mapper.DialogTopicDetectionMapper.build_input">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogTopicDetectionMapper.build_input">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">history</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">topic_candidates</span><span class="p">:</span>
             <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">candidate_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">candidate_str</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topic_candidates</span><span class="p">))</span>
@@ -505,7 +510,7 @@
 
 
 <div class="viewcode-block" id="DialogTopicDetectionMapper.parse_output">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.dialog_topic_detection_mapper.html#data_juicer.ops.mapper.dialog_topic_detection_mapper.DialogTopicDetectionMapper.parse_output">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogTopicDetectionMapper.parse_output">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
         <span class="n">analysis</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -522,7 +527,7 @@
 
 
 <div class="viewcode-block" id="DialogTopicDetectionMapper.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.dialog_topic_detection_mapper.html#data_juicer.ops.mapper.dialog_topic_detection_mapper.DialogTopicDetectionMapper.process_single">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogTopicDetectionMapper.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels_key</span> <span class="ow">in</span> <span class="n">meta</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis_key</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>

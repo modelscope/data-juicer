@@ -449,12 +449,20 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.document_minhash_deduplicator.html#data_juicer.ops.deduplicator.DocumentMinhashDeduplicator">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DocumentMinhashDeduplicator</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Deduplicator to deduplicate samples at document-level using MinHashLSH.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deduplicates samples at the document level using MinHash LSH.</span>
 
-<span class="sd">    Different from simhash, minhash is stored as bytes, so they won&#39;t be</span>
-<span class="sd">    kept in the final dataset.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    This operator computes MinHash values for each sample and uses Locality-Sensitive</span>
+<span class="sd">    Hashing (LSH) to identify and remove near-duplicate documents. The Jaccard similarity</span>
+<span class="sd">    threshold determines when two documents are considered duplicates. The tokenization</span>
+<span class="sd">    method can be customized, and a Hugging Face tokenizer can be used for &#39;sentencepiece&#39;</span>
+<span class="sd">    tokenization. The minhash values are stored as bytes and are not kept in the final</span>
+<span class="sd">    dataset. The number of bands and rows per band in LSH can be set manually or determined</span>
+<span class="sd">    by an optimal parameter computation algorithm. Important notes:</span>
+<span class="sd">    - If using &#39;punctuation&#39; tokenization with an ignore pattern, ensure the pattern does</span>
+<span class="sd">      not include punctuations.</span>
+<span class="sd">    - For &#39;sentencepiece&#39; tokenization, a tokenizer model path is required.</span>
+<span class="sd">    - The deduplication process involves clustering and filtering, and only unique samples</span>
+<span class="sd">      or the first sample in a cluster are retained.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="DocumentMinhashDeduplicator.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.deduplicator.document_minhash_deduplicator.html#data_juicer.ops.deduplicator.DocumentMinhashDeduplicator.__init__">[docs]</a>

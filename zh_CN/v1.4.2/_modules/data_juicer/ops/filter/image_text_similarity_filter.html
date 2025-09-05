@@ -367,8 +367,15 @@
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageTextSimilarityFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples those similarities between image and text</span>
-<span class="sd">    within a specific range.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with image-text similarity within a specified range.</span>
+
+<span class="sd">    This operator uses a Hugging Face CLIP model to compute the similarity between images</span>
+<span class="sd">    and text. It retains samples where the similarity scores fall within the given range.</span>
+<span class="sd">    The similarity score is computed for each image-text pair, and the final score can be</span>
+<span class="sd">    reduced using &#39;avg&#39;, &#39;max&#39;, or &#39;min&#39; modes. The &#39;any&#39; or &#39;all&#39; strategy determines if at</span>
+<span class="sd">    least one or all image-text pairs must meet the similarity criteria. The key metric</span>
+<span class="sd">    &#39;image_text_similarity&#39; is cached in the sample&#39;s stats. Images can be flipped</span>
+<span class="sd">    horizontally or vertically before computing the similarity.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>

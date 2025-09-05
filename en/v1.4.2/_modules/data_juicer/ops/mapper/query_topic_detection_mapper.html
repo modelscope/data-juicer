@@ -357,12 +357,18 @@
 <span class="nd">@TAGGING_OPS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">QueryTopicDetectionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to predict user&#39;s topic label in query. Input from query_key.</span>
-<span class="sd">    Output topic label and corresponding score for the query, which is</span>
-<span class="sd">    store in &#39;query_topic_label&#39; and &#39;query_topic_label_score&#39; in</span>
-<span class="sd">    Data-Juicer meta field.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Predicts the topic label and its corresponding score for a given query. The input is</span>
+<span class="sd">    taken from the specified query key. The output, which includes the predicted topic label</span>
+<span class="sd">    and its score, is stored in the &#39;query_topic_label&#39; and &#39;query_topic_label_score&#39; fields</span>
+<span class="sd">    of the Data-Juicer meta field. This operator uses a Hugging Face model for topic</span>
+<span class="sd">    classification. If a Chinese to English translation model is provided, it will first</span>
+<span class="sd">    translate the query from Chinese to English before predicting the topic.</span>
+
+<span class="sd">    - Uses a Hugging Face model for topic classification.</span>
+<span class="sd">    - Optionally translates Chinese queries to English using another Hugging Face</span>
+<span class="sd">    model.</span>
+<span class="sd">    - Stores the predicted topic label in &#39;query_topic_label&#39;.</span>
+<span class="sd">    - Stores the corresponding score in &#39;query_topic_label_score&#39;.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>

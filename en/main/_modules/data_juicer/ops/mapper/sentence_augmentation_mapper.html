@@ -363,25 +363,22 @@
 
 
 <div class="viewcode-block" id="SentenceAugmentationMapper">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.sentence_augmentation_mapper.html#data_juicer.ops.mapper.sentence_augmentation_mapper.SentenceAugmentationMapper">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.SentenceAugmentationMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SentenceAugmentationMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to augment sentences.</span>
-<span class="sd">    The purpose of this operation is to enhance sentences.</span>
-<span class="sd">    If the input text is at the document level, the enhancement</span>
-<span class="sd">    effect may not be optimal. Therefore, please consider the</span>
-<span class="sd">    length of the input text carefully.</span>
-
-<span class="sd">    Recommended model list: [</span>
-<span class="sd">        lmsys/vicuna-13b-v1.5</span>
-<span class="sd">        Qwen/Qwen2-7B-Instruct</span>
-<span class="sd">    ]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Augments sentences by generating enhanced versions using a Hugging Face model. This</span>
+<span class="sd">    operator enhances input sentences by generating new, augmented versions. It is designed</span>
+<span class="sd">    to work best with individual sentences rather than full documents. For optimal results,</span>
+<span class="sd">    ensure the input text is at the sentence level. The augmentation process uses a Hugging</span>
+<span class="sd">    Face model, such as `lmsys/vicuna-13b-v1.5` or `Qwen/Qwen2-7B-Instruct`. The operator</span>
+<span class="sd">    requires specifying both the primary and secondary text keys, where the augmented</span>
+<span class="sd">    sentence will be stored in the secondary key. The generation process can be customized</span>
+<span class="sd">    with parameters like temperature, top-p sampling, and beam search size.&quot;&quot;&quot;</span>
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
 <div class="viewcode-block" id="SentenceAugmentationMapper.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.sentence_augmentation_mapper.html#data_juicer.ops.mapper.sentence_augmentation_mapper.SentenceAugmentationMapper.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.SentenceAugmentationMapper.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hf_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Qwen/Qwen2-7B-Instruct&quot;</span><span class="p">,</span>
@@ -440,7 +437,7 @@
 
 
 <div class="viewcode-block" id="SentenceAugmentationMapper.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.sentence_augmentation_mapper.html#data_juicer.ops.mapper.sentence_augmentation_mapper.SentenceAugmentationMapper.process_single">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.SentenceAugmentationMapper.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># there is no target text</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_key_second</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
