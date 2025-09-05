@@ -2,11 +2,17 @@ import ast
 import json
 import os
 import re
+from pathlib import Path
 from typing import Any, List
 
 import translators as ts
 
 DOC_PATH = "docs/Operators.md"
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DOC_OP_PATH = ROOT / "docs/operators"
+
 
 # >>> some constant doc contents
 DOC_ABSTRACT = """
@@ -69,6 +75,11 @@ FORMATTER_EXCLUDE = {"__init__.py", "load.py"}
 
 # load OP tag mappings
 ALL_TAG_MAPPING = json.load(open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "tag_mappings.json")))
+
+
+def find_md(pattern: str):
+    matches = list(DOC_OP_PATH.rglob(pattern))
+    return matches[0] if matches else None
 
 
 def replace_tags_with_icons(tags, lang="en"):
@@ -182,25 +193,36 @@ class OPRecord:
     the doc.
     """
 
-    def __init__(self, type: str, name: str, desc: str, tags: List[str] = None, code: str = None, test: str = None):
+    def __init__(
+        self,
+        type: str,
+        name: str,
+        desc: str,
+        tags: List[str] = None,
+        test: str = None,
+        info: str = None,
+        ref: str = None,
+    ):
         self.type = type
         self.name = name
         self.tags = tags if tags else []
         self.desc = desc
-        self.code = code
         self.test = test
+        self.info = info
+        self.ref = ref
 
     def __repr__(self):
-        return f"{self.type}, {self.name}, {self.tags}, {self.desc}, " f"{self.code}, {self.test}"
+        return f"{self.type}, {self.name}, {self.tags}, {self.desc}, {self.info}, {self.ref}"
 
     def __eq__(self, other):
+        # Do not compare test properties
         return (
             self.type == other.type
             and self.name == other.name
             and set(self.tags) == set(other.tags)
             and self.desc == other.desc
-            and self.code == other.code
-            and self.test == other.test
+            and self.info == other.info
+            and self.ref == other.ref
         )
 
     def __ne__(self, other):
@@ -271,8 +293,9 @@ def get_op_list_from_code_for_formatter():
                         type=type,
                         name=name,
                         desc=doc,
-                        code=code_path,
                         test=test_path,
+                        info=info_link(name),
+                        ref=ref_link(name),
                     )
                 )
         else:
@@ -287,8 +310,9 @@ def get_op_list_from_code_for_formatter():
                     type=type,
                     name=formatter.replace(".py", ""),
                     desc=doc,
-                    code=code_path,
                     test=test_path if os.path.exists(test_path) else "-",
+                    info=info_link(formatter.replace(".py", "")),
+                    ref=ref_link(formatter.replace(".py", "")),
                 )
             )
     return op_record_list
@@ -316,14 +340,16 @@ def get_op_list_from_code():
                 continue
             docstrings = get_class_and_docstring(code_path)
             _, doc = docstrings[0]
+            info = info_link(op.replace(".py", ""))
             op_record_list.append(
                 OPRecord(
                     type=type,
                     name=op.replace(".py", ""),
                     desc=doc,
                     tags=analyze_tag_from_code(code_path),
-                    code=code_path,
                     test=test_path if os.path.exists(test_path) else "-",
+                    info=info,
+                    ref=ref_link(op.replace(".py", "")),
                 )
             )
     op_record_list.sort(key=lambda record: (record.type, record.name))
@@ -390,6 +416,19 @@ def generate_overview(op_record_dict):
     return "\n\n".join(doc)
 
 
+def info_link(name):
+    rd_link = find_md(f"{name}.md")
+    if rd_link:
+        rd_link = os.path.relpath(rd_link.relative_to(ROOT), "docs")
+        return f"[info]({rd_link})"
+    else:
+        return "-"
+
+
+def ref_link(name):
+    return "-"
+
+
 def generate_op_table_section(op_type, op_record_list):
     """
     Generate the OP table section for the given OP type and the OP record list.
@@ -398,20 +437,15 @@ def generate_op_table_section(op_type, op_record_list):
     doc = [f'## {op_type} <a name="{op_type}"/>']
     # make the OP table
     table = [
-        "| Operator 算子 | Tags 标签 | Description 描述 | Source code 源码 |" " Unit tests 单测样例 |",
-        "|----------|------|-------------|-------------|------------|",
+        "| Operator 算子 | Tags 标签 | Description 描述 | Details 详情 | Reference 参考 |",
+        "|----------|------|-------------|-------------|-------------|",
     ]
     trans_descs = get_op_desc_in_en_zh_batched([record.desc for record in op_record_list])
     for i, record in enumerate(op_record_list):
         tags = " ".join(replace_tags_with_icons(record.tags))
-        tests = f'[tests]({os.path.join("..", record.test)})' if record.test != "-" else "-"
-        op_row = (
-            f"| {record.name} "
-            f"| {tags} "
-            f"| {trans_descs[i]} "
-            f'| [code]({os.path.join("..", record.code)}) '
-            f"| {tests} |"
-        )
+        info = record.info
+        ref = record.ref
+        op_row = f"| {record.name} " f"| {tags} " f"| {trans_descs[i]} " f"| {info} " f"| {ref} |"
         table.append(op_row)
     doc.append("\n".join(table))
     return "\n\n".join(doc)
@@ -428,7 +462,10 @@ def get_op_desc_in_en_zh_batched(descs):
         res2 = get_op_desc_in_en_zh_batched(descs[split_idx:])
         return res1 + res2
     else:
-        res = ts.translate_text(batch, translator="alibaba", from_language="en", to_language="zh")
+        try:
+            res = ts.translate_text(batch, translator="alibaba", from_language="en", to_language="zh")
+        except Exception:
+            res = f"-{separator}" * (len(descs) - 1) + "-"
     zhs = res.split(separator)
     assert len(zhs) == len(descs)
     return [desc + " " + zh.strip() for desc, zh in zip(descs, zhs)]
@@ -440,14 +477,13 @@ def parse_op_record_from_current_doc():
     """
     # patterns
     tab_pattern = r"\| +(.*?) +\| +(.*?) +\| +(.*?) +\| +(.*?) +\| +(.*?) +\|"
-    link_pattern = r"\[.*?\]\((.*?)\)"
 
     if os.path.exists(DOC_PATH):
         op_record_list = []
         with open(DOC_PATH, "r", encoding="utf-8") as fin:
             content = fin.read()
             res = re.findall(tab_pattern, content)
-            for name, tags, desc, code, test in res:
+            for name, tags, desc, info, ref in res:
                 # skip table header
                 if name == "Operator 算子":
                     continue
@@ -456,16 +492,16 @@ def parse_op_record_from_current_doc():
                 tags = [remove_emojis(tag.lower()) for tag in tags.split(" ")]
                 # only need English description
                 desc = desc.split(". ")[0] + "."
-                code = re.findall(link_pattern, code)[0]
-                test = re.findall(link_pattern, test)
+                test_path = os.path.join(OP_TEST_PREFIX, type, f"test_{name}.py")
                 op_record_list.append(
                     OPRecord(
                         type=type,
                         name=name,
                         desc=desc,
                         tags=tags,
-                        code=code.replace("../", ""),
-                        test=test[0].replace("../", "") if len(test) > 0 else "-",
+                        test=test_path if os.path.exists(test_path) else "-",
+                        info=info,
+                        ref=ref[0] if len(ref) > 0 else "-",
                     )
                 )
         op_record_list.sort(key=lambda record: (record.type, record.name))
@@ -498,6 +534,7 @@ def check_and_update_op_record(old_op_record_list, new_op_record_list):
     usability_tag_set = set(ALL_TAG_MAPPING["Usability Tags"].keys())
     old_op_record_dict = {record.name: record for record in old_op_record_list}
     updated_op_record_list = []
+
     for record in new_op_record_list:
         # check unittest
         test = record.test
@@ -505,6 +542,7 @@ def check_and_update_op_record(old_op_record_list, new_op_record_list):
             usability_tag = "alpha"
         else:
             usability_tag = "beta"
+
         if record.name in old_op_record_dict:
             # get the old usability tag
             old_record = old_op_record_dict[record.name]
@@ -516,9 +554,18 @@ def check_and_update_op_record(old_op_record_list, new_op_record_list):
             if old_usability_tag and old_usability_tag == "stable" and usability_tag == "beta":
                 print(f"{record.name} kept stable")
                 usability_tag = "stable"
+
+            new_ref = record.ref if record.ref is not None else "-"
+            old_ref = old_record.ref if old_record.ref is not None else "-"
+            if (new_ref == "-" or new_ref == "") and (old_ref != "-" and old_ref != ""):
+                record.ref = old_ref
+        else:
+            pass
+
         curr_tags = [tag for tag in record.tags if tag not in usability_tag_set]
         curr_tags.append(usability_tag)
         record.tags = curr_tags
+
         updated_op_record_list.append(record)
 
     return updated_op_record_list

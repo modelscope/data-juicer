@@ -13,12 +13,13 @@ transformers = LazyLoader("transformers")
 @LOADED_IMAGES.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class MllmMapper(Mapper):
-    """Mapper to use MLLMs for visual question answering tasks.
-    Recommended model list: [
-        llava-hf/llava-v1.6-vicuna-7b-hf,
-        Qwen/Qwen2-VL-7B-Instruct,
-    ]
-    """
+    """Mapper to use MLLMs for visual question answering tasks. This operator uses a Hugging
+    Face model to generate answers based on input text and images. It supports models like
+    `llava-hf/llava-v1.6-vicuna-7b-hf` and `Qwen/Qwen2-VL-7B-Instruct`. The operator
+    processes each sample, loading and processing images, and generating responses using the
+    specified model. The generated responses are appended to the sample's text field. The
+    key parameters include the model ID, maximum new tokens, temperature, top-p sampling,
+    and beam search size, which control the generation process."""
 
     _accelerator = "cuda"
 

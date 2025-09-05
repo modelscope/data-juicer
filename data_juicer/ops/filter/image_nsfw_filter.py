@@ -16,7 +16,13 @@ OP_NAME = "image_nsfw_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageNSFWFilter(Filter):
-    """Filter to keep samples whose images have nsfw scores in a specified range."""
+    """Filter to keep samples whose images have nsfw scores in a specified range.
+
+    This operator uses a Hugging Face model to compute the nsfw scores for each image in a
+    sample. It keeps samples based on the specified `min_score` and `max_score` thresholds.
+    The operator supports two strategies: 'any' (keep the sample if any image meets the
+    condition) or 'all' (keep the sample only if all images meet the condition). The nsfw
+    scores are cached in the 'image_nsfw_score' field of the sample's stats."""
 
     _accelerator = "cuda"
 

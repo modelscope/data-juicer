@@ -9,7 +9,16 @@ from data_juicer.utils.sample import random_sample
 
 @OPERATORS.register_module("random_selector")
 class RandomSelector(Selector):
-    """Selector to random select samples."""
+    """Randomly selects a subset of samples from the dataset.
+
+    This operator randomly selects a subset of samples based on either a specified ratio or
+    a fixed number. If both `select_ratio` and `select_num` are provided, the one that
+    results in fewer samples is used. The selection is skipped if the dataset has only one
+    or no samples. The `random_sample` function is used to perform the actual sampling.
+
+    - `select_ratio`: The ratio of samples to select (0 to 1).
+    - `select_num`: The exact number of samples to select.
+    - If neither `select_ratio` nor `select_num` is set, the dataset remains unchanged."""
 
     def __init__(
         self,

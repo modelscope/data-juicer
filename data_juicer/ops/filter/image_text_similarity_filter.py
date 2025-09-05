@@ -19,8 +19,15 @@ OP_NAME = "image_text_similarity_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageTextSimilarityFilter(Filter):
-    """Filter to keep samples those similarities between image and text
-    within a specific range."""
+    """Filter to keep samples with image-text similarity within a specified range.
+
+    This operator uses a Hugging Face CLIP model to compute the similarity between images
+    and text. It retains samples where the similarity scores fall within the given range.
+    The similarity score is computed for each image-text pair, and the final score can be
+    reduced using 'avg', 'max', or 'min' modes. The 'any' or 'all' strategy determines if at
+    least one or all image-text pairs must meet the similarity criteria. The key metric
+    'image_text_similarity' is cached in the sample's stats. Images can be flipped
+    horizontally or vertically before computing the similarity."""
 
     _accelerator = "cuda"
     _batched_op = True

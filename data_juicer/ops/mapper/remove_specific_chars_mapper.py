@@ -7,7 +7,13 @@ from ..base_op import OPERATORS, Mapper
 
 @OPERATORS.register_module("remove_specific_chars_mapper")
 class RemoveSpecificCharsMapper(Mapper):
-    """Mapper to clean specific chars in text samples."""
+    """Removes specific characters from text samples.
+
+    This operator removes specified characters from the text. The characters to be removed
+    can be provided as a string or a list of strings. If no characters are specified, the
+    default set includes special and non-alphanumeric characters. The operator processes the
+    text using a regular expression pattern that matches any of the specified characters and
+    replaces them with an empty string. This is done in a batched manner for efficiency."""
 
     _batched_op = True
 

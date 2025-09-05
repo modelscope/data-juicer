@@ -34,8 +34,18 @@ OP_NAME = 'video_captioning_from_video_mapper'
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoCaptioningFromVideoMapper(Mapper):
-    """Mapper to generate samples whose captions are generated based on
-    a video-to-text model and sampled video frame."""
+    """Generates video captions using a Hugging Face video-to-text model and sampled video
+    frames.
+
+    This operator processes video samples to generate captions based on the provided video
+    frames.
+    It uses a Hugging Face video-to-text model, such as 'kpyu/video-blip-opt-2.7b-ego4d',
+    to generate multiple caption candidates for each video. The number of generated
+    captions and the strategy to keep or filter these candidates can be configured. The
+    operator supports different frame sampling methods, including extracting all
+    keyframes or uniformly sampling a specified number of frames. Additionally, it allows
+    for horizontal and vertical flipping of the frames. The final output can include both
+    the original sample and the generated captions, depending on the configuration."""
 
     _accelerator = 'cuda'
     _batched_op = True

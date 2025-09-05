@@ -14,7 +14,15 @@ OP_NAME = "video_duration_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoDurationFilter(Filter):
-    """Keep data samples whose videos' durations are within a specified range."""
+    """Keep data samples whose videos' durations are within a specified range.
+
+    This operator filters data samples based on the duration of their associated videos. It
+    keeps samples where the video durations fall within a specified minimum and maximum
+    range. The filtering strategy can be set to 'any' or 'all':
+    - 'any': Keep the sample if any of its videos meet the duration criteria.
+    - 'all': Keep the sample only if all of its videos meet the duration criteria.
+    The video durations are computed and stored in the 'video_duration' field of the
+    sample's stats. If no videos are present, an empty array is stored."""
 
     def __init__(
         self, min_duration: float = 0, max_duration: float = sys.maxsize, any_or_all: str = "any", *args, **kwargs

@@ -23,8 +23,22 @@ OP_NAME = "imgdiff_difference_caption_generator_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class Difference_Caption_Generator_Mapper(Mapper):
-    """A fused operator for OPs that is used to run sequential OPs on
-    the same batch to allow fine-grained control on data processing."""
+    """Generates difference captions for bounding box regions in two images.
+
+    This operator processes pairs of images and generates captions for the differences in
+    their bounding box regions. It uses a multi-step process:
+    - Describes the content of each bounding box region using a Hugging Face model.
+    - Crops the bounding box regions from both images.
+    - Checks if the cropped regions match the generated captions.
+    - Determines if there are differences between the two captions.
+    - Marks the difference area with a red box.
+    - Generates difference captions for the marked areas.
+    - The key metric is the similarity score between the captions, computed using a CLIP
+      model.
+    - If no valid bounding boxes or differences are found, it returns empty captions and
+      zeroed bounding boxes.
+    - Uses 'cuda' as the accelerator if any of the fused operations support it.
+    - Caches temporary images during processing and clears them afterward."""
 
     _accelerator = "cuda"
 

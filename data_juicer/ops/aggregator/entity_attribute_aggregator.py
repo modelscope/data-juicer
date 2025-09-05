@@ -20,9 +20,17 @@ OP_NAME = "entity_attribute_aggregator"
 # TODO: LLM-based inference.
 @OPERATORS.register_module(OP_NAME)
 class EntityAttributeAggregator(Aggregator):
-    """
-    Return conclusion of the given entity's attribute from some docs.
-    """
+    """Summarizes a given attribute of an entity from a set of documents.
+
+    The operator extracts and summarizes the specified attribute of a given entity from the
+    provided documents. It uses a system prompt, example prompt, and input template to
+    generate the summary. The output is formatted as a markdown-style summary with the
+    entity and attribute clearly labeled. The summary is limited to a specified number of
+    words (default is 100). The operator uses a Hugging Face tokenizer to handle token
+    limits and splits documents if necessary. If the input key or required fields are
+    missing, the operator logs a warning and returns the sample unchanged. The summary is
+    stored in the batch metadata under the specified output key. The system prompt, input
+    template, example prompt, and output pattern can be customized."""
 
     DEFAULT_SYSTEM_TEMPLATE = (
         "给定与`{entity}`相关的一些文档，总结`{entity}`的`{attribute}`。\n"

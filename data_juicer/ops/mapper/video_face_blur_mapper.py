@@ -27,7 +27,14 @@ OP_NAME = "video_face_blur_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoFaceBlurMapper(Mapper):
-    """Mapper to blur faces detected in videos."""
+    """Mapper to blur faces detected in videos.
+
+    This operator uses an OpenCV classifier for face detection and applies a specified blur
+    type to the detected faces. The default classifier is 'haarcascade_frontalface_alt.xml'.
+    Supported blur types include 'mean', 'box', and 'gaussian'. The radius of the blur
+    kernel can be adjusted. If a save directory is not provided, the processed videos will
+    be saved in the same directory as the input files. The `DJ_PRODUCED_DATA_DIR`
+    environment variable can also be used to specify the save directory."""
 
     _default_kwargs = {
         "scaleFactor": 1.1,

@@ -12,10 +12,16 @@ OP_NAME = "text_entity_dependency_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class TextEntityDependencyFilter(Filter):
-    """
-    Identify the entities in the text which are independent with other token,
-    and filter them. The text containing no entities will be omitted.
-    """
+    """Identify and filter text samples based on entity dependencies.
+
+    This operator uses a spaCy model to detect entities in the text and evaluates their
+    dependency relationships. It filters out samples where entities have fewer than a
+    specified number of dependency edges. The key metric is 'num_dependency_edges', which
+    counts the number of edges for each entity in the dependency tree. Samples with no
+    detected entities are omitted. The operator supports 'any' or 'all' strategies: 'any'
+    keeps samples if at least one entity meets the dependency threshold, while 'all'
+    requires all entities to meet the threshold. Supported languages are English ('en') and
+    Chinese ('zh')."""
 
     def __init__(self, lang: str = "en", min_dependency_num: int = 1, any_or_all: str = "all", *args, **kwargs):
         """

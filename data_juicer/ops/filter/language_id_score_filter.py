@@ -10,8 +10,14 @@ OP_NAME = "language_id_score_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class LanguageIDScoreFilter(Filter):
-    """Filter to keep samples in a specific language with confidence score
-    larger than a specific min value."""
+    """Filter to keep samples in a specific language with a confidence score above a threshold.
+
+    This operator uses a FastText model to identify the language of each sample. It keeps
+    samples that are in the specified language(s) and have a language identification
+    confidence score greater than or equal to the minimum score. If no specific language is
+    provided, it only filters based on the confidence score. The language ID and its
+    confidence score are stored in the 'lang' and 'lang_score' fields of the sample's stats,
+    respectively."""
 
     def __init__(self, lang: Union[str, List[str]] = "", min_score: float = 0.8, *args, **kwargs):
         """

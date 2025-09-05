@@ -286,9 +286,17 @@ class GPUMinHashActor:
 
 @OPERATORS.register_module(OP_NAME)
 class RayBTSMinhashDeduplicator(Deduplicator):
-    """
-    A MinhashLSH deduplicator based on RAY.
-    """
+    """A MinhashLSH deduplicator that operates in Ray distributed mode.
+
+    This operator uses the MinHash LSH technique to identify and remove near-duplicate
+    samples from a dataset. It supports various tokenization methods, including space,
+    punctuation, character, and sentencepiece. The Jaccard similarity threshold is used to
+    determine if two samples are considered duplicates. If the Jaccard similarity of two
+    samples is greater than or equal to the specified threshold, one of the samples is
+    filtered out. The operator computes the MinHash values for each sample and uses a union-
+    find algorithm to group similar samples. The key metric, Jaccard similarity, is computed
+    based on the shingling of the text. The operator can run on both CPU and GPU, with
+    specific batch size and memory configurations for each."""
 
     # TODO: Set a more reasonable value
     EMPTY_HASH_VALUE = "EMPTY"

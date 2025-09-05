@@ -11,8 +11,13 @@ OP_NAME = "token_num_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class TokenNumFilter(Filter):
-    """Filter to keep samples with total token number within a specific
-    range."""
+    """Filter to keep samples with a total token number within a specified range.
+
+    This operator uses a Hugging Face tokenizer to count the number of tokens in each
+    sample. It keeps samples where the token count is between the minimum and maximum
+    thresholds. The token count is stored in the 'num_token' field of the sample's stats. If
+    the token count is not already computed, it will be calculated using the specified
+    tokenizer."""
 
     def __init__(
         self,

@@ -19,8 +19,16 @@ OP_NAME = "image_text_matching_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageTextMatchingFilter(Filter):
-    """Filter to keep samples those matching score between image and text
-    within a specific range."""
+    """Filter to keep samples with image-text matching scores within a specific range.
+
+    This operator uses a Hugging Face BLIP model to compute the matching score between
+    images and text. It keeps samples where the matching score falls within the specified
+    `min_score` and `max_score` range. The key metric, `image_text_matching_score`, is
+    computed for each image-text pair. If multiple images are associated with a single text,
+    the scores can be reduced using 'avg', 'max', or 'min' modes. The operator supports
+    horizontal and vertical flipping of images. Samples are kept based on either 'any' or
+    'all' strategy: 'any' keeps the sample if any image meets the condition, while 'all'
+    keeps the sample only if all images meet the condition."""
 
     _accelerator = "cuda"
 

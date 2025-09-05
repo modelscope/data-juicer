@@ -8,9 +8,15 @@ from ..base_op import OPERATORS, Filter
 
 @OPERATORS.register_module("audio_size_filter")
 class AudioSizeFilter(Filter):
-    """Keep data samples whose audio size (in bytes/kb/MB/...) within a
-    specific range.
-    """
+    """Keep data samples based on the size of their audio files.
+
+    This operator filters data samples by checking if the size of their audio files falls
+    within a specified range. The size can be in bytes, kilobytes, megabytes, or any other
+    unit. The key metric used is 'audio_sizes', which is an array of file sizes in bytes. If
+    no audio files are present, the 'audio_sizes' field will be an empty array. The operator
+    supports two strategies for keeping samples: 'any' and 'all'. In 'any' mode, a sample is
+    kept if at least one of its audio files meets the size criteria. In 'all' mode, all
+    audio files must meet the size criteria for the sample to be kept."""
 
     def __init__(self, min_size: str = "0", max_size: str = "1TB", any_or_all: str = "any", *args, **kwargs):
         """

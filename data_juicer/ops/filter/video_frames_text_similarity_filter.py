@@ -24,8 +24,17 @@ OP_NAME = "video_frames_text_similarity_filter"
 @LOADED_VIDEOS.register_module(OP_NAME)
 @INTER_SAMPLED_FRAMES.register_module(OP_NAME)
 class VideoFramesTextSimilarityFilter(Filter):
-    """Filter to keep samples those similarities between sampled video frame
-    images and text within a specific range."""
+    """Filter to keep samples based on the similarity between video frame images and text
+    within a specific range.
+
+    This operator uses a Hugging Face CLIP model to compute the similarity between video
+    frames and associated text. It keeps samples where the computed similarity scores fall
+    within a specified range. The operator supports different frame sampling methods,
+    including 'all_keyframes' and 'uniform', and allows for horizontal and vertical flipping
+    of the frames. The similarity score is reduced using one of three modes: 'avg', 'max',
+    or 'min'. The operator also supports two strategies for keeping samples: 'any' (keep if
+    any video meets the condition) or 'all' (keep only if all videos meet the condition).
+    The key metric is stored in the 'video_frames_text_similarity' field."""
 
     _accelerator = "cuda"
 

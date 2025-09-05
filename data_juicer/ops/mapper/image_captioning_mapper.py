@@ -28,8 +28,17 @@ OP_NAME = "image_captioning_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageCaptioningMapper(Mapper):
-    """Mapper to generate samples whose captions are generated based on
-    another model and the figure."""
+    """Generates image captions using a Hugging Face model and appends them to samples.
+
+    This operator generates captions for images in the input samples using a specified
+    Hugging Face model. It can generate multiple captions per image and apply different
+    strategies to retain the generated captions. The operator supports three retention
+    modes: 'random_any', 'similar_one_simhash', and 'all'. In 'random_any' mode, a random
+    caption is retained. In 'similar_one_simhash' mode, the most similar caption to the
+    original text (based on SimHash) is retained. In 'all' mode, all generated captions are
+    concatenated and retained. The operator can also keep or discard the original sample
+    based on the `keep_original_sample` parameter. If both `prompt` and `prompt_key` are
+    set, the `prompt_key` takes precedence."""
 
     _accelerator = "cuda"
     _batched_op = True

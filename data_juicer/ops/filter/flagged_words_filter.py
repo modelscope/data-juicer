@@ -20,7 +20,16 @@ OP_NAME = "flagged_words_filter"
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)
 class FlaggedWordFilter(Filter):
-    """Filter to keep samples with flagged-word ratio in a specified range."""
+    """Filter to keep samples with flagged-word ratio in a specified range.
+
+    This operator filters out samples based on the ratio of flagged words. It uses a list of
+    flagged words, which can be language-specific or combined from multiple languages. The
+    flagged-word ratio is computed as the number of flagged words divided by the total
+    number of words in the sample. If tokenization is enabled, a Hugging Face tokenizer is
+    used to split the text into words. The operator supports word augmentation for certain
+    languages, which can be configured. The key metric, 'flagged_words_ratio', is cached and
+    reused if already computed. Samples are kept if their flagged-word ratio falls within
+    the specified min and max ratio."""
 
     _batched_op = True
 

@@ -25,9 +25,16 @@ OP_NAME = "video_aesthetics_filter"
 @LOADED_VIDEOS.register_module(OP_NAME)
 @INTER_SAMPLED_FRAMES.register_module(OP_NAME)
 class VideoAestheticsFilter(Filter):
-    """Filter to keep data samples with aesthetics scores for specified frames
-    in the videos within a specific range.
-    """
+    """Filter to keep data samples with aesthetics scores for specified frames in the videos
+    within a specific range.
+
+    This operator evaluates the aesthetic quality of video frames using a Hugging Face
+    model. It keeps samples where the aesthetics scores of the specified frames fall within
+    a given range. The key metric, 'video_frames_aesthetics_score', is computed by
+    averaging, taking the max, or min of the frame scores, depending on the reduce mode.
+    Frame sampling can be done uniformly or by extracting all keyframes. The filter applies
+    a 'any' or 'all' strategy to decide if a sample should be kept based on the scores of
+    multiple videos."""
 
     _accelerator = "cuda"
 

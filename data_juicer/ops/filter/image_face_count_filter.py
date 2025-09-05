@@ -20,7 +20,14 @@ OP_NAME = "image_face_count_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageFaceCountFilter(Filter):
-    """Filter to keep samples with the number of faces within a specific range."""
+    """Filter to keep samples with the number of faces within a specific range.
+
+    This operator uses an OpenCV classifier for face detection. It filters samples based on
+    the number of faces detected in the images, keeping only those with a face count within
+    the specified range. The operator supports two strategies: 'any' (keep if any image
+    meets the condition) and 'all' (keep only if all images meet the condition). The face
+    counts are cached in the 'face_counts' field. If no images are present in the sample,
+    the face count is set to an empty array."""
 
     _default_kwargs = {
         "scaleFactor": 1.1,
