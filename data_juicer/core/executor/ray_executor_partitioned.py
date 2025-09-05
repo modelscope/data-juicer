@@ -143,8 +143,8 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         # If partition_config is None (flat configuration), create a dict with flat values
         if partition_config is None:
             partition_config = {
-                "size": getattr(self.cfg, "partition_size", 10000),
-                "max_size_mb": getattr(self.cfg, "max_partition_size_mb", 128),
+                "rows": getattr(self.cfg, "partition_rows", 50000),
+                "size_in_mb": getattr(self.cfg, "partition_size_in_mb", 256),
             }
 
         # Check if auto-configuration is enabled
@@ -156,17 +156,17 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 "Resource optimization enabled - will analyze dataset and optimize partition size, worker count, and other resource-dependent settings"
             )
             # We'll configure this after loading the dataset
-            self.partition_size = None
-            self.max_partition_size_mb = None
+            self.partition_rows = None
+            self.partition_size_in_mb = None
         else:
             # Use manual configuration
             self.auto_configure_resources = False
-            self.partition_size = partition_config.get("size") or getattr(self.cfg, "partition_size", 10000)
-            self.max_partition_size_mb = partition_config.get("max_size_mb") or getattr(
-                self.cfg, "max_partition_size_mb", 128
+            self.partition_rows = partition_config.get("rows") or getattr(self.cfg, "partition_rows", 50000)
+            self.partition_size_in_mb = partition_config.get("size_in_mb") or getattr(
+                self.cfg, "partition_size_in_mb", 256
             )
             logger.info(
-                f"Manual resource configuration: partition_size={self.partition_size}, max_partition_size_mb={self.max_partition_size_mb}"
+                f"Manual resource configuration: partition_rows={self.partition_rows} rows, partition_size_in_mb={self.partition_size_in_mb} MB"
             )
 
         # Retry configuration (fixed defaults)
@@ -179,10 +179,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             "format", "parquet"
         )  # parquet, arrow, jsonl - for disk storage
         self.storage_compression = intermediate_storage_config.get("compression", "snappy")
-        self.parquet_batch_size = intermediate_storage_config.get(
-            "parquet_batch_size", 10000
-        )  # Number of rows per parquet file
-        logger.info(f"Using parquet batch size: {self.parquet_batch_size} rows per file")
 
         # File lifecycle management (now part of intermediate_storage config)
         self.preserve_intermediate_data = intermediate_storage_config.get("preserve_intermediate_data") or getattr(
@@ -192,6 +188,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         self.cleanup_on_success = intermediate_storage_config.get("cleanup_on_success", False)
         self.retention_policy = intermediate_storage_config.get("retention_policy", "keep_all")
         self.max_retention_days = intermediate_storage_config.get("max_retention_days", 7)
+
+        # Partition writing configuration
+        self.write_partitions = intermediate_storage_config.get("write_partitions", True)
+        logger.info(f"Partition writing: {'enabled' if self.write_partitions else 'disabled'}")
 
         # Checkpoint configuration
         checkpoint_cfg = getattr(self.cfg, "checkpoint", None)
@@ -218,17 +218,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         if self.checkpoint_strategy == CheckpointStrategy.DISABLED:
             self.checkpoint_enabled = False
 
-        # Initialize Ray
-        logger.info("Initializing Ray for partitioned execution...")
-        # Suppress macOS malloc stack logging warnings
-        os.environ["MALLOC_NANOZONE"] = "0"
-        try:
-            ray.init(getattr(self.cfg, "ray_address", "auto"))
-        except RuntimeError as e:
-            if "called ray.init twice" in str(e):
-                logger.info("Ray already initialized, continuing...")
-            else:
-                raise
         self.tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
 
         # Initialize dataset builder
@@ -435,9 +424,11 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         if format_type == "parquet":
             # For parquet, Ray creates a directory with the .parquet extension
             # and puts the actual parquet files inside that directory
-            # Use configurable batch size for optimal file sizes
+            # Write as a single parquet file by setting a very high row limit
             ray_dataset.write_parquet(
-                abs_file_path, num_rows_per_file=self.parquet_batch_size, compression=self.storage_compression
+                abs_file_path,
+                num_rows_per_file=1000000,  # Large number to ensure single file
+                compression=self.storage_compression,
             )
         elif format_type == "arrow":
             # OPTIMIZATION: Use Ray's built-in Arrow writing instead of materializing to Arrow table
@@ -458,25 +449,142 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             # Fallback to file-based estimation
             return max(1, int(ray.cluster_resources().get("CPU", 1) * 2))
 
+    def _calculate_partition_rows(self, sample_data=None):
+        """
+        Calculate the number of rows per partition based on configuration.
+
+        Uses either partition.rows (direct row count) or partition.size_in_mb (size-based calculation).
+        If both are provided, partition.rows takes precedence.
+
+        Args:
+            sample_data: Optional sample data to analyze row sizes (used when size_in_mb is specified)
+
+        Returns:
+            int: Number of rows per partition
+        """
+        # If partition_rows is explicitly set, use it
+        if hasattr(self, "partition_rows") and self.partition_rows is not None:
+            logger.info(f"Using explicit partition_rows: {self.partition_rows}")
+            return self.partition_rows
+
+        # If partition_size_in_mb is set, calculate rows based on data profile
+        if hasattr(self, "partition_size_in_mb") and self.partition_size_in_mb is not None:
+            if not sample_data:
+                logger.warning("partition_size_in_mb specified but no sample data available, using default 50000 rows")
+                return 50000
+
+            # Calculate average row size in bytes
+            total_size = 0
+            for record in sample_data:
+                total_size += len(json.dumps(record, default=str).encode("utf-8"))
+
+            avg_row_size_bytes = total_size / len(sample_data)
+
+            # Calculate rows needed for target partition size
+            target_size_bytes = self.partition_size_in_mb * 1024 * 1024
+            calculated_rows = int(target_size_bytes / avg_row_size_bytes)
+
+            # Clamp to reasonable bounds
+            calculated_rows = max(1000, min(calculated_rows, 1000000))
+
+            logger.info(f"Calculated partition rows from size_in_mb={self.partition_size_in_mb}MB:")
+            logger.info(f"  avg_row_size={avg_row_size_bytes:.1f} bytes")
+            logger.info(f"  calculated_rows={calculated_rows}")
+            logger.info(f"  estimated_partition_size={calculated_rows * avg_row_size_bytes / (1024*1024):.1f}MB")
+
+            return calculated_rows
+
+        # Fallback to default
+        logger.info("Using default partition_rows: 50000")
+        return 50000
+
+    def _should_skip_partitioning(self, dataset) -> bool:
+        """
+        Determine if partitioning should be skipped based on dataset characteristics.
+
+        Returns True if the dataset is already well-chunked and doesn't need partitioning.
+        """
+        try:
+            total_samples = dataset.data.count()
+
+            # Skip partitioning for small datasets
+            if total_samples < 10000:
+                logger.info(f"Dataset has {total_samples} samples - skipping partitioning (too small)")
+                return True
+
+            # Check if dataset is already well-chunked
+            ray_dataset = dataset.data
+            num_blocks = ray_dataset.num_blocks()
+
+            # If dataset has many small blocks, it's already well-chunked
+            if num_blocks > 10 and total_samples / num_blocks < 5000:
+                logger.info(
+                    f"Dataset has {num_blocks} blocks with ~{total_samples // num_blocks} samples each - already well-chunked"
+                )
+                return True
+
+            # Check if we're in a simple processing scenario
+            if hasattr(self.cfg, "process") and len(self.cfg.process) <= 3:
+                logger.info(
+                    f"Simple processing pipeline ({len(self.cfg.process)} operations) - considering skipping partitioning"
+                )
+                # Could add more logic here to determine if operations are lightweight
+
+            return False
+
+        except Exception as e:
+            logger.warning(f"Could not determine if partitioning should be skipped: {e}")
+            return False
+
     def _create_partitions_with_mapping(self, dataset) -> Tuple[List[str], DatasetMapping]:
         """Create partitions from the dataset with preserved mapping."""
         logger.info("Creating dataset partitions with mapping...")
+
+        # Check if we should skip partitioning (unless forced)
+        force_partitioning = (
+            getattr(self.cfg.partition, "force_partitioning", False) if hasattr(self.cfg, "partition") else False
+        )
+        if not force_partitioning and self._should_skip_partitioning(dataset):
+            logger.info("Skipping partitioning - using original dataset structure")
+            # Return the original dataset as a single "partition"
+            original_dataset_path = self.cfg.dataset_path
+            total_samples = dataset.data.count()
+
+            self.dataset_mapping = DatasetMapping(
+                original_dataset_path=original_dataset_path,
+                original_dataset_size=total_samples,
+                partition_count=1,
+                partition_size=total_samples,
+            )
+
+            # Return the original dataset path as the single partition
+            return [original_dataset_path], self.dataset_mapping
 
         # Get original dataset information
         original_dataset_path = self.cfg.dataset_path
         total_samples = dataset.data.count()
 
-        # Calculate partition count and sizes
-        partition_count, partition_sizes = self._calculate_partition_sizes(total_samples)
+        # Sample data for size calculation if needed
+        sample_data = None
+        if hasattr(self, "partition_size_in_mb") and self.partition_size_in_mb is not None:
+            # Sample a small amount of data to analyze row sizes
+            sample_size = min(100, total_samples)
+            sample_data = dataset.data.take(sample_size)
+
+        # Calculate partition count and sizes using unified logic
+        partition_count, partition_sizes = self._calculate_partition_sizes(total_samples, sample_data)
         logger.info(f"Creating {partition_count} partitions from {total_samples} samples...")
         logger.info(f"Partition sizes: {partition_sizes}")
+
+        # Get the actual rows per partition for dataset mapping
+        rows_per_partition = self._calculate_partition_rows(sample_data)
 
         # Initialize dataset mapping
         self.dataset_mapping = DatasetMapping(
             original_dataset_path=original_dataset_path,
             original_dataset_size=total_samples,
             partition_count=partition_count,
-            partition_size=self.partition_size,
+            partition_size=rows_per_partition,
         )
 
         # Save partitions to disk with metadata
@@ -485,22 +593,31 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         # Use Ray's distributed split instead of materializing everything in memory
         # This keeps data distributed and is much more memory efficient
         #
-        # Note: We're using Ray's repartition approach because Ray datasets don't support skip() or slice() methods.
-        # This creates equal-sized partitions which is more memory efficient than materializing the entire dataset.
-        # While we lose precise control over partition boundaries, we gain significant memory efficiency
-        # and better distributed processing capabilities.
+        # Note: We're using Ray's repartition to create exactly the number of partitions we need.
+        # This gives us Ray's distributed processing benefits while maintaining control over partition count.
+        # Partition writing is optional - can be disabled for better performance when intermediate files aren't needed.
         ray_dataset = dataset.data
 
-        # Create partitions with exact sizes using Ray's capabilities
-        # We'll use a more efficient approach that avoids materializing the entire dataset
-        # and keeps data as Ray datasets throughout the process for maximum memory efficiency
+        # Create exactly the number of Ray partitions we need
+        # This is much more efficient than creating many partitions and manually combining them
+        logger.info(f"Creating exactly {partition_count} Ray partitions for direct writing")
+
+        # Use Ray's split to create the exact number of partitions we want
+        # This should be more efficient than repartition for equal-sized splits
+        ray_partitions = ray_dataset.split(partition_count)
+
+        logger.info(f"Created {len(ray_partitions)} Ray partitions using split()")
+
+        # Create partitions by writing each Ray partition directly to disk
+        # This eliminates the need for manual data combination and is much more efficient
         start_idx = 0
         for i in range(partition_count):
             partition_size = partition_sizes[i]
             end_idx = start_idx + partition_size
 
-            # Create partition path
-            partition_path = os.path.join(self.partitions_dir, f"partition_{i:06d}.parquet")
+            # Create base partition path (will be updated based on storage format and write_partitions setting)
+            base_partition_name = f"partition_{i:06d}"
+            partition_path = os.path.join(self.partitions_dir, f"{base_partition_name}.parquet")
 
             # Log individual partition creation start
             partition_creation_start = time.time()
@@ -520,99 +637,99 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 )
             )
 
-            # Extract partition data using Ray's native repartitioning
-            # This is much more memory efficient and distributed-friendly
-            # We'll use repartition to create equal-sized partitions
-            # Note: This approach creates equal-sized partitions, which may differ from the calculated sizes
-            # but is much more efficient than materializing the entire dataset
+            # Get the i-th Ray partition directly from the split result
+            # This is much more efficient than manually combining multiple small partitions
+            logger.info(f"Processing partition {i} from Ray split partition {i}")
 
-            # Use Ray's repartition method to create equal-sized partitions
-            # This is the most efficient approach available in Ray
-            partitions = ray_dataset.repartition(partition_count)
+            # Get the actual partition dataset from the split result
+            partition_dataset = ray_partitions[i]
 
-            # Get the specific partition by index
-            # Note: repartition creates equal-sized partitions, so we need to adjust our approach
-            # We'll use the partition size from repartition rather than our calculated size
-            actual_partition_size = partitions.count() // partition_count
-            partition_data = partitions.take(actual_partition_size)
+            # Get sample count for this partition
+            partition_sample_count = partition_dataset.count()
 
-            # Save partition to disk using configurable format
-            if self.storage_format == "parquet":
-                # Use Parquet for best performance and compression
-                # Use absolute path to avoid Ray worker file system issues
-                partition_path_abs = os.path.abspath(partition_path)
-                os.makedirs(partition_path_abs, exist_ok=True)
-                # Create a new Ray dataset from the partition data
-                partition_dataset = ray.data.from_items(partition_data)
-                # Use configurable batch size for optimal file sizes
-                partition_dataset.write_parquet(
-                    partition_path_abs, num_rows_per_file=self.parquet_batch_size, compression=self.storage_compression
-                )
-                partition_path = partition_path_abs
-            elif self.storage_format == "arrow":
-                # Use Arrow (Feather) for memory mapping and zero-copy reads
-                # Append .arrow extension for proper file identification
-                partition_path = partition_path + ".arrow"
-                # Ensure directory exists before writing
-                os.makedirs(os.path.dirname(partition_path), exist_ok=True)
+            # Calculate start and end indices for this partition
+            start_idx = i * partition_size
+            end_idx = start_idx + partition_sample_count
 
-                # OPTIMIZATION: Avoid materializing to Arrow table - write directly from Ray dataset
-                # This eliminates the memory overhead of converting to Arrow format
-                partition_dataset = ray.data.from_items(partition_data)
-                # Use Ray's built-in Arrow writing capability for maximum efficiency
-                partition_dataset.write_arrow(partition_path)
-            else:
-                # Fallback to JSONL for compatibility
-                partition_path = partition_path + ".jsonl"
-                partition_dataset = ray.data.from_items(partition_data)
-                partition_dataset.write_json(partition_path, force_ascii=False)
+            # Optionally write partition to disk based on configuration
+            if self.write_partitions:
+                # Save partition to disk using configurable format
+                if self.storage_format == "parquet":
+                    # Use Parquet for best performance and compression
+                    partition_path_abs = os.path.abspath(partition_path)
+                    os.makedirs(os.path.dirname(partition_path_abs), exist_ok=True)
 
-            # Get file size
-            file_size = os.path.getsize(partition_path)
+                    # Write partition directly using the split dataset
+                    # This is much more efficient than converting to items and back
+                    # Use a large number to ensure single file per partition
+                    partition_dataset.write_parquet(
+                        partition_path_abs,
+                        num_rows_per_file=1000000,  # Large number to ensure single file per partition
+                        compression=self.storage_compression,
+                    )
+                    partition_path = partition_path_abs
+                elif self.storage_format == "arrow":
+                    # Use Arrow (Feather) for memory mapping and zero-copy reads
+                    partition_path = partition_path + ".arrow"
+                    os.makedirs(os.path.dirname(partition_path), exist_ok=True)
+                    partition_dataset.write_arrow(partition_path)
+                else:
+                    # Fallback to JSONL for compatibility
+                    partition_path = partition_path + ".jsonl"
+                    partition_dataset.write_json(partition_path, force_ascii=False)
 
-            # Calculate checksum - we already have the partition data
-            checksum = self._calculate_checksum(partition_data)
+                # Get file size and calculate checksum
+                file_size = os.path.getsize(partition_path)
+                # For checksum, we need to materialize a small sample
+                sample_for_checksum = partition_dataset.take(min(100, partition_sample_count))
+                checksum = self._calculate_checksum(sample_for_checksum)
 
-            # Create partition metadata
-            partition_metadata = PartitionMetadata(
-                partition_id=i,
-                original_start_idx=start_idx,
-                original_end_idx=end_idx,
-                sample_count=partition_size,
-                file_size_bytes=file_size,
-                checksum=checksum,
-                created_timestamp=time.time(),
-            )
-
-            if self.dataset_mapping.partitions is not None:
-                self.dataset_mapping.partitions.append(partition_metadata)
-            partition_paths.append(partition_path)
-
-            logger.info(
-                f"Created partition {i+1}/{partition_count}: {partition_path} "
-                f"({partition_size} samples, {file_size} bytes)"
-            )
-
-            # Log individual partition creation complete
-            partition_creation_complete = time.time()
-            partition_creation_duration = partition_creation_complete - partition_creation_start
-            self._log_processing_event(
-                ProcessingEvent(
-                    event_id=f"partition_creation_complete_{i}_{int(partition_creation_complete)}",
-                    event_type="partition_creation_complete",
-                    timestamp=partition_creation_complete,
+                # Create partition metadata
+                partition_metadata = PartitionMetadata(
                     partition_id=i,
-                    message=f"Partition {i} creation completed - {partition_size} samples in {partition_creation_duration:.2f}s",
-                    metadata={
-                        "partition_id": i,
-                        "partition_path": partition_path,
-                        "sample_count": partition_size,
-                        "file_size_bytes": file_size,
-                        "checksum": checksum,
-                        "duration_seconds": partition_creation_duration,
-                    },
+                    original_start_idx=start_idx,
+                    original_end_idx=end_idx,
+                    sample_count=partition_sample_count,
+                    file_size_bytes=file_size,
+                    checksum=checksum,
+                    created_timestamp=time.time(),
                 )
-            )
+
+                # Add partition metadata and path
+                if self.dataset_mapping.partitions is not None:
+                    self.dataset_mapping.partitions.append(partition_metadata)
+                partition_paths.append(partition_path)
+
+                logger.info(
+                    f"Created partition {i+1}/{partition_count}: {partition_path} "
+                    f"({partition_sample_count} samples, {file_size} bytes)"
+                )
+
+                # Log partition creation complete
+                partition_creation_complete = time.time()
+                partition_creation_duration = partition_creation_complete - partition_creation_start
+                self._log_processing_event(
+                    ProcessingEvent(
+                        event_id=f"partition_creation_complete_{i}_{int(partition_creation_complete)}",
+                        event_type="partition_creation_complete",
+                        timestamp=partition_creation_complete,
+                        partition_id=i,
+                        message=f"Partition {i} creation completed - {partition_sample_count} samples in {partition_creation_duration:.2f}s",
+                        metadata={
+                            "partition_id": i,
+                            "partition_path": partition_path,
+                            "sample_count": partition_sample_count,
+                            "file_size_bytes": file_size,
+                            "checksum": checksum,
+                            "duration_seconds": partition_creation_duration,
+                        },
+                    )
+                )
+            else:
+                # Skip writing to disk - just create virtual partition paths
+                partition_path = os.path.join(self.partitions_dir, f"{base_partition_name}_virtual")
+                partition_paths.append(partition_path)
+                logger.info(f"Partition {i} created in memory (no disk writing)")
 
             # Update start index for next partition
             start_idx = end_idx
@@ -620,28 +737,31 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         logger.info(f"Successfully created {len(partition_paths)} partitions")
         return partition_paths, self.dataset_mapping
 
-    def _calculate_partition_sizes(self, total_samples: int) -> Tuple[int, List[int]]:
-        """Calculate partition count and sizes ensuring each partition (except last) has exactly partition_size samples."""
+    def _calculate_partition_sizes(self, total_samples: int, sample_data=None) -> Tuple[int, List[int]]:
+        """Calculate partition count and sizes based on unified partition configuration."""
         if total_samples <= 0:
             return 1, [0]
 
+        # Get the number of rows per partition using unified logic
+        rows_per_partition = self._calculate_partition_rows(sample_data)
+
         # Calculate how many full partitions we can have
-        full_partitions = total_samples // self.partition_size
+        full_partitions = total_samples // rows_per_partition
 
         # Calculate remaining samples
-        remaining_samples = total_samples % self.partition_size
+        remaining_samples = total_samples % rows_per_partition
 
         # Determine partition count
         if remaining_samples == 0:
             # Perfect division - all partitions are full
             partition_count = full_partitions
-            partition_sizes = [self.partition_size] * partition_count
+            partition_sizes = [rows_per_partition] * partition_count
         else:
             # We need one more partition for the remaining samples
             partition_count = full_partitions + 1
-            partition_sizes = [self.partition_size] * full_partitions + [remaining_samples]
+            partition_sizes = [rows_per_partition] * full_partitions + [remaining_samples]
 
-        logger.info(f"Partition calculation: {total_samples} samples, {self.partition_size} per partition")
+        logger.info(f"Partition calculation: {total_samples} samples, {rows_per_partition} rows per partition")
         logger.info(f"Full partitions: {full_partitions}, remaining: {remaining_samples}")
         logger.info(f"Total partitions: {partition_count}")
         logger.info(f"Partition sizes: {partition_sizes}")
@@ -1408,12 +1528,12 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 recommendations = auto_configure_resources(self.cfg, dataset, ops)
 
                 # Apply recommendations
-                self.partition_size = recommendations["recommended_partition_size"]
-                self.max_partition_size_mb = recommendations["recommended_max_size_mb"]
+                self.partition_rows = recommendations["recommended_partition_size"]
+                self.partition_size_in_mb = recommendations["recommended_max_size_mb"]
 
                 logger.info(f"Resource optimization completed:")
-                logger.info(f"  Partition size: {self.partition_size} samples")
-                logger.info(f"  Max partition size: {self.max_partition_size_mb} MB")
+                logger.info(f"  Partition rows: {self.partition_rows}")
+                logger.info(f"  Partition size: {self.partition_size_in_mb} MB")
                 logger.info(f"  Worker count: {getattr(self.cfg, 'np', 'Not set')}")
                 logger.info(f"  Primary modality: {recommendations['primary_modality']}")
                 logger.info(f"  Data characteristics: {recommendations['data_characteristics']}")
@@ -1422,12 +1542,12 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
 
             except Exception as e:
                 logger.warning(f"Resource optimization failed: {e}, falling back to default values")
-                self.partition_size = 10000
-                self.max_partition_size_mb = 128
+                self.partition_rows = 50000
+                self.partition_size_in_mb = 256
 
         # Create partitions FIRST to determine actual partition count
         logger.info(
-            f"Creating new partitions with size: {self.partition_size}, max_size_mb: {self.max_partition_size_mb}..."
+            f"Creating new partitions with unified sizing: rows={getattr(self, 'partition_rows', 'auto')}, size_in_mb={getattr(self, 'partition_size_in_mb', 'auto')}..."
         )
 
         # Log repartition start event

@@ -925,19 +925,19 @@ def auto_configure_resources(cfg, dataset, process_pipeline: List) -> Dict:
             cfg.partition = {}
 
         logger.info(f"Current cfg.partition: {cfg.partition}")
-        logger.info(f"Setting partition.size to: {recommendations['recommended_partition_size']}")
-        logger.info(f"Setting partition.max_size_mb to: {recommendations['recommended_max_size_mb']}")
+        logger.info(f"Setting partition.rows to: {recommendations['recommended_partition_size']}")
+        logger.info(f"Setting partition.size_in_mb to: {recommendations['recommended_max_size_mb']}")
         logger.info(f"Setting np to: {recommendations['recommended_worker_count']}")
 
-        cfg.partition["size"] = recommendations["recommended_partition_size"]
-        cfg.partition["max_size_mb"] = recommendations["recommended_max_size_mb"]
+        cfg.partition["rows"] = recommendations["recommended_partition_size"]
+        cfg.partition["size_in_mb"] = recommendations["recommended_max_size_mb"]
 
         # Update worker count
         cfg.np = recommendations["recommended_worker_count"]
 
         logger.info("Resource optimization completed:")
-        logger.info(f"  partition.size: {cfg.partition['size']}")
-        logger.info(f"  partition.max_size_mb: {cfg.partition['max_size_mb']}")
+        logger.info(f"  partition.rows: {cfg.partition['rows']}")
+        logger.info(f"  partition.size_in_mb: {cfg.partition['size_in_mb']}")
         logger.info(f"  np (worker count): {cfg.np}")
 
         return recommendations
