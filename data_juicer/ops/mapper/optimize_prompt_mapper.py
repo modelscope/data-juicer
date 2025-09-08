@@ -27,6 +27,8 @@ class OptimizePromptMapper(Mapper):
     Mapper to optimize prompts based on the existing ones.
     This OP will use the existing prompts in the same batch and newly optimized prompts as the examples to optimize
     the next ones.
+
+    Reference: https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html
     """
 
     DEFAULT_SYSTEM_PROMPT = (
