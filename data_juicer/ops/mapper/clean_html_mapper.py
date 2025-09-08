@@ -13,7 +13,13 @@ OP_NAME = "clean_html_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class CleanHtmlMapper(Mapper):
-    """Mapper to clean html code in text samples."""
+    """Cleans HTML code from text samples, converting HTML to plain text.
+
+    This operator processes text samples by removing HTML tags and converting HTML elements
+    to a more readable format. Specifically, it replaces `<li>` and `<ol>` tags with newline
+    and bullet points. The Selectolax HTML parser is used to extract the text content from
+    the HTML. This operation is performed in a batched manner, making it efficient for large
+    datasets."""
 
     _batched_op = True
 

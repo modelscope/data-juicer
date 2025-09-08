@@ -13,12 +13,13 @@ transformers = LazyLoader("transformers")
 @LOADED_IMAGES.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class MllmMapper(Mapper):
-    """Mapper to use MLLMs for visual question answering tasks.
-    Recommended model list: [
-        llava-hf/llava-v1.6-vicuna-7b-hf,
-        Qwen/Qwen2-VL-7B-Instruct,
-    ]
-    """
+    """Mapper to use MLLMs for visual question answering tasks. This operator uses a Hugging
+    Face model to generate answers based on input text and images. It supports models like
+    `llava-hf/llava-v1.6-vicuna-7b-hf` and `Qwen/Qwen2-VL-7B-Instruct`. The operator
+    processes each sample, loading and processing images, and generating responses using the
+    specified model. The generated responses are appended to the sample's text field. The
+    key parameters include the model ID, maximum new tokens, temperature, top-p sampling,
+    and beam search size, which control the generation process."""
 
     _accelerator = "cuda"
 
@@ -49,8 +50,8 @@ class MllmMapper(Mapper):
         """
         torch.set_num_threads(1)
 
-        kwargs.setdefault("mem_required", "32GB")
-        kwargs.setdefault("num_proc", 1)
+        kwargs["mem_required"] = "32GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
+        kwargs["num_proc"] = 1 if kwargs.get("num_proc", None) is None else kwargs["num_proc"]
         super().__init__(*args, **kwargs)
 
         self.hf_model = hf_model

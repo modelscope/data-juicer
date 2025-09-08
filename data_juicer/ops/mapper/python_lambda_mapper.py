@@ -7,7 +7,14 @@ OP_NAME = "python_lambda_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class PythonLambdaMapper(Mapper):
-    """Mapper for executing Python lambda function on data samples."""
+    """Mapper for applying a Python lambda function to data samples.
+
+    This operator allows users to define a custom transformation using a Python lambda
+    function. The lambda function is applied to each sample, and the result must be a
+    dictionary. If the `batched` parameter is set to True, the lambda function will process
+    a batch of samples at once. If no lambda function is provided, the identity function is
+    used, which returns the input sample unchanged. The operator validates the lambda
+    function to ensure it has exactly one argument and compiles it safely."""
 
     def __init__(self, lambda_str: str = "", batched: bool = False, **kwargs):
         """

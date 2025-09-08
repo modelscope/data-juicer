@@ -22,10 +22,16 @@ OP_NAME = "video_resize_resolution_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoResizeResolutionMapper(Mapper):
-    """
-    Mapper to resize videos resolution. We leave the super resolution
-    with deep learning for future works.
-    """
+    """Resizes video resolution based on specified width and height constraints.
+
+    This operator resizes videos to fit within the provided minimum and maximum width and
+    height limits. It can optionally maintain the original aspect ratio by adjusting the
+    dimensions accordingly. The resized videos are saved in the specified directory or the
+    same directory as the input if no save directory is provided. The key metric for
+    resizing is the video's width and height, which are adjusted to meet the constraints
+    while maintaining the aspect ratio if configured. The `force_divisible_by` parameter
+    ensures that the output dimensions are divisible by a specified integer, which must be a
+    positive even number when used with aspect ratio adjustments."""
 
     def __init__(
         self,

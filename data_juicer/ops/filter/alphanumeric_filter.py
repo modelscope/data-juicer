@@ -11,8 +11,15 @@ OP_NAME = "alphanumeric_filter"
 
 @OPERATORS.register_module("alphanumeric_filter")
 class AlphanumericFilter(Filter):
-    """Filter to keep samples with alphabet/numeric ratio within a specific
-    range."""
+    """Filter to keep samples with an alphabet/numeric ratio within a specific range.
+
+    This operator filters samples based on the ratio of alphanumeric characters or tokens.
+    It keeps samples where the ratio of alphanumeric characters (or tokens) to the total
+    number of characters (or tokens) is within the specified range. The ratio is computed
+    either character-based or token-based, depending on the `tokenization` parameter. If
+    `tokenization` is True, it uses a Hugging Face tokenizer to count tokens. The key metric
+    used for filtering is 'alpha_token_ratio' if tokenization is enabled, otherwise
+    'alnum_ratio'. The operator caches these metrics in the stats field for each sample."""
 
     _batched_op = True
 

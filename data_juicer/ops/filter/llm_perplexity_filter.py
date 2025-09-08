@@ -20,7 +20,15 @@ OP_NAME = "llm_perplexity_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class LLMPerplexityFilter(Filter):
-    """Filter to keep samples with perplexity score, computed using a specified llm, within a specific range."""
+    """Filter to keep samples with perplexity scores within a specified range, computed using a
+    specified LLM.
+
+    This operator computes the perplexity score for each sample using a Hugging Face LLM. It
+    then filters the samples based on whether their perplexity scores fall within the
+    specified minimum and maximum score range. The perplexity score is calculated as the
+    exponential of the loss value from the LLM. The operator uses a query and response
+    template to format the input text for the LLM. If the perplexity score is not already
+    cached in the sample's stats under the key 'llm_perplexity', it will be computed."""
 
     _accelerator = "cuda"
 

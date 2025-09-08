@@ -15,11 +15,16 @@ OP_NAME = "dialog_topic_detection_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class DialogTopicDetectionMapper(Mapper):
-    """
-    Mapper to generate user's topic labels in dialog. Input from
-    history_key, query_key and response_key. Output lists of
-    labels and analysis for queries in the dialog.
-    """
+    """Generates user's topic labels and analysis in a dialog.
+
+    This operator processes a dialog to detect and label the topics discussed by the user.
+    It takes input from `history_key`, `query_key`, and `response_key` and outputs lists of
+    labels and analysis for each query in the dialog. The operator uses a predefined system
+    prompt and templates to build the input prompt for the API call. It supports customizing
+    the system prompt, templates, and patterns for parsing the API response. The results are
+    stored in the `meta` field under the keys specified by `labels_key` and `analysis_key`.
+    If these keys already exist in the `meta` field, the operator skips processing. The
+    operator retries the API call up to `try_num` times in case of errors."""
 
     DEFAULT_SYSTEM_PROMPT = (
         "请判断用户和LLM多轮对话中用户所讨论的话题。\n"

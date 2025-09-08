@@ -7,12 +7,13 @@ from ..base_op import OPERATORS, Mapper
 
 @OPERATORS.register_module("remove_table_text_mapper")
 class RemoveTableTextMapper(Mapper):
-    """
-    Mapper to remove table texts from text samples.
+    """Mapper to remove table texts from text samples.
 
-    Regular expression is used to remove tables in the range of column
-    number of tables.
-    """
+    This operator uses regular expressions to identify and remove tables from the text. It
+    targets tables with a specified range of columns, defined by the minimum and maximum
+    number of columns. The operator iterates over each sample, applying the regex pattern to
+    remove tables that match the column criteria. The processed text, with tables removed,
+    is then stored back in the sample. This operation is batched for efficiency."""
 
     _batched_op = True
 

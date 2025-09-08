@@ -182,9 +182,18 @@ class FusedFilter(Filter):
 
 @OPERATORS.register_module("general_fused_op")
 class GeneralFusedOP(Mapper):
-    """An explicitly fused operator designed to execute multiple sequential
-    operations (OPs) on the same batch, enabling fine-grained control over
-    data processing."""
+    """An explicitly fused operator designed to execute multiple sequential operations (OPs) on
+    the same batch, enabling fine-grained control over data processing.
+
+    This operator allows for the chaining of multiple data processing steps, such as mappers
+    and filters, into a single pass. It processes each batch of samples sequentially through
+    the defined operations, ensuring that all specified transformations are applied in
+    order. The operator supports both mappers, which transform data, and filters, which
+    remove or keep samples based on computed statistics. Context variables can be passed
+    between operations if needed. The accelerator is set to 'cuda' if any of the fused
+    operations use it. The number of processes is determined by the minimum value among all
+    fused operations. After processing, any temporary context variables, such as those used
+    for video containers, are cleaned up."""
 
     _batched_op = True
 

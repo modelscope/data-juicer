@@ -11,8 +11,15 @@ from ..base_op import OPERATORS, Selector
 
 @OPERATORS.register_module("topk_specified_field_selector")
 class TopkSpecifiedFieldSelector(Selector):
-    """Selector to select top samples based on the sorted specified field
-    value."""
+    """Selects top samples based on the sorted values of a specified field.
+
+    This operator selects the top samples from a dataset based on the values of a specified
+    field. The field can be multi-level, with keys separated by dots. The selection is based
+    on either a specified ratio of the dataset or a fixed number of top samples. If both
+    `top_ratio` and `topk` are provided, the one resulting in fewer samples is used. The
+    sorting order can be ascending or descending, controlled by the `reverse` parameter. The
+    key metric is the value of the specified field, and the operator uses this to determine
+    which samples to keep."""
 
     def __init__(
         self,
