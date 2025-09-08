@@ -9,8 +9,13 @@ from ..base_op import OPERATORS, Mapper
 
 @OPERATORS.register_module("remove_header_mapper")
 class RemoveHeaderMapper(Mapper):
-    """Mapper to remove headers at the beginning of documents in Latex
-    samples."""
+    """Removes headers at the beginning of documents in LaTeX samples.
+
+    This operator identifies and removes headers such as chapter, part, section, subsection,
+    subsubsection, paragraph, and subparagraph. It uses a regular expression to match these
+    headers. If a sample does not contain any headers and `drop_no_head` is set to True, the
+    sample text will be removed. Otherwise, the sample remains unchanged. The operator
+    processes samples in batches for efficiency."""
 
     _batched_op = True
 

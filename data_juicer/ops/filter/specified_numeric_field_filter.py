@@ -21,12 +21,18 @@ OP_NAME = "specified_numeric_field_filter"
 @NON_STATS_FILTERS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class SpecifiedNumericFieldFilter(Filter):
-    """
-    Filter based on specified numeric field information.
+    """Filter samples based on a specified numeric field value.
 
-    If the specified numeric information in the sample is not within the
-    specified range, the sample will be filtered.
-    """
+    This operator filters out samples if the numeric value in the specified field is not
+    within the given range. The field can be multi-level, with keys separated by dots. The
+    sample is kept if the numeric value is between the minimum and maximum values,
+    inclusive. If the field key is not provided, all samples are retained. The operator
+    ensures that the field exists in the sample and that its value is numeric before
+    performing the comparison.
+
+    - Uses the 'min_value' and 'max_value' to define the acceptable range.
+    - Supports multi-level fields using dot-separated keys.
+    - Returns False for non-numeric or out-of-range values, filtering the sample."""
 
     def __init__(
         self, field_key: str = "", min_value: float = -sys.maxsize, max_value: float = sys.maxsize, *args, **kwargs

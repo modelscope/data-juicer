@@ -20,9 +20,15 @@ OP_NAME = "extract_keyword_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractKeywordMapper(Mapper):
-    """
-    Generate keywords for the text
-    """
+    """Generate keywords for the text.
+
+    This operator uses a specified API model to generate high-level keywords that summarize
+    the main concepts, themes, or topics of the input text. The generated keywords are
+    stored in the meta field under the key specified by `keyword_key`. The operator retries
+    the API call up to `try_num` times in case of errors. If `drop_text` is set to True, the
+    original text is removed from the sample after processing. The operator uses a default
+    prompt template and completion delimiter, which can be customized. The output is parsed
+    using a regular expression to extract the keywords."""
 
     # This prompt is modified from light RAG
     # https://github.com/HKUDS/LightRAG

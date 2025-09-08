@@ -26,7 +26,16 @@ def replace_func(match, scene_counts_iter):
 
 @OPERATORS.register_module(OP_NAME)
 class VideoSplitBySceneMapper(Mapper):
-    """Mapper to cut videos into scene clips."""
+    """Splits videos into scene clips based on detected scene changes.
+
+    This operator uses a specified scene detector to identify and split video scenes. It
+    supports three types of detectors: ContentDetector, ThresholdDetector, and
+    AdaptiveDetector. The operator processes each video in the sample, detects scenes, and
+    splits the video into individual clips. The minimum length of a scene can be set, and
+    progress can be shown during processing. The resulting clips are saved in the specified
+    directory or the same directory as the input files if no save directory is provided. The
+    operator also updates the text field in the sample to reflect the new video clips. If a
+    video does not contain any scenes, it remains unchanged."""
 
     # Define shared detector keys and their properties
     avaliable_detectors = {

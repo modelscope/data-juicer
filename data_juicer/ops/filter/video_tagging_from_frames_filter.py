@@ -18,7 +18,16 @@ OP_NAME = "video_tagging_from_frames_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoTaggingFromFramesFilter(Filter):
-    """Filter to keep samples whose videos contain the given tags."""
+    """Filter to keep samples whose videos contain specified tags.
+
+    This operator filters video samples based on the presence of given tags in the video
+    frames. It uses a Hugging Face tokenizer to extract and tag frames. The filtering can be
+    configured to require any or all of the specified tags to be present. The operator
+    supports two frame sampling methods: "all_keyframes" and "uniform". When using
+    "uniform", the number of frames to sample can be specified. The extracted tags are
+    stored in the meta field with the key 'video_frame_tags' by default. The decision to
+    keep a sample is based on whether any or all of the video frames meet the tag criteria,
+    as specified by the 'any_or_all' parameter."""
 
     _accelerator = "cuda"
 
@@ -63,7 +72,7 @@ class VideoTaggingFromFramesFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "9GB")
+        kwargs["mem_required"] = "9GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         if contain not in ["any", "all"]:
             raise ValueError(

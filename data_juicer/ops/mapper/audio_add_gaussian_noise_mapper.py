@@ -19,11 +19,14 @@ OP_NAME = "audio_add_gaussian_noise_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_AUDIOS.register_module(OP_NAME)
 class AudioAddGaussianNoiseMapper(Mapper):
-    """
+    """Mapper to add Gaussian noise to audio samples.
 
-    Mapper to add gaussian noise to audio.
-
-    """
+    This operator adds Gaussian noise to audio data with a specified probability. The
+    amplitude of the noise is randomly chosen between `min_amplitude` and `max_amplitude`.
+    If `save_dir` is provided, the modified audio files are saved in that directory;
+    otherwise, they are saved in the same directory as the input files. The `p` parameter
+    controls the probability of applying this transformation to each sample. If no audio is
+    present in the sample, it is returned unchanged."""
 
     def __init__(
         self,

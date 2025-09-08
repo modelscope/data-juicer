@@ -16,10 +16,15 @@ OP_NAME = "image_watermark_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageWatermarkFilter(Filter):
-    """
-    Filter to keep samples whose images have no watermark with high
-    probability.
-    """
+    """Filter to keep samples whose images have no watermark with high probability.
+
+    This operator uses a Hugging Face watermark detection model to filter samples based on
+    the presence of watermarks in their images. It keeps samples where the predicted
+    watermark probability is below a specified threshold. The operator supports two
+    strategies: 'any' (keep if any image meets the condition) and 'all' (keep only if all
+    images meet the condition). The key metric 'image_watermark_prob' is computed for each
+    image, representing the probability that the image contains a watermark. If no images
+    are present in the sample, the metric is set to an empty array."""
 
     _accelerator = "cuda"
 
@@ -47,7 +52,7 @@ class ImageWatermarkFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "500MB")
+        kwargs["mem_required"] = "500MB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self.prob_threshold = prob_threshold
         if any_or_all not in ["any", "all"]:

@@ -95,8 +95,17 @@ def run_ner(caption, pos_tagger=None):
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class PhraseGroundingRecallFilter(Filter):
-    """Filter to keep samples whose locating recalls of phrases extracted
-    from text in the images are within a specified range."""
+    """Filter to keep samples based on the phrase grounding recall of phrases extracted from
+    text in images.
+
+    This operator uses a Hugging Face Owl-ViT model to locate phrases extracted from the
+    text within the images. It keeps samples where the phrase grounding recall is within a
+    specified range. The recall is computed by comparing the number of correctly located
+    phrases to the total number of phrases. The operator can handle multiple images per text
+    chunk and supports different strategies for reducing the recall values (e.g., average,
+    max, min). It also allows for flipping images horizontally or vertically. The key metric
+    'phrase_grounding_recall' is computed and stored in the sample's stats. If no images are
+    present, the recall is set to an empty array."""
 
     _accelerator = "cuda"
 
@@ -148,7 +157,7 @@ class PhraseGroundingRecallFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "1GB")
+        kwargs["mem_required"] = "1GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self.min_recall = min_recall
         self.max_recall = max_recall

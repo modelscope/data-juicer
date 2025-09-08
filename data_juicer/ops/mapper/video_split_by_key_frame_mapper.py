@@ -28,7 +28,16 @@ OP_NAME = "video_split_by_key_frame_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoSplitByKeyFrameMapper(Mapper):
-    """Mapper to split video by key frame."""
+    """Splits a video into segments based on key frames.
+
+    This operator processes video data by splitting it into multiple segments at key frame
+    boundaries. It uses the key frames to determine where to make the splits. The original
+    sample can be kept or discarded based on the `keep_original_sample` parameter. If
+    `save_dir` is specified, the split video files will be saved in that directory;
+    otherwise, they will be saved in the same directory as the input files. The operator
+    processes each video in the sample and updates the sample with the new video keys and
+    text placeholders. The `Fields.source_file` field is updated to reflect the new video
+    segments. This operator works in batch mode, processing multiple samples at once."""
 
     _batched_op = True
 

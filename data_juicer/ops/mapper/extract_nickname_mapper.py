@@ -16,9 +16,16 @@ OP_NAME = "extract_nickname_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractNicknameMapper(Mapper):
-    """
-    Extract nickname relationship in the text.
-    """
+    """Extracts nickname relationships in the text using a language model.
+
+    This operator uses a language model to identify and extract nickname relationships from
+    the input text. It follows specific instructions to ensure accurate extraction, such as
+    identifying the speaker, the person being addressed, and the nickname used. The
+    extracted relationships are stored in the meta field under the specified key. The
+    operator uses a default system prompt, input template, and output pattern, but these can
+    be customized. The results are parsed and validated to ensure they meet the required
+    format. If the text already contains the nickname information, it is not processed
+    again. The operator retries the API call a specified number of times if an error occurs."""
 
     DEFAULT_SYSTEM_PROMPT = (
         "给定你一段文本，你的任务是将人物之间的称呼方式（昵称）提取出来。\n"

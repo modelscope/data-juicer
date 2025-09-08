@@ -17,7 +17,14 @@ OP_NAME = "image_tagging_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageTaggingMapper(Mapper):
-    """Mapper to generate image tags."""
+    """Generates image tags for each image in the sample.
+
+    This operator processes images to generate descriptive tags. It uses a Hugging Face
+    model to analyze the images and produce relevant tags. The tags are stored in the
+    specified field, defaulting to 'image_tags'. If the tags are already present in the
+    sample, the operator will not recompute them. For samples without images, an empty tag
+    array is assigned. The generated tags are sorted by frequency and stored as a list of
+    strings."""
 
     _accelerator = "cuda"
 
@@ -29,7 +36,7 @@ class ImageTaggingMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "9GB")
+        kwargs["mem_required"] = "9GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self.model_key = prepare_model(
             model_type="recognizeAnything", pretrained_model_name_or_path="ram_plus_swin_large_14m.pth", input_size=384

@@ -12,7 +12,7 @@ from typing_extensions import Annotated
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
-from data_juicer.utils.resource_utils import get_ray_gpu_count, get_ray_gpu_memory
+from data_juicer.utils.ray_utils import ray_available_gpu_memories, ray_gpu_count
 
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
@@ -286,9 +286,17 @@ class GPUMinHashActor:
 
 @OPERATORS.register_module(OP_NAME)
 class RayBTSMinhashDeduplicator(Deduplicator):
-    """
-    A MinhashLSH deduplicator based on RAY.
-    """
+    """A MinhashLSH deduplicator that operates in Ray distributed mode.
+
+    This operator uses the MinHash LSH technique to identify and remove near-duplicate
+    samples from a dataset. It supports various tokenization methods, including space,
+    punctuation, character, and sentencepiece. The Jaccard similarity threshold is used to
+    determine if two samples are considered duplicates. If the Jaccard similarity of two
+    samples is greater than or equal to the specified threshold, one of the samples is
+    filtered out. The operator computes the MinHash values for each sample and uses a union-
+    find algorithm to group similar samples. The key metric, Jaccard similarity, is computed
+    based on the shingling of the text. The operator can run on both CPU and GPU, with
+    specific batch size and memory configurations for each."""
 
     # TODO: Set a more reasonable value
     EMPTY_HASH_VALUE = "EMPTY"
@@ -631,7 +639,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         if self.use_cuda():
             logger.info("Using GPU for MinHash computation")
             # Get available GPU count and set concurrency
-            gpu_count = get_ray_gpu_count()
+            gpu_count = ray_gpu_count()
             if gpu_count == 0:
                 logger.error("No GPUs available in Ray cluster")
                 raise RuntimeError("No GPUs available in Ray cluster")
@@ -640,9 +648,9 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             logger.info(f"Setting GPU concurrency to {concurrency} based on available GPUs")
 
             # Get available GPU memory and set batch size
-            gpu_memory = get_ray_gpu_memory()
-            if gpu_memory:
-                min_memory = min(gpu_memory.values())
+            gpu_memory = ray_available_gpu_memories()
+            if len(gpu_memory):
+                min_memory = min(gpu_memory)
                 # Use 80% of available memory to leave room for overhead
                 safe_memory = min_memory * 0.8
                 estimated_batch_size = int(safe_memory / self.memory_per_sample)

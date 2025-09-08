@@ -9,10 +9,10 @@ from typing import Dict, List
 import numpy
 from loguru import logger
 
-from data_juicer import is_cuda_available
 from data_juicer.core.data import DJDataset, NestedDataset
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import free_models
+from data_juicer.utils.resource_utils import is_cuda_available
 
 transformers = LazyLoader("transformers")
 
@@ -87,8 +87,13 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         current_tag = getattr(cls, "current_tag", "standalone")
         if current_tag.startswith("ray"):
             ray = LazyLoader("ray")
-            logger.info(f">>>>>>>>>>>>>>>>>>>> [Init Ray]: dj_dist_unittest_{cls.__name__}")
-            ray.init("auto", ignore_reinit_error=True, namespace=f"dj_dist_unittest_{cls.__name__}")
+            if not ray.is_initialized():
+                logger.info(f">>>>>>>>>>>>>>>>>>>> [Init Ray]: dj_dist_unittest_{cls.__name__}")
+                ray.init(
+                    "auto",
+                    ignore_reinit_error=True,
+                    namespace=f"dj_dist_unittest_{cls.__name__}",
+                )
 
             # erase existing resources
             cls._cleanup_ray_data_state()

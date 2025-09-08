@@ -11,11 +11,20 @@ from ..base_op import OPERATORS, Mapper
 
 @OPERATORS.register_module("remove_comments_mapper")
 class RemoveCommentsMapper(Mapper):
-    """
-    Mapper to remove comments in different kinds of documents.
+    """Removes comments from documents, currently supporting only 'tex' format.
 
-    Only support 'tex' for now.
-    """
+    This operator removes inline and multiline comments from text samples. It supports both
+    inline and multiline comment removal, controlled by the `inline` and `multiline`
+    parameters. Currently, it is designed to work with 'tex' documents. The operator
+    processes each sample in the batch and applies regular expressions to remove comments.
+    The processed text is then updated in the original samples.
+
+    - Inline comments are removed using the pattern `[^\\]%.+$`.
+    - Multiline comments are removed using the pattern `^%.*\n?`.
+
+    Important notes:
+    - Only 'tex' document type is supported at present.
+    - The operator processes the text in place and updates the original samples."""
 
     _batched_op = True
 

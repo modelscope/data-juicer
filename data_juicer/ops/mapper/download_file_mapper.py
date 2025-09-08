@@ -17,7 +17,16 @@ OP_NAME = "download_file_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class DownloadFileMapper(Mapper):
-    """Mapper to download url files to local files or load them into memory."""
+    """Mapper to download URL files to local files or load them into memory.
+
+    This operator downloads files from URLs and can either save them to a specified
+    directory or load the contents directly into memory. It supports downloading multiple
+    files concurrently and can resume downloads if the `resume_download` flag is set. The
+    operator processes nested lists of URLs, flattening them for batch processing and then
+    reconstructing the original structure in the output. If both `save_dir` and `save_field`
+    are not specified, it defaults to saving the content under the key `image_bytes`. The
+    operator logs any failed download attempts and provides error messages for
+    troubleshooting."""
 
     _batched_op = True
 

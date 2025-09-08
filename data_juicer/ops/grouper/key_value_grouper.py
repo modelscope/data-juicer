@@ -8,7 +8,13 @@ from .naive_grouper import NaiveGrouper
 
 @OPERATORS.register_module("key_value_grouper")
 class KeyValueGrouper(Grouper):
-    """Group samples to batched samples according values in given keys."""
+    """Groups samples into batches based on values in specified keys.
+
+    This operator groups samples by the values of the given keys, which can be nested. If no
+    keys are provided, it defaults to using the text key. It uses a naive grouping strategy
+    to batch samples with identical key values. The resulting dataset is a list of batched
+    samples, where each batch contains samples that share the same key values. This is
+    useful for organizing data by specific attributes or features."""
 
     def __init__(self, group_by_keys: Optional[List[str]] = None, *args, **kwargs):
         """

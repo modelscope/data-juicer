@@ -13,9 +13,15 @@ OP_NAME = "calibrate_qa_mapper"
 # TODO: LLM-based inference.
 @OPERATORS.register_module(OP_NAME)
 class CalibrateQAMapper(Mapper):
-    """
-    Mapper to calibrate question-answer pairs based on reference text.
-    """
+    """Calibrates question-answer pairs based on reference text using an API model.
+
+    This operator uses a specified API model to calibrate question-answer pairs, making them
+    more detailed and accurate. It constructs the input prompt by combining the reference
+    text and the question-answer pair, then sends it to the API for calibration. The output
+    is parsed to extract the calibrated question and answer. The operator retries the API
+    call and parsing up to a specified number of times in case of errors. The default system
+    prompt, input templates, and output pattern can be customized. The operator supports
+    additional parameters for model initialization and sampling."""
 
     # avoid leading whitespace
     DEFAULT_SYSTEM_PROMPT = (

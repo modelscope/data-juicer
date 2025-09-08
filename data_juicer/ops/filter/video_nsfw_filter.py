@@ -24,7 +24,15 @@ OP_NAME = "video_nsfw_filter"
 @LOADED_VIDEOS.register_module(OP_NAME)
 @INTER_SAMPLED_FRAMES.register_module(OP_NAME)
 class VideoNSFWFilter(Filter):
-    """Filter to keep samples whose videos have nsfw scores in a specified range."""
+    """Filter to keep samples whose videos have nsfw scores in a specified range.
+
+    This operator uses a Hugging Face model to detect NSFW content in video frames. It keeps
+    samples where the NSFW score is below a specified threshold. The operator supports two
+    frame sampling methods: "all_keyframes" and "uniform". For "uniform", it extracts a
+    specified number of frames. The NSFW scores are reduced using one of three modes: "avg",
+    "max", or "min". The key metric, 'video_nsfw_score', is computed for each video and
+    stored in the sample's stats. The operator can use either an "any" or "all" strategy to
+    decide if a sample should be kept based on the NSFW scores of its videos."""
 
     _accelerator = "cuda"
 
@@ -72,7 +80,7 @@ class VideoNSFWFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "1GB")
+        kwargs["mem_required"] = "1GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self.min_score = min_score
         self.max_score = max_score

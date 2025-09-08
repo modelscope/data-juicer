@@ -12,7 +12,15 @@ from ...base_op import OPERATORS
 
 @OPERATORS.register_module("human_preference_annotation_mapper")
 class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
-    """Operator for human preference annotation using Label Studio."""
+    """Operator for human preference annotation using Label Studio.
+
+    This operator formats and presents pairs of answers to a prompt for human evaluation. It
+    uses a default or custom Label Studio configuration to display the prompt and answer
+    options. The operator processes the annotations to determine the preferred answer,
+    updating the sample with the chosen and rejected answers. The operator requires specific
+    keys in the samples for the prompt and answer options. If these keys are missing, it
+    logs warnings and uses placeholder text. The annotated results are processed to update
+    the sample with the chosen and rejected answers."""
 
     DEFAULT_LABEL_CONFIG = """
     <View className="root">

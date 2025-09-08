@@ -14,9 +14,15 @@ torchaudio = LazyLoader("torchaudio")
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class VideoTaggingFromAudioMapper(Mapper):
-    """Mapper to generate video tags from audio streams extracted by video
-    using the Audio Spectrogram Transformer.
-    """
+    """Generates video tags from audio streams using the Audio Spectrogram Transformer.
+
+    This operator extracts audio streams from videos and uses a Hugging Face Audio
+    Spectrogram Transformer (AST) model to generate tags. The tags are stored in the
+    specified metadata field, defaulting to 'video_audio_tags'. If no valid audio stream is
+    found, the tag is set to 'EMPTY'. The operator resamples audio to match the model's
+    required sampling rate if necessary. The tags are inferred based on the highest logit
+    value from the model's output. If the tags are already present in the sample, the
+    operator skips processing for that sample."""
 
     _accelerator = "cuda"
 
@@ -38,7 +44,7 @@ class VideoTaggingFromAudioMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "500MB")
+        kwargs["mem_required"] = "500MB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self.model_key = prepare_model(
             model_type="huggingface", pretrained_model_name_or_path=hf_ast, trust_remote_code=trust_remote_code

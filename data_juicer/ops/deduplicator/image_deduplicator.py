@@ -32,10 +32,19 @@ def get_hash_method(method_name):
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageDeduplicator(Deduplicator):
-    """
-    Deduplicator to deduplicate samples at document-level using exact matching
-    of images between documents.
-    """
+    """Deduplicates samples at the document level by exact matching of images.
+
+    This operator compares images across documents to identify and remove duplicates.
+    - It uses a specified hash method (default is 'phash') to compute image hashes.
+    - If `consider_text` is set, it also considers text content for deduplication,
+    using a text deduplicator in conjunction with the image hashes.
+    - The key metric, `imagehash`, is computed for each sample. If `consider_text`
+    is enabled, an additional `hash` field is used.
+    - Duplicates are identified by comparing these hash values. Samples with
+    identical hashes are considered duplicates.
+    - When `show_num` is greater than 0, the operator also returns a subset of
+    duplicate pairs for tracing purposes.
+    - The operator caches the `imagehash` and, if applicable, the `hash` fields."""
 
     def __init__(self, method: str = "phash", consider_text: bool = False, *args, **kwargs):
         """
