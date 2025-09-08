@@ -57,9 +57,9 @@ def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=
 
     if not use_cuda and gpu_required > 0:
         raise ValueError(
-            f'Op[{name}] attempted to request GPU resources (gpu_required={gpu_required}), \
-            but appears to lack GPU support. If you have verified this operator support GPU acceleration, \
-            please explicitly set its property: `_accelerator = "cuda"`'
+            f"Op[{name}] attempted to request GPU resources (gpu_required={gpu_required}), "
+            "but appears to lack GPU support. If you have verified this operator support GPU acceleration, "
+            'please explicitly set its property: `_accelerator = "cuda"`.'
         )
 
     eps = 1e-9  # about 1 byte
@@ -83,13 +83,13 @@ def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=
             )
             auto_proc_from_gpu = math.floor(gpu_count / (gpu_required + eps))
             auto_num_proc = min(auto_proc_from_mem, auto_proc_from_gpu)
-            if auto_num_proc <= 1:
+            if auto_num_proc < 1:
                 auto_num_proc = len(available_memories())  # set to the number of available nodes
 
             logger.info(
                 f"Set the `num_proc` to {auto_num_proc} of Op[{name}] based on the "
-                f"required cuda memory: {mem_required}"
-                f"and required gpu: {gpu_required} "
+                f"required cuda memory: {mem_required}GB "
+                f"and required gpu: {gpu_required}."
             )
         return auto_num_proc
     else:
@@ -103,12 +103,18 @@ def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=
         if auto_num_proc < 1.0:
             auto_num_proc = len(available_memories())  # number of processes is equal to the number of nodes
             logger.warning(
-                f"The required CPU number:{cpu_required} "
-                f"and memory:{mem_required}GB might "
-                f"be more than the available CPU:{cpu_num} "
-                f"and memory :{mems_available}GB."
+                f"The required CPU number: {cpu_required} "
+                f"and memory: {mem_required}GB might "
+                f"be more than the available CPU: {cpu_num} "
+                f"and memory: {mems_available}GB."
                 f"This Op [{name}] might "
                 f"require more resource to run. "
                 f"Set num_proc to available nodes number {auto_num_proc}."
+            )
+        else:
+            logger.info(
+                f"Set the `num_proc` to {auto_num_proc} of Op[{name}] based on the "
+                f"required memory: {mem_required}GB "
+                f"and required cpu: {cpu_required}."
             )
         return auto_num_proc

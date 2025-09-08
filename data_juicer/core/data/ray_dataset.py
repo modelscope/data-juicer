@@ -92,7 +92,6 @@ def filter_batch(batch, filter_func):
 class RayDataset(DJDataset):
     def __init__(self, dataset: ray.data.Dataset, dataset_path: str = None, cfg: Optional[Namespace] = None) -> None:
         self.data = preprocess_dataset(dataset, dataset_path, cfg)
-        self.np = getattr(cfg, "np", None) if cfg else None
 
     def schema(self) -> Schema:
         """Get dataset schema.
@@ -154,12 +153,12 @@ class RayDataset(DJDataset):
 
     def _run_single_op(self, op):
         auto_parallel = False
-        if self.op.num_proc:
-            op_proc = self.op.num_proc
+        if op.num_proc:
+            op_proc = op.num_proc
         else:
             auto_parallel = True
             op_proc = calculate_np(op._name, op.mem_required, op.cpu_required, op.use_cuda(), op.gpu_required)
-        num_gpus = self.op.gpu_required if self.op.gpu_required else get_num_gpus(op, op_proc)
+        num_gpus = op.gpu_required if op.gpu_required else get_num_gpus(op, op_proc)
 
         if op._name in TAGGING_OPS.modules and Fields.meta not in self.data.columns():
 
