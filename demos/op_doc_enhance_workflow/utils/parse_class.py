@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import ast
+import traceback
 from pathlib import Path
 from typing import Any, Dict, Optional, List
 
@@ -296,11 +297,24 @@ def literal_eval_with_self(raw_code: str, attr_map: Dict[str, str]) -> Any:
     Only suitable for literal expressions (list/dict/strings/numbers).
     Returns Python value on success, or None if expression isn't a pure literal.
     """
-    expr = ast.parse(raw_code, mode="eval")
-    transformer = ASTTransformer(attr_map, env)
-    new_expr = transformer.visit(expr)
-    ast.fix_missing_locations(new_expr)
+    return literal_eval_universal(raw_code, extra_env=None, attr_map=attr_map)
+
+def literal_eval_universal(expr_str, extra_env=None, attr_map=None):
     try:
-        return ast.literal_eval(new_expr.body)
+        scope = env.copy()
+        if extra_env:
+            scope.update(extra_env)
+        node = ast.parse(expr_str, mode='eval')
+        
+        if attr_map:
+            transformer = ASTTransformer(attr_map, scope)
+            node = transformer.visit(node)
+            ast.fix_missing_locations(node)
+        try:
+            return ast.literal_eval(node.body)
+        except (ValueError, SyntaxError, TypeError):
+            pass
+        return _eval_static(node.body, scope)
     except Exception:
+        traceback.print_exc()
         return None

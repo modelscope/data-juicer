@@ -93,26 +93,6 @@ def _to_samples(raw: Any, md_dir: Path) -> List[Dict[str, Any]]:
     # Fallback: convert to string
     return [{"text": str(raw)}]
 
-
-def samples_to_ds_tgt(obj: Any) -> Tuple[List[Any], List[Any]]:
-    """
-    Split samples with 'target' field into dataset and target lists.
-
-    Extracts paired data where each item has exactly 2 keys: one data key and 'target'.
-    """
-    ds_obj = []
-    tgt_obj = []
-    if isinstance(obj, list) and all(isinstance(it, dict) for it in obj) and all("target" in it for it in obj):
-        for it in obj:
-            if len(it) != 2:
-                continue
-            other_key = (it.keys() - {"target"}).pop()
-            ds_obj.append({other_key: it[other_key]})
-            tgt_obj.append({other_key: it["target"]})
-        return ds_obj, tgt_obj
-    return None, None
-
-
 def route(
     vals: Dict[str, str],
     attr_map: Dict[str, str],
@@ -129,20 +109,13 @@ def route(
     # Parse raw string values using attribute mapping
     ds_raw = vals.get("ds") or ""
     tgt_raw = vals.get("tgt") or ""
-    samples_raw = vals.get("samples") or ""
     ds_obj = parse_literal_or_none(ds_raw, attr_map)
     tgt_obj = parse_literal_or_none(tgt_raw, attr_map)
-    samples_obj = parse_literal_or_none(samples_raw, attr_map)
 
     # Validate input data availability
-    if (ds_obj is None or tgt_obj is None) and samples_obj is None:
-        return None
-    elif (ds_obj is None or tgt_obj is None) and samples_obj is not None:
-        # Extract ds/tgt from samples if direct ds/tgt not available
-        ds_obj, tgt_obj = samples_to_ds_tgt(samples_obj)
-
     if ds_obj is None or tgt_obj is None:
         return None
+
     # Convert to normalized sample format
     ds_samples = _to_samples(ds_obj, md_dir)
     tgt_samples = _to_samples(tgt_obj, md_dir)

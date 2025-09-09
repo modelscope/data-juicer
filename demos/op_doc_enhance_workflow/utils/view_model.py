@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 from .example_ir import ExampleIR
 
-TEXT_COLLAPSE_THRESHOLD = 600
+TEXT_COLLAPSE_THRESHOLD = 300
 LIST_COLLAPSE_THRESHOLD = 600
 IMAGES_INLINE_LIMIT = 6
 VIDEOS_INLINE_LIMIT = 1
@@ -43,8 +43,8 @@ def _collapsible(summary: str, inner_html: str, open_default: bool = False) -> s
 def _pre_block(text: str) -> str:
     """Base pre block with consistent style."""
     return (
-        "<pre style=\"padding:6px; background:#f6f8fa; border-radius:4px; "
-        "overflow-x:auto; white-space:pre; word-wrap:normal;\">"
+        '<pre style="padding:6px; background:#f6f8fa; border-radius:4px; '
+        'overflow-x:auto; white-space:pre; word-wrap:normal;">'
         f"{escape(text)}</pre>"
     )
 
@@ -57,9 +57,7 @@ def _render_text_block(text: str, collapse_threshold: int = None) -> str:
     if collapse_threshold and len(text) > collapse_threshold:
         preview = _pre_block(text[:collapse_threshold] + "...")
         full = _pre_block(text)
-        return preview + _collapsible(
-            f"Show more 展开更多 ({len(text) - collapse_threshold} more chars)", full
-        )
+        return preview + _collapsible(f"Show more 展开更多 ({len(text) - collapse_threshold} more chars)", full)
     return _pre_block(text)
 
 
@@ -68,22 +66,15 @@ def _render_images(paths: List[str]) -> str:
     if not paths:
         return ""
     if len(paths) <= IMAGES_INLINE_LIMIT:
-        items = "".join(
-            f'<img src="{escape(p)}" width="160" style="margin:4px;"/>' for p in paths
-        )
+        items = "".join(f'<img src="{escape(p)}" width="160" style="margin:4px;"/>' for p in paths)
         return f'<div class="image-grid">{items}</div>'
     # split
     head = paths[:IMAGES_INLINE_LIMIT]
     tail = paths[IMAGES_INLINE_LIMIT:]
-    head_items = "".join(
-        f'<img src="{escape(p)}" width="160" style="margin:4px;"/>' for p in head
-    )
-    tail_items = "".join(
-        f'<img src="{escape(p)}" width="160" style="margin:4px;"/>' for p in tail
-    )
-    return (
-        f'<div class="image-grid">{head_items}</div>'
-        + _collapsible(f"Show {len(tail)} more images 展开更多图片", f'<div class="image-grid">{tail_items}</div>')
+    head_items = "".join(f'<img src="{escape(p)}" width="160" style="margin:4px;"/>' for p in head)
+    tail_items = "".join(f'<img src="{escape(p)}" width="160" style="margin:4px;"/>' for p in tail)
+    return f'<div class="image-grid">{head_items}</div>' + _collapsible(
+        f"Show {len(tail)} more images 展开更多图片", f'<div class="image-grid">{tail_items}</div>'
     )
 
 
@@ -92,24 +83,14 @@ def _render_videos(paths: List[str]) -> str:
     if not paths:
         return ""
     if len(paths) <= VIDEOS_INLINE_LIMIT:
-        items = "".join(
-            f'<video src="{escape(p)}" controls width="320" style="margin:4px;"></video>'
-            for p in paths
-        )
+        items = "".join(f'<video src="{escape(p)}" controls width="320" style="margin:4px;"></video>' for p in paths)
         return f'<div class="video-grid">{items}</div>'
     head = paths[:VIDEOS_INLINE_LIMIT]
     tail = paths[VIDEOS_INLINE_LIMIT:]
-    head_items = "".join(
-        f'<video src="{escape(p)}" controls width="320" style="margin:4px;"></video>'
-        for p in head
-    )
-    tail_items = "".join(
-        f'<video src="{escape(p)}" controls width="320" style="margin:4px;"></video>'
-        for p in tail
-    )
-    return (
-        f'<div class="video-grid">{head_items}</div>'
-        + _collapsible(f"Show {len(tail)} more videos 展开更多视频", f'<div class="video-grid">{tail_items}</div>')
+    head_items = "".join(f'<video src="{escape(p)}" controls width="320" style="margin:4px;"></video>' for p in head)
+    tail_items = "".join(f'<video src="{escape(p)}" controls width="320" style="margin:4px;"></video>' for p in tail)
+    return f'<div class="video-grid">{head_items}</div>' + _collapsible(
+        f"Show {len(tail)} more videos 展开更多视频", f'<div class="video-grid">{tail_items}</div>'
     )
 
 
@@ -119,46 +100,95 @@ def _render_audios(paths: List[str]) -> str:
         return ""
     if len(paths) <= AUDIOS_INLINE_LIMIT:
         items = "".join(
-            f'<audio src="{escape(p)}" controls style="display:block; margin:4px 0;"></audio>'
-            for p in paths
+            f'<audio src="{escape(p)}" controls style="display:block; margin:4px 0;"></audio>' for p in paths
         )
         return f'<div class="audio-list">{items}</div>'
     head = paths[:AUDIOS_INLINE_LIMIT]
     tail = paths[AUDIOS_INLINE_LIMIT:]
     head_items = "".join(
-        f'<audio src="{escape(p)}" controls style="display:block; margin:4px 0;"></audio>'
-        for p in head
+        f'<audio src="{escape(p)}" controls style="display:block; margin:4px 0;"></audio>' for p in head
     )
     tail_items = "".join(
-        f'<audio src="{escape(p)}" controls style="display:block; margin:4px 0;"></audio>'
-        for p in tail
+        f'<audio src="{escape(p)}" controls style="display:block; margin:4px 0;"></audio>' for p in tail
     )
-    return (
-        f'<div class="audio-list">{head_items}</div>'
-        + _collapsible(f"Show {len(tail)} more audios 展开更多音频", f'<div class="audio-list">{tail_items}</div>')
+    return f'<div class="audio-list">{head_items}</div>' + _collapsible(
+        f"Show {len(tail)} more audios 展开更多音频", f'<div class="audio-list">{tail_items}</div>'
     )
-
-
-def _shorten(val: Any, max_len: int = 120) -> str:
-    """Truncate string representation of value to max length."""
-    s = str(val)
-    return (s[:max_len] + "...") if len(s) > max_len else s
 
 
 def _render_meta(meta: Dict[str, Any]) -> str:
-    """Render metadata as a normal (non-collapsed) HTML table."""
+    """Render metadata as a structured HTML table with nested dict support."""
     if not meta:
         return ""
-    rows = "".join(
-        f"<tr>"
-        f"<td style='padding:4px 8px; color:#555; white-space:nowrap;'>{escape(str(k))}</td>"
-        f"<td style='padding:4px 8px;'>{escape(_shorten(v))}</td>"
-        f"</tr>"
-        for k, v in meta.items()
-    )
+    
+    def _render_value(value: Any, indent_level: int = 0) -> str:
+        """Recursively render values, with special handling for nested dicts."""
+        indent_style = f"padding-left: {indent_level * 20}px;" if indent_level > 0 else ""
+        
+        if isinstance(value, dict) and value:
+            # 如果是字典，创建嵌套的表格结构
+            nested_rows = []
+            for k, v in value.items():
+                nested_value = _render_value(v, indent_level + 1)
+                nested_rows.append(
+                    f"<tr>"
+                    f"<td style='padding:2px 8px; color:#777; white-space:nowrap; {indent_style}'>{escape(str(k))}</td>"
+                    f"<td style='padding:2px 8px; {indent_style}'>{nested_value}</td>"
+                    f"</tr>"
+                )
+            return "".join(nested_rows)
+        elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict):
+            # 如果是字典列表，直接展示每个字典的内容，不显示索引
+            list_items = []
+            for item in value:
+                if isinstance(item, dict):
+                    item_content = _render_value(item, indent_level + 1)
+                    list_items.append(item_content)
+                else:
+                    list_items.append(
+                        f"<tr>"
+                        f"<td style='padding:2px 8px; color:#777; white-space:nowrap; {indent_style}'>-</td>"
+                        f"<td style='padding:2px 8px; {indent_style}'>{escape(str(item))}</td>"
+                        f"</tr>"
+                    )
+            return "".join(list_items)
+        else:
+            # 普通值直接显示
+            return escape(str(value))
+    
+    # 构建主表格
+    rows = []
+    for k, v in meta.items():
+        if isinstance(v, dict) and v:
+            # 字典类型：先显示键名，然后显示嵌套内容
+            rows.append(
+                f"<tr>"
+                f"<td style='padding:4px 8px; color:#555; white-space:nowrap; font-weight:bold;' colspan='2'>{escape(str(k))}</td>"
+                f"</tr>"
+            )
+            nested_content = _render_value(v, 1)
+            rows.append(nested_content)
+        elif isinstance(v, list) and len(v) > 0 and isinstance(v[0], dict):
+            # 字典列表类型
+            rows.append(
+                f"<tr>"
+                f"<td style='padding:4px 8px; color:#555; white-space:nowrap; font-weight:bold;' colspan='2'>{escape(str(k))}</td>"
+                f"</tr>"
+            )
+            list_content = _render_value(v, 1)
+            rows.append(list_content)
+        else:
+            # 普通键值对
+            rows.append(
+                f"<tr>"
+                f"<td style='padding:4px 8px; color:#555; white-space:nowrap;'>{escape(str(k))}</td>"
+                f"<td style='padding:4px 8px;'>{escape(str(v))}</td>"
+                f"</tr>"
+            )
+    
     return (
         "<div class='meta' style='margin-top:6px;'>"
-        f"<table style='border-collapse:collapse; margin-top:6px;'>{rows}</table>"
+        f"<table style='border-collapse:collapse; margin-top:6px;'>{''.join(rows)}</table>"
         "</div>"
     )
 
@@ -185,8 +215,8 @@ def _render_sample_header(sample_idx: int, sample: Dict[str, Any]) -> str:
     summary = " | ".join(content_types) if content_types else "empty"
     return (
         f'<div class="sample-header" '
-        f"style=\"background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; "
-        f"font-size:0.9em; color:#666; border-left:3px solid #007acc;\">"
+        f'style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; '
+        f'font-size:0.9em; color:#666; border-left:3px solid #007acc;">'
         f"<strong>Sample {sample_idx + 1}:</strong> {summary}</div>"
     )
 
@@ -205,7 +235,7 @@ def _render_sample_card(sample: Dict[str, Any], sample_idx: int) -> str:
         q_block = _render_text_block(q, collapse_threshold=TEXT_COLLAPSE_THRESHOLD)
         a_block = _render_text_block(a, collapse_threshold=TEXT_COLLAPSE_THRESHOLD)
         parts.append(
-            "<div class=\"qa\" style=\"margin-bottom:6px;\">"
+            '<div class="qa" style="margin-bottom:6px;">'
             f"<div><strong>Q:</strong> {q_block}</div>"
             f"<div><strong>A:</strong> {a_block}</div>"
             "</div>"
@@ -213,8 +243,8 @@ def _render_sample_card(sample: Dict[str, Any], sample_idx: int) -> str:
     # Handle text-only content
     elif sample.get("text"):
         parts.append(_render_text_block(str(sample["text"]), collapse_threshold=TEXT_COLLAPSE_THRESHOLD))
-    
-    # Handle list-only content 
+
+    # Handle list-only content
     if sample.get("list"):
         parts.append(_render_text_block(str(sample["list"]), collapse_threshold=LIST_COLLAPSE_THRESHOLD))
 

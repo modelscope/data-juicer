@@ -39,6 +39,13 @@ env = Environment(
     lstrip_blocks=True,
 )
 
+examples_cache = {}
+
+examples_cache_path = Path(__file__).parent / "examples.json"
+if examples_cache_path.exists():
+    with open(examples_cache_path, "r") as f:
+        examples_cache = json.load(f)
+
 # -----------------------------------------------------------------------------
 # Global prompts for LLM calls (centralized for easy adjustment)
 # -----------------------------------------------------------------------------
@@ -523,9 +530,6 @@ def process_example(examples, attr_map, op_info, test_file_full, existing_exampl
     """
     if op_info["name"] in NO_EXPLAIN_OPS:
         return []
-    if existing_examples:
-        select_methods = existing_examples.keys()
-        explanations = {m: existing_examples[m]["explanation"] for m in select_methods}
     examples_list = []
     usable = {}
     md_dir_abs = OPS_DOCS_DIR / op_info["type"]
@@ -538,7 +542,10 @@ def process_example(examples, attr_map, op_info, test_file_full, existing_exampl
     if not usable:
         return examples_list
 
-    if not existing_examples:
+    if existing_examples:
+        select_methods = [m for m in existing_examples.keys() if m in usable]
+        explanations = {m: existing_examples[m]["explanation"] for m in select_methods}
+    else:
         # Selection + explanation via LLM based on full test file and pre-screened method names
         select_methods, explanations = select_and_explain_examples(
             usable,
@@ -633,12 +640,25 @@ def camel_to_snake(camel_str):
 # -----------------------------------------------------------------------------
 
 
+def should_use_cache(new_method_info, cached_method_info):
+    """Determine whether cached method information should be used"""
+    if not cached_method_info:
+        return False
+
+    # Compare only op_code and ds
+    new_op_code = new_method_info.get("op_code")
+    new_ds = new_method_info.get("ds")
+
+    cached_op_code = cached_method_info.get("op_code")
+    cached_ds = cached_method_info.get("ds")
+
+    return (new_op_code == cached_op_code and new_ds == cached_ds) or (new_ds is None and cached_ds is not None)
+
+
 def main():
     """Generate documentation for all operators found by OPSearcher."""
     searcher = OPSearcher(include_formatter=True)
     all_ops = searcher.records_map
-    # all_ops_list = searcher.search(op_type="mapper")
-    # all_ops = {d["name"]: d for d in all_ops_list}
     op_detail_list = []
     original_descs = []
 
@@ -652,9 +672,28 @@ def main():
         test_file = find_test_file(op_info["name"])
         if test_file:
             test_file_full = test_file.read_text(encoding="utf-8")[:5000]
+            new_examples = process_test_file(test_file)
+            new_examples = {k: v for k, v in new_examples.items() if not any(x in k for x in ["parallel", "np"])}
             attr_map = extract_class_attr_paths(test_file)
-            examples = process_test_file(test_file)
-            examples = {k: v for k, v in examples.items() if not any(x in k for x in ["parallel", "np"])}
+            if examples_cache and examples_cache.get(op_info["name"]):
+                final_examples = {}
+                cached_op_examples = examples_cache.get(op_info["name"], {})
+            
+                for method_name, new_method_info in new_examples.items():
+                    cached_method_info = cached_op_examples.get(method_name)
+                    
+                    if should_use_cache(new_method_info, cached_method_info):
+                        final_examples[method_name] = cached_method_info.copy()
+                        if new_method_info.get("tgt") is not None:
+                            final_examples[method_name]["tgt"] = new_method_info["tgt"]
+                    else:
+                        final_examples[method_name] = new_method_info
+                
+                examples = final_examples
+            else:
+                examples = new_examples
+            # update examples cache
+            examples_cache[op_info["name"]] = examples
             if existing_md and existing_md.get("examples"):
                 existing_examples = existing_md["examples"]
             else:
@@ -698,8 +737,11 @@ def main():
                 op_info_tmpl["desc"] = en_desc + "\n\n" + zh_desc
         op_detail_list.append((op_info["name"], op_info_tmpl, examples_list))
 
+    # save examples cache
+    with open(examples_cache_path, "w") as f:
+        json.dump(examples_cache, f, indent=4, ensure_ascii=False)
+
     bilingual_descs = get_op_desc_in_en_zh_batched(original_descs)
-    # bilingual_descs = original_descs
     iter_bilingual_descs = iter(bilingual_descs)
     for op_name, op_info_tmpl, examples_list in op_detail_list:
         if not op_info_tmpl.get("desc"):
