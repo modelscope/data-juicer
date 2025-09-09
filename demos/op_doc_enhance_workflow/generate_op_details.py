@@ -19,6 +19,7 @@ from utils.view_model import to_legacy_view
 from docstring_parser import parse
 
 from data_juicer.tools.op_search import OPSearcher
+from rewrite_op_docstrings import update_op_docstrings_with_names
 
 # -----------------------------------------------------------------------------
 # Paths, constants, and template environment
@@ -378,6 +379,7 @@ def optimize_text(text):
     - Keep list items that start with '- '
     - Keep blank lines (paragraph separation)
     """
+    text = "\n".join([line.strip() for line in text.split("\n")])
     lines = text.split("\n")
     result = []
     i = 0
@@ -639,6 +641,15 @@ def camel_to_snake(camel_str):
 # -----------------------------------------------------------------------------
 
 
+def rewrite_op_doc(op_name):
+    results = update_op_docstrings_with_names([op_name])
+    assert len(results[0]) == 1
+    for result_info in results[0]:
+        if result_info.get("new_docstring"):
+            return optimize_text(result_info["new_docstring"])
+    return None
+
+
 def should_use_cache(new_method_info, cached_method_info):
     """Determine whether cached method information should be used"""
     if not cached_method_info:
@@ -725,8 +736,7 @@ def main():
         existing_md = load_existing_op_md(op_info["name"], op_info["type"])
         res = handle_one(op_info, existing_md)
         _, op_info_tmpl, examples_list = res
-        cleaned_desc = "\n".join([line.strip() for line in op_info["desc"].split("\n")])
-        cleaned_desc = optimize_text(cleaned_desc)
+        cleaned_desc = optimize_text(op_info["desc"])
         if existing_md and existing_md.get("desc"):
             en_desc, zh_desc = split_bilingual_text(existing_md["desc"])
             if cleaned_desc.strip() != en_desc.strip() or not zh_desc:
@@ -735,6 +745,9 @@ def main():
             else:
                 op_info_tmpl["desc"] = en_desc + "\n\n" + zh_desc
         else:
+            new_desc = rewrite_op_doc(op_name)
+            if new_desc:
+                cleaned_desc = new_desc
             original_descs.append(cleaned_desc)
         op_detail_list.append((op_info["name"], op_info_tmpl, examples_list))
 

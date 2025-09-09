@@ -14,6 +14,17 @@ from typing import Callable, List, Optional, Tuple
 
 from utils.model import chat
 
+ROOT = Path(__file__).resolve().parents[2]
+OPS_DIR = ROOT / "data_juicer" / "ops"
+
+
+def find_op_file(op_name):
+    """Locate the corresponding operator file for a given operator name."""
+    pattern = f"{op_name}.py"
+    matches = list(OPS_DIR.rglob(pattern))
+    return matches[0] if matches else None
+
+
 # ---------------------------
 # AST helpers
 # ---------------------------
@@ -89,6 +100,12 @@ def _get_docstring_expr_if_any(cls_node: ast.ClassDef) -> Optional[ast.Expr]:
 
 
 def _escape_triple_double_quotes(s: str) -> str:
+    s_list = s.split("\n")
+    for i, line in enumerate(s_list):
+        if i == 0:
+            continue
+        s_list[i] = "    " + line
+    s = "\n".join(s_list)
     return s.replace('"""', '\\"""')
 
 
@@ -306,17 +323,6 @@ def rewrite_file_ops(
         return results
 
     for info in infos:
-        # if info.old_docstring and len(info.old_docstring.strip()) > 100:
-        #     results.append(
-        #         {
-        #             "file_path": file_path,
-        #             "class_name": info.class_name,
-        #             "op_name": info.op_name,
-        #             "action": "skipped",
-        #             "reason": "long_existing_docstring",
-        #         }
-        #     )
-        #     continue
         new_doc = call_model_to_generate_docstring(info, model_func=model_func)
         if not new_doc or new_doc.strip() == "":
             results.append(
@@ -385,48 +391,10 @@ def rewrite_file_ops(
                     "class_name": info.class_name,
                     "op_name": info.op_name,
                     "action": action,
+                    "old_docstring": info.old_docstring,
+                    "new_docstring": new_doc,
                 }
             )
-
-    return results
-
-
-def run_workflow(
-    ops_root: str = "data_juicer/ops",
-    glob_pattern: str = "**/*.py",
-    include_subdirs: Optional[List[str]] = None,  # e.g., ["filter", "map"]
-    exclude_patterns: Optional[List[str]] = None,
-    dry_run: bool = True,
-    backup: bool = True,
-    model_func: Optional[Callable] = None,
-) -> List[dict]:
-    """
-    Traverse ops_root, find Python files, and rewrite operator docstrings.
-    Returns a list of result dicts summarizing actions.
-    """
-    pattern = os.path.join(ops_root, glob_pattern)
-    files = glob.glob(pattern, recursive=True)
-
-    # optional include_subdirs filter
-    if include_subdirs:
-        include_subdirs = set(include_subdirs)
-        files = [f for f in files if any(os.sep + sub + os.sep in f for sub in include_subdirs)]
-
-    if exclude_patterns:
-        excl = tuple(exclude_patterns)
-        files = [f for f in files if not any(pat in f for pat in excl)]
-
-    results = []
-    for fp in sorted(files):
-        # try:
-        res = rewrite_file_ops(fp, model_func=model_func, dry_run=dry_run, backup=backup)
-        results.extend(res)
-        # except Exception as e:
-        #     results.append({
-        #         "file_path": fp,
-        #         "action": "error",
-        #         "error": f"{e.__class__.__name__}: {e}",
-        #     })
 
     return results
 
@@ -435,86 +403,41 @@ def run_workflow(
 # main
 # ---------------------------
 
-def get_git_modified_files():
-    """Get the list of files that have been modified but not submitted in git"""
-    try:
-        result = subprocess.run(
-            ['git', 'diff', '--name-only', 'HEAD'],
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        modified_files = result.stdout.strip().split('\n') if result.stdout.strip() else []
-        
-        result_new = subprocess.run(
-            ['git', 'ls-files', '--others', '--exclude-standard'],
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        new_files = result_new.stdout.strip().split('\n') if result_new.stdout.strip() else []
-        
-        return modified_files + new_files
-    except subprocess.CalledProcessError:
-        print("Warning: Unable to get git status, may not be in git repository")
-        return []
 
-def is_operator_file(file_path):
-    path = Path(file_path)
-    
-    if path.suffix != '.py':
-        return False
-    
-    return (
-        'ops' in path.parts and 'data_juicer' in path.parts
-    )
+def update_op_docstrings_with_files(modified_operator_files: List[str]):
 
-def get_modified_operator_files():
-    """Get locally modified operator files list"""
-    modified_files = get_git_modified_files()
-    operator_files = []
-    
-    for file_path in modified_files:
-        if file_path and is_operator_file(file_path) and os.path.exists(file_path):
-            operator_files.append(file_path)
-    
-    return operator_files
-
-def main():
-    ops_dir = "data_juicer/ops"
-    project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    results = run_workflow(
-        ops_root=os.path.join(project_dir, ops_dir),
-        glob_pattern="**/*.py",
-        include_subdirs=None,  # Can be changed to None to handle all
-        dry_run=False,  # rehearse
-        backup=False,  # When formally written,.bak is generated
-        model_func=chat,
-    )
-    print(json.dumps(results, ensure_ascii=False, indent=2))
-
-
-def update_modified_operator_docstrings():
-    # Get locally modified operator files
-    modified_operator_files = get_modified_operator_files()
-    
     if not modified_operator_files:
         print("No locally modified operator file found")
         return
-    
+
     print(f"Found {len(modified_operator_files)} modified operator files:")
     for file_path in modified_operator_files:
         print(f"  - {file_path}")
-    
+
+    results = []
     # Process each file
     for file_path in modified_operator_files:
         print(f"\nProcessing file: {file_path}")
         try:
-            rewrite_file_ops(file_path, chat, dry_run=False, backup=False)
+            result = rewrite_file_ops(file_path, chat, dry_run=False, backup=False)
+            results.append(result)
             print(f"✅ Successfully updated: {file_path}")
         except Exception as e:
             print(f"❌ Failed to process {file_path}: {e}")
 
+    return results
+
+
+def update_op_docstrings_with_names(op_names: List[str]):
+    files = []
+    for op_name in op_names:
+        file_path = find_op_file(op_name)
+        if not file_path:
+            print(f"Operator {op_name} not found")
+            continue
+        files.append(file_path)
+    return update_op_docstrings_with_files(files)
+
 
 if __name__ == "__main__":
-    update_modified_operator_docstrings()
+    pass
