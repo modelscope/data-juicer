@@ -31,7 +31,14 @@ TEMPLATE_DIR = Path(__file__).parent / "templates"
 
 MD_FLAGS = re.MULTILINE | re.DOTALL
 PROMPT_BRIEF_DELIM = "\n\n-----\n\n"
-NO_EXPLAIN_OPS = ["llm_task_relevance_filter", "in_context_influence_filter", "text_embd_similarity_filter"]
+NO_EXPLAIN_OPS = [
+    "llm_task_relevance_filter",
+    "in_context_influence_filter",
+    "text_embd_similarity_filter",
+    "audio_add_gaussian_noise_mapper",
+    "image_blur_mapper",
+    "image_captioning_from_gpt4v_mapper"
+]
 
 env = Environment(
     loader=FileSystemLoader(str(TEMPLATE_DIR)),
@@ -678,17 +685,17 @@ def main():
             if examples_cache and examples_cache.get(op_info["name"]):
                 final_examples = {}
                 cached_op_examples = examples_cache.get(op_info["name"], {})
-            
+
                 for method_name, new_method_info in new_examples.items():
                     cached_method_info = cached_op_examples.get(method_name)
-                    
+
                     if should_use_cache(new_method_info, cached_method_info):
                         final_examples[method_name] = cached_method_info.copy()
                         if new_method_info.get("tgt") is not None:
                             final_examples[method_name]["tgt"] = new_method_info["tgt"]
                     else:
                         final_examples[method_name] = new_method_info
-                
+
                 examples = final_examples
             else:
                 examples = new_examples

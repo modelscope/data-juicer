@@ -117,78 +117,147 @@ def _render_audios(paths: List[str]) -> str:
 
 
 def _render_meta(meta: Dict[str, Any]) -> str:
-    """Render metadata as a structured HTML table with nested dict support."""
+    """Render metadata as an HTML table with group-level zebra backgrounds.
+    All rows inside a group share the same background.
+    Apply styles on TD with !important to survive Sphinx theme overrides."""
+
     if not meta:
         return ""
-    
-    def _render_value(value: Any, indent_level: int = 0) -> str:
-        """Recursively render values, with special handling for nested dicts."""
-        indent_style = f"padding-left: {indent_level * 20}px;" if indent_level > 0 else ""
-        
-        if isinstance(value, dict) and value:
-            # 如果是字典，创建嵌套的表格结构
-            nested_rows = []
-            for k, v in value.items():
-                nested_value = _render_value(v, indent_level + 1)
-                nested_rows.append(
-                    f"<tr>"
-                    f"<td style='padding:2px 8px; color:#777; white-space:nowrap; {indent_style}'>{escape(str(k))}</td>"
-                    f"<td style='padding:2px 8px; {indent_style}'>{nested_value}</td>"
-                    f"</tr>"
-                )
-            return "".join(nested_rows)
-        elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict):
-            # 如果是字典列表，直接展示每个字典的内容，不显示索引
-            list_items = []
-            for item in value:
-                if isinstance(item, dict):
-                    item_content = _render_value(item, indent_level + 1)
-                    list_items.append(item_content)
-                else:
-                    list_items.append(
+
+    zebra_light = "#f8f9fa"
+    zebra_white = "#ffffff"
+    border_color = "#eaecef"  # subtle border color
+
+    def indent_style(level: int) -> str:
+        return f"padding-left: {level * 16}px;" if level > 0 else ""
+
+    def table_style() -> str:
+        # Force a border around each table to keep visible separation under themes
+        return f"border-collapse:collapse; width:100%; border:1px solid {border_color} !important;"
+
+    def td_style(
+        group_bg: str, level: int = 0, nowrap: bool = False, padding: str = "4px 8px", bold: bool = False
+    ) -> str:
+        # Put background and borders on TD to avoid being overridden by theme table/tr rules
+        parts = [
+            "text-align:left;",
+            "vertical-align:top;",
+            f"padding:{padding};",
+            f"background-color:{group_bg} !important;" if group_bg else "",
+            f"border-bottom:1px solid {border_color} !important;",
+        ]
+        if nowrap:
+            parts.append("white-space:nowrap;")
+        if bold:
+            parts.append("font-weight:bold; color:#555;")
+        if level > 0:
+            parts.append(indent_style(level))
+        return " ".join(p for p in parts if p)
+
+    def should_expand_list(lst: list) -> bool:
+        """Expand a child list as a titled block if:
+        - length > 3 and (all items are dicts OR total string length > 20)."""
+        if len(lst) <= 3:
+            return False
+        all_dicts = all(isinstance(x, dict) for x in lst)
+        total_len = sum(len(str(x)) for x in lst)
+        return all_dicts or total_len > 20
+
+    def render_list_items(lst: list, level: int, group_bg: str) -> str:
+        """Render list as one-item-per-row; dict items render as nested dict tables; all TDs carry same bg."""
+        rows = []
+        for item in lst:
+            if isinstance(item, dict) and item:
+                nested_rows = render_dict_as_rows(item, level + 1, group_bg)
+                content = f"<table class='meta-table' style='{table_style()}'>{nested_rows}</table>"
+            else:
+                content = escape(str(item))
+            rows.append(f"<tr>" f"<td colspan='2' style='{td_style(group_bg, level)}'>{content}</td>" f"</tr>")
+        return "".join(rows)
+
+    def render_dict_as_rows(d: Dict[str, Any], level: int, group_bg: str) -> str:
+        """Render dict as key-value rows; all TDs carry same bg."""
+        rows = []
+        for ck, cv in d.items():
+            # Child list
+            if isinstance(cv, list) and cv:
+                if should_expand_list(cv):
+                    # Sub-title row
+                    rows.append(
                         f"<tr>"
-                        f"<td style='padding:2px 8px; color:#777; white-space:nowrap; {indent_style}'>-</td>"
-                        f"<td style='padding:2px 8px; {indent_style}'>{escape(str(item))}</td>"
+                        f"<td colspan='2' style='{td_style(group_bg, level, bold=True)}'>{escape(str(ck))}</td>"
                         f"</tr>"
                     )
-            return "".join(list_items)
-        else:
-            # 普通值直接显示
-            return escape(str(value))
-    
-    # 构建主表格
-    rows = []
+                    rows.append(render_list_items(cv, level + 1, group_bg))
+                else:
+                    # Render list as plain string
+                    rows.append(
+                        f"<tr>"
+                        f"<td style='{td_style(group_bg, level, nowrap=True)}'>{escape(str(ck))}</td>"
+                        f"<td style='{td_style(group_bg)}'>{escape(str(cv))}</td>"
+                        f"</tr>"
+                    )
+                continue
+
+            # Child dict: nested table
+            if isinstance(cv, dict) and cv:
+                nested_rows = render_dict_as_rows(cv, level + 1, group_bg)
+                rows.append(
+                    f"<tr>"
+                    f"<td style='{td_style(group_bg, level, nowrap=True)}'>{escape(str(ck))}</td>"
+                    f"<td style='{td_style(group_bg)}'>"
+                    f"<table class='meta-table' style='{table_style()}'>{nested_rows}</table>"
+                    f"</td>"
+                    f"</tr>"
+                )
+                continue
+
+            # Scalars or empty containers
+            rows.append(
+                f"<tr>"
+                f"<td style='{td_style(group_bg, level, nowrap=True)}'>{escape(str(ck))}</td>"
+                f"<td style='{td_style(group_bg)}'>{escape(str(cv))}</td>"
+                f"</tr>"
+            )
+        return "".join(rows)
+
+    # Build top-level table
+    out_rows = []
+    group_idx = 0  # zebra only across top-level dict/list groups
+
     for k, v in meta.items():
         if isinstance(v, dict) and v:
-            # 字典类型：先显示键名，然后显示嵌套内容
-            rows.append(
+            group_bg = zebra_light if group_idx % 2 == 0 else zebra_white
+            group_idx += 1
+            out_rows.append(
                 f"<tr>"
-                f"<td style='padding:4px 8px; color:#555; white-space:nowrap; font-weight:bold;' colspan='2'>{escape(str(k))}</td>"
+                f"<td colspan='2' style='{td_style(group_bg, bold=True, padding='6px 8px')}'>{escape(str(k))}</td>"
                 f"</tr>"
             )
-            nested_content = _render_value(v, 1)
-            rows.append(nested_content)
-        elif isinstance(v, list) and len(v) > 0 and isinstance(v[0], dict):
-            # 字典列表类型
-            rows.append(
+            out_rows.append(render_dict_as_rows(v, level=1, group_bg=group_bg))
+
+        elif isinstance(v, list):
+            group_bg = zebra_light if group_idx % 2 == 0 else zebra_white
+            group_idx += 1
+            out_rows.append(
                 f"<tr>"
-                f"<td style='padding:4px 8px; color:#555; white-space:nowrap; font-weight:bold;' colspan='2'>{escape(str(k))}</td>"
+                f"<td colspan='2' style='{td_style(group_bg, bold=True, padding='6px 8px')}'>{escape(str(k))}</td>"
                 f"</tr>"
             )
-            list_content = _render_value(v, 1)
-            rows.append(list_content)
+            out_rows.append(render_list_items(v, level=1, group_bg=group_bg))
+
         else:
-            # 普通键值对
-            rows.append(
+            # Non-group simple row (no zebra background)
+            out_rows.append(
                 f"<tr>"
-                f"<td style='padding:4px 8px; color:#555; white-space:nowrap;'>{escape(str(k))}</td>"
-                f"<td style='padding:4px 8px;'>{escape(str(v))}</td>"
+                f"<td style='text-align:left; vertical-align:top; padding:4px 8px; white-space:nowrap; border-bottom:1px solid {border_color} !important;'>{escape(str(k))}</td>"
+                f"<td style='text-align:left; vertical-align:top; padding:4px 8px; border-bottom:1px solid {border_color} !important;'>{escape(str(v))}</td>"
                 f"</tr>"
             )
-    
+
     return (
         "<div class='meta' style='margin-top:6px;'>"
-        f"<table style='border-collapse:collapse; margin-top:6px;'>{''.join(rows)}</table>"
+        f"<table class='meta-table' style='{table_style()}'>{''.join(out_rows)}</table>"
         "</div>"
     )
 
