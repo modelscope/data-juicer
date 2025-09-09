@@ -1,17 +1,26 @@
 # optimize_prompt_mapper
 
+Optimize prompts based on existing ones in the same batch.
 
-Mapper to optimize prompts based on the existing ones. This OP will use the existing prompts in the same batch and newly optimized prompts as the examples to optimize the next ones.
+This operator uses the existing prompts and newly optimized prompts as examples to generate better prompts. It supports using a Hugging Face model or an API for text generation. The operator can be configured to keep the original samples or replace them with the generated ones. The optimization process involves multiple retries if the generated prompt is empty. The operator operates in batch mode and can leverage vLLM for inference acceleration on CUDA devices.
 
-Reference: https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html
+- Uses existing and newly generated prompts to optimize future prompts.
+- Supports both Hugging Face models and API-based text generation.
+- Can keep or replace original samples with generated ones.
+- Retries up to a specified number of times if the generated prompt is empty.
+- Operates in batch mode and can use vLLM for acceleration on CUDA.
+- References: https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html
 
+根据同一批次中现有的提示进行优化。
 
-用于根据现有提示进行优化的映射器。此算子将使用同一批次中的现有提示和新优化的提示作为示例来优化后续的提示。
+该算子使用现有的提示和新优化的提示作为示例来生成更好的提示。它支持使用Hugging Face模型或API进行文本生成。可以配置该算子保留原始样本或将它们替换为生成的样本。如果生成的提示为空，则优化过程会涉及多次重试。该算子以批处理模式运行，并且可以在CUDA设备上利用vLLM进行推理加速。
 
-参考：https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html
-
-
-*****
+- 使用现有的和新生成的提示来优化未来的提示。
+- 支持Hugging Face模型和基于API的文本生成。
+- 可以保留原始样本或将它们替换为生成的样本。
+- 如果生成的提示为空，则最多重试指定次数。
+- 以批处理模式运行，并且可以在CUDA上使用vLLM进行加速。
+- 参考：https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html
 
 Type 算子类型: **mapper**
 
