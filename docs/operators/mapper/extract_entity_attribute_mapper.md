@@ -15,24 +15,24 @@ Tags 标签: cpu, api, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `api_model` | <class 'str'> | `'gpt-4o'` |  |
-| `query_entities` | typing.List[str] | `[]` |  |
-| `query_attributes` | typing.List[str] | `[]` |  |
-| `entity_key` | <class 'str'> | `'main_entities'` |  |
+| `api_model` | <class 'str'> | `'gpt-4o'` | API model name. |
+| `query_entities` | typing.List[str] | `[]` | Entity list to be queried. |
+| `query_attributes` | typing.List[str] | `[]` | Attribute list to be queried. |
+| `entity_key` | <class 'str'> | `'main_entities'` | The key name in the meta field to store the given main entity for attribute extraction. It's "entity" in default. |
 | `attribute_key` | <class 'str'> | `'attributes'` |  |
-| `attribute_desc_key` | <class 'str'> | `'attribute_descriptions'` |  |
-| `support_text_key` | <class 'str'> | `'attribute_support_texts'` |  |
-| `api_endpoint` | typing.Optional[str] | `None` |  |
-| `response_path` | typing.Optional[str] | `None` |  |
-| `system_prompt_template` | typing.Optional[str] | `None` |  |
-| `input_template` | typing.Optional[str] | `None` |  |
-| `attr_pattern_template` | typing.Optional[str] | `None` |  |
-| `demo_pattern` | typing.Optional[str] | `None` |  |
-| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` |  |
-| `drop_text` | <class 'bool'> | `False` |  |
-| `model_params` | typing.Dict | `{}` |  |
-| `sampling_params` | typing.Dict | `{}` |  |
-| `kwargs` |  | `''` |  |
+| `attribute_desc_key` | <class 'str'> | `'attribute_descriptions'` | The key name in the meta field to store the extracted attribute description. It's "attribute_description" in default. |
+| `support_text_key` | <class 'str'> | `'attribute_support_texts'` | The key name in the meta field to store the attribute support text extracted from the raw text. It's "support_text" in default. |
+| `api_endpoint` | typing.Optional[str] | `None` | URL endpoint for the API. |
+| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. Defaults to 'choices.0.message.content'. |
+| `system_prompt_template` | typing.Optional[str] | `None` | System prompt template for the task. Need to be specified by given entity and attribute. |
+| `input_template` | typing.Optional[str] | `None` | Template for building the model input. |
+| `attr_pattern_template` | typing.Optional[str] | `None` | Pattern for parsing the attribute from output. Need to be specified by given attribute. |
+| `demo_pattern` | typing.Optional[str] | `None` | Pattern for parsing the demonstration from output to support the attribute. |
+| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retry attempts when there is an API call error or output parsing error. |
+| `drop_text` | <class 'bool'> | `False` | If drop the text in the output. |
+| `model_params` | typing.Dict | `{}` | Parameters for initializing the API model. |
+| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95} |
+| `kwargs` |  | `''` | Extra keyword arguments. |
 
 ## 📊 Effect demonstration 效果演示
 ### test
