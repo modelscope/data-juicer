@@ -1729,7 +1729,8 @@ stats.</p>
 <li><p><strong>api_or_hf_model</strong> -- API or huggingface model name.</p></li>
 <li><p><strong>min_score</strong> -- The min score threshold to keep the sample.</p></li>
 <li><p><strong>max_score</strong> -- The max score threshold to keep the sample.</p></li>
-<li><p><strong>is_hf_model</strong> -- If true, use huggingface model. Otherwise, use API.</p></li>
+<li><p><strong>is_hf_model</strong> -- If true, use Transformers for loading hugging face or
+local llm.</p></li>
 <li><p><strong>api_endpoint</strong> -- URL endpoint for the API.</p></li>
 <li><p><strong>response_path</strong> -- Path to extract content from the API response.
 Defaults to 'choices.0.message.content'.</p></li>
@@ -1742,7 +1743,7 @@ multi fields such as 'query', 'analysis' and 'answer' in RFT data.</p></li>
 <li><p><strong>try_num</strong> -- The number of retry attempts when there is an API
 call error or output parsing error.</p></li>
 <li><p><strong>enable_vllm</strong> -- If true, use VLLM for loading hugging face or
-local llm. Otherwise, use API for reference.</p></li>
+local llm.</p></li>
 <li><p><strong>model_params</strong> -- Parameters for initializing the API model.</p></li>
 <li><p><strong>sampling_params</strong> -- Extra parameters passed to the API call.
 e.g {'temperature': 0.9, 'top_p': 0.95}</p></li>

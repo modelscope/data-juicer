@@ -627,6 +627,21 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <td><p>-</p></td>
 <td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
 </tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolRanking</span></code></p></td>
+<td><p>根据指定的评测指标对数据池进行排序</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolMerging</span></code></p></td>
+<td><p>将多个数据池合并为一个数据集或数据池</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolCartesianJoin</span></code></p></td>
+<td><p>计算两个数据池集合的卡氏积</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -702,6 +717,16 @@ bash<span class="w"> </span>setup_easyanimate.sh
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InceptionEvaluator</span></code></p></td>
 <td><p>通过视频分类模型抽取特征测评生成的视频</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>：该评估器评估对象类型，目前只支持<code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code><br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>：未使用的参数<br />- 返回值：根据给定的metric返回对应的字典<br /></p></td>
+<td><p><a class="reference external" href="https://github.com/NVlabs/long-video-gan/tree/main/metrics">Inception Metrics</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AccuracyEvaluator</span></code></p></td>
+<td><p>评测预测标签和真实标签比较得到的准确率</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>：该评估器评估对象类型，目前只支持<code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code><br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>：未使用的参数<br />- 返回值：根据给定的metric返回对应的字典<br /></p></td>
+<td><p><a class="reference external" href="https://github.com/NVlabs/long-video-gan/tree/main/metrics">Inception Metrics</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSEEvaluator</span></code></p></td>
+<td><p>评测预测值和真实值之间的MSE分数</p></td>
 <td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>：该评估器评估对象类型，目前只支持<code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code><br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>：未使用的参数<br />- 返回值：根据给定的metric返回对应的字典<br /></p></td>
 <td><p><a class="reference external" href="https://github.com/NVlabs/long-video-gan/tree/main/metrics">Inception Metrics</a></p></td>
 </tr>
@@ -803,6 +828,21 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <td><p>用VBench的prompt数据集对EasyAnimate模型进行推理，并存储生成的视频</p></td>
 <td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>：推理类型。需要在组件配置文件中设置<code class="docutils literal notranslate"><span class="pre">type</span></code>参数为<code class="docutils literal notranslate"><span class="pre">&quot;easyanimate&quot;</span></code>来激活该组件<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>：未使用的参数<br /></p></td>
 <td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HFTransformersInferExecutor</span></code></p></td>
+<td><p>用HuggingFace Transformers进行推理。</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>：推理类型。需要在组件配置文件中设置<code class="docutils literal notranslate"><span class="pre">type</span></code>参数为<code class="docutils literal notranslate"><span class="pre">&quot;huggingface&quot;</span></code>来激活该组件<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>：未使用的参数<br /></p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">VLLMInferExecutor</span></code></p></td>
+<td><p>用vLLM进行推理。</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>：推理类型。需要在组件配置文件中设置<code class="docutils literal notranslate"><span class="pre">type</span></code>参数为<code class="docutils literal notranslate"><span class="pre">&quot;vllm&quot;</span></code>来激活该组件<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>：未使用的参数<br /></p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">APIModelInferExecutor</span></code></p></td>
+<td><p>用OpenAI API模型进行推理。</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>：推理类型。需要在组件配置文件中设置<code class="docutils literal notranslate"><span class="pre">type</span></code>参数为<code class="docutils literal notranslate"><span class="pre">&quot;api&quot;</span></code>来激活该组件<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>：未使用的参数<br /></p></td>
+<td><p>-</p></td>
 </tr>
 </tbody>
 </table>

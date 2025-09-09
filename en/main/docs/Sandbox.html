@@ -625,6 +625,21 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <td><p>-</p></td>
 <td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
 </tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolRanking</span></code></p></td>
+<td><p>Rank data pools according to specified evaluation metrics</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolMerging</span></code></p></td>
+<td><p>Merge data pools into one dataset or data pool</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DataPoolCartesianJoin</span></code></p></td>
+<td><p>Join two sets of data pools with Cartesian Join</p></td>
+<td><p>-</p></td>
+<td><p><a class="reference external" href="https://arxiv.org/abs/2407.11784">Sandbox Paper</a></p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -700,6 +715,16 @@ bash<span class="w"> </span>setup_easyanimate.sh
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InceptionEvaluator</span></code></p></td>
 <td><p>Evaluate the generated videos by features extracted from video classification models.</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of the object to be evaluated by the evaluator, currently only supports <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code><br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: A useless parameter.<br />- Return: A dictionary of scores in the given metric. <br /></p></td>
+<td><p><a class="reference external" href="https://github.com/NVlabs/long-video-gan/tree/main/metrics">Inception Metrics</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AccuracyEvaluator</span></code></p></td>
+<td><p>Evaluate the accuracy to compare the labels in the predicted ones and ground truth</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of the object to be evaluated by the evaluator, currently only supports <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code><br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: A useless parameter.<br />- Return: A dictionary of scores in the given metric. <br /></p></td>
+<td><p><a class="reference external" href="https://github.com/NVlabs/long-video-gan/tree/main/metrics">Inception Metrics</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSEEvaluator</span></code></p></td>
+<td><p>Evaluate the MSE score between the predicted values and ground truth.</p></td>
 <td><p><br />- <code class="docutils literal notranslate"><span class="pre">eval_type</span></code>: The type of the object to be evaluated by the evaluator, currently only supports <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code><br />- <code class="docutils literal notranslate"><span class="pre">eval_obj</span></code>: A useless parameter.<br />- Return: A dictionary of scores in the given metric. <br /></p></td>
 <td><p><a class="reference external" href="https://github.com/NVlabs/long-video-gan/tree/main/metrics">Inception Metrics</a></p></td>
 </tr>
@@ -801,6 +826,21 @@ bash<span class="w"> </span>setup_easyanimate.sh
 <td><p>Perform inference on EasyAnimate text-to-video model with the prompts from VBench, and save the generated videos.</p></td>
 <td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model inference. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;easyanimate&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: A useless parameter.<br /></p></td>
 <td><p><a class="reference external" href="https://github.com/aigc-apps/EasyAnimate">EasyAnimate</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HFTransformersInferExecutor</span></code></p></td>
+<td><p>Perform inference with HuggingFace Transformers.</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model inference. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;huggingface&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: A useless parameter.<br /></p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">VLLMInferExecutor</span></code></p></td>
+<td><p>Perform inference with vLLM.</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model inference. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;vllm&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: A useless parameter.<br /></p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">APIModelInferExecutor</span></code></p></td>
+<td><p>Perform inference with OpenAI API.</p></td>
+<td><p><br />- <code class="docutils literal notranslate"><span class="pre">run_type</span></code>: Type of model inference. We need to set <code class="docutils literal notranslate"><span class="pre">type</span></code>  arg as <code class="docutils literal notranslate"><span class="pre">&quot;api&quot;</span></code> in the component configuration file to activate this component.<br />- <code class="docutils literal notranslate"><span class="pre">run_obj</span></code>: A useless parameter.<br /></p></td>
+<td><p>-</p></td>
 </tr>
 </tbody>
 </table>

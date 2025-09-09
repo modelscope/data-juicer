@@ -481,7 +481,8 @@
 <span class="sd">        :param api_or_hf_model: API or huggingface model name.</span>
 <span class="sd">        :param min_score: The min score threshold to keep the sample.</span>
 <span class="sd">        :param max_score: The max score threshold to keep the sample.</span>
-<span class="sd">        :param is_hf_model: If true, use huggingface model. Otherwise, use API.</span>
+<span class="sd">        :param is_hf_model:  If true, use Transformers for loading hugging face or</span>
+<span class="sd">            local llm.</span>
 <span class="sd">        :param api_endpoint: URL endpoint for the API.</span>
 <span class="sd">        :param response_path: Path to extract content from the API response.</span>
 <span class="sd">            Defaults to &#39;choices.0.message.content&#39;.</span>
@@ -494,7 +495,7 @@
 <span class="sd">        :param try_num: The number of retry attempts when there is an API</span>
 <span class="sd">            call error or output parsing error.</span>
 <span class="sd">        :param enable_vllm: If true, use VLLM for loading hugging face or</span>
-<span class="sd">            local llm. Otherwise, use API for reference.</span>
+<span class="sd">            local llm.</span>
 <span class="sd">        :param model_params: Parameters for initializing the API model.</span>
 <span class="sd">        :param sampling_params: Extra parameters passed to the API call.</span>
 <span class="sd">            e.g {&#39;temperature&#39;: 0.9, &#39;top_p&#39;: 0.95}</span>

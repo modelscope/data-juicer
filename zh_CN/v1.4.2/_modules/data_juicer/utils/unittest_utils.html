@@ -350,6 +350,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
@@ -576,6 +577,21 @@
         <span class="n">first</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
         <span class="n">second</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">second</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataJuicerTestCaseBase.assertListOfDictEqual">
+<a class="viewcode-back" href="../../../api/data_juicer.utils.unittest_utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.assertListOfDictEqual">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assertListOfDictEqual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">second</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">ignore_order</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assert two list of dicts are equal&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore_order</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">first</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">second</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">process_list_of_dict</span><span class="p">(</span><span class="n">lst</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">process_list_of_dict</span><span class="p">(</span><span class="n">first</span><span class="p">),</span> <span class="n">process_list_of_dict</span><span class="p">(</span><span class="n">second</span><span class="p">))</span></div>
 </div>
 
 
@@ -622,11 +638,14 @@
 <div class="viewcode-block" id="get_partial_test_cases">
 <a class="viewcode-back" href="../../../api/data_juicer.utils.unittest_utils.html#data_juicer.utils.unittest_utils.get_partial_test_cases">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_partial_test_cases</span><span class="p">():</span>
+    <span class="n">must_run</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;tests/config/test_config.py&quot;</span><span class="p">}</span>
     <span class="n">diff_files</span> <span class="o">=</span> <span class="n">get_diff_files</span><span class="p">()</span>
     <span class="n">test_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">find_corresponding_test_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">diff_files</span><span class="p">]</span>
     <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="n">test_files</span><span class="p">:</span>
         <span class="c1"># can&#39;t find corresponding test files for some changed files: run all</span>
         <span class="k">return</span> <span class="kc">None</span>
+    <span class="c1"># add test cases that must be run</span>
+    <span class="n">test_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">must_run</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">test_files</span><span class="p">)))</span>
     <span class="k">return</span> <span class="n">test_files</span></div>
 
 </pre></div>

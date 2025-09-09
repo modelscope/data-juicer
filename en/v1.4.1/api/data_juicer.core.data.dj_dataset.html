@@ -600,6 +600,14 @@ NestedDataset.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.from_list">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.from_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.from_list" title="Link to this definition">¶</a></dt>
+<dd><p>Override the from_dict func, which is called by most from_xx
+constructors, such that the constructed dataset object is
+NestedDataset.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.data.dj_dataset.NestedDataset.add_column">
 <span class="sig-name descname"><span class="pre">add_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.add_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.dj_dataset.NestedDataset.add_column" title="Link to this definition">¶</a></dt>
 <dd><p>Override the add column func, such that the processed samples
@@ -766,6 +774,7 @@ function in parallel instead of using add_column.
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.select"><code class="docutils literal notranslate"><span class="pre">NestedDataset.select()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.to_list"><code class="docutils literal notranslate"><span class="pre">NestedDataset.to_list()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.from_dict"><code class="docutils literal notranslate"><span class="pre">NestedDataset.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.from_list"><code class="docutils literal notranslate"><span class="pre">NestedDataset.from_list()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.add_column"><code class="docutils literal notranslate"><span class="pre">NestedDataset.add_column()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.select_columns"><code class="docutils literal notranslate"><span class="pre">NestedDataset.select_columns()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.dj_dataset.NestedDataset.remove_columns"><code class="docutils literal notranslate"><span class="pre">NestedDataset.remove_columns()</span></code></a></li>

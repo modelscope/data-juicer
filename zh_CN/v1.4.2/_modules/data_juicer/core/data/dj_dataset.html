@@ -879,6 +879,16 @@
         <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
 
 
+<div class="viewcode-block" id="NestedDataset.from_list">
+<a class="viewcode-back" href="../../../../api/data_juicer.core.data.dj_dataset.html#data_juicer.core.NestedDataset.from_list">[文档]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_list</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the from_dict func, which is called by most from_xx</span>
+<span class="sd">        constructors, such that the constructed dataset object is</span>
+<span class="sd">        NestedDataset.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
+
+
 <div class="viewcode-block" id="NestedDataset.add_column">
 <a class="viewcode-back" href="../../../../api/data_juicer.core.data.dj_dataset.html#data_juicer.core.NestedDataset.add_column">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>

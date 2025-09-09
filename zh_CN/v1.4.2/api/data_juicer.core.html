@@ -562,6 +562,14 @@ NestedDataset.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.NestedDataset.from_list">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.from_list"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.NestedDataset.from_list" title="Link to this definition">¶</a></dt>
+<dd><p>Override the from_dict func, which is called by most from_xx
+constructors, such that the constructed dataset object is
+NestedDataset.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.NestedDataset.get">
 <span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/dj_dataset.html#NestedDataset.get"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.NestedDataset.get" title="Link to this definition">¶</a></dt>
 <dd><p>Get k rows from the dataset.</p>
@@ -1283,6 +1291,7 @@ modification by the Mapper</p>
 <li><a class="reference internal" href="#data_juicer.core.NestedDataset.cleanup_cache_files"><code class="docutils literal notranslate"><span class="pre">NestedDataset.cleanup_cache_files()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.NestedDataset.filter"><code class="docutils literal notranslate"><span class="pre">NestedDataset.filter()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.NestedDataset.from_dict"><code class="docutils literal notranslate"><span class="pre">NestedDataset.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.NestedDataset.from_list"><code class="docutils literal notranslate"><span class="pre">NestedDataset.from_list()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.NestedDataset.get"><code class="docutils literal notranslate"><span class="pre">NestedDataset.get()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.NestedDataset.get_column"><code class="docutils literal notranslate"><span class="pre">NestedDataset.get_column()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.NestedDataset.load_from_disk"><code class="docutils literal notranslate"><span class="pre">NestedDataset.load_from_disk()</span></code></a></li>
