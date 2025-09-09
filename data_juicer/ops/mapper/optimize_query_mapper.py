@@ -4,7 +4,6 @@ from data_juicer.ops.mapper.optimize_qa_mapper import OptimizeQAMapper
 OP_NAME = "optimize_query_mapper"
 
 
-# TODO: Extend LLM-based OPs into API-based implementation.
 @OPERATORS.register_module(OP_NAME)
 class OptimizeQueryMapper(OptimizeQAMapper):
     """Optimize queries in question-answer pairs to make them more specific and detailed.

@@ -1,7 +1,7 @@
 import os
 import time
 from argparse import ArgumentError
-from typing import List, Union
+from typing import List, Optional, Union
 
 from jsonargparse import ActionConfigFile, ArgumentParser
 from loguru import logger
@@ -37,6 +37,8 @@ def init_sandbox_configs(args=None):
 
     parser.add_argument("--resume", type=bool, default=False, help="Whether to resume from the existing context infos.")
 
+    parser.add_argument("--debug", type=bool, default=False, help="Whether to activate the debug mode.")
+
     parser.add_argument(
         "--hpo_config", type=str, help="Path to a configuration file when using auto-HPO tool.", required=False
     )
@@ -68,6 +70,42 @@ def init_sandbox_configs(args=None):
         help="List of params for each evaluation jobs.",
     )
 
+    # iterative target related
+    parser.add_argument(
+        "--max_iter_num",
+        type=int,
+        default=1,
+        help="Maximum number of iterations for iterative target. "
+        "If set to a positive integer, the pipelines will run "
+        "iteratively until the maximum number of iterations is reached. "
+        "If set to 0, you must set the iter_target and the pipelines will "
+        "run iteratively until the iter_target is satisfied. ",
+    )
+
+    parser.add_argument(
+        "--iter_targets",
+        type=Optional[List[str]],
+        default=[],
+        help="Targets for iterative pipelines. "
+        "If set, the pipelines will run iteratively until the target is satisfied or for the max iteration number. "
+        "The target is a dict with the following keys: "
+        "'targets': a list of str targets to monitor. The format of a single target should be "
+        "'<pipeline_name>.<hook_meta_name>.<hook_output_name> [>|>=|<|<=|==] <target_value>', where the "
+        "pipeline/hook/output names must come from the existing ones in the pipelines."
+        "If not set, the target will be evaluated iteratively until the maximum number of iterations is reached. ",
+    )
+
+    parser.add_argument(
+        "--iter_targets_mode",
+        type=str,
+        default="all",
+        help="The mode to check the iterative targets for stopping the pipelines. "
+        "'all': all targets must be satisfied. "
+        "'any': any satisfied target is OK. ",
+    )
+
+    parser.add_argument("--iter_updater", type=dict, default={}, help="The updater for iterative running. ")
+
     try:
         cfg = parser.parse_args(args=args)
 
@@ -87,7 +125,7 @@ def init_sandbox_configs(args=None):
             os.makedirs(log_dir, exist_ok=True)
         timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))
         logfile_name = f"sandbox_log_{project_name}_{exp_name}_time_{timestamp}.txt"
-        setup_logger(save_dir=log_dir, filename=logfile_name)
+        setup_logger(save_dir=log_dir, filename=logfile_name, level="DEBUG" if cfg.debug else "INFO")
 
         return cfg
     except ArgumentError:
