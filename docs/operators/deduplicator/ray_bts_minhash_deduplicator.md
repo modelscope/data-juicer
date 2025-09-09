@@ -15,24 +15,24 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `tokenization` | <class 'str'> | `'space'` | tokenization method for sample texts. It |
+| `tokenization` | <class 'str'> | `'space'` | tokenization method for sample texts. It should be one of [space, punctuation, character, sentencepiece]. For English-like languages, we recommend to use 'space', for Chinese-like languages, we recommend to use 'character', and for multiple languages, we recommend to use 'sentencepiece'. If using 'sentencepiece', please provided the model path in the 'tokenizer_model' field. |
 | `window_size` | typing.Annotated[int, Gt(gt=0)] | `5` | window size of shingling |
 | `lowercase` | <class 'bool'> | `True` | whether to convert text to lower case first |
-| `ignore_pattern` | typing.Optional[str] | `None` | whether to ignore sub-strings with |
-| `num_permutations` | typing.Annotated[int, Gt(gt=0)] | `256` | number of permutations in minhash |
-| `jaccard_threshold` | typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | `0.7` | the min jaccard similarity threshold |
-| `num_bands` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | number of bands in LSH. Default it's None, and |
-| `num_rows_per_band` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | number of rows in each band in LSH. |
-| `tokenizer_model` | typing.Optional[str] | `None` | path for the sentencepiece model, used for |
-| `union_find_parallel_num` | typing.Union[int, str] | `'auto'` | number of parallel workers for |
-| `union_threshold` | typing.Optional[int] | `256` | threshold for minhash values group to |
-| `max_pending_edge_buffer_task` | typing.Optional[int] | `20` | max number of pending edge buffer |
-| `num_edge_buffer_task_returns` | typing.Optional[int] | `10` | number of edge buffer tasks for |
-| `max_pending_filter_tasks` | typing.Optional[int] | `20` | max number of pending filter ray |
-| `num_filter_task_returns` | typing.Optional[int] | `10` | number of filter tasks for `ray.wait` |
-| `merge_batch_size` | typing.Optional[int] | `1000` | batch size for BTS operations. Default |
-| `minhash_batch_size` | typing.Union[int, str, NoneType] | `'auto'` | batch size for MinHash computation. If "auto", |
-| `memory_per_sample` | typing.Optional[float] | `0.1` | estimated memory needed per sample in MB. |
+| `ignore_pattern` | typing.Optional[str] | `None` | whether to ignore sub-strings with specific pattern when computing minhash |
+| `num_permutations` | typing.Annotated[int, Gt(gt=0)] | `256` | number of permutations in minhash computing |
+| `jaccard_threshold` | typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | `0.7` | the min jaccard similarity threshold in near-duplicate detection. When the jaccard similarity of two sample texts is >= this threshold, they are regarded as similar samples and this op will only keep one of them after deduplication |
+| `num_bands` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | number of bands in LSH. Default it's None, and it will be determined by an optimal params computation algorithm by minimize the weighted sum of probs of False Positives and False Negatives |
+| `num_rows_per_band` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | number of rows in each band in LSH. Default it's None, and it will be determined by an optimal params computation algorithm |
+| `tokenizer_model` | typing.Optional[str] | `None` | path for the sentencepiece model, used for sentencepiece tokenization. |
+| `union_find_parallel_num` | typing.Union[int, str] | `'auto'` | number of parallel workers for union-find algorithm. Default it's 'auto', and it will be determined by half of the number of CPUs. |
+| `union_threshold` | typing.Optional[int] | `256` | threshold for minhash values group to perform union-find algorithm. Default it's 256. |
+| `max_pending_edge_buffer_task` | typing.Optional[int] | `20` | max number of pending edge buffer ray tasks. Default it's 20. |
+| `num_edge_buffer_task_returns` | typing.Optional[int] | `10` | number of edge buffer tasks for `ray.wait` to return. Default it's 10. |
+| `max_pending_filter_tasks` | typing.Optional[int] | `20` | max number of pending filter ray tasks. Default it's 20. |
+| `num_filter_task_returns` | typing.Optional[int] | `10` | number of filter tasks for `ray.wait` to return. Default it's 10. |
+| `merge_batch_size` | typing.Optional[int] | `1000` | batch size for BTS operations. Default it's 1000. |
+| `minhash_batch_size` | typing.Union[int, str, NoneType] | `'auto'` | batch size for MinHash computation. If "auto", it will be set to default value on CPU(1024), or auto calculated per available GPU memory and memory_per_sample setting for GPU. |
+| `memory_per_sample` | typing.Optional[float] | `0.1` | estimated memory needed per sample in MB. Used to calculate batch size based on available GPU memory. Default is 0.1 MB per sample. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

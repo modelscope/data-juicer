@@ -15,11 +15,11 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `field_key` | <class 'str'> | `''` | Selector based on the specified value |
-| `lower_percentile` | typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])]] | `None` | The lower bound of the percentile to |
-| `upper_percentile` | typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])]] | `None` | The upper bound of the percentile to |
-| `lower_rank` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | The lower bound of the rank to be sample, |
-| `upper_rank` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | The upper bound of the rank to be sample, |
+| `field_key` | <class 'str'> | `''` | Selector based on the specified value corresponding to the target key. The target key corresponding to multi-level field information need to be separated by '.'. |
+| `lower_percentile` | typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])]] | `None` | The lower bound of the percentile to be sample, samples will be selected if their specified field values are greater than this lower bound. When both lower_percentile and lower_rank are set, the value corresponding to the larger number of samples will be applied. |
+| `upper_percentile` | typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])]] | `None` | The upper bound of the percentile to be sample, samples will be selected if their specified field values are less or equal to the upper bound. When both upper_percentile and upper_rank are set, the value corresponding to the smaller number of samples will be applied. |
+| `lower_rank` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | The lower bound of the rank to be sample, samples will be selected if their specified field values are greater than this lower bound. When both lower_percentile and lower_rank are set, the value corresponding to the larger number of samples will be applied. |
+| `upper_rank` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | The upper bound of the rank to be sample, samples will be selected if their specified field values are less or equal to the upper bound. When both upper_percentile and upper_rank are set, the value corresponding to the smaller number of samples will be applied. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

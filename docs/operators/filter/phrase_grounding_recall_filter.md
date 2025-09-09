@@ -15,17 +15,17 @@ Tags 标签: cpu, hf, multimodal
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `hf_owlvit` | <class 'str'> | `'google/owlvit-base-patch32'` | Owl-ViT model name on huggingface to locate the |
+| `hf_owlvit` | <class 'str'> | `'google/owlvit-base-patch32'` | Owl-ViT model name on huggingface to locate the phrases extracted from the text. |
 | `trust_remote_code` | <class 'bool'> | `False` |  |
 | `min_recall` | <class 'float'> | `0.1` | The min phrase grounding recall to keep samples. |
 | `max_recall` | <class 'float'> | `1.0` | The max phrase grounding recall to keep samples. |
 | `horizontal_flip` | <class 'bool'> | `False` | Flip image horizontally (left to right). |
 | `vertical_flip` | <class 'bool'> | `False` | Flip image vertically (top to bottom). |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
-| `reduce_mode` | <class 'str'> | `'avg'` | reduce mode when one text corresponds to |
-| `iou_thr` | <class 'float'> | `0.5` | the IoU threshold for NMS-like post-process. If two |
-| `large_area_ratio_thr` | <class 'float'> | `0.95` | the area ratio threshold for filtering out |
-| `conf_thr` | <class 'float'> | `0.0` | the confidence score threshold for removing |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition. |
+| `reduce_mode` | <class 'str'> | `'avg'` | reduce mode when one text corresponds to multiple images in a chunk. 'avg': Take the average of multiple values 'max': Take the max of multiple values 'min': Take the min of multiple values |
+| `iou_thr` | <class 'float'> | `0.5` | the IoU threshold for NMS-like post-process. If two predicted bboxes are overlap with an IoU larger than this threshold, the bbox with less confidence will be removed. Default: 0.5. |
+| `large_area_ratio_thr` | <class 'float'> | `0.95` | the area ratio threshold for filtering out those large predicted bboxes. If the area of a predicted bbox accounts for more than this ratio threshold of the whole image area, this bbox will be removed. Default: 0.95. |
+| `conf_thr` | <class 'float'> | `0.0` | the confidence score threshold for removing low-confidence bboxes. If the confidence score of a predicted bbox is lower than the threshold, this bbox will be removed. Default: 0. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

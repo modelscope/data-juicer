@@ -28,9 +28,9 @@ Tags 标签: cpu, multimodal
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `split_duration` | <class 'float'> | `10` | duration of each video split in seconds. |
-| `min_last_split_duration` | <class 'float'> | `0` | The minimum allowable duration in |
-| `keep_original_sample` | <class 'bool'> | `True` | whether to keep the original sample. If |
-| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. |
+| `min_last_split_duration` | <class 'float'> | `0` | The minimum allowable duration in seconds for the last video split. If the duration of the last split is less than this value, it will be discarded. |
+| `keep_original_sample` | <class 'bool'> | `True` | whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default. |
+| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

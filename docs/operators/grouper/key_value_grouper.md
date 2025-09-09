@@ -15,7 +15,7 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `group_by_keys` | typing.Optional[typing.List[str]] | `None` | group samples according values in the keys. |
+| `group_by_keys` | typing.Optional[typing.List[str]] | `None` | group samples according values in the keys. Support for nested keys such as "__dj__stats__.text_len". It is [self.text_key] in default. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

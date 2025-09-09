@@ -23,7 +23,7 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `field_key` | <class 'str'> | `''` | Selector based on the specified value |
+| `field_key` | <class 'str'> | `''` | Selector based on the specified value corresponding to the target key. The target key corresponding to multi-level field information need to be separated by '.'. |
 | `target_tags` | typing.List[str] | `None` | Target tags to be select. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |

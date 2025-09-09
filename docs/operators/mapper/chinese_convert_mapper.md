@@ -15,7 +15,7 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `mode` | <class 'str'> | `'s2t'` | Choose the mode to convert Chinese: |
+| `mode` | <class 'str'> | `'s2t'` | Choose the mode to convert Chinese: s2t: Simplified Chinese to Traditional Chinese,  t2s: Traditional Chinese to Simplified Chinese,  s2tw: Simplified Chinese to Traditional Chinese (Taiwan Standard),  tw2s: Traditional Chinese (Taiwan Standard) to Simplified Chinese,  s2hk: Simplified Chinese to Traditional Chinese (Hong Kong variant),  hk2s: Traditional Chinese (Hong Kong variant) to Simplified Chinese,  s2twp: Simplified Chinese to Traditional Chinese (Taiwan Standard) with Taiwanese idiom,  tw2sp: Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland Chinese idiom,  t2tw: Traditional Chinese to Traditional Chinese (Taiwan Standard),  tw2t: Traditional Chinese (Taiwan standard) to Traditional Chinese,  hk2t: Traditional Chinese (Hong Kong variant) to Traditional Chinese,  t2hk: Traditional Chinese to Traditional Chinese (Hong Kong variant),  t2jp: Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji,  jp2t: New Japanese Kanji (Shinjitai) to Traditional Chinese Characters, |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

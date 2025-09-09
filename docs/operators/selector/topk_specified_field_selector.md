@@ -15,10 +15,10 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `field_key` | <class 'str'> | `''` | Selector based on the specified value |
-| `top_ratio` | typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])]] | `None` | Ratio of selected top samples, samples will be |
-| `topk` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | Number of selected top sample, samples will be |
-| `reverse` | <class 'bool'> | `True` | Determine the sorting rule, if reverse=True, |
+| `field_key` | <class 'str'> | `''` | Selector based on the specified value corresponding to the target key. The target key corresponding to multi-level field information need to be separated by '.'. |
+| `top_ratio` | typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])]] | `None` | Ratio of selected top samples, samples will be selected if their specified field values are within this parameter. When both topk and top_ratio are set, the value corresponding to the smaller number of samples will be applied. |
+| `topk` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | Number of selected top sample, samples will be selected if their specified field values are within this parameter. When both topk and top_ratio are set, the value corresponding to the smaller number of samples will be applied. |
+| `reverse` | <class 'bool'> | `True` | Determine the sorting rule, if reverse=True, then sort in descending order. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

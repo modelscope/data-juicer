@@ -16,6 +16,7 @@ from utils.parse_class import extract_class_attr_paths
 from utils.extractor import extract_test_info_from_path
 from utils.router import route
 from utils.view_model import to_legacy_view
+from docstring_parser import parse
 
 from data_juicer.tools.op_search import OPSearcher
 
@@ -37,7 +38,7 @@ NO_EXPLAIN_OPS = [
     "text_embd_similarity_filter",
     "audio_add_gaussian_noise_mapper",
     "image_blur_mapper",
-    "image_captioning_from_gpt4v_mapper"
+    "image_captioning_from_gpt4v_mapper",
 ]
 
 env = Environment(
@@ -306,17 +307,8 @@ def parse_param_desc(param_desc_str):
     Parse parameter descriptions from docstring in ':param name: desc' format.
     Return a dict {param_name: description}.
     """
-    param_map = {}
-    for line in param_desc_str.splitlines():
-        line = line.strip()
-        if line.startswith(":param"):
-            try:
-                _, rest = line.split(":param", 1)
-                name, desc = rest.strip().split(":", 1)
-                param_map[name.strip()] = desc.strip()
-            except ValueError:
-                continue
-    return param_map
+    docstring = parse(param_desc_str)
+    return {p.arg_name: p.description.replace("\n", " ") for p in docstring.params}
 
 
 def param_signature_to_list(sig, param_docs):
@@ -742,6 +734,8 @@ def main():
                 original_descs.append(cleaned_desc)
             else:
                 op_info_tmpl["desc"] = en_desc + "\n\n" + zh_desc
+        else:
+            original_descs.append(cleaned_desc)
         op_detail_list.append((op_info["name"], op_info_tmpl, examples_list))
 
     # save examples cache

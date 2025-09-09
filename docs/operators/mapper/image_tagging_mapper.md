@@ -15,7 +15,7 @@ Tags 标签: cpu, image
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `tag_field_name` | <class 'str'> | `'image_tags'` | the field name to store the tags. It's |
+| `tag_field_name` | <class 'str'> | `'image_tags'` | the field name to store the tags. It's "image_tags" in default. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

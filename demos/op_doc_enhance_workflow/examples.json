@@ -3030,6 +3030,12 @@
             "ds": "[{'query': '鱼香肉丝怎么做？', 'response': '鱼香肉丝是将猪肉丝与胡萝卜、青椒、木耳炒制，调入调味料如酱油、醋和辣豆瓣酱，快速翻炒而成的美味佳肴。'}, {'query': '什么是蚂蚁上树？', 'response': '蚂蚁上树是一道中国菜。'}]",
             "tgt": null,
             "samples": null
+        },
+        "test_api": {
+            "op_code": "OptimizeQAMapper(api_or_hf_model='Qwen/Qwen2.5-7B-Instruct', enable_vllm=False, is_hf_model=True, sampling_params={'max_new_tokens': 200})",
+            "ds": null,
+            "tgt": null,
+            "samples": "[{'query': '鱼香肉丝怎么做？', 'response': '鱼香肉丝是将猪肉丝与胡萝卜、青椒、木耳炒制，调入调味料如酱油、醋和辣豆瓣酱，快速翻炒而成的美味佳肴。'}, {'query': '什么是蚂蚁上树？', 'response': '蚂蚁上树是一道中国菜。'}]"
         }
     },
     "optimize_query_mapper": {
@@ -4390,5 +4396,19 @@
     "JsonFormatter": {},
     "ParquetFormatter": {},
     "TextFormatter": {},
-    "TsvFormatter": {}
+    "TsvFormatter": {},
+    "optimize_prompt_mapper": {
+        "test": {
+            "op_code": "OptimizePromptMapper(api_or_hf_model='Qwen/Qwen2.5-7B-Instruct', gen_num=3, max_example_num=3, enable_vllm=False, is_hf_model=True, sampling_params={'max_new_tokens': 200})",
+            "ds": null,
+            "tgt": null,
+            "samples": null
+        },
+        "test_api_model": {
+            "op_code": "OptimizePromptMapper(api_or_hf_model='Qwen/Qwen2.5-7B-Instruct', gen_num=3, max_example_num=3, enable_vllm=False, is_hf_model=True, sampling_params={'max_new_tokens': 200})",
+            "ds": null,
+            "tgt": null,
+            "samples": null
+        }
+    }
 }

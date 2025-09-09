@@ -16,7 +16,7 @@ Tags 标签: cpu, text
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `lowercase` | <class 'bool'> | `False` | Whether to convert sample text to lower case |
-| `ignore_non_character` | <class 'bool'> | `False` | Whether to ignore non-alphabet |
+| `ignore_non_character` | <class 'bool'> | `False` | Whether to ignore non-alphabet characters, including whitespaces, digits, and punctuations |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args. |
 

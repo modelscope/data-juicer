@@ -17,11 +17,11 @@ Tags 标签: cpu, hf, multimodal
 |--------|------|--------|------|
 | `hf_img2seq` | <class 'str'> | `'Salesforce/blip2-opt-2.7b'` | model name on huggingface to generate caption |
 | `trust_remote_code` | <class 'bool'> | `False` |  |
-| `caption_num` | typing.Annotated[int, Gt(gt=0)] | `1` | how many candidate captions to generate |
-| `keep_candidate_mode` | <class 'str'> | `'random_any'` | retain strategy for the generated |
-| `keep_original_sample` | <class 'bool'> | `True` | whether to keep the original sample. If |
-| `prompt` | typing.Optional[str] | `None` | a string prompt to guide the generation of blip2 model |
-| `prompt_key` | typing.Optional[str] | `None` | the key name of fields in samples to store prompts |
+| `caption_num` | typing.Annotated[int, Gt(gt=0)] | `1` | how many candidate captions to generate for each image |
+| `keep_candidate_mode` | <class 'str'> | `'random_any'` | retain strategy for the generated $caption_num$ candidates.      'random_any': Retain the random one from generated captions      'similar_one_simhash': Retain the generated one that is most         similar to the original caption      'all': Retain all generated captions by concatenation  Note:     This is a batched_OP, whose input and output type are     both list. Suppose there are $N$ list of input samples, whose batch     size is $b$, and denote caption_num as $M$.     The number of total samples after generation is $2Nb$ when     keep_original_sample is True and $Nb$ when keep_original_sample is     False. For 'random_any' and 'similar_one_simhash' mode,     it's $(1+M)Nb$ for 'all' mode when keep_original_sample is True     and $MNb$ when keep_original_sample is False. |
+| `keep_original_sample` | <class 'bool'> | `True` | whether to keep the original sample. If it's set to False, there will be only generated captions in the final datasets and the original captions will be removed. It's True in default. |
+| `prompt` | typing.Optional[str] | `None` | a string prompt to guide the generation of blip2 model for all samples globally. It's None in default, which means no prompt provided. |
+| `prompt_key` | typing.Optional[str] | `None` | the key name of fields in samples to store prompts for each sample. It's used for set different prompts for different samples. If it's none, use prompt in parameter "prompt". It's None in default. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

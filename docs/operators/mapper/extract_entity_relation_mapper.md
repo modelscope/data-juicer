@@ -29,23 +29,23 @@ Tags 标签: cpu, api, text
 |--------|------|--------|------|
 | `api_model` | <class 'str'> | `'gpt-4o'` | API model name. |
 | `entity_types` | typing.List[str] | `None` | Pre-defined entity types for knowledge graph. |
-| `entity_key` | <class 'str'> | `'entity'` | The key name to store the entities in the meta |
-| `relation_key` | <class 'str'> | `'relation'` | The field name to store the relations between |
+| `entity_key` | <class 'str'> | `'entity'` | The key name to store the entities in the meta field. It's "entity" in default. |
+| `relation_key` | <class 'str'> | `'relation'` | The field name to store the relations between entities. It's "relation" in default. |
 | `api_endpoint` | typing.Optional[str] | `None` | URL endpoint for the API. |
-| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. |
+| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. Defaults to 'choices.0.message.content'. |
 | `prompt_template` | typing.Optional[str] | `None` | The template of input prompt. |
 | `tuple_delimiter` | typing.Optional[str] | `None` | Delimiter to separate items in outputs. |
 | `record_delimiter` | typing.Optional[str] | `None` | Delimiter to separate records in outputs. |
 | `completion_delimiter` | typing.Optional[str] | `None` | To mark the end of the output. |
-| `max_gleaning` | typing.Annotated[int, Ge(ge=0)] | `1` | the extra max num to call LLM to glean entities |
-| `continue_prompt` | typing.Optional[str] | `None` | the prompt for gleaning entities and |
-| `if_loop_prompt` | typing.Optional[str] | `None` | the prompt to determine whether to stop |
+| `max_gleaning` | typing.Annotated[int, Ge(ge=0)] | `1` | the extra max num to call LLM to glean entities and relations. |
+| `continue_prompt` | typing.Optional[str] | `None` | the prompt for gleaning entities and relations. |
+| `if_loop_prompt` | typing.Optional[str] | `None` | the prompt to determine whether to stop gleaning. |
 | `entity_pattern` | typing.Optional[str] | `None` | Regular expression for parsing entity record. |
-| `relation_pattern` | typing.Optional[str] | `None` | Regular expression for parsing relation |
-| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retry attempts when there is an API |
+| `relation_pattern` | typing.Optional[str] | `None` | Regular expression for parsing relation record. |
+| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retry attempts when there is an API call error or output parsing error. |
 | `drop_text` | <class 'bool'> | `False` | If drop the text in the output. |
 | `model_params` | typing.Dict | `{}` | Parameters for initializing the API model. |
-| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. |
+| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95} |
 | `kwargs` |  | `''` | Extra keyword arguments. |
 
 ## 📊 Effect demonstration 效果演示

@@ -15,8 +15,8 @@ Tags 标签: cpu, multimodal
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `keep_original_sample` | <class 'bool'> | `True` | whether to keep the original sample. If |
-| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. |
+| `keep_original_sample` | <class 'bool'> | `True` | whether to keep the original sample. If it's set to False, there will be only split sample in the final datasets and the original sample will be removed. It's True in default. |
+| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

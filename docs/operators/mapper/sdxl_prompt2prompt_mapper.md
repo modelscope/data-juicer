@@ -15,13 +15,13 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `hf_diffusion` | <class 'str'> | `'stabilityai/stable-diffusion-xl-base-1.0'` | diffusion model name on huggingface to generate |
+| `hf_diffusion` | <class 'str'> | `'stabilityai/stable-diffusion-xl-base-1.0'` | diffusion model name on huggingface to generate the image. |
 | `trust_remote_code` |  | `False` |  |
-| `torch_dtype` | <class 'str'> | `'fp32'` | the floating point type used to load the diffusion |
-| `num_inference_steps` | <class 'float'> | `50` | The larger the value, the better the |
-| `guidance_scale` | <class 'float'> | `7.5` | A higher guidance scale value encourages the |
-| `text_key` |  | `None` | the key name used to store the first caption |
-| `text_key_second` |  | `None` | the key name used to store the second caption |
+| `torch_dtype` | <class 'str'> | `'fp32'` | the floating point type used to load the diffusion model. |
+| `num_inference_steps` | <class 'float'> | `50` | The larger the value, the better the image generation quality; however, this also increases the time required for generation. |
+| `guidance_scale` | <class 'float'> | `7.5` | A higher guidance scale value encourages the model to generate images closely linked to the text prompt at the expense of lower image quality. Guidance scale is enabled when |
+| `text_key` |  | `None` | the key name used to store the first caption in the caption pair. |
+| `text_key_second` |  | `None` | the key name used to store the second caption in the caption pair. |
 | `output_dir` |  | `'/home/cmgzn/.cache/data_juicer/assets'` | the storage location of the generated images. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |

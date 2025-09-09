@@ -15,7 +15,7 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `suffixes` | typing.Union[str, typing.List[str]] | `[]` | the suffix of text that will be keep. |
+| `suffixes` | typing.Union[str, typing.List[str]] | `[]` | the suffix of text that will be keep. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx'] |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 
