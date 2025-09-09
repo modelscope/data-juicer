@@ -501,7 +501,7 @@ def parse_op_record_from_current_doc():
                         tags=tags,
                         test=test_path if os.path.exists(test_path) else "-",
                         info=info,
-                        ref=ref[0] if len(ref) > 0 else "-",
+                        ref=ref if len(ref) > 0 else "-",
                     )
                 )
         op_record_list.sort(key=lambda record: (record.type, record.name))

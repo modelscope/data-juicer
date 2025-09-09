@@ -1060,7 +1060,7 @@ def get_model(model_key=None, rank=None, use_cuda=False):
     global MODEL_ZOO
     if model_key not in MODEL_ZOO:
         logger.debug(f"{model_key} not found in MODEL_ZOO ({mp.current_process().name})")
-        if use_cuda:
+        if use_cuda and cuda_device_count() > 0:
             rank = rank if rank is not None else 0
             rank = rank % cuda_device_count()
             device = f"cuda:{rank}"
