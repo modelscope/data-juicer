@@ -88,7 +88,7 @@ CalibrateQAMapper(api_model='qwen2.5-72b-instruct')
 李莲花：我不知道，也不愿知道。我所说的只是个故事，当故事听就好，是真是假、你自己判断.
 李莲花：不必紧张，这毒我中了许久，早就习惯了，没那么严重的。
 李莲花：等我有天想起你的时候，我发现我忘了为什么要恨你，觉得过去那些已不重要。
-</pre></details><div class='meta' style='margin-top:6px;'><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555; white-space:nowrap;'>query</td><td style='padding:4px 8px;'>你还喜欢乔婉娩吗？</td></tr><tr><td style='padding:4px 8px; color:#555; white-space:nowrap;'>response</td><td style='padding:4px 8px;'>不喜欢。</td></tr></table></div></div>
+</pre></details><div class='meta' style='margin-top:6px;'><table class='meta-table' style='border-collapse:collapse; width:100%; border:1px solid #eaecef !important;'><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; white-space:nowrap; border-bottom:1px solid #eaecef !important;'>query</td><td style='text-align:left; vertical-align:top; padding:4px 8px; border-bottom:1px solid #eaecef !important;'>你还喜欢乔婉娩吗？</td></tr><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; white-space:nowrap; border-bottom:1px solid #eaecef !important;'>response</td><td style='text-align:left; vertical-align:top; padding:4px 8px; border-bottom:1px solid #eaecef !important;'>不喜欢。</td></tr></table></div></div>
 
 #### 📤 output data 输出数据
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;"># 角色语言风格
@@ -144,7 +144,7 @@ CalibrateQAMapper(api_model='qwen2.5-72b-instruct')
 李莲花：我不知道，也不愿知道。我所说的只是个故事，当故事听就好，是真是假、你自己判断.
 李莲花：不必紧张，这毒我中了许久，早就习惯了，没那么严重的。
 李莲花：等我有天想起你的时候，我发现我忘了为什么要恨你，觉得过去那些已不重要。
-</pre></details><div class='meta' style='margin-top:6px;'><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555; white-space:nowrap;'>query</td><td style='padding:4px 8px;'>你还喜欢乔婉娩吗？</td></tr><tr><td style='padding:4px 8px; color:#555; white-space:nowrap;'>response</td><td style='padding:4px 8px;'>乔婉娩啊，曾经确实有过一段情愫，但如今早已风轻云淡。往事如烟，既然是往事，早就该忘记了。</td></tr></table></div></div>
+</pre></details><div class='meta' style='margin-top:6px;'><table class='meta-table' style='border-collapse:collapse; width:100%; border:1px solid #eaecef !important;'><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; white-space:nowrap; border-bottom:1px solid #eaecef !important;'>query</td><td style='text-align:left; vertical-align:top; padding:4px 8px; border-bottom:1px solid #eaecef !important;'>你还喜欢乔婉娩吗？</td></tr><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; white-space:nowrap; border-bottom:1px solid #eaecef !important;'>response</td><td style='text-align:left; vertical-align:top; padding:4px 8px; border-bottom:1px solid #eaecef !important;'>乔婉娩啊，曾经确实有过一段情愫，但如今早已风轻云淡。往事如烟，既然是往事，早就该忘记了。</td></tr></table></div></div>
 
 #### ✨ explanation 解释
 This example demonstrates the basic usage of the CalibrateQAMapper. It takes a reference text and a question-answer pair, then uses an API model (in this case, 'qwen2.5-72b-instruct') to generate a more detailed and accurate answer. 
@@ -209,7 +209,7 @@ CalibrateQAMapper(api_model='qwen2.5-72b-instruct', api_endpoint='https://dashsc
 李莲花：我不知道，也不愿知道。我所说的只是个故事，当故事听就好，是真是假、你自己判断.
 李莲花：不必紧张，这毒我中了许久，早就习惯了，没那么严重的。
 李莲花：等我有天想起你的时候，我发现我忘了为什么要恨你，觉得过去那些已不重要。
-</pre></details><div class='meta' style='margin-top:6px;'><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555; white-space:nowrap;'>query</td><td style='padding:4px 8px;'>你还喜欢乔婉娩吗？</td></tr><tr><td style='padding:4px 8px; color:#555; white-space:nowrap;'>response</td><td style='padding:4px 8px;'>不喜欢。</td></tr></table></div></div>
+</pre></details><div class='meta' style='margin-top:6px;'><table class='meta-table' style='border-collapse:collapse; width:100%; border:1px solid #eaecef !important;'><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; white-space:nowrap; border-bottom:1px solid #eaecef !important;'>query</td><td style='text-align:left; vertical-align:top; padding:4px 8px; border-bottom:1px solid #eaecef !important;'>你还喜欢乔婉娩吗？</td></tr><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; white-space:nowrap; border-bottom:1px solid #eaecef !important;'>response</td><td style='text-align:left; vertical-align:top; padding:4px 8px; border-bottom:1px solid #eaecef !important;'>不喜欢。</td></tr></table></div></div>
 
 #### 📤 output data 输出数据
 <div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;"># 角色语言风格
@@ -265,7 +265,7 @@ CalibrateQAMapper(api_model='qwen2.5-72b-instruct', api_endpoint='https://dashsc
 李莲花：我不知道，也不愿知道。我所说的只是个故事，当故事听就好，是真是假、你自己判断.
 李莲花：不必紧张，这毒我中了许久，早就习惯了，没那么严重的。
 李莲花：等我有天想起你的时候，我发现我忘了为什么要恨你，觉得过去那些已不重要。
-</pre></details><div class='meta' style='margin-top:6px;'><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555; white-space:nowrap;'>query</td><td style='padding:4px 8px;'>你还喜欢乔婉娩吗？</td></tr><tr><td style='padding:4px 8px; color:#555; white-space:nowrap;'>response</td><td style='padding:4px 8px;'>乔婉娩啊，她曾是我生命中的一段过往，但如今早已随风而散。人总要学会放下，过去的感情就像流水，一去不复返。如今的我，只愿在这江湖上自在行走，不再为情所困。</td></tr></table></div></div>
+</pre></details><div class='meta' style='margin-top:6px;'><table class='meta-table' style='border-collapse:collapse; width:100%; border:1px solid #eaecef !important;'><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; white-space:nowrap; border-bottom:1px solid #eaecef !important;'>query</td><td style='text-align:left; vertical-align:top; padding:4px 8px; border-bottom:1px solid #eaecef !important;'>你还喜欢乔婉娩吗？</td></tr><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; white-space:nowrap; border-bottom:1px solid #eaecef !important;'>response</td><td style='text-align:left; vertical-align:top; padding:4px 8px; border-bottom:1px solid #eaecef !important;'>乔婉娩啊，她曾是我生命中的一段过往，但如今早已随风而散。人总要学会放下，过去的感情就像流水，一去不复返。如今的我，只愿在这江湖上自在行走，不再为情所困。</td></tr></table></div></div>
 
 #### ✨ explanation 解释
 This example illustrates the use of additional arguments with the CalibrateQAMapper. It specifies the API endpoint and the path to the response content in the output, demonstrating the flexibility of configuring the operator.
