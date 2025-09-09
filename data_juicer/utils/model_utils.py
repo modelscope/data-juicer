@@ -320,18 +320,18 @@ def prepare_api_model(
 
     def get_processor():
         try:
-            return tiktoken.encoding_for_model(model)
+            return tiktoken.encoding_for_model(check_model_home(model))
         except Exception:
             pass
 
         try:
-            return dashscope.get_tokenizer(model)
+            return dashscope.get_tokenizer(check_model_home(model))
         except Exception:
             pass
 
         try:
             processor = transformers.AutoProcessor.from_pretrained(
-                pretrained_model_name_or_path=model, **processor_config
+                pretrained_model_name_or_path=check_model_home(model), **processor_config
             )
             return processor
         except Exception:
