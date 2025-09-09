@@ -16,8 +16,8 @@ Tags 标签: cpu, text
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `lowercase` | <class 'bool'> | `False` | Whether to convert sample text to lower case |
-| `ignore_special_character` | <class 'bool'> | `True` | Whether to ignore special |
-| `min_repeat_sentence_length` | <class 'int'> | `2` | Sentences shorter than this |
+| `ignore_special_character` | <class 'bool'> | `True` | Whether to ignore special characters when judging repeated sentences. Special characters are all characters except Chinese characters, letters and numbers. |
+| `min_repeat_sentence_length` | <class 'int'> | `2` | Sentences shorter than this length will not be deduplicated. If ignore_special_character is set to True, then special characters are not included in this length. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

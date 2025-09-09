@@ -15,7 +15,7 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `filter_condition` | <class 'str'> | `''` | The filter condition as a string. |
+| `filter_condition` | <class 'str'> | `''` | The filter condition as a string. It can include logical operators (and/or) and chain comparisons. For example: "10 < num <= 30 and text != 'nothing here' and __dj__meta__.a == 3". |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

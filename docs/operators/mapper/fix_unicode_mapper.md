@@ -15,7 +15,7 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `normalization` | <class 'str'> | `None` | the specified form of Unicode |
+| `normalization` | <class 'str'> | `None` | the specified form of Unicode normalization mode, which can be one of ['NFC', 'NFKC', 'NFD', and 'NFKD'], default 'NFC'. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

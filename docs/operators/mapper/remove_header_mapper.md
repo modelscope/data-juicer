@@ -15,7 +15,7 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `drop_no_head` | <class 'bool'> | `True` | whether to drop sample texts without |
+| `drop_no_head` | <class 'bool'> | `True` | whether to drop sample texts without headers. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

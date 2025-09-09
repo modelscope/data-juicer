@@ -15,14 +15,14 @@ Tags 标签: cpu, hf, multimodal
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `hf_clip` | <class 'str'> | `'openai/clip-vit-base-patch32'` | clip model name on huggingface to compute |
+| `hf_clip` | <class 'str'> | `'openai/clip-vit-base-patch32'` | clip model name on huggingface to compute the similarity between image and text. |
 | `trust_remote_code` | <class 'bool'> | `False` |  |
 | `min_score` | <class 'float'> | `0.1` | The min similarity to keep samples. |
 | `max_score` | <class 'float'> | `1.0` | The max similarity to keep samples. |
 | `horizontal_flip` | <class 'bool'> | `False` | Flip image horizontally (left to right). |
 | `vertical_flip` | <class 'bool'> | `False` | Flip image vertically (top to bottom). |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
-| `reduce_mode` | <class 'str'> | `'avg'` | reduce mode when one text corresponds to |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition. |
+| `reduce_mode` | <class 'str'> | `'avg'` | reduce mode when one text corresponds to multiple images in a chunk. 'avg': Take the average of multiple values 'max': Take the max of multiple values 'min': Take the min of multiple values |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

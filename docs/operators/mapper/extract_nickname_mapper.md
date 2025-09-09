@@ -16,16 +16,16 @@ Tags 标签: cpu, api, text
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `api_model` | <class 'str'> | `'gpt-4o'` | API model name. |
-| `nickname_key` | <class 'str'> | `'nickname'` | The key name to store the nickname |
+| `nickname_key` | <class 'str'> | `'nickname'` | The key name to store the nickname relationship in the meta field. It's "nickname" in default. |
 | `api_endpoint` | typing.Optional[str] | `None` | URL endpoint for the API. |
-| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. |
+| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. Defaults to 'choices.0.message.content'. |
 | `system_prompt` | typing.Optional[str] | `None` | System prompt for the task. |
 | `input_template` | typing.Optional[str] | `None` | Template for building the model input. |
 | `output_pattern` | typing.Optional[str] | `None` | Regular expression for parsing model output. |
-| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retry attempts when there is an API |
+| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retry attempts when there is an API call error or output parsing error. |
 | `drop_text` | <class 'bool'> | `False` | If drop the text in the output. |
 | `model_params` | typing.Dict | `{}` | Parameters for initializing the API model. |
-| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. |
+| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95} |
 | `kwargs` |  | `''` | Extra keyword arguments. |
 
 ## 📊 Effect demonstration 效果演示

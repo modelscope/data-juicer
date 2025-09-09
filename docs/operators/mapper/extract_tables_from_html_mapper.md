@@ -16,8 +16,8 @@ Tags 标签: cpu, text
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `tables_field_name` | <class 'str'> | `'html_tables'` | Field name to store the extracted tables. |
-| `retain_html_tags` | <class 'bool'> | `False` | If True, retains HTML tags in the tables; |
-| `include_header` | <class 'bool'> | `True` | If True, includes the table header; |
+| `retain_html_tags` | <class 'bool'> | `False` | If True, retains HTML tags in the tables; otherwise, removes them. |
+| `include_header` | <class 'bool'> | `True` | If True, includes the table header; otherwise, excludes it. This parameter is effective             only when `retain_html_tags` is False and applies solely to the extracted table content. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

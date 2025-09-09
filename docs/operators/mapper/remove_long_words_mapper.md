@@ -15,8 +15,8 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `min_len` | <class 'int'> | `1` | The min mapper word length in this op, words |
-| `max_len` | <class 'int'> | `9223372036854775807` | The max mapper word length in this op, words |
+| `min_len` | <class 'int'> | `1` | The min mapper word length in this op, words will be filtered if their length is below this parameter. |
+| `max_len` | <class 'int'> | `9223372036854775807` | The max mapper word length in this op, words will be filtered if their length exceeds this parameter. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

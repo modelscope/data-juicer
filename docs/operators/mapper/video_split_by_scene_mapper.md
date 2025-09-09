@@ -15,11 +15,11 @@ Tags 标签: cpu, multimodal
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `detector` | <class 'str'> | `'ContentDetector'` | Algorithm from `scenedetect.detectors`. Should be one |
+| `detector` | <class 'str'> | `'ContentDetector'` | Algorithm from `scenedetect.detectors`. Should be one of ['ContentDetector', 'ThresholdDetector', 'AdaptiveDetector`]. |
 | `threshold` | typing.Annotated[float, Ge(ge=0)] | `27.0` | Threshold passed to the detector. |
 | `min_scene_len` | typing.Annotated[int, Ge(ge=0)] | `15` | Minimum length of any scene. |
 | `show_progress` | <class 'bool'> | `False` | Whether to show progress from scenedetect. |
-| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. |
+| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

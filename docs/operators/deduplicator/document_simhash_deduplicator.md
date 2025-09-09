@@ -26,9 +26,9 @@ Tags 标签: cpu, text
 | `tokenization` | <class 'str'> | `'space'` |  |
 | `window_size` | typing.Annotated[int, Gt(gt=0)] | `6` | window size of shingling |
 | `lowercase` | <class 'bool'> | `True` | whether to convert text to lower case first |
-| `ignore_pattern` | typing.Optional[str] | `None` | whether to ignore sub-strings with |
+| `ignore_pattern` | typing.Optional[str] | `None` | whether to ignore sub-strings with specific pattern when computing simhash |
 | `num_blocks` | typing.Annotated[int, Gt(gt=0)] | `6` | number of blocks in simhash computing |
-| `hamming_distance` | typing.Annotated[int, Gt(gt=0)] | `4` | the max hamming distance threshold in |
+| `hamming_distance` | typing.Annotated[int, Gt(gt=0)] | `4` | the max hamming distance threshold in near-duplicate detection. When the hamming distance of two sample texts is <= this threshold, they are regarded as similar samples and this op will only keep one of them after deduplication. This threshold should be always less than num_blocks |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

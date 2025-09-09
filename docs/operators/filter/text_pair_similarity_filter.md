@@ -15,14 +15,14 @@ Tags 标签: cpu, hf, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `hf_clip` |  | `'openai/clip-vit-base-patch32'` | clip model name on huggingface to compute |
+| `hf_clip` |  | `'openai/clip-vit-base-patch32'` |  |
 | `trust_remote_code` |  | `False` |  |
-| `min_score` | <class 'jsonargparse.typing.ClosedUnitInterval'> | `0.1` | The min similarity to keep samples. |
-| `max_score` | <class 'jsonargparse.typing.ClosedUnitInterval'> | `1.0` | The max similarity to keep samples. |
-| `text_key_second` |  | `None` | used to store the other sentence |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
-| `args` |  | `''` | extra args |
-| `kwargs` |  | `''` | extra args |
+| `min_score` | <class 'jsonargparse.typing.ClosedUnitInterval'> | `0.1` |  |
+| `max_score` | <class 'jsonargparse.typing.ClosedUnitInterval'> | `1.0` |  |
+| `text_key_second` |  | `None` |  |
+| `any_or_all` | <class 'str'> | `'any'` |  |
+| `args` |  | `''` |  |
+| `kwargs` |  | `''` |  |
 
 ## 📊 Effect demonstration 效果演示
 ### test_no_eoc_special_token

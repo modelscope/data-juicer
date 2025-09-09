@@ -33,10 +33,10 @@ Tags 标签: cpu, multimodal
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame |
-| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from |
-| `duration` | <class 'float'> | `0` | The duration of each segment in seconds. |
-| `frame_dir` | <class 'str'> | `None` | Output directory to save extracted frames. |
+| `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame videos from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames (the number of which depends on the duration of the video) and the latter one extract specified number of frames uniformly from the video. If "duration" > 0, frame_sampling_method acts on every segment. Default: "all_keyframes". |
+| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration. If "duration" > 0, frame_num is the number of frames per segment. |
+| `duration` | <class 'float'> | `0` | The duration of each segment in seconds. If 0, frames are extracted from the entire video. If duration > 0, the video is segmented into multiple segments based on duration, and frames are extracted from each segment. |
+| `frame_dir` | <class 'str'> | `None` | Output directory to save extracted frames. If None, a default directory based on the video file path is used. |
 | `frame_key` |  | `'video_frames'` | The name of field to save generated frames info. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |

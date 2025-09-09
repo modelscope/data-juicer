@@ -23,9 +23,9 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `field_key` | <class 'str'> | `''` | Filter based on the specified numeric value |
-| `min_value` | <class 'float'> | `-9223372036854775807` | The min filter value in SpecifiedNumericField |
-| `max_value` | <class 'float'> | `9223372036854775807` | The max filter value in SpecifiedNumericField |
+| `field_key` | <class 'str'> | `''` | Filter based on the specified numeric value corresponding to the target key. The target key corresponding to multi-level field information need to be separated by '.'. |
+| `min_value` | <class 'float'> | `-9223372036854775807` | The min filter value in SpecifiedNumericField op, samples will be filtered if their specified numeric field value is below this parameter. |
+| `max_value` | <class 'float'> | `9223372036854775807` | The max filter value in SpecifiedNumericField op, samples will be filtered if their specified numeric field value exceeds this parameter. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

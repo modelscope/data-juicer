@@ -18,19 +18,19 @@ Tags 标签: cpu, vllm, hf, api
 | `api_or_hf_model` | <class 'str'> | `'gpt-4o'` | API or huggingface model name. |
 | `min_score` | <class 'float'> | `0.5` | The min score threshold to keep the sample. |
 | `max_score` | <class 'float'> | `1.0` | The max score threshold to keep the sample. |
-| `is_hf_model` | <class 'bool'> | `False` | If true, use huggingface model. Otherwise, use API. |
+| `is_hf_model` | <class 'bool'> | `False` | If true, use Transformers for loading hugging face or local llm. |
 | `api_endpoint` | typing.Optional[str] | `None` | URL endpoint for the API. |
-| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. |
-| `input_keys` | typing.List[str] | `['text']` | Sub set of keys in the sample. Support data with |
+| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. Defaults to 'choices.0.message.content'. |
+| `input_keys` | typing.List[str] | `['text']` | Sub set of keys in the sample. Support data with multi fields such as 'query', 'analysis' and 'answer' in RFT data. |
 | `field_names` | typing.List[str] | `['Text']` | Corresponding field names for input keys. |
 | `system_prompt` | typing.Optional[str] | `None` | System prompt for the task. |
 | `input_template` | typing.Optional[str] | `None` | Template for building the model input. |
 | `field_template` | typing.Optional[str] | `None` | Template for each field in the prompt. |
-| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retry attempts when there is an API |
-| `enable_vllm` | <class 'bool'> | `False` | If true, use VLLM for loading hugging face or |
+| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retry attempts when there is an API call error or output parsing error. |
+| `enable_vllm` | <class 'bool'> | `False` | If true, use VLLM for loading hugging face or local llm. |
 | `model_params` | typing.Dict | `{}` | Parameters for initializing the API model. |
-| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. |
-| `dim_required_keys` | typing.Optional[typing.List[str]] | `None` | A list of keys used to calculate the average |
+| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95} |
+| `dim_required_keys` | typing.Optional[typing.List[str]] | `None` | A list of keys used to calculate the average dimension score, only the dimension scores associated with these keys are used in the average calculation. |
 | `kwargs` |  | `''` | Extra keyword arguments. |
 
 ## 📊 Effect demonstration 效果演示

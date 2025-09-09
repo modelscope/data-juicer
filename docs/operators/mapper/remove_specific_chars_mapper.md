@@ -15,7 +15,7 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `chars_to_remove` | typing.Union[str, typing.List[str]] | `'◆●■►▼▲▴∆▻▷❖♡□'` | a list or a string including all |
+| `chars_to_remove` | typing.Union[str, typing.List[str]] | `'◆●■►▼▲▴∆▻▷❖♡□'` | a list or a string including all characters that need to be removed from text. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

@@ -15,10 +15,10 @@ Tags 标签: cpu, hf, image
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `hf_watermark_model` | <class 'str'> | `'amrul-hzz/watermark_detector'` | watermark detection model name on |
+| `hf_watermark_model` | <class 'str'> | `'amrul-hzz/watermark_detector'` | watermark detection model name on huggingface. |
 | `trust_remote_code` | <class 'bool'> | `False` |  |
-| `prob_threshold` | <class 'float'> | `0.8` | the predicted watermark probability threshold |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
+| `prob_threshold` | <class 'float'> | `0.8` | the predicted watermark probability threshold for samples. range from 0 to 1. Samples with watermark probability less than this threshold will be kept. |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

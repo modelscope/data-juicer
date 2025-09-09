@@ -21,9 +21,9 @@ Tags 标签: cpu, video
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame |
-| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from |
-| `tag_field_name` | <class 'str'> | `'video_frame_tags'` | the field name to store the tags. It's |
+| `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames (the number of which depends on the duration of the video) and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes". |
+| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration. |
+| `tag_field_name` | <class 'str'> | `'video_frame_tags'` | the field name to store the tags. It's "video_frame_tags" in default. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

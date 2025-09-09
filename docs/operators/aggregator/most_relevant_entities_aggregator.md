@@ -18,17 +18,17 @@ Tags 标签: cpu, api
 | `api_model` | <class 'str'> | `'gpt-4o'` | API model name. |
 | `entity` | <class 'str'> | `None` | The given entity. |
 | `query_entity_type` | <class 'str'> | `None` | The type of queried relevant entities. |
-| `input_key` | <class 'str'> | `'event_description'` | The input key in the meta field of the samples. |
-| `output_key` | <class 'str'> | `'most_relevant_entities'` | The output key in the aggregation field of the |
-| `max_token_num` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | The max token num of the total tokens of the |
+| `input_key` | <class 'str'> | `'event_description'` | The input key in the meta field of the samples. It is "event_description" in default. |
+| `output_key` | <class 'str'> | `'most_relevant_entities'` | The output key in the aggregation field of the samples. It is "most_relevant_entities" in default. |
+| `max_token_num` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | The max token num of the total tokens of the sub documents. Without limitation if it is None. |
 | `api_endpoint` | typing.Optional[str] | `None` | URL endpoint for the API. |
-| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. |
+| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. Defaults to 'choices.0.message.content'. |
 | `system_prompt_template` | typing.Optional[str] | `None` | The system prompt template. |
 | `input_template` | typing.Optional[str] | `None` | The input template. |
 | `output_pattern` | typing.Optional[str] | `None` | The output pattern. |
-| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retry attempts when there is an API |
+| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retry attempts when there is an API call error or output parsing error. |
 | `model_params` | typing.Dict | `{}` | Parameters for initializing the API model. |
-| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. |
+| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95} |
 | `kwargs` |  | `''` | Extra keyword arguments. |
 
 ## 📊 Effect demonstration 效果演示
