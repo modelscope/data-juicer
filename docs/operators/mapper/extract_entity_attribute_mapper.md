@@ -35,7 +35,65 @@ Tags 标签: cpu, api, text
 | `kwargs` |  | `''` | Extra keyword arguments. |
 
 ## 📊 Effect demonstration 效果演示
-not available 暂无
+### test
+```python
+ExtractEntityAttributeMapper(api_model='qwen2.5-72b-instruct', query_entities=['李莲花', '方多病'], query_attributes=['语言风格', '角色性格'], response_path=None)
+```
+
+#### 📥 input data 输入数据
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">△笛飞声独自坐在莲花楼屋顶上。李莲花边走边悠闲地给马喂草。方多病则走在一侧，却总不时带着怀疑地盯向楼顶的笛飞声。
+方多病走到李莲花身侧：我昨日分明看到阿飞神神秘秘地见了一人，我肯定他有什么瞒着我们。阿飞的来历我必须去查清楚！
+李莲花继续悠然地喂草：放心吧，我认识他十几年了，对他一清二楚。
+方多病：认识十几年？你上次才说是一面之缘？
+李莲花忙圆谎：见得不多，但知根知底。哎，这老马吃得也太多了。
+方多病一把夺过李莲花手中的草料：别转移话题！——快说！
+李莲花：阿飞啊，脾气不太好，他......这十年也没出过几次门，所以见识短，你不要和他计较。还有他是个武痴，武功深藏不露，你平时别惹他。
+方多病：呵...</pre><details style='margin:6px 0;'><summary style='cursor:pointer; color:#0366d6;'>Show more 展开更多 (352 more chars)</summary><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">△笛飞声独自坐在莲花楼屋顶上。李莲花边走边悠闲地给马喂草。方多病则走在一侧，却总不时带着怀疑地盯向楼顶的笛飞声。
+方多病走到李莲花身侧：我昨日分明看到阿飞神神秘秘地见了一人，我肯定他有什么瞒着我们。阿飞的来历我必须去查清楚！
+李莲花继续悠然地喂草：放心吧，我认识他十几年了，对他一清二楚。
+方多病：认识十几年？你上次才说是一面之缘？
+李莲花忙圆谎：见得不多，但知根知底。哎，这老马吃得也太多了。
+方多病一把夺过李莲花手中的草料：别转移话题！——快说！
+李莲花：阿飞啊，脾气不太好，他......这十年也没出过几次门，所以见识短，你不要和他计较。还有他是个武痴，武功深藏不露，你平时别惹他。
+方多病：呵，阿飞武功高？编瞎话能不能用心点？
+李莲花：可都是大实话啊。反正，我和他彼此了解得很。你就别瞎操心了。
+方多病很是质疑：(突然反应过来)等等！你说你和他认识十几年？你们彼此了解？！这么说，就我什么都不知道？！
+△李莲花一愣，意外方多病是如此反应。
+方多病很是不爽：不行，你们现在投奔我，我必须对我的手下都了解清楚。现在换我来问你，你，李莲花究竟籍贯何处？今年多大？家里还有什么人？平时都有些什么喜好？还有，可曾婚配？
+△此时的笛飞声正坐在屋顶，从他的位置远远地向李莲花和方多病二人看去，二人声音渐弱。
+李莲花：鄙人李莲花，有个兄弟叫李莲蓬，莲花山莲花镇莲花村人，曾经订过亲，但媳妇跟人跑子。这一辈子呢，没什么抱负理想，只想种种萝卜、逗逗狗，平时豆花爱吃甜的，粽子要肉的......
+方多病：没一句实话。
+</pre></details></div>
+
+#### 📤 output data 输出数据
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">△笛飞声独自坐在莲花楼屋顶上。李莲花边走边悠闲地给马喂草。方多病则走在一侧，却总不时带着怀疑地盯向楼顶的笛飞声。
+方多病走到李莲花身侧：我昨日分明看到阿飞神神秘秘地见了一人，我肯定他有什么瞒着我们。阿飞的来历我必须去查清楚！
+李莲花继续悠然地喂草：放心吧，我认识他十几年了，对他一清二楚。
+方多病：认识十几年？你上次才说是一面之缘？
+李莲花忙圆谎：见得不多，但知根知底。哎，这老马吃得也太多了。
+方多病一把夺过李莲花手中的草料：别转移话题！——快说！
+李莲花：阿飞啊，脾气不太好，他......这十年也没出过几次门，所以见识短，你不要和他计较。还有他是个武痴，武功深藏不露，你平时别惹他。
+方多病：呵...</pre><details style='margin:6px 0;'><summary style='cursor:pointer; color:#0366d6;'>Show more 展开更多 (352 more chars)</summary><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">△笛飞声独自坐在莲花楼屋顶上。李莲花边走边悠闲地给马喂草。方多病则走在一侧，却总不时带着怀疑地盯向楼顶的笛飞声。
+方多病走到李莲花身侧：我昨日分明看到阿飞神神秘秘地见了一人，我肯定他有什么瞒着我们。阿飞的来历我必须去查清楚！
+李莲花继续悠然地喂草：放心吧，我认识他十几年了，对他一清二楚。
+方多病：认识十几年？你上次才说是一面之缘？
+李莲花忙圆谎：见得不多，但知根知底。哎，这老马吃得也太多了。
+方多病一把夺过李莲花手中的草料：别转移话题！——快说！
+李莲花：阿飞啊，脾气不太好，他......这十年也没出过几次门，所以见识短，你不要和他计较。还有他是个武痴，武功深藏不露，你平时别惹他。
+方多病：呵，阿飞武功高？编瞎话能不能用心点？
+李莲花：可都是大实话啊。反正，我和他彼此了解得很。你就别瞎操心了。
+方多病很是质疑：(突然反应过来)等等！你说你和他认识十几年？你们彼此了解？！这么说，就我什么都不知道？！
+△李莲花一愣，意外方多病是如此反应。
+方多病很是不爽：不行，你们现在投奔我，我必须对我的手下都了解清楚。现在换我来问你，你，李莲花究竟籍贯何处？今年多大？家里还有什么人？平时都有些什么喜好？还有，可曾婚配？
+△此时的笛飞声正坐在屋顶，从他的位置远远地向李莲花和方多病二人看去，二人声音渐弱。
+李莲花：鄙人李莲花，有个兄弟叫李莲蓬，莲花山莲花镇莲花村人，曾经订过亲，但媳妇跟人跑子。这一辈子呢，没什么抱负理想，只想种种萝卜、逗逗狗，平时豆花爱吃甜的，粽子要肉的......
+方多病：没一句实话。
+</pre></details><div class='meta' style='margin-top:6px;'><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555; white-space:nowrap; font-weight:bold;' colspan='2'>__dj__meta__</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 20px;'>attribute_descriptions</td><td style='padding:2px 8px; padding-left: 20px;'>[&#x27;李莲花的语言风格轻松幽默，善于用平易近人的语气和细节来化解紧张的气氛。他常常以调侃的方式回答问题，即使在被质疑时也能巧妙地圆谎，表现出一种机智和从容。&#x27;, &#x27;李莲花是一个随和、悠闲且善于圆滑应对的人。他对朋友有着深厚的信任，同时在面对质疑时能够巧妙地转移话题或圆谎。&#x27;, &#x27;方多病的语言风格直率、质疑、急躁。他说话直接，常常带着怀疑和不满，喜欢追问和质疑别人的话，显得有些急躁和不耐烦。&#x27;, &#x27;方多病是一个多疑、警惕性高的人，对周围的人和事总是保持高度的怀疑态度。他同时也是一个有责任感的人，对自己身边的人非常关心，尤其是当他认为这些人可能对自己或他人构成威胁时。&#x27;]</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 20px;'>attribute_support_texts</td><td style='padding:2px 8px; padding-left: 20px;'>[[&#x27;李莲花继续悠然地喂草：放心吧，我认识他十几年了，对他一清二楚。&#x27;, &#x27;李莲花：鄙人李莲花，有个兄弟叫李莲蓬，莲花山莲花镇莲花村人，曾经订过亲，但媳妇跟人跑子。这一辈子呢，没什么抱负理想，只想种种萝卜、逗逗狗，平时豆花爱吃甜的，粽子要肉的......&#x27;], [&#x27;李莲花继续悠然地喂草：放心吧，我认识他十几年了，对他一清二楚。&#x27;, &#x27;李莲花：阿飞啊，脾气不太好，他......这十年也没出过几次门，所以见识短，你不要和他计较。还有他是个武痴，武功深藏不露，你平时别惹他。&#x27;, &#x27;李莲花：鄙人李莲花，有个兄弟叫李莲蓬，莲花山莲花镇莲花村人，曾经订过亲，但媳妇跟人跑子。这一辈子呢，没什么抱负理想，只想种种萝卜、逗逗狗，平时豆花爱吃甜的，粽子要肉的......&#x27;], [&#x27;方多病：我昨日分明看到阿飞神神秘秘地见了一人，我肯定他有什么瞒着我们。阿飞的来历我必须去查清楚！&#x27;, &#x27;方多病：认识十几年？你上次才说是一面之缘？&#x27;, &#x27;方多病一把夺过李莲花手中的草料：别转移话题！——快说！&#x27;, &#x27;方多病：呵，阿飞武功高？编瞎话能不能用心点？&#x27;, &#x27;方多病很是不爽：不行，你们现在投奔我，我必须对我的手下都了解清楚。现在换我来问你，你，李莲花究竟籍贯何处？今年多大？家里还有什么人？平时都有些什么喜好？还有，可曾婚配？&#x27;], [&#x27;方多病则走在一侧，却总不时带着怀疑地盯向楼顶的笛飞声。&#x27;, &#x27;方多病：我昨日分明看到阿飞神神秘秘地见了一人，我肯定他有什么瞒着我们。阿飞的来历我必须去查清楚！&#x27;, &#x27;方多病很是不爽：不行，你们现在投奔我，我必须对我的手下都了解清楚。现在换我来问你，你，李莲花究竟籍贯何处？今年多大？家里还有什么人？平时都有些什么喜好？还有，可曾婚配？&#x27;]]</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 20px;'>attributes</td><td style='padding:2px 8px; padding-left: 20px;'>[&#x27;语言风格&#x27;, &#x27;角色性格&#x27;, &#x27;语言风格&#x27;, &#x27;角色性格&#x27;]</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 20px;'>main_entities</td><td style='padding:2px 8px; padding-left: 20px;'>[&#x27;李莲花&#x27;, &#x27;李莲花&#x27;, &#x27;方多病&#x27;, &#x27;方多病&#x27;]</td></tr></table></div></div>
+
+#### ✨ explanation 解释
+This example demonstrates the ExtractEntityAttributeMapper operator's functionality by extracting attributes for the entities '李莲花' and '方多病' from a given text. The operator uses an API model to identify and extract the specified attributes (such as '语言风格' and '角色性格') for these entities. The extracted information, including attribute descriptions and supporting texts, is then stored in the sample's metadata. 
+这个例子展示了ExtractEntityAttributeMapper算子的功能，从给定的文本中提取实体'李莲花'和'方多病'的属性。算子使用一个API模型来识别并抽取这些实体的指定属性（如'语言风格'和'角色性格'）。提取的信息，包括属性描述和支持文本，会被存储在样本的元数据中。
+
 
 ## 🔗 related links 相关链接
 - [source code 源代码](../../../data_juicer/ops/mapper/extract_entity_attribute_mapper.py)

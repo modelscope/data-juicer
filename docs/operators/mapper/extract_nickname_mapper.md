@@ -29,7 +29,58 @@ Tags 标签: cpu, api, text
 | `kwargs` |  | `''` | Extra keyword arguments. |
 
 ## 📊 Effect demonstration 效果演示
-not available 暂无
+### test
+```python
+ExtractNicknameMapper(api_model='qwen2.5-72b-instruct', response_path=None)
+```
+
+#### 📥 input data 输入数据
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">△李莲花又指出刚才门框上的痕迹。
+△李莲花：门框上也是人的掌痕和爪印。指力能嵌入硬物寸余，七分力道主上，三分力道垫下，还有辅以的爪式，看样子这还有昆仑派的外家功夫。
+方多病看着李莲花，愈发生疑os：通过痕迹就能判断出功夫和门派，这绝对只有精通武艺之人才能做到，李莲花你到底是什么人？！
+笛飞声环顾四周：有朝月派，还有昆仑派，看来必是一群武林高手在这发生了决斗！
+李莲花：如果是武林高手过招，为何又会出现如此多野兽的痕迹。方小宝，你可听过江湖上有什么门派是驯兽来斗？方小宝？方小宝？
+方多病回过神：不、不曾听过。
+李莲花：还有这些人都去了哪里？
+笛飞声：打架不管是输是赢，自然是打完就走。
+李莲花摇头：...</pre><details style='margin:6px 0;'><summary style='cursor:pointer; color:#0366d6;'>Show more 展开更多 (106 more chars)</summary><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">△李莲花又指出刚才门框上的痕迹。
+△李莲花：门框上也是人的掌痕和爪印。指力能嵌入硬物寸余，七分力道主上，三分力道垫下，还有辅以的爪式，看样子这还有昆仑派的外家功夫。
+方多病看着李莲花，愈发生疑os：通过痕迹就能判断出功夫和门派，这绝对只有精通武艺之人才能做到，李莲花你到底是什么人？！
+笛飞声环顾四周：有朝月派，还有昆仑派，看来必是一群武林高手在这发生了决斗！
+李莲花：如果是武林高手过招，为何又会出现如此多野兽的痕迹。方小宝，你可听过江湖上有什么门派是驯兽来斗？方小宝？方小宝？
+方多病回过神：不、不曾听过。
+李莲花：还有这些人都去了哪里？
+笛飞声：打架不管是输是赢，自然是打完就走。
+李莲花摇头：就算打完便走，但这里是客栈，为何这么多年一直荒在这里，甚至没人来收拾一下？
+笛飞声：闹鬼？这里死过这么多人，楼下又画了那么多符，所以不敢进来？
+△这时，梁上又出现有东西移动的声响，李莲花、笛飞声都猛然回头看去。
+</pre></details></div>
+
+#### 📤 output data 输出数据
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">△李莲花又指出刚才门框上的痕迹。
+△李莲花：门框上也是人的掌痕和爪印。指力能嵌入硬物寸余，七分力道主上，三分力道垫下，还有辅以的爪式，看样子这还有昆仑派的外家功夫。
+方多病看着李莲花，愈发生疑os：通过痕迹就能判断出功夫和门派，这绝对只有精通武艺之人才能做到，李莲花你到底是什么人？！
+笛飞声环顾四周：有朝月派，还有昆仑派，看来必是一群武林高手在这发生了决斗！
+李莲花：如果是武林高手过招，为何又会出现如此多野兽的痕迹。方小宝，你可听过江湖上有什么门派是驯兽来斗？方小宝？方小宝？
+方多病回过神：不、不曾听过。
+李莲花：还有这些人都去了哪里？
+笛飞声：打架不管是输是赢，自然是打完就走。
+李莲花摇头：...</pre><details style='margin:6px 0;'><summary style='cursor:pointer; color:#0366d6;'>Show more 展开更多 (106 more chars)</summary><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">△李莲花又指出刚才门框上的痕迹。
+△李莲花：门框上也是人的掌痕和爪印。指力能嵌入硬物寸余，七分力道主上，三分力道垫下，还有辅以的爪式，看样子这还有昆仑派的外家功夫。
+方多病看着李莲花，愈发生疑os：通过痕迹就能判断出功夫和门派，这绝对只有精通武艺之人才能做到，李莲花你到底是什么人？！
+笛飞声环顾四周：有朝月派，还有昆仑派，看来必是一群武林高手在这发生了决斗！
+李莲花：如果是武林高手过招，为何又会出现如此多野兽的痕迹。方小宝，你可听过江湖上有什么门派是驯兽来斗？方小宝？方小宝？
+方多病回过神：不、不曾听过。
+李莲花：还有这些人都去了哪里？
+笛飞声：打架不管是输是赢，自然是打完就走。
+李莲花摇头：就算打完便走，但这里是客栈，为何这么多年一直荒在这里，甚至没人来收拾一下？
+笛飞声：闹鬼？这里死过这么多人，楼下又画了那么多符，所以不敢进来？
+△这时，梁上又出现有东西移动的声响，李莲花、笛飞声都猛然回头看去。
+</pre></details><div class='meta' style='margin-top:6px;'><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555; white-space:nowrap; font-weight:bold;' colspan='2'>__dj__meta__</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 20px;'>nickname</td><td style='padding:2px 8px; padding-left: 20px;'><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 60px;'>relation_description</td><td style='padding:2px 8px; padding-left: 60px;'>李莲花你</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 60px;'>relation_keywords</td><td style='padding:2px 8px; padding-left: 60px;'>[&#x27;nickname&#x27;]</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 60px;'>relation_source_entity</td><td style='padding:2px 8px; padding-left: 60px;'>方多病</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 60px;'>relation_strength</td><td style='padding:2px 8px; padding-left: 60px;'>None</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 60px;'>relation_target_entity</td><td style='padding:2px 8px; padding-left: 60px;'>李莲花</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 60px;'>relation_description</td><td style='padding:2px 8px; padding-left: 60px;'>方小宝</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 60px;'>relation_keywords</td><td style='padding:2px 8px; padding-left: 60px;'>[&#x27;nickname&#x27;]</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 60px;'>relation_source_entity</td><td style='padding:2px 8px; padding-left: 60px;'>李莲花</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 60px;'>relation_strength</td><td style='padding:2px 8px; padding-left: 60px;'>None</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 60px;'>relation_target_entity</td><td style='padding:2px 8px; padding-left: 60px;'>方多病</td></tr></td></tr></table></div></div>
+
+#### ✨ explanation 解释
+The operator identifies and extracts nickname relationships from the input text. In this example, it correctly identifies that '方多病' refers to '李莲花' as '李莲花你', and '李莲花' refers to '方多病' as '方小宝'. The output data shows these relationships in a structured format within the meta field.
+算子从输入文本中识别并提取昵称关系。在这个例子中，它正确地识别出“方多病”称呼“李莲花”为“李莲花你”，以及“李莲花”称呼“方多病”为“方小宝”。输出数据以结构化格式在meta字段中展示了这些关系。
 
 ## 🔗 related links 相关链接
 - [source code 源代码](../../../data_juicer/ops/mapper/extract_nickname_mapper.py)

@@ -36,7 +36,21 @@ Tags 标签: cpu, api
 | `kwargs` |  | `''` | Extra keyword arguments. |
 
 ## 📊 Effect demonstration 效果演示
-not available 暂无
+### test_default
+```python
+DialogTopicDetectionMapper(api_model='qwen2.5-72b-instruct')
+```
+
+#### 📥 input data 输入数据
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> empty</div><div class='meta' style='margin-top:6px;'><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555; white-space:nowrap;'>history</td><td style='padding:4px 8px;'>[(&#x27;李莲花有口皆碑&#x27;, &#x27;「微笑」过奖了，我也就是个普通大夫，没什么值得夸耀的。&#x27;), (&#x27;是的，你确实是一个普通大夫，没什么值得夸耀的。&#x27;, &#x27;「委屈」你这话说的，我也是尽心尽力治病救人了。&#x27;), (&#x27;你自己说的呀，我现在说了，你又不高兴了。&#x27;, &#x27;or of of of of or or and or of of of of of of of,,, &#x27;), (&#x27;你在说什么我听不懂。&#x27;, &#x27;「委屈」我也没说什么呀，就是觉得你有点冤枉我了&#x27;)]</td></tr></table></div></div>
+
+#### 📤 output data 输出数据
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> empty</div><div class='meta' style='margin-top:6px;'><table style='border-collapse:collapse; margin-top:6px;'><tr><td style='padding:4px 8px; color:#555; white-space:nowrap;'>history</td><td style='padding:4px 8px;'>[[&#x27;李莲花有口皆碑&#x27;, &#x27;「微笑」过奖了，我也就是个普通大夫，没什么值得夸耀的。&#x27;], [&#x27;是的，你确实是一个普通大夫，没什么值得夸耀的。&#x27;, &#x27;「委屈」你这话说的，我也是尽心尽力治病救人了。&#x27;], [&#x27;你自己说的呀，我现在说了，你又不高兴了。&#x27;, &#x27;or of of of of or or and or of of of of of of of,,, &#x27;], [&#x27;你在说什么我听不懂。&#x27;, &#x27;「委屈」我也没说什么呀，就是觉得你有点冤枉我了&#x27;]]</td></tr><tr><td style='padding:4px 8px; color:#555; white-space:nowrap; font-weight:bold;' colspan='2'>__dj__meta__</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 20px;'>dialog_topic_labels</td><td style='padding:2px 8px; padding-left: 20px;'>[&#x27;人物评价&#x27;, &#x27;人物评价&#x27;, &#x27;角色扮演/对话互动&#x27;, &#x27;技术问题/沟通障碍&#x27;]</td></tr><tr><td style='padding:2px 8px; color:#777; white-space:nowrap; padding-left: 20px;'>dialog_topic_labels_analysis</td><td style='padding:2px 8px; padding-left: 20px;'>[&#x27;用户提到“李莲花”，但没有提供足够的背景信息来确定具体的人物或作品。不过从“有口皆碑”一词来看，李莲花可能是一位受人尊敬或广受好评的人物。&#x27;, &#x27;用户再次提到“李莲花”并回应LLM的回答，确认了李莲花是一个普通大夫，且没有什么值得夸耀的。&#x27;, &#x27;用户和LLM之间的对话似乎是在角色扮演或模拟某种情景，用户提到李莲花自谦为普通大夫，而LLM则以李莲花的身份回应，表现出一种委屈的情绪。用户再次回应，指出LLM之前的话，形成了一种互动。&#x27;, &#x27;用户表示听不懂LLM的回复，可能是LLM出现了技术问题，导致输出的内容无法理解。&#x27;]</td></tr></table></div></div>
+
+#### ✨ explanation 解释
+This example uses the default settings of the DialogTopicDetectionMapper operator to detect and label the topics in a conversation. The operator processes each round of the dialog, identifying the main topics discussed and providing an analysis for each. The output includes a list of topic labels and a corresponding analysis for each round of the dialog.
+这个例子使用了DialogTopicDetectionMapper算子的默认设置来检测和标注对话中的主题。算子处理对话中的每一轮，识别讨论的主要话题，并为每一轮提供分析。输出包括每轮对话的主题标签列表和相应的分析。
+
 
 ## 🔗 related links 相关链接
 - [source code 源代码](../../../data_juicer/ops/mapper/dialog_topic_detection_mapper.py)
