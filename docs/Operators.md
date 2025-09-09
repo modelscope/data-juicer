@@ -36,7 +36,7 @@ Data-Juicer 中的算子分为以下 7 种类型。
 | [deduplicator](#deduplicator) | 10 | Detects and removes duplicate samples. 识别、删除重复样本。 |
 | [filter](#filter) | 54 | Filters out low-quality samples. 过滤低质量样本。 |
 | [formatter](#formatter) | 8 | Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。 |
-| [grouper](#grouper) | 3 | Group samples to batched samples. 将样本分组，每一组组成一个批量样本。 |
+| [grouper](#grouper) | 4 | Group samples to batched samples. 将样本分组，每一组组成一个批量样本。 |
 | [mapper](#mapper) | 83 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
 | [selector](#selector) | 5 | Selects top samples based on ranking. 基于排序选取高质量样本。 |
 
@@ -160,6 +160,7 @@ All the specific operators are listed below, each featured with several capabili
 
 | Operator 算子 | Tags 标签 | Description 描述 | Details 详情 | Reference 参考 |
 |----------|------|-------------|-------------|-------------|
+| a_test_new_grouper | 🔤Text 💻CPU 🔴Alpha | Groups samples into batches based on values in specified keys. 根据指定键中的值将样本分组为批处理。 | - | - |
 | key_value_grouper | 🔤Text 💻CPU 🟢Stable | Groups samples into batches based on values in specified keys. 根据指定键中的值将样本分组为批处理。 | [info](operators/grouper/key_value_grouper.md) | - |
 | naive_grouper | 💻CPU 🟢Stable | Group all samples in a dataset into a single batched sample. 将数据集中的所有样本分组为单个批处理样本。 | [info](operators/grouper/naive_grouper.md) | - |
 | naive_reverse_grouper | 💻CPU 🟢Stable | Split batched samples into individual samples. 将批处理的样品分成单个样品。 | [info](operators/grouper/naive_reverse_grouper.md) | - |
