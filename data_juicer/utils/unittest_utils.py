@@ -4,6 +4,7 @@ import os
 import shutil
 import subprocess
 import unittest
+from typing import Dict, List
 
 import numpy
 from loguru import logger
@@ -200,6 +201,18 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         second = sorted(second, key=lambda x: tuple(sorted(x.items())))
         return self.assertEqual(first, second)
 
+    def assertListOfDictEqual(self, first: List[Dict], second: List[Dict], ignore_order=True):
+        """Assert two list of dicts are equal"""
+        if not ignore_order:
+            return self.assertEqual(first, second)
+        if len(first) != len(second):
+            return False
+
+        def process_list_of_dict(lst):
+            return sorted(tuple(d.items()) for d in lst)
+
+        return self.assertEqual(process_list_of_dict(first), process_list_of_dict(second))
+
 
 # for partial unittest
 def get_diff_files(prefix_filter=["data_juicer/", "tests/"]):
@@ -235,9 +248,12 @@ def find_corresponding_test_file(file_path):
 
 
 def get_partial_test_cases():
+    must_run = {"tests/config/test_config.py"}
     diff_files = get_diff_files()
     test_files = [find_corresponding_test_file(file_path) for file_path in diff_files]
     if None in test_files:
         # can't find corresponding test files for some changed files: run all
         return None
+    # add test cases that must be run
+    test_files = list(must_run.union(set(test_files)))
     return test_files

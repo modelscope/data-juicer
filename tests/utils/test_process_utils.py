@@ -61,19 +61,11 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             self.enable_ray_mode()
             result = calculate_np("test_op", mem_required=0, cpu_required=0, use_cuda=True)
             self.assertEqual(result, 2)
-            logger.warning.assert_any_call(
-                "The required cuda memory of Op[test_op] has not been specified. "
-                "Please specify the mem_required field in the "
-                "config file, or you might encounter CUDA "
-                "out of memory error. You can reference "
-                "the mem_required field in the "
-                "config_all.yaml file."
+            logger.warning.assert_called_with(
+                "The required cuda memory and gpu of Op[test_op] has not been specified. "
+                "Please specify the mem_required field or gpu_required field in the config file. "
+                "You can reference the config_all.yaml file.Set the `num_proc` to number of GPUs 2."
             )
-            logger.warning.assert_any_call(
-                "Both mem_required and num_proc of Op[test_op] are not set."
-                "Set the `num_proc` to number of GPUs 2."
-            )
-
     @TEST_TAG('ray')
     def test_cuda_auto_less_than_device_count(self):
         logger = MagicMock()
@@ -86,12 +78,8 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             self.enable_ray_mode()
             result = calculate_np("test_op", mem_required=3, cpu_required=0, use_cuda=True)
             self.assertEqual(result, 2)
-            logger.warning.assert_any_call(
-                "The required cuda memory:3GB might "
-                "be more than the available cuda devices memory list:"
-                "[2.0, 2.0]GB."
-                "This Op[test_op] might "
-                "require more resource to run."
+            logger.info.assert_called_with(
+                "Set the `num_proc` to 2 of Op[test_op] based on the required cuda memory: 3GB and required gpu: 0."
             )
 
     @TEST_TAG('ray')
@@ -104,23 +92,25 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             mock_cuda_count.return_value = 2
             # auto_num_proc = (5//2) * 2 = 4
             self.enable_ray_mode()
-            result = calculate_np("test_op", mem_required=2, cpu_required=0, num_proc=5, use_cuda=True)
+            result = calculate_np("test_op", mem_required=2, cpu_required=0, use_cuda=True)
             self.assertEqual(result, 4)
-            logger.warning.assert_any_call(
-                "The given num_proc: 5 is greater than "
-                "the value 4 auto calculated based "
-                "on the mem_required of Op[test_op]. "
-                "Set the `num_proc` to 4."
+            logger.info.assert_called_with(
+                "Set the `num_proc` to 4 of Op[test_op] based on the required cuda memory: 2GB and required gpu: 0."
             )
 
     def test_cpu_default_num_proc(self):
+        logger = MagicMock()
         with patch(f"{self._patch_module}.available_memories") as mock_avail_mem, \
-            patch(f"{self._patch_module}.cpu_count") as mock_cpu_count:
+            patch(f"{self._patch_module}.cpu_count") as mock_cpu_count, \
+            patch(f"{self._patch_module}.logger", logger):
             mock_avail_mem.return_value = [8 * 1024 + 1]  # 8GB, add eps
             mock_cpu_count.return_value = 4
             result = calculate_np("test_op", mem_required=2, cpu_required=0, use_cuda=False)
             # auto_proc = 8//2 =4
             self.assertEqual(result, 4)
+            logger.info.assert_called_with(
+                "Set the `num_proc` to 4 of Op[test_op] based on the required memory: 2GB and required cpu: 0."
+            )
 
     def test_cpu_insufficient_memory(self):
         logger = MagicMock()
@@ -129,27 +119,32 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             patch(f"{self._patch_module}.logger", logger):
             mock_avail_mem.return_value = [2 * 1024]  # 2GB
             mock_cpu_count.return_value = 8
-            result = calculate_np("test_op", mem_required=3, cpu_required=2, num_proc=5, use_cuda=False)
+            result = calculate_np("test_op", mem_required=3, cpu_required=2, use_cuda=False)
             # auto_proc = 0,  max(min(5,0),1) =1
             self.assertEqual(result, 1)
             logger.warning.assert_called_with(
-                "The required CPU number:2 "
-                "and memory:3GB might "
-                "be more than the available CPU:8 "
-                "and memory :[2.0]GB."
+                "The required CPU number: 2 "
+                "and memory: 3GB might "
+                "be more than the available CPU: 8 "
+                "and memory: [2.0]GB."
                 "This Op [test_op] might "
-                "require more resource to run."
+                "require more resource to run. "
+                "Set num_proc to available nodes number 1."
             )
 
     def test_cpu_num_proc_unset_and_mem_unlimited(self):
-        from data_juicer.utils.resource_utils import available_memories, cpu_count
+        logger = MagicMock()
         with patch(f"{self._patch_module}.available_memories") as mock_avail_mem, \
-            patch(f"{self._patch_module}.cpu_count") as mock_cpu_count:
+            patch(f"{self._patch_module}.cpu_count") as mock_cpu_count, \
+            patch(f"{self._patch_module}.logger", logger):
             mock_avail_mem.return_value = [8 * 1024]
             mock_cpu_count.return_value = 4
             result = calculate_np("test_op", mem_required=0, cpu_required=0, use_cuda=False)
             # auto_proc = 8/(接近0) ≈无限大，取默认 num_proc=4
             self.assertEqual(result, 4)
+            logger.info.assert_called_with(
+                "Set the `num_proc` to 4 of Op[test_op] based on the required memory: 0GB and required cpu: 0."
+            )
 
 
 if __name__ == '__main__':

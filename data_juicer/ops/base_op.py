@@ -16,6 +16,7 @@ UNFORKABLE = Registry("Unforkable")
 NON_STATS_FILTERS = Registry("Non-stats Filters")
 TAGGING_OPS = Registry("Tagging Operators")
 ATTRIBUTION_FILTERS = Registry("Attribution Filters")
+DEFAULT_BATCH_SIZE = 1000
 
 
 def convert_list_dict_to_dict_list(samples):
@@ -166,13 +167,16 @@ class OP:
         # extra mm bytes keys
         self.image_bytes_key = kwargs.get("image_bytes_key", "image_bytes")
 
+        self.system_key = kwargs.get("system_key", "system")
+        self.instruction_key = kwargs.get("instruction_key", "instruction")
+        self.prompt_key = kwargs.get("prompt_key", "prompt")
         self.query_key = kwargs.get("query_key", "query")
         self.response_key = kwargs.get("response_key", "response")
         self.history_key = kwargs.get("history_key", "history")
 
         self.index_key = kwargs.get("index_key", None)
 
-        self.batch_size = kwargs.get("batch_size", 1000)
+        self.batch_size = kwargs.get("batch_size", DEFAULT_BATCH_SIZE)
         self.work_dir = kwargs.get("work_dir", None)
 
         # for unittest, do not skip the error.
@@ -189,6 +193,7 @@ class OP:
         # parameters to determine the number of procs for this op
         self.num_proc = kwargs.get("num_proc", None)
         self.cpu_required = kwargs.get("cpu_required", 1)
+        self.gpu_required = kwargs.get("gpu_required", 0)
         self.mem_required = kwargs.get("mem_required", 0)
         if isinstance(self.mem_required, str):
             self.mem_required = size_to_bytes(self.mem_required) / 1024**3
@@ -223,7 +228,10 @@ class OP:
         # Local import to avoid logger being serialized in multiprocessing
         from loguru import logger
 
-        op_proc = calculate_np(self._name, self.mem_required, self.cpu_required, self.num_proc, self.use_cuda())
+        if self.num_proc:
+            return self.num_proc
+
+        op_proc = calculate_np(self._name, self.mem_required, self.cpu_required, self.use_cuda(), self.gpu_required)
         logger.debug(f"Op [{self._name}] running with number of procs:{op_proc}")
         return op_proc
 
