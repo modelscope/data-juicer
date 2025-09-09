@@ -44,6 +44,7 @@ from .imgdiff_difference_caption_generator_mapper import (
 from .mllm_mapper import MllmMapper
 from .nlpaug_en_mapper import NlpaugEnMapper
 from .nlpcda_zh_mapper import NlpcdaZhMapper
+from .optimize_prompt_mapper import OptimizePromptMapper
 from .optimize_qa_mapper import OptimizeQAMapper
 from .optimize_query_mapper import OptimizeQueryMapper
 from .optimize_response_mapper import OptimizeResponseMapper
@@ -131,6 +132,7 @@ __all__ = [
     "MllmMapper",
     "NlpaugEnMapper",
     "NlpcdaZhMapper",
+    "OptimizePromptMapper",
     "OptimizeQAMapper",
     "OptimizeQueryMapper",
     "OptimizeResponseMapper",
