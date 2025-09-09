@@ -37,7 +37,7 @@ Data-Juicer 中的算子分为以下 7 种类型。
 | [filter](#filter) | 54 | Filters out low-quality samples. 过滤低质量样本。 |
 | [formatter](#formatter) | 8 | Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。 |
 | [grouper](#grouper) | 3 | Group samples to batched samples. 将样本分组，每一组组成一个批量样本。 |
-| [mapper](#mapper) | 82 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
+| [mapper](#mapper) | 83 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
 | [selector](#selector) | 5 | Selects top samples based on ranking. 基于排序选取高质量样本。 |
 
 All the specific operators are listed below, each featured with several capability tags. 
@@ -209,6 +209,7 @@ All the specific operators are listed below, each featured with several capabili
 | mllm_mapper | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Mapper to use MLLMs for visual question answering tasks. Mapper使用MLLMs进行视觉问答任务。 | [info](operators/mapper/mllm_mapper.md) | - |
 | nlpaug_en_mapper | 🔤Text 💻CPU 🟢Stable | Augments English text samples using various methods from the nlpaug library. 使用nlpaug库中的各种方法增强英语文本样本。 | [info](operators/mapper/nlpaug_en_mapper.md) | - |
 | nlpcda_zh_mapper | 🔤Text 💻CPU 🟢Stable | Augments Chinese text samples using the nlpcda library. 使用nlpcda库扩充中文文本样本。 | [info](operators/mapper/nlpcda_zh_mapper.md) | - |
+| optimize_prompt_mapper | 🚀GPU 🌊vLLM 🧩HF 🔗API 🟡Beta | Mapper to optimize prompts based on the existing ones. 映射器根据现有的优化提示。 | - | - |
 | optimize_qa_mapper | 🚀GPU 🌊vLLM 🧩HF 🔗API 🟢Stable | Mapper to optimize question-answer pairs. 映射器来优化问题-答案对。 | [info](operators/mapper/optimize_qa_mapper.md) | - |
 | optimize_query_mapper | 🚀GPU 🟢Stable | Optimize queries in question-answer pairs to make them more specific and detailed. 优化问答对中的查询，使其更加具体和详细。 | [info](operators/mapper/optimize_query_mapper.md) | - |
 | optimize_response_mapper | 🚀GPU 🟢Stable | Optimize response in question-answer pairs to be more detailed and specific. 优化问答对中的响应，使其更加详细和具体。 | [info](operators/mapper/optimize_response_mapper.md) | - |
