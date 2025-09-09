@@ -23,13 +23,21 @@ OP_NAME = "optimize_prompt_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class OptimizePromptMapper(Mapper):
-    """
-    Mapper to optimize prompts based on the existing ones.
-    This OP will use the existing prompts in the same batch and newly optimized prompts as the examples to optimize
-    the next ones.
+    """Optimize prompts based on existing ones in the same batch.
 
-    Reference: https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html
-    """
+    This operator uses the existing prompts and newly optimized prompts as examples to
+    generate better prompts. It supports using a Hugging Face model or an API for text
+    generation. The operator can be configured to keep the original samples or replace them
+    with the generated ones. The optimization process involves multiple retries if the
+    generated prompt is empty. The operator operates in batch mode and can leverage vLLM for
+    inference acceleration on CUDA devices.
+
+    - Uses existing and newly generated prompts to optimize future prompts.
+    - Supports both Hugging Face models and API-based text generation.
+    - Can keep or replace original samples with generated ones.
+    - Retries up to a specified number of times if the generated prompt is empty.
+    - Operates in batch mode and can use vLLM for acceleration on CUDA.
+    - References: https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html"""
 
     DEFAULT_SYSTEM_PROMPT = (
         "请你仔细观察多个示例提示词，按照你的理解，总结出相应规矩，然后写出一个新的更好的提示词，以让模型更好地完成指定任务。"
