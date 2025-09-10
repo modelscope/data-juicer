@@ -85,7 +85,7 @@ class ExtractEntityAttributeMapper(Mapper):
         :param entity_key: The key name in the meta field to store the
             given main entity for attribute extraction. It's "entity" in
             default.
-        :param entity_attribute_key: The key name in the meta field to
+        :param attribute_key: The key name in the meta field to
             store the given attribute to be extracted. It's "attribute"
             in default.
         :param attribute_desc_key: The key name in the meta field to store

@@ -81,6 +81,8 @@ class OptimizePromptMapper(Mapper):
 
         :param api_or_hf_model: API or huggingface model name.
         :param gen_num: The number of new prompts to generate.
+        :param max_example_num: Maximum number of example prompts to include as
+            context when generating new optimized prompts.
         :param keep_original_sample: whether to keep the original sample. If
             it's set to False, there will be only generated texts in the final
             datasets and the original texts will be removed. It's True in

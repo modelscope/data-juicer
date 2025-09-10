@@ -42,6 +42,7 @@ class ImageWatermarkFilter(Filter):
 
         :param hf_watermark_model: watermark detection model name on
             huggingface.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param prob_threshold: the predicted watermark probability threshold
             for samples. range from 0 to 1. Samples with watermark probability
             less than this threshold will be kept.
