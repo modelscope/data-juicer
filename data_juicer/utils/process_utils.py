@@ -53,7 +53,7 @@ def get_min_cuda_memory():
 
 
 def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=0):
-    """Calculate the optimum number of processes for the given OP"""
+    """Calculate the optimum number of processes for the given OP automatically。"""
 
     if not use_cuda and gpu_required > 0:
         raise ValueError(
@@ -75,7 +75,7 @@ def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=
                 f"has not been specified. "
                 f"Please specify the mem_required field or gpu_required field in the "
                 f"config file. You can reference the config_all.yaml file."
-                f"Set the `num_proc` to number of GPUs {auto_num_proc}."
+                f"Set the auto `num_proc` to number of GPUs {auto_num_proc}."
             )
         else:
             auto_proc_from_mem = sum(
@@ -88,7 +88,7 @@ def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=
                 auto_num_proc = len(available_memories())  # set to the number of available nodes
 
             logger.info(
-                f"Set the `num_proc` to {auto_num_proc} of Op[{name}] based on the "
+                f"Set the auto `num_proc` to {auto_num_proc} of Op[{name}] based on the "
                 f"required cuda memory: {mem_required}GB "
                 f"required gpu: {gpu_required} and required cpu: {cpu_required}."
             )
@@ -109,11 +109,11 @@ def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=
                 f"and memory: {mems_available}GB."
                 f"This Op [{name}] might "
                 f"require more resource to run. "
-                f"Set num_proc to available nodes number {auto_num_proc}."
+                f"Set the auto `num_proc` to available nodes number {auto_num_proc}."
             )
         else:
             logger.info(
-                f"Set the `num_proc` to {auto_num_proc} of Op[{name}] based on the "
+                f"Set the auto `num_proc` to {auto_num_proc} of Op[{name}] based on the "
                 f"required memory: {mem_required}GB "
                 f"and required cpu: {cpu_required}."
             )

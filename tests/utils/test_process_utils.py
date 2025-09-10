@@ -64,7 +64,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             logger.warning.assert_called_with(
                 "The required cuda memory and gpu of Op[test_op] has not been specified. "
                 "Please specify the mem_required field or gpu_required field in the config file. "
-                "You can reference the config_all.yaml file.Set the `num_proc` to number of GPUs 2."
+                "You can reference the config_all.yaml file.Set the auto `num_proc` to number of GPUs 2."
             )
     @TEST_TAG('ray')
     def test_cuda_auto_less_than_device_count(self):
@@ -79,7 +79,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             result = calculate_np("test_op", mem_required=3, cpu_required=0, use_cuda=True)
             self.assertEqual(result, 2)
             logger.info.assert_called_with(
-                "Set the `num_proc` to 2 of Op[test_op] based on the required cuda memory: 3GB required gpu: 0 and required cpu: 0."
+                "Set the auto `num_proc` to 2 of Op[test_op] based on the required cuda memory: 3GB required gpu: 0 and required cpu: 0."
             )
 
     @TEST_TAG('ray')
@@ -95,7 +95,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             result = calculate_np("test_op", mem_required=2, cpu_required=0, use_cuda=True)
             self.assertEqual(result, 4)
             logger.info.assert_called_with(
-                "Set the `num_proc` to 4 of Op[test_op] based on the required cuda memory: 2GB required gpu: 0 and required cpu: 0."
+                "Set the auto `num_proc` to 4 of Op[test_op] based on the required cuda memory: 2GB required gpu: 0 and required cpu: 0."
             )
 
     def test_cpu_default_num_proc(self):
@@ -109,7 +109,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             # auto_proc = 8//2 =4
             self.assertEqual(result, 4)
             logger.info.assert_called_with(
-                "Set the `num_proc` to 4 of Op[test_op] based on the required memory: 2GB and required cpu: 0."
+                "Set the auto `num_proc` to 4 of Op[test_op] based on the required memory: 2GB and required cpu: 0."
             )
 
     def test_cpu_insufficient_memory(self):
@@ -129,7 +129,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
                 "and memory: [2.0]GB."
                 "This Op [test_op] might "
                 "require more resource to run. "
-                "Set num_proc to available nodes number 1."
+                "Set the auto `num_proc` to available nodes number 1."
             )
 
     def test_cpu_num_proc_unset_and_mem_unlimited(self):
@@ -143,7 +143,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             # auto_proc = 8/(接近0) ≈无限大，取默认 num_proc=4
             self.assertEqual(result, 4)
             logger.info.assert_called_with(
-                "Set the `num_proc` to 4 of Op[test_op] based on the required memory: 0GB and required cpu: 0."
+                "Set the auto `num_proc` to 4 of Op[test_op] based on the required memory: 0GB and required cpu: 0."
             )
 
 

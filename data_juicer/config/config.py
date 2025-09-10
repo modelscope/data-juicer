@@ -282,7 +282,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 "it's False, the intermediate fields to store the hashes "
                 "computed by Deduplicators will be removed. Default: False.",
             )
-            parser.add_argument("--np", type=PositiveInt, default=None, help="Number of processes to process dataset.")
+            parser.add_argument("--np", type=PositiveInt, default=4, help="Number of processes to process dataset.")
             parser.add_argument(
                 "--text_keys",
                 type=Union[str, List[str]],
