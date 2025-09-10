@@ -749,7 +749,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         "audio_key": cfg.get("audio_key", "audios"),
         "video_key": cfg.get("video_key", "videos"),
         "image_bytes_key": cfg.get("image_bytes_key", "image_bytes"),
-        "num_proc": cfg.get('np', None),
+        "num_proc": cfg.get("np", None),
         "turbo": cfg.get("turbo", False),
         "skip_op_error": cfg.get("skip_op_error", True),
         "work_dir": cfg.work_dir,
