@@ -282,7 +282,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 "it's False, the intermediate fields to store the hashes "
                 "computed by Deduplicators will be removed. Default: False.",
             )
-            parser.add_argument("--np", type=PositiveInt, default=4, help="Number of processes to process dataset.")
+            parser.add_argument("--np", type=PositiveInt, default=None, help="Number of processes to process dataset.")
             parser.add_argument(
                 "--text_keys",
                 type=Union[str, List[str]],
@@ -674,21 +674,12 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
     from data_juicer.utils.resource_utils import cpu_count
 
     sys_cpu_count = cpu_count()
-    if not cfg.get("np", None):
-        cfg.np = sys_cpu_count
-        logger.warning(
-            f"Number of processes `np` is not set, " f"set it to cpu count [{sys_cpu_count}] as default value."
-        )
-    if cfg.np > sys_cpu_count:
+    if cfg.get("np", None) and cfg.np > sys_cpu_count:
         logger.warning(
             f"Number of processes `np` is set as [{cfg.np}], which "
-            f"is larger than the cpu count [{sys_cpu_count}]. Due "
-            f"to the data processing of Data-Juicer is a "
-            f"computation-intensive task, we recommend to set it to"
-            f" a value <= cpu count. Set it to [{sys_cpu_count}] "
-            f"here."
+            f"is larger than the cpu count [{sys_cpu_count}]. "
+            f"We recommend to set it to a value <= cpu count. "
         )
-        cfg.np = sys_cpu_count
 
     # whether or not to use cache management
     # disabling the cache or using checkpoint explicitly will turn off the
@@ -754,6 +745,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         "audio_key": cfg.get("audio_key", "audios"),
         "video_key": cfg.get("video_key", "videos"),
         "image_bytes_key": cfg.get("image_bytes_key", "image_bytes"),
+        "num_proc": cfg.np,
         "turbo": cfg.get("turbo", False),
         "skip_op_error": cfg.get("skip_op_error", True),
         "work_dir": cfg.work_dir,
