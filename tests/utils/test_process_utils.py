@@ -79,7 +79,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             result = calculate_np("test_op", mem_required=3, cpu_required=0, use_cuda=True)
             self.assertEqual(result, 2)
             logger.info.assert_called_with(
-                "Set the `num_proc` to 2 of Op[test_op] based on the required cuda memory: 3GB and required gpu: 0."
+                "Set the `num_proc` to 2 of Op[test_op] based on the required cuda memory: 3GB required gpu: 0 and required cpu: 0."
             )
 
     @TEST_TAG('ray')
@@ -95,7 +95,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
             result = calculate_np("test_op", mem_required=2, cpu_required=0, use_cuda=True)
             self.assertEqual(result, 4)
             logger.info.assert_called_with(
-                "Set the `num_proc` to 4 of Op[test_op] based on the required cuda memory: 2GB and required gpu: 0."
+                "Set the `num_proc` to 4 of Op[test_op] based on the required cuda memory: 2GB required gpu: 0 and required cpu: 0."
             )
 
     def test_cpu_default_num_proc(self):
