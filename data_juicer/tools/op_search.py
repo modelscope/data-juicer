@@ -6,6 +6,8 @@ import inspect
 import re
 from typing import Dict, List, Optional
 
+from docstring_parser import parse
+
 from data_juicer.format.formatter import FORMATTERS
 from data_juicer.ops import OPERATORS
 
@@ -20,6 +22,15 @@ class OPRecord:
         self.tags = tags
         self.sig = sig
         self.param_desc = param_desc
+        self.param_desc_map = self._parse_param_desc()
+
+    def _parse_param_desc(self):
+        """
+        Parse parameter descriptions from docstring in ':param name: desc' format.
+        Return a dict {param_name: description}.
+        """
+        docstring = parse(self.param_desc)
+        return {p.arg_name: p.description.replace("\n", " ") for p in docstring.params}
 
     def to_dict(self):
         return {
@@ -29,6 +40,7 @@ class OPRecord:
             "tags": self.tags,
             "sig": self.sig,
             "param_desc": self.param_desc,
+            "param_desc_map": self.param_desc_map,
         }
 
 

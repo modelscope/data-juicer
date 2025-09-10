@@ -1,4 +1,3 @@
-import sys
 import os
 import yaml
 import inspect
@@ -6,11 +5,11 @@ from loguru import logger
 
 from data_juicer.tools.op_search import OPSearcher
 from utils.param_type_utils import TypeAnnotationParser
+from utils.param_desc_insert import insert_missing_param_desc
 
 # Constants
 MAX_NUM = 1000000
 MIN_NUM = -1000000
-
 
 class ParameterProcessor:
     """Process function parameters and extract metadata."""
@@ -50,27 +49,6 @@ class ParameterProcessor:
             return MIN_NUM, MAX_NUM
         return float(MIN_NUM), float(MAX_NUM)
 
-    def extract_param_description(self, param_docstring, param_name):
-        """Extract parameter description from docstring."""
-        if param_name == "trust_remote_code":
-            return "Whether to trust the remote code for loading huggingface model."
-
-        if not param_docstring or param_name not in param_docstring:
-            raise ValueError(f"Failed to extract parameter description for {param_name}")
-
-        try:
-            # Find parameter description
-            param_section = param_docstring.split(f"{param_name}:")[1]
-            next_param_pos = param_section.find(":param")
-            if next_param_pos != -1:
-                param_desc = param_section[:next_param_pos].strip()
-            else:
-                param_desc = param_section.strip()
-
-            return self._clean_text(param_desc)
-        except (IndexError, AttributeError):
-            raise ValueError(f"Failed to extract parameter description for {param_name}")
-
     def _clean_text(self, text):
         """Clean and format text."""
         if not text:
@@ -100,7 +78,7 @@ class OperatorInfoExtractor:
 
         for op_record in filter_ops:
             op_name = op_record["name"]
-            logger.info(f"Processing operator: {op_name}")
+            # logger.info(f"Processing operator: {op_name}")
 
             # Handle special case reuse
             if self._should_reuse_config(op_name, all_op_info):
@@ -136,18 +114,26 @@ class OperatorInfoExtractor:
 
         return {}
 
+
     def _extract_single_operator(self, op_record):
         """Extract information for a single operator."""
         sig = op_record["sig"]
-        param_docstring = op_record["param_desc"]
+        param_desc_map = op_record["param_desc_map"]
         params_info = {}
 
         # Process each parameter
         for param_name, param in sig.parameters.items():
             if param_name in ["self", "args", "kwargs"]:
                 continue
+    
+            if not param_desc_map.get(param_name):
+                if param_name == "trust_remote_code":
+                    param_desc_map[param_name] = insert_missing_param_desc(op_record["name"], param_name)
+                else:
+                    logger.warning(f"{op_record['name']}: No description found for parameter {param_name}")
+                    continue
 
-            param_info = self._process_parameter(param_name, param, param_docstring)
+            param_info = self._process_parameter(param_name, param, param_desc_map.get(param_name))
             params_info[param_name] = param_info
 
         return {
@@ -155,7 +141,7 @@ class OperatorInfoExtractor:
             "args": params_info,
         }
 
-    def _process_parameter(self, param_name, param, param_docstring):
+    def _process_parameter(self, param_name, param, param_desc):
         """Process a single parameter and extract its metadata."""
         # Parse parameter type
         type_str, constraint_min, constraint_max = self.parser.parse_annotation(param.annotation)
@@ -173,9 +159,6 @@ class OperatorInfoExtractor:
 
         # Get default value
         default_val = self.processor.convert_default_value(param.default, self.parser.str_to_type(type_str))
-
-        # Extract parameter description
-        param_desc = self.processor.extract_param_description(param_docstring, param_name)
 
         # Build parameter info
         param_info = {

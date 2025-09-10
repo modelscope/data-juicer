@@ -1,6 +1,13 @@
 nested_aggregator:
-  desc: Considering the limitation of input length, nested aggregate contents for
-    each given number of samples.
+  desc: Aggregates nested content from multiple samples into a single summary. This
+    operator uses a recursive summarization approach to aggregate content from multiple
+    samples. It processes the input text, which is split into sub-documents, and generates
+    a summary that maintains the average length of the original documents. The aggregation
+    is performed using an API model, guided by system prompts and templates. The operator
+    supports retrying the API call in case of errors and allows for customization
+    of the summarization process through various parameters. The default system prompt
+    and templates are provided in Chinese, but they can be customized. The operator
+    uses a Hugging Face tokenizer to handle tokenization.
   args:
     api_model:
       desc: API model name.
@@ -14,8 +21,8 @@ nested_aggregator:
     output_key:
       desc: The output key in the aggregation field in the samples. It is same as
         the input_key in default.
-      type: Optional[str]
-      default: null
+      type: str
+      default: ''
     max_token_num:
       desc: The max token num of the total tokens of the sub documents. Without limitation
         if it is None.
@@ -60,7 +67,16 @@ nested_aggregator:
       type: Dict
       default: {}
 entity_attribute_aggregator:
-  desc: Return conclusion of the given entity's attribute from some docs.
+  desc: Summarizes a given attribute of an entity from a set of documents. The operator
+    extracts and summarizes the specified attribute of a given entity from the provided
+    documents. It uses a system prompt, example prompt, and input template to generate
+    the summary. The output is formatted as a markdown-style summary with the entity
+    and attribute clearly labeled. The summary is limited to a specified number of
+    words (default is 100). The operator uses a Hugging Face tokenizer to handle token
+    limits and splits documents if necessary. If the input key or required fields
+    are missing, the operator logs a warning and returns the sample unchanged. The
+    summary is stored in the batch metadata under the specified output key. The system
+    prompt, input template, example prompt, and output pattern can be customized.
   args:
     api_model:
       desc: API model name.
@@ -138,7 +154,16 @@ entity_attribute_aggregator:
       type: Dict
       default: {}
 meta_tags_aggregator:
-  desc: Merge similar meta tags to one tag.
+  desc: 'Merge similar meta tags into a single, unified tag. This operator aggregates
+    and consolidates similar meta tags from the input data. It can handle two scenarios:
+    - When a set of target tags is provided, it maps the original tags to these predefined
+    categories. If a "miscellaneous" or "other" category is included, any tags that
+    do not fit into the specified categories are grouped under this label. - When
+    no target tags are provided, it generates reasonable categories based on the similarity
+    and frequency of the input tags. The operator uses a language model (default:
+    gpt-4o) to analyze and merge the tags. The system prompt, input template, and
+    output pattern can be customized. The aggregated tags are then updated in the
+    input sample''s metadata.'
   args:
     api_model:
       desc: API model name.
@@ -173,7 +198,7 @@ meta_tags_aggregator:
       type: Optional[str]
       default: null
     tag_template:
-      desc: The tap template for target tags.
+      desc: The tap template for each tag and its frequency.
       type: Optional[str]
       default: null
     output_pattern:
@@ -197,8 +222,15 @@ meta_tags_aggregator:
       type: Dict
       default: {}
 most_relevant_entities_aggregator:
-  desc: Extract entities closely related to a given entity from some texts, and sort
-    them in descending order of importance.
+  desc: Extracts and ranks entities closely related to a given entity from provided
+    texts. The operator uses a language model API to identify and rank entities, filtering
+    out entities of the same type as the given entity. The ranked list is sorted in
+    descending order of importance. Input texts are aggregated and passed to the model,
+    with an optional token limit. The output is parsed using a regular expression
+    to extract the relevant entities. Results are stored in the batch metadata under
+    the key 'most_relevant_entities'. The operator retries the API call up to a specified
+    number of times in case of errors. The system prompt, input template, and output
+    pattern can be customized.
   args:
     api_model:
       desc: API model name.
@@ -266,8 +298,15 @@ most_relevant_entities_aggregator:
       type: Dict
       default: {}
 document_deduplicator:
-  desc: Deduplicator to deduplicate samples at document-level using exact matching.
-    Using md5 hash to deduplicate samples.
+  desc: Deduplicates samples at the document level using exact matching. This operator
+    computes an MD5 hash for each sample's text. It can optionally convert the text
+    to lowercase and ignore non-alphabet characters, including whitespaces, digits,
+    and punctuation. The deduplication is based on the computed hash values, where
+    samples with identical hashes are considered duplicates. The `compute_hash` method
+    adds a 'hash' key to each sample, storing its MD5 hash. During processing, the
+    first occurrence of each unique hash is kept, and subsequent duplicates are filtered
+    out. If the `show_num` parameter is set, the operator also returns a specified
+    number of duplicate pairs for inspection.
   args:
     lowercase:
       desc: Whether to convert sample text to lower case
@@ -279,8 +318,18 @@ document_deduplicator:
       type: bool
       default: false
 document_minhash_deduplicator:
-  desc: Deduplicator to deduplicate samples at document-level using MinHashLSH. Different
-    from simhash, minhash is stored as bytes, so they won't be kept in the final dataset.
+  desc: 'Deduplicates samples at the document level using MinHash LSH. This operator
+    computes MinHash values for each sample and uses Locality-Sensitive Hashing (LSH)
+    to identify and remove near-duplicate documents. The Jaccard similarity threshold
+    determines when two documents are considered duplicates. The tokenization method
+    can be customized, and a Hugging Face tokenizer can be used for ''sentencepiece''
+    tokenization. The minhash values are stored as bytes and are not kept in the final
+    dataset. The number of bands and rows per band in LSH can be set manually or determined
+    by an optimal parameter computation algorithm. Important notes: - If using ''punctuation''
+    tokenization with an ignore pattern, ensure the pattern does not include punctuations.
+    - For ''sentencepiece'' tokenization, a tokenizer model path is required. - The
+    deduplication process involves clustering and filtering, and only unique samples
+    or the first sample in a cluster are retained.'
   args:
     tokenization:
       desc: tokenization method for sample texts. It should be one of [space, punctuation,
@@ -338,12 +387,21 @@ document_minhash_deduplicator:
       type: Optional[str]
       default: null
 document_simhash_deduplicator:
-  desc: Deduplicator to deduplicate samples at document-level using SimHash.
+  desc: 'Deduplicates samples at the document level using SimHash. This operator computes
+    SimHash values for each sample and removes duplicates based on a specified Hamming
+    distance threshold. It supports different tokenization methods: ''space'', ''punctuation'',
+    and ''character''. The SimHash is computed over shingles of a given window size,
+    and the deduplication process clusters similar documents and retains only one
+    from each cluster. The default mode converts text to lowercase and can ignore
+    specific patterns. The key metric, Hamming distance, is used to determine similarity
+    between SimHash values. Important notes: - The `ignore_pattern` parameter can
+    be used to exclude certain substrings during SimHash computation. - For punctuation-based
+    tokenization, the `ignore_pattern` should not include punctuations to avoid conflicts.
+    - The `hamming_distance` must be less than the number of blocks (`num_blocks`).
+    - Only the first sample in each cluster is retained by default.'
   args:
     tokenization:
-      desc: tokenization method for sample texts. It should be one of [space, punctuation,
-        character]. For English-like languages, we recommend to use 'space'. And for
-        Chinese-like languages, we recommend to use 'character'
+      desc: tokenization method for sample texts
       type: str
       default: space
     window_size:
@@ -377,7 +435,16 @@ document_simhash_deduplicator:
       max: 1000000
 general_fused_op:
   desc: An explicitly fused operator designed to execute multiple sequential operations
-    (OPs) on the same batch, enabling fine-grained control over data processing.
+    (OPs) on the same batch, enabling fine-grained control over data processing. This
+    operator allows for the chaining of multiple data processing steps, such as mappers
+    and filters, into a single pass. It processes each batch of samples sequentially
+    through the defined operations, ensuring that all specified transformations are
+    applied in order. The operator supports both mappers, which transform data, and
+    filters, which remove or keep samples based on computed statistics. Context variables
+    can be passed between operations if needed. The accelerator is set to 'cuda' if
+    any of the fused operations use it. The number of processes is determined by the
+    minimum value among all fused operations. After processing, any temporary context
+    variables, such as those used for video containers, are cleaned up.
   args:
     batch_size:
       desc: the batch size of the input samples.
@@ -390,8 +457,17 @@ general_fused_op:
       type: Optional[List]
       default: null
 image_deduplicator:
-  desc: Deduplicator to deduplicate samples at document-level using exact matching
-    of images between documents.
+  desc: Deduplicates samples at the document level by exact matching of images. This
+    operator compares images across documents to identify and remove duplicates. -
+    It uses a specified hash method (default is 'phash') to compute image hashes.
+    - If `consider_text` is set, it also considers text content for deduplication,
+    using a text deduplicator in conjunction with the image hashes. - The key metric,
+    `imagehash`, is computed for each sample. If `consider_text` is enabled, an additional
+    `hash` field is used. - Duplicates are identified by comparing these hash values.
+    Samples with identical hashes are considered duplicates. - When `show_num` is
+    greater than 0, the operator also returns a subset of duplicate pairs for tracing
+    purposes. - The operator caches the `imagehash` and, if applicable, the `hash`
+    fields.
   args:
     method:
       desc: hash method for image
@@ -402,7 +478,16 @@ image_deduplicator:
       type: bool
       default: false
 ray_bts_minhash_deduplicator:
-  desc: A MinhashLSH deduplicator based on RAY.
+  desc: A MinhashLSH deduplicator that operates in Ray distributed mode. This operator
+    uses the MinHash LSH technique to identify and remove near-duplicate samples from
+    a dataset. It supports various tokenization methods, including space, punctuation,
+    character, and sentencepiece. The Jaccard similarity threshold is used to determine
+    if two samples are considered duplicates. If the Jaccard similarity of two samples
+    is greater than or equal to the specified threshold, one of the samples is filtered
+    out. The operator computes the MinHash values for each sample and uses a union-
+    find algorithm to group similar samples. The key metric, Jaccard similarity, is
+    computed based on the shingling of the text. The operator can run on both CPU
+    and GPU, with specific batch size and memory configurations for each.
   args:
     tokenization:
       desc: tokenization method for sample texts. It should be one of [space, punctuation,
@@ -515,7 +600,15 @@ ray_bts_minhash_deduplicator:
       min: -1000000.0
       max: 1000000.0
 ray_document_deduplicator:
-  desc: Deduplicator to deduplicate samples at document-level using exact matching.
+  desc: 'Deduplicates samples at the document level using exact matching in Ray distributed
+    mode. This operator computes a hash for each document and filters out duplicates
+    based on exact matches. The hash is calculated from the text content, which can
+    be optionally converted to lowercase and stripped of non-alphabet characters.
+    The key metric used for deduplication is the MD5 hash of the processed text. If
+    the `lowercase` parameter is set, the text is converted to lowercase before hashing.
+    If `ignore_non_character` is enabled, all non-alphabet characters, including whitespaces,
+    digits, and punctuation, are removed. The operator supports two backends: ''ray_actor''
+    and ''redis'', with the default being ''ray_actor''.'
   args:
     backend:
       desc: the backend for dedup, either 'ray_actor' or 'redis'
@@ -535,8 +628,14 @@ ray_document_deduplicator:
       type: bool
       default: false
 ray_image_deduplicator:
-  desc: Deduplicator to deduplicate samples at document-level using exact matching
-    of images between documents.
+  desc: Deduplicates samples at the document level using exact matching of images
+    in Ray distributed mode. This operator uses a specified hash method to compute
+    image hashes and identifies duplicates by comparing these hashes. It operates
+    in Ray distributed mode, supporting 'ray_actor' or 'redis' backends for deduplication.
+    The hash method can be set during initialization, with supported methods listed
+    in `HASH_METHOD`. If a sample does not contain an image, it is assigned an empty
+    hash value. The operator loads images from the specified keys and computes their
+    combined hash for comparison.
   args:
     backend:
       desc: the backend for dedup, either 'ray_actor' or 'redis'
@@ -551,8 +650,13 @@ ray_image_deduplicator:
       type: str
       default: phash
 ray_video_deduplicator:
-  desc: Deduplicator to deduplicate samples at document-level using exact matching
-    of videos between documents.
+  desc: Deduplicates samples at document-level using exact matching of videos in Ray
+    distributed mode. This operator computes the MD5 hash of video streams in each
+    sample and compares them to identify duplicates. It uses Ray distributed mode
+    for parallel processing. The hash is computed by demuxing the video streams and
+    updating the MD5 hash with each video packet. If a sample does not contain a valid
+    video, it is assigned an empty hash value. The operator supports 'ray_actor' or
+    'redis' backends for deduplication.
   args:
     backend:
       desc: the backend for dedup, either 'ray_actor' or 'redis'
@@ -563,15 +667,29 @@ ray_video_deduplicator:
       type: str
       default: redis://localhost:6379
 video_deduplicator:
-  desc: Deduplicator to deduplicate samples at document-level using exact matching
-    of videos between documents.
+  desc: Deduplicates samples at the document level using exact matching of videos.
+    This operator computes a hash for each video in the sample and uses it to identify
+    and remove duplicate documents. If `consider_text` is set to True, it also considers
+    the text hash alongside the video hash for deduplication. The video hash is computed
+    by hashing the video data, including all video streams in the container. The operator
+    supports sampling and tracing of duplicate pairs when the `show_num` parameter
+    is greater than 0. Important fields used for caching include 'videohash' and optionally
+    'hash' if text is considered.
   args:
     consider_text:
       desc: whether to consider text hash together with video hash when applying deduplication.
       type: bool
       default: false
 alphanumeric_filter:
-  desc: Filter to keep samples with alphabet/numeric ratio within a specific range.
+  desc: Filter to keep samples with an alphabet/numeric ratio within a specific range.
+    This operator filters samples based on the ratio of alphanumeric characters or
+    tokens. It keeps samples where the ratio of alphanumeric characters (or tokens)
+    to the total number of characters (or tokens) is within the specified range. The
+    ratio is computed either character-based or token-based, depending on the `tokenization`
+    parameter. If `tokenization` is True, it uses a Hugging Face tokenizer to count
+    tokens. The key metric used for filtering is 'alpha_token_ratio' if tokenization
+    is enabled, otherwise 'alnum_ratio'. The operator caches these metrics in the
+    stats field for each sample.
   args:
     tokenization:
       desc: Whether to count the ratio of alphanumeric to the total number of tokens.
@@ -594,7 +712,15 @@ alphanumeric_filter:
       min: -1000000.0
       max: 1000000.0
 audio_duration_filter:
-  desc: Keep data samples whose audios' durations are within a specified range.
+  desc: 'Keep data samples whose audio durations are within a specified range. This
+    operator filters data samples based on the duration of their audio files. It keeps
+    samples where the audio duration is between a minimum and maximum value, in seconds.
+    The operator supports two strategies for keeping samples: ''any'' (keep if any
+    audio meets the condition) or ''all'' (keep only if all audios meet the condition).
+    The audio duration is computed using the `librosa` library. If the audio duration
+    has already been computed, it is retrieved from the sample''s stats under the
+    key ''audio_duration''. If no audio is present in the sample, an empty array is
+    stored in the stats.'
   args:
     min_duration:
       desc: The min audio duration to keep samples in seconds. It's 0 by default.
@@ -619,8 +745,16 @@ audio_duration_filter:
       - any
       - all
 audio_nmf_snr_filter:
-  desc: Keep data samples whose audios' SNRs (computed based on NMF) are within a
-    specified range.
+  desc: Keep data samples whose audio Signal-to-Noise Ratios (SNRs) are within a specified
+    range. This operator computes the SNR of each audio in a sample using Non-negative
+    Matrix Factorization (NMF). It then filters the samples based on whether their
+    SNRs fall within the given minimum and maximum thresholds. The SNR is computed
+    for each audio, and the filtering strategy can be set to either 'any' or 'all'.
+    In 'any' mode, a sample is kept if at least one of its audios meets the SNR criteria.
+    In 'all' mode, all audios must meet the criteria for the sample to be kept. The
+    NMF computation uses a specified number of iterations. If no audio is present
+    in the sample, the SNR is recorded as an empty array. The key metric is stored
+    in the 'audio_nmf_snr' field.
   args:
     min_snr:
       desc: The min audio SNR to keep samples in dB. It's 0 by default.
@@ -650,16 +784,23 @@ audio_nmf_snr_filter:
       - any
       - all
 audio_size_filter:
-  desc: Keep data samples whose audio size (in bytes/kb/MB/...) within a specific
-    range.
+  desc: 'Keep data samples based on the size of their audio files. This operator filters
+    data samples by checking if the size of their audio files falls within a specified
+    range. The size can be in bytes, kilobytes, megabytes, or any other unit. The
+    key metric used is ''audio_sizes'', which is an array of file sizes in bytes.
+    If no audio files are present, the ''audio_sizes'' field will be an empty array.
+    The operator supports two strategies for keeping samples: ''any'' and ''all''.
+    In ''any'' mode, a sample is kept if at least one of its audio files meets the
+    size criteria. In ''all'' mode, all audio files must meet the size criteria for
+    the sample to be kept.'
   args:
     min_size:
-      desc: The min audio size to keep samples. set to be "0" by default for no size
+      desc: The min audio size to keep samples.  set to be "0" by default for no size
         constraint
       type: str
       default: '0'
     max_size:
-      desc: The max audio size to keep samples. set to be "1Tb" by default, an approximate
+      desc: The max audio size to keep samples.  set to be "1Tb" by default, an approximate
         for un-limited case
       type: str
       default: 1TB
@@ -673,7 +814,13 @@ audio_size_filter:
       - any
       - all
 average_line_length_filter:
-  desc: Filter to keep samples with average line length within a specific range.
+  desc: Filter to keep samples with average line length within a specific range. This
+    operator filters out samples based on their average line length. It keeps samples
+    where the average line length is between the specified minimum and maximum values.
+    The average line length is calculated as the total text length divided by the
+    number of lines. If the context is provided, it uses precomputed lines from the
+    context. The computed average line length is stored in the 'avg_line_length' key
+    in the stats field.
   args:
     min_len:
       desc: The min filter length in this op, samples will be filtered if their average
@@ -690,8 +837,13 @@ average_line_length_filter:
       min: -1000000
       max: 1000000
 character_repetition_filter:
-  desc: Filter to keep samples with char-level n-gram repetition ratio within a specific
-    range.
+  desc: Filter to keep samples with character-level n-gram repetition ratio within
+    a specific range. This operator calculates the character-level n-gram repetition
+    ratio for each sample and filters out samples that do not fall within the specified
+    range. The repetition ratio is computed based on the frequency of n-grams in the
+    text. The key metric 'char_rep_ratio' is cached in the stats field. Samples are
+    kept if their 'char_rep_ratio' is between the specified min and max ratios. The
+    n-gram length, minimum, and maximum ratios are configurable.
   args:
     rep_len:
       desc: Repetition length for char-level n-gram.
@@ -714,7 +866,15 @@ character_repetition_filter:
       min: -1000000.0
       max: 1000000.0
 flagged_words_filter:
-  desc: Filter to keep samples with flagged-word ratio less than a specific max value.
+  desc: Filter to keep samples with flagged-word ratio in a specified range. This
+    operator filters out samples based on the ratio of flagged words. It uses a list
+    of flagged words, which can be language-specific or combined from multiple languages.
+    The flagged-word ratio is computed as the number of flagged words divided by the
+    total number of words in the sample. If tokenization is enabled, a Hugging Face
+    tokenizer is used to split the text into words. The operator supports word augmentation
+    for certain languages, which can be configured. The key metric, 'flagged_words_ratio',
+    is cached and reused if already computed. Samples are kept if their flagged-word
+    ratio falls within the specified min and max ratio.
   args:
     lang:
       desc: Consider flagged words in what language. If lang == "all", we will adopt
@@ -725,6 +885,12 @@ flagged_words_filter:
       desc: Whether to use model to tokenize documents
       type: bool
       default: false
+    min_ratio:
+      desc: The min filter ratio in this op.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
     max_ratio:
       desc: The max filter ratio in this op.
       type: float
@@ -750,8 +916,13 @@ flagged_words_filter:
       type: str
       default: ''
 general_field_filter:
-  desc: Filter to keep samples based on a general field filter condition. The filter
-    condition is a string that can include logical operators and chain comparisons.
+  desc: 'Filter to keep samples based on a general field filter condition. The filter
+    condition is a string that can include logical operators (and/or) and chain comparisons.
+    For example: "10 < num <= 30 and text != ''nothing here'' and __dj__meta__.a ==
+    3". The condition is evaluated for each sample, and only samples that meet the
+    condition are kept. The result of the filter condition is stored in the sample''s
+    stats under the key ''general_field_filter_condition''. If the filter condition
+    is empty or already computed, the sample is not re-evaluated.'
   args:
     filter_condition:
       desc: 'The filter condition as a string. It can include logical operators (and/or)
@@ -760,7 +931,14 @@ general_field_filter:
       type: str
       default: ''
 image_aesthetics_filter:
-  desc: Filter to keep samples with aesthetics scores within a specific range.
+  desc: 'Filter to keep samples with aesthetics scores within a specific range. This
+    operator uses a Hugging Face model to predict the aesthetics score of images.
+    It keeps samples where the predicted scores fall within the specified min and
+    max score range. The operator supports two strategies: ''any'' (keep if any image
+    meets the condition) and ''all'' (keep only if all images meet the condition).
+    Aesthetics scores are cached in the ''image_aesthetics_scores'' field. If no images
+    are present, the sample is kept. Scores are normalized by dividing by 10 if the
+    model name includes ''shunk031/aesthetics-predictor''.'
   args:
     hf_scorer_model:
       desc: Huggingface model name for the aesthetics predictor. By default, we will
@@ -769,7 +947,7 @@ image_aesthetics_filter:
       type: str
       default: ''
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: whether to trust the remote code of HF models.
       type: bool
       default: false
     min_score:
@@ -794,8 +972,14 @@ image_aesthetics_filter:
       - any
       - all
 image_aspect_ratio_filter:
-  desc: Filter to keep samples with image aspect ratio within a specific range. AspectRatio
-    = W / H.
+  desc: 'Filter to keep samples with image aspect ratio within a specific range. The
+    operator computes the aspect ratio for each image in the sample, defined as the
+    width divided by the height (W / H). It caches the computed aspect ratios in the
+    ''aspect_ratios'' field. Samples are kept if their images'' aspect ratios fall
+    within the specified minimum and maximum range. The ''any_or_all'' parameter determines
+    the strategy: ''any'' keeps samples if at least one image meets the criteria,
+    while ''all'' requires all images to meet the criteria. If no images are present
+    in a sample, the sample is not filtered out.'
   args:
     min_ratio:
       desc: The min aspect ratio to keep samples.
@@ -819,7 +1003,13 @@ image_aspect_ratio_filter:
       - any
       - all
 image_face_count_filter:
-  desc: Filter to keep samples with the number of faces within a specific range.
+  desc: 'Filter to keep samples with the number of faces within a specific range.
+    This operator uses an OpenCV classifier for face detection. It filters samples
+    based on the number of faces detected in the images, keeping only those with a
+    face count within the specified range. The operator supports two strategies: ''any''
+    (keep if any image meets the condition) and ''all'' (keep only if all images meet
+    the condition). The face counts are cached in the ''face_counts'' field. If no
+    images are present in the sample, the face count is set to an empty array.'
   args:
     cv_classifier:
       desc: OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
@@ -847,7 +1037,14 @@ image_face_count_filter:
       - any
       - all
 image_face_ratio_filter:
-  desc: Filter to keep samples with face area ratios within a specific range.
+  desc: Filter to keep samples with face area ratios within a specific range. This
+    operator filters samples based on the ratio of the largest face area to the total
+    image area. It uses an OpenCV classifier for face detection. The key metric, 'face_ratios',
+    is computed for each image in the sample. Samples are kept if the face area ratios
+    fall within the specified min and max ratio range. The filtering strategy can
+    be set to 'any' (keep if any image meets the condition) or 'all' (keep only if
+    all images meet the condition). If no images are present in the sample, the sample
+    is retained.
   args:
     cv_classifier:
       desc: OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
@@ -875,19 +1072,30 @@ image_face_ratio_filter:
       - any
       - all
 image_nsfw_filter:
-  desc: Filter to keep samples whose images have low nsfw scores.
+  desc: 'Filter to keep samples whose images have nsfw scores in a specified range.
+    This operator uses a Hugging Face model to compute the nsfw scores for each image
+    in a sample. It keeps samples based on the specified `min_score` and `max_score`
+    thresholds. The operator supports two strategies: ''any'' (keep the sample if
+    any image meets the condition) or ''all'' (keep the sample only if all images
+    meet the condition). The nsfw scores are cached in the ''image_nsfw_score'' field
+    of the sample''s stats.'
   args:
     hf_nsfw_model:
       desc: nsfw detection model name on huggingface.
       type: str
       default: Falconsai/nsfw_image_detection
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: whether to trust the remote code of HF models.
       type: bool
       default: false
+    min_score:
+      desc: the min nsfw score threshold for samples. range from 0 to 1.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
     max_score:
-      desc: the nsfw score threshold for samples. range from 0 to 1. Samples with
-        nsfw score less than this threshold will be kept.
+      desc: the max nsfw score threshold for samples. range from 0 to 1.
       type: float
       default: 0.5
       min: -1000000.0
@@ -903,7 +1111,13 @@ image_nsfw_filter:
       - all
 image_pair_similarity_filter:
   desc: Filter to keep image pairs with similarities between images within a specific
-    range.
+    range. This operator uses a Hugging Face CLIP model to compute the cosine similarity
+    between two images in each sample. It retains samples where the similarity score
+    falls within the specified minimum and maximum thresholds. The 'any' strategy
+    keeps a sample if any of the image pairs meet the condition, while the 'all' strategy
+    requires all image pairs to meet the condition. The similarity scores are cached
+    in the 'image_pair_similarity' field. Each sample must include exactly two distinct
+    images.
   args:
     hf_clip:
       desc: clip model name on huggingface to compute the similarity between image
@@ -911,7 +1125,7 @@ image_pair_similarity_filter:
       type: str
       default: openai/clip-vit-base-patch32
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: whether to trust the remote code of HF models.
       type: bool
       default: false
     min_score:
@@ -936,7 +1150,15 @@ image_pair_similarity_filter:
       - any
       - all
 image_shape_filter:
-  desc: Filter to keep samples with image shape (w, h) within specific ranges.
+  desc: 'Filter to keep samples with image shape (width, height) within specific ranges.
+    This operator filters samples based on the width and height of images. It keeps
+    samples where the image dimensions fall within the specified ranges. The operator
+    supports two strategies: ''any'' and ''all''. In ''any'' mode, a sample is kept
+    if at least one image meets the criteria. In ''all'' mode, all images in the sample
+    must meet the criteria for the sample to be kept. The image width and height are
+    stored in the ''image_width'' and ''image_height'' fields of the sample''s stats.
+    If no images are present in the sample, the corresponding stats fields will be
+    empty arrays.'
   args:
     min_width:
       desc: The min width to keep samples.
@@ -972,16 +1194,21 @@ image_shape_filter:
       - any
       - all
 image_size_filter:
-  desc: Keep data samples whose image size (in Bytes/KB/MB/...) within a specific
-    range.
+  desc: 'Keep data samples whose image size (in Bytes/KB/MB/...) is within a specific
+    range. This operator filters data samples based on the size of their images. It
+    keeps samples if the image sizes fall within the specified minimum and maximum
+    size range. The operator supports two strategies: ''any''(keep the sample if any
+    image meets the size condition) and ''all'' (keep the sample only if all images
+    meet the size condition). If no images are present in the sample, the ''image_sizes''
+    field will be an empty array.'
   args:
     min_size:
-      desc: The min image size to keep samples. set to be "0" by default for no size
+      desc: The min image size to keep samples.  set to be "0" by default for no size
         constraint
       type: str
       default: '0'
     max_size:
-      desc: The max image size to keep samples. set to be "1TB" by default, an approximate
+      desc: The max image size to keep samples.  set to be "1TB" by default, an approximate
         for un-limited case
       type: str
       default: 1TB
@@ -995,8 +1222,16 @@ image_size_filter:
       - any
       - all
 image_text_matching_filter:
-  desc: Filter to keep samples those matching score between image and text within
-    a specific range.
+  desc: 'Filter to keep samples with image-text matching scores within a specific
+    range. This operator uses a Hugging Face BLIP model to compute the matching score
+    between images and text. It keeps samples where the matching score falls within
+    the specified `min_score` and `max_score` range. The key metric, `image_text_matching_score`,
+    is computed for each image-text pair. If multiple images are associated with a
+    single text, the scores can be reduced using ''avg'', ''max'', or ''min'' modes.
+    The operator supports horizontal and vertical flipping of images. Samples are
+    kept based on either ''any'' or ''all'' strategy: ''any'' keeps the sample if
+    any image meets the condition, while ''all'' keeps the sample only if all images
+    meet the condition.'
   args:
     hf_blip:
       desc: blip model name on huggingface to compute the matching score between image
@@ -1004,7 +1239,7 @@ image_text_matching_filter:
       type: str
       default: Salesforce/blip-itm-base-coco
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
     min_score:
@@ -1043,8 +1278,14 @@ image_text_matching_filter:
       type: str
       default: avg
 image_text_similarity_filter:
-  desc: Filter to keep samples those similarities between image and text within a
-    specific range.
+  desc: Filter to keep samples with image-text similarity within a specified range.
+    This operator uses a Hugging Face CLIP model to compute the similarity between
+    images and text. It retains samples where the similarity scores fall within the
+    given range. The similarity score is computed for each image-text pair, and the
+    final score can be reduced using 'avg', 'max', or 'min' modes. The 'any' or 'all'
+    strategy determines if at least one or all image-text pairs must meet the similarity
+    criteria. The key metric 'image_text_similarity' is cached in the sample's stats.
+    Images can be flipped horizontally or vertically before computing the similarity.
   args:
     hf_clip:
       desc: clip model name on huggingface to compute the similarity between image
@@ -1052,7 +1293,7 @@ image_text_similarity_filter:
       type: str
       default: openai/clip-vit-base-patch32
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
     min_score:
@@ -1091,14 +1332,22 @@ image_text_similarity_filter:
       type: str
       default: avg
 image_watermark_filter:
-  desc: Filter to keep samples whose images have no watermark with high probability.
+  desc: 'Filter to keep samples whose images have no watermark with high probability.
+    This operator uses a Hugging Face watermark detection model to filter samples
+    based on the presence of watermarks in their images. It keeps samples where the
+    predicted watermark probability is below a specified threshold. The operator supports
+    two strategies: ''any'' (keep if any image meets the condition) and ''all'' (keep
+    only if all images meet the condition). The key metric ''image_watermark_prob''
+    is computed for each image, representing the probability that the image contains
+    a watermark. If no images are present in the sample, the metric is set to an empty
+    array.'
   args:
     hf_watermark_model:
       desc: watermark detection model name on huggingface.
       type: str
       default: amrul-hzz/watermark_detector
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
     prob_threshold:
@@ -1118,9 +1367,120 @@ image_watermark_filter:
       options:
       - any
       - all
+llm_perplexity_filter:
+  desc: Filter to keep samples with perplexity scores within a specified range, computed
+    using a specified LLM. This operator computes the perplexity score for each sample
+    using a Hugging Face LLM. It then filters the samples based on whether their perplexity
+    scores fall within the specified minimum and maximum score range. The perplexity
+    score is calculated as the exponential of the loss value from the LLM. The operator
+    uses a query and response template to format the input text for the LLM. If the
+    perplexity score is not already cached in the sample's stats under the key 'llm_perplexity',
+    it will be computed.
+  args:
+    hf_model:
+      desc: huggingface embedding model name.
+      type: str
+      default: Qwen/Qwen2.5-0.5B
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Optional[Dict]
+      default: null
+    min_score:
+      desc: Minimum perplexity score.
+      type: float
+      default: 1.0
+      min: -1000000.0
+      max: 1000000.0
+    max_score:
+      desc: Maximum perplexity score.
+      type: float
+      default: 100.0
+      min: -1000000.0
+      max: 1000000.0
+    query_template:
+      desc: Template for building the query string.
+      type: Optional[str]
+      default: null
+    response_template:
+      desc: Template for building the response string.
+      type: Optional[str]
+      default: null
+in_context_influence_filter:
+  desc: Filter to keep texts based on their in-context influence on a validation set.
+    This operator calculates the in-context influence of each sample by comparing
+    perplexities with and without the sample as context. The influence score is computed
+    as the ratio of these perplexities. If `valid_as_demo` is True, the score is L(A|Q)
+    / L(A|task_desc, Q_v, A_v, Q). Otherwise, it is L(A_v|Q) / L(A_v|task_desc, Q,
+    A, Q_v). The operator retains samples whose in-context influence score is within
+    a specified range. The in-context influence score is stored in the 'in_context_influence'
+    field of the sample's stats. The validation set must be prepared using the `prepare_valid_feature`
+    method if not provided during initialization.
+  args:
+    valid_dataset:
+      desc: The dataset to use for validation. If None, 'self.prepare_valid_feature'
+        should be manually called before applying the filter.
+      type: Optional[List[Dict]]
+      default: null
+    task_desc:
+      desc: The description of the validation task.
+      type: str
+      default: ''
+    valid_as_demo:
+      desc: If true, score =  L(A|Q) / L(A|task_desc, Q_v, A_v, Q); If false, score
+        = L(A_v|Q) L(A_v|task_desc, Q, A, Q_v).
+      type: bool
+      default: false
+    n_shot:
+      desc: The number of shots in validation.
+      type: Optional[int]
+      default: null
+      min: -1000000
+      max: 1000000
+instruction_following_difficulty_filter:
+  desc: Filter to keep texts based on their instruction following difficulty (IFD,
+    https://arxiv.org/abs/2308.12032) score. This operator computes the IFD score
+    for each sample, which is the ratio of the loss with and without the query. It
+    keeps samples where the IFD score falls within a specified range. The IFD score
+    is calculated using a Hugging Face tokenizer and model. If the IFD score is already
+    cached in the 'ifd_score' field, it will be reused. The operator decides to keep
+    or filter samples based on the provided minimum and maximum IFD score thresholds.
+  args:
+    hf_model:
+      desc: huggingface embedding model name.
+      type: str
+      default: Qwen/Qwen2.5-0.5B
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Optional[Dict]
+      default: null
+    min_score:
+      desc: Minimum perplexity score.
+      type: float
+      default: 1.0
+      min: -1000000.0
+      max: 1000000.0
+    max_score:
+      desc: Maximum perplexity score.
+      type: float
+      default: 100.0
+      min: -1000000.0
+      max: 1000000.0
+    query_template:
+      desc: Template for building the query string.
+      type: Optional[str]
+      default: null
+    response_template:
+      desc: Template for building the response string.
+      type: Optional[str]
+      default: null
 language_id_score_filter:
-  desc: Filter to keep samples in a specific language with confidence score larger
-    than a specific min value.
+  desc: Filter to keep samples in a specific language with a confidence score above
+    a threshold. This operator uses a FastText model to identify the language of each
+    sample. It keeps samples that are in the specified language(s) and have a language
+    identification confidence score greater than or equal to the minimum score. If
+    no specific language is provided, it only filters based on the confidence score.
+    The language ID and its confidence score are stored in the 'lang' and 'lang_score'
+    fields of the sample's stats, respectively.
   args:
     lang:
       desc: Samples in which languages to keep.
@@ -1133,21 +1493,34 @@ language_id_score_filter:
       min: -1000000.0
       max: 1000000.0
 llm_analysis_filter: &id001
-  desc: Base filter class for leveraging LLMs to filter various samples. Provides
-    foundational functionality for dimensional scoring (0~5) and tagging.
+  desc: Base filter class for leveraging LLMs to analyze and filter data samples.
+    This operator uses an LLM to score and tag each sample across multiple quality
+    dimensions. It supports both API-based and Hugging Face models. The LLM evaluates
+    the sample on clarity, relevance, usefulness, and fluency, providing scores from
+    1 to 5. Tags are assigned to categorize the sample, and a recommendation is made
+    to keep, review, or discard the sample. The average score is computed based on
+    the required dimension keys. Samples are kept if their average score falls within
+    the specified min and max score thresholds. The key metric 'llm_analysis_score'
+    is cached in the sample's stats.
   args:
     api_or_hf_model:
       desc: API or huggingface model name.
       type: str
       default: gpt-4o
     min_score:
-      desc: The lowest score threshold to keep the sample.
+      desc: The min score threshold to keep the sample.
       type: float
       default: 0.5
       min: -1000000.0
       max: 1000000.0
+    max_score:
+      desc: The max score threshold to keep the sample.
+      type: float
+      default: 1.0
+      min: -1000000.0
+      max: 1000000.0
     is_hf_model:
-      desc: If true, use huggingface model. Otherwise, use API.
+      desc: If true, use Transformers for loading hugging face or local llm.
       type: bool
       default: false
     api_endpoint:
@@ -1189,8 +1562,7 @@ llm_analysis_filter: &id001
       min: 1
       max: 1000000
     enable_vllm:
-      desc: If true, use VLLM for loading hugging face or local llm. Otherwise, use
-        API for reference.
+      desc: If true, use VLLM for loading hugging face or local llm.
       type: bool
       default: false
     model_params:
@@ -1209,8 +1581,56 @@ llm_analysis_filter: &id001
       default: null
 llm_difficulty_score_filter: *id001
 llm_quality_score_filter: *id001
+llm_task_relevance_filter:
+  desc: Filter to keep samples with high relevance scores to validation tasks estimated
+    by an LLM. This operator evaluates the relevance of each sample to a specified
+    validation task using an LLM. The LLM scores the sample on multiple dimensions,
+    including topical relevance, linguistic style match, task match, knowledge alignment,
+    and potential utility. Each dimension is scored on a 1-5 scale, with 5 being the
+    highest. The key metric, 'llm_task_relevance', is the average score across these
+    dimensions. Samples are kept if their average score meets or exceeds the specified
+    minimum threshold. The operator uses either an API or a Hugging Face model for
+    evaluation. If no validation dataset or task description is provided, the 'prepare_valid_feature'
+    method must be called manually before applying the filter.
+  args:
+    api_or_hf_model:
+      desc: API or huggingface model name.
+      type: str
+      default: gpt-4o
+    min_score:
+      desc: The lowest score threshold to keep the sample.
+      type: float
+      default: 0.5
+      min: -1000000.0
+      max: 1000000.0
+    is_hf_model:
+      desc: Indicates if the model is from HuggingFace.
+      type: bool
+      default: false
+    valid_dataset:
+      desc: The dataset to use for validation.
+      type: Optional[List[Dict]]
+      default: null
+    task_desc:
+      desc: The description of the validation task. If valid_dataset=None and task_desc=None,
+        'self.prepare_valid_feature' should be manually called before applying the
+        filter.
+      type: Optional[str]
+      default: null
+    n_shot:
+      desc: The number of shots in validation.
+      type: Optional[int]
+      default: null
+      min: -1000000
+      max: 1000000
 maximum_line_length_filter:
-  desc: Filter to keep samples with maximum line length within a specific range.
+  desc: Filter to keep samples with a maximum line length within a specified range.
+    This operator filters out samples based on the length of their longest line. It
+    retains samples where the maximum line length is within the specified `min_len`
+    and `max_len` range. The maximum line length is computed by splitting the text
+    into lines and measuring the length of each line. If the context is provided,
+    it uses precomputed lines stored under the key 'lines' in the context. The maximum
+    line length is cached in the 'max_line_length' field of the stats.
   args:
     min_len:
       desc: The min filter length in this op, samples will be filtered if their maximum
@@ -1227,22 +1647,40 @@ maximum_line_length_filter:
       min: -1000000
       max: 1000000
 perplexity_filter:
-  desc: Filter to keep samples with perplexity score less than a specific max value.
+  desc: Filter to keep samples with perplexity score in a specified range. This operator
+    computes the perplexity of text samples using a Hugging Face tokenizer and a KenLM
+    language model. It keeps samples with perplexity scores within the specified minimum
+    and maximum values. The perplexity is calculated character-based by default. If
+    the perplexity is already computed, it will be reused from the 'perplexity' field
+    in the sample's stats. The operator supports batched operations for efficiency.
   args:
     lang:
       desc: Compute perplexity for samples in which language.
       type: str
       default: en
+    min_ppl:
+      desc: The min filter perplexity in this op.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
     max_ppl:
-      desc: The max filter perplexity in this op, samples will be filtered if their
-        perplexity exceeds this parameter.
+      desc: The max filter perplexity in this op.
       type: float
       default: 1500.0
       min: -1000000.0
       max: 1000000.0
 phrase_grounding_recall_filter:
-  desc: Filter to keep samples whose locating recalls of phrases extracted from text
-    in the images are within a specified range.
+  desc: Filter to keep samples based on the phrase grounding recall of phrases extracted
+    from text in images. This operator uses a Hugging Face Owl-ViT model to locate
+    phrases extracted from the text within the images. It keeps samples where the
+    phrase grounding recall is within a specified range. The recall is computed by
+    comparing the number of correctly located phrases to the total number of phrases.
+    The operator can handle multiple images per text chunk and supports different
+    strategies for reducing the recall values (e.g., average, max, min). It also allows
+    for flipping images horizontally or vertically. The key metric 'phrase_grounding_recall'
+    is computed and stored in the sample's stats. If no images are present, the recall
+    is set to an empty array.
   args:
     hf_owlvit:
       desc: Owl-ViT model name on huggingface to locate the phrases extracted from
@@ -1250,7 +1688,7 @@ phrase_grounding_recall_filter:
       type: str
       default: google/owlvit-base-patch32
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
     min_recall:
@@ -1313,7 +1751,13 @@ phrase_grounding_recall_filter:
       min: -1000000.0
       max: 1000000.0
 special_characters_filter:
-  desc: Filter to keep samples with special-char ratio within a specific range.
+  desc: Filter to keep samples with special-character ratio within a specific range.
+    This operator filters out samples based on the ratio of special characters in
+    the text. It keeps samples where the special-character ratio is within the specified
+    minimum and maximum thresholds. The special-character ratio is computed as the
+    number of special characters divided by the total number of characters in the
+    text. If the 'special_char_ratio' is already cached in the stats, it will be reused.
+    Otherwise, it will be computed and stored in the 'special_char_ratio' field.
   args:
     min_ratio:
       desc: The min filter ratio in this op, samples will be filtered if their special-char
@@ -1330,8 +1774,15 @@ special_characters_filter:
       min: -1000000.0
       max: 1000000.0
 specified_field_filter:
-  desc: Filter based on specified field information. If the specified field information
-    in the sample is not within the specified target value, the sample will be filtered.
+  desc: Filter samples based on the specified field information. This operator checks
+    if the value of a specified field in each sample is within a given target value
+    range. If the field value is not within the target range, the sample is filtered
+    out. The field can be a multi-level key, with levels separated by dots. The target
+    value is a list of acceptable values for the field. If the field value is not
+    a list or tuple, it is converted to a list for comparison. Samples are retained
+    if all values in the field match any of the target values. - Uses the 'field_key'
+    and 'target_value' parameters. - Supports multi-level field keys, e.g., 'level1.level2'.
+    - Converts non-list/tuple field values to a list for comparison.
   args:
     field_key:
       desc: Filter based on the specified value corresponding to the target key. The
@@ -1345,9 +1796,15 @@ specified_field_filter:
       type: List
       default: []
 specified_numeric_field_filter:
-  desc: Filter based on specified numeric field information. If the specified numeric
-    information in the sample is not within the specified range, the sample will be
-    filtered.
+  desc: Filter samples based on a specified numeric field value. This operator filters
+    out samples if the numeric value in the specified field is not within the given
+    range. The field can be multi-level, with keys separated by dots. The sample is
+    kept if the numeric value is between the minimum and maximum values, inclusive.
+    If the field key is not provided, all samples are retained. The operator ensures
+    that the field exists in the sample and that its value is numeric before performing
+    the comparison. - Uses the 'min_value' and 'max_value' to define the acceptable
+    range. - Supports multi-level fields using dot-separated keys. - Returns False
+    for non-numeric or out-of-range values, filtering the sample.
   args:
     field_key:
       desc: Filter based on the specified numeric value corresponding to the target
@@ -1370,7 +1827,15 @@ specified_numeric_field_filter:
       min: -1000000.0
       max: 1000000.0
 stopwords_filter:
-  desc: Filter to keep samples with stopword ratio larger than a specific min value.
+  desc: Filter to keep samples with stopword ratio within a specified range. This
+    operator calculates the ratio of stopwords in a sample and keeps samples where
+    this ratio is between the specified minimum and maximum values. The stopword ratio
+    is computed as the number of stopwords divided by the total number of words. If
+    the `tokenization` parameter is set, a Hugging Face tokenizer is used to tokenize
+    the text. The stopwords are loaded from a directory, and if the language is set
+    to "all", it merges stopwords from all available languages. The key metric is
+    `stopwords_ratio`, which is character-based by default. The operator also supports
+    word augmentation for specific languages.
   args:
     lang:
       desc: Consider stopwords in what language. If lang == "all", we will adopt the
@@ -1385,6 +1850,12 @@ stopwords_filter:
       desc: The min filter ratio in this op.
       type: float
       default: 0.3
+      min: -1000000.0
+      max: 1000000.0
+    max_ratio:
+      desc: The max filter ratio in this op.
+      type: float
+      default: 1.0
       min: -1000000.0
       max: 1000000.0
     stopwords_dir:
@@ -1406,7 +1877,12 @@ stopwords_filter:
       type: str
       default: ''
 suffix_filter:
-  desc: Filter to keep samples with specified suffix.
+  desc: Filter to keep samples with specified suffix. This operator retains samples
+    that have a suffix matching any of the provided suffixes. If no suffixes are specified,
+    all samples are kept. The key metric 'keep' is computed based on whether the sample's
+    suffix matches the specified list. The 'suffix' field of each sample is checked
+    against the list of allowed suffixes. If the suffix matches, the sample is kept;
+    otherwise, it is filtered out.
   args:
     suffixes:
       desc: 'the suffix of text that will be keep. For example: ''.txt'', ''txt''
@@ -1414,7 +1890,12 @@ suffix_filter:
       type: Union[str, List[str]]
       default: '[]'
 text_action_filter:
-  desc: Filter to keep texts those contain actions in the text.
+  desc: Filter to keep texts that contain a minimum number of actions. This operator
+    uses a Spacy model to detect actions in the text. It keeps samples if the number
+    of detected actions meets or exceeds the specified minimum. The supported languages
+    are English ('en') and Chinese ('zh'). The 'num_action' statistic is computed
+    and cached for each sample. Actions are identified based on part-of-speech (POS)
+    tags and specific tags for verbs.
   args:
     lang:
       desc: language of the text in the samples. 'en' for detection of actions in
@@ -1428,9 +1909,83 @@ text_action_filter:
       default: 1
       min: -1000000
       max: 1000000
+text_embd_similarity_filter:
+  desc: Filter to keep texts whose average embedding similarity to a set of given
+    validation texts falls within a specific range. This operator computes the cosine
+    similarity between the text embeddings and a set of validation text embeddings.
+    It keeps samples where the average similarity score is within the specified range.
+    The key metric, 'text_embd_similarity', is computed as the mean cosine similarity.
+    The operator supports both API-based and Hugging Face model- based embeddings.
+    If no valid dataset is provided, the `prepare_valid_feature` method must be called
+    manually before applying the filter.
+  args:
+    api_or_hf_model:
+      desc: API or huggingface embedding model name.
+      type: str
+      default: text-embedding-v4
+    is_hf_model:
+      desc: Indicates if the model is from HuggingFace.
+      type: bool
+      default: false
+    api_endpoint:
+      desc: Embedding URL endpoint for the API.
+      type: str
+      default: embeddings
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'data.0.embedding'
+        for embedding model.
+      type: str
+      default: data.0.embedding
+    model_params:
+      desc: Parameters for initializing the API model.
+      type: Optional[Dict]
+      default: null
+    min_score:
+      desc: The min average similarity to keep samples.
+      type: float
+      default: 0.1
+      min: 0.0
+      max: 1.0
+    max_score:
+      desc: The max average similarity to keep samples.
+      type: float
+      default: 1.0
+      min: 0.0
+      max: 1.0
+    valid_dataset:
+      desc: The dataset to use for validation. If None, 'self.prepare_valid_feature'
+        should be manually called before applying the filter.
+      type: Optional[List[Dict]]
+      default: null
+    ebd_dim:
+      desc: The embedding's dimension via API. API specific parameter, i.e., if is_hf_model=True,
+        this parameter will not take effect.
+      type: int
+      default: 4096
+      min: -1000000
+      max: 1000000
+    pooling:
+      desc: 'strategy to extract embedding from the hidden states. https://arxiv.org/abs/2503.01807
+        None: default option, the hidden state of the last token. "mean": uniform
+        mean of hidden states. "weighted_mean": weighted mean of hidden states. https://arxiv.org/abs/2202.08904
+        HF_MODEL specific parameter, i.e., if is_hf_model=False, this parameter will
+        not take effect.'
+      type: Optional[str]
+      default: null
+    input_template:
+      desc: Template for building the model input.
+      type: Optional[str]
+      default: null
 text_entity_dependency_filter:
-  desc: Identify the entities in the text which are independent with other token,
-    and filter them. The text containing no entities will be omitted.
+  desc: 'Identify and filter text samples based on entity dependencies. This operator
+    uses a spaCy model to detect entities in the text and evaluates their dependency
+    relationships. It filters out samples where entities have fewer than a specified
+    number of dependency edges. The key metric is ''num_dependency_edges'', which
+    counts the number of edges for each entity in the dependency tree. Samples with
+    no detected entities are omitted. The operator supports ''any'' or ''all'' strategies:
+    ''any'' keeps samples if at least one entity meets the dependency threshold, while
+    ''all'' requires all entities to meet the threshold. Supported languages are English
+    (''en'') and Chinese (''zh'').'
   args:
     lang:
       desc: language of the text in the samples. 'en' for detection of entities in
@@ -1454,7 +2009,12 @@ text_entity_dependency_filter:
       - any
       - all
 text_length_filter:
-  desc: Filter to keep samples with total text length within a specific range.
+  desc: Filter to keep samples with total text length within a specific range. This
+    operator filters out samples based on their total text length. It retains samples
+    where the text length is between the specified minimum and maximum lengths. The
+    text length is computed as the number of characters in the sample's text. If the
+    'text_len' key is already present in the sample's stats, it will be reused; otherwise,
+    it will be computed. The operator processes samples in batches for efficiency.
   args:
     min_len:
       desc: The min text length in the filtering. samples will be filtered if their
@@ -1471,8 +2031,15 @@ text_length_filter:
       min: -1000000
       max: 1000000
 text_pair_similarity_filter:
-  desc: Filter to keep text pairs with similarities between texts within a specific
-    range.
+  desc: 'Filter to keep text pairs with similarities within a specific range. This
+    operator computes the similarity between two texts in a pair using a Hugging Face
+    CLIP model. It keeps samples where the similarity score falls within the specified
+    min and max thresholds. The key metric, ''text_pair_similarity'', is computed
+    as the cosine similarity between the text embeddings. The operator supports two
+    strategies for keeping samples: ''any'' (keep if any pair meets the condition)
+    and ''all'' (keep only if all pairs meet the condition). If the second text key
+    is not provided, the operator will raise an error. The similarity scores are cached
+    under the ''text_pair_similarity'' field in the sample''s stats.'
   args:
     hf_clip:
       desc: clip model name on huggingface to compute the similarity between image
@@ -1480,7 +2047,7 @@ text_pair_similarity_filter:
       type: str
       default: openai/clip-vit-base-patch32
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
     min_score:
@@ -1509,7 +2076,12 @@ text_pair_similarity_filter:
       - any
       - all
 token_num_filter:
-  desc: Filter to keep samples with total token number within a specific range.
+  desc: Filter to keep samples with a total token number within a specified range.
+    This operator uses a Hugging Face tokenizer to count the number of tokens in each
+    sample. It keeps samples where the token count is between the minimum and maximum
+    thresholds. The token count is stored in the 'num_token' field of the sample's
+    stats. If the token count is not already computed, it will be calculated using
+    the specified tokenizer.
   args:
     hf_tokenizer:
       desc: the tokenizer name of Hugging Face tokenizers.
@@ -1531,7 +2103,13 @@ token_num_filter:
       max: 1000000
 video_aesthetics_filter:
   desc: Filter to keep data samples with aesthetics scores for specified frames in
-    the videos within a specific range.
+    the videos within a specific range. This operator evaluates the aesthetic quality
+    of video frames using a Hugging Face model. It keeps samples where the aesthetics
+    scores of the specified frames fall within a given range. The key metric, 'video_frames_aesthetics_score',
+    is computed by averaging, taking the max, or min of the frame scores, depending
+    on the reduce mode. Frame sampling can be done uniformly or by extracting all
+    keyframes. The filter applies a 'any' or 'all' strategy to decide if a sample
+    should be kept based on the scores of multiple videos.
   args:
     hf_scorer_model:
       desc: Huggingface model name for the aesthetics predictor. By default, we will
@@ -1540,7 +2118,7 @@ video_aesthetics_filter:
       type: str
       default: ''
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
     min_score:
@@ -1590,8 +2168,15 @@ video_aesthetics_filter:
       type: str
       default: avg
 video_aspect_ratio_filter:
-  desc: Filter to keep samples with video aspect ratio within a specific range. AspectRatio
-    = W / H.
+  desc: 'Filter to keep samples with video aspect ratio within a specific range. This
+    operator filters samples based on the aspect ratios of their videos. It keeps
+    samples where the video aspect ratios fall within a specified range. The aspect
+    ratio is calculated as the width divided by the height (W / H). The operator supports
+    two strategies for keeping samples: ''any'' and ''all''. In ''any'' mode, a sample
+    is kept if at least one video meets the aspect ratio condition. In ''all'' mode,
+    all videos in the sample must meet the condition for the sample to be kept. The
+    aspect ratios are computed and stored in the ''video_aspect_ratios'' field of
+    the sample''s stats.'
   args:
     min_ratio:
       desc: The minimum aspect ratio to keep samples, supported format is a string,
@@ -1613,7 +2198,14 @@ video_aspect_ratio_filter:
       - any
       - all
 video_duration_filter:
-  desc: Keep data samples whose videos' durations are within a specified range.
+  desc: 'Keep data samples whose videos'' durations are within a specified range.
+    This operator filters data samples based on the duration of their associated videos.
+    It keeps samples where the video durations fall within a specified minimum and
+    maximum range. The filtering strategy can be set to ''any'' or ''all'': - ''any'':
+    Keep the sample if any of its videos meet the duration criteria. - ''all'': Keep
+    the sample only if all of its videos meet the duration criteria. The video durations
+    are computed and stored in the ''video_duration'' field of the sample''s stats.
+    If no videos are present, an empty array is stored.'
   args:
     min_duration:
       desc: The min video duration to keep samples in seconds. It's 0 by default.
@@ -1638,8 +2230,16 @@ video_duration_filter:
       - any
       - all
 video_frames_text_similarity_filter:
-  desc: Filter to keep samples those similarities between sampled video frame images
-    and text within a specific range.
+  desc: 'Filter to keep samples based on the similarity between video frame images
+    and text within a specific range. This operator uses a Hugging Face CLIP model
+    to compute the similarity between video frames and associated text. It keeps samples
+    where the computed similarity scores fall within a specified range. The operator
+    supports different frame sampling methods, including ''all_keyframes'' and ''uniform'',
+    and allows for horizontal and vertical flipping of the frames. The similarity
+    score is reduced using one of three modes: ''avg'', ''max'', or ''min''. The operator
+    also supports two strategies for keeping samples: ''any'' (keep if any video meets
+    the condition) or ''all'' (keep only if all videos meet the condition). The key
+    metric is stored in the ''video_frames_text_similarity'' field.'
   args:
     hf_clip:
       desc: clip model name on huggingface to compute the similarity between frame
@@ -1648,7 +2248,7 @@ video_frames_text_similarity_filter:
       type: str
       default: openai/clip-vit-base-patch32
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
     min_score:
@@ -1706,7 +2306,13 @@ video_frames_text_similarity_filter:
       default: avg
 video_motion_score_filter:
   desc: Filter to keep samples with video motion scores within a specific range. The
-    Farneback's algorithm from OpenCV is used to compute dense optical flow.
+    operator uses Farneback's algorithm from OpenCV to compute dense optical flow.
+    It calculates the average motion score for each video and retains samples based
+    on the specified minimum and maximum score thresholds. The 'any' or 'all' strategy
+    determines whether to keep a sample if any or all videos meet the criteria. The
+    motion score is computed as the mean magnitude of the optical flow, which can
+    be normalized relative to the frame's diagonal length. The stats are cached under
+    the key 'video_motion_score'.
   args: &id002
     min_score:
       desc: The minimum motion score to keep samples.
@@ -1767,21 +2373,45 @@ video_motion_score_filter:
 video_motion_score_raft_filter:
   desc: 'Filter to keep samples with video motion scores within a specified range.
     This operator utilizes the RAFT (Recurrent All-Pairs Field Transforms) model from
-    torchvision to predict optical flow between video frames. For further details,
-    refer to the official torchvision documentation: https://pytorch.org/vision/main/models/raft.html
-    The original paper on RAFT is available here: https://arxiv.org/abs/2003.12039'
+    torchvision to predict optical flow between video frames. It keeps samples where
+    the video motion score is within the given min and max score range. The motion
+    score is computed based on the optical flow between frames, which is estimated
+    using the RAFT model. The operator can sample frames at a specified FPS and apply
+    transformations to the frames before computing the flow. - The RAFT model is used
+    to estimate the optical flow. - Frames are preprocessed using a series of transformations
+    including normalization and color channel flipping. - The motion score is calculated
+    from the optical flow data. - The operator can be configured to filter based on
+    any or all frames in the video. - The device for model inference (CPU or CUDA)
+    is automatically detected and set. For further details, refer to the official
+    torchvision documentation: https://pytorch.org/vision/main/models/raft.html The
+    original paper on RAFT is available here: https://arxiv.org/abs/2003.12039'
   args: *id002
 video_nsfw_filter:
-  desc: Filter to keep samples whose videos have low nsfw scores.
+  desc: 'Filter to keep samples whose videos have nsfw scores in a specified range.
+    This operator uses a Hugging Face model to detect NSFW content in video frames.
+    It keeps samples where the NSFW score is below a specified threshold. The operator
+    supports two frame sampling methods: "all_keyframes" and "uniform". For "uniform",
+    it extracts a specified number of frames. The NSFW scores are reduced using one
+    of three modes: "avg", "max", or "min". The key metric, ''video_nsfw_score'',
+    is computed for each video and stored in the sample''s stats. The operator can
+    use either an "any" or "all" strategy to decide if a sample should be kept based
+    on the NSFW scores of its videos.'
   args:
     hf_nsfw_model:
       desc: nsfw detection model name on huggingface.
       type: str
       default: Falconsai/nsfw_image_detection
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
+    min_score:
+      desc: the nsfw score threshold for samples. range from 0 to 1. Samples with
+        nsfw score greater than this threshold will be kept.
+      type: float
+      default: 0.0
+      min: -1000000.0
+      max: 1000000.0
     max_score:
       desc: the nsfw score threshold for samples. range from 0 to 1. Samples with
         nsfw score less than this threshold will be kept.
@@ -1824,7 +2454,14 @@ video_nsfw_filter:
       - all
 video_ocr_area_ratio_filter:
   desc: Keep data samples whose detected text area ratios for specified frames in
-    the video are within a specified range.
+    the video are within a specified range. This operator filters data based on the
+    ratio of the detected text area to the total frame area. It uses EasyOCR to detect
+    text in the specified languages and calculates the area ratio for each sampled
+    frame. The operator then determines whether to keep a sample based on the `any`
+    or `all` strategy, which checks if any or all of the videos meet the specified
+    area ratio range. The key metric, `video_ocr_area_ratio`, is computed as the mean
+    of the text area ratios across the sampled frames. The number of sampled frames
+    and the specific frames to be sampled can be configured.
   args:
     min_area_ratio:
       desc: The min ocr area ratio to keep samples. It's 0 by default.
@@ -1862,7 +2499,15 @@ video_ocr_area_ratio_filter:
       - any
       - all
 video_resolution_filter:
-  desc: Keep data samples whose videos' resolutions are within a specified range.
+  desc: 'Keep data samples whose videos'' resolutions are within a specified range.
+    This operator filters data samples based on the resolution of the videos they
+    contain. It keeps samples if the video resolutions fall within the defined width
+    and height ranges. The filtering strategy can be set to ''any'' or ''all'': -
+    ''any'': Keeps the sample if any video meets the resolution criteria. - ''all'':
+    Keeps the sample only if all videos meet the resolution criteria. The operator
+    computes and caches the ''video_width'' and ''video_height'' for each video in
+    the sample. If no videos are present, it sets these fields to empty arrays. These
+    cached values are used to determine whether to keep or filter out the sample.'
   args:
     min_width:
       desc: The min horizontal resolution.
@@ -1898,7 +2543,14 @@ video_resolution_filter:
       - any
       - all
 human_preference_annotation_mapper:
-  desc: Operator for human preference annotation using Label Studio.
+  desc: Operator for human preference annotation using Label Studio. This operator
+    formats and presents pairs of answers to a prompt for human evaluation. It uses
+    a default or custom Label Studio configuration to display the prompt and answer
+    options. The operator processes the annotations to determine the preferred answer,
+    updating the sample with the chosen and rejected answers. The operator requires
+    specific keys in the samples for the prompt and answer options. If these keys
+    are missing, it logs warnings and uses placeholder text. The annotated results
+    are processed to update the sample with the chosen and rejected answers.
   args:
     label_config_file:
       desc: Path to the label config file
@@ -1925,7 +2577,13 @@ human_preference_annotation_mapper:
       type: str
       default: rejected
 audio_add_gaussian_noise_mapper:
-  desc: Mapper to add gaussian noise to audio.
+  desc: Mapper to add Gaussian noise to audio samples. This operator adds Gaussian
+    noise to audio data with a specified probability. The amplitude of the noise is
+    randomly chosen between `min_amplitude` and `max_amplitude`. If `save_dir` is
+    provided, the modified audio files are saved in that directory; otherwise, they
+    are saved in the same directory as the input files. The `p` parameter controls
+    the probability of applying this transformation to each sample. If no audio is
+    present in the sample, it is returned unchanged.
   args:
     min_amplitude:
       desc: 'float unit: linear amplitude. Default: 0.001. Minimum noise amplification
@@ -1942,14 +2600,28 @@ audio_add_gaussian_noise_mapper:
       min: -1000000.0
       max: 1000000.0
     p:
-      desc: 'float range: [0.0, 1.0]. Default: 0.5. The probability of applying this
+      desc: 'float range: [0.0, 1.0].  Default: 0.5. The probability of applying this
         transform.'
       type: float
       default: 0.5
       min: -1000000.0
       max: 1000000.0
+    save_dir:
+      desc: 'str. Default: None. The directory where generated audio files will be
+        stored. If not specified, outputs will be saved in the same directory as their
+        corresponding input files. This path can alternatively be defined by setting
+        the `DJ_PRODUCED_DATA_DIR` environment variable.'
+      type: str
+      default: ''
 audio_ffmpeg_wrapped_mapper:
-  desc: Simple wrapper for FFmpeg audio filters.
+  desc: Wraps FFmpeg audio filters for processing audio files in a dataset. This operator
+    applies specified FFmpeg audio filters to the audio files in the dataset. It supports
+    passing custom filter parameters and global arguments to the FFmpeg command line.
+    The processed audio files are saved to a specified directory or the same directory
+    as the input files if no save directory is provided. The `DJ_PRODUCED_DATA_DIR`
+    environment variable can also be used to set the save directory. If no filter
+    name is provided, the audio files remain unmodified. The operator updates the
+    source file paths in the dataset after processing.
   args:
     filter_name:
       desc: ffmpeg audio filter name.
@@ -1971,8 +2643,23 @@ audio_ffmpeg_wrapped_mapper:
       desc: whether to overwrite output file.
       type: bool
       default: true
+    save_dir:
+      desc: The directory where generated audio files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 calibrate_qa_mapper:
-  desc: Mapper to calibrate question-answer pairs based on reference text.
+  desc: Calibrates question-answer pairs based on reference text using an API model.
+    This operator uses a specified API model to calibrate question-answer pairs, making
+    them more detailed and accurate. It constructs the input prompt by combining the
+    reference text and the question-answer pair, then sends it to the API for calibration.
+    The output is parsed to extract the calibrated question and answer. The operator
+    retries the API call and parsing up to a specified number of times in case of
+    errors. The default system prompt, input templates, and output pattern can be
+    customized. The operator supports additional parameters for model initialization
+    and sampling.
   args:
     api_model:
       desc: API model name.
@@ -2023,7 +2710,13 @@ calibrate_qa_mapper:
       type: Dict
       default: {}
 calibrate_query_mapper:
-  desc: Mapper to calibrate query in question-answer pairs based on reference text.
+  desc: Calibrate query in question-answer pairs based on reference text. This operator
+    adjusts the query (question) in a question-answer pair to be more detailed and
+    accurate, while ensuring it can still be answered by the original answer. It uses
+    a reference text to inform the calibration process. The calibration is guided
+    by a system prompt, which instructs the model to refine the question without adding
+    extraneous information. The output is parsed to extract the calibrated query,
+    with any additional content removed.
   args:
     api_model:
       desc: API model name.
@@ -2074,7 +2767,12 @@ calibrate_query_mapper:
       type: Dict
       default: {}
 calibrate_response_mapper:
-  desc: Mapper to calibrate response in question-answer pairs based on reference text.
+  desc: Calibrate response in question-answer pairs based on reference text. This
+    mapper calibrates the 'response' part of a question-answer pair by using a reference
+    text. It aims to make the response more detailed and accurate while ensuring it
+    still answers the original question. The calibration process uses a default system
+    prompt, which can be customized. The output is stripped of any leading or trailing
+    whitespace.
   args:
     api_model:
       desc: API model name.
@@ -2125,31 +2823,49 @@ calibrate_response_mapper:
       type: Dict
       default: {}
 chinese_convert_mapper:
-  desc: Mapper to convert Chinese between Traditional Chinese, Simplified Chinese
-    and Japanese Kanji.
+  desc: Mapper to convert Chinese text between Traditional, Simplified, and Japanese
+    Kanji. This operator converts Chinese text based on the specified mode. It supports
+    conversions between Simplified Chinese, Traditional Chinese (including Taiwan
+    and Hong Kong variants), and Japanese Kanji. The conversion is performed using
+    a pre-defined set of rules. The available modes include 's2t' for Simplified to
+    Traditional, 't2s' for Traditional to Simplified, and other specific variants
+    like 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp', 't2tw', 'tw2t', 'hk2t',
+    't2hk', 't2jp', and 'jp2t'. The operator processes text in batches and applies
+    the conversion to the specified text key in the samples.
   args:
     mode:
       desc: "Choose the mode to convert Chinese: s2t: Simplified Chinese to Traditional\
-        \ Chinese, t2s: Traditional Chinese to Simplified Chinese, s2tw: Simplified\
-        \ Chinese to Traditional Chinese (Taiwan Standard), tw2s: Traditional Chinese\
-        \ (Taiwan Standard) to Simplified Chinese, s2hk: Simplified Chinese to Traditional\
-        \ Chinese (Hong Kong variant), hk2s: Traditional Chinese (Hong Kong variant)\
-        \ to Simplified Chinese, s2twp: Simplified Chinese to Traditional Chinese\
-        \ (Taiwan Standard) with Taiwanese idiom, tw2sp: Traditional Chinese (Taiwan\
-        \ Standard) to Simplified Chinese with Mainland Chinese idiom, t2tw: Traditional\
-        \ Chinese to Traditional Chinese (Taiwan Standard), tw2t: Traditional Chinese\
-        \ (Taiwan standard) to Traditional Chinese, hk2t: Traditional Chinese (Hong\
-        \ Kong variant) to Traditional Chinese, t2hk: Traditional Chinese to Traditional\
-        \ Chinese (Hong Kong variant), t2jp: Traditional Chinese Characters (Ky\u016B\
-        jitai) to New Japanese Kanji, jp2t: New Japanese Kanji (Shinjitai) to Traditional\
+        \ Chinese,  t2s: Traditional Chinese to Simplified Chinese,  s2tw: Simplified\
+        \ Chinese to Traditional Chinese (Taiwan Standard),  tw2s: Traditional Chinese\
+        \ (Taiwan Standard) to Simplified Chinese,  s2hk: Simplified Chinese to Traditional\
+        \ Chinese (Hong Kong variant),  hk2s: Traditional Chinese (Hong Kong variant)\
+        \ to Simplified Chinese,  s2twp: Simplified Chinese to Traditional Chinese\
+        \ (Taiwan Standard) with Taiwanese idiom,  tw2sp: Traditional Chinese (Taiwan\
+        \ Standard) to Simplified Chinese with Mainland Chinese idiom,  t2tw: Traditional\
+        \ Chinese to Traditional Chinese (Taiwan Standard),  tw2t: Traditional Chinese\
+        \ (Taiwan standard) to Traditional Chinese,  hk2t: Traditional Chinese (Hong\
+        \ Kong variant) to Traditional Chinese,  t2hk: Traditional Chinese to Traditional\
+        \ Chinese (Hong Kong variant),  t2jp: Traditional Chinese Characters (Ky\u016B\
+        jitai) to New Japanese Kanji,  jp2t: New Japanese Kanji (Shinjitai) to Traditional\
         \ Chinese Characters,"
       type: str
       default: s2t
 clean_copyright_mapper:
-  desc: Mapper to clean copyright comments at the beginning of the text samples.
+  desc: Cleans copyright comments at the beginning of text samples. This operator
+    removes copyright comments from the start of text samples. It identifies and strips
+    multiline comments that contain the word "copyright" using a regular expression.
+    It also greedily removes lines starting with comment markers like `//`, `#`, or
+    `--` at the beginning of the text, as these are often part of copyright headers.
+    The operator processes each sample individually but can handle batches for efficiency.
   args: {}
 clean_email_mapper:
-  desc: Mapper to clean email in text samples.
+  desc: Cleans email addresses from text samples using a regular expression. This
+    operator removes or replaces email addresses in the text based on a regular expression
+    pattern. By default, it uses a standard pattern to match email addresses, but
+    a custom pattern can be provided. The matched email addresses are replaced with
+    a specified replacement string, which defaults to an empty string. The operation
+    is applied to each text sample in the batch. If no email address is found in a
+    sample, it remains unchanged.
   args:
     pattern:
       desc: regular expression pattern to search for within text.
@@ -2160,10 +2876,24 @@ clean_email_mapper:
       type: str
       default: ''
 clean_html_mapper:
-  desc: Mapper to clean html code in text samples.
+  desc: Cleans HTML code from text samples, converting HTML to plain text. This operator
+    processes text samples by removing HTML tags and converting HTML elements to a
+    more readable format. Specifically, it replaces `<li>` and `<ol>` tags with newline
+    and bullet points. The Selectolax HTML parser is used to extract the text content
+    from the HTML. This operation is performed in a batched manner, making it efficient
+    for large datasets.
   args: {}
 clean_ip_mapper:
-  desc: Mapper to clean ipv4 and ipv6 address in text samples.
+  desc: Cleans IPv4 and IPv6 addresses from text samples. This operator removes or
+    replaces IPv4 and IPv6 addresses in the text. It uses a regular expression to
+    identify and clean the IP addresses. By default, it replaces the IP addresses
+    with an empty string, effectively removing them. The operator can be configured
+    with a custom pattern and replacement string. If no pattern is provided, a default
+    pattern for both IPv4 and IPv6 addresses is used. The operator processes samples
+    in batches. - Uses a regular expression to find and clean IP addresses. - Replaces
+    found IP addresses with a specified replacement string. - Default replacement
+    string is an empty string, which removes the IP addresses. - Can use a custom
+    regular expression pattern if provided. - Processes samples in batches for efficiency.
   args:
     pattern:
       desc: regular expression pattern to search for within text.
@@ -2174,7 +2904,13 @@ clean_ip_mapper:
       type: str
       default: ''
 clean_links_mapper:
-  desc: Mapper to clean links like http/https/ftp in text samples.
+  desc: Mapper to clean links like http/https/ftp in text samples. This operator removes
+    or replaces URLs and other web links in the text. It uses a regular expression
+    pattern to identify and remove links. By default, it replaces the identified links
+    with an empty string, effectively removing them. The operator can be customized
+    with a different pattern and replacement string. It processes samples in batches
+    and modifies the text in place. If no links are found in a sample, it is left
+    unchanged.
   args:
     pattern:
       desc: regular expression pattern to search for within text.
@@ -2185,9 +2921,16 @@ clean_links_mapper:
       type: str
       default: ''
 dialog_intent_detection_mapper:
-  desc: Mapper to generate user's intent labels in dialog. Input from history_key,
-    query_key and response_key. Output lists of labels and analysis for queries in
-    the dialog.
+  desc: Generates user's intent labels in a dialog by analyzing the history, query,
+    and response. This operator processes a dialog to identify and label the user's
+    intent. It uses a predefined system prompt and templates to build input prompts
+    for an API call. The API model (e.g., GPT-4) is used to analyze the dialog and
+    generate intent labels and analysis. The results are stored in the meta field
+    under 'dialog_intent_labels' and 'dialog_intent_labels_analysis'. The operator
+    supports customizing the system prompt, templates, and patterns for parsing the
+    API response. If the intent candidates are provided, they are included in the
+    input prompt. The operator retries the API call up to a specified number of times
+    if there are errors.
   args:
     api_model:
       desc: API model name.
@@ -2271,9 +3014,15 @@ dialog_intent_detection_mapper:
       type: Dict
       default: {}
 dialog_sentiment_detection_mapper:
-  desc: Mapper to generate user's sentiment labels in dialog. Input from history_key,
-    query_key and response_key. Output lists of labels and analysis for queries in
-    the dialog.
+  desc: Generates sentiment labels and analysis for user queries in a dialog. This
+    operator processes a dialog to detect and label the sentiments expressed by the
+    user. It uses the provided history, query, and response keys to construct prompts
+    for an API call. The API returns sentiment analysis and labels, which are then
+    parsed and stored in the sample's metadata under the 'dialog_sentiment_labels'
+    and 'dialog_sentiment_labels_analysis' keys. The operator supports custom templates
+    and patterns for prompt construction and output parsing. If no sentiment candidates
+    are provided, it uses open-domain sentiment labels. The operator retries the API
+    call up to a specified number of times in case of errors.
   args:
     api_model:
       desc: API model name.
@@ -2357,9 +3106,16 @@ dialog_sentiment_detection_mapper:
       type: Dict
       default: {}
 dialog_sentiment_intensity_mapper:
-  desc: Mapper to predict user's sentiment intensity (from -5 to 5 in default prompt)
-    in dialog. Input from history_key, query_key and response_key. Output lists of
-    intensities and analysis for queries in the dialog.
+  desc: Mapper to predict user's sentiment intensity in a dialog, ranging from -5
+    to 5. This operator analyzes the sentiment of user queries in a dialog and outputs
+    a list of sentiment intensities and corresponding analyses. The sentiment intensity
+    ranges from -5 (extremely negative) to 5 (extremely positive), with 0 indicating
+    a neutral sentiment. The analysis is based on the provided history, query, and
+    response keys. The default system prompt and templates guide the sentiment analysis
+    process. The results are stored in the meta field under 'dialog_sentiment_intensity'
+    for intensities and 'dialog_sentiment_intensity_analysis' for analyses. The operator
+    uses an API model to generate the sentiment analysis, with configurable retry
+    attempts and sampling parameters.
   args:
     api_model:
       desc: API model name.
@@ -2434,9 +3190,15 @@ dialog_sentiment_intensity_mapper:
       type: Dict
       default: {}
 dialog_topic_detection_mapper:
-  desc: Mapper to generate user's topic labels in dialog. Input from history_key,
-    query_key and response_key. Output lists of labels and analysis for queries in
-    the dialog.
+  desc: Generates user's topic labels and analysis in a dialog. This operator processes
+    a dialog to detect and label the topics discussed by the user. It takes input
+    from `history_key`, `query_key`, and `response_key` and outputs lists of labels
+    and analysis for each query in the dialog. The operator uses a predefined system
+    prompt and templates to build the input prompt for the API call. It supports customizing
+    the system prompt, templates, and patterns for parsing the API response. The results
+    are stored in the `meta` field under the keys specified by `labels_key` and `analysis_key`.
+    If these keys already exist in the `meta` field, the operator skips processing.
+    The operator retries the API call up to `try_num` times in case of errors.
   args:
     api_model:
       desc: API model name.
@@ -2519,7 +3281,15 @@ dialog_topic_detection_mapper:
       type: Dict
       default: {}
 download_file_mapper:
-  desc: Mapper to download url files to local files or load them into memory.
+  desc: Mapper to download URL files to local files or load them into memory. This
+    operator downloads files from URLs and can either save them to a specified directory
+    or load the contents directly into memory. It supports downloading multiple files
+    concurrently and can resume downloads if the `resume_download` flag is set. The
+    operator processes nested lists of URLs, flattening them for batch processing
+    and then reconstructing the original structure in the output. If both `save_dir`
+    and `save_field` are not specified, it defaults to saving the content under the
+    key `image_bytes`. The operator logs any failed download attempts and provides
+    error messages for troubleshooting.
   args:
     download_field:
       desc: The filed name to get the url to download.
@@ -2550,10 +3320,23 @@ download_file_mapper:
       min: -1000000
       max: 1000000
 expand_macro_mapper:
-  desc: Mapper to expand macro definitions in the document body of Latex samples.
+  desc: Expands macro definitions in the document body of LaTeX samples. This operator
+    processes LaTeX documents to expand user-defined macros in the text. It supports
+    newcommand and def macros without arguments. Macros are identified and expanded
+    in the text, ensuring they are not part of longer alphanumeric words. The operator
+    currently does not support macros with arguments. The processed text is updated
+    in the samples.
   args: {}
 extract_entity_attribute_mapper:
-  desc: Extract attributes for given entities from the text
+  desc: Extracts attributes for given entities from the text and stores them in the
+    sample's metadata. This operator uses an API model to extract specified attributes
+    for given entities from the input text. It constructs prompts based on provided
+    templates and parses the model's output to extract attribute descriptions and
+    supporting text. The extracted data is stored in the sample's metadata under the
+    specified keys. If the required metadata fields already exist, the operator skips
+    processing for that sample. The operator retries the API call and parsing up to
+    a specified number of times in case of errors. The default system prompt, input
+    template, and parsing patterns are used if not provided.
   args:
     api_model:
       desc: API model name.
@@ -2634,7 +3417,15 @@ extract_entity_attribute_mapper:
       type: Dict
       default: {}
 extract_entity_relation_mapper:
-  desc: Extract entities and relations in the text for knowledge graph.
+  desc: Extracts entities and relations from text to build a knowledge graph. - Identifies
+    entities based on specified types and extracts their names, types, and descriptions.
+    - Identifies relationships between the entities, including source and target entities,
+    relationship descriptions, keywords, and strength scores. - Uses a Hugging Face
+    tokenizer and a predefined prompt template to guide the extraction process. -
+    Outputs entities and relations in a structured format, using delimiters for separation.
+    - Caches the results in the sample's metadata under the keys 'entity' and 'relation'.
+    - Supports multiple retries and gleaning to ensure comprehensive extraction. -
+    The default entity types include 'organization', 'person', 'geo', and 'event'.
   args:
     api_model:
       desc: API model name.
@@ -2721,7 +3512,13 @@ extract_entity_relation_mapper:
       type: Dict
       default: {}
 extract_event_mapper:
-  desc: Extract events and relevant characters in the text
+  desc: Extracts events and relevant characters from the text. This operator uses
+    an API model to summarize the text into multiple events and extract the relevant
+    characters for each event. The summary and character extraction follow a predefined
+    format. The operator retries the API call up to a specified number of times if
+    there is an error. The extracted events and characters are stored in the meta
+    field of the samples. If no events are found, the original samples are returned.
+    The operator can optionally drop the original text after processing.
   args:
     api_model:
       desc: API model name.
@@ -2778,7 +3575,14 @@ extract_event_mapper:
       type: Dict
       default: {}
 extract_keyword_mapper:
-  desc: Generate keywords for the text
+  desc: Generate keywords for the text. This operator uses a specified API model to
+    generate high-level keywords that summarize the main concepts, themes, or topics
+    of the input text. The generated keywords are stored in the meta field under the
+    key specified by `keyword_key`. The operator retries the API call up to `try_num`
+    times in case of errors. If `drop_text` is set to True, the original text is removed
+    from the sample after processing. The operator uses a default prompt template
+    and completion delimiter, which can be customized. The output is parsed using
+    a regular expression to extract the keywords.
   args:
     api_model:
       desc: API model name.
@@ -2830,7 +3634,16 @@ extract_keyword_mapper:
       type: Dict
       default: {}
 extract_nickname_mapper:
-  desc: Extract nickname relationship in the text.
+  desc: Extracts nickname relationships in the text using a language model. This operator
+    uses a language model to identify and extract nickname relationships from the
+    input text. It follows specific instructions to ensure accurate extraction, such
+    as identifying the speaker, the person being addressed, and the nickname used.
+    The extracted relationships are stored in the meta field under the specified key.
+    The operator uses a default system prompt, input template, and output pattern,
+    but these can be customized. The results are parsed and validated to ensure they
+    meet the required format. If the text already contains the nickname information,
+    it is not processed again. The operator retries the API call a specified number
+    of times if an error occurs.
   args:
     api_model:
       desc: API model name.
@@ -2882,7 +3695,13 @@ extract_nickname_mapper:
       type: Dict
       default: {}
 extract_support_text_mapper:
-  desc: Extract support sub text for a summary.
+  desc: Extracts a supporting sub-text from the original text based on a given summary.
+    This operator uses an API model to identify and extract a segment of the original
+    text that best matches the provided summary. It leverages a system prompt and
+    input template to guide the extraction process. The extracted support text is
+    stored in the specified meta field key. If the extraction fails or returns an
+    empty string, the original summary is used as a fallback. The operator retries
+    the extraction up to a specified number of times in case of errors.
   args:
     api_model:
       desc: API model name.
@@ -2935,7 +3754,13 @@ extract_support_text_mapper:
       type: Dict
       default: {}
 extract_tables_from_html_mapper:
-  desc: Mapper to extract tables from HTML content.
+  desc: Extracts tables from HTML content and stores them in a specified field. This
+    operator processes HTML content to extract tables. It can either retain or remove
+    HTML tags based on the `retain_html_tags` parameter. If `retain_html_tags` is
+    False, it can also include or exclude table headers based on the `include_header`
+    parameter. The extracted tables are stored in the `tables_field_name` field within
+    the sample's metadata. If no tables are found, an empty list is stored. If the
+    tables have already been extracted, the operator will not reprocess the sample.
   args:
     tables_field_name:
       desc: Field name to store the extracted tables.
@@ -2947,12 +3772,17 @@ extract_tables_from_html_mapper:
       default: false
     include_header:
       desc: If True, includes the table header; otherwise, excludes it. This parameter
-        is effective only when `retain_html_tags` is False and applies solely to the
-        extracted table content.
+        is effective             only when `retain_html_tags` is False and applies
+        solely to the extracted table content.
       type: bool
       default: true
 fix_unicode_mapper:
-  desc: Mapper to fix unicode errors in text samples.
+  desc: Fixes unicode errors in text samples. This operator corrects common unicode
+    errors and normalizes the text to a specified Unicode normalization form. The
+    default normalization form is 'NFC', but it can be set to 'NFKC', 'NFD', or 'NFKD'
+    during initialization. It processes text samples in batches, applying the specified
+    normalization to each sample. If an unsupported normalization form is provided,
+    a ValueError is raised.
   args:
     normalization:
       desc: the specified form of Unicode normalization mode, which can be one of
@@ -2960,11 +3790,16 @@ fix_unicode_mapper:
       type: str
       default: ''
 generate_qa_from_examples_mapper:
-  desc: 'Mapper to generate question and answer pairs from examples. You should configure
-    an empty dataset in your yaml config file: ``` generated_dataset_config: type:
-    ''EmptyFormatter'' # use `RayEmptyFormatter` when enable ray length: ${The number
-    of generated samples} feature_keys: ${text key} ``` The number of samples generated
-    is determined by the length of the empty dataset.'
+  desc: Generates question and answer pairs from examples using a Hugging Face model.
+    This operator generates QA pairs based on provided seed examples. The number of
+    generated samples is determined by the length of the empty dataset configured
+    in the YAML file. The operator uses a Hugging Face model to generate new QA pairs,
+    which are then filtered based on their similarity to the seed examples. Samples
+    with a similarity score below the specified threshold are kept. The similarity
+    is computed using the ROUGE-L metric. The operator requires a seed file in chatml
+    format, which provides the initial QA examples. The generated QA pairs must follow
+    specific formatting rules, such as maintaining the same format as the input examples
+    and ensuring that questions and answers are paired correctly.
   args:
     hf_model:
       desc: Huggingface model ID.
@@ -3028,12 +3863,14 @@ generate_qa_from_examples_mapper:
       type: Optional[Dict]
       default: null
 generate_qa_from_text_mapper:
-  desc: 'Mapper to generate question and answer pairs from text. Recommended model
-    list: [ ''alibaba-pai/pai-llama3-8b-doc2qa'', ''alibaba-pai/pai-baichuan2-7b-doc2qa'',
-    ''alibaba-pai/pai-qwen1_5-4b-doc2qa'', ''alibaba-pai/pai-qwen1_5-7b-doc2qa'',
-    ''alibaba-pai/pai-qwen1_5-1b8-doc2qa'', ''alibaba-pai/pai-qwen1_5-0b5-doc2qa''
-    ] These recommended models are all trained with Chinese data and are suitable
-    for Chinese.'
+  desc: Generates question and answer pairs from text using a specified model. This
+    operator uses a Hugging Face model to generate QA pairs from the input text. It
+    supports both Hugging Face and vLLM models for inference. The recommended models,
+    such as 'alibaba-pai/pai-llama3-8b-doc2qa', are trained on Chinese data and are
+    suitable for Chinese text. The operator can limit the number of generated QA pairs
+    per text and allows custom output patterns for parsing the model's response. By
+    default, it uses a regular expression to extract questions and answers from the
+    model's output. If no QA pairs are extracted, a warning is logged.
   args:
     hf_model:
       desc: Huggingface model ID.
@@ -3064,7 +3901,14 @@ generate_qa_from_text_mapper:
       type: Optional[Dict]
       default: null
 image_blur_mapper:
-  desc: Mapper to blur images.
+  desc: 'Blurs images in the dataset with a specified probability and blur type. This
+    operator blurs images using one of three types: mean, box, or Gaussian. The probability
+    of an image being blurred is controlled by the `p` parameter. The blur effect
+    is applied using a kernel with a specified radius. Blurred images are saved to
+    a directory, which can be specified or defaults to the input directory. If the
+    save directory is not provided, the `DJ_PRODUCED_DATA_DIR` environment variable
+    can be used to set it. The operator ensures that the blur type is one of the supported
+    options and that the radius is non-negative.'
   args:
     p:
       desc: Probability of the image being blurred.
@@ -3082,9 +3926,24 @@ image_blur_mapper:
       default: 2.0
       min: -1000000.0
       max: 1000000.0
+    save_dir:
+      desc: The directory where generated image files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 image_captioning_from_gpt4v_mapper:
-  desc: Mapper to generate samples whose texts are generated based on gpt-4-vision
-    and the image.
+  desc: Generates text captions for images using the GPT-4 Vision model. This operator
+    generates text based on the provided images and specified parameters. It supports
+    different modes of text generation, including 'reasoning', 'description', 'conversation',
+    and 'custom'. The generated text can be added to the original sample or replace
+    it, depending on the `keep_original_sample` parameter. The operator uses a Hugging
+    Face tokenizer and the GPT-4 Vision API to generate the text. The `any_or_all`
+    parameter determines whether all or any of the images in a sample must meet the
+    generation criteria for the sample to be kept. If `user_prompt_key` is set, it
+    will use the prompt from the sample; otherwise, it will use the `user_prompt`
+    parameter. If both are set, `user_prompt_key` takes precedence.
   args:
     mode:
       desc: mode of text generated from images, can be one of ['reasoning', 'description',
@@ -3110,7 +3969,7 @@ image_captioning_from_gpt4v_mapper:
       max: 1
     system_prompt:
       desc: a string prompt used to set the context of a conversation and provide
-        global guidance or rules for the gpt4-vision so that it can generate responses
+        global guidance or rules for the gpt4-vision so that it can  generate responses
         in the expected way. If `mode` set to `custom`, the parameter will be used.
       type: str
       default: ''
@@ -3141,15 +4000,23 @@ image_captioning_from_gpt4v_mapper:
       - any
       - all
 image_captioning_mapper:
-  desc: Mapper to generate samples whose captions are generated based on another model
-    and the figure.
+  desc: 'Generates image captions using a Hugging Face model and appends them to samples.
+    This operator generates captions for images in the input samples using a specified
+    Hugging Face model. It can generate multiple captions per image and apply different
+    strategies to retain the generated captions. The operator supports three retention
+    modes: ''random_any'', ''similar_one_simhash'', and ''all''. In ''random_any''
+    mode, a random caption is retained. In ''similar_one_simhash'' mode, the most
+    similar caption to the original text (based on SimHash) is retained. In ''all''
+    mode, all generated captions are concatenated and retained. The operator can also
+    keep or discard the original sample based on the `keep_original_sample` parameter.
+    If both `prompt` and `prompt_key` are set, the `prompt_key` takes precedence.'
   args:
     hf_img2seq:
       desc: model name on huggingface to generate caption
       type: str
       default: Salesforce/blip2-opt-2.7b
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: whether to trust the remote code of HF models.
       type: bool
       default: false
     caption_num:
@@ -3159,16 +4026,16 @@ image_captioning_mapper:
       min: 1
       max: 1000000
     keep_candidate_mode:
-      desc: 'retain strategy for the generated $caption_num$ candidates. ''random_any'':
-        Retain the random one from generated captions ''similar_one_simhash'': Retain
-        the generated one that is most similar to the original caption ''all'': Retain
-        all generated captions by concatenation Note: This is a batched_OP, whose
-        input and output type are both list. Suppose there are $N$ list of input samples,
-        whose batch size is $b$, and denote caption_num as $M$. The number of total
-        samples after generation is $2Nb$ when keep_original_sample is True and $Nb$
-        when keep_original_sample is False. For ''random_any'' and ''similar_one_simhash''
-        mode, it''s $(1+M)Nb$ for ''all'' mode when keep_original_sample is True and
-        $MNb$ when keep_original_sample is False.'
+      desc: 'retain strategy for the generated $caption_num$ candidates.      ''random_any'':
+        Retain the random one from generated captions      ''similar_one_simhash'':
+        Retain the generated one that is most         similar to the original caption      ''all'':
+        Retain all generated captions by concatenation  Note:     This is a batched_OP,
+        whose input and output type are     both list. Suppose there are $N$ list
+        of input samples, whose batch     size is $b$, and denote caption_num as $M$.     The
+        number of total samples after generation is $2Nb$ when     keep_original_sample
+        is True and $Nb$ when keep_original_sample is     False. For ''random_any''
+        and ''similar_one_simhash'' mode,     it''s $(1+M)Nb$ for ''all'' mode when
+        keep_original_sample is True     and $MNb$ when keep_original_sample is False.'
       type: str
       default: random_any
     keep_original_sample:
@@ -3188,15 +4055,56 @@ image_captioning_mapper:
         in parameter "prompt". It's None in default.
       type: Optional[str]
       default: null
+image_detection_yolo_mapper:
+  desc: Perform object detection using YOLO on images and return bounding boxes and
+    class labels. This operator uses a YOLO model to detect objects in images. It
+    processes each image in the sample, returning the bounding boxes and class labels
+    for detected objects. The operator sets the `bbox_tag` and `class_label_tag` fields
+    in the sample's metadata. If no image is present or no objects are detected, it
+    sets `bbox_tag` to an empty array and `class_label_tag` to -1. The operator uses
+    a confidence score threshold and IoU (Intersection over Union) score threshold
+    to filter detections.
+  args:
+    imgsz:
+      desc: resolution for image resizing
+      type: int
+      default: 640
+      min: -1000000
+      max: 1000000
+    conf:
+      desc: confidence score threshold
+      type: float
+      default: 0.05
+      min: -1000000.0
+      max: 1000000.0
+    iou:
+      desc: IoU (Intersection over Union) score threshold
+      type: float
+      default: 0.5
+      min: -1000000.0
+      max: 1000000.0
+    model_path:
+      desc: the path to the YOLO model.
+      type: str
+      default: yolo11n.pt
 image_diffusion_mapper:
-  desc: Generate image by diffusion model
+  desc: Generate images using a diffusion model based on provided captions. This operator
+    uses a Hugging Face diffusion model to generate images from given captions. It
+    supports different modes for retaining generated samples, including random selection,
+    similarity-based selection, and retaining all. The operator can also generate
+    captions if none are provided, using a Hugging Face image-to-sequence model. The
+    strength parameter controls the extent of transformation from the reference image,
+    and the guidance scale influences how closely the generated images match the text
+    prompt. Generated images can be saved in a specified directory or the same directory
+    as the input files. This is a batched operation, processing multiple samples at
+    once and producing a specified number of augmented images per sample.
   args:
     hf_diffusion:
       desc: diffusion model name on huggingface to generate the image.
       type: str
       default: CompVis/stable-diffusion-v1-4
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: whether to trust the remote code of HF models.
       type: bool
       default: false
     torch_dtype:
@@ -3237,7 +4145,7 @@ image_diffusion_mapper:
     keep_original_sample:
       desc: whether to keep the original sample. If it's set to False, there will
         be only generated captions in the final datasets and the original captions
-        will be removed. It's True in default.
+        will be removed. It's True by default.
       type: bool
       default: true
     caption_key:
@@ -3251,8 +4159,19 @@ image_diffusion_mapper:
       desc: model name on huggingface to generate caption if caption_key is None.
       type: str
       default: Salesforce/blip2-opt-2.7b
+    save_dir:
+      desc: The directory where generated image files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 image_face_blur_mapper:
-  desc: Mapper to blur faces detected in images.
+  desc: Mapper to blur faces detected in images. This operator uses an OpenCV classifier
+    to detect faces in images and applies a specified blur type to the detected face
+    regions. The blur types supported are 'mean', 'box', and 'gaussian'. The radius
+    of the blur kernel can be adjusted. If no save directory is provided, the modified
+    images will be saved in the same directory as the input files.
   args:
     cv_classifier:
       desc: OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
@@ -3268,8 +4187,23 @@ image_face_blur_mapper:
       default: 2.0
       min: 0
       max: 1000000.0
+    save_dir:
+      desc: The directory where generated image files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 image_remove_background_mapper:
-  desc: Mapper to remove background of images
+  desc: Mapper to remove the background of images. This operator processes each image
+    in the sample, removing its background. It uses the `rembg` library to perform
+    the background removal. If `alpha_matting` is enabled, it applies alpha matting
+    with specified thresholds and erosion size. The resulting images are saved in
+    PNG format. The `bgcolor` parameter can be set to specify a custom background
+    color for the cutout image. The processed images are stored in the directory specified
+    by `save_dir`, or in the same directory as the input files if `save_dir` is not
+    provided. The `source_file` field in the sample is updated to reflect the new
+    file paths.
   args:
     alpha_matting:
       desc: (bool, optional) Flag indicating whether to use alpha matting. Defaults
@@ -3299,8 +4233,23 @@ image_remove_background_mapper:
         cutout image. Defaults to None.
       type: Optional[Tuple[int, int, int, int]]
       default: null
+    save_dir:
+      desc: The directory where generated image files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 image_segment_mapper:
-  desc: Perform segment-anything on images and return the bounding boxes.
+  desc: Perform segment-anything on images and return the bounding boxes. This operator
+    uses a FastSAM model to detect and segment objects in images, returning their
+    bounding boxes. It processes each image in the sample, and stores the bounding
+    boxes in the 'bbox_tag' field under the 'meta' key. If no images are present in
+    the sample, an empty array is stored instead. The operator allows setting the
+    image resolution, confidence threshold, and IoU (Intersection over Union) score
+    threshold for the segmentation process. Bounding boxes are represented as N x
+    M x 4 arrays, where N is the number of images, M is the number of detected boxes,
+    and 4 represents the coordinates.
   args:
     imgsz:
       desc: resolution for image resizing
@@ -3326,15 +4275,29 @@ image_segment_mapper:
       type: str
       default: FastSAM-x.pt
 image_tagging_mapper:
-  desc: Mapper to generate image tags.
+  desc: Generates image tags for each image in the sample. This operator processes
+    images to generate descriptive tags. It uses a Hugging Face model to analyze the
+    images and produce relevant tags. The tags are stored in the specified field,
+    defaulting to 'image_tags'. If the tags are already present in the sample, the
+    operator will not recompute them. For samples without images, an empty tag array
+    is assigned. The generated tags are sorted by frequency and stored as a list of
+    strings.
   args:
     tag_field_name:
       desc: the field name to store the tags. It's "image_tags" in default.
       type: str
       default: image_tags
 imgdiff_difference_area_generator_mapper:
-  desc: A fused operator for OPs that is used to run sequential OPs on the same batch
-    to allow fine-grained control on data processing.
+  desc: 'Generates and filters bounding boxes for image pairs based on similarity,
+    segmentation, and text matching. This operator processes image pairs to identify
+    and filter regions with significant differences. It uses a sequence of operations:
+    - Filters out image pairs with large differences. - Segments the images to identify
+    potential objects. - Crops sub-images based on bounding boxes. - Determines if
+    the sub-images contain valid objects using image-text matching. - Filters out
+    sub-images that are too similar. - Removes overlapping bounding boxes. - Uses
+    Hugging Face models for similarity and text matching, and FastSAM for segmentation.
+    - Caches intermediate results in `DATA_JUICER_ASSETS_CACHE`. - Returns the filtered
+    bounding boxes in the `MetaKeys.bbox_tag` field.'
   args:
     image_pair_similarity_filter_args:
       desc: 'Arguments for image pair similarity filter. Controls the similarity filtering
@@ -3357,8 +4320,18 @@ imgdiff_difference_area_generator_mapper:
       type: Optional[Dict]
       default: {}
 imgdiff_difference_caption_generator_mapper:
-  desc: A fused operator for OPs that is used to run sequential OPs on the same batch
-    to allow fine-grained control on data processing.
+  desc: 'Generates difference captions for bounding box regions in two images. This
+    operator processes pairs of images and generates captions for the differences
+    in their bounding box regions. It uses a multi-step process: - Describes the content
+    of each bounding box region using a Hugging Face model. - Crops the bounding box
+    regions from both images. - Checks if the cropped regions match the generated
+    captions. - Determines if there are differences between the two captions. - Marks
+    the difference area with a red box. - Generates difference captions for the marked
+    areas. - The key metric is the similarity score between the captions, computed
+    using a CLIP model. - If no valid bounding boxes or differences are found, it
+    returns empty captions and zeroed bounding boxes. - Uses ''cuda'' as the accelerator
+    if any of the fused operations support it. - Caches temporary images during processing
+    and clears them afterward.'
   args:
     mllm_mapper_args:
       desc: 'Arguments for multimodal language model mapper. Controls the generation
@@ -3381,8 +4354,14 @@ imgdiff_difference_caption_generator_mapper:
       type: Optional[Dict]
       default: {}
 mllm_mapper:
-  desc: 'Mapper to use MLLMs for visual question answering tasks. Recommended model
-    list: [ llava-hf/llava-v1.6-vicuna-7b-hf, Qwen/Qwen2-VL-7B-Instruct, ]'
+  desc: Mapper to use MLLMs for visual question answering tasks. This operator uses
+    a Hugging Face model to generate answers based on input text and images. It supports
+    models like `llava-hf/llava-v1.6-vicuna-7b-hf` and `Qwen/Qwen2-VL-7B-Instruct`.
+    The operator processes each sample, loading and processing images, and generating
+    responses using the specified model. The generated responses are appended to the
+    sample's text field. The key parameters include the model ID, maximum new tokens,
+    temperature, top-p sampling, and beam search size, which control the generation
+    process.
   args:
     hf_model:
       desc: hugginface model id.
@@ -3395,26 +4374,36 @@ mllm_mapper:
       min: -1000000
       max: 1000000
     temperature:
-      desc: used to control the randomness of generated text. The higher the temperature,
-        the more random and creative the generated text will be.
+      desc: used to control the randomness of             generated text. The higher
+        the temperature, the more                 random and creative the generated
+        text will be.
       type: float
       default: 0.2
       min: -1000000.0
       max: 1000000.0
     top_p:
-      desc: randomly select the next word from the group of words whose cumulative
-        probability reaches p.
+      desc: randomly select the next word from the group             of words whose
+        cumulative probability reaches p.
       type: str
       default: ''
     num_beams:
-      desc: the larger the beam search size, the higher the quality of the generated
-        text.
+      desc: the larger the beam search size, the higher             the quality of
+        the generated text.
       type: int
       default: 1
       min: -1000000
       max: 1000000
 nlpaug_en_mapper:
-  desc: Mapper to simply augment samples in English based on nlpaug library.
+  desc: Augments English text samples using various methods from the nlpaug library.
+    This operator applies a series of text augmentation techniques to generate new
+    samples. It supports both word-level and character-level augmentations, such as
+    deleting, swapping, and inserting words or characters. The number of augmented
+    samples can be controlled, and the original samples can be kept or removed. When
+    multiple augmentation methods are enabled, they can be applied sequentially or
+    independently. Sequential application means each sample is augmented by all enabled
+    methods in sequence, while independent application generates multiple augmented
+    samples for each method. We recommend using 1-3 augmentation methods at a time
+    to avoid significant changes in sample semantics.
   args:
     sequential:
       desc: whether combine all augmentation methods to a sequence. If it's True,
@@ -3483,7 +4472,16 @@ nlpaug_en_mapper:
       type: bool
       default: false
 nlpcda_zh_mapper:
-  desc: Mapper to simply augment samples in Chinese based on nlpcda library.
+  desc: Augments Chinese text samples using the nlpcda library. This operator applies
+    various augmentation methods to Chinese text, such as replacing similar words,
+    homophones, deleting random characters, swapping characters, and replacing equivalent
+    numbers. The number of augmented samples generated can be controlled by the `aug_num`
+    parameter. If `sequential` is set to True, the augmentation methods are applied
+    in sequence; otherwise, they are applied independently. The original sample can
+    be kept or removed based on the `keep_original_sample` flag. It is recommended
+    to use 1-3 augmentation methods at a time to avoid significant changes in the
+    semantics of the samples. Some augmentation methods may not work for special texts,
+    resulting in no augmented samples being generated.
   args:
     sequential:
       desc: whether combine all augmentation methods to a sequence. If it's True,
@@ -3545,13 +4543,124 @@ nlpcda_zh_mapper:
         \u6709\u4F0D\u79CD\u4E0D\u540C\u7684\u6570\u636E\u589E\u5F3A\u65B9\u6CD5\""
       type: bool
       default: false
-optimize_qa_mapper:
-  desc: Mapper to optimize question-answer pairs.
+optimize_prompt_mapper:
+  desc: 'Optimize prompts based on existing ones in the same batch. This operator
+    uses the existing prompts and newly optimized prompts as examples to generate
+    better prompts. It supports using a Hugging Face model or an API for text generation.
+    The operator can be configured to keep the original samples or replace them with
+    the generated ones. The optimization process involves multiple retries if the
+    generated prompt is empty. The operator operates in batch mode and can leverage
+    vLLM for inference acceleration on CUDA devices. - Uses existing and newly generated
+    prompts to optimize future prompts. - Supports both Hugging Face models and API-based
+    text generation. - Can keep or replace original samples with generated ones. -
+    Retries up to a specified number of times if the generated prompt is empty. -
+    Operates in batch mode and can use vLLM for acceleration on CUDA. - References:
+    https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html'
   args:
-    hf_model:
-      desc: Hugging Face model ID.
+    api_or_hf_model:
+      desc: API or huggingface model name.
       type: str
       default: Qwen/Qwen2.5-7B-Instruct
+    gen_num:
+      desc: The number of new prompts to generate.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    max_example_num:
+      desc: Maximum number of example prompts to include as  context when generating
+        new optimized prompts.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
+    keep_original_sample:
+      desc: whether to keep the original sample. If it's set to False, there will
+        be only generated texts in the final datasets and the original texts will
+        be removed. It's True in default.
+      type: bool
+      default: true
+    retry_num:
+      desc: how many times to retry to generate the prompt if the parsed generated
+        prompt is empty. It's 3 in default.
+      type: int
+      default: 3
+      min: -1000000
+      max: 1000000
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: null
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: null
+    system_prompt:
+      desc: System prompt for guiding the generation task.
+      type: Optional[str]
+      default: null
+    input_template:
+      desc: Template for building the input prompt. It must include one placeholder
+        '{}', which will be replaced by `example_num` formatted examples defined by
+        `example_template`.
+      type: Optional[str]
+      default: null
+    example_template:
+      desc: Template for formatting one prompt example. It must include one placeholder
+        '{}', which will be replaced by one formatted prompt.
+      type: Optional[str]
+      default: null
+    prompt_template:
+      desc: Template for formatting a single prompt within each example. Must include
+        two placeholders '{}' for the question and answer.
+      type: Optional[str]
+      default: null
+    output_pattern:
+      desc: Regular expression pattern to extract questions and answers from model
+        response.
+      type: Optional[str]
+      default: null
+    enable_vllm:
+      desc: Whether to use vllm for inference acceleration.
+      type: bool
+      default: false
+    is_hf_model:
+      desc: If true, use Transformers for loading hugging face or local llm.
+      type: bool
+      default: false
+    model_params:
+      desc: Parameters for initializing the model.
+      type: Optional[Dict]
+      default: null
+    sampling_params:
+      desc: 'Sampling parameters for text generation. e.g {''temperature'': 0.9, ''top_p'':
+        0.95}'
+      type: Optional[Dict]
+      default: null
+optimize_qa_mapper:
+  desc: Mapper to optimize question-answer pairs. This operator refines and enhances
+    the quality of question-answer pairs. It uses a Hugging Face model to generate
+    more detailed and accurate questions and answers. The input is formatted using
+    a template, and the output is parsed using a regular expression. The system prompt,
+    input template, and output pattern can be customized. If VLLM is enabled, the
+    operator accelerates inference on CUDA devices.
+  args:
+    api_or_hf_model:
+      desc: API or huggingface model name.
+      type: str
+      default: Qwen/Qwen2.5-7B-Instruct
+    is_hf_model:
+      desc: If true, use huggingface model. Otherwise, use API.
+      type: bool
+      default: true
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: null
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: null
     system_prompt:
       desc: System prompt for guiding the optimization task.
       type: Optional[str]
@@ -3571,6 +4680,13 @@ optimize_qa_mapper:
       desc: Regular expression pattern to extract question and answer from model response.
       type: Optional[str]
       default: null
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
     enable_vllm:
       desc: Whether to use VLLM for inference acceleration.
       type: bool
@@ -3585,12 +4701,29 @@ optimize_qa_mapper:
       type: Optional[Dict]
       default: null
 optimize_query_mapper:
-  desc: Mapper to optimize query in question-answer pairs.
+  desc: Optimize queries in question-answer pairs to make them more specific and detailed.
+    This mapper refines the questions in a QA pair, making them more specific and
+    detailed while ensuring that the original answer can still address the optimized
+    question. It uses a predefined system prompt for the optimization process. The
+    optimized query is extracted from the raw output by stripping any leading or trailing
+    whitespace. The mapper utilizes a CUDA accelerator for faster processing.
   args:
-    hf_model:
-      desc: Hugging Face model ID.
+    api_or_hf_model:
+      desc: API or huggingface model name.
       type: str
       default: Qwen/Qwen2.5-7B-Instruct
+    is_hf_model:
+      desc: If true, use huggingface model. Otherwise, use API.
+      type: bool
+      default: true
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: null
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: null
     system_prompt:
       desc: System prompt for guiding the optimization task.
       type: Optional[str]
@@ -3610,6 +4743,13 @@ optimize_query_mapper:
       desc: Regular expression pattern to extract question and answer from model response.
       type: Optional[str]
       default: null
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
     enable_vllm:
       desc: Whether to use VLLM for inference acceleration.
       type: bool
@@ -3624,12 +4764,30 @@ optimize_query_mapper:
       type: Optional[Dict]
       default: null
 optimize_response_mapper:
-  desc: Mapper to optimize response in question-answer pairs.
+  desc: Optimize response in question-answer pairs to be more detailed and specific.
+    This operator enhances the responses in question-answer pairs, making them more
+    detailed and specific while ensuring they still address the original question.
+    It uses a predefined system prompt for optimization. The optimized response is
+    stripped of any leading or trailing whitespace before being returned. This mapper
+    leverages a Hugging Face model for the optimization process, which is accelerated
+    using CUDA.
   args:
-    hf_model:
-      desc: Hugging Face model ID.
+    api_or_hf_model:
+      desc: API or huggingface model name.
       type: str
       default: Qwen/Qwen2.5-7B-Instruct
+    is_hf_model:
+      desc: If true, use huggingface model. Otherwise, use API.
+      type: bool
+      default: true
+    api_endpoint:
+      desc: URL endpoint for the API.
+      type: Optional[str]
+      default: null
+    response_path:
+      desc: Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      type: Optional[str]
+      default: null
     system_prompt:
       desc: System prompt for guiding the optimization task.
       type: Optional[str]
@@ -3649,6 +4807,13 @@ optimize_response_mapper:
       desc: Regular expression pattern to extract question and answer from model response.
       type: Optional[str]
       default: null
+    try_num:
+      desc: The number of retry attempts when there is an API call error or output
+        parsing error.
+      type: int
+      default: 3
+      min: 1
+      max: 1000000
     enable_vllm:
       desc: Whether to use VLLM for inference acceleration.
       type: bool
@@ -3663,7 +4828,15 @@ optimize_response_mapper:
       type: Optional[Dict]
       default: null
 pair_preference_mapper:
-  desc: Mapper to construct paired preference samples.
+  desc: Mapper to construct paired preference samples by generating a rejected response
+    and its reason. This operator uses an API model to generate a new response that
+    is opposite in style, factuality, or stance to the original response. The generated
+    response and the reason for its generation are stored in the sample. The default
+    system prompt and input template are provided, but can be customized. The output
+    is parsed using a regular expression to extract the new response and the reason.
+    If parsing fails, the operator retries up to a specified number of times. The
+    generated response and reason are stored in the sample under the keys 'rejected_response'
+    and 'reason', respectively.
   args:
     api_model:
       desc: API model name.
@@ -3717,10 +4890,24 @@ pair_preference_mapper:
       type: Dict
       default: {}
 punctuation_normalization_mapper:
-  desc: Mapper to normalize unicode punctuations to English punctuations in text samples.
+  desc: "Normalizes unicode punctuations to their English equivalents in text samples.\
+    \ This operator processes a batch of text samples and replaces any unicode punctuation\
+    \ with its corresponding English punctuation. The mapping includes common substitutions\
+    \ like \"\uFF0C\" to \",\", \"\u3002\" to \".\", and \"\u201C\" to \". It iterates\
+    \ over each character in the text, replacing it if it is found in the predefined\
+    \ punctuation map. The result is a set of text samples with consistent punctuation\
+    \ formatting."
   args: {}
 python_file_mapper:
-  desc: Mapper for executing Python function defined in a file.
+  desc: 'Executes a Python function defined in a file on input data. This operator
+    loads a specified Python function from a given file and applies it to the input
+    data. The function must take exactly one argument and return a dictionary. The
+    operator can process data either sample by sample or in batches, depending on
+    the `batched` parameter. If the file path is not provided, the operator acts as
+    an identity function, returning the input sample unchanged. The function is loaded
+    dynamically, and its name and file path are configurable. Important notes: - The
+    file must be a valid Python file (`.py`). - The function must be callable and
+    accept exactly one argument. - The function''s return value must be a dictionary.'
   args:
     file_path:
       desc: The path to the Python file containing the function to be executed.
@@ -3735,7 +4922,13 @@ python_file_mapper:
       type: bool
       default: false
 python_lambda_mapper:
-  desc: Mapper for executing Python lambda function on data samples.
+  desc: Mapper for applying a Python lambda function to data samples. This operator
+    allows users to define a custom transformation using a Python lambda function.
+    The lambda function is applied to each sample, and the result must be a dictionary.
+    If the `batched` parameter is set to True, the lambda function will process a
+    batch of samples at once. If no lambda function is provided, the identity function
+    is used, which returns the input sample unchanged. The operator validates the
+    lambda function to ensure it has exactly one argument and compiles it safely.
   args:
     lambda_str:
       desc: A string representation of the lambda function to be executed on data
@@ -3747,8 +4940,13 @@ python_lambda_mapper:
       type: bool
       default: false
 query_intent_detection_mapper:
-  desc: Mapper to predict user's Intent label in query. Input from query_key. Output
-    intent label and corresponding score for the query.
+  desc: Predicts the user's intent label and corresponding score for a given query.
+    The operator uses a Hugging Face model to classify the intent of the input query.
+    If the query is in Chinese, it can optionally be translated to English using another
+    Hugging Face translation model before classification. The predicted intent label
+    and its confidence score are stored in the meta field with the keys 'query_intent_label'
+    and 'query_intent_score', respectively. If these keys already exist in the meta
+    field, the operator will skip processing for those samples.
   args:
     hf_model:
       desc: Huggingface model ID to predict intent label.
@@ -3778,10 +4976,13 @@ query_intent_detection_mapper:
       type: str
       default: query_intent_label_score
 query_sentiment_detection_mapper:
-  desc: Mapper to predict user's sentiment label ('negative', 'neutral' and 'positive')
-    in query. Input from query_key. Output label and corresponding score for the query,
-    which is store in 'query_sentiment_label' and 'query_sentiment_label_score' in
-    Data-Juicer meta field.
+  desc: Predicts user's sentiment label ('negative', 'neutral', 'positive') in a query.
+    This mapper takes input from the specified query key and outputs the predicted
+    sentiment label and its corresponding score. The results are stored in the Data-Juicer
+    meta field under 'query_sentiment_label' and 'query_sentiment_label_score'. It
+    uses a Hugging Face model for sentiment detection. If a Chinese-to-English translation
+    model is provided, it first translates the query from Chinese to English before
+    performing sentiment analysis.
   args:
     hf_model:
       desc: Huggingface model ID to predict sentiment label.
@@ -3811,9 +5012,15 @@ query_sentiment_detection_mapper:
       type: str
       default: query_sentiment_label_score
 query_topic_detection_mapper:
-  desc: Mapper to predict user's topic label in query. Input from query_key. Output
-    topic label and corresponding score for the query, which is store in 'query_topic_label'
-    and 'query_topic_label_score' in Data-Juicer meta field.
+  desc: Predicts the topic label and its corresponding score for a given query. The
+    input is taken from the specified query key. The output, which includes the predicted
+    topic label and its score, is stored in the 'query_topic_label' and 'query_topic_label_score'
+    fields of the Data-Juicer meta field. This operator uses a Hugging Face model
+    for topic classification. If a Chinese to English translation model is provided,
+    it will first translate the query from Chinese to English before predicting the
+    topic. - Uses a Hugging Face model for topic classification. - Optionally translates
+    Chinese queries to English using another Hugging Face model. - Stores the predicted
+    topic label in 'query_topic_label'. - Stores the corresponding score in 'query_topic_label_score'.
   args:
     hf_model:
       desc: Huggingface model ID to predict topic label.
@@ -3843,7 +5050,15 @@ query_topic_detection_mapper:
       type: str
       default: query_topic_label_score
 relation_identity_mapper:
-  desc: identify relation between two entity in the text.
+  desc: Identify the relation between two entities in a given text. This operator
+    uses an API model to analyze the relationship between two specified entities in
+    the text. It constructs a prompt with the provided system and input templates,
+    then sends it to the API model for analysis. The output is parsed using a regular
+    expression to extract the relationship. If the two entities are the same, the
+    relationship is identified as "another identity." The result is stored in the
+    meta field under the key 'role_relation' by default. The operator retries the
+    API call up to a specified number of times in case of errors. If `drop_text` is
+    set to True, the original text is removed from the sample after processing.
   args:
     api_model:
       desc: API model name.
@@ -3903,11 +5118,23 @@ relation_identity_mapper:
       type: Dict
       default: {}
 remove_bibliography_mapper:
-  desc: Mapper to remove bibliography at the end of documents in Latex samples.
+  desc: Removes bibliography sections at the end of LaTeX documents. This operator
+    identifies and removes bibliography sections in LaTeX documents. It uses a regular
+    expression to match common bibliography commands such as appendix, begin{references},
+    begin{thebibliography}, and bibliography. The matched sections are removed from
+    the text. The operator processes samples in batch mode for efficiency.
   args: {}
 remove_comments_mapper:
-  desc: Mapper to remove comments in different kinds of documents. Only support 'tex'
-    for now.
+  desc: 'Removes comments from documents, currently supporting only ''tex'' format.
+    This operator removes inline and multiline comments from text samples. It supports
+    both inline and multiline comment removal, controlled by the `inline` and `multiline`
+    parameters. Currently, it is designed to work with ''tex'' documents. The operator
+    processes each sample in the batch and applies regular expressions to remove comments.
+    The processed text is then updated in the original samples. - Inline comments
+    are removed using the pattern `[^ ]%.+$`. - Multiline comments are removed using
+    the pattern `^%.* ?`. Important notes: - Only ''tex'' document type is supported
+    at present. - The operator processes the text in place and updates the original
+    samples.'
   args:
     doc_type:
       desc: Type of document to remove comments.
@@ -3922,14 +5149,25 @@ remove_comments_mapper:
       type: bool
       default: true
 remove_header_mapper:
-  desc: Mapper to remove headers at the beginning of documents in Latex samples.
+  desc: Removes headers at the beginning of documents in LaTeX samples. This operator
+    identifies and removes headers such as chapter, part, section, subsection, subsubsection,
+    paragraph, and subparagraph. It uses a regular expression to match these headers.
+    If a sample does not contain any headers and `drop_no_head` is set to True, the
+    sample text will be removed. Otherwise, the sample remains unchanged. The operator
+    processes samples in batches for efficiency.
   args:
     drop_no_head:
       desc: whether to drop sample texts without headers.
       type: bool
       default: true
 remove_long_words_mapper:
-  desc: Mapper to remove long words within a specific range.
+  desc: Mapper to remove long words within a specific range. This operator filters
+    out words in the text that are either shorter than the specified minimum length
+    or longer than the specified maximum length. Words are first checked with their
+    original length, and if they do not meet the criteria, they are stripped of special
+    characters and re-evaluated. The key metric used is the character-based length
+    of each word. The processed text retains only the words that fall within the defined
+    length range. This operator processes text in batches for efficiency.
   args:
     min_len:
       desc: The min mapper word length in this op, words will be filtered if their
@@ -3946,7 +5184,13 @@ remove_long_words_mapper:
       min: -1000000
       max: 1000000
 remove_non_chinese_character_mapper:
-  desc: Mapper to remove non chinese Character in text samples.
+  desc: Removes non-Chinese characters from text samples. This mapper removes all
+    characters that are not part of the Chinese character set. - It can optionally
+    keep alphabets, numbers, and punctuation based on the configuration. - The removal
+    is done using a regular expression pattern. - The pattern is constructed to exclude
+    or include alphabets, numbers, and punctuation as specified. - The key metric
+    for this operation is the presence of non-Chinese characters, which are removed.
+    - The operator processes samples in a batched manner.
   args:
     keep_alphabet:
       desc: whether to keep alphabet
@@ -3961,7 +5205,15 @@ remove_non_chinese_character_mapper:
       type: bool
       default: true
 remove_repeat_sentences_mapper:
-  desc: Mapper to remove repeat sentences in text samples.
+  desc: Mapper to remove repeat sentences in text samples. This operator processes
+    text samples to remove duplicate sentences. It splits the text into lines and
+    then further splits each line into sentences. Sentences are considered duplicates
+    if they are identical after optional case normalization and special character
+    removal. The operator uses a hash set to track unique sentences. Sentences shorter
+    than `min_repeat_sentence_length` are not deduplicated. If `ignore_special_character`
+    is enabled, special characters (all except Chinese, letters, and numbers) are
+    ignored when checking for duplicates. The resulting text is reassembled with unique
+    sentences.
   args:
     lowercase:
       desc: Whether to convert sample text to lower case
@@ -3981,7 +5233,12 @@ remove_repeat_sentences_mapper:
       min: -1000000
       max: 1000000
 remove_specific_chars_mapper:
-  desc: Mapper to clean specific chars in text samples.
+  desc: Removes specific characters from text samples. This operator removes specified
+    characters from the text. The characters to be removed can be provided as a string
+    or a list of strings. If no characters are specified, the default set includes
+    special and non-alphanumeric characters. The operator processes the text using
+    a regular expression pattern that matches any of the specified characters and
+    replaces them with an empty string. This is done in a batched manner for efficiency.
   args:
     chars_to_remove:
       desc: a list or a string including all characters that need to be removed from
@@ -3990,8 +5247,12 @@ remove_specific_chars_mapper:
       default: "\u25C6\u25CF\u25A0\u25BA\u25BC\u25B2\u25B4\u2206\u25BB\u25B7\u2756\
         \u2661\u25A1"
 remove_table_text_mapper:
-  desc: Mapper to remove table texts from text samples. Regular expression is used
-    to remove tables in the range of column number of tables.
+  desc: Mapper to remove table texts from text samples. This operator uses regular
+    expressions to identify and remove tables from the text. It targets tables with
+    a specified range of columns, defined by the minimum and maximum number of columns.
+    The operator iterates over each sample, applying the regex pattern to remove tables
+    that match the column criteria. The processed text, with tables removed, is then
+    stored back in the sample. This operation is batched for efficiency.
   args:
     min_col:
       desc: The min number of columns of table to remove.
@@ -4006,7 +5267,17 @@ remove_table_text_mapper:
       min: 2
       max: 20
 remove_words_with_incorrect_substrings_mapper:
-  desc: Mapper to remove words with incorrect substrings.
+  desc: Mapper to remove words containing specified incorrect substrings. This operator
+    processes text by removing words that contain any of the specified incorrect substrings.
+    By default, it removes words with substrings like "http", "www", ".com", "href",
+    and "//". The operator can operate in tokenized or non-tokenized mode. In tokenized
+    mode, it uses a Hugging Face tokenizer to tokenize the text before processing.
+    The key metric is not computed; this operator focuses on filtering out specific
+    words. - If `tokenization` is True, the text is tokenized using a Hugging Face
+    tokenizer, and words are filtered based on the specified substrings. - If `tokenization`
+    is False, the text is split into sentences and words, and words are filtered based
+    on the specified substrings. - The filtered text is then merged back into a single
+    string. The operator processes samples in batches and updates the text in place.
   args:
     lang:
       desc: sample in which language
@@ -4021,8 +5292,15 @@ remove_words_with_incorrect_substrings_mapper:
       type: Optional[List[str]]
       default: null
 replace_content_mapper:
-  desc: Mapper to replace all content in the text that matches a specific regular
-    expression pattern with a designated replacement string.
+  desc: Replaces content in the text that matches a specific regular expression pattern
+    with a designated replacement string. This operator processes text by searching
+    for patterns defined in `pattern` and replacing them with the corresponding `repl`
+    string. If multiple patterns and replacements are provided, each pattern is replaced
+    by its respective replacement. The operator supports both single and multiple
+    patterns and replacements. The regular expressions are compiled with the `re.DOTALL`
+    flag to match across multiple lines. If the length of the patterns and replacements
+    do not match, a `ValueError` is raised. This operation is batched, meaning it
+    processes multiple samples at once.
   args:
     pattern:
       desc: regular expression pattern(s) to search for within text
@@ -4033,14 +5311,20 @@ replace_content_mapper:
       type: Union[str, List[str]]
       default: ''
 sdxl_prompt2prompt_mapper:
-  desc: Generate pairs of similar images by the SDXL model
+  desc: Generates pairs of similar images using the SDXL model. This operator uses
+    a Hugging Face diffusion model to generate image pairs based on two text prompts.
+    The quality and similarity of the generated images are controlled by parameters
+    such as `num_inference_steps` and `guidance_scale`. The first and second text
+    prompts are specified using `text_key` and `text_key_second`, respectively. The
+    generated images are saved in the specified `output_dir` with unique filenames.
+    The operator requires both text keys to be set for processing.
   args:
     hf_diffusion:
       desc: diffusion model name on huggingface to generate the image.
       type: str
       default: stabilityai/stable-diffusion-xl-base-1.0
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
     torch_dtype:
@@ -4075,10 +5359,15 @@ sdxl_prompt2prompt_mapper:
       type: str
       default: /home/cmgzn/.cache/data_juicer/assets
 sentence_augmentation_mapper:
-  desc: 'Mapper to augment sentences. The purpose of this operation is to enhance
-    sentences. If the input text is at the document level, the enhancement effect
-    may not be optimal. Therefore, please consider the length of the input text carefully.
-    Recommended model list: [ lmsys/vicuna-13b-v1.5 Qwen/Qwen2-7B-Instruct ]'
+  desc: Augments sentences by generating enhanced versions using a Hugging Face model.
+    This operator enhances input sentences by generating new, augmented versions.
+    It is designed to work best with individual sentences rather than full documents.
+    For optimal results, ensure the input text is at the sentence level. The augmentation
+    process uses a Hugging Face model, such as `lmsys/vicuna-13b-v1.5` or `Qwen/Qwen2-7B-Instruct`.
+    The operator requires specifying both the primary and secondary text keys, where
+    the augmented sentence will be stored in the secondary key. The generation process
+    can be customized with parameters like temperature, top-p sampling, and beam search
+    size.
   args:
     hf_model:
       desc: Huggingface model id.
@@ -4127,14 +5416,30 @@ sentence_augmentation_mapper:
       type: str
       default: ''
 sentence_split_mapper:
-  desc: Mapper to split text samples to sentences.
+  desc: Splits text samples into individual sentences based on the specified language.
+    This operator uses an NLTK-based tokenizer to split the input text into sentences.
+    The language for the tokenizer is specified during initialization. The original
+    text in each sample is replaced with a list of sentences. This operator processes
+    samples in batches for efficiency. Ensure that the `lang` parameter is set to
+    the appropriate language code (e.g., "en" for English) to achieve accurate sentence
+    splitting.
   args:
     lang:
       desc: split sentence of text in which language.
       type: str
       default: en
 text_chunk_mapper:
-  desc: Split input text to chunks.
+  desc: 'Split input text into chunks based on specified criteria. - Splits the input
+    text into multiple chunks using a specified maximum length and a split pattern.
+    - If `max_len` is provided, the text is split into chunks with a maximum length
+    of `max_len`. - If `split_pattern` is provided, the text is split at occurrences
+    of the pattern. If the length exceeds `max_len`, it will force a cut. - The `overlap_len`
+    parameter specifies the overlap length between consecutive chunks if the split
+    does not occur at the pattern. - Uses a Hugging Face tokenizer to calculate the
+    text length in tokens if a tokenizer name is provided; otherwise, it uses the
+    string length. - Caches the following stats: ''chunk_count'' (number of chunks
+    generated for each sample). - Raises a `ValueError` if both `max_len` and `split_pattern`
+    are `None` or if `overlap_len` is greater than or equal to `max_len`.'
   args:
     max_len:
       desc: Split text into multi texts with this max len if not None.
@@ -4154,15 +5459,14 @@ text_chunk_mapper:
       min: 0
       max: 1000000
     tokenizer:
-      desc: 'The tokenizer name of Hugging Face tokenizers. The text length will be
+      desc: The tokenizer name of Hugging Face tokenizers. The text length will be
         calculate as the token num if it is offered. Otherwise, the text length equals
         to string length. Support tiktoken tokenizer (such as gpt-4o), dashscope tokenizer
-        ( such as qwen2.5-72b-instruct) and huggingface tokenizer. :trust_remote_code:
-        for loading huggingface model'
+        ( such as qwen2.5-72b-instruct) and huggingface tokenizer.
       type: Optional[str]
       default: null
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
 video_captioning_from_audio_mapper:
@@ -4176,16 +5480,24 @@ video_captioning_from_audio_mapper:
       type: bool
       default: true
 video_captioning_from_frames_mapper:
-  desc: Mapper to generate samples whose captions are generated based on an image-to-text
-    model and sampled video frames. Captions from different frames will be concatenated
-    to a single string.
+  desc: 'Generates video captions from sampled frames using an image-to-text model.
+    Captions from different frames are concatenated into a single string. - Uses a
+    Hugging Face image-to-text model to generate captions for sampled video frames.
+    - Supports different frame sampling methods: ''all_keyframes'' or ''uniform''.
+    - Can apply horizontal and vertical flips to the frames before captioning. - Offers
+    multiple strategies for retaining generated captions: ''random_any'', ''similar_one_simhash'',
+    or ''all''. - Optionally keeps the original sample in the final dataset. - Allows
+    setting a global prompt or per-sample prompts to guide caption generation. - Generates
+    a specified number of candidate captions per video, which can be reduced based
+    on the selected retention strategy. - The number of output samples depends on
+    the retention strategy and whether original samples are kept.'
   args:
     hf_img2seq:
       desc: model name on huggingface to generate caption
       type: str
       default: Salesforce/blip2-opt-2.7b
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
     caption_num:
@@ -4195,16 +5507,16 @@ video_captioning_from_frames_mapper:
       min: 1
       max: 1000000
     keep_candidate_mode:
-      desc: 'retain strategy for the generated $caption_num$ candidates. ''random_any'':
-        Retain the random one from generated captions ''similar_one_simhash'': Retain
-        the generated one that is most similar to the original caption ''all'': Retain
-        all generated captions by concatenation Note: This is a batched_OP, whose
-        input and output type are both list. Suppose there are $N$ list of input samples,
-        whose batch size is $b$, and denote caption_num as $M$. The number of total
-        samples after generation is $2Nb$ when keep_original_sample is True and $Nb$
-        when keep_original_sample is False. For ''random_any'' and ''similar_one_simhash''
-        mode, it''s $(1+M)Nb$ for ''all'' mode when keep_original_sample is True and
-        $MNb$ when keep_original_sample is False.'
+      desc: 'retain strategy for the generated $caption_num$ candidates.      ''random_any'':
+        Retain the random one from generated captions      ''similar_one_simhash'':
+        Retain the generated one that is most         similar to the original caption      ''all'':
+        Retain all generated captions by concatenation  Note:     This is a batched_OP,
+        whose input and output type are     both list. Suppose there are $N$ list
+        of input samples, whose batch     size is $b$, and denote caption_num as $M$.     The
+        number of total samples after generation is $2Nb$ when     keep_original_sample
+        is True and $Nb$ when keep_original_sample is     False. For ''random_any''
+        and ''similar_one_simhash'' mode,     it''s $(1+M)Nb$ for ''all'' mode when
+        keep_original_sample is True     and $MNb$ when keep_original_sample is False.'
       type: str
       default: random_any
     keep_original_sample:
@@ -4259,7 +5571,7 @@ video_captioning_from_summarizer_mapper:
       type: str
       default: ''
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
     consider_video_caption_from_video:
@@ -4322,15 +5634,23 @@ video_captioning_from_summarizer_mapper:
       type: bool
       default: true
 video_captioning_from_video_mapper:
-  desc: Mapper to generate samples whose captions are generated based on a video-to-text
-    model and sampled video frame.
+  desc: Generates video captions using a Hugging Face video-to-text model and sampled
+    video frames. This operator processes video samples to generate captions based
+    on the provided video frames. It uses a Hugging Face video-to-text model, such
+    as 'kpyu/video-blip-opt-2.7b-ego4d', to generate multiple caption candidates for
+    each video. The number of generated captions and the strategy to keep or filter
+    these candidates can be configured. The operator supports different frame sampling
+    methods, including extracting all keyframes or uniformly sampling a specified
+    number of frames. Additionally, it allows for horizontal and vertical flipping
+    of the frames. The final output can include both the original sample and the generated
+    captions, depending on the configuration.
   args:
     hf_video_blip:
       desc: video-blip model name on huggingface to generate caption
       type: str
       default: kpyu/video-blip-opt-2.7b-ego4d
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: ':param trust_remote_code: whether to trust the remote code of HF models.'
       type: bool
       default: false
     caption_num:
@@ -4340,16 +5660,16 @@ video_captioning_from_video_mapper:
       min: 1
       max: 1000000
     keep_candidate_mode:
-      desc: 'retain strategy for the generated $caption_num$ candidates. ''random_any'':
-        Retain the random one from generated captions ''similar_one_simhash'': Retain
-        the generated one that is most similar to the original caption ''all'': Retain
-        all generated captions by concatenation Note: This is a batched_OP, whose
-        input and output type are both list. Suppose there are $N$ list of input samples,
-        whose batch size is $b$, and denote caption_num as $M$. The number of total
-        samples after generation is $2Nb$ when keep_original_sample is True and $Nb$
-        when keep_original_sample is False. For ''random_any'' and ''similar_one_simhash''
-        mode, it''s $(1+M)Nb$ for ''all'' mode when keep_original_sample is True and
-        $MNb$ when keep_original_sample is False.'
+      desc: 'retain strategy for the generated $caption_num$ candidates.      ''random_any'':
+        Retain the random one from generated captions      ''similar_one_simhash'':
+        Retain the generated one that is most         similar to the original caption      ''all'':
+        Retain all generated captions by concatenation  Note:     This is a batched_OP,
+        whose input and output type are     both list. Suppose there are $N$ list
+        of input samples, whose batch     size is $b$, and denote caption_num as $M$.     The
+        number of total samples after generation is $2Nb$ when     keep_original_sample
+        is True and $Nb$ when keep_original_sample is     False. For ''random_any''
+        and ''similar_one_simhash'' mode,     it''s $(1+M)Nb$ for ''all'' mode when
+        keep_original_sample is True     and $MNb$ when keep_original_sample is False.'
       type: str
       default: random_any
     keep_original_sample:
@@ -4397,10 +5717,18 @@ video_captioning_from_video_mapper:
       default: false
 video_extract_frames_mapper:
   desc: 'Mapper to extract frames from video files according to specified methods.
-    Extracted Frames Data Format: The data format for the extracted frames is a dictionary
-    mapping video key to extracted frames directory where the extracted frames are
-    saved. The dictionary follows the structure: { "video_key_1": "/${frame_dir}/video_key_1_filename/",
-    "video_key_2": "/${frame_dir}/video_key_2_filename/", ... }'
+    Extracts frames from video files using either all keyframes or a uniform sampling
+    method. The extracted frames are saved in a directory, and the mapping from video
+    keys to frame directories is stored in the sample''s metadata. The data format
+    for the extracted frames is a dictionary mapping video keys to their respective
+    frame directories: - "video_key_1": "/${frame_dir}/video_key_1_filename/" - "video_key_2":
+    "/${frame_dir}/video_key_2_filename/" - **Frame Sampling Methods**: - "all_keyframes":
+    Extracts all keyframes from the video. - "uniform": Extracts a specified number
+    of frames uniformly from the video. - If `duration` is set, the video is segmented
+    into multiple segments based on the duration, and frames are extracted from each
+    segment. - The output directory for the frames can be specified; otherwise, a
+    default directory is used. - The field name in the sample''s metadata where the
+    frame information is stored can be customized.'
   args:
     frame_sampling_method:
       desc: 'sampling method of extracting frame videos from the videos. Should be
@@ -4439,7 +5767,13 @@ video_extract_frames_mapper:
       type: str
       default: video_frames
 video_face_blur_mapper:
-  desc: Mapper to blur faces detected in videos.
+  desc: Mapper to blur faces detected in videos. This operator uses an OpenCV classifier
+    for face detection and applies a specified blur type to the detected faces. The
+    default classifier is 'haarcascade_frontalface_alt.xml'. Supported blur types
+    include 'mean', 'box', and 'gaussian'. The radius of the blur kernel can be adjusted.
+    If a save directory is not provided, the processed videos will be saved in the
+    same directory as the input files. The `DJ_PRODUCED_DATA_DIR` environment variable
+    can also be used to specify the save directory.
   args:
     cv_classifier:
       desc: OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
@@ -4455,8 +5789,21 @@ video_face_blur_mapper:
       default: 2.0
       min: -1000000.0
       max: 1000000.0
+    save_dir:
+      desc: The directory where generated video files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 video_ffmpeg_wrapped_mapper:
-  desc: Simple wrapper for FFmpeg video filters.
+  desc: Wraps FFmpeg video filters for processing video files in a dataset. This operator
+    applies a specified FFmpeg video filter to each video file in the dataset. It
+    supports passing keyword arguments to the filter and global arguments to the FFmpeg
+    command line. The processed videos are saved in a specified directory or the same
+    directory as the input files. If no filter name is provided, the videos remain
+    unmodified. The operator updates the source file paths in the dataset to reflect
+    any changes.
   args:
     filter_name:
       desc: ffmpeg video filter name.
@@ -4478,8 +5825,23 @@ video_ffmpeg_wrapped_mapper:
       desc: whether to overwrite output file.
       type: bool
       default: true
+    save_dir:
+      desc: The directory where generated video files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 video_remove_watermark_mapper:
-  desc: Remove the watermarks in videos given regions.
+  desc: 'Remove watermarks from videos based on specified regions. This operator removes
+    watermarks from video frames by detecting and masking the watermark areas. It
+    supports two detection methods: ''pixel_value'' and ''pixel_diversity''. The regions
+    of interest (ROIs) for watermark detection can be specified as either pixel coordinates
+    or ratios of the frame dimensions. The operator extracts a set number of frames
+    uniformly from the video to detect watermark pixels. A pixel is considered part
+    of a watermark if it meets the detection criteria in a minimum number of frames.
+    The cleaned video is saved in the specified directory or the same directory as
+    the input file if no save directory is provided.'
   args:
     roi_strings:
       desc: a given list of regions the watermarks locate. The format of each can
@@ -4521,8 +5883,24 @@ video_remove_watermark_mapper:
         is useless and frame_num must be greater than 1 in 'pixel_diversity' mode.
       type: str
       default: pixel_value
+    save_dir:
+      desc: The directory where generated video files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 video_resize_aspect_ratio_mapper:
-  desc: Mapper to resize videos by aspect ratio. AspectRatio = W / H.
+  desc: Resizes videos to fit within a specified aspect ratio range. This operator
+    adjusts the dimensions of videos to ensure their aspect ratios fall within a defined
+    range. It can either increase or decrease the video dimensions based on the specified
+    strategy. The aspect ratio is calculated as width divided by height. If a video's
+    aspect ratio is outside the given range, it will be resized to match the closest
+    boundary (either the minimum or maximum ratio). The `min_ratio` and `max_ratio`
+    should be provided as strings in the format "9:21" or "9/21". The resizing process
+    uses the `ffmpeg` library to handle the actual video scaling. Videos that do not
+    need resizing are left unchanged. The operator supports saving the modified videos
+    to a specified directory or the same directory as the input files.
   args:
     min_ratio:
       desc: The minimum aspect ratio to enforce videos with an aspect ratio below
@@ -4542,9 +5920,23 @@ video_resize_aspect_ratio_mapper:
         it. Accepted values are ['decrease', 'increase'].
       type: str
       default: increase
+    save_dir:
+      desc: The directory where generated video files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 video_resize_resolution_mapper:
-  desc: Mapper to resize videos resolution. We leave the super resolution with deep
-    learning for future works.
+  desc: Resizes video resolution based on specified width and height constraints.
+    This operator resizes videos to fit within the provided minimum and maximum width
+    and height limits. It can optionally maintain the original aspect ratio by adjusting
+    the dimensions accordingly. The resized videos are saved in the specified directory
+    or the same directory as the input if no save directory is provided. The key metric
+    for resizing is the video's width and height, which are adjusted to meet the constraints
+    while maintaining the aspect ratio if configured. The `force_divisible_by` parameter
+    ensures that the output dimensions are divisible by a specified integer, which
+    must be a positive even number when used with aspect ratio adjustments.
   args:
     min_width:
       desc: Videos with width less than 'min_width' will be mapped to videos with
@@ -4575,20 +5967,39 @@ video_resize_resolution_mapper:
       min: -1000000
       max: 1000000
     force_original_aspect_ratio:
-      desc: Enable decreasing or increasing output video width or height if necessary
-        to keep the original aspect ratio, including ['disable', 'decrease', 'increase'].
+      desc: Enable decreasing or             increasing output video width or height
+        if necessary             to keep the original aspect ratio, including ['disable',             'decrease',
+        'increase'].
       type: str
       default: disable
     force_divisible_by:
-      desc: Ensures that both the output dimensions, width and height, are divisible
-        by the given integer when used together with force_original_aspect_ratio,
-        must be a positive even number.
+      desc: Ensures that both the output dimensions,             width and height,
+        are divisible by the given integer when used             together with force_original_aspect_ratio,
+        must be a positive             even number.
       type: int
       default: 2
       min: 1
       max: 1000000
+    save_dir:
+      desc: The directory where generated video files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 video_split_by_duration_mapper:
-  desc: Mapper to split video by duration.
+  desc: Splits videos into segments based on a specified duration. This operator splits
+    each video in the dataset into smaller segments, each with a fixed duration. The
+    last segment is discarded if its duration is less than the specified minimum last
+    split duration. The original sample can be kept or removed based on the `keep_original_sample`
+    parameter. The generated video files are saved in the specified directory or,
+    if not provided, in the same directory as the input files. The key metric for
+    this operation is the duration of each segment, which is character-based (seconds).
+    - Splits videos into segments of a specified duration. - Discards the last segment
+    if it is shorter than the minimum allowed duration. - Keeps or removes the original
+    sample based on the `keep_original_sample` parameter. - Saves the generated video
+    files in the specified directory or the input file's directory. - Uses the duration
+    in seconds to determine the segment boundaries.
   args:
     split_duration:
       desc: duration of each video split in seconds.
@@ -4609,8 +6020,23 @@ video_split_by_duration_mapper:
         It's True in default.
       type: bool
       default: true
+    save_dir:
+      desc: The directory where generated video files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 video_split_by_key_frame_mapper:
-  desc: Mapper to split video by key frame.
+  desc: Splits a video into segments based on key frames. This operator processes
+    video data by splitting it into multiple segments at key frame boundaries. It
+    uses the key frames to determine where to make the splits. The original sample
+    can be kept or discarded based on the `keep_original_sample` parameter. If `save_dir`
+    is specified, the split video files will be saved in that directory; otherwise,
+    they will be saved in the same directory as the input files. The operator processes
+    each video in the sample and updates the sample with the new video keys and text
+    placeholders. The `Fields.source_file` field is updated to reflect the new video
+    segments. This operator works in batch mode, processing multiple samples at once.
   args:
     keep_original_sample:
       desc: whether to keep the original sample. If it's set to False, there will
@@ -4618,8 +6044,23 @@ video_split_by_key_frame_mapper:
         removed. It's True in default.
       type: bool
       default: true
+    save_dir:
+      desc: The directory where generated video files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 video_split_by_scene_mapper:
-  desc: Mapper to cut videos into scene clips.
+  desc: 'Splits videos into scene clips based on detected scene changes. This operator
+    uses a specified scene detector to identify and split video scenes. It supports
+    three types of detectors: ContentDetector, ThresholdDetector, and AdaptiveDetector.
+    The operator processes each video in the sample, detects scenes, and splits the
+    video into individual clips. The minimum length of a scene can be set, and progress
+    can be shown during processing. The resulting clips are saved in the specified
+    directory or the same directory as the input files if no save directory is provided.
+    The operator also updates the text field in the sample to reflect the new video
+    clips. If a video does not contain any scenes, it remains unchanged.'
   args:
     detector:
       desc: Algorithm from `scenedetect.detectors`. Should be one of ['ContentDetector',
@@ -4642,16 +6083,29 @@ video_split_by_scene_mapper:
       desc: Whether to show progress from scenedetect.
       type: bool
       default: false
+    save_dir:
+      desc: The directory where generated video files will be stored. If not specified,
+        outputs will be saved in the same directory as their corresponding input files.
+        This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR`
+        environment variable.
+      type: str
+      default: ''
 video_tagging_from_audio_mapper:
-  desc: Mapper to generate video tags from audio streams extracted by video using
-    the Audio Spectrogram Transformer.
+  desc: Generates video tags from audio streams using the Audio Spectrogram Transformer.
+    This operator extracts audio streams from videos and uses a Hugging Face Audio
+    Spectrogram Transformer (AST) model to generate tags. The tags are stored in the
+    specified metadata field, defaulting to 'video_audio_tags'. If no valid audio
+    stream is found, the tag is set to 'EMPTY'. The operator resamples audio to match
+    the model's required sampling rate if necessary. The tags are inferred based on
+    the highest logit value from the model's output. If the tags are already present
+    in the sample, the operator skips processing for that sample.
   args:
     hf_ast:
       desc: path to the HF model to tag from audios.
       type: str
       default: MIT/ast-finetuned-audioset-10-10-0.4593
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: whether to trust the remote code of HF models
       type: bool
       default: false
     tag_field_name:
@@ -4659,7 +6113,16 @@ video_tagging_from_audio_mapper:
       type: str
       default: video_audio_tags
 video_tagging_from_frames_mapper:
-  desc: Mapper to generate video tags from frames extract by video.
+  desc: 'Generates video tags from frames extracted from videos. This operator extracts
+    frames from videos and generates tags based on the content of these frames. The
+    frame extraction method can be either "all_keyframes" or "uniform". For "all_keyframes",
+    all keyframes are extracted, while for "uniform", a specified number of frames
+    are extracted uniformly across the video. The tags are generated using a pre-trained
+    model and stored in the specified field name. If the tags are already present
+    in the sample, the operator skips processing. Important notes: - Uses a Hugging
+    Face tokenizer and a pre-trained model for tag generation. - If no video is present
+    in the sample, an empty tag array is stored. - Frame tensors are processed to
+    generate tags, which are then sorted by frequency and stored.'
   args:
     frame_sampling_method:
       desc: 'sampling method of extracting frame images from the videos. Should be
@@ -4684,11 +6147,24 @@ video_tagging_from_frames_mapper:
       type: str
       default: video_frame_tags
 whitespace_normalization_mapper:
-  desc: 'Mapper to normalize different kinds of whitespaces to whitespace '' '' (0x20)
-    in text samples. Different kinds of whitespaces can be found here: https://en.wikipedia.org/wiki/Whitespace_character'
+  desc: Normalizes various types of whitespace characters to standard spaces in text
+    samples. This mapper converts all non-standard whitespace characters, such as
+    tabs and newlines, to the standard space character (' ', 0x20). It also trims
+    leading and trailing whitespace from the text. This ensures consistent spacing
+    across all text samples, improving readability and consistency. The normalization
+    process is based on a comprehensive list of whitespace characters, which can be
+    found at https://en.wikipedia.org/wiki/Whitespace_character.
   args: {}
 video_tagging_from_frames_filter:
-  desc: Filter to keep samples whose videos contain the given tags.
+  desc: 'Filter to keep samples whose videos contain specified tags. This operator
+    filters video samples based on the presence of given tags in the video frames.
+    It uses a Hugging Face tokenizer to extract and tag frames. The filtering can
+    be configured to require any or all of the specified tags to be present. The operator
+    supports two frame sampling methods: "all_keyframes" and "uniform". When using
+    "uniform", the number of frames to sample can be specified. The extracted tags
+    are stored in the meta field with the key ''video_frame_tags'' by default. The
+    decision to keep a sample is based on whether any or all of the video frames meet
+    the tag criteria, as specified by the ''any_or_all'' parameter.'
   args:
     tags:
       desc: 'a tag list to shift the videos, total tags can be found in https://github.com/xinyu1205/recognize-anything/blob/main/ram/data/ram_tag_list.txt
@@ -4735,13 +6211,22 @@ video_tagging_from_frames_filter:
       - all
 video_watermark_filter:
   desc: Filter to keep samples whose videos have no watermark with high probability.
+    This operator uses a Hugging Face watermark detection model to predict the probability
+    of watermarks in video frames. It keeps samples where the predicted watermark
+    probability is below a specified threshold. The key metric, 'video_watermark_prob',
+    is computed by extracting frames from the video using a specified sampling method
+    and then averaging, maximizing, or minimizing the probabilities based on the reduce
+    mode. If multiple videos are present, the operator can use either an 'any' or
+    'all' strategy to determine if the sample should be kept. The frame sampling method
+    can be 'all_keyframes' or 'uniform', and the reduce mode can be 'avg', 'max',
+    or 'min'.
   args:
     hf_watermark_model:
       desc: watermark detection model name on huggingface.
       type: str
       default: amrul-hzz/watermark_detector
     trust_remote_code:
-      desc: Whether to trust the remote code for loading huggingface model.
+      desc: whether to trust the remote code of HF models.
       type: bool
       default: false
     prob_threshold:
@@ -4787,7 +6272,14 @@ video_watermark_filter:
       - all
 word_repetition_filter:
   desc: Filter to keep samples with word-level n-gram repetition ratio within a specific
-    range.
+    range. This operator calculates the word-level n-gram repetition ratio for each
+    sample and filters out those that do not fall within the specified range. The
+    n-gram length and the min/max ratio thresholds are configurable. If tokenization
+    is enabled, a Hugging Face tokenizer is used to tokenize the text. The key metric,
+    `word_rep_ratio`, is computed as the ratio of repeated n-grams to the total number
+    of n-grams. This ratio is then compared against the min and max ratio thresholds
+    to decide whether to keep or filter the sample. If the ratio is outside the specified
+    range, the sample is filtered out.
   args:
     lang:
       desc: sample in which language.
@@ -4818,7 +6310,13 @@ word_repetition_filter:
       min: -1000000.0
       max: 1000000.0
 words_num_filter:
-  desc: Filter to keep samples with total words number within a specific range.
+  desc: Filter to keep samples with a total word count within a specified range. This
+    operator filters samples based on the number of words they contain. It retains
+    samples if their word count is within the given minimum and maximum limits. If
+    tokenization is enabled, it uses a Hugging Face tokenizer to count words. The
+    key metric `num_words` is computed and stored in the sample's stats under the
+    `num_words` field. If the word count is already cached, it reuses the cached value
+    to avoid redundant computation.
   args:
     lang:
       desc: sample in which language.
@@ -4843,10 +6341,19 @@ words_num_filter:
       min: -1000000
       max: 1000000
 naive_grouper:
-  desc: Group all samples to one batched sample.
+  desc: Group all samples in a dataset into a single batched sample. This operator
+    takes a dataset and combines all its samples into one batched sample. If the input
+    dataset is empty, it returns an empty dataset. The resulting batched sample is
+    a dictionary where each key corresponds to a list of values from all samples in
+    the dataset.
   args: {}
 key_value_grouper:
-  desc: Group samples to batched samples according values in given keys.
+  desc: Groups samples into batches based on values in specified keys. This operator
+    groups samples by the values of the given keys, which can be nested. If no keys
+    are provided, it defaults to using the text key. It uses a naive grouping strategy
+    to batch samples with identical key values. The resulting dataset is a list of
+    batched samples, where each batch contains samples that share the same key values.
+    This is useful for organizing data by specific attributes or features.
   args:
     group_by_keys:
       desc: group samples according values in the keys. Support for nested keys such
@@ -4854,14 +6361,27 @@ key_value_grouper:
       type: Optional[List[str]]
       default: null
 naive_reverse_grouper:
-  desc: Split batched samples to samples.
+  desc: Split batched samples into individual samples. This operator processes a dataset
+    by splitting each batched sample into individual samples. It also handles and
+    optionally exports batch metadata. - If a sample contains 'batch_meta', it is
+    separated and can be exported to a specified path. - The operator converts the
+    remaining data from a dictionary of lists to a list of dictionaries, effectively
+    unbatching the samples. - If `batch_meta_export_path` is provided, the batch metadata
+    is written to this file in JSON format, one entry per line. - If no samples are
+    present in the dataset, the original dataset is returned.
   args:
     batch_meta_export_path:
       desc: the path to export the batch meta. Just drop the batch meta if it is None.
       type: str
       default: ''
 frequency_specified_field_selector:
-  desc: Selector to select samples based on the sorted frequency of specified field.
+  desc: Selector to filter samples based on the frequency of a specified field. This
+    operator selects samples based on the frequency of values in a specified field.
+    The field can be multi-level, with keys separated by dots. It supports filtering
+    by either a top ratio or a fixed number (topk) of the most frequent values. If
+    both top_ratio and topk are provided, the one resulting in fewer samples is used.
+    The sorting order can be controlled with the reverse parameter. The operator processes
+    the dataset and returns a new dataset containing only the selected samples.
   args:
     field_key:
       desc: Selector based on the specified value corresponding to the target key.
@@ -4892,7 +6412,14 @@ frequency_specified_field_selector:
       type: bool
       default: true
 random_selector:
-  desc: Selector to random select samples.
+  desc: 'Randomly selects a subset of samples from the dataset. This operator randomly
+    selects a subset of samples based on either a specified ratio or a fixed number.
+    If both `select_ratio` and `select_num` are provided, the one that results in
+    fewer samples is used. The selection is skipped if the dataset has only one or
+    no samples. The `random_sample` function is used to perform the actual sampling.
+    - `select_ratio`: The ratio of samples to select (0 to 1). - `select_num`: The
+    exact number of samples to select. - If neither `select_ratio` nor `select_num`
+    is set, the dataset remains unchanged.'
   args:
     select_ratio:
       desc: The ratio to select. When both select_ratio and select_num are set, the
@@ -4910,8 +6437,14 @@ random_selector:
       min: 1
       max: 1000000
 range_specified_field_selector:
-  desc: Selector to select a range of samples based on the sorted specified field
-    value from smallest to largest.
+  desc: Selects a range of samples based on the sorted values of a specified field.
+    This operator selects samples whose values for a specified field fall within a
+    given range. The range can be defined using percentiles or ranks, and the operator
+    will use the more inclusive bounds if both are provided. The field values are
+    first sorted in ascending order, and then the samples are selected based on the
+    lower and upper bounds. If no bounds are provided, the original dataset is returned.
+    The operator ensures that the specified field exists in the dataset and handles
+    multi-level fields by separating keys with dots.
   args:
     field_key:
       desc: Selector based on the specified value corresponding to the target key.
@@ -4956,7 +6489,15 @@ range_specified_field_selector:
       min: 1
       max: 1000000
 tags_specified_field_selector:
-  desc: Selector to select samples based on the tags of specified field.
+  desc: Selector to filter samples based on the tags of a specified field. This operator
+    selects samples where the value of the specified field matches one of the target
+    tags. The field can be multi-level, with levels separated by dots (e.g., 'level1.level2').
+    The operator checks if the specified field exists in the dataset and if the field
+    value is a string, number, or None. If the field value matches any of the target
+    tags, the sample is kept. The selection is case-sensitive. - The `field_key` parameter
+    specifies the field to check. - The `target_tags` parameter is a list of tags
+    to match against the field value. - If the dataset has fewer than two samples
+    or if `field_key` is empty, the dataset is returned unchanged.
   args:
     field_key:
       desc: Selector based on the specified value corresponding to the target key.
@@ -4969,7 +6510,14 @@ tags_specified_field_selector:
       type: List[str]
       default: []
 topk_specified_field_selector:
-  desc: Selector to select top samples based on the sorted specified field value.
+  desc: Selects top samples based on the sorted values of a specified field. This
+    operator selects the top samples from a dataset based on the values of a specified
+    field. The field can be multi-level, with keys separated by dots. The selection
+    is based on either a specified ratio of the dataset or a fixed number of top samples.
+    If both `top_ratio` and `topk` are provided, the one resulting in fewer samples
+    is used. The sorting order can be ascending or descending, controlled by the `reverse`
+    parameter. The key metric is the value of the specified field, and the operator
+    uses this to determine which samples to keep.
   args:
     field_key:
       desc: Selector based on the specified value corresponding to the target key.

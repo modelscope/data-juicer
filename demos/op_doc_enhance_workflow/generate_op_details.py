@@ -9,14 +9,12 @@ import os
 import re
 from pathlib import Path
 
-import translators as ts
 from jinja2 import Environment, FileSystemLoader
 from utils.model import chat
 from utils.parse_class import extract_class_attr_paths
 from utils.extractor import extract_test_info_from_path
 from utils.router import route
 from utils.view_model import to_legacy_view
-from docstring_parser import parse
 
 from data_juicer.tools.op_search import OPSearcher
 from rewrite_op_docstrings import update_op_docstrings_with_names
@@ -301,15 +299,6 @@ def render_op_doc(op_info, examples_data, template="op_doc.md.j2"):
 # -----------------------------------------------------------------------------
 # Parameter parsing utilities
 # -----------------------------------------------------------------------------
-
-
-def parse_param_desc(param_desc_str):
-    """
-    Parse parameter descriptions from docstring in ':param name: desc' format.
-    Return a dict {param_name: description}.
-    """
-    docstring = parse(param_desc_str)
-    return {p.arg_name: p.description.replace("\n", " ") for p in docstring.params}
 
 
 def param_signature_to_list(sig, param_docs):
@@ -675,7 +664,7 @@ def main():
     def handle_one(op_info, existing_md=None):
         """Process a single operator into template-ready info and examples."""
         # Params
-        params = param_signature_to_list(op_info["sig"], parse_param_desc(op_info["param_desc"]))
+        params = param_signature_to_list(op_info["sig"], op_info["param_desc_map"])
 
         # Tests and examples
         examples_list = []

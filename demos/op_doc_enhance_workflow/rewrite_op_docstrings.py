@@ -1,12 +1,8 @@
 # scripts/rewrite_op_docstrings.py
 # -*- coding: utf-8 -*-
 import ast
-import glob
-import json
-import subprocess
 from pathlib import Path
 
-import os
 import shutil
 import textwrap
 from dataclasses import dataclass
@@ -310,6 +306,7 @@ def rewrite_file_ops(
     model_func: Callable,
     dry_run: bool = True,
     backup: bool = True,
+    system_prompt: str = DEFAULT_SYSTEM_PROMPT,
 ) -> List[dict]:
     """
     Process one file: find operator classes, generate new docstrings, preview/replace.
@@ -323,7 +320,7 @@ def rewrite_file_ops(
         return results
 
     for info in infos:
-        new_doc = call_model_to_generate_docstring(info, model_func=model_func)
+        new_doc = call_model_to_generate_docstring(info, model_func=model_func, system_prompt=system_prompt)
         if not new_doc or new_doc.strip() == "":
             results.append(
                 {
@@ -404,7 +401,7 @@ def rewrite_file_ops(
 # ---------------------------
 
 
-def update_op_docstrings_with_files(modified_operator_files: List[str]):
+def update_op_docstrings_with_files(modified_operator_files: List[str], system_prompt: str = DEFAULT_SYSTEM_PROMPT):
 
     if not modified_operator_files:
         print("No locally modified operator file found")
@@ -419,7 +416,7 @@ def update_op_docstrings_with_files(modified_operator_files: List[str]):
     for file_path in modified_operator_files:
         print(f"\nProcessing file: {file_path}")
         try:
-            result = rewrite_file_ops(file_path, chat, dry_run=False, backup=False)
+            result = rewrite_file_ops(file_path, chat, dry_run=False, backup=False, system_prompt=system_prompt)
             results.append(result)
             print(f"✅ Successfully updated: {file_path}")
         except Exception as e:
@@ -428,7 +425,7 @@ def update_op_docstrings_with_files(modified_operator_files: List[str]):
     return results
 
 
-def update_op_docstrings_with_names(op_names: List[str]):
+def update_op_docstrings_with_names(op_names: List[str], system_prompt: str = DEFAULT_SYSTEM_PROMPT):
     files = []
     for op_name in op_names:
         file_path = find_op_file(op_name)
@@ -436,7 +433,7 @@ def update_op_docstrings_with_names(op_names: List[str]):
             print(f"Operator {op_name} not found")
             continue
         files.append(file_path)
-    return update_op_docstrings_with_files(files)
+    return update_op_docstrings_with_files(files, system_prompt=system_prompt)
 
 
 if __name__ == "__main__":
