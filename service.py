@@ -66,7 +66,12 @@ def register_class(module, cls):
                 # create an instance
                 instance = cls(**_setup_cfg(init_args))
                 # wrap called method
-                method = validate_call(getattr(instance, method_name))
+
+                """
+                Optimized according to issue #777 thanks to https://github.com/Night-Quiet
+                """
+                method = validate_call(getattr(instance, method_name), config=dict(arbitrary_types_allowed=True))
+
                 result = _invoke(method, request)
                 return {"status": "success", "result": result}
             except Exception as e:
