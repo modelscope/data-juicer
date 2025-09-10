@@ -48,6 +48,7 @@ class TextPairSimilarityFilter(Filter):
 
         :param hf_clip: clip model name on huggingface to compute
             the similarity between image and text.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param min_score: The min similarity to keep samples.
         :param max_score: The max similarity to keep samples.
         :param text_key_second: used to store the other sentence

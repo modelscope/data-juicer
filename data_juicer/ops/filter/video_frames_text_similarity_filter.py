@@ -60,6 +60,7 @@ class VideoFramesTextSimilarityFilter(Filter):
             the similarity between frame image and text. It's kind of
             language-related. For example, for Chinese datasets, ChineseCLIP
             might be a better choice.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param min_score: the min similarity to keep samples.
         :param max_score: the max similarity to keep samples.
         :param frame_sampling_method: sampling method of extracting frame
