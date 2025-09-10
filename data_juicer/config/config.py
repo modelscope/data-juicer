@@ -677,9 +677,13 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
     if cfg.get("np", None) and cfg.np > sys_cpu_count:
         logger.warning(
             f"Number of processes `np` is set as [{cfg.np}], which "
-            f"is larger than the cpu count [{sys_cpu_count}]. "
-            f"We recommend to set it to a value <= cpu count. "
+            f"is larger than the cpu count [{sys_cpu_count}]. Due "
+            f"to the data processing of Data-Juicer is a "
+            f"computation-intensive task, we recommend to set it to"
+            f" a value <= cpu count. Set it to [{sys_cpu_count}] "
+            f"here."
         )
+        cfg.np = sys_cpu_count
 
     # whether or not to use cache management
     # disabling the cache or using checkpoint explicitly will turn off the
@@ -745,7 +749,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         "audio_key": cfg.get("audio_key", "audios"),
         "video_key": cfg.get("video_key", "videos"),
         "image_bytes_key": cfg.get("image_bytes_key", "image_bytes"),
-        "num_proc": cfg.np,
+        "num_proc": cfg.get('np', None),
         "turbo": cfg.get("turbo", False),
         "skip_op_error": cfg.get("skip_op_error", True),
         "work_dir": cfg.work_dir,
