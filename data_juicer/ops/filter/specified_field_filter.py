@@ -2,12 +2,11 @@ from typing import List
 
 from data_juicer.utils.constant import Fields
 
-from ..base_op import NON_STATS_FILTERS, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 
 OP_NAME = "specified_field_filter"
 
 
-@NON_STATS_FILTERS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class SpecifiedFieldFilter(Filter):
     """Filter samples based on the specified field information.
