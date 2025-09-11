@@ -404,7 +404,7 @@
 <div class="viewcode-block" id="calculate_np">
 <a class="viewcode-back" href="../../../api/data_juicer.utils.process_utils.html#data_juicer.utils.process_utils.calculate_np">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">calculate_np</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mem_required</span><span class="p">,</span> <span class="n">cpu_required</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">gpu_required</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the optimum number of processes for the given OP&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the optimum number of processes for the given OP automatically。&quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">use_cuda</span> <span class="ow">and</span> <span class="n">gpu_required</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -414,11 +414,11 @@
         <span class="p">)</span>
 
     <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-9</span>  <span class="c1"># about 1 byte</span>
+    <span class="n">cpu_num</span> <span class="o">=</span> <span class="n">cpu_count</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">use_cuda</span><span class="p">:</span>
         <span class="n">cuda_mems_available</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="o">/</span> <span class="mi">1024</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">available_gpu_memories</span><span class="p">()]</span>  <span class="c1"># GB</span>
         <span class="n">gpu_count</span> <span class="o">=</span> <span class="n">cuda_device_count</span><span class="p">()</span>
-
         <span class="k">if</span> <span class="ow">not</span> <span class="n">mem_required</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">gpu_required</span><span class="p">:</span>
             <span class="n">auto_num_proc</span> <span class="o">=</span> <span class="n">gpu_count</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -426,25 +426,25 @@
                 <span class="sa">f</span><span class="s2">&quot;has not been specified. &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Please specify the mem_required field or gpu_required field in the &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;config file. You can reference the config_all.yaml file.&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Set the `num_proc` to number of GPUs </span><span class="si">{</span><span class="n">auto_num_proc</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Set the auto `num_proc` to number of GPUs </span><span class="si">{</span><span class="n">auto_num_proc</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">auto_proc_from_mem</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
                 <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">mem_available</span> <span class="o">/</span> <span class="p">(</span><span class="n">mem_required</span> <span class="o">+</span> <span class="n">eps</span><span class="p">))</span> <span class="k">for</span> <span class="n">mem_available</span> <span class="ow">in</span> <span class="n">cuda_mems_available</span><span class="p">]</span>
             <span class="p">)</span>
             <span class="n">auto_proc_from_gpu</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">gpu_count</span> <span class="o">/</span> <span class="p">(</span><span class="n">gpu_required</span> <span class="o">+</span> <span class="n">eps</span><span class="p">))</span>
-            <span class="n">auto_num_proc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">auto_proc_from_mem</span><span class="p">,</span> <span class="n">auto_proc_from_gpu</span><span class="p">)</span>
+            <span class="n">auto_proc_from_cpu</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">cpu_num</span> <span class="o">/</span> <span class="p">(</span><span class="n">cpu_required</span> <span class="o">+</span> <span class="n">eps</span><span class="p">))</span>
+            <span class="n">auto_num_proc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">auto_proc_from_mem</span><span class="p">,</span> <span class="n">auto_proc_from_gpu</span><span class="p">,</span> <span class="n">auto_proc_from_cpu</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">auto_num_proc</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">auto_num_proc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">available_memories</span><span class="p">())</span>  <span class="c1"># set to the number of available nodes</span>
 
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Set the `num_proc` to </span><span class="si">{</span><span class="n">auto_num_proc</span><span class="si">}</span><span class="s2"> of Op[</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">] based on the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Set the auto `num_proc` to </span><span class="si">{</span><span class="n">auto_num_proc</span><span class="si">}</span><span class="s2"> of Op[</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">] based on the &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;required cuda memory: </span><span class="si">{</span><span class="n">mem_required</span><span class="si">}</span><span class="s2">GB &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;and required gpu: </span><span class="si">{</span><span class="n">gpu_required</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;required gpu: </span><span class="si">{</span><span class="n">gpu_required</span><span class="si">}</span><span class="s2"> and required cpu: </span><span class="si">{</span><span class="n">cpu_required</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">auto_num_proc</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">cpu_num</span> <span class="o">=</span> <span class="n">cpu_count</span><span class="p">()</span>
         <span class="n">mems_available</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="o">/</span> <span class="mi">1024</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">available_memories</span><span class="p">()]</span>  <span class="c1"># GB</span>
         <span class="n">auto_proc_from_mem</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">mem_available</span> <span class="o">/</span> <span class="p">(</span><span class="n">mem_required</span> <span class="o">+</span> <span class="n">eps</span><span class="p">))</span> <span class="k">for</span> <span class="n">mem_available</span> <span class="ow">in</span> <span class="n">mems_available</span><span class="p">])</span>
         <span class="n">auto_proc_from_cpu</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">cpu_num</span> <span class="o">/</span> <span class="p">(</span><span class="n">cpu_required</span> <span class="o">+</span> <span class="n">eps</span><span class="p">))</span>
@@ -460,11 +460,11 @@
                 <span class="sa">f</span><span class="s2">&quot;and memory: </span><span class="si">{</span><span class="n">mems_available</span><span class="si">}</span><span class="s2">GB.&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;This Op [</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">] might &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;require more resource to run. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Set num_proc to available nodes number </span><span class="si">{</span><span class="n">auto_num_proc</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Set the auto `num_proc` to available nodes number </span><span class="si">{</span><span class="n">auto_num_proc</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Set the `num_proc` to </span><span class="si">{</span><span class="n">auto_num_proc</span><span class="si">}</span><span class="s2"> of Op[</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">] based on the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Set the auto `num_proc` to </span><span class="si">{</span><span class="n">auto_num_proc</span><span class="si">}</span><span class="s2"> of Op[</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">] based on the &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;required memory: </span><span class="si">{</span><span class="n">mem_required</span><span class="si">}</span><span class="s2">GB &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;and required cpu: </span><span class="si">{</span><span class="n">cpu_required</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>

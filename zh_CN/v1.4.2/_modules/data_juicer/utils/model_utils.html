@@ -692,18 +692,18 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_processor</span><span class="p">():</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">tiktoken</span><span class="o">.</span><span class="n">encoding_for_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">tiktoken</span><span class="o">.</span><span class="n">encoding_for_model</span><span class="p">(</span><span class="n">check_model_home</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">dashscope</span><span class="o">.</span><span class="n">get_tokenizer</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">dashscope</span><span class="o">.</span><span class="n">get_tokenizer</span><span class="p">(</span><span class="n">check_model_home</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">processor</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-                <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">processor_config</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">check_model_home</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="o">**</span><span class="n">processor_config</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">processor</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>

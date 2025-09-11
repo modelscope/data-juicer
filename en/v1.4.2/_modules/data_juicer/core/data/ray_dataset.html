@@ -345,6 +345,7 @@
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -531,12 +532,20 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_run_single_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
+        <span class="c1"># TODO: optimize auto proc</span>
         <span class="n">auto_parallel</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">num_proc</span><span class="p">:</span>
             <span class="n">op_proc</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">num_proc</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">auto_parallel</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">op_proc</span> <span class="o">=</span> <span class="n">calculate_np</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">mem_required</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">cpu_required</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">(),</span> <span class="n">op</span><span class="o">.</span><span class="n">gpu_required</span><span class="p">)</span>
+            <span class="n">op_proc</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span>
+        <span class="n">auto_op_proc</span> <span class="o">=</span> <span class="n">calculate_np</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">mem_required</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">cpu_required</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">(),</span> <span class="n">op</span><span class="o">.</span><span class="n">gpu_required</span><span class="p">)</span>
+        <span class="n">op_proc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">op_proc</span><span class="p">,</span> <span class="n">auto_op_proc</span><span class="p">)</span>
+
+        <span class="c1"># use ray default parallelism in cpu mode if op.num_proc is not specified</span>
+        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">auto_parallel</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Op [</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s2">] running with number of procs:</span><span class="si">{</span><span class="n">op_proc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="n">num_gpus</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">gpu_required</span> <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">gpu_required</span> <span class="k">else</span> <span class="n">get_num_gpus</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">op_proc</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="n">TAGGING_OPS</span><span class="o">.</span><span class="n">modules</span> <span class="ow">and</span> <span class="n">Fields</span><span class="o">.</span><span class="n">meta</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">():</span>
