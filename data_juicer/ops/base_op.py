@@ -229,7 +229,8 @@ class OP:
         from loguru import logger
 
         op_proc = calculate_np(self._name, self.mem_required, self.cpu_required, self.use_cuda(), self.gpu_required)
-        op_proc = min(op_proc, self.num_proc)
+        if self.num_proc is not None:
+            op_proc = min(op_proc, self.num_proc)
         logger.debug(f"Op [{self._name}] running with number of procs:{op_proc}")
         return op_proc
 
