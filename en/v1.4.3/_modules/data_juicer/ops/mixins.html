@@ -1,0 +1,1024 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
+        <title>data_juicer.ops.mixins - Data Juicer</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=25af2a20" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sidebar-menu.css?v=aecff795" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">Data Juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  <span class="sidebar-brand-text">Data Juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial/DJ-Cookbook.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial/Installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/tutorial/QuickStart.html">Quick Start</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">docs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/RecipeGallery.html">Data Recipe Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DatasetCfg.html">Dataset Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/BadDataExhibition.html">“Bad” Data Exhibition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_SORA.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_agent.html">DataJuicer-Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DJ_service.html">DJ_service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/DeveloperGuide.html">How-to Guide for Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Distributed.html">Distributed Data Processing in Data-Juicer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/Sandbox.html">Sandbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../demos/README.html">Demos</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/distributed_deduplication/README.html">Distributed Fuzzy Deduplication Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/evaluator/README.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/evaluator/gpt_eval/README.html">GPT EVAL: Evaluate your model with OpenAI API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/evaluator/recorder/README.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/fmt_conversion/README.html">Format Conversion Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/fmt_conversion/multimodal/README.html">Multimodal Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/fmt_conversion/post_tuning_dialog/README.html">Post Tuning Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/hpo/README.html">Hyper-parameter Optimization for Data Recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/mm_eval/inception_metrics/README.html">Metrics for video generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/mm_eval/vbench_metrics/README.html">VBench metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/postprocess/README.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/preprocess/README.html">Preprocess Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/quality_classifier/README.html">Data Scoring</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">thirdparty</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../thirdparty/LLM_ecosystems/README.html">LLM Ecosystems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../thirdparty/models/README.html">Third-party Model Library</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+  <div class="current-info">
+    <span class="current-lang">en</span>|<span class="current-version">v1.4.3</span>
+  </div>
+  <div class="dropdown-panel">
+    
+    <div class="section">
+      <dt>Language</dt>
+      <dd>
+        
+        <a href="../../../../../en/v1.4.3/_modules/data_juicer/ops/mixins.html"
+          class="active" >
+          English
+        </a>
+        
+        <a href="../../../../../zh_CN/v1.4.3/_modules/data_juicer/ops/mixins_ZH.html"
+          >
+          简体中文
+        </a>
+        
+      </dd>
+    </div>
+    
+
+    
+    <div class="section version">
+      <dt>Version</dt>
+      <dd>
+        
+        <a href="../../../../main/_modules/data_juicer/ops/mixins.html" >
+          main
+        </a>
+        
+        <a href="../../../../v1.4.3/_modules/data_juicer/ops/mixins.html" class="active" >
+          v1.4.3
+        </a>
+        
+        <a href="../../../../v1.4.2/_modules/data_juicer/ops/mixins.html" >
+          v1.4.2
+        </a>
+        
+        <a href="../../../../v1.4.1/_modules/data_juicer/ops/mixins.html" >
+          v1.4.1
+        </a>
+        
+        <a href="../../../../v1.4.0/_modules/data_juicer/ops/mixins.html" >
+          v1.4.0
+        </a>
+        
+      </dd>
+    </div>
+    
+  </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for data_juicer.ops.mixins</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="EventDrivenMixin">
+<a class="viewcode-back" href="../../../api/data_juicer.ops.mixins.html#data_juicer.ops.mixins.EventDrivenMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EventDrivenMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin for event-driven capabilities in operations.</span>
+
+<span class="sd">    This mixin provides functionality for registering event handlers,</span>
+<span class="sd">    triggering events, and managing event polling.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="EventDrivenMixin.__init__">
+<a class="viewcode-back" href="../../../api/data_juicer.ops.mixins.html#data_juicer.ops.mixins.EventDrivenMixin.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_handlers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polling_threads</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_polling_flags</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="EventDrivenMixin.register_event_handler">
+<a class="viewcode-back" href="../../../api/data_juicer.ops.mixins.html#data_juicer.ops.mixins.EventDrivenMixin.register_event_handler">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_event_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">handler</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register a handler for a specific event type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event_type: Type of event to handle</span>
+<span class="sd">            handler: Callback function to handle the event</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_handlers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_handlers</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_handlers</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EventDrivenMixin.trigger_event">
+<a class="viewcode-back" href="../../../api/data_juicer.ops.mixins.html#data_juicer.ops.mixins.EventDrivenMixin.trigger_event">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trigger_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Trigger an event and call all registered handlers.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event_type: Type of event to trigger</span>
+<span class="sd">            data: Event data to pass to handlers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_handlers</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_handlers</span><span class="p">[</span><span class="n">event_type</span><span class="p">]:</span>
+                <span class="n">handler</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EventDrivenMixin.start_polling">
+<a class="viewcode-back" href="../../../api/data_juicer.ops.mixins.html#data_juicer.ops.mixins.EventDrivenMixin.start_polling">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start_polling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">poll_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start polling for a specific event type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event_type: Type of event to poll for</span>
+<span class="sd">            poll_func: Function to call for polling</span>
+<span class="sd">            interval: Polling interval in seconds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">polling_threads</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">polling_threads</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_polling_flags</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">polling_worker</span><span class="p">():</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_polling_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">poll_func</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">trigger_event</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in polling for </span><span class="si">{</span><span class="n">event_type</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+
+        <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">polling_worker</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polling_threads</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">thread</span>
+        <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="EventDrivenMixin.stop_polling">
+<a class="viewcode-back" href="../../../api/data_juicer.ops.mixins.html#data_juicer.ops.mixins.EventDrivenMixin.stop_polling">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop_polling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop polling for a specific event type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event_type: Type of event to stop polling for</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">polling_threads</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stop_polling_flags</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">polling_threads</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">polling_threads</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="EventDrivenMixin.stop_all_polling">
+<a class="viewcode-back" href="../../../api/data_juicer.ops.mixins.html#data_juicer.ops.mixins.EventDrivenMixin.stop_all_polling">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop_all_polling</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop all polling threads.&quot;&quot;&quot;</span>
+        <span class="n">event_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">polling_threads</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">event_type</span> <span class="ow">in</span> <span class="n">event_types</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stop_polling</span><span class="p">(</span><span class="n">event_type</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EventDrivenMixin.wait_for_completion">
+<a class="viewcode-back" href="../../../api/data_juicer.ops.mixins.html#data_juicer.ops.mixins.EventDrivenMixin.wait_for_completion">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_completion</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">condition_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">bool</span><span class="p">],</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">,</span>
+        <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Operation timed out&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wait for a condition to be met.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            condition_func: Function that returns True when condition is met</span>
+<span class="sd">            timeout: Maximum time to wait in seconds</span>
+<span class="sd">            poll_interval: Polling interval in seconds</span>
+<span class="sd">            error_message: Error message to raise on timeout</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TimeoutError: If the condition is not met within the timeout</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">condition_func</span><span class="p">():</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_interval</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NotificationMixin">
+<a class="viewcode-back" href="../../../api/data_juicer.ops.mixins.html#data_juicer.ops.mixins.NotificationMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NotificationMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin for sending notifications through various channels.</span>
+
+<span class="sd">    This mixin provides functionality for sending notifications via email,</span>
+<span class="sd">    Slack, DingTalk, and other platforms.</span>
+
+<span class="sd">    Notification configuration can be specified as a &quot;notification_config&quot;</span>
+<span class="sd">    parameter within an operator (for backward compatibility):</span>
+<span class="sd">    ```yaml</span>
+<span class="sd">    process:</span>
+<span class="sd">      - some_mapper:</span>
+<span class="sd">          notification_config:</span>
+<span class="sd">            enabled: true</span>
+<span class="sd">            email:</span>
+<span class="sd">              # ... email settings ...</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    For security best practices, sensitive information like passwords and</span>
+<span class="sd">    tokens should be provided via environment variables:</span>
+
+<span class="sd">    - Email: set &#39;DATA_JUICER_EMAIL_PASSWORD&#39; environment variable</span>
+<span class="sd">      or service-specific &#39;DATA_JUICER_SMTP_SERVER_NAME_PASSWORD&#39;</span>
+<span class="sd">    - Slack: set &#39;DATA_JUICER_SLACK_WEBHOOK&#39; environment variable</span>
+<span class="sd">    - DingTalk: set &#39;DATA_JUICER_DINGTALK_TOKEN&#39; and</span>
+<span class="sd">      &#39;DATA_JUICER_DINGTALK_SECRET&#39; environment variables</span>
+
+<span class="sd">    For even more secure email authentication, you can use TLS client</span>
+<span class="sd">    certificates instead of passwords:</span>
+
+<span class="sd">    1. Generate a client certificate and key (example using OpenSSL):</span>
+<span class="sd">       ```bash</span>
+<span class="sd">       # Generate a private key</span>
+<span class="sd">       openssl genrsa -out client.key 2048</span>
+
+<span class="sd">       # Generate a certificate signing request (CSR)</span>
+<span class="sd">       openssl req -new -key client.key -out client.csr</span>
+
+<span class="sd">       # Generate a self-signed certificate</span>
+<span class="sd">       openssl x509 -req -days 365 -in client.csr -signkey client.key</span>
+<span class="sd">            -out client.crt</span>
+<span class="sd">       ```</span>
+
+<span class="sd">    2. Configure your SMTP server to accept this client certificate for</span>
+<span class="sd">        authentication</span>
+
+<span class="sd">    3. Configure Data Juicer to use certificate authentication:</span>
+<span class="sd">       ```yaml</span>
+<span class="sd">       notification:</span>
+<span class="sd">         enabled: true</span>
+<span class="sd">         email:</span>
+<span class="sd">           use_cert_auth: true</span>
+<span class="sd">           client_cert_file: &quot;/path/to/client.crt&quot;</span>
+<span class="sd">           client_key_file: &quot;/path/to/client.key&quot;</span>
+<span class="sd">           smtp_server: &quot;smtp.example.com&quot;</span>
+<span class="sd">           smtp_port: 587</span>
+<span class="sd">           sender_email: &quot;notifications@example.com&quot;</span>
+<span class="sd">           recipients: [&quot;recipient@example.com&quot;]</span>
+<span class="sd">       ```</span>
+
+<span class="sd">    4. Or use environment variables:</span>
+<span class="sd">       ```bash</span>
+<span class="sd">       export DATA_JUICER_EMAIL_CERT=&quot;/path/to/client.crt&quot;</span>
+<span class="sd">       export DATA_JUICER_EMAIL_KEY=&quot;/path/to/client.key&quot;</span>
+<span class="sd">       ```</span>
+
+<span class="sd">    For maximum connection security, you can use a direct SSL connection</span>
+<span class="sd">    instead of STARTTLS by enabling the &#39;use_ssl&#39; option:</span>
+
+<span class="sd">    ```yaml</span>
+<span class="sd">    notification:</span>
+<span class="sd">      enabled: true</span>
+<span class="sd">      email:</span>
+<span class="sd">        use_ssl: true</span>
+<span class="sd">        smtp_port: 465  # Common port for SMTP over SSL</span>
+<span class="sd">        # ... other email configuration ...</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    This establishes an encrypted connection from the beginning, rather than</span>
+<span class="sd">     starting with an unencrypted connection and upgrading to TLS as with</span>
+<span class="sd">     STARTTLS. Note that this option can be combined with certificate</span>
+<span class="sd">     authentication for maximum security.</span>
+
+<span class="sd">    The email notification system supports various email server configurations</span>
+<span class="sd">      through a flexible configuration system. Here are some examples for</span>
+<span class="sd">      different servers:</span>
+
+<span class="sd">    Standard SMTP with STARTTLS:</span>
+<span class="sd">    ```yaml</span>
+<span class="sd">    notification:</span>
+<span class="sd">      enabled: true</span>
+<span class="sd">      email:</span>
+<span class="sd">        smtp_server: &quot;smtp.example.com&quot;</span>
+<span class="sd">        smtp_port: 587</span>
+<span class="sd">        username: &quot;your.username@example.com&quot;</span>
+<span class="sd">        sender_email: &quot;your.username@example.com&quot;</span>
+<span class="sd">        sender_name: &quot;Your Name&quot;  # Optional</span>
+<span class="sd">        recipients: [&quot;recipient1@example.com&quot;, &quot;recipient2@example.com&quot;]</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Direct SSL Connection (e.g., Gmail):</span>
+<span class="sd">    ```yaml</span>
+<span class="sd">    notification:</span>
+<span class="sd">      enabled: true</span>
+<span class="sd">      email:</span>
+<span class="sd">        smtp_server: &quot;smtp.gmail.com&quot;</span>
+<span class="sd">        smtp_port: 465</span>
+<span class="sd">        use_ssl: true</span>
+<span class="sd">        username: &quot;your.username@gmail.com&quot;</span>
+<span class="sd">        sender_email: &quot;your.username@gmail.com&quot;</span>
+<span class="sd">        sender_name: &quot;Your Name&quot;</span>
+<span class="sd">        recipients: [&quot;recipient1@example.com&quot;, &quot;recipient2@example.com&quot;]</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Alibaba Email Server:</span>
+<span class="sd">    ```yaml</span>
+<span class="sd">    notification:</span>
+<span class="sd">      enabled: true</span>
+<span class="sd">      email:</span>
+<span class="sd">        smtp_server: &quot;smtp.alibaba-inc.com&quot;</span>
+<span class="sd">        smtp_port: 465</span>
+<span class="sd">        username: &quot;your.username@alibaba-inc.com&quot;</span>
+<span class="sd">        sender_email: &quot;your.username@alibaba-inc.com&quot;</span>
+<span class="sd">        sender_name: &quot;Your Name&quot;</span>
+<span class="sd">        recipient_separator: &quot;;&quot;       # Use semicolons to separate recipients</span>
+<span class="sd">        recipients: [&quot;recipient1@example.com&quot;, &quot;recipient2@example.com&quot;]</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Environment variable usage examples:</span>
+<span class="sd">    ```bash</span>
+<span class="sd">    # General email password</span>
+<span class="sd">    export DATA_JUICER_EMAIL_PASSWORD=&quot;your_email_password&quot;</span>
+
+<span class="sd">    # Server-specific passwords (preferred for clarity)</span>
+<span class="sd">    export DATA_JUICER_SMTP_GMAIL_COM_PASSWORD=&quot;your_gmail_password&quot;</span>
+<span class="sd">    export DATA_JUICER_SMTP_ALIBABA_INC_COM_PASSWORD=&quot;your_alibaba_password&quot;</span>
+
+<span class="sd">    # Slack webhook</span>
+<span class="sd">    export DATA_JUICER_SLACK_WEBHOOK=&quot;your_slack_webhook_url&quot;</span>
+
+<span class="sd">    # DingTalk credentials</span>
+<span class="sd">    export DATA_JUICER_DINGTALK_TOKEN=&quot;your_dingtalk_token&quot;</span>
+<span class="sd">    export DATA_JUICER_DINGTALK_SECRET=&quot;your_dingtalk_secret&quot;</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    If environment variables are not set, the system will fall back to using</span>
+<span class="sd">    values from the configuration file, but this is less secure and not</span>
+<span class="sd">    recommended for production environments.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="NotificationMixin.__init__">
+<a class="viewcode-back" href="../../../api/data_juicer.ops.mixins.html#data_juicer.ops.mixins.NotificationMixin.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Get notification configuration directly from kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;notification_config&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="c1"># Initialize notification handlers if configured</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notification_handlers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_email_notification</span><span class="p">,</span>
+            <span class="s2">&quot;slack&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_slack_notification</span><span class="p">,</span>
+            <span class="s2">&quot;dingtalk&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_dingtalk_notification</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Check if notifications are enabled for this operator</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Notification is enabled for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Notification is disabled for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NotificationMixin.send_notification">
+<a class="viewcode-back" href="../../../api/data_juicer.ops.mixins.html#data_juicer.ops.mixins.NotificationMixin.send_notification">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">notification_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send a notification message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message: The message to send</span>
+<span class="sd">            notification_type: The type of notification to send.</span>
+<span class="sd">                                Email, Slack, DingTalk.</span>
+<span class="sd">                                If None, send nothing</span>
+<span class="sd">            **kwargs: Additional arguments to pass to the notification handler</span>
+<span class="sd">                      These can override any configuration settings for this</span>
+<span class="sd">                      specific notification</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the notification was sent successfully, else False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if notifications are enabled</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;notification_config&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="c1"># Notifications are disabled, log and return</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not sending notification: disabled for &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Check if notification handlers are initialized</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;notification_handlers&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Notification handlers not initialized&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Apply any temporary overrides for this specific notification</span>
+        <span class="n">temp_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;notification_config&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
+
+        <span class="c1"># Process the specific notification overrides from kwargs</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">temp_config</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">temp_config</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="c1"># For dict values (like email settings), merge them</span>
+                <span class="n">temp_config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># For other values, just replace them</span>
+                <span class="n">temp_config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="c1"># Store the original config and set the temporary one</span>
+        <span class="n">original_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span> <span class="o">=</span> <span class="n">temp_config</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">notification_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No notification type specified, ignoring... &quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">notification_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_handlers</span><span class="p">:</span>
+                <span class="c1"># Check if this specific channel is enabled</span>
+                <span class="n">channel_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">notification_type</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">channel_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">channel_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not sending </span><span class="si">{</span><span class="n">notification_type</span><span class="si">}</span><span class="s2"> notification: &quot;</span> <span class="sa">f</span><span class="s2">&quot;channel disabled&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_handlers</span><span class="p">[</span><span class="n">notification_type</span><span class="p">](</span><span class="n">message</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported notification type: </span><span class="si">{</span><span class="n">notification_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="c1"># Restore the original configuration</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span> <span class="o">=</span> <span class="n">original_config</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_send_email_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send an email notification.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message: The message to send</span>
+<span class="sd">            **kwargs: Additional parameters for email configuration</span>
+<span class="sd">                      (recipients, subject, etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Whether the email was sent successfully</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">smtplib</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">ssl</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">email.mime.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">MIMEText</span>
+
+            <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+            <span class="c1"># Get email configuration settings with priority order:</span>
+            <span class="c1"># 1. kwargs (passed directly to the method)</span>
+            <span class="c1"># 2. config (from notification_config)</span>
+            <span class="c1"># 3. default values (Alibaba-specific defaults)</span>
+
+            <span class="c1"># SMTP server configuration</span>
+            <span class="n">smtp_server</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;smtp_server&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;smtp_server&quot;</span><span class="p">))</span>
+            <span class="n">smtp_port</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;smtp_port&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;smtp_port&quot;</span><span class="p">,</span> <span class="mi">465</span><span class="p">))</span>  <span class="c1"># Default to 465 (SSL)</span>
+            <span class="n">use_ssl</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_ssl&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_ssl&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>  <span class="c1"># Default to SSL</span>
+
+            <span class="c1"># Some more defaults</span>
+            <span class="n">include_port_in_address</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;include_port_in_address&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;include_port_in_address&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+            <span class="n">recipient_separator</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;recipient_separator&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;recipient_separator&quot;</span><span class="p">,</span> <span class="s2">&quot;;&quot;</span><span class="p">)</span>
+            <span class="p">)</span>  <span class="c1"># Default to semicolon</span>
+            <span class="n">message_encoding</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;message_encoding&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;message_encoding&quot;</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Authentication method</span>
+            <span class="n">use_cert_auth</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_cert_auth&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_cert_auth&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+
+            <span class="c1"># Sender information</span>
+            <span class="n">sender_email</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sender_email&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sender_email&quot;</span><span class="p">))</span>
+            <span class="n">sender_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sender_name&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sender_name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Format sender with name if provided</span>
+            <span class="n">formatted_sender</span> <span class="o">=</span> <span class="n">sender_email</span>
+            <span class="k">if</span> <span class="n">sender_name</span> <span class="ow">and</span> <span class="n">sender_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="s2">&quot;&lt;&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">formatted_sender</span><span class="p">:</span>
+                <span class="n">formatted_sender</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sender_name</span><span class="si">}</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">sender_email</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+
+            <span class="c1"># Authentication credentials</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">sender_email</span><span class="p">))</span>
+
+            <span class="c1"># Recipients and subject</span>
+            <span class="n">recipients</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;recipients&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;recipients&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="n">subject</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="s2">&quot;Notification from Data Juicer&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Try to get password from environment var first (most secure)</span>
+            <span class="c1"># Check for service-specific env vars first, then fall back to</span>
+            <span class="c1"># generic one</span>
+            <span class="n">password</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">env_password_keys</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="sa">f</span><span class="s2">&quot;DATA_JUICER_</span><span class="si">{</span><span class="n">smtp_server</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">_PASSWORD&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+                <span class="s2">&quot;DATA_JUICER_EMAIL_PASSWORD&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">env_key</span> <span class="ow">in</span> <span class="n">env_password_keys</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">env_key</span><span class="p">):</span>
+                    <span class="n">password</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">env_key</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+            <span class="c1"># Fall back to config if no environment variable is set</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">password</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Email password environment variables not set. &quot;</span>
+                    <span class="sa">f</span><span class="s1">&#39;Tried: </span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">env_password_keys</span><span class="p">)</span><span class="si">}</span><span class="s1">. &#39;</span>
+                    <span class="s2">&quot;Falling back to configuration. Consider using &quot;</span>
+                    <span class="s2">&quot;environmentvariables for better security.&quot;</span>
+                <span class="p">)</span>
+                <span class="n">password</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Certificate authentication settings</span>
+            <span class="n">client_cert_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DATA_JUICER_EMAIL_CERT&quot;</span><span class="p">)</span>
+            <span class="n">client_key_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DATA_JUICER_EMAIL_KEY&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Fall back to config if environment variables not set</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">client_cert_file</span><span class="p">:</span>
+                <span class="n">client_cert_file</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_cert_file&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_cert_file&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">client_key_file</span><span class="p">:</span>
+                <span class="n">client_key_file</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_key_file&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_key_file&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Validate required parameters</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">smtp_server</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">recipients</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Missing required email configuration (server/recipients)&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">use_cert_auth</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">username</span> <span class="ow">and</span> <span class="n">password</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Missing credentials for password-based authentication&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="n">use_cert_auth</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">client_cert_file</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">client_key_file</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Missing client certificate or key for authentication&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Create SSL context for certificate authentication if needed</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">use_cert_auth</span> <span class="ow">and</span> <span class="n">client_cert_file</span> <span class="ow">and</span> <span class="n">client_key_file</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using TLS client certificate authentication for email&quot;</span><span class="p">)</span>
+                <span class="n">context</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">create_default_context</span><span class="p">(</span><span class="n">ssl</span><span class="o">.</span><span class="n">Purpose</span><span class="o">.</span><span class="n">SERVER_AUTH</span><span class="p">)</span>
+                <span class="n">context</span><span class="o">.</span><span class="n">load_cert_chain</span><span class="p">(</span><span class="n">certfile</span><span class="o">=</span><span class="n">client_cert_file</span><span class="p">,</span> <span class="n">keyfile</span><span class="o">=</span><span class="n">client_key_file</span><span class="p">)</span>
+
+            <span class="c1"># Create email message</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">MIMEText</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="s2">&quot;plain&quot;</span><span class="p">,</span> <span class="n">message_encoding</span><span class="p">)</span>
+            <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;From&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatted_sender</span>
+            <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;To&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">recipient_separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">recipients</span><span class="p">)</span>
+            <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;Subject&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subject</span>
+
+            <span class="c1"># Determine connection type and send message</span>
+            <span class="c1"># Port 465 is typically for SMTP over SSL</span>
+            <span class="k">if</span> <span class="n">use_ssl</span> <span class="ow">or</span> <span class="n">smtp_port</span> <span class="o">==</span> <span class="mi">465</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using direct SSL connection to </span><span class="si">{</span><span class="n">smtp_server</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">smtp_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Handle different connection string formats</span>
+                <span class="n">server_address</span> <span class="o">=</span> <span class="n">smtp_server</span>
+                <span class="k">if</span> <span class="n">include_port_in_address</span><span class="p">:</span>
+                    <span class="n">server_address</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">smtp_server</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">smtp_port</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                <span class="c1"># Use the SSL context if certificate authentication is enabled</span>
+                <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP_SSL</span><span class="p">(</span>
+                        <span class="n">server_address</span><span class="p">,</span> <span class="n">smtp_port</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">include_port_in_address</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span>
+                    <span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+                        <span class="c1"># No login needed with client certificates</span>
+                        <span class="n">server</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Standard SSL connection with password</span>
+                    <span class="k">with</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP_SSL</span><span class="p">(</span><span class="n">server_address</span><span class="p">,</span> <span class="n">smtp_port</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">include_port_in_address</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+                        <span class="n">server</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+                        <span class="n">server</span><span class="o">.</span><span class="n">sendmail</span><span class="p">(</span><span class="n">formatted_sender</span><span class="p">,</span> <span class="n">recipients</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">as_string</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Standard connection with STARTTLS upgrade</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using STARTTLS connection to </span><span class="si">{</span><span class="n">smtp_server</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">smtp_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">use_cert_auth</span> <span class="ow">and</span> <span class="n">client_cert_file</span> <span class="ow">and</span> <span class="n">client_key_file</span><span class="p">:</span>
+                    <span class="c1"># Connect with certificate authentication</span>
+                    <span class="k">with</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP</span><span class="p">(</span><span class="n">smtp_server</span><span class="p">,</span> <span class="n">smtp_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+                        <span class="n">server</span><span class="o">.</span><span class="n">starttls</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+                        <span class="c1"># No login needed with client certificates</span>
+                        <span class="n">server</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Connect with password authentication</span>
+                    <span class="k">with</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP</span><span class="p">(</span><span class="n">smtp_server</span><span class="p">,</span> <span class="n">smtp_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+                        <span class="n">server</span><span class="o">.</span><span class="n">starttls</span><span class="p">()</span>
+                        <span class="n">server</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+                        <span class="n">server</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to send email notification: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_send_slack_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send a Slack notification.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message: The message to send</span>
+<span class="sd">            **kwargs: Additional parameters for Slack configuration</span>
+<span class="sd">                      (webhook_url, channel, etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Whether the notification was sent successfully</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+            <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+
+            <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;slack&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+            <span class="c1"># Override config with kwargs if provided</span>
+            <span class="n">webhook_url</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;webhook_url&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;webhook_url&quot;</span><span class="p">))</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;channel&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;channel&quot;</span><span class="p">))</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;Data Juicer&quot;</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">webhook_url</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Missing required Slack webhook URL&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Prepare payload</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span>
+                <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="n">channel</span><span class="p">:</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;channel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">channel</span>
+
+            <span class="c1"># Send notification</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                <span class="n">webhook_url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">),</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to send Slack notification: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_send_dingtalk_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send a DingTalk notification.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message: The message to send</span>
+<span class="sd">            **kwargs: Additional parameters for DingTalk configuration</span>
+<span class="sd">                      (access_token, secret, etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Whether the notification was sent successfully</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">hmac</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
+
+            <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+
+            <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dingtalk&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+            <span class="c1"># Override config with kwargs if provided</span>
+            <span class="n">access_token</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;access_token&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;access_token&quot;</span><span class="p">))</span>
+            <span class="n">secret</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;secret&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;secret&quot;</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">access_token</span><span class="p">:</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Missing required DingTalk access token&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Prepare URL with signature if secret is provided</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://oapi.dingtalk.com/robot/send?access_token=</span><span class="si">{</span><span class="n">access_token</span><span class="si">}</span><span class="s2">&quot;</span>  <span class="c1"># noqa: E501</span>
+
+            <span class="k">if</span> <span class="n">secret</span><span class="p">:</span>
+                <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span>
+                <span class="n">string_to_sign</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">secret</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">hmac_code</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">secret</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">string_to_sign</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">digestmod</span><span class="o">=</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+                <span class="n">sign</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote_plus</span><span class="p">(</span><span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">hmac_code</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&amp;timestamp=</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">&amp;sign=</span><span class="si">{</span><span class="n">sign</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># Prepare payload</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;msgtype&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">}}</span>
+
+            <span class="c1"># Send notification</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">),</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">})</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;errcode&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to send DingTalk notification: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="../../../_static/documentation_options.js?v=a68a9277"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

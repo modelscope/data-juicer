@@ -1,0 +1,832 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
+        <title>data_juicer.ops.common.prompt2prompt_pipeline module - Data Juicer</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sidebar-menu.css?v=aecff795" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Data Juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">Data Juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/DJ-Cookbook.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/Installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/QuickStart.html">Quick Start</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">docs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RecipeGallery.html">Data Recipe Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DatasetCfg.html">Dataset Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/BadDataExhibition.html">“Bad” Data Exhibition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_SORA.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_agent.html">DataJuicer-Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_service.html">DJ_service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DeveloperGuide.html">How-to Guide for Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Distributed.html">Distributed Data Processing in Data-Juicer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Sandbox.html">Sandbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../demos/README.html">Demos</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tools/distributed_deduplication/README.html">Distributed Fuzzy Deduplication Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/README.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/gpt_eval/README.html">GPT EVAL: Evaluate your model with OpenAI API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/recorder/README.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/README.html">Format Conversion Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README.html">Multimodal Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README.html">Post Tuning Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/hpo/README.html">Hyper-parameter Optimization for Data Recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README.html">Metrics for video generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/vbench_metrics/README.html">VBench metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/postprocess/README.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/preprocess/README.html">Preprocess Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/quality_classifier/README.html">Data Scoring</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">thirdparty</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README.html">LLM Ecosystems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/models/README.html">Third-party Model Library</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+  <div class="current-info">
+    <span class="current-lang">en</span>|<span class="current-version">v1.4.3</span>
+  </div>
+  <div class="dropdown-panel">
+    
+    <div class="section">
+      <dt>Language</dt>
+      <dd>
+        
+        <a href="../../../en/v1.4.3/api/data_juicer.ops.common.prompt2prompt_pipeline.html"
+          class="active" >
+          English
+        </a>
+        
+        <a href="../../../zh_CN/v1.4.3/api/data_juicer.ops.common.prompt2prompt_pipeline.html"
+          >
+          简体中文
+        </a>
+        
+      </dd>
+    </div>
+    
+
+    
+    <div class="section version">
+      <dt>Version</dt>
+      <dd>
+        
+        <a href="../../main/api/data_juicer.ops.common.prompt2prompt_pipeline.html" >
+          main
+        </a>
+        
+        <a href="../../v1.4.3/api/data_juicer.ops.common.prompt2prompt_pipeline.html" class="active" >
+          v1.4.3
+        </a>
+        
+        <a href="../../v1.4.2/api/data_juicer.ops.common.prompt2prompt_pipeline.html" >
+          v1.4.2
+        </a>
+        
+        <a href="../../v1.4.1/api/data_juicer.ops.common.prompt2prompt_pipeline.html" >
+          v1.4.1
+        </a>
+        
+        <a href="../../v1.4.0/api/data_juicer.ops.common.prompt2prompt_pipeline.html" >
+          v1.4.0
+        </a>
+        
+      </dd>
+    </div>
+    
+  </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/api/data_juicer.ops.common.prompt2prompt_pipeline.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-data_juicer.ops.common.prompt2prompt_pipeline">
+<span id="data-juicer-ops-common-prompt2prompt-pipeline-module"></span><h1>data_juicer.ops.common.prompt2prompt_pipeline module<a class="headerlink" href="#module-data_juicer.ops.common.prompt2prompt_pipeline" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.rescale_noise_cfg">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">rescale_noise_cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_cfg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_pred_text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guidance_rescale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#rescale_noise_cfg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.rescale_noise_cfg" title="Link to this definition">¶</a></dt>
+<dd><p>Rescale <cite>noise_cfg</cite> according to <cite>guidance_rescale</cite>. Based on
+findings of [Common Diffusion Noise Schedules and
+Sample Steps are Flawed](<a class="reference external" href="https://arxiv.org/pdf/2305.08891.pdf">https://arxiv.org/pdf/2305.08891.pdf</a>).</p>
+<blockquote>
+<div><p>See Section 3.4</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">Prompt2PromptPipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vae</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AutoencoderKL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_encoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CLIPTextModel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_encoder_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CLIPTextModelWithProjection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CLIPTokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CLIPTokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">UNet2DConditionModel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheduler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">KarrasDiffusionSchedulers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_encoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CLIPVisionModelWithProjection</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_extractor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CLIPImageProcessor</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_zeros_for_empty_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_watermarker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#Prompt2PromptPipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">StableDiffusionXLPipeline</span></code></p>
+<p>Args:
+Prompt-to-Prompt-Pipeline for text-to-image generation using
+Stable Diffusion. This model inherits from
+[<cite>StableDiffusionPipeline</cite>]. Check the superclass documentation</p>
+<blockquote>
+<div><p>for the generic methods the library implements for</p>
+</div></blockquote>
+<p>all the pipelines (such as downloading or saving, running on a
+particular device, etc.)</p>
+<blockquote>
+<div><dl>
+<dt>vae ([<cite>AutoencoderKL</cite>]):</dt><dd><p>Variational Auto-Encoder (VAE) Model to encode and decode
+images to and from latent representations.</p>
+</dd>
+<dt>text_encoder ([<cite>CLIPTextModel</cite>]):</dt><dd><p>Frozen text-encoder. Stable Diffusion uses the text portion of
+[CLIP](<a class="reference external" href="https://huggingface.co/docs/transformers/model_doc/">https://huggingface.co/docs/transformers/model_doc/</a>
+clip#transformers.CLIPTextModel), specifically
+the [clip-vit-large-patch14](<a class="reference external" href="https://huggingface.co/openai/">https://huggingface.co/openai/</a>
+clip-vit-large-patch14) variant.</p>
+</dd>
+<dt>tokenizer (<cite>CLIPTokenizer</cite>):</dt><dd><p>Tokenizer of class
+[CLIPTokenizer](<a class="reference external" href="https://huggingface.co/docs/transformers/">https://huggingface.co/docs/transformers/</a>
+v4.21.0/en/model_doc/clip#transformers.CLIPTokenizer).</p>
+</dd>
+<dt>unet ([<cite>UNet2DConditionModel</cite>]): Conditional U-Net architecture</dt><dd><p>to denoise the encoded image latents. scheduler</p>
+</dd>
+<dt>([<cite>SchedulerMixin</cite>]):</dt><dd><dl class="simple">
+<dt>A scheduler to be used in combination with <cite>unet</cite> to denoise</dt><dd><p>the encoded image latents. Can be one of</p>
+</dd>
+</dl>
+<p>[<cite>DDIMScheduler</cite>], [<cite>LMSDiscreteScheduler</cite>], or [<cite>PNDMScheduler</cite>].</p>
+</dd>
+<dt>safety_checker ([<cite>StableDiffusionSafetyChecker</cite>]):</dt><dd><dl class="simple">
+<dt>Classification module that estimates whether generated</dt><dd><p>images could be considered offensive or harmful.</p>
+</dd>
+</dl>
+<p>Please, refer to the [model card](<a class="reference external" href="https://huggingface.co/">https://huggingface.co/</a>
+runwayml/stable-diffusion-v1-5) for details.</p>
+</dd>
+<dt>feature_extractor ([<cite>CLIPFeatureExtractor</cite>]):</dt><dd><dl class="simple">
+<dt>Model that extracts features from generated images to be</dt><dd><p>used as inputs for the <cite>safety_checker</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline.check_inputs">
+<span class="sig-name descname"><span class="pre">check_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_prompt_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_embeds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_prompt_embeds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pooled_prompt_embeds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_pooled_prompt_embeds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#Prompt2PromptPipeline.check_inputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline.check_inputs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline.register_attention_control">
+<span class="sig-name descname"><span class="pre">register_attention_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#Prompt2PromptPipeline.register_attention_control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline.register_attention_control" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.P2PCrossAttnProcessor">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">P2PCrossAttnProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place_in_unet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#P2PCrossAttnProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.P2PCrossAttnProcessor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.P2PCrossAttnProcessor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place_in_unet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#P2PCrossAttnProcessor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.P2PCrossAttnProcessor.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">AttentionControl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionControl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.step_callback">
+<span class="sig-name descname"><span class="pre">step_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionControl.step_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.step_callback" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.between_steps">
+<span class="sig-name descname"><span class="pre">between_steps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionControl.between_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.between_steps" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.num_uncond_att_layers">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_uncond_att_layers</span></span><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.num_uncond_att_layers" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.forward">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_cross</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place_in_unet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionControl.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.forward" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionControl.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.reset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionControl.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.create_controller">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">create_controller</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_attention_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_inference_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attn_res</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl" title="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl"><span class="pre">AttentionControl</span></a></span></span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#create_controller"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.create_controller" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.EmptyControl">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">EmptyControl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#EmptyControl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.EmptyControl" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl" title="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttentionControl</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.EmptyControl.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_cross</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place_in_unet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#EmptyControl.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.EmptyControl.forward" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">AttentionStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl" title="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttentionControl</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.get_empty_store">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_empty_store</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionStore.get_empty_store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.get_empty_store" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_cross</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place_in_unet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionStore.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.forward" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.between_steps">
+<span class="sig-name descname"><span class="pre">between_steps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionStore.between_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.between_steps" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.get_average_attention">
+<span class="sig-name descname"><span class="pre">get_average_attention</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionStore.get_average_attention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.get_average_attention" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionStore.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.reset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionStore.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">LocalBlend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#LocalBlend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#LocalBlend.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">AttentionControlEdit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_blend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend" title="data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend"><span class="pre">LocalBlend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionControlEdit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore" title="data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttentionStore</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.step_callback">
+<span class="sig-name descname"><span class="pre">step_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionControlEdit.step_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.step_callback" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.replace_self_attention">
+<span class="sig-name descname"><span class="pre">replace_self_attention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">att_replace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionControlEdit.replace_self_attention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.replace_self_attention" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.replace_cross_attention">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">replace_cross_attention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">att_replace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionControlEdit.replace_cross_attention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.replace_cross_attention" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_cross</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place_in_unet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionControlEdit.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.forward" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_blend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend" title="data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend"><span class="pre">LocalBlend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionControlEdit.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">AttentionReplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_blend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend" title="data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend"><span class="pre">LocalBlend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionReplace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit" title="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttentionControlEdit</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace.replace_cross_attention">
+<span class="sig-name descname"><span class="pre">replace_cross_attention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">att_replace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionReplace.replace_cross_attention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace.replace_cross_attention" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_blend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend" title="data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend"><span class="pre">LocalBlend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionReplace.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">AttentionRefine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_blend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend" title="data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend"><span class="pre">LocalBlend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionRefine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit" title="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttentionControlEdit</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine.replace_cross_attention">
+<span class="sig-name descname"><span class="pre">replace_cross_attention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">att_replace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionRefine.replace_cross_attention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine.replace_cross_attention" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_blend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend" title="data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend"><span class="pre">LocalBlend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionRefine.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">AttentionReweight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equalizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_blend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend" title="data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend"><span class="pre">LocalBlend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controller</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit" title="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit"><span class="pre">AttentionControlEdit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionReweight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit" title="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttentionControlEdit</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight.replace_cross_attention">
+<span class="sig-name descname"><span class="pre">replace_cross_attention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attn_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">att_replace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionReweight.replace_cross_attention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight.replace_cross_attention" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equalizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_blend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend" title="data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend"><span class="pre">LocalBlend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controller</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit" title="data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit"><span class="pre">AttentionControlEdit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attn_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#AttentionReweight.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.update_alpha_time_word">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">update_alpha_time_word</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_ind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_inds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#update_alpha_time_word"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.update_alpha_time_word" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.get_time_words_attention_alpha">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">get_time_words_attention_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_replace_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_words</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">77</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#get_time_words_attention_alpha"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_time_words_attention_alpha" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.get_word_inds">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">get_word_inds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_place</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#get_word_inds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_word_inds" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.get_replacement_mapper_">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">get_replacement_mapper_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">77</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#get_replacement_mapper_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_replacement_mapper_" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.get_replacement_mapper">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">get_replacement_mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">77</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#get_replacement_mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_replacement_mapper" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.get_equalizer">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">get_equalizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_select</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#get_equalizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_equalizer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">ScoreParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mismatch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#ScoreParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mismatch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#ScoreParams.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams.mis_match_char">
+<span class="sig-name descname"><span class="pre">mis_match_char</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#ScoreParams.mis_match_char"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams.mis_match_char" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.get_matrix">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">get_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#get_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_matrix" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.get_traceback_matrix">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">get_traceback_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#get_traceback_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_traceback_matrix" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.global_align">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">global_align</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#global_align"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.global_align" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.get_aligned_sequences">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">get_aligned_sequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trace_back</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#get_aligned_sequences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_aligned_sequences" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.get_mapper">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">get_mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">77</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#get_mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_mapper" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.prompt2prompt_pipeline.get_refinement_mapper">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.prompt2prompt_pipeline.</span></span><span class="sig-name descname"><span class="pre">get_refinement_mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">77</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/common/prompt2prompt_pipeline.html#get_refinement_mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_refinement_mapper" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">data_juicer.ops.common.prompt2prompt_pipeline module</a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.rescale_noise_cfg"><code class="docutils literal notranslate"><span class="pre">rescale_noise_cfg()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline"><code class="docutils literal notranslate"><span class="pre">Prompt2PromptPipeline</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline.check_inputs"><code class="docutils literal notranslate"><span class="pre">Prompt2PromptPipeline.check_inputs()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline.register_attention_control"><code class="docutils literal notranslate"><span class="pre">Prompt2PromptPipeline.register_attention_control()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.P2PCrossAttnProcessor"><code class="docutils literal notranslate"><span class="pre">P2PCrossAttnProcessor</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.P2PCrossAttnProcessor.__init__"><code class="docutils literal notranslate"><span class="pre">P2PCrossAttnProcessor.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl"><code class="docutils literal notranslate"><span class="pre">AttentionControl</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.step_callback"><code class="docutils literal notranslate"><span class="pre">AttentionControl.step_callback()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.between_steps"><code class="docutils literal notranslate"><span class="pre">AttentionControl.between_steps()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.num_uncond_att_layers"><code class="docutils literal notranslate"><span class="pre">AttentionControl.num_uncond_att_layers</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.forward"><code class="docutils literal notranslate"><span class="pre">AttentionControl.forward()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.reset"><code class="docutils literal notranslate"><span class="pre">AttentionControl.reset()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.__init__"><code class="docutils literal notranslate"><span class="pre">AttentionControl.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.create_controller"><code class="docutils literal notranslate"><span class="pre">create_controller()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.EmptyControl"><code class="docutils literal notranslate"><span class="pre">EmptyControl</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.EmptyControl.forward"><code class="docutils literal notranslate"><span class="pre">EmptyControl.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore"><code class="docutils literal notranslate"><span class="pre">AttentionStore</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.get_empty_store"><code class="docutils literal notranslate"><span class="pre">AttentionStore.get_empty_store()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.forward"><code class="docutils literal notranslate"><span class="pre">AttentionStore.forward()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.between_steps"><code class="docutils literal notranslate"><span class="pre">AttentionStore.between_steps()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.get_average_attention"><code class="docutils literal notranslate"><span class="pre">AttentionStore.get_average_attention()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.reset"><code class="docutils literal notranslate"><span class="pre">AttentionStore.reset()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.__init__"><code class="docutils literal notranslate"><span class="pre">AttentionStore.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend"><code class="docutils literal notranslate"><span class="pre">LocalBlend</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend.__init__"><code class="docutils literal notranslate"><span class="pre">LocalBlend.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit"><code class="docutils literal notranslate"><span class="pre">AttentionControlEdit</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.step_callback"><code class="docutils literal notranslate"><span class="pre">AttentionControlEdit.step_callback()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.replace_self_attention"><code class="docutils literal notranslate"><span class="pre">AttentionControlEdit.replace_self_attention()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.replace_cross_attention"><code class="docutils literal notranslate"><span class="pre">AttentionControlEdit.replace_cross_attention()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.forward"><code class="docutils literal notranslate"><span class="pre">AttentionControlEdit.forward()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.__init__"><code class="docutils literal notranslate"><span class="pre">AttentionControlEdit.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace"><code class="docutils literal notranslate"><span class="pre">AttentionReplace</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace.replace_cross_attention"><code class="docutils literal notranslate"><span class="pre">AttentionReplace.replace_cross_attention()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace.__init__"><code class="docutils literal notranslate"><span class="pre">AttentionReplace.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine"><code class="docutils literal notranslate"><span class="pre">AttentionRefine</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine.replace_cross_attention"><code class="docutils literal notranslate"><span class="pre">AttentionRefine.replace_cross_attention()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine.__init__"><code class="docutils literal notranslate"><span class="pre">AttentionRefine.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight"><code class="docutils literal notranslate"><span class="pre">AttentionReweight</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight.replace_cross_attention"><code class="docutils literal notranslate"><span class="pre">AttentionReweight.replace_cross_attention()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight.__init__"><code class="docutils literal notranslate"><span class="pre">AttentionReweight.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.update_alpha_time_word"><code class="docutils literal notranslate"><span class="pre">update_alpha_time_word()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_time_words_attention_alpha"><code class="docutils literal notranslate"><span class="pre">get_time_words_attention_alpha()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_word_inds"><code class="docutils literal notranslate"><span class="pre">get_word_inds()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_replacement_mapper_"><code class="docutils literal notranslate"><span class="pre">get_replacement_mapper_()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_replacement_mapper"><code class="docutils literal notranslate"><span class="pre">get_replacement_mapper()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_equalizer"><code class="docutils literal notranslate"><span class="pre">get_equalizer()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams"><code class="docutils literal notranslate"><span class="pre">ScoreParams</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams.__init__"><code class="docutils literal notranslate"><span class="pre">ScoreParams.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams.mis_match_char"><code class="docutils literal notranslate"><span class="pre">ScoreParams.mis_match_char()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_matrix"><code class="docutils literal notranslate"><span class="pre">get_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_traceback_matrix"><code class="docutils literal notranslate"><span class="pre">get_traceback_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.global_align"><code class="docutils literal notranslate"><span class="pre">global_align()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_aligned_sequences"><code class="docutils literal notranslate"><span class="pre">get_aligned_sequences()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_mapper"><code class="docutils literal notranslate"><span class="pre">get_mapper()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.ops.common.prompt2prompt_pipeline.get_refinement_mapper"><code class="docutils literal notranslate"><span class="pre">get_refinement_mapper()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="../_static/documentation_options.js?v=a68a9277"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

@@ -1,0 +1,528 @@
+<!doctype html>
+<html class="no-js" lang="zh-CN" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="索引" href="../../../genindex.html" /><link rel="search" title="搜索" href="../../../search.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
+        <title>remove_table_text_mapper - Data Juicer</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=25af2a20" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sidebar-menu.css?v=aecff795" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+
+
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index_ZH.html"><div class="brand">Data Juicer</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index_ZH.html">
+  
+  <span class="sidebar-brand-text">Data Juicer</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="搜索" name="q" aria-label="搜索">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">教程</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/DJ-Cookbook_ZH.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/Installation_ZH.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/QuickStart_ZH.html">快速上手</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">帮助文档</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RecipeGallery_ZH.html">数据菜谱Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DatasetCfg_ZH.html">数据集配置指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../BadDataExhibition_ZH.html">“坏”数据展览</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DJ_SORA_ZH.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DJ_agent_ZH.html">DataJuicer-Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DJ_service_ZH.html">DJ_服务化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DeveloperGuide_ZH.html">开发者指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Sandbox_ZH.html">沙盒实验室</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../demos/README_ZH.html">演示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../demos/auto_evaluation_helm/README_ZH.html">自动化评测：HELM 评测及可视化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../demos/role_playing_system_prompt/README_ZH.html">为LLM构造角色扮演的system prompt</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">工具</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/distributed_deduplication/README_ZH.html">分布式模糊去重工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/evaluator/README_ZH.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/evaluator/gpt_eval/README_ZH.html">GPT EVAL：使用 OpenAI API 评测大模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/evaluator/recorder/README_ZH.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/fmt_conversion/README_ZH.html">格式转换工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/fmt_conversion/multimodal/README_ZH.html">多模态工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/fmt_conversion/post_tuning_dialog/README_ZH.html">后微调工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/hpo/README_ZH.html">数据菜谱的自动化超参优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/mm_eval/vbench_metrics/README_ZH.html">VBench metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/postprocess/README_ZH.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/preprocess/README_ZH.html">预处理工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/quality_classifier/README_ZH.html">给数据打分</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">第三方</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../thirdparty/LLM_ecosystems/README_ZH.html">大语言模型生态</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../thirdparty/models/README_ZH.html">第三方模型库</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+</li>
+</ul>
+
+</div></div><div class="sidebar-bottom-menu">
+  <div class="current-info">
+    <span class="current-lang">zh-CN</span>|<span class="current-version">v1.4.3</span>
+  </div>
+  <div class="dropdown-panel">
+    
+    <div class="section">
+      <dt>Language</dt>
+      <dd>
+        
+        <a href="../../../../../en/v1.4.3/docs/operators/mapper/remove_table_text_mapper.html"
+          >
+          English
+        </a>
+        
+        <a href="../../../../../zh_CN/v1.4.3/docs/operators/mapper/remove_table_text_mapper.html"
+          >
+          简体中文
+        </a>
+        
+      </dd>
+    </div>
+    
+
+    
+    <div class="section version">
+      <dt>Version</dt>
+      <dd>
+        
+        <a href="../../../../main/docs/operators/mapper/remove_table_text_mapper.html" >
+          main
+        </a>
+        
+        <a href="../../../../v1.4.3/docs/operators/mapper/remove_table_text_mapper.html" class="active" >
+          v1.4.3
+        </a>
+        
+        <a href="../../../../v1.4.2/docs/operators/mapper/remove_table_text_mapper.html" >
+          v1.4.2
+        </a>
+        
+        <a href="../../../../v1.4.1/docs/operators/mapper/remove_table_text_mapper.html" >
+          v1.4.1
+        </a>
+        
+        <a href="../../../../v1.4.0/docs/operators/mapper/remove_table_text_mapper.html" >
+          v1.4.0
+        </a>
+        
+      </dd>
+    </div>
+    
+  </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../../_sources/docs/operators/mapper/remove_table_text_mapper.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="remove-table-text-mapper">
+<h1>remove_table_text_mapper<a class="headerlink" href="#remove-table-text-mapper" title="Link to this heading">¶</a></h1>
+<p>Mapper to remove table texts from text samples.</p>
+<p>This operator uses regular expressions to identify and remove tables from the text. It targets tables with a specified range of columns, defined by the minimum and maximum number of columns. The operator iterates over each sample, applying the regex pattern to remove tables that match the column criteria. The processed text, with tables removed, is then stored back in the sample. This operation is batched for efficiency.</p>
+<p>用于从文本样本中移除表格文本的映射器。</p>
+<p>该算子使用正则表达式来识别并移除文本中的表格。它针对具有指定列数范围的表格，该范围由最小和最大列数定义。算子遍历每个样本，应用正则表达式模式以移除符合列标准的表格。处理后的文本（已移除表格）将存回样本中。此操作为了效率进行了批处理。</p>
+<p>Type 算子类型: <strong>mapper</strong></p>
+<p>Tags 标签: cpu, text</p>
+<section id="parameter-configuration">
+<h2>🔧 Parameter Configuration 参数配置<a class="headerlink" href="#parameter-configuration" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>name 参数名</p></th>
+<th class="head"><p>type 类型</p></th>
+<th class="head"><p>default 默认值</p></th>
+<th class="head"><p>desc 说明</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">min_col</span></code></p></td>
+<td><p>typing.Annotated[int, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=2), Le(le=20)])]</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2</span></code></p></td>
+<td><p>The min number of columns of table to remove.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">max_col</span></code></p></td>
+<td><p>typing.Annotated[int, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=2), Le(le=20)])]</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">20</span></code></p></td>
+<td><p>The max number of columns of table to remove.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p></td>
+<td><p>extra args</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">kwargs</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p></td>
+<td><p>extra args</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="effect-demonstration">
+<h2>📊 Effect demonstration 效果演示<a class="headerlink" href="#effect-demonstration" title="Link to this heading">¶</a></h2>
+<section id="test-single-table-case">
+<h3>test_single_table_case<a class="headerlink" href="#test-single-table-case" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RemoveTableTextMapper</span><span class="p">()</span>
+</pre></div>
+</div>
+<section id="input-data">
+<h4>📥 input data 输入数据<a class="headerlink" href="#input-data" title="Link to this heading">¶</a></h4>
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> list</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[&#x27;This is a table:\n编号 分行 营运资金1 营运资金2 营运资金3 营运资金4 营运资金5\n① 北京分行 495,000,000.00 200,000,000.00 295,000,000.00 - 495,000,000.00\n② 大连分行 440,000,000.00 100,000,000.00 340,000,000.00 - 440,000,000.00\n③ 重庆分行 500,000,000.00 100,000,000.00 400,000,000.00 - 500,000,000.00\n④ 南京分行 430,000,000.00 100,000,000.00 330,000,000.00 - 430,000,000.00\n⑤ 青岛分行 500,000,000.00 - 100,159,277.60 399,840,722.40 500,000,000.00\nThe end of the table.&#x27;]</pre></div>
+</section>
+<section id="output-data">
+<h4>📤 output data 输出数据<a class="headerlink" href="#output-data" title="Link to this heading">¶</a></h4>
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> list</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[&#x27;This is a table:\nThe end of the table.&#x27;]</pre></div>
+</section>
+<section id="explanation">
+<h4>✨ explanation 解释<a class="headerlink" href="#explanation" title="Link to this heading">¶</a></h4>
+<p>This example demonstrates the operator's ability to remove a typical table from the text. The input text contains a table with multiple rows and columns, which is completely removed by the operator, leaving only the introductory and concluding sentences. This showcases the operator's effectiveness in identifying and removing structured data (tables) from unstructured text.
+这个例子展示了算子从文本中移除典型表格的能力。输入文本包含一个有多行多列的表格，算子完全移除了这个表格，只留下了引言和结尾句。这展示了算子在识别并移除结构化数据（表格）方面是有效的。</p>
+</section>
+</section>
+<section id="test-false-positive-case">
+<h3>test_false_positive_case<a class="headerlink" href="#test-false-positive-case" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RemoveTableTextMapper</span><span class="p">()</span>
+</pre></div>
+</div>
+<section id="id1">
+<h4>📥 input data 输入数据<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h4>
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> list</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[&#x27;平安银行股份有限公司\n非公开发行普通股认购资金到位情况的验资报告非公开发行普通股认购资金到位情况的验资报告\n普华永道中天验字(2015)第446号\n(第一页，共二页)\n平安银行股份有限公司：\n平安银行股份有限公司(以下简称“贵公司”)委托中信证券股份有限公司作为主\n承销商非公开发行普通股 598,802,395 股。我们接受委托，审验了贵公司截至\n2015年 5月 5日止由中信证券股份有限公司代收取的向境内合格投资者非公开发行\n普通股认购资金的到位情况。按照国家相关法律、法规的规定以及认购协议、合同\n的要求出资认购，提供真实、合法、完整的验资资料，保护资产的安全、完整是贵\n公司管理层及中信证券股份有限公司的责任。我们的责任是对贵公司由中信证券股\n份有限公司代收取的境内合格投资者本次非公开发行普通股认购资金的到位情况发\n表审验意见。我们的审验是依据《中国注册会计师审计准则第 1602号——验资》进\n行的。在审验过程中，我们结合贵公司的实际情况，实施了检查等必要的审验程\n序。\n经贵公司 2014 年 7 月 15 日第九届董事会第五次会议提议，2014 年 8 月 4 日\n2014 年第二次临时股东大会审议通过《平安银行股份有限公司关于非公开发行普\n通股方案的议案》，贵公司拟向境内合格投资者非公开发行不超过 1,070,663,811\n股普通股。...</pre><details style='margin:6px 0;'><summary style='cursor:pointer; color:#0366d6;'>Show more 展开更多 (1776 more chars)</summary><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[&#x27;平安银行股份有限公司\n非公开发行普通股认购资金到位情况的验资报告非公开发行普通股认购资金到位情况的验资报告\n普华永道中天验字(2015)第446号\n(第一页，共二页)\n平安银行股份有限公司：\n平安银行股份有限公司(以下简称“贵公司”)委托中信证券股份有限公司作为主\n承销商非公开发行普通股 598,802,395 股。我们接受委托，审验了贵公司截至\n2015年 5月 5日止由中信证券股份有限公司代收取的向境内合格投资者非公开发行\n普通股认购资金的到位情况。按照国家相关法律、法规的规定以及认购协议、合同\n的要求出资认购，提供真实、合法、完整的验资资料，保护资产的安全、完整是贵\n公司管理层及中信证券股份有限公司的责任。我们的责任是对贵公司由中信证券股\n份有限公司代收取的境内合格投资者本次非公开发行普通股认购资金的到位情况发\n表审验意见。我们的审验是依据《中国注册会计师审计准则第 1602号——验资》进\n行的。在审验过程中，我们结合贵公司的实际情况，实施了检查等必要的审验程\n序。\n经贵公司 2014 年 7 月 15 日第九届董事会第五次会议提议，2014 年 8 月 4 日\n2014 年第二次临时股东大会审议通过《平安银行股份有限公司关于非公开发行普\n通股方案的议案》，贵公司拟向境内合格投资者非公开发行不超过 1,070,663,811\n股普通股。根据中国证券监督管理委员会证监许可[2015]697 号文《关于核准平安\n银行股份有限公司非公开发行股票的批复》，贵公司获准向境内合格投资者非公开\n发行不超过1,070,663,811股普通股。普华永道中天验字(2015)第446号\n(第二页，共二页)\n经我们审验，截至 2015 年 5 月 5 日止，贵公司以每股人民币 16.70 元合计向\n境内合格投资者非公开发行普通股 598,802,395 股，由发行主承销商中信证券股份\n有限公司代贵公司实际收到人民币 9,999,999,996.50元。所有认购资金均以人民币\n现金形式汇入。\n本验资报告仅供贵公司向中国证券监督管理委员会、深圳证券交易所报送资料\n及向中国证券登记结算有限责任公司深圳分公司申请非公开发行普通股登记时使\n用，不应将其视为是对贵公司验资报告日后资本保全、偿债能力和持续经营能力等\n的保证。因使用本验资报告不当造成的后果，与执行本验资业务的注册会计师及会\n计师事务所无关。\n附件一 非公开发行普通股认购资金到位情况明细表\n附件二 验资事项说明\n附件三 普华永道中天会计师事务所(特殊普通合伙)营业执照\n附件四 普华永道中天会计师事务所(特殊普通合伙)执业证书\n附件五 普华永道中天会计师事务所(特殊普通合伙)证券相关业务许可证\n普华永道中天会计师事务所 注册会计师\n(特殊普通合伙) 姚文平\n中国•上海市 注册会计师\n2015年 5月7日 朱丽平\n2附件一\n非公开发行普通股认购资金到位情况明细表\n截至2015年5月 5日止\n被审验单位名称：平安银行股份有限公司\n货币单位：人民币元\n金额\n到位认购资金 9,999,999,996.50\n3附件二\n验资事项说明\n一、 基本情况\n平安银行股份有限公司(以下简称“贵公司”)是中国平安保险(集团)股份有限公司控股的\n一家跨区域经营的股份制商业银行，是原深圳发展银行股份有限公司以吸收合并原平\n安银行股份有限公司的方式完成两行整合并更名的银行，总部位于深圳。原深圳发展\n银行成立于 1987年 12月 22日，并于 1991年 4月 3日在深圳证券交易所上市(股票代\n码：000001)。\n贵公司经中国银行业监督管理委员会批准领有 00386413 号金融许可证，机构编码为\nB0014H144030001，深圳市工商行政管理局批准核发的 440301103098545 号《中华\n人民共和国企业法人执照》。贵公司注册资本为人民币 13,709,873,744 元，实收资本\n(股本)为人民币 13,709,873,744元，其中包括有限售条件股份 1,905,819,165 股，无限\n售条件股份 11,804,054,579 股。贵公司的上述实收资本(股本)已经普华永道中天会计\n师事务所(特殊普通合伙)审验，并已于 2015 年 4 月 13 日出具普华永道中天验字(2015)\n第321号验资报告。\n二、本次非公开发行普通股审批及情况说明\n于 2014 年 7 月 15 日第九届董事会第五次会议《平安银行股份有限公司关于非公开发\n行普通股方案的议案》，同意提议股东大会批准贵公司向境内合格投资者非公开发行\n不超过 1,070,663,811 股普通股。于 2014 年 8 月 4 日 2014 年第二次临时股东大会审\n议通过，批准了董事会的上述提议。中国证券监督管理委员会于 2015 年 4 月 22 日出\n具证监许可[2015]697 号文《关于核准平安银行股份有限公司非公开发行股票的批\n复》核准了贵公司向境内合格投资者非公开发行不超过1,070,663,811股普通股。\n三、 审验结果\n经我们审验，截至 2015 年 5 月 5 日止，贵公司已完成普通股 598,802,395 股的发\n行，每股发行价格为人民币 16.70 元，认购资金合计人民币 9,999,999,996.50 元，全\n部以人民币现金形式汇入，由发行主承销商中信证券股份有限公司代贵公司收缴，已\n全部存入主承销商中信证券股份有限公司于平安银行股份有限公司北京分行营业部开\n立的19014508950004银行账号内。\n4&#x27;]</pre></details></div>
+</section>
+<section id="id2">
+<h4>📤 output data 输出数据<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h4>
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> list</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[&#x27;平安银行股份有限公司\n非公开发行普通股认购资金到位情况的验资报告非公开发行普通股认购资金到位情况的验资报告\n普华永道中天验字(2015)第446号\n(第一页，共二页)\n平安银行股份有限公司：\n平安银行股份有限公司(以下简称“贵公司”)委托中信证券股份有限公司作为主\n普通股认购资金的到位情况。按照国家相关法律、法规的规定以及认购协议、合同\n的要求出资认购，提供真实、合法、完整的验资资料，保护资产的安全、完整是贵\n公司管理层及中信证券股份有限公司的责任。我们的责任是对贵公司由中信证券股\n份有限公司代收取的境内合格投资者本次非公开发行普通股认购资金的到位情况发\n表审验意见。我们的审验是依据《中国注册会计师审计准则第 1602号——验资》进\n行的。在审验过程中，我们结合贵公司的实际情况，实施了检查等必要的审验程\n序。\n经贵公司 2014 年 7 月 15 日第九届董事会第五次会议提议，2014 年 8 月 4 日\n银行股份有限公司非公开发行股票的批复》，贵公司获准向境内合格投资者非公开\n发行不超过1,070,663,811股普通股。普华永道中天验字(2015)第446号\n(第二页，共二页)\n经我们审验，截至 2015 年 5 月 5 日止，贵公司以每股人民币 16.70 元合计向\n境内合格投资者非公开发行普通股 598,802,395 股，由发行主承...</pre><details style='margin:6px 0;'><summary style='cursor:pointer; color:#0366d6;'>Show more 展开更多 (1237 more chars)</summary><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">[&#x27;平安银行股份有限公司\n非公开发行普通股认购资金到位情况的验资报告非公开发行普通股认购资金到位情况的验资报告\n普华永道中天验字(2015)第446号\n(第一页，共二页)\n平安银行股份有限公司：\n平安银行股份有限公司(以下简称“贵公司”)委托中信证券股份有限公司作为主\n普通股认购资金的到位情况。按照国家相关法律、法规的规定以及认购协议、合同\n的要求出资认购，提供真实、合法、完整的验资资料，保护资产的安全、完整是贵\n公司管理层及中信证券股份有限公司的责任。我们的责任是对贵公司由中信证券股\n份有限公司代收取的境内合格投资者本次非公开发行普通股认购资金的到位情况发\n表审验意见。我们的审验是依据《中国注册会计师审计准则第 1602号——验资》进\n行的。在审验过程中，我们结合贵公司的实际情况，实施了检查等必要的审验程\n序。\n经贵公司 2014 年 7 月 15 日第九届董事会第五次会议提议，2014 年 8 月 4 日\n银行股份有限公司非公开发行股票的批复》，贵公司获准向境内合格投资者非公开\n发行不超过1,070,663,811股普通股。普华永道中天验字(2015)第446号\n(第二页，共二页)\n经我们审验，截至 2015 年 5 月 5 日止，贵公司以每股人民币 16.70 元合计向\n境内合格投资者非公开发行普通股 598,802,395 股，由发行主承销商中信证券股份\n有限公司代贵公司实际收到人民币 9,999,999,996.50元。所有认购资金均以人民币\n现金形式汇入。\n本验资报告仅供贵公司向中国证券监督管理委员会、深圳证券交易所报送资料\n及向中国证券登记结算有限责任公司深圳分公司申请非公开发行普通股登记时使\n用，不应将其视为是对贵公司验资报告日后资本保全、偿债能力和持续经营能力等\n的保证。因使用本验资报告不当造成的后果，与执行本验资业务的注册会计师及会\n计师事务所无关。\n2015年 5月7日 朱丽平\n2附件一\n非公开发行普通股认购资金到位情况明细表\n截至2015年5月 5日止\n被审验单位名称：平安银行股份有限公司\n货币单位：人民币元\n金额\n到位认购资金 9,999,999,996.50\n3附件二\n验资事项说明\n一、 基本情况\n平安银行股份有限公司(以下简称“贵公司”)是中国平安保险(集团)股份有限公司控股的\n一家跨区域经营的股份制商业银行，是原深圳发展银行股份有限公司以吸收合并原平\n安银行股份有限公司的方式完成两行整合并更名的银行，总部位于深圳。原深圳发展\n银行成立于 1987年 12月 22日，并于 1991年 4月 3日在深圳证券交易所上市(股票代\n码：000001)。\n(股本)为人民币 13,709,873,744元，其中包括有限售条件股份 1,905,819,165 股，无限\n售条件股份 11,804,054,579 股。贵公司的上述实收资本(股本)已经普华永道中天会计\n师事务所(特殊普通合伙)审验，并已于 2015 年 4 月 13 日出具普华永道中天验字(2015)\n第321号验资报告。\n二、本次非公开发行普通股审批及情况说明\n于 2014 年 7 月 15 日第九届董事会第五次会议《平安银行股份有限公司关于非公开发\n行普通股方案的议案》，同意提议股东大会批准贵公司向境内合格投资者非公开发行\n不超过 1,070,663,811 股普通股。于 2014 年 8 月 4 日 2014 年第二次临时股东大会审\n议通过，批准了董事会的上述提议。中国证券监督管理委员会于 2015 年 4 月 22 日出\n具证监许可[2015]697 号文《关于核准平安银行股份有限公司非公开发行股票的批\n复》核准了贵公司向境内合格投资者非公开发行不超过1,070,663,811股普通股。\n三、 审验结果\n经我们审验，截至 2015 年 5 月 5 日止，贵公司已完成普通股 598,802,395 股的发\n行，每股发行价格为人民币 16.70 元，认购资金合计人民币 9,999,999,996.50 元，全\n部以人民币现金形式汇入，由发行主承销商中信证券股份有限公司代贵公司收缴，已\n全部存入主承销商中信证券股份有限公司于平安银行股份有限公司北京分行营业部开\n立的19014508950004银行账号内。\n4&#x27;]</pre></details></div>
+</section>
+<section id="id3">
+<h4>✨ explanation 解释<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h4>
+<p>This example illustrates an important edge case where the input text does not contain a table but has a format that could be mistaken for one. The operator correctly identifies that there is no table present and leaves the text unchanged. This shows the operator's capability to distinguish between actual tables and text that may resemble a table, preventing false positives.
+这个例子展示了一个重要的边界情况，其中输入文本不包含表格，但格式可能被误认为是表格。算子正确地识别出没有表格存在，并且保持文本不变。这展示了算子能够区分实际的表格和看起来像表格的文本，防止了误报。</p>
+</section>
+</section>
+</section>
+<section id="related-links">
+<h2>🔗 related links 相关链接<a class="headerlink" href="#related-links" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/v1.4.3/data_juicer/ops/mapper/remove_table_text_mapper.py">source code 源代码</a></p></li>
+<li><p><a class="reference external" href="https://github.com/modelscope/data-juicer/blob/v1.4.3/tests/ops/mapper/test_remove_table_text_mapper.py">unit test 单元测试</a></p></li>
+<li><p><a class="reference internal" href="../../Operators.html"><span class="std std-doc">Return operator list 返回算子列表</span></a></p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Data-Juicer Team
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">remove_table_text_mapper</a><ul>
+<li><a class="reference internal" href="#parameter-configuration">🔧 Parameter Configuration 参数配置</a></li>
+<li><a class="reference internal" href="#effect-demonstration">📊 Effect demonstration 效果演示</a><ul>
+<li><a class="reference internal" href="#test-single-table-case">test_single_table_case</a><ul>
+<li><a class="reference internal" href="#input-data">📥 input data 输入数据</a></li>
+<li><a class="reference internal" href="#output-data">📤 output data 输出数据</a></li>
+<li><a class="reference internal" href="#explanation">✨ explanation 解释</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#test-false-positive-case">test_false_positive_case</a><ul>
+<li><a class="reference internal" href="#id1">📥 input data 输入数据</a></li>
+<li><a class="reference internal" href="#id2">📤 output data 输出数据</a></li>
+<li><a class="reference internal" href="#id3">✨ explanation 解释</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#related-links">🔗 related links 相关链接</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div>
+<script src="../../../_static/documentation_options.js?v=13db99cc"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/translations.js?v=beaddf03"></script>
+    </body>
+</html>
