@@ -15,12 +15,12 @@ Tags 标签: cpu, video
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `tags` | typing.List[str] | `['people']` | a tag list to shift the videos, total tags can be found |
-| `contain` | <class 'str'> | `'any'` | require the videos containing 'any' or 'all' tags. |
-| `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame |
-| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from |
-| `tag_field_name` | <class 'str'> | `'video_frame_tags'` | the key name to store the tags in the meta |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
+| `tags` | typing.List[str] | `['people']` | a tag list to shift the videos, total tags can be found in https://github.com/xinyu1205/recognize-anything/blob/main/ram/data/ram_tag_list.txt # noqa: E501 |
+| `contain` | <class 'str'> | `'any'` | require the videos containing 'any' or 'all' tags. When tags equal to [], 'all' keeps all samples, 'any' keeps no sample. |
+| `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames (the number of which depends on the duration of the video) and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes". |
+| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration. |
+| `tag_field_name` | <class 'str'> | `'video_frame_tags'` | the key name to store the tags in the meta field. It's "video_frame_tags" in default. |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all videos. 'any': keep this sample if any videos meet the condition. 'all': keep this sample only if all videos meet the condition. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

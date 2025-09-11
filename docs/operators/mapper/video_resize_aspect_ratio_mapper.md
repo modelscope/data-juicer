@@ -11,10 +11,10 @@ Tags 标签: cpu, video
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `min_ratio` | <class 'str'> | `'9/21'` | The minimum aspect ratio to enforce videos with |
-| `max_ratio` | <class 'str'> | `'21/9'` | The maximum aspect ratio to enforce videos with |
-| `strategy` | <class 'str'> | `'increase'` | The resizing strategy to apply when adjusting the |
-| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. |
+| `min_ratio` | <class 'str'> | `'9/21'` | The minimum aspect ratio to enforce videos with an aspect ratio below `min_ratio` will be resized to match this minimum ratio. The ratio should be provided as a string in the format "9:21" or "9/21". |
+| `max_ratio` | <class 'str'> | `'21/9'` | The maximum aspect ratio to enforce videos with an aspect ratio above `max_ratio` will be resized to match this maximum ratio. The ratio should be provided as a string in the format "21:9" or "21/9". |
+| `strategy` | <class 'str'> | `'increase'` | The resizing strategy to apply when adjusting the video dimensions. It can be either 'decrease' to reduce the dimension or 'increase' to enlarge it. Accepted values are ['decrease', 'increase']. |
+| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

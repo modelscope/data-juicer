@@ -21,9 +21,9 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `file_path` | <class 'str'> | `''` | The path to the Python file containing the function |
-| `function_name` | <class 'str'> | `'process_single'` | The name of the function defined in the file |
-| `batched` | <class 'bool'> | `False` | A boolean indicating whether to process input data in |
+| `file_path` | <class 'str'> | `''` | The path to the Python file containing the function to be executed. |
+| `function_name` | <class 'str'> | `'process_single'` | The name of the function defined in the file to be executed. |
+| `batched` | <class 'bool'> | `False` | A boolean indicating whether to process input data in batches. |
 | `kwargs` |  | `''` | Additional keyword arguments passed to the parent class. |
 
 ## 📊 Effect demonstration 效果演示

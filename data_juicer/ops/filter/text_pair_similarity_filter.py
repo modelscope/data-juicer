@@ -46,18 +46,19 @@ class TextPairSimilarityFilter(Filter):
         """
         Initialization method.
 
-            :param hf_clip: clip model name on huggingface to compute
-                the similarity between image and text.
-            :param min_score: The min similarity to keep samples.
-            :param max_score: The max similarity to keep samples.
-            :param text_key_second: used to store the other sentence
-                in the text pair.
-            :param any_or_all: keep this sample with 'any' or 'all' strategy of
-                all images. 'any': keep this sample if any images meet the
-                condition. 'all': keep this sample only if all images meet the
-                condition.
-            :param args: extra args
-            :param kwargs: extra args
+        :param hf_clip: clip model name on huggingface to compute
+            the similarity between image and text.
+        :param trust_remote_code: whether to trust the remote code of HF models.
+        :param min_score: The min similarity to keep samples.
+        :param max_score: The max similarity to keep samples.
+        :param text_key_second: used to store the other sentence
+            in the text pair.
+        :param any_or_all: keep this sample with 'any' or 'all' strategy of
+            all images. 'any': keep this sample if any images meet the
+            condition. 'all': keep this sample only if all images meet the
+            condition.
+        :param args: extra args
+        :param kwargs: extra args
         """
         torch.set_num_threads(1)
 

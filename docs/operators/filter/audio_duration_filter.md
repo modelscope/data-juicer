@@ -15,9 +15,9 @@ Tags 标签: cpu, audio
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `min_duration` | <class 'int'> | `0` | The min audio duration to keep samples in seconds. |
-| `max_duration` | <class 'int'> | `9223372036854775807` | The max audio duration to keep samples in seconds. |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
+| `min_duration` | <class 'int'> | `0` | The min audio duration to keep samples in seconds. It's 0 by default. |
+| `max_duration` | <class 'int'> | `9223372036854775807` | The max audio duration to keep samples in seconds. It's sys.maxsize by default. |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all audios. 'any': keep this sample if any audios meet the condition. 'all': keep this sample only if all audios meet the condition. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

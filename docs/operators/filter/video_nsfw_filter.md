@@ -18,11 +18,11 @@ Tags 标签: cpu, hf, video
 | `hf_nsfw_model` | <class 'str'> | `'Falconsai/nsfw_image_detection'` | nsfw detection model name on huggingface. |
 | `trust_remote_code` | <class 'bool'> | `False` |  |
 | `min_score` | <class 'float'> | `0.0` |  |
-| `max_score` | <class 'float'> | `0.5` | the nsfw score threshold for samples. |
-| `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame |
-| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from |
-| `reduce_mode` | <class 'str'> | `'avg'` | reduce mode for multiple sampled video frames. |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
+| `max_score` | <class 'float'> | `0.5` | the nsfw score threshold for samples. range from 0 to 1. Samples with nsfw score less than this threshold will be kept. |
+| `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames (the number of which depends on the duration of the video) and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes". |
+| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration. |
+| `reduce_mode` | <class 'str'> | `'avg'` | reduce mode for multiple sampled video frames. 'avg': Take the average of multiple values 'max': Take the max of multiple values 'min': Take the min of multiple values |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all videos. 'any': keep this sample if any videos meet the condition. 'all': keep this sample only if all videos meet the condition. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

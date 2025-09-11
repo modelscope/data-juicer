@@ -61,6 +61,7 @@ class ImageDiffusionMapper(Mapper):
 
         :param hf_diffusion: diffusion model name on huggingface to generate
             the image.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param torch_dtype: the floating point type used to load the diffusion
             model. Can be one of ['fp32', 'fp16', 'bf16']
         :param revision: The specific model version to use. It can be a

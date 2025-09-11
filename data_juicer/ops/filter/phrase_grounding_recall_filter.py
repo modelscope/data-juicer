@@ -130,6 +130,7 @@ class PhraseGroundingRecallFilter(Filter):
 
         :param hf_owlvit: Owl-ViT model name on huggingface to locate the
             phrases extracted from the text.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param min_recall: The min phrase grounding recall to keep samples.
         :param max_recall: The max phrase grounding recall to keep samples.
         :param horizontal_flip: Flip image horizontally (left to right).

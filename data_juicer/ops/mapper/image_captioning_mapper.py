@@ -59,6 +59,7 @@ class ImageCaptioningMapper(Mapper):
         Initialization method.
 
         :param hf_img2seq: model name on huggingface to generate caption
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param caption_num: how many candidate captions to generate
             for each image
         :param keep_candidate_mode: retain strategy for the generated

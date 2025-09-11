@@ -15,8 +15,8 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `min_len` | <class 'int'> | `10` | The min filter length in this op, samples will |
-| `max_len` | <class 'int'> | `9223372036854775807` | The max filter length in this op, samples will |
+| `min_len` | <class 'int'> | `10` | The min filter length in this op, samples will be filtered if their average line length is below this parameter. |
+| `max_len` | <class 'int'> | `9223372036854775807` | The max filter length in this op, samples will be filtered if their average line length exceeds this parameter. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

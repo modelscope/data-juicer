@@ -16,7 +16,7 @@ Tags 标签: cpu, text
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `lang` | typing.Union[str, typing.List[str]] | `''` | Samples in which languages to keep. |
-| `min_score` | <class 'float'> | `0.8` | The min language identification confidence |
+| `min_score` | <class 'float'> | `0.8` | The min language identification confidence scores of samples to keep. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

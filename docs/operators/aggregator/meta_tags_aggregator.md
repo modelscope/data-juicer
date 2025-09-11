@@ -27,15 +27,15 @@ Tags 标签: cpu, api
 | `meta_tag_key` | <class 'str'> | `'dialog_sentiment_labels'` | The key of the meta tag to be mapped. |
 | `target_tags` | typing.Optional[typing.List[str]] | `None` | The tags that is supposed to be mapped to. |
 | `api_endpoint` | typing.Optional[str] | `None` | URL endpoint for the API. |
-| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. |
+| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. Defaults to 'choices.0.message.content'. |
 | `system_prompt` | typing.Optional[str] | `None` | The system prompt. |
 | `input_template` | typing.Optional[str] | `None` | The input template. |
 | `target_tag_template` | typing.Optional[str] | `None` | The tap template for target tags. |
-| `tag_template` | typing.Optional[str] | `None` | The tap template for each tag and its |
+| `tag_template` | typing.Optional[str] | `None` | The tap template for each tag and its frequency. |
 | `output_pattern` | typing.Optional[str] | `None` | The output pattern. |
-| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retry attempts when there is an API |
+| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retry attempts when there is an API call error or output parsing error. |
 | `model_params` | typing.Dict | `{}` | Parameters for initializing the API model. |
-| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. |
+| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95} |
 | `kwargs` |  | `''` | Extra keyword arguments. |
 
 ## 📊 Effect demonstration 效果演示

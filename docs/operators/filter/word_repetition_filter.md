@@ -18,8 +18,8 @@ Tags 标签: cpu, text
 | `lang` | <class 'str'> | `'en'` | sample in which language. |
 | `tokenization` | <class 'bool'> | `False` | whether to use model to tokenize documents |
 | `rep_len` | typing.Annotated[int, Gt(gt=0)] | `10` | Repetition length for word-level n-gram. |
-| `min_ratio` | <class 'float'> | `0.0` | The min filter ratio in this op, samples will |
-| `max_ratio` | <class 'float'> | `0.5` | The max filter ratio in this op, samples will |
+| `min_ratio` | <class 'float'> | `0.0` | The min filter ratio in this op, samples will be filtered if their word-level n-gram repetition ratio is below this parameter. |
+| `max_ratio` | <class 'float'> | `0.5` | The max filter ratio in this op, samples will be filtered if their word-level n-gram repetition ratio exceeds this parameter. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

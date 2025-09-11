@@ -15,8 +15,8 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `lambda_str` | <class 'str'> | `''` | A string representation of the lambda function to be |
-| `batched` | <class 'bool'> | `False` | A boolean indicating whether to process input data in |
+| `lambda_str` | <class 'str'> | `''` | A string representation of the lambda function to be executed on data samples. If empty, the identity function is used. |
+| `batched` | <class 'bool'> | `False` | A boolean indicating whether to process input data in batches. |
 | `kwargs` |  | `''` | Additional keyword arguments passed to the parent class. |
 
 ## 📊 Effect demonstration 效果演示
