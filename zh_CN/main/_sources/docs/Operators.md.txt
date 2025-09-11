@@ -7,31 +7,22 @@ sources and file formats, and allow for flexible extension to custom datasets.
 
 算子 (Operator) 是协助数据修改、清理、过滤、去重等基本流程的集合。我们支持广泛的数据来源和文件格式，并支持对自定义数据集的灵活扩展。
 
-This page offers a basic description of the operators (OPs) in Data-Juicer. 
-Users can consult the 
-[API documentation](https://modelscope.github.io/data-juicer/en/main/api.html) 
-for the operator API reference. To learn more about each operator, click its
-adjacent 'info' link to access the operator's details page, which includes its
-detailed parameters, effect demonstrations, and links to relevant unit tests 
-and source code. 
+This page offers a basic description of the operators (OPs) in Data-Juicer.
+Users can refer to the
+[API documentation](https://modelscope.github.io/data-juicer/) for the specific
+parameters of each operator. Users can refer to and run the unit tests
+(`tests/ops/...`) for [examples of operator-wise usage](../tests/ops) as well
+as the effects of each operator when applied to built-in test data samples.
+Besides, you can try to use agent to automatically route suitable OPs and
+call them. E.g., refer to
+[Agentic Filters of DJ](../demos/api_service/react_data_filter_process.ipynb),
+ [Agentic Mappers of DJ](../demos/api_service/react_data_mapper_process.ipynb)
 
-Additionally, the 'Reference' column in the table is intended to cite research,
-libraries, or resource links that the operator's design or implementation is
-based on. We welcome contributions of known or relevant reference sources to
-enrich this section.
-
-Users can also refer to and run the unit tests (`tests/ops/...`) for
-[examples of operator-wise usage](../tests/ops) as well as the effects of each
-operator when applied to built-in test data samples. Besides, you can try to
-use agent to automatically route suitable OPs and call them. E.g., refer to
-[Agentic Filters of DJ](../demos/api_service/react_data_filter_process.ipynb), [Agentic Mappers of DJ](../demos/api_service/react_data_mapper_process.ipynb)
-
-这个页面提供了Data-Juicer中算子的基本描述。算子的API参考，用户可以直接查阅[API文档](https://modelscope.github.io/data-juicer/en/main/api.html)。
-要详细了解每个算子，请点击其旁的info链接进入算子详情页，其中包含了算子参数、效果演示，以及相关单元测试和源码的链接。
-
-此外，表格中的『参考』（Reference）列则用于注明算子设计或实现所依据的研究、库或资料链接，欢迎您提供已知或相关的参考来源，共同完善此部分内容。
-
-用户还可以查看、运行单元测试 (`tests/ops/...`)，来体验[各OP的用法示例](../tests/ops)以及每个OP作用于内置测试数据样本时的效果。例如，参考[Agentic Filters of DJ](../demos/api_service/react_data_filter_process.ipynb), [Agentic Mappers of DJ](../demos/api_service/react_data_mapper_process.ipynb)
+这个页面提供了OP的基本描述，用户可以参考[API文档](https://modelscope.github.io/data-juicer/)更细致了解每个
+OP的具体参数，并且可以查看、运行单元测试 (`tests/ops/...`)，来体验
+[各OP的用法示例](../tests/ops)以及每个OP作用于内置测试数据样本时的效果。例如，参考
+[Agentic Filters of DJ](../demos/api_service/react_data_filter_process.ipynb),
+ [Agentic Mappers of DJ](../demos/api_service/react_data_mapper_process.ipynb)
 
 
 ## Overview  概览
@@ -205,7 +196,7 @@ All the specific operators are listed below, each featured with several capabili
 | generate_qa_from_examples_mapper | 🚀GPU 🌊vLLM 🧩HF 🟢Stable | Generates question and answer pairs from examples using a Hugging Face model. 使用拥抱面部模型从示例生成问题和答案对。 | [info](operators/mapper/generate_qa_from_examples_mapper.md) | - |
 | generate_qa_from_text_mapper | 🔤Text 🚀GPU 🌊vLLM 🧩HF 🟢Stable | Generates question and answer pairs from text using a specified model. 使用指定的模型从文本生成问题和答案对。 | [info](operators/mapper/generate_qa_from_text_mapper.md) | - |
 | image_blur_mapper | 🏞Image 💻CPU 🟢Stable | Blurs images in the dataset with a specified probability and blur type. 使用指定的概率和模糊类型对数据集中的图像进行模糊处理。 | [info](operators/mapper/image_blur_mapper.md) | - |
-| image_captioning_from_gpt4v_mapper | 🔮Multimodal 💻CPU 🟡Beta | Generates text captions for images using the GPT-4 Vision model. 使用GPT-4视觉模型为图像生成文本标题。 | [info](operators/mapper/image_captioning_from_gpt4v_mapper.md) | - |
+| image_captioning_from_gpt4v_mapper | 🔮Multimodal 💻CPU 🟡Beta | Generates text captions for images using the GPT-4 Vision model. 使用GPT-4视觉模型生成图像的文本标题。 | [info](operators/mapper/image_captioning_from_gpt4v_mapper.md) | - |
 | image_captioning_mapper | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Generates image captions using a Hugging Face model and appends them to samples. 使用拥抱面部模型生成图像标题，并将其附加到样本中。 | [info](operators/mapper/image_captioning_mapper.md) | - |
 | image_detection_yolo_mapper | 🏞Image 🚀GPU 🟡Beta | Perform object detection using YOLO on images and return bounding boxes and class labels. 使用YOLO对图像执行对象检测，并返回边界框和类标签。 | [info](operators/mapper/image_detection_yolo_mapper.md) | - |
 | image_diffusion_mapper | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Generate images using a diffusion model based on provided captions. 使用基于提供的字幕的扩散模型生成图像。 | [info](operators/mapper/image_diffusion_mapper.md) | - |
@@ -226,7 +217,7 @@ All the specific operators are listed below, each featured with several capabili
 | punctuation_normalization_mapper | 🔤Text 💻CPU 🟢Stable | Normalizes unicode punctuations to their English equivalents in text samples. 将unicode标点规范化为文本示例中的英语等效项。 | [info](operators/mapper/punctuation_normalization_mapper.md) | - |
 | python_file_mapper | 💻CPU 🟢Stable | Executes a Python function defined in a file on input data. 对输入数据执行文件中定义的Python函数。 | [info](operators/mapper/python_file_mapper.md) | - |
 | python_lambda_mapper | 💻CPU 🟢Stable | Mapper for applying a Python lambda function to data samples. Mapper，用于将Python lambda函数应用于数据样本。 | [info](operators/mapper/python_lambda_mapper.md) | - |
-| query_intent_detection_mapper | 🚀GPU 🧩HF 🧩HF 🟢Stable | Predicts the user's intent label and corresponding score for a given query. 为给定查询预测用户的意图标签和相应的分数。 | [info](operators/mapper/query_intent_detection_mapper.md) | - |
+| query_intent_detection_mapper | 🚀GPU 🧩HF 🧩HF 🟢Stable | Predicts the user's intent label and corresponding score for a given query. 预测给定查询的用户意图标签和相应分数。 | [info](operators/mapper/query_intent_detection_mapper.md) | - |
 | query_sentiment_detection_mapper | 🚀GPU 🧩HF 🧩HF 🟢Stable | Predicts user's sentiment label ('negative', 'neutral', 'positive') in a query. 在查询中预测用户的情绪标签 (“负面” 、 “中性” 、 “正面”)。 | [info](operators/mapper/query_sentiment_detection_mapper.md) | - |
 | query_topic_detection_mapper | 🚀GPU 🧩HF 🧩HF 🟢Stable | Predicts the topic label and its corresponding score for a given query. 预测给定查询的主题标签及其相应的分数。 | [info](operators/mapper/query_topic_detection_mapper.md) | - |
 | relation_identity_mapper | 🔤Text 💻CPU 🔗API 🟢Stable | Identify the relation between two entities in a given text. 确定给定文本中两个实体之间的关系。 | [info](operators/mapper/relation_identity_mapper.md) | - |
@@ -255,11 +246,11 @@ All the specific operators are listed below, each featured with several capabili
 | video_resize_aspect_ratio_mapper | 🎬Video 💻CPU 🟢Stable | Resizes videos to fit within a specified aspect ratio range. 调整视频大小以适应指定的宽高比范围。 | [info](operators/mapper/video_resize_aspect_ratio_mapper.md) | - |
 | video_resize_resolution_mapper | 🎬Video 💻CPU 🟢Stable | Resizes video resolution based on specified width and height constraints. 根据指定的宽度和高度限制调整视频分辨率。 | [info](operators/mapper/video_resize_resolution_mapper.md) | - |
 | video_split_by_duration_mapper | 🔮Multimodal 💻CPU 🟢Stable | Splits videos into segments based on a specified duration. 根据指定的持续时间将视频拆分为多个片段。 | [info](operators/mapper/video_split_by_duration_mapper.md) | - |
-| video_split_by_key_frame_mapper | 🔮Multimodal 💻CPU 🟢Stable | Splits a video into segments based on key frames. 根据关键帧将视频分割为多个片段。 | [info](operators/mapper/video_split_by_key_frame_mapper.md) | - |
+| video_split_by_key_frame_mapper | 🔮Multimodal 💻CPU 🟢Stable | Splits a video into segments based on key frames. 根据关键帧将视频分割成多个片段。 | [info](operators/mapper/video_split_by_key_frame_mapper.md) | - |
 | video_split_by_scene_mapper | 🔮Multimodal 💻CPU 🟢Stable | Splits videos into scene clips based on detected scene changes. 根据检测到的场景变化将视频拆分为场景剪辑。 | [info](operators/mapper/video_split_by_scene_mapper.md) | - |
 | video_tagging_from_audio_mapper | 🎬Video 🚀GPU 🧩HF 🟢Stable | Generates video tags from audio streams using the Audio Spectrogram Transformer. 使用音频频谱图转换器从音频流生成视频标签。 | [info](operators/mapper/video_tagging_from_audio_mapper.md) | - |
 | video_tagging_from_frames_mapper | 🎬Video 🚀GPU 🟢Stable | Generates video tags from frames extracted from videos. 从视频中提取的帧生成视频标签。 | [info](operators/mapper/video_tagging_from_frames_mapper.md) | - |
-| whitespace_normalization_mapper | 🔤Text 💻CPU 🟢Stable | Normalizes various types of whitespace characters to standard spaces in text samples. 将文本样本中各种类型的空白字符规范化为标准空格。 | [info](operators/mapper/whitespace_normalization_mapper.md) | - |
+| whitespace_normalization_mapper | 🔤Text 💻CPU 🟢Stable | Normalizes various types of whitespace characters to standard spaces in text samples. 将各种类型的空白字符规范化为文本样本中的标准空格。 | [info](operators/mapper/whitespace_normalization_mapper.md) | - |
 
 ## selector <a name="selector"/>
 
