@@ -53,7 +53,7 @@ def get_min_cuda_memory():
 
 
 def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=0):
-    """Calculate the optimum number of processes for the given OP"""
+    """Calculate the optimum number of processes for the given OP automatically。"""
 
     if not use_cuda and gpu_required > 0:
         raise ValueError(
@@ -63,11 +63,11 @@ def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=
         )
 
     eps = 1e-9  # about 1 byte
+    cpu_num = cpu_count()
 
     if use_cuda:
         cuda_mems_available = [m / 1024 for m in available_gpu_memories()]  # GB
         gpu_count = cuda_device_count()
-
         if not mem_required and not gpu_required:
             auto_num_proc = gpu_count
             logger.warning(
@@ -75,25 +75,25 @@ def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=
                 f"has not been specified. "
                 f"Please specify the mem_required field or gpu_required field in the "
                 f"config file. You can reference the config_all.yaml file."
-                f"Set the `num_proc` to number of GPUs {auto_num_proc}."
+                f"Set the auto `num_proc` to number of GPUs {auto_num_proc}."
             )
         else:
             auto_proc_from_mem = sum(
                 [math.floor(mem_available / (mem_required + eps)) for mem_available in cuda_mems_available]
             )
             auto_proc_from_gpu = math.floor(gpu_count / (gpu_required + eps))
-            auto_num_proc = min(auto_proc_from_mem, auto_proc_from_gpu)
+            auto_proc_from_cpu = math.floor(cpu_num / (cpu_required + eps))
+            auto_num_proc = min(auto_proc_from_mem, auto_proc_from_gpu, auto_proc_from_cpu)
             if auto_num_proc < 1:
                 auto_num_proc = len(available_memories())  # set to the number of available nodes
 
             logger.info(
-                f"Set the `num_proc` to {auto_num_proc} of Op[{name}] based on the "
+                f"Set the auto `num_proc` to {auto_num_proc} of Op[{name}] based on the "
                 f"required cuda memory: {mem_required}GB "
-                f"and required gpu: {gpu_required}."
+                f"required gpu: {gpu_required} and required cpu: {cpu_required}."
             )
         return auto_num_proc
     else:
-        cpu_num = cpu_count()
         mems_available = [m / 1024 for m in available_memories()]  # GB
         auto_proc_from_mem = sum([math.floor(mem_available / (mem_required + eps)) for mem_available in mems_available])
         auto_proc_from_cpu = math.floor(cpu_num / (cpu_required + eps))
@@ -109,11 +109,11 @@ def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=
                 f"and memory: {mems_available}GB."
                 f"This Op [{name}] might "
                 f"require more resource to run. "
-                f"Set num_proc to available nodes number {auto_num_proc}."
+                f"Set the auto `num_proc` to available nodes number {auto_num_proc}."
             )
         else:
             logger.info(
-                f"Set the `num_proc` to {auto_num_proc} of Op[{name}] based on the "
+                f"Set the auto `num_proc` to {auto_num_proc} of Op[{name}] based on the "
                 f"required memory: {mem_required}GB "
                 f"and required cpu: {cpu_required}."
             )
