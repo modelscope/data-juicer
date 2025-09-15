@@ -531,16 +531,11 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
 
             # partition configuration
             parser.add_argument(
-                "--partition.rows",
-                type=int,
-                default=50000,
-                help="Number of rows per partition (nested partition config, used when auto_configure=false)",
-            )
-            parser.add_argument(
-                "--partition.size_in_mb",
-                type=int,
-                default=256,
-                help="Target partition size in MB (nested partition config, alternative to partition.rows)",
+                "--partition.method",
+                type=str,
+                default="natural_file",
+                choices=["natural_file"],
+                help="Partitioning method: natural_file (use original files as partitions)",
             )
 
             # Resource optimization configuration

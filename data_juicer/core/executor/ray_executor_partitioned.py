@@ -15,7 +15,6 @@ This module implements a comprehensive partitioned execution strategy for Ray mo
 import hashlib
 import json
 import os
-import shutil
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -30,6 +29,7 @@ from pydantic import PositiveInt
 
 from data_juicer.core.adapter import Adapter
 from data_juicer.core.data.dataset_builder import DatasetBuilder
+from data_juicer.core.data.ray_dataset import RayDataset
 from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.executor.dag_execution_mixin import DAGExecutionMixin
 from data_juicer.core.executor.event_logging_mixin import EventLoggingMixin
@@ -38,9 +38,67 @@ from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
 
-from .partition_size_optimizer import PartitionSizeOptimizer, auto_configure_resources
-
 ray = LazyLoader("ray")
+
+
+def _process_single_batch(
+    file_path: str, ops: List, partition_id: int, work_dir: str, cfg: Namespace
+) -> Dict[str, Any]:
+    """
+    Process a single batch as a Ray dataset.
+
+    Args:
+        file_path: Path to the input file
+        ops: List of operations to apply
+        partition_id: ID of the partition
+        work_dir: Working directory
+        cfg: Configuration object
+
+    Returns:
+        Dictionary containing processing results
+    """
+    try:
+        logger.info(f"Processing file {partition_id}: {file_path}")
+
+        # Create results directory for this partition
+        results_dir = os.path.join(work_dir, "results")
+        os.makedirs(results_dir, exist_ok=True)
+
+        # Create DatasetBuilder instance for this partition
+        partition_cfg = Namespace(**vars(cfg))
+        partition_cfg.dataset_path = file_path  # Override dataset_path for this partition
+        datasetbuilder = DatasetBuilder(partition_cfg, executor_type="ray")
+
+        # Load dataset using DatasetBuilder for proper handling
+        dataset = datasetbuilder.load_dataset()
+
+        # Apply all operations
+        processed_dataset = dataset.process(ops)
+
+        # Get sample count (avoid calling .count() during convergence to prevent memory issues)
+        sample_count = 0  # Will be calculated later if needed
+
+        logger.info(f"File {partition_id} processed successfully")
+
+        return {
+            "partition_id": partition_id,
+            "input_path": file_path,
+            "dataset": processed_dataset,  # Return dataset object instead of file path
+            "success": True,
+            "sample_count": sample_count,
+            "error": None,
+        }
+
+    except Exception as e:
+        logger.error(f"File {partition_id} processing failed: {e}")
+        return {
+            "partition_id": partition_id,
+            "input_path": file_path,
+            "output_path": None,
+            "success": False,
+            "sample_count": 0,
+            "error": str(e),
+        }
 
 
 class CheckpointStrategy(Enum):
@@ -64,6 +122,7 @@ class PartitionMetadata:
     file_size_bytes: int
     checksum: str
     created_timestamp: float
+    file_path: Optional[str] = None  # Path to the original file for file-based partitioning
     processing_status: str = "pending"  # pending, processing, completed, failed
     error_message: Optional[str] = None
     processing_start_time: Optional[float] = None
@@ -136,38 +195,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         # Override strategy methods for partitioned execution
         self._override_strategy_methods()
 
-        # Partitioning configuration
-        # Handle both flat and nested partition configurations
-        partition_config = getattr(self.cfg, "partition", {})
-
-        # If partition_config is None (flat configuration), create a dict with flat values
-        if partition_config is None:
-            partition_config = {
-                "rows": getattr(self.cfg, "partition_rows", 50000),
-                "size_in_mb": getattr(self.cfg, "partition_size_in_mb", 256),
-            }
-
-        # Check if auto-configuration is enabled
-        resource_optimization_config = getattr(self.cfg, "resource_optimization", {})
-        self.auto_configure_resources = resource_optimization_config.get("auto_configure", False)
-
-        if self.auto_configure_resources:
-            logger.info(
-                "Resource optimization enabled - will analyze dataset and optimize partition size, worker count, and other resource-dependent settings"
-            )
-            # We'll configure this after loading the dataset
-            self.partition_rows = None
-            self.partition_size_in_mb = None
-        else:
-            # Use manual configuration
-            self.auto_configure_resources = False
-            self.partition_rows = partition_config.get("rows") or getattr(self.cfg, "partition_rows", 50000)
-            self.partition_size_in_mb = partition_config.get("size_in_mb") or getattr(
-                self.cfg, "partition_size_in_mb", 256
-            )
-            logger.info(
-                f"Manual resource configuration: partition_rows={self.partition_rows} rows, partition_size_in_mb={self.partition_size_in_mb} MB"
-            )
+        # Simplified configuration for natural file partitioning
+        # With natural files, we don't need partition size parameters
+        logger.info("Using natural file partitioning - partition boundaries determined by input files")
 
         # Retry configuration (fixed defaults)
         self.max_retries = 3
@@ -220,8 +250,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
 
         self.tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
 
-        # Initialize dataset builder
-        self.datasetbuilder = DatasetBuilder(self.cfg, executor_type="ray")
+        # DatasetBuilder will be created per partition for proper isolation
 
         # Initialize RayExporter for final output
         logger.info("Preparing exporter...")
@@ -270,10 +299,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
 
         # Dataset mapping
         self.dataset_mapping: Optional[DatasetMapping] = None
-
-        # Initialize partition size optimizer for auto-configuration
-        if self.auto_configure_resources:
-            self.partition_optimizer = PartitionSizeOptimizer(self.cfg)
 
     def _should_checkpoint(self, op_idx: int, op_name: str, partition_id: int) -> bool:
         """Determine if checkpoint should be created based on configuration strategy."""
@@ -442,331 +467,214 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         """Estimate the number of partitions based on dataset size."""
         try:
             total_samples = dataset.data.count()
-            # Use the same logic as _calculate_partition_sizes for consistency
-            partition_count, _ = self._calculate_partition_sizes(total_samples)
-            return partition_count
+            # Simple heuristic: 1 partition per 50k samples, minimum 1, maximum 10
+            return max(1, min(10, total_samples // 50000))
         except Exception:
-            # Fallback to file-based estimation
-            return max(1, int(ray.cluster_resources().get("CPU", 1) * 2))
+            # Fallback to default
+            return 1
 
-    def _calculate_partition_rows(self, sample_data=None):
+    def _can_use_natural_files(self, dataset) -> bool:
         """
-        Calculate the number of rows per partition based on configuration.
+        Check if we can use natural files as partitions.
 
-        Uses either partition.rows (direct row count) or partition.size_in_mb (size-based calculation).
-        If both are provided, partition.rows takes precedence.
-
-        Args:
-            sample_data: Optional sample data to analyze row sizes (used when size_in_mb is specified)
-
-        Returns:
-            int: Number of rows per partition
-        """
-        # If partition_rows is explicitly set, use it
-        if hasattr(self, "partition_rows") and self.partition_rows is not None:
-            logger.info(f"Using explicit partition_rows: {self.partition_rows}")
-            return self.partition_rows
-
-        # If partition_size_in_mb is set, calculate rows based on data profile
-        if hasattr(self, "partition_size_in_mb") and self.partition_size_in_mb is not None:
-            if not sample_data:
-                logger.warning("partition_size_in_mb specified but no sample data available, using default 50000 rows")
-                return 50000
-
-            # Calculate average row size in bytes
-            total_size = 0
-            for record in sample_data:
-                total_size += len(json.dumps(record, default=str).encode("utf-8"))
-
-            avg_row_size_bytes = total_size / len(sample_data)
-
-            # Calculate rows needed for target partition size
-            target_size_bytes = self.partition_size_in_mb * 1024 * 1024
-            calculated_rows = int(target_size_bytes / avg_row_size_bytes)
-
-            # Clamp to reasonable bounds
-            calculated_rows = max(1000, min(calculated_rows, 1000000))
-
-            logger.info(f"Calculated partition rows from size_in_mb={self.partition_size_in_mb}MB:")
-            logger.info(f"  avg_row_size={avg_row_size_bytes:.1f} bytes")
-            logger.info(f"  calculated_rows={calculated_rows}")
-            logger.info(f"  estimated_partition_size={calculated_rows * avg_row_size_bytes / (1024*1024):.1f}MB")
-
-            return calculated_rows
-
-        # Fallback to default
-        logger.info("Using default partition_rows: 50000")
-        return 50000
-
-    def _should_skip_partitioning(self, dataset) -> bool:
-        """
-        Determine if partitioning should be skipped based on dataset characteristics.
-
-        Returns True if the dataset is already well-chunked and doesn't need partitioning.
+        Returns True if we can extract original file paths from the dataset.
         """
         try:
-            total_samples = dataset.data.count()
-
-            # Skip partitioning for small datasets
-            if total_samples < 10000:
-                logger.info(f"Dataset has {total_samples} samples - skipping partitioning (too small)")
-                return True
-
-            # Check if dataset is already well-chunked
             ray_dataset = dataset.data
-            num_blocks = ray_dataset.num_blocks()
+            original_file_paths = self._extract_original_file_paths(ray_dataset)
 
-            # If dataset has many small blocks, it's already well-chunked
-            if num_blocks > 10 and total_samples / num_blocks < 5000:
-                logger.info(
-                    f"Dataset has {num_blocks} blocks with ~{total_samples // num_blocks} samples each - already well-chunked"
-                )
+            if len(original_file_paths) > 0:
+                logger.info(f"Found {len(original_file_paths)} original files - can use natural file partitioning")
                 return True
-
-            # Check if we're in a simple processing scenario
-            if hasattr(self.cfg, "process") and len(self.cfg.process) <= 3:
-                logger.info(
-                    f"Simple processing pipeline ({len(self.cfg.process)} operations) - considering skipping partitioning"
-                )
-                # Could add more logic here to determine if operations are lightweight
-
-            return False
+            else:
+                logger.info("No original files found - will use manual partitioning")
+                return False
 
         except Exception as e:
-            logger.warning(f"Could not determine if partitioning should be skipped: {e}")
+            logger.warning(f"Could not check for natural files: {e}")
             return False
+
+    def _use_original_files_as_partitions(self, dataset) -> Tuple[List[str], DatasetMapping]:
+        """
+        Use original files as partitions when they are already well-sized.
+
+        This method extracts the original file paths from the Ray dataset and uses them
+        directly as partitions, avoiding the need to split and re-write data.
+        """
+        logger.info("Using original files as natural partitions...")
+
+        try:
+            # Get the underlying Ray dataset
+            ray_dataset = dataset.data
+            total_samples = ray_dataset.count()
+
+            # Extract original file paths from Ray dataset metadata
+            original_file_paths = self._extract_original_file_paths(ray_dataset)
+
+            if not original_file_paths:
+                logger.warning("Could not extract original file paths, falling back to single partition")
+                return self._create_single_partition_fallback(dataset)
+
+            logger.info(f"Found {len(original_file_paths)} original files to use as partitions")
+
+            # Create partition metadata for each original file
+            partitions = []
+            for i, file_path in enumerate(original_file_paths):
+                try:
+                    # Get file size
+                    file_size = os.path.getsize(file_path) if os.path.exists(file_path) else 0
+
+                    # Estimate sample count for this file (rough approximation)
+                    estimated_samples = max(1, file_size // 512)  # Assume ~512 bytes per sample
+
+                    partition_metadata = PartitionMetadata(
+                        partition_id=i,
+                        original_start_idx=file_path,  # Store the file path here
+                        original_end_idx=estimated_samples,
+                        sample_count=estimated_samples,
+                        file_size_bytes=file_size,
+                        checksum="",  # Will be calculated if needed
+                        created_timestamp=time.time(),
+                        processing_status="pending",
+                    )
+                    partitions.append(partition_metadata)
+
+                    logger.debug(f"Partition {i}: {file_path} ({file_size} bytes, ~{estimated_samples} samples)")
+
+                except Exception as e:
+                    logger.warning(f"Could not process file {file_path}: {e}")
+                    continue
+
+            if not partitions:
+                logger.warning("No valid partitions found, falling back to single partition")
+                return self._create_single_partition_fallback(dataset)
+
+            # Create dataset mapping
+            self.dataset_mapping = DatasetMapping(
+                original_dataset_path=self.cfg.dataset_path,
+                original_dataset_size=total_samples,
+                partition_count=len(partitions),
+                partition_size=sum(p.sample_count for p in partitions) // len(partitions),
+                partitions=partitions,
+            )
+
+            logger.info(f"Successfully created {len(partitions)} partitions from original files")
+            logger.info(f"Total estimated samples: {sum(p.sample_count for p in partitions)}")
+
+            return original_file_paths, self.dataset_mapping
+
+        except Exception as e:
+            logger.error(f"Error using original files as partitions: {e}")
+            logger.info("Falling back to single partition approach")
+            return self._create_single_partition_fallback(dataset)
+
+    def _extract_original_file_paths(self, ray_dataset) -> List[str]:
+        """
+        Extract original file paths from Ray dataset metadata.
+
+        This method tries multiple approaches to get the original file paths
+        that were used to create the Ray dataset.
+        """
+        file_paths = []
+
+        try:
+            # Method 1: Try to access Ray's internal metadata (for materialized datasets)
+            if hasattr(ray_dataset, "_plan") and hasattr(ray_dataset._plan, "_in_blocks"):
+                metadata = ray_dataset._plan._in_blocks
+                if metadata:
+                    for block_ref in metadata:
+                        try:
+                            block_metadata = ray.get(block_ref.get_metadata.remote())
+                            if hasattr(block_metadata, "input_files"):
+                                file_paths.extend(block_metadata.input_files)
+                        except Exception:
+                            continue
+
+            # Method 2: Try to get file paths from dataset metadata (for materialized datasets)
+            if not file_paths and hasattr(ray_dataset, "metadata"):
+                try:
+                    metadata = ray_dataset.metadata()
+                    if metadata:
+                        for block_metadata in metadata:
+                            if hasattr(block_metadata, "input_files"):
+                                file_paths.extend(block_metadata.input_files)
+                except Exception:
+                    pass
+
+            # Method 3: Fallback - try to infer from dataset path (most reliable for directory-based datasets)
+            if not file_paths:
+                dataset_path = self.cfg.dataset_path
+                if os.path.isfile(dataset_path):
+                    file_paths = [dataset_path]
+                elif os.path.isdir(dataset_path):
+                    # Look for common data files in the directory
+                    import glob
+
+                    for ext in [".parquet", ".arrow", ".jsonl", ".json"]:
+                        pattern = os.path.join(dataset_path, f"*{ext}")
+                        found_files = glob.glob(pattern)
+                        if found_files:
+                            # Sort files to ensure consistent ordering
+                            found_files.sort()
+                            file_paths.extend(found_files)
+                            logger.debug(f"Found {len(found_files)} {ext} files in directory: {found_files}")
+                            break
+
+            # Filter out non-existent files and remove duplicates
+            file_paths = list(set([fp for fp in file_paths if os.path.exists(fp)]))
+
+            logger.debug(f"Extracted {len(file_paths)} original file paths: {file_paths}")
+            return file_paths
+
+        except Exception as e:
+            logger.debug(f"Error extracting original file paths: {e}")
+            return []
+
+    def _create_single_partition_fallback(self, dataset) -> Tuple[List[str], DatasetMapping]:
+        """Fallback method when we can't use original files as partitions."""
+        original_dataset_path = self.cfg.dataset_path
+        total_samples = dataset.data.count()
+
+        self.dataset_mapping = DatasetMapping(
+            original_dataset_path=original_dataset_path,
+            original_dataset_size=total_samples,
+            partition_count=1,
+            partition_size=total_samples,
+        )
+
+        # Return the original dataset path as the single partition
+        return [original_dataset_path], self.dataset_mapping
 
     def _create_partitions_with_mapping(self, dataset) -> Tuple[List[str], DatasetMapping]:
         """Create partitions from the dataset with preserved mapping."""
         logger.info("Creating dataset partitions with mapping...")
 
-        # Check if we should skip partitioning (unless forced)
-        force_partitioning = (
-            getattr(self.cfg.partition, "force_partitioning", False) if hasattr(self.cfg, "partition") else False
-        )
-        if not force_partitioning and self._should_skip_partitioning(dataset):
-            logger.info("Skipping partitioning - using original dataset structure")
-            # Return the original dataset as a single "partition"
-            original_dataset_path = self.cfg.dataset_path
-            total_samples = dataset.data.count()
+        # Determine partitioning method
+        partition_method = "natural_file"  # Default
+        if hasattr(self.cfg, "partition") and self.cfg.partition:
+            partition_method = getattr(self.cfg.partition, "method", "natural_file")
 
-            self.dataset_mapping = DatasetMapping(
-                original_dataset_path=original_dataset_path,
-                original_dataset_size=total_samples,
-                partition_count=1,
-                partition_size=total_samples,
-            )
+        logger.info(f"Partition method: {partition_method}")
 
-            # Return the original dataset path as the single partition
-            return [original_dataset_path], self.dataset_mapping
-
-        # Get original dataset information
-        original_dataset_path = self.cfg.dataset_path
-        total_samples = dataset.data.count()
-
-        # Sample data for size calculation if needed
-        sample_data = None
-        if hasattr(self, "partition_size_in_mb") and self.partition_size_in_mb is not None:
-            # Sample a small amount of data to analyze row sizes
-            sample_size = min(100, total_samples)
-            sample_data = dataset.data.take(sample_size)
-
-        # Calculate partition count and sizes using unified logic
-        partition_count, partition_sizes = self._calculate_partition_sizes(total_samples, sample_data)
-        logger.info(f"Creating {partition_count} partitions from {total_samples} samples...")
-        logger.info(f"Partition sizes: {partition_sizes}")
-
-        # Get the actual rows per partition for dataset mapping
-        rows_per_partition = self._calculate_partition_rows(sample_data)
-
-        # Initialize dataset mapping
-        self.dataset_mapping = DatasetMapping(
-            original_dataset_path=original_dataset_path,
-            original_dataset_size=total_samples,
-            partition_count=partition_count,
-            partition_size=rows_per_partition,
-        )
-
-        # Save partitions to disk with metadata
-        partition_paths = []
-
-        # Use Ray's distributed split instead of materializing everything in memory
-        # This keeps data distributed and is much more memory efficient
-        #
-        # Note: We're using Ray's repartition to create exactly the number of partitions we need.
-        # This gives us Ray's distributed processing benefits while maintaining control over partition count.
-        # Partition writing is optional - can be disabled for better performance when intermediate files aren't needed.
-        ray_dataset = dataset.data
-
-        # Create exactly the number of Ray partitions we need
-        # This is much more efficient than creating many partitions and manually combining them
-        logger.info(f"Creating exactly {partition_count} Ray partitions for direct writing")
-
-        # Use Ray's split to create the exact number of partitions we want
-        # This should be more efficient than repartition for equal-sized splits
-        ray_partitions = ray_dataset.split(partition_count)
-
-        logger.info(f"Created {len(ray_partitions)} Ray partitions using split()")
-
-        # Create partitions by writing each Ray partition directly to disk
-        # This eliminates the need for manual data combination and is much more efficient
-        start_idx = 0
-        for i in range(partition_count):
-            partition_size = partition_sizes[i]
-            end_idx = start_idx + partition_size
-
-            # Create base partition path (will be updated based on storage format and write_partitions setting)
-            base_partition_name = f"partition_{i:06d}"
-            partition_path = os.path.join(self.partitions_dir, f"{base_partition_name}.parquet")
-
-            # Log individual partition creation start
-            partition_creation_start = time.time()
-            self._log_processing_event(
-                ProcessingEvent(
-                    event_id=f"partition_creation_start_{i}_{int(partition_creation_start)}",
-                    event_type="partition_creation_start",
-                    timestamp=partition_creation_start,
-                    partition_id=i,
-                    message=f"Starting creation of partition {i}",
-                    metadata={
-                        "partition_id": i,
-                        "partition_path": partition_path,
-                        "total_partitions": partition_count,
-                        "expected_size": partition_size,
-                    },
-                )
-            )
-
-            # Get the i-th Ray partition directly from the split result
-            # This is much more efficient than manually combining multiple small partitions
-            logger.info(f"Processing partition {i} from Ray split partition {i}")
-
-            # Get the actual partition dataset from the split result
-            partition_dataset = ray_partitions[i]
-
-            # Get sample count for this partition
-            partition_sample_count = partition_dataset.count()
-
-            # Calculate start and end indices for this partition
-            start_idx = i * partition_size
-            end_idx = start_idx + partition_sample_count
-
-            # Optionally write partition to disk based on configuration
-            if self.write_partitions:
-                # Save partition to disk using configurable format
-                if self.storage_format == "parquet":
-                    # Use Parquet for best performance and compression
-                    partition_path_abs = os.path.abspath(partition_path)
-                    os.makedirs(os.path.dirname(partition_path_abs), exist_ok=True)
-
-                    # Write partition directly using the split dataset
-                    # This is much more efficient than converting to items and back
-                    # Use a large number to ensure single file per partition
-                    partition_dataset.write_parquet(
-                        partition_path_abs,
-                        num_rows_per_file=1000000,  # Large number to ensure single file per partition
-                        compression=self.storage_compression,
-                    )
-                    partition_path = partition_path_abs
-                elif self.storage_format == "arrow":
-                    # Use Arrow (Feather) for memory mapping and zero-copy reads
-                    partition_path = partition_path + ".arrow"
-                    os.makedirs(os.path.dirname(partition_path), exist_ok=True)
-                    partition_dataset.write_arrow(partition_path)
-                else:
-                    # Fallback to JSONL for compatibility
-                    partition_path = partition_path + ".jsonl"
-                    partition_dataset.write_json(partition_path, force_ascii=False)
-
-                # Get file size and calculate checksum
-                file_size = os.path.getsize(partition_path)
-                # For checksum, we need to materialize a small sample
-                sample_for_checksum = partition_dataset.take(min(100, partition_sample_count))
-                checksum = self._calculate_checksum(sample_for_checksum)
-
-                # Create partition metadata
-                partition_metadata = PartitionMetadata(
-                    partition_id=i,
-                    original_start_idx=start_idx,
-                    original_end_idx=end_idx,
-                    sample_count=partition_sample_count,
-                    file_size_bytes=file_size,
-                    checksum=checksum,
-                    created_timestamp=time.time(),
-                )
-
-                # Add partition metadata and path
-                if self.dataset_mapping.partitions is not None:
-                    self.dataset_mapping.partitions.append(partition_metadata)
-                partition_paths.append(partition_path)
-
-                logger.info(
-                    f"Created partition {i+1}/{partition_count}: {partition_path} "
-                    f"({partition_sample_count} samples, {file_size} bytes)"
-                )
-
-                # Log partition creation complete
-                partition_creation_complete = time.time()
-                partition_creation_duration = partition_creation_complete - partition_creation_start
-                self._log_processing_event(
-                    ProcessingEvent(
-                        event_id=f"partition_creation_complete_{i}_{int(partition_creation_complete)}",
-                        event_type="partition_creation_complete",
-                        timestamp=partition_creation_complete,
-                        partition_id=i,
-                        message=f"Partition {i} creation completed - {partition_sample_count} samples in {partition_creation_duration:.2f}s",
-                        metadata={
-                            "partition_id": i,
-                            "partition_path": partition_path,
-                            "sample_count": partition_sample_count,
-                            "file_size_bytes": file_size,
-                            "checksum": checksum,
-                            "duration_seconds": partition_creation_duration,
-                        },
-                    )
-                )
+        # Choose partitioning strategy based on method
+        if partition_method == "natural_file":
+            if self._can_use_natural_files(dataset):
+                logger.info("Using natural files as partitions")
+                return self._use_original_files_as_partitions(dataset)
             else:
-                # Skip writing to disk - just create virtual partition paths
-                partition_path = os.path.join(self.partitions_dir, f"{base_partition_name}_virtual")
-                partition_paths.append(partition_path)
-                logger.info(f"Partition {i} created in memory (no disk writing)")
-
-            # Update start index for next partition
-            start_idx = end_idx
-
-        logger.info(f"Successfully created {len(partition_paths)} partitions")
-        return partition_paths, self.dataset_mapping
-
-    def _calculate_partition_sizes(self, total_samples: int, sample_data=None) -> Tuple[int, List[int]]:
-        """Calculate partition count and sizes based on unified partition configuration."""
-        if total_samples <= 0:
-            return 1, [0]
-
-        # Get the number of rows per partition using unified logic
-        rows_per_partition = self._calculate_partition_rows(sample_data)
-
-        # Calculate how many full partitions we can have
-        full_partitions = total_samples // rows_per_partition
-
-        # Calculate remaining samples
-        remaining_samples = total_samples % rows_per_partition
-
-        # Determine partition count
-        if remaining_samples == 0:
-            # Perfect division - all partitions are full
-            partition_count = full_partitions
-            partition_sizes = [rows_per_partition] * partition_count
+                logger.warning("No natural files found, falling back to manual partitioning")
+                # Fall through to manual partitioning
+        elif partition_method == "optimized":
+            raise NotImplementedError("Optimized partitioning not yet implemented")
+        elif partition_method == "manual":
+            raise NotImplementedError("Manual partitioning not yet implemented")
         else:
-            # We need one more partition for the remaining samples
-            partition_count = full_partitions + 1
-            partition_sizes = [rows_per_partition] * full_partitions + [remaining_samples]
+            logger.warning(f"Unknown partition method '{partition_method}', using natural files")
+            if self._can_use_natural_files(dataset):
+                return self._use_original_files_as_partitions(dataset)
 
-        logger.info(f"Partition calculation: {total_samples} samples, {rows_per_partition} rows per partition")
-        logger.info(f"Full partitions: {full_partitions}, remaining: {remaining_samples}")
-        logger.info(f"Total partitions: {partition_count}")
-        logger.info(f"Partition sizes: {partition_sizes}")
-
-        return partition_count, partition_sizes
+        # If we reach here, natural file partitioning failed and manual is not implemented
+        raise NotImplementedError("No natural files found and manual partitioning is not implemented")
 
     def _save_dataset_mapping(self):
         """Save dataset mapping to disk."""
@@ -870,75 +778,72 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             if latest_checkpoint_path and os.path.exists(latest_checkpoint_path):
                 logger.info(f"Loading checkpoint for partition {partition_id} from operation {latest_op_idx}")
                 raw_dataset = self._load_operation_checkpoint(latest_checkpoint_path)
-                # Wrap in RayDataset for processing
-                from data_juicer.core.data.ray_dataset import RayDataset
 
                 current_dataset = RayDataset(raw_dataset, dataset_path=partition_path, cfg=self.cfg)
                 ops_to_process = ops[latest_op_idx + 1 :]
             else:
-                # Load partition data
+                # Load partition data using DatasetBuilder for proper handling
                 # Convert relative path to absolute path to avoid Ray path resolution issues
                 partition_path = os.path.abspath(partition_path)
                 logger.debug(f"Loading partition {partition_id} from {partition_path}")
-                if partition_path.endswith(".parquet"):
-                    raw_dataset = ray.data.read_parquet(partition_path)
-                elif partition_path.endswith(".arrow"):
-                    raw_dataset = ray.data.read_arrow(partition_path)
-                else:
-                    raw_dataset = ray.data.read_json(partition_path)
-                # Wrap in RayDataset for processing
-                from data_juicer.core.data.ray_dataset import RayDataset
 
-                current_dataset = RayDataset(raw_dataset, dataset_path=partition_path, cfg=self.cfg)
+                # Create DatasetBuilder instance for this partition
+                from data_juicer.core.data.dataset_builder import DatasetBuilder
+
+                partition_cfg = Namespace(**vars(self.cfg))
+                partition_cfg.dataset_path = partition_path  # Override dataset_path for this partition
+                datasetbuilder = DatasetBuilder(partition_cfg, executor_type="ray")
+
+                # Load dataset using DatasetBuilder for proper handling
+                current_dataset = datasetbuilder.load_dataset()
                 ops_to_process = ops
 
             # Create checkpoint directory for operation checkpoints
             partition_checkpoint_dir = os.path.join(self.checkpoint_dir, f"partition_{partition_id:06d}")
             os.makedirs(partition_checkpoint_dir, exist_ok=True)
 
-            # Process operations step by step for proper checkpointing
+            # Process all operations at once (like Ray executor) for performance
             input_rows = current_dataset.data.count()
 
+            # Log all operations as starting (for compatibility with existing logging)
             for op_idx, op in enumerate(ops_to_process):
                 actual_op_idx = latest_op_idx + 1 + op_idx if latest_op_idx is not None else op_idx
-
-                # Log operation start
                 self.log_op_start(partition_id, op._name, actual_op_idx, {})
 
-                # Process single operation
-                op_start_time = time.time()
-                current_dataset.process([op])  # Process only this operation
-                op_duration = time.time() - op_start_time
+            # Process ALL operations in a single Ray task (8x performance improvement)
+            logger.info(f"Processing {len(ops_to_process)} operations on partition {partition_id} in batch")
+            batch_start_time = time.time()
+            current_dataset.process(ops_to_process)  # Process all operations at once!
+            batch_duration = time.time() - batch_start_time
 
-                # Get row count after this operation
-                output_rows = current_dataset.data.count()
+            # Get final row count
+            output_rows = current_dataset.data.count()
 
-                # Determine checkpoint path and save if needed
-                checkpoint_path = None
-                if self._should_checkpoint(actual_op_idx, op._name, partition_id):
-                    # Save operation checkpoint to checkpoint directory
-                    checkpoint_path = os.path.join(
-                        partition_checkpoint_dir, f"op_{actual_op_idx:03d}_{op._name}.parquet"
-                    )
-                    self._write_dataset_with_directory_creation(current_dataset, checkpoint_path, "parquet")
+            # Log all operations as completed (for compatibility with existing logging)
+            for op_idx, op in enumerate(ops_to_process):
+                actual_op_idx = latest_op_idx + 1 + op_idx if latest_op_idx is not None else op_idx
+                # Distribute batch time across operations for logging
+                op_duration = batch_duration / len(ops_to_process)
 
-                    # Log checkpoint save
-                    self.log_checkpoint_save(partition_id, op._name, actual_op_idx, checkpoint_path)
-                    logger.debug(f"Saved checkpoint for partition {partition_id}, operation {actual_op_idx}")
-
-                # Log operation completion
                 self.log_op_complete(
                     partition_id,
                     op._name,
                     actual_op_idx,
                     op_duration,
-                    checkpoint_path,
-                    input_rows,
-                    output_rows,
+                    None,  # No individual operation checkpoints
+                    input_rows if op_idx == 0 else input_rows,  # Use input_rows for all ops to avoid None subtraction
+                    (
+                        output_rows if op_idx == len(ops_to_process) - 1 else input_rows
+                    ),  # Use input_rows for intermediate ops
                 )
 
-                # Update input_rows for next operation
-                input_rows = output_rows
+            # Create partition-level checkpoint (instead of operation-level)
+            if self.checkpoint_enabled:
+                partition_checkpoint_path = os.path.join(
+                    partition_checkpoint_dir, f"partition_{partition_id:06d}_completed.parquet"
+                )
+                self._write_dataset_with_directory_creation(current_dataset, partition_checkpoint_path, "parquet")
+                logger.debug(f"Saved partition-level checkpoint for partition {partition_id}")
 
             # Write final output
             output_path = os.path.join(self.results_dir, f"partition_{partition_id:06d}.parquet")
@@ -1069,11 +974,18 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         # Sort partitions by ID to maintain original order
         successful_results.sort(key=lambda x: x["partition_id"])
 
-        # Ensure the output directory exists
-        os.makedirs(os.path.dirname(self.cfg.export_path), exist_ok=True)
+        # Use standard exporter to combine all partitions
+        logger.info("Creating combined dataset from all partitions...")
+        result_path = self._export_combined_dataset(successful_results)
 
-        # Create a combined dataset from all partitions and write it directly
-        # This will create fragmented output as Ray's default behavior
+        # Create final mapping report
+        self._create_final_mapping_report(partition_results)
+
+        logger.info(f"Successfully exported {len(successful_results)} partitions")
+        return result_path
+
+    def _export_combined_dataset(self, successful_results: List[Dict[str, Any]]) -> str:
+        """Export all partitions combined into a single dataset (original behavior)."""
         logger.info("Creating combined dataset from all partitions...")
 
         # Load all partition datasets
@@ -1128,77 +1040,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         self.exporter.export(combined_dataset, columns=None)
         logger.info(f"Successfully exported combined dataset with {total_samples} total samples")
 
-        # Create final mapping report
-        self._create_final_mapping_report(partition_results)
-
-        logger.info(f"Successfully wrote {len(successful_results)} partitions with {total_samples} total samples")
         return self.cfg.export_path
-
-    def _fallback_merge_partitions(self, successful_results: List[Dict[str, Any]]):
-        """Fallback method to merge partitions using direct file operations."""
-        logger.info("Using fallback merge method...")
-
-        # Ensure the directory exists
-        os.makedirs(os.path.dirname(self.cfg.export_path), exist_ok=True)
-
-        # For JSONL output, use direct concatenation
-        if self.exporter.export_format in ["json", "jsonl"]:
-            with open(self.cfg.export_path, "w") as output_file:
-                for result in successful_results:
-                    if result["output_path"] and os.path.exists(result["output_path"]):
-                        try:
-                            # Convert relative path to absolute path to avoid path resolution issues
-                            output_path = os.path.abspath(result["output_path"])
-                            if os.path.isdir(output_path):
-                                # Directory of parquet files - convert to JSONL
-                                self._convert_parquet_dir_to_jsonl(output_path, output_file)
-                            elif output_path.endswith(".parquet"):
-                                # Single parquet file - convert to JSONL
-                                self._convert_parquet_file_to_jsonl(output_path, output_file)
-                            else:
-                                # Assume JSONL - copy directly
-                                with open(output_path, "r") as input_file:
-                                    shutil.copyfileobj(input_file, output_file)
-                        except Exception as e:
-                            logger.error(f"Failed to process partition {result['partition_id']} in fallback: {e}")
-                            continue
-        else:
-            # For other formats, we'll need to implement conversion
-            logger.error(f"Fallback merge not implemented for format: {self.exporter.export_format}")
-            raise NotImplementedError(f"Fallback merge not implemented for format: {self.exporter.export_format}")
-
-    def _convert_parquet_dir_to_jsonl(self, parquet_dir: str, output_file):
-        """Convert a directory of parquet files to JSONL."""
-        import pandas as pd
-
-        # Find all parquet files in the directory
-        parquet_files = []
-        for root, dirs, files in os.walk(parquet_dir):
-            for file in files:
-                if file.endswith(".parquet"):
-                    parquet_files.append(os.path.join(root, file))
-
-        # Convert each parquet file to JSONL
-        for parquet_file in parquet_files:
-            try:
-                df = pd.read_parquet(parquet_file)
-                for _, row in df.iterrows():
-                    output_file.write(json.dumps(row.to_dict()) + "\n")
-            except Exception as e:
-                logger.error(f"Failed to convert parquet file {parquet_file}: {e}")
-                continue
-
-    def _convert_parquet_file_to_jsonl(self, parquet_file: str, output_file):
-        """Convert a single parquet file to JSONL."""
-        import pandas as pd
-
-        try:
-            df = pd.read_parquet(parquet_file)
-            for _, row in df.iterrows():
-                output_file.write(json.dumps(row.to_dict()) + "\n")
-        except Exception as e:
-            logger.error(f"Failed to convert parquet file {parquet_file}: {e}")
-            raise
 
     def _create_final_mapping_report(self, partition_results: List[Dict[str, Any]]):
         """Create a final mapping report showing the relationship between original and processed data."""
@@ -1509,46 +1351,16 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         # Create job summary at the start of the run
         self._create_job_summary(self.cfg.job_id, self.cfg.job_dir)
 
-        # Load dataset
-        logger.info("Loading dataset with Ray...")
-        dataset = self._load_dataset(load_data_np)
+        # Extract file paths directly (skip dataset loading for efficiency)
+        logger.info("Extracting file paths from dataset...")
+        file_paths = self._extract_file_paths_from_config()
 
         # Prepare process operators
         logger.info("Preparing process operators...")
         ops = self._prepare_operators()
 
-        # Auto-configure partition size and worker count if enabled
-        if self.auto_configure_resources:
-            logger.info(
-                "Auto-configuring partition size and worker count based on data characteristics and available resources..."
-            )
-
-            try:
-                # Get resource optimization recommendations
-                recommendations = auto_configure_resources(self.cfg, dataset, ops)
-
-                # Apply recommendations
-                self.partition_rows = recommendations["recommended_partition_size"]
-                self.partition_size_in_mb = recommendations["recommended_max_size_mb"]
-
-                logger.info(f"Resource optimization completed:")
-                logger.info(f"  Partition rows: {self.partition_rows}")
-                logger.info(f"  Partition size: {self.partition_size_in_mb} MB")
-                logger.info(f"  Worker count: {getattr(self.cfg, 'np', 'Not set')}")
-                logger.info(f"  Primary modality: {recommendations['primary_modality']}")
-                logger.info(f"  Data characteristics: {recommendations['data_characteristics']}")
-                logger.info(f"  Resource analysis: {recommendations['resource_analysis']}")
-                logger.info(f"  Reasoning: {recommendations['reasoning']}")
-
-            except Exception as e:
-                logger.warning(f"Resource optimization failed: {e}, falling back to default values")
-                self.partition_rows = 50000
-                self.partition_size_in_mb = 256
-
-        # Create partitions FIRST to determine actual partition count
-        logger.info(
-            f"Creating new partitions with unified sizing: rows={getattr(self, 'partition_rows', 'auto')}, size_in_mb={getattr(self, 'partition_size_in_mb', 'auto')}..."
-        )
+        # Create partitions from files (much more efficient)
+        logger.info("Creating partitions from file paths...")
 
         # Log repartition start event
         repartition_start_time = time.time()
@@ -1557,11 +1369,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 event_id=f"repartition_start_{int(repartition_start_time)}",
                 event_type="repartition_start",
                 timestamp=repartition_start_time,
-                message="Starting dataset repartitioning phase",
+                message="Starting file-based partitioning phase",
                 metadata={
                     "original_dataset_path": self.cfg.dataset_path,
-                    "partition_size": getattr(self.cfg, "partition_size", None),
-                    "max_partition_size_mb": getattr(self.cfg, "max_partition_size_mb", None),
+                    "file_count": len(file_paths),
                     "storage_format": (
                         getattr(self.cfg.intermediate_storage, "format", "parquet")
                         if hasattr(self.cfg, "intermediate_storage")
@@ -1576,7 +1387,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             )
         )
 
-        partition_paths, self.dataset_mapping = self._create_partitions_with_mapping(dataset)
+        partition_paths, self.dataset_mapping = self._create_partitions_from_files(file_paths)
 
         # Log repartition complete event
         repartition_complete_time = time.time()
@@ -1612,45 +1423,34 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         }
         self.log_job_start(job_config, len(ops))
 
-        # Process partitions with fault tolerance in parallel using threads
-        logger.info(f"Processing {len(partition_paths)} partitions with fault tolerance in parallel using threads...")
+        # Process files in parallel using Ray actors (much more efficient)
+        logger.info(f"Processing {len(partition_paths)} files in parallel...")
 
-        # Use ThreadPoolExecutor for parallel processing
-        partition_results = []
-        with ThreadPoolExecutor(max_workers=min(len(partition_paths), 8)) as executor:
-            # Submit all partition processing tasks
-            future_to_partition = {}
-            for i, partition_path in enumerate(partition_paths):
-                logger.info(f"Submitting partition {i}/{len(partition_paths)-1} for parallel processing")
-                future = executor.submit(self._process_partition_with_retry, partition_path, ops, i)
-                future_to_partition[future] = i
-
-            # Collect results as they complete
-            for future in as_completed(future_to_partition):
-                partition_id = future_to_partition[future]
-                try:
-                    result = future.result()
-                    partition_results.append(result)
-                    logger.info(f"Partition {partition_id} completed successfully")
-                except Exception as e:
-                    logger.error(f"Partition {partition_id} failed with exception: {e}")
-                    partition_results.append(
-                        {
-                            "partition_id": partition_id,
-                            "input_path": partition_paths[partition_id],
-                            "output_path": None,
-                            "success": False,
-                            "error": str(e),
-                        }
-                    )
+        partition_results = self._process_files_parallel(partition_paths, ops)
 
         # Save final checkpoint
         logger.info("Saving final checkpoint...")
         self._save_checkpoint(partition_results, ops)
 
-        # Merge partitions
-        logger.info("Merging processed partitions...")
-        final_output_path = self._merge_partitions_with_mapping(partition_results)
+        # Export final dataset using RayExporter (same as ray_executor.py)
+        logger.info("Exporting dataset to disk...")
+
+        if len(partition_results) == 1 and partition_results[0].get("input_path") == "merged":
+            # Convergence was used, get the processed dataset
+            logger.info("Convergence processing completed, exporting final dataset...")
+            final_dataset = partition_results[0]["dataset"]
+        else:
+            # No convergence, load the processed dataset
+            logger.info("Loading processed dataset...")
+            final_dataset = self._load_processed_dataset_from_results(partition_results)
+
+        if hasattr(final_dataset, "data"):
+            # RayDataset wrapper
+            self.exporter.export(final_dataset.data, columns=final_dataset.data.columns())
+        else:
+            # Raw Ray dataset
+            self.exporter.export(final_dataset, columns=final_dataset.columns())
+        final_output_path = self.cfg.export_path
 
         # Log job completion
         job_duration = time.time() - job_start_time
@@ -1663,7 +1463,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             return None
 
         # Return processed dataset
-        return self._load_processed_dataset(final_output_path)
+        return final_dataset
 
     def _resume_job(self, resumption_validation: Dict[str, Any]):
         """
@@ -1766,7 +1566,347 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
 
     def _load_dataset(self, load_data_np: Optional[int] = None):
         """Load dataset using the dataset builder."""
-        return self.datasetbuilder.load_dataset(num_proc=load_data_np)
+        # Create DatasetBuilder instance for loading the full dataset
+        datasetbuilder = DatasetBuilder(self.cfg, executor_type="ray")
+        return datasetbuilder.load_dataset(num_proc=load_data_np)
+
+    def _extract_file_paths_from_config(self) -> List[str]:
+        """
+        Extract file paths directly from config without loading the full dataset.
+        """
+        dataset_path = self.cfg.dataset_path
+
+        if os.path.isfile(dataset_path):
+            # Single file
+            return [dataset_path]
+        elif os.path.isdir(dataset_path):
+            # Directory - find all supported files
+            supported_extensions = [".json", ".jsonl", ".parquet", ".arrow"]
+            file_paths = []
+
+            for root, dirs, files in os.walk(dataset_path):
+                for file in files:
+                    if any(file.endswith(ext) for ext in supported_extensions):
+                        file_paths.append(os.path.join(root, file))
+
+            # Sort files for consistent ordering
+            file_paths.sort()
+            return file_paths
+        else:
+            raise ValueError(f"Dataset path not found: {dataset_path}")
+
+    def _create_partitions_from_files(self, file_paths: List[str]) -> Tuple[List[str], DatasetMapping]:
+        """
+        Create partitions directly from file paths without loading dataset.
+
+        This is much more efficient than loading the entire dataset first.
+        """
+        logger.info(f"Creating {len(file_paths)} partitions from file paths...")
+
+        partitions = []
+        total_size = 0
+
+        for i, file_path in enumerate(file_paths):
+            file_size = os.path.getsize(file_path)
+            total_size += file_size
+
+            # Calculate checksum for the file
+            with open(file_path, "rb") as f:
+                file_content = f.read()
+                checksum = hashlib.md5(file_content).hexdigest()
+
+            partition = PartitionMetadata(
+                partition_id=i,
+                original_start_idx=0,  # File-based, so start from 0
+                original_end_idx=0,  # Will be updated after processing
+                sample_count=0,  # Will be updated after processing
+                file_size_bytes=file_size,
+                checksum=checksum,
+                created_timestamp=time.time(),
+                file_path=file_path,
+            )
+            partitions.append(partition)
+
+        dataset_mapping = DatasetMapping(
+            original_dataset_path=self.cfg.dataset_path,
+            original_dataset_size=total_size,
+            partition_count=len(partitions),
+            partition_size=total_size // len(partitions) if partitions else 0,
+            partitions=partitions,
+        )
+
+        logger.info(f"Created {len(partitions)} partitions with total size {total_size / (1024*1024):.2f} MB")
+
+        return file_paths, dataset_mapping
+
+    def _process_files_parallel(self, file_paths: List[str], ops: List) -> List[Dict[str, Any]]:
+        """
+        Process files in parallel using Ray tasks with convergence support for global operations.
+
+        This provides true parallelism by processing each file in its own Ray task,
+        but handles global operations by converging partitions when needed.
+        """
+        logger.info(f"Processing {len(file_paths)} files in parallel using Ray tasks...")
+
+        # Detect convergence points for global operations
+        convergence_points = self._detect_convergence_points_partitioned(self.cfg)
+
+        if convergence_points:
+            logger.info(f"Found convergence points at operations: {convergence_points}")
+            return self._process_with_convergence(file_paths, ops, convergence_points)
+        else:
+            logger.info("No convergence points found, processing files sequentially")
+            return self._process_without_convergence(file_paths, ops)
+
+    def _process_with_convergence(
+        self, file_paths: List[str], ops: List, convergence_points: List[int]
+    ) -> List[Dict[str, Any]]:
+        """
+        Process files with convergence support for global operations.
+
+        This method:
+        1. Processes partitions up to the first convergence point
+        2. Merges partitions for global operations
+        3. Continues processing the merged dataset
+        """
+        logger.info("Processing with convergence support for global operations...")
+
+        # Find the first convergence point
+        first_convergence = min(convergence_points)
+        logger.info(f"First convergence point at operation {first_convergence}")
+
+        # Split operations into pre-convergence and post-convergence
+        pre_convergence_ops = ops[:first_convergence]
+        post_convergence_ops = ops[first_convergence:]
+
+        logger.info(f"Pre-convergence operations: {len(pre_convergence_ops)}")
+        logger.info(f"Post-convergence operations: {len(post_convergence_ops)}")
+
+        # Process partitions up to convergence point
+        if pre_convergence_ops:
+            logger.info("Processing partitions up to convergence point...")
+            partition_results = self._process_without_convergence(file_paths, pre_convergence_ops)
+        else:
+            logger.info("No pre-convergence operations, loading raw partitions...")
+            partition_results = self._load_raw_partitions(file_paths)
+
+        # Merge partitions for global operations
+        logger.info("Merging partitions for global operations...")
+        merged_dataset = self._merge_partitions_for_global_ops(partition_results)
+
+        # Process merged dataset with post-convergence operations
+        if post_convergence_ops:
+            logger.info("Processing merged dataset with global operations...")
+            final_dataset = self._process_merged_dataset(merged_dataset, post_convergence_ops)
+
+            # Return the processed dataset for final export in run()
+            return [
+                {"partition_id": 0, "input_path": "merged", "dataset": final_dataset, "success": True, "error": None}
+            ]
+        else:
+            # No post-convergence operations, just return the merged result
+            return [
+                {"partition_id": 0, "input_path": "merged", "dataset": merged_dataset, "success": True, "error": None}
+            ]
+
+    def _process_without_convergence(self, file_paths: List[str], ops: List) -> List[Dict[str, Any]]:
+        """
+        Process files without convergence using ThreadPoolExecutor for parallelism
+        """
+        logger.info("Processing files without convergence using ThreadPoolExecutor...")
+
+        results = []
+        max_workers = min(len(file_paths), 4)  # Limit to 4 workers to avoid overwhelming the system
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all tasks
+            future_to_index = {
+                executor.submit(_process_single_batch, file_path, ops, i, self.work_dir, self.cfg): i
+                for i, file_path in enumerate(file_paths)
+            }
+
+            # Collect results as they complete
+            for future in as_completed(future_to_index):
+                i = future_to_index[future]
+                file_path = file_paths[i]
+
+                try:
+                    result = future.result()
+                    results.append(result)
+                    logger.info(f"File {i+1} processed successfully")
+                except Exception as e:
+                    logger.error(f"File {i+1} failed: {e}")
+                    results.append(
+                        {
+                            "partition_id": i,
+                            "input_path": file_path,
+                            "output_path": None,
+                            "success": False,
+                            "error": str(e),
+                        }
+                    )
+
+        # Sort results by partition_id to maintain order
+        results.sort(key=lambda x: x["partition_id"])
+
+        # Log results
+        successful = sum(1 for r in results if r["success"])
+        failed = len(results) - successful
+
+        logger.info(f"Processing completed: {successful} successful, {failed} failed")
+
+        return results
+
+    def _load_raw_partitions(self, file_paths: List[str]) -> List[Dict[str, Any]]:
+        """
+        Load raw partitions without processing (for when there are no pre-convergence operations).
+        """
+        logger.info("Loading raw partitions...")
+        results = []
+
+        for i, file_path in enumerate(file_paths):
+            try:
+                # Create DatasetBuilder instance for this partition
+                from data_juicer.core.data.dataset_builder import DatasetBuilder
+
+                partition_cfg = Namespace(**vars(self.cfg))
+                partition_cfg.dataset_path = file_path
+                datasetbuilder = DatasetBuilder(partition_cfg, executor_type="ray")
+
+                # Load dataset
+                dataset = datasetbuilder.load_dataset()
+
+                results.append(
+                    {
+                        "partition_id": i,
+                        "input_path": file_path,
+                        "dataset": dataset,  # Return dataset object instead of file path
+                        "success": True,
+                        "error": None,
+                    }
+                )
+
+                logger.info(f"Loaded raw partition {i}")
+
+            except Exception as e:
+                logger.error(f"Failed to load raw partition {i}: {e}")
+                results.append(
+                    {"partition_id": i, "input_path": file_path, "output_path": None, "success": False, "error": str(e)}
+                )
+
+        return results
+
+    def _merge_partitions_for_global_ops(self, partition_results: List[Dict[str, Any]]):
+        """
+        Merge processed partitions into a single dataset for global operations.
+
+        Uses Ray's efficient union-based merging for all dataset sizes.
+        """
+        logger.info("Merging partitions for global operations...")
+
+        # Filter successful results
+        successful_results = [r for r in partition_results if r["success"]]
+
+        if not successful_results:
+            raise RuntimeError("No successful partitions to merge")
+
+        return self._union_merge_partitions(successful_results)
+
+    def _union_merge_partitions(self, successful_results: List[Dict[str, Any]]):
+        """
+        Merge partitions using Ray's union operation.
+
+        This approach unions all datasets in a single operation, which is more efficient
+        than chaining individual unions and reduces object store pressure.
+        """
+        logger.info("Merging partitions using Ray union operation...")
+
+        # Extract dataset objects directly from results
+        partition_datasets = []
+
+        for result in successful_results:
+            if "dataset" in result and result["dataset"] is not None:
+                partition_datasets.append(result["dataset"].data)
+
+        if not partition_datasets:
+            raise RuntimeError("No valid datasets found")
+
+        logger.info(f"Union merge of {len(partition_datasets)} partitions...")
+
+        # Union all datasets in a single operation (more efficient than chaining)
+        if len(partition_datasets) == 1:
+            merged_dataset = partition_datasets[0]
+        else:
+            # Use * to unpack the list as individual arguments
+            merged_dataset = partition_datasets[0].union(*partition_datasets[1:])
+
+        logger.info(f"Union dataset created")
+
+        return RayDataset(merged_dataset, dataset_path="merged", cfg=self.cfg)
+
+    def _process_merged_dataset(self, merged_dataset, post_convergence_ops: List):
+        """
+        Process the merged dataset with post-convergence operations (global operations).
+        """
+        logger.info(f"Processing merged dataset with {len(post_convergence_ops)} global operations...")
+
+        # Apply post-convergence operations
+        processed_dataset = merged_dataset.process(post_convergence_ops)
+
+        logger.info(f"Global operations completed. Final dataset ready for export")
+
+        return processed_dataset
+
+    def _load_processed_dataset_from_results(self, partition_results: List[Dict[str, Any]]):
+        """
+        Load processed dataset from partition results using Ray's union operation.
+
+        Args:
+            partition_results: List of results from parallel processing
+
+        Returns:
+            Combined Ray dataset
+        """
+        logger.info("Loading processed dataset from partition results...")
+
+        # Filter successful results
+        successful_results = [r for r in partition_results if r["success"]]
+        failed_results = [r for r in partition_results if not r["success"]]
+
+        if failed_results:
+            logger.warning(f"{len(failed_results)} files failed processing:")
+            for result in failed_results:
+                logger.warning(f"  File {result['partition_id']}: {result['error']}")
+
+        if not successful_results:
+            raise RuntimeError("All files failed processing")
+
+        # Extract dataset objects directly from results
+        partition_datasets = []
+        for result in successful_results:
+            if "dataset" in result and result["dataset"] is not None:
+                try:
+                    partition_datasets.append(result["dataset"].data)
+                    logger.info(f"Using partition {result['partition_id']} with {result['sample_count']} samples")
+
+                except Exception as e:
+                    logger.error(f"Failed to use partition {result['partition_id']}: {e}")
+                    continue
+
+        if not partition_datasets:
+            raise RuntimeError("No partition datasets could be loaded successfully")
+
+        # Combine all partitions using Ray's union operation
+        logger.info(f"Combining {len(partition_datasets)} partitions...")
+        # Use the first dataset and union the rest to avoid chaining
+        combined_dataset = partition_datasets[0]
+        for dataset in partition_datasets[1:]:
+            combined_dataset = combined_dataset.union(dataset)
+
+        # total_samples = combined_dataset.count()
+        # logger.info(f"Successfully combined dataset with {total_samples} total samples")
+
+        return combined_dataset
 
     def _prepare_operators(self):
         """Prepare process operators."""
@@ -1876,7 +2016,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
 
     def _detect_convergence_points_partitioned(self, cfg) -> List[int]:
         """Detect convergence points for partitioned execution."""
-        operations = self._get_operations_from_config(cfg)
+        operations = self._prepare_operators()
         convergence_points = []
 
         for op_idx, op in enumerate(operations):

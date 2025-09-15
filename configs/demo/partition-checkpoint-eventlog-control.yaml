@@ -24,9 +24,10 @@ dataset_path: './demos/data/demo-dataset.jsonl'
 #   work_dir: "./outputs/my_project" → job_dir: "./outputs/my_project/20250804_143022_abc123"
 work_dir: "./outputs/partition-checkpoint-eventlog/{job_id}"
 export_path: '{work_dir}/processed.jsonl'
+np: 8
 
 # Executor configuration
-executor_type: "ray_partitioned"  # Use our enhanced partitioned executor
+executor_type: "ray"  # Use our enhanced partitioned executor
 ray_address: "auto"
 # np will be auto-configured based on available cluster resources when partition.auto_configure: true
 # np: 2  # Number of Ray workers (auto-configured when partition.auto_configure: true)
@@ -37,26 +38,6 @@ partition_dir: "{work_dir}/partitions"
 
 # Event logs: Fast storage (SSD, local disk) - small files, frequent writes (Optional)
 event_log_dir: "{work_dir}/event_logs"  # Optional: separate fast storage for event logs
-
-# Checkpoints: Large storage (HDD, network storage) - large files, infrequent writes (Optional)
-checkpoint_dir: "{work_dir}/checkpoints"  # Optional: separate large storage for checkpoints
-
-
-# Partition configuration
-partition:
-  method: "natural_file"  # Use original files as partitions (default, fastest)
-
-# Checkpoint configuration
-checkpoint:
-  enabled: false
-  # strategy: "every_op"  # every_op, every_partition, every_n_ops, manual, disabled
-  # n_ops: 1  # Number of operations between checkpoints (for every_n_ops strategy)
-  # op_names: []  # Specific operation names to checkpoint after (for manual strategy)
-
-# Intermediate storage configuration (includes file lifecycle management)
-intermediate_storage:
-  format: "parquet"  # parquet, arrow, jsonl; defaults to parquet
-  write_partitions: false
 
 # Event logging configuration
 event_logging:
@@ -111,7 +92,6 @@ process:
 export_in_parallel: true
 keep_stats_in_res_ds: true
 keep_hashes_in_res_ds: true
-
 
 # =============================================================================
 # COMPLETE USER EXPERIENCE:
