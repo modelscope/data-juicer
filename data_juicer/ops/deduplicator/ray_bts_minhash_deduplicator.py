@@ -707,5 +707,4 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         )
         end_time = time.time()
         logger.info(f"filter time = {end_time - start_time}")
-        result.materialize()
         return result

@@ -1690,7 +1690,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             logger.info("No pre-convergence operations, loading raw partitions...")
             partition_results = self._load_raw_partitions(file_paths)
 
-        # Merge partitions for global operations
+        # Merge partitions for global operations, and materialize to avoid union chain
         logger.info("Merging partitions for global operations...")
         merged_dataset = self._merge_partitions_for_global_ops(partition_results)
 
@@ -1842,7 +1842,8 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
 
         logger.info(f"Union dataset created")
 
-        return RayDataset(merged_dataset, dataset_path="merged", cfg=self.cfg)
+        # materialize to avoid union chain and memory stress
+        return RayDataset(merged_dataset.materialize(), dataset_path="merged", cfg=self.cfg)
 
     def _process_merged_dataset(self, merged_dataset, post_convergence_ops: List):
         """
