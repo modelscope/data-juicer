@@ -1547,10 +1547,6 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                             }
                         )
 
-        # Save final checkpoint
-        logger.info("Saving final checkpoint...")
-        self._save_checkpoint(partition_results, ops)
-
         # Merge partitions
         logger.info("Merging processed partitions...")
         final_output_path = self._merge_partitions_with_mapping(partition_results)
