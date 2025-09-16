@@ -104,12 +104,12 @@ class BTSUnionFind:
         result_refs = []
         for remote_edge_buffer in self.remote_edge_buffers:
             if len(result_refs) > self.max_pending_edge_buffer_task:
-                ready_refs, result_refs = ray.wait(result_refs, num_returns=self.num_edge_buffer_task_returns)
-                edge_list = ray.get(ready_refs)
+                # Wait for all pending tasks to complete to avoid backpressure
+                edge_list = ray.get(result_refs)
                 for edges in edge_list:
                     for x, y in edges:
                         self.union(x, y)
-                del ready_refs
+                result_refs = []  # Reset the list after processing
             result_refs.append(remote_edge_buffer.get_edges.remote(self.parallel_id))
         edge_list = ray.get(result_refs)
         for edges in edge_list:
@@ -566,8 +566,18 @@ class RayBTSMinhashDeduplicator(Deduplicator):
     def merge_op_batch(self, object_refs):
         results = []
         while object_refs:
-            ready_refs, object_refs = ray.wait(object_refs, num_returns=min(self.merge_batch_size, len(object_refs)))
-            results.extend(ray.get(ready_refs))
+            # Process in smaller batches to avoid getting stuck on individual tasks
+            batch_size = min(self.merge_batch_size, len(object_refs))
+            if batch_size == len(object_refs):
+                # If this is the last batch, process all remaining tasks
+                results.extend(ray.get(object_refs))
+                break
+            else:
+                # Process a batch and wait for all to complete
+                batch_refs = object_refs[:batch_size]
+                remaining_refs = object_refs[batch_size:]
+                results.extend(ray.get(batch_refs))
+                object_refs = remaining_refs
         return results
 
     def merge(self):
@@ -697,4 +707,5 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         )
         end_time = time.time()
         logger.info(f"filter time = {end_time - start_time}")
+        result.materialize()
         return result
