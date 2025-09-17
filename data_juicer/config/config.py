@@ -531,11 +531,17 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
 
             # partition configuration
             parser.add_argument(
-                "--partition.method",
+                "--partition.mode",
                 type=str,
-                default="natural_file",
-                choices=["natural_file"],
-                help="Partitioning method: natural_file (use original files as partitions)",
+                default="auto",
+                choices=["manual", "auto"],
+                help="Partition mode: manual (specify num_of_partitions) or auto (use partition size optimizer)",
+            )
+            parser.add_argument(
+                "--partition.num_of_partitions",
+                type=int,
+                default=4,
+                help="Number of partitions for manual mode (ignored in auto mode)",
             )
 
             # Resource optimization configuration

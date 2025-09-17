@@ -105,15 +105,27 @@ arrow_memory_mapping: false
 
 #### `partition` - Partitioning and Resilience
 Controls how the dataset is split and how failures are handled:
-- **Auto-Configuration** (Recommended):
-  - `auto_configure`: Enable automatic partition size optimization based on data modality
-- **Manual Partitioning** (when `auto_configure: false`):
-  - `size`: Number of samples per partition
-    - **50-100**: Debugging, quick iterations, small datasets
-    - **100-300**: Production, good balance of fault tolerance and efficiency ⭐
-    - **300-500**: Large datasets with stable processing
-    - **500+**: Only for very large datasets with minimal failure risk
-  - `max_size_mb`: Maximum partition size in MB
+
+**Two Partition Modes:**
+
+1. **Auto Mode** (Recommended - `mode: "auto"`):
+   - Automatically analyzes your data characteristics and system resources
+   - Calculates optimal partition size targeting ~64MB per partition
+   - Determines optimal number of partitions based on dataset size
+   - Configures optimal worker count based on available CPU cores
+   - No manual tuning required - adapts to your hardware and data
+   - Configuration:
+     - `mode`: `"auto"`
+     - `size`: Fallback partition size (samples) - used if auto-analysis fails
+     - `max_size_mb`: Fallback max partition size (MB) - used if auto-analysis fails
+
+2. **Manual Mode** (`mode: "manual"`):
+   - You specify the exact number of partitions to create
+   - Useful when you know your optimal partitioning strategy
+   - Configuration:
+     - `mode`: `"manual"`
+     - `num_of_partitions`: Exact number of partitions to create
+     - `size` and `max_size_mb` are ignored in manual mode
 
 
 #### `intermediate_storage` - Intermediate Data Management
@@ -156,14 +168,16 @@ event_logging:
 
 # Partitioning configuration
 partition:
-  # Basic partitioning settings
-  # Recommended partition sizes:
-  # - 50-100: For debugging, quick iterations, small datasets
-  # - 100-300: For production, good balance of fault tolerance and efficiency
-  # - 300-500: For large datasets with stable processing
-  # - 500+: Only for very large datasets with minimal failure risk
-  size: 200  # Number of samples per partition (smaller for better fault tolerance)
-  max_size_mb: 32  # Maximum partition size in MB (reduced for faster processing)
+  mode: "auto"          # Auto mode - optimal partitioning based on data analysis
+  size: 5000            # Fallback partition size (samples) - used if auto-analysis fails
+  max_size_mb: 64       # Fallback max partition size (MB) - used if auto-analysis fails
+  # Note: num_of_partitions is calculated automatically in auto mode
+
+# Alternative: Manual partition mode
+# partition:
+#   mode: "manual"        # Manual mode - specify exact number of partitions
+#   num_of_partitions: 8  # Split dataset into exactly 8 partitions
+#   # Note: size and max_size_mb are ignored in manual mode
   
 
 
@@ -184,15 +198,65 @@ intermediate_storage:
   max_retention_days: 7
 ```
 
+## 📊 Partition Modes Explained
+
+### Auto Mode (Recommended)
+**When to use:** Most use cases, especially when you want optimal performance without manual tuning.
+
+**Benefits:**
+- ✅ Automatically adapts to your data characteristics (text length, modality, etc.)
+- ✅ Optimizes for your system resources (CPU, memory, GPU)
+- ✅ Targets ~64MB per partition for optimal memory usage
+- ✅ Calculates optimal number of partitions based on dataset size
+- ✅ No manual tuning required
+
+**Example output:**
+```
+🔧 Auto-configuring partition settings based on data characteristics...
+📊 Dataset analysis complete:
+  Total samples: 10000
+  Recommended partition size: 5000 samples
+  Calculated partitions: 2
+  Recommended max size: 64 MB
+  Recommended workers: 4
+```
+
+### Manual Mode
+**When to use:** When you have specific requirements or know your optimal partitioning strategy.
+
+**Benefits:**
+- ✅ Full control over partition count
+- ✅ Predictable resource usage
+- ✅ Useful for debugging or specific workflows
+- ✅ Can be more efficient for known dataset patterns
+
+**Example:**
+```yaml
+partition:
+  mode: "manual"
+  num_of_partitions: 8  # Always creates exactly 8 partitions
+```
+
 ## 🚀 Quick Start
 
 ### 1. Basic Usage
+
+#### Auto Partition Mode (Recommended)
 ```bash
-# Run with auto-generated job ID
-dj-process --config configs/demo/checkpoint_config_example.yaml
+# Run with auto-generated job ID and auto partition optimization
+dj-process --config configs/demo/partition-auto-mode.yaml
 
 # Run with custom job ID
-dj-process --config configs/demo/checkpoint_config_example.yaml --job_id my_experiment_001
+dj-process --config configs/demo/partition-auto-mode.yaml --job_id my_experiment_001
+```
+
+#### Manual Partition Mode
+```bash
+# Run with manual partition configuration (8 partitions)
+dj-process --config configs/demo/partition-manual-mode.yaml
+
+# Run with custom job ID
+dj-process --config configs/demo/partition-manual-mode.yaml --job_id my_experiment_001
 ```
 
 ### 2. Resume a Job

@@ -44,7 +44,9 @@ checkpoint_dir: "{work_dir}/checkpoints"  # Optional: separate large storage for
 
 # Partition configuration
 partition:
-  method: "natural_file"  # Use original files as partitions (default, fastest)
+  mode: "manual"                      # Auto partition mode - optimal partitioning
+  num_of_partitions: 4  # Number of partitions to create
+
 
 # Checkpoint configuration
 checkpoint:
@@ -137,8 +139,9 @@ keep_hashes_in_res_ds: true
 #    └── processed.jsonl       # Final output file
 #
 # 4. Resource Optimization:
-#    - resource_optimization.auto_configure: true automatically optimizes:
+#    - partition.mode: "auto" automatically optimizes:
 #      * Partition size based on data characteristics and available memory
+#      * Number of partitions based on dataset size and optimal partition size
 #      * Worker count (np) based on available CPU cores
 #      * Processing efficiency based on data modality (text, image, audio, video)
 #    - No manual tuning required - system adapts to your hardware and data

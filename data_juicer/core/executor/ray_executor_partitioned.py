@@ -89,8 +89,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         self.datasetbuilder = DatasetBuilder(self.cfg, executor_type="ray")
 
         # Partition configuration
-        self.num_partitions = getattr(self.cfg, "num_partitions", 4)  # Default to 4 partitions
-        logger.info(f"Using dataset splitting with {self.num_partitions} partitions")
+        self._configure_partitioning()
 
         # Checkpoint configuration
         checkpoint_cfg = getattr(self.cfg, "checkpoint", None)
@@ -140,6 +139,106 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             keep_hashes_in_res_ds=getattr(self.cfg, "keep_hashes_in_res_ds", False),
         )
 
+    def _configure_partitioning(self):
+        """Configure partitioning based on manual or auto mode."""
+        # Get partition configuration
+        partition_cfg = getattr(self.cfg, "partition", {})
+
+        # Handle both dict and object configurations
+        if isinstance(partition_cfg, dict):
+            mode = partition_cfg.get("mode", "auto")
+            num_of_partitions = partition_cfg.get("num_of_partitions", 4)
+            partition_size = partition_cfg.get("size", 5000)
+            max_size_mb = partition_cfg.get("max_size_mb", 64)
+        else:
+            mode = getattr(partition_cfg, "mode", "auto")
+            num_of_partitions = getattr(partition_cfg, "num_of_partitions", 4)
+            partition_size = getattr(partition_cfg, "size", 5000)
+            max_size_mb = getattr(partition_cfg, "max_size_mb", 64)
+
+        # Fallback to legacy configuration if partition config is not available
+        if not partition_cfg:
+            mode = "manual"
+            num_of_partitions = getattr(self.cfg, "num_partitions", 4)
+            logger.warning("No partition configuration found, using legacy num_partitions")
+
+        self.partition_mode = mode
+        self.num_partitions = num_of_partitions
+        self.partition_size = partition_size
+        self.max_size_mb = max_size_mb
+
+        if mode == "manual":
+            logger.info(f"Manual partition mode: using {self.num_partitions} partitions")
+        else:  # auto mode
+            logger.info(f"Auto partition mode: will determine optimal partitioning based on data characteristics")
+            logger.info(f"Fallback partition size: {self.partition_size} samples, max {self.max_size_mb} MB")
+
+    def _configure_auto_partitioning(self, dataset, ops):
+        """Configure partitioning using the partition size optimizer for auto mode."""
+        try:
+            from data_juicer.core.executor.partition_size_optimizer import (
+                auto_configure_resources,
+            )
+
+            logger.info("🔧 Auto-configuring partition settings based on data characteristics...")
+
+            # Use the partition size optimizer to determine optimal settings
+            recommendations = auto_configure_resources(self.cfg, dataset, ops)
+
+            # Update partition configuration based on recommendations
+            if hasattr(recommendations, "get"):
+                # Handle dict-like recommendations
+                recommended_size = recommendations.get("recommended_partition_size", self.partition_size)
+                recommended_max_size_mb = recommendations.get("recommended_max_size_mb", self.max_size_mb)
+                recommended_workers = recommendations.get("recommended_worker_count", getattr(self.cfg, "np", 4))
+            else:
+                # Handle object-like recommendations
+                recommended_size = getattr(recommendations, "recommended_partition_size", self.partition_size)
+                recommended_max_size_mb = getattr(recommendations, "recommended_max_size_mb", self.max_size_mb)
+                recommended_workers = getattr(recommendations, "recommended_worker_count", getattr(self.cfg, "np", 4))
+
+            # Calculate optimal number of partitions based on dataset size and recommended partition size
+            try:
+                if hasattr(dataset, "count"):
+                    total_samples = dataset.count()
+                elif hasattr(dataset, "__len__"):
+                    total_samples = len(dataset)
+                else:
+                    total_samples = 10000  # Fallback estimate
+
+                # Calculate number of partitions needed
+                self.num_partitions = max(1, int(total_samples / recommended_size))
+
+                # Ensure we don't create too many partitions (max 32 for efficiency)
+                self.num_partitions = min(self.num_partitions, 32)
+
+                logger.info(f"📊 Dataset analysis complete:")
+                logger.info(f"  Total samples: {total_samples}")
+                logger.info(f"  Recommended partition size: {recommended_size} samples")
+                logger.info(f"  Calculated partitions: {self.num_partitions}")
+                logger.info(f"  Recommended max size: {recommended_max_size_mb} MB")
+                logger.info(f"  Recommended workers: {recommended_workers}")
+
+                # Update worker count if not already set
+                if not hasattr(self.cfg, "np") or self.cfg.np is None:
+                    self.cfg.np = recommended_workers
+                    logger.info(f"  Updated worker count to: {recommended_workers}")
+
+            except Exception as e:
+                logger.warning(f"Could not determine dataset size for partition calculation: {e}")
+                logger.info(f"Using fallback partition count: {self.num_partitions}")
+
+        except ImportError as e:
+            logger.warning(f"Could not import partition size optimizer: {e}")
+            logger.info("Falling back to manual partition configuration")
+        except Exception as e:
+            logger.warning(f"Auto partition configuration failed: {e}")
+            logger.info("Falling back to manual partition configuration")
+
+    def _resolve_checkpoint_filename(self, op_idx: int, partition_id: int) -> str:
+        """Resolve checkpoint filename using consistent format."""
+        return f"checkpoint_op_{op_idx:04d}_partition_{partition_id:04d}.parquet"
+
     def _should_checkpoint(self, op_idx: int, op_name: str) -> bool:
         """Determine if checkpoint should be created based on configuration strategy."""
         if not self.checkpoint_enabled:
@@ -157,9 +256,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             logger.warning(f"Unknown checkpoint strategy: {self.checkpoint_strategy}, defaulting to every_op")
             return True
 
-    def _save_checkpoint(self, dataset: RayDataset, op_idx: int, op_name: str, partition_id: int = 0) -> str:
+    def _save_checkpoint(self, dataset: RayDataset, op_idx: int, op_name: str = None, partition_id: int = 0) -> str:
         """Save dataset checkpoint to parquet format."""
-        checkpoint_filename = f"checkpoint_op_{op_idx:03d}_{op_name}_partition_{partition_id:03d}.parquet"
+        checkpoint_filename = self._resolve_checkpoint_filename(op_idx, partition_id)
         checkpoint_path = os.path.join(self.checkpoint_dir, checkpoint_filename)
 
         # Ensure directory exists
@@ -181,9 +280,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         logger.info(f"Saved checkpoint: {checkpoint_path}")
         return checkpoint_path
 
-    def _load_checkpoint(self, op_idx: int, op_name: str, partition_id: int = 0) -> Optional[RayDataset]:
+    def _load_checkpoint(self, op_idx: int, op_name: str = None, partition_id: int = 0) -> Optional[RayDataset]:
         """Load dataset checkpoint from parquet format."""
-        checkpoint_filename = f"checkpoint_op_{op_idx:03d}_{op_name}_partition_{partition_id:03d}.parquet"
+        checkpoint_filename = self._resolve_checkpoint_filename(op_idx, partition_id)
         checkpoint_path = os.path.join(self.checkpoint_dir, checkpoint_filename)
 
         if not os.path.exists(checkpoint_path):
@@ -196,9 +295,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             # Log checkpoint load event
             self._log_event(
                 event_type=EventType.CHECKPOINT_LOAD,
-                message=f"Loaded checkpoint from operation {op_idx}: {op_name}",
+                message=f"Loaded checkpoint from operation {op_idx}",
                 partition_id=partition_id,
-                operation_name=op_name,
+                operation_name=op_name or f"op_{op_idx:04d}",
                 operation_idx=op_idx,
                 metadata={"checkpoint_path": checkpoint_path},
             )
@@ -213,13 +312,14 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         checkpoint_files = []
 
         for filename in os.listdir(self.checkpoint_dir):
-            if filename.startswith(f"checkpoint_op_") and filename.endswith(f"_partition_{partition_id:03d}.parquet"):
+            if filename.startswith(f"checkpoint_op_") and filename.endswith(f"_partition_{partition_id:04d}.parquet"):
                 try:
-                    # Parse filename: checkpoint_op_XXX_OpName_partition_YYY.parquet
+                    # Parse filename: checkpoint_op_XXXX_partition_YYYY.parquet
                     parts = filename.replace(".parquet", "").split("_")
-                    if len(parts) >= 5:
+                    if len(parts) >= 4:
                         op_idx = int(parts[2])
-                        op_name = parts[3]
+                        # For backward compatibility, we'll use a generic op_name
+                        op_name = f"op_{op_idx:04d}"
                         checkpoint_files.append((op_idx, op_name, os.path.join(self.checkpoint_dir, filename)))
                 except (ValueError, IndexError):
                     continue
@@ -245,8 +345,11 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         """
         job_start_time = time.time()
 
-        if self.job_id:
-            logger.info(f"🔄 Attempting to resume job: {self.job_id}")
+        # Check if user provided a job_id (indicating resumption attempt)
+        user_provided_job_id = getattr(self.cfg, "_user_provided_job_id", False)
+
+        if user_provided_job_id and self.job_id:
+            logger.info(f"🔄 User provided job_id: {self.job_id} - attempting to resume job")
             resume_result = self._resume_job(self.job_id)
             if resume_result == "completed":
                 logger.info("✅ Job is already completed - nothing to do")
@@ -258,6 +361,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 logger.info("❌ Job resumption failed - starting fresh")
                 is_resuming = False
         else:
+            if self.job_id:
+                logger.info(f"🚀 Starting new job with auto-generated job_id: {self.job_id}")
+            else:
+                logger.info("🚀 Starting new job")
             is_resuming = False
 
         if not is_resuming:
@@ -278,6 +385,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 "checkpoint_enabled": self.checkpoint_enabled,
                 "is_resuming": is_resuming,
                 "job_id": self.job_id,
+                "user_provided_job_id": user_provided_job_id,
             },
         )
 
@@ -292,6 +400,10 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         # Prepare operations
         logger.info("Preparing operations...")
         ops = self._prepare_operators()
+
+        # Handle auto partition mode
+        if self.partition_mode == "auto":
+            self._configure_auto_partitioning(dataset, ops)
 
         # Detect convergence points for global operations
         convergence_points = self._detect_convergence_points_partitioned(ops)
@@ -455,10 +567,24 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 if current_dataset is None:
                     logger.warning(f"Partition {partition_id}: Failed to load checkpoint, starting from beginning")
                     current_dataset = dataset
-                group_ops = ops[latest_checkpoint[0] + 1 : end_idx]
-                if not group_ops:
-                    logger.info(f"Partition {partition_id}: All operations in this group already processed, skipping")
-                    continue
+                    group_ops = ops[start_idx:end_idx]  # Start from beginning of group
+                    logger.info(
+                        f"Partition {partition_id}: Will process {len(group_ops)} operations from beginning of group"
+                    )
+                else:
+                    logger.info(
+                        f"Partition {partition_id}: Successfully loaded checkpoint, resuming from operation {latest_checkpoint[0] + 1}"
+                    )
+                    group_ops = ops[latest_checkpoint[0] + 1 : end_idx]  # Resume from checkpoint
+                    if not group_ops:
+                        logger.info(
+                            f"Partition {partition_id}: All operations in this group already processed, skipping"
+                        )
+                        continue
+                    else:
+                        logger.info(
+                            f"Partition {partition_id}: Will process {len(group_ops)} remaining operations from checkpoint"
+                        )
 
             # Process the group of operations
             if group_ops:
