@@ -12,6 +12,7 @@ import os
 import time
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
 from jsonargparse import Namespace
@@ -74,6 +75,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         self.executor_type = "ray_partitioned"
         self.work_dir = self.cfg.work_dir
         self.adapter = Adapter(self.cfg)
+        self.job_id = self.cfg.get("job_id", None)
 
         # Initialize EventLoggingMixin for job management and event logging
         EventLoggingMixin.__init__(self, cfg)
@@ -236,19 +238,50 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         Args:
             load_data_np: Number of workers for loading dataset
             skip_return: Whether to skip returning the dataset
+            job_id: Optional job ID to resume from checkpoints
 
         Returns:
             Processed dataset
         """
         job_start_time = time.time()
-        logger.info("🚀 Starting simplified partitioned processing...")
+
+        if self.job_id:
+            logger.info(f"🔄 Attempting to resume job: {self.job_id}")
+            resume_result = self._resume_job(self.job_id)
+            if resume_result == "completed":
+                logger.info("✅ Job is already completed - nothing to do")
+                return None  # Exit gracefully
+            elif resume_result == "resuming":
+                logger.info("✅ Job resumption successful - will use existing checkpoints")
+                is_resuming = True
+            else:  # resume_result == "failed"
+                logger.info("❌ Job resumption failed - starting fresh")
+                is_resuming = False
+        else:
+            is_resuming = False
+
+        if not is_resuming:
+            logger.info("🚀 Starting simplified partitioned processing...")
+        else:
+            logger.info("🔄 Resuming partitioned processing from checkpoints...")
 
         # Log job start event
         self._log_event(
             event_type=EventType.JOB_START,
-            message="Starting partitioned dataset processing",
-            metadata={"num_partitions": self.num_partitions, "checkpoint_enabled": self.checkpoint_enabled},
+            message=(
+                "Starting partitioned dataset processing"
+                if not is_resuming
+                else "Resuming partitioned dataset processing"
+            ),
+            metadata={
+                "num_partitions": self.num_partitions,
+                "checkpoint_enabled": self.checkpoint_enabled,
+                "is_resuming": is_resuming,
+                "job_id": self.job_id,
+            },
         )
+
+        # Note: Config validation is handled in _resume_job() if resuming
 
         # Load the full dataset using a single DatasetBuilder
         logger.info("Loading dataset with single DatasetBuilder...")
@@ -486,6 +519,79 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             groups.append((current_start, len(ops), ops[current_start:]))
 
         return groups
+
+    def _find_job_directory(self, job_id: str) -> Optional[str]:
+        """Find the job directory based on job_id."""
+        # Check if the current work_dir already contains the job_id
+        current_work_dir = Path(self.work_dir)
+        logger.info(f"Checking if current work_dir contains job_id: {current_work_dir}")
+
+        if job_id in str(current_work_dir):
+            # Current work_dir already contains job_id, check if it's a valid job directory
+            logger.info(f"Current work_dir contains job_id '{job_id}', checking if it's a valid job directory")
+
+            # Check if this directory has events files (indicating it's a job directory)
+            latest_events_file = self.event_logger.find_latest_events_file(str(current_work_dir))
+            if latest_events_file:
+                logger.info(f"Found events file in current work_dir: {latest_events_file}")
+                return str(current_work_dir)
+            else:
+                logger.warning(f"No events file found in current work_dir: {current_work_dir}")
+
+        logger.warning(f"No directory found containing job_id '{job_id}' with events files")
+        return None
+
+    def _check_job_completion(self, job_dir: str, job_id: str) -> bool:
+        """Check if the job is already completed."""
+        latest_events_file = self.event_logger.find_latest_events_file(job_dir)
+        if not latest_events_file:
+            logger.info(f"No events file found in job directory: {job_dir}")
+            return False
+
+        is_completed = self.event_logger.check_job_completion(latest_events_file)
+        if is_completed:
+            logger.info(f"Job {job_id} is already completed - no need to resume")
+        else:
+            logger.info(f"Job {job_id} is not completed - resumption possible")
+
+        return is_completed
+
+    def _resume_job(self, job_id: str) -> str:
+        """Resume a job from checkpoints.
+
+        Returns:
+            "completed": Job is already completed
+            "resuming": Job can be resumed
+            "failed": Job resumption failed
+        """
+        logger.info(f"Attempting to resume job: {job_id}")
+
+        # Find job directory
+        job_dir = self._find_job_directory(job_id)
+        if not job_dir:
+            logger.error(f"Job directory not found for job_id: {job_id}")
+            return "failed"
+
+        logger.info(f"Found job directory: {job_dir}")
+
+        # Check if config validation passed (done during config initialization)
+        if not getattr(self.cfg, "_same_yaml_config", False):
+            logger.error("Config validation failed - configurations don't match")
+            return "failed"
+
+        # Check if job is already completed
+        if self._check_job_completion(job_dir, job_id):
+            return "completed"  # Job already completed
+
+        # Update checkpoint directory to use the job's checkpoint directory
+        job_checkpoint_dir = os.path.join(job_dir, "checkpoints")
+        if os.path.exists(job_checkpoint_dir):
+            self.checkpoint_dir = job_checkpoint_dir
+            logger.info(f"Using checkpoint directory from job: {self.checkpoint_dir}")
+        else:
+            logger.warning(f"No checkpoint directory found in job directory: {job_checkpoint_dir}")
+
+        return "resuming"
 
     def _prepare_operators(self):
         """Prepare process operators."""

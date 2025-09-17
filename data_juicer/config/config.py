@@ -669,6 +669,17 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
         with timing_context("Updating operator process"):
             cfg = update_op_process(cfg, parser, used_ops)
 
+        # Validate config for resumption if job_id is provided
+        if not load_configs_only and hasattr(cfg, "job_id") and cfg.job_id:
+            # Check if this is a resumption attempt by looking for existing job directory
+            job_dir = getattr(cfg, "job_dir", None)
+            if job_dir and os.path.exists(job_dir):
+                logger.info(f"🔍 Checking for job resumption: {cfg.job_id}")
+                cfg._same_yaml_config = validate_config_for_resumption(cfg, job_dir, args)
+            else:
+                # New job, set flag to True
+                cfg._same_yaml_config = True
+
         # copy the config file into the work directory
         if not load_configs_only:
             config_backup(cfg)
@@ -1058,6 +1069,176 @@ def namespace_to_arg_list(namespace, prefix="", includes=None, excludes=None):
     return arg_list
 
 
+def save_cli_arguments(cfg: Namespace):
+    """Save CLI arguments to cli.yaml in the work directory."""
+    if not hasattr(cfg, "work_dir") or not cfg.work_dir:
+        return
+
+    # Get the original CLI arguments if available
+    original_args = getattr(cfg, "_original_args", None)
+    if not original_args:
+        # Try to reconstruct from sys.argv if available
+        import sys
+
+        original_args = sys.argv[1:] if len(sys.argv) > 1 else []
+
+    if not original_args:
+        logger.warning("No CLI arguments available to save")
+        return
+
+    # Create cli.yaml in work directory
+    cli_path = os.path.join(cfg.work_dir, "cli.yaml")
+
+    # Convert args to a simple format
+    cli_data = {"arguments": original_args}
+
+    # Save as YAML
+    import yaml
+
+    with open(cli_path, "w") as f:
+        yaml.dump(cli_data, f, default_flow_style=False, indent=2)
+
+    logger.info(f"💾 Saved CLI arguments to: {cli_path}")
+
+
+def validate_config_for_resumption(cfg: Namespace, job_dir: str, original_args: List[str] = None) -> bool:
+    """Validate that the current config matches the job's saved config for safe resumption.
+
+    Does verbatim comparison between:
+    1. Original config.yaml + cli.yaml (saved during job creation)
+    2. Current config (from current command)
+
+    Sets cfg._same_yaml_config = True/False for the executor to use.
+    """
+    try:
+        from pathlib import Path
+
+        # Find the original config file in the job directory
+        config_files = list(Path(job_dir).glob("*.yaml")) + list(Path(job_dir).glob("*.yml"))
+        if not config_files:
+            logger.warning(f"No config file found in job directory: {job_dir}")
+            cfg._same_yaml_config = False
+            return False
+
+        # Find the original config.yaml (not cli.yaml)
+        original_config_file = None
+        for config_file in config_files:
+            if config_file.name != "cli.yaml":
+                original_config_file = config_file
+                break
+
+        if not original_config_file:
+            logger.warning(f"No original config file found in job directory: {job_dir}")
+            cfg._same_yaml_config = False
+            return False
+
+        # 1. Direct file comparison for config files
+        current_config_file = cfg.config[0] if hasattr(cfg, "config") and cfg.config else None
+        if not current_config_file:
+            logger.error("No current config file found")
+            cfg._same_yaml_config = False
+            return False
+
+        with open(original_config_file, "r") as f:
+            original_config_content = f.read()
+        with open(current_config_file, "r") as f:
+            current_config_content = f.read()
+
+        config_match = original_config_content.strip() == current_config_content.strip()
+
+        # 2. Per-key comparison for CLI arguments
+        cli_file = Path(job_dir) / "cli.yaml"
+        cli_config = {}
+        if cli_file.exists():
+            with open(cli_file, "r") as f:
+                cli_data = yaml.safe_load(f)
+                cli_config = _parse_cli_to_config(cli_data.get("arguments", []))
+
+        # Get current CLI arguments from the original args passed to init_configs
+        current_cli_args = original_args
+        if not current_cli_args:
+            # Fallback: try to get from sys.argv
+            import sys
+
+            current_cli_args = sys.argv[1:] if len(sys.argv) > 1 else []
+
+        current_cli_config = _parse_cli_to_config(current_cli_args)
+
+        # Compare CLI arguments per key
+        cli_differences = []
+        all_cli_keys = set(cli_config.keys()) | set(current_cli_config.keys())
+        excluded_keys = {"config", "_original_args", "backed_up_config_path", "_same_yaml_config", "job_id"}
+
+        for key in all_cli_keys:
+            if key in excluded_keys:
+                continue
+
+            original_value = cli_config.get(key)
+            current_value = current_cli_config.get(key)
+
+            if original_value != current_value:
+                cli_differences.append({"key": key, "original": original_value, "current": current_value})
+
+        cli_match = len(cli_differences) == 0
+
+        if not config_match or not cli_match:
+            logger.error("❌ Config validation failed - configurations don't match:")
+            if not config_match:
+                logger.error("   [config] Config file content differs")
+            if not cli_match:
+                logger.error("   [cli] CLI arguments differ:")
+                for diff in cli_differences:
+                    logger.error(f"      {diff['key']}: {diff['original']} → {diff['current']}")
+            logger.error("💡 Use the same config file and CLI arguments for resumption")
+            cfg._same_yaml_config = False
+            return False
+
+        logger.info("✅ Config validation passed - configurations match exactly")
+        cfg._same_yaml_config = True
+        return True
+
+    except Exception as e:
+        logger.error(f"Error validating config for resumption: {e}")
+        cfg._same_yaml_config = False
+        return False
+
+
+def _parse_cli_to_config(cli_args: list) -> dict:
+    """Parse CLI arguments into config dictionary format."""
+    config = {}
+
+    i = 0
+    while i < len(cli_args):
+        arg = cli_args[i]
+
+        if arg.startswith("--"):
+            key = arg[2:]  # Remove '--'
+
+            # Check if next arg is a value (not another flag)
+            if i + 1 < len(cli_args) and not cli_args[i + 1].startswith("--"):
+                value = cli_args[i + 1]
+
+                # Try to parse as different types
+                if value.lower() in ["true", "false"]:
+                    config[key] = value.lower() == "true"
+                elif value.isdigit():
+                    config[key] = int(value)
+                elif value.replace(".", "").isdigit():
+                    config[key] = float(value)
+                else:
+                    config[key] = value
+
+                i += 2  # Skip both key and value
+            else:
+                # Boolean flag (no value)
+                config[key] = True
+                i += 1
+        else:
+            i += 1
+
+    return config
+
+
 def config_backup(cfg: Namespace):
     if not cfg.config:
         return
@@ -1077,6 +1258,9 @@ def config_backup(cfg: Namespace):
         shutil.copyfile(cfg_path, target_path)
     else:
         logger.info(f"Config file [{cfg_path}] already exists at [{target_path}]")
+
+    # Also save CLI arguments
+    save_cli_arguments(cfg)
 
 
 def display_config(cfg: Namespace):

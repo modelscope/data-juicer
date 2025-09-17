@@ -49,7 +49,8 @@ partition:
 # Checkpoint configuration
 checkpoint:
   enabled: true
-  strategy: "every_op"
+  strategy: "every_n_ops"
+  n_ops: 3
   # strategy: "every_op"  # every_op, every_partition, every_n_ops, manual, disabled
   # n_ops: 1  # Number of operations between checkpoints (for every_n_ops strategy)
   # op_names: []  # Specific operation names to checkpoint after (for manual strategy)

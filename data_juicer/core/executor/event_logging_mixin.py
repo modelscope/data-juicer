@@ -114,7 +114,10 @@ class EventLogger:
         # Use work_dir for JSONL file if provided, otherwise use log_dir
         self.jsonl_dir = Path(work_dir) if work_dir else self.log_dir
         self.jsonl_dir.mkdir(parents=True, exist_ok=True)
-        self.jsonl_file = self.jsonl_dir / "events.jsonl"
+
+        # Create timestamped events file
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        self.jsonl_file = self.jsonl_dir / f"events_{timestamp}.jsonl"
 
     def log_event(self, event: Event):
         """Log an event (to memory, loguru, and JSONL for resumability)."""
@@ -132,6 +135,38 @@ class EventLogger:
                     )
                     + "\n"
                 )
+
+    def find_latest_events_file(self, work_dir: str) -> Optional[Path]:
+        """Find the latest events file in the work directory."""
+        events_dir = Path(work_dir)
+        if not events_dir.exists():
+            return None
+
+        # Find all events files with timestamp pattern
+        events_files = list(events_dir.glob("events_*.jsonl"))
+        if not events_files:
+            return None
+
+        # Sort by modification time and return the latest
+        latest_file = max(events_files, key=lambda f: f.stat().st_mtime)
+        return latest_file
+
+    def check_job_completion(self, events_file: Path) -> bool:
+        """Check if job is already completed by looking for job_complete event."""
+        if not events_file.exists():
+            return False
+
+        try:
+            with open(events_file, "r") as f:
+                for line in f:
+                    if line.strip():
+                        event = json.loads(line.strip())
+                        if event.get("event_type") == "job_complete":
+                            return True
+        except (json.JSONDecodeError, IOError) as e:
+            logger.warning(f"Error reading events file {events_file}: {e}")
+
+        return False
 
     def _format_event_for_logging(self, event: Event) -> str:
         """Format event for logging with enhanced details."""
