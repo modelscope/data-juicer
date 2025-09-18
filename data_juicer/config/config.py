@@ -858,8 +858,6 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
             redirect=cfg.executor_type == "default",
             max_log_size_mb=getattr(cfg, "max_log_size_mb", 100),
             backup_count=getattr(cfg, "backup_count", 5),
-            level="DEBUG" if cfg.get("debug", False) else "INFO",
-            redirect=cfg.get("executor_type", "default") == "default",
         )
 
     # check and get dataset dir
