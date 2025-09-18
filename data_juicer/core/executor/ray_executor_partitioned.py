@@ -543,8 +543,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
 
             # Use DAG-aware execution if available
             if self.pipeline_dag:
-                self._execute_operations_with_dag_monitoring(merged_ray_dataset, post_convergence_ops, partition_id=0)
-                final_dataset = merged_ray_dataset
+                final_dataset = self._execute_operations_with_dag_monitoring(
+                    merged_ray_dataset, post_convergence_ops, partition_id=0
+                )
             else:
                 # Fallback to normal execution
                 final_dataset = merged_ray_dataset.process(post_convergence_ops)
@@ -564,7 +565,8 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
 
         if not self.checkpoint_enabled:
             logger.info(f"Checkpointing disabled, processing all operations at once for partition {partition_id}")
-            return dataset.process(ops)
+            # Still use DAG monitoring even when checkpointing is disabled
+            return self._execute_operations_with_dag_monitoring(dataset, ops, partition_id)
 
         # check the latest checkpoint for the partition
         latest_checkpoint = self._find_latest_checkpoint(partition_id)
@@ -620,7 +622,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
 
                 # Use DAG-aware execution if available
                 if self.pipeline_dag:
-                    self._execute_operations_with_dag_monitoring(current_dataset, group_ops, partition_id)
+                    current_dataset = self._execute_operations_with_dag_monitoring(
+                        current_dataset, group_ops, partition_id
+                    )
                 else:
                     # Fallback to normal execution with manual logging
                     # Log operation start events
@@ -829,12 +833,11 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
 
         return self.dag_execution_strategy.get_dag_node_id(op_name, op_idx, partition_id=partition_id, **kwargs)
 
-    def _execute_operations_with_dag_monitoring(self, dataset, ops: List, partition_id: int = 0) -> None:
+    def _execute_operations_with_dag_monitoring(self, dataset, ops: List, partition_id: int = 0):
         """Execute operations with DAG monitoring for partitioned execution."""
         if not self.pipeline_dag:
             logger.warning("Pipeline DAG not initialized, falling back to normal execution")
-            dataset.process(ops)
-            return
+            return dataset.process(ops)
 
         # Log operation start events for all operations
         for op_idx, op in enumerate(ops):
@@ -854,7 +857,7 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                     self.log_op_start(0, op_name, op_idx, {})
 
         # Execute all operations normally (this is what actually processes the data)
-        dataset.process(ops)
+        processed_dataset = dataset.process(ops)
 
         # Log operation completion events for all operations
         for op_idx, op in enumerate(ops):
@@ -873,6 +876,8 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
                 # Log operation completion without DAG context
                 if hasattr(self, "log_op_complete"):
                     self.log_op_complete(0, op_name, op_idx, 0.0, None, 0, 0)
+
+        return processed_dataset
 
     def _log_operation_with_dag_context(
         self, op_name: str, op_idx: int, event_type: str, partition_id: int = 0, **kwargs
