@@ -46,6 +46,7 @@ https://github.com/user-attachments/assets/a45f0eee-0f0e-4ffe-9a42-d9a55370089d
 
 
 ## News
+- 🛠️ [2025-08-09] **New Job Management & Monitoring Features**: We've added comprehensive job monitoring capabilities including a [Processing Snapshot Utility](data_juicer/utils/job/snapshot.py) that provides detailed JSON analysis of job status, progress tracking, and checkpointing information. Also introduced [Resource-Aware Partitioning](data_juicer/core/executor/partition_size_optimizer.py) for automatic optimization of distributed processing resources, and enhanced logging with centralized rotation and retention policies.
 - 🛠️ [2025-06-04] How to process feedback data in the "era of experience"? We propose [Trinity-RFT: A General-Purpose and Unified Framework for Reinforcement Fine-Tuning of LLMs](https://arxiv.org/abs/2505.17826), which leverages Data-Juicer for its data pipelines tailored for RFT scenarios.
 - 🎉 [2025-06-04] Our [Data-Model Co-development Survey](https://ieeexplore.ieee.org/document/11027559) has been accepted by IEEE Transactions on Pattern Analysis and Machine Intelligence (**TPAMI**)! Welcome to explore and contribute the [awesome-list](https://modelscope.github.io/data-juicer/en/main/docs/awesome_llm_data.html).
 - 🔎 [2025-06-04] We introduce [DetailMaster: Can Your Text-to-Image Model Handle Long Prompts?](https://www.arxiv.org/abs/2505.16915) A synthetic benchmark revealing notable performance drops despite large models' proficiency with short descriptions.
@@ -122,6 +123,7 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
   - [How-to Guide for Developers](docs/DeveloperGuide.md)
   - [Distributed Data Processing in Data-Juicer](docs/Distributed.md)
   - [Sandbox](docs/Sandbox.md)
+  - [Job Management & Monitoring](docs/JobManagement.md)
   - [Data-Juicer Agent](docs/DJ_agent.md)
 - Demos
   - [demos](demos/README.md)
@@ -139,6 +141,10 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
   - [Postprocess Tools](tools/postprocess/README.md)
   - [Preprocess Tools](tools/preprocess/README.md)
   - [Data Scoring](tools/quality_classifier/README.md)
+- Job Management & Monitoring
+  - [Processing Snapshot Utility](data_juicer/utils/job/snapshot.py) - Comprehensive job status analysis with JSON output
+  - [Job Management Tools](data_juicer/utils/job/) - Monitor and manage DataJuicer processing jobs
+  - [Resource-Aware Partitioning](data_juicer/core/executor/partition_size_optimizer.py) - Automatic resource optimization for distributed processing
 - Third-party
   - [LLM Ecosystems](thirdparty/LLM_ecosystems/README.md)
   - [Third-party Model Library](thirdparty/models/README.md)
