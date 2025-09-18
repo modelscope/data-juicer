@@ -157,10 +157,18 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             max_size_mb = getattr(partition_cfg, "max_size_mb", 64)
 
         # Fallback to legacy configuration if partition config is not available
-        if not partition_cfg:
+        # or if legacy num_partitions is explicitly set
+        if (
+            not partition_cfg
+            or hasattr(self.cfg, "num_partitions")
+            and getattr(self.cfg, "num_partitions", None) is not None
+        ):
             mode = "manual"
             num_of_partitions = getattr(self.cfg, "num_partitions", 4)
-            logger.warning("No partition configuration found, using legacy num_partitions")
+            if not partition_cfg:
+                logger.warning("No partition configuration found, using legacy num_partitions")
+            else:
+                logger.warning("Legacy num_partitions detected, overriding partition configuration")
 
         self.partition_mode = mode
         self.num_partitions = num_of_partitions
