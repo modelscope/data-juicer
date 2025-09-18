@@ -16,10 +16,15 @@ OP_NAME = "image_watermark_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageWatermarkFilter(Filter):
-    """
-    Filter to keep samples whose images have no watermark with high
-    probability.
-    """
+    """Filter to keep samples whose images have no watermark with high probability.
+
+    This operator uses a Hugging Face watermark detection model to filter samples based on
+    the presence of watermarks in their images. It keeps samples where the predicted
+    watermark probability is below a specified threshold. The operator supports two
+    strategies: 'any' (keep if any image meets the condition) and 'all' (keep only if all
+    images meet the condition). The key metric 'image_watermark_prob' is computed for each
+    image, representing the probability that the image contains a watermark. If no images
+    are present in the sample, the metric is set to an empty array."""
 
     _accelerator = "cuda"
 
@@ -47,7 +52,7 @@ class ImageWatermarkFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "500MB")
+        kwargs["mem_required"] = "500MB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self.prob_threshold = prob_threshold
         if any_or_all not in ["any", "all"]:
@@ -71,7 +76,9 @@ class ImageWatermarkFilter(Filter):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         model, processor = get_model(self.model_key, rank, self.use_cuda())
 
@@ -90,7 +97,7 @@ class ImageWatermarkFilter(Filter):
         if len(itm_probs) <= 0:
             return True
 
-        keep_bools = np.array([itm_prob < self.prob_threshold for itm_prob in itm_probs])
+        keep_bools = np.array([self.get_keep_boolean(itm_prob, None, self.prob_threshold) for itm_prob in itm_probs])
 
         # different strategies
         if self.any:

@@ -9,11 +9,12 @@ class ExecutorFactory:
     @staticmethod
     def create_executor(executor_type: str) -> Union[DefaultExecutor, RayExecutor, PartitionedRayExecutor]:
         if executor_type in ("local", "default"):
-            return DefaultExecutor()
+            return DefaultExecutor
         elif executor_type == "ray":
             return RayExecutor()
         elif executor_type == "ray_partitioned":
             return PartitionedRayExecutor()
+
         # TODO: add nemo support
         #  elif executor_type == "nemo":
         #    return NemoExecutor()

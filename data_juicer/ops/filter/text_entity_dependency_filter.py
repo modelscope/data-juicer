@@ -12,10 +12,16 @@ OP_NAME = "text_entity_dependency_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class TextEntityDependencyFilter(Filter):
-    """
-    Identify the entities in the text which are independent with other token,
-    and filter them. The text containing no entities will be omitted.
-    """
+    """Identify and filter text samples based on entity dependencies.
+
+    This operator uses a spaCy model to detect entities in the text and evaluates their
+    dependency relationships. It filters out samples where entities have fewer than a
+    specified number of dependency edges. The key metric is 'num_dependency_edges', which
+    counts the number of edges for each entity in the dependency tree. Samples with no
+    detected entities are omitted. The operator supports 'any' or 'all' strategies: 'any'
+    keeps samples if at least one entity meets the dependency threshold, while 'all'
+    requires all entities to meet the threshold. Supported languages are English ('en') and
+    Chinese ('zh')."""
 
     def __init__(self, lang: str = "en", min_dependency_num: int = 1, any_or_all: str = "all", *args, **kwargs):
         """
@@ -23,7 +29,7 @@ class TextEntityDependencyFilter(Filter):
 
         :param lang: language of the text in the samples. 'en' for detection of
             entities in English and 'zh' for detection of entities in Chinese.
-        :param mini_dependency_num: The min token number in the filtering.
+        :param min_dependency_num: The min token number in the filtering.
             Objects is independent if their number of edges in the dependency
             tree is below this parameter.
         :param any_or_all: keep this sample with 'any' or 'all' strategy.
@@ -80,7 +86,9 @@ class TextEntityDependencyFilter(Filter):
 
     def process_single(self, sample):
         num_dependency_edges = sample[Fields.stats][StatsKeys.num_dependency_edges]
-        keep_bools = np.array([self.min_dependency_num <= num_edge for num_edge in num_dependency_edges])
+        keep_bools = np.array(
+            [self.get_keep_boolean(num_edge, self.min_dependency_num) for num_edge in num_dependency_edges]
+        )
         # omit the samples without entity
         if len(keep_bools) <= 0:
             return False

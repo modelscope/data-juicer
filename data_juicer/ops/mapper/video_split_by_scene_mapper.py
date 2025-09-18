@@ -26,7 +26,16 @@ def replace_func(match, scene_counts_iter):
 
 @OPERATORS.register_module(OP_NAME)
 class VideoSplitBySceneMapper(Mapper):
-    """Mapper to cut videos into scene clips."""
+    """Splits videos into scene clips based on detected scene changes.
+
+    This operator uses a specified scene detector to identify and split video scenes. It
+    supports three types of detectors: ContentDetector, ThresholdDetector, and
+    AdaptiveDetector. The operator processes each video in the sample, detects scenes, and
+    splits the video into individual clips. The minimum length of a scene can be set, and
+    progress can be shown during processing. The resulting clips are saved in the specified
+    directory or the same directory as the input files if no save directory is provided. The
+    operator also updates the text field in the sample to reflect the new video clips. If a
+    video does not contain any scenes, it remains unchanged."""
 
     # Define shared detector keys and their properties
     avaliable_detectors = {
@@ -49,6 +58,7 @@ class VideoSplitBySceneMapper(Mapper):
         threshold: NonNegativeFloat = 27.0,
         min_scene_len: NonNegativeInt = 15,
         show_progress: bool = False,
+        save_dir: str = None,
         *args,
         **kwargs,
     ):
@@ -60,11 +70,15 @@ class VideoSplitBySceneMapper(Mapper):
         :param threshold: Threshold passed to the detector.
         :param min_scene_len: Minimum length of any scene.
         :param show_progress: Whether to show progress from scenedetect.
+        :param save_dir: The directory where generated video files will be stored.
+            If not specified, outputs will be saved in the same directory as their corresponding input files.
+            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         if detector not in self.avaliable_detectors:
             raise ValueError(
@@ -76,6 +90,7 @@ class VideoSplitBySceneMapper(Mapper):
         self.threshold = threshold
         self.min_scene_len = min_scene_len
         self.show_progress = show_progress
+        self.save_dir = save_dir
 
         # prepare detector args
         avaliable_kwargs = self.avaliable_detectors[self.detector]
@@ -98,7 +113,7 @@ class VideoSplitBySceneMapper(Mapper):
             if video_key in output_video_keys:
                 continue
 
-            redirected_video_key = transfer_filename(video_key, OP_NAME, **self._init_parameters)
+            redirected_video_key = transfer_filename(video_key, OP_NAME, self.save_dir, **self._init_parameters)
             output_template = add_suffix_to_filename(redirected_video_key, "_$SCENE_NUMBER")
 
             # detect scenes

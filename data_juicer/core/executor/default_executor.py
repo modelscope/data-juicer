@@ -15,7 +15,7 @@ from data_juicer.core.executor.dag_execution_mixin import DAGExecutionMixin
 from data_juicer.core.executor.event_logging_mixin import EventLoggingMixin
 from data_juicer.core.exporter import Exporter
 from data_juicer.core.tracer import Tracer
-from data_juicer.ops import OPERATORS, load_ops
+from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.ops.selector import (
     FrequencySpecifiedFieldSelector,
@@ -61,6 +61,8 @@ class DefaultExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin):
 
         self.adapter = Adapter(self.cfg)
 
+        self.np = self.cfg.get("np", None) or 1
+
         # only enable it when using cache
         if self.cfg.use_cache:
             logger.info(f"Using cache compression method: " f"[{self.cfg.cache_compress}]")
@@ -76,7 +78,8 @@ class DefaultExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin):
         # have been processed will be skipped.
         if self.cfg.use_checkpoint:
             logger.info("Preparing checkpoint manager...")
-            self.ckpt_manager = CheckpointManager(self.ckpt_dir, self.cfg.process, self.cfg.np)
+            self.ckpt_dir = os.path.join(self.work_dir, "ckpt")
+            self.ckpt_manager = CheckpointManager(self.ckpt_dir, self.cfg.process, self.np)
             if self.ckpt_manager.ckpt_available:
                 logger.info("Found existed dataset checkpoint.")
                 self.cfg.process = self.ckpt_manager.get_left_process_list()
@@ -85,34 +88,34 @@ class DefaultExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin):
         logger.info("Preparing exporter...")
         self.exporter = Exporter(
             self.cfg.export_path,
+            self.cfg.export_type,
             self.cfg.export_shard_size,
             self.cfg.export_in_parallel,
-            self.cfg.np,
+            self.np,
             keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
             keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
+            **self.cfg.export_extra_args,
         )
 
         # setup tracer
         self.open_tracer = self.cfg.open_tracer
         if self.open_tracer:
             logger.info("Preparing tracer...")
-            self.tracer = Tracer(self.work_dir, show_num=self.cfg.trace_num)
-            self.op_list_to_trace = self.cfg.op_list_to_trace
-            if len(self.cfg.op_list_to_trace) == 0:
-                logger.info("Trace for all ops.")
-                self.op_list_to_trace = set(OPERATORS.modules.keys())
+            self.tracer = Tracer(self.work_dir, self.cfg.op_list_to_trace, show_num=self.cfg.trace_num)
 
     def run(
         self,
         dataset: Union[Dataset, NestedDataset] = None,
         load_data_np: Optional[PositiveInt] = None,
-        skip_return=False,
+        skip_export: bool = False,
+        skip_return: bool = False,
     ):
         """
         Running the dataset process pipeline.
 
         :param dataset: a Dataset object to be executed.
         :param load_data_np: number of workers when loading the dataset.
+        :param skip_export: whether export the results into disk
         :param skip_return: skip return for API called.
         :return: processed dataset.
         """
@@ -125,7 +128,7 @@ class DefaultExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin):
         else:
             logger.info("Loading dataset from dataset builder...")
             if load_data_np is None:
-                load_data_np = self.cfg.np
+                load_data_np = self.np
             dataset = self.dataset_builder.load_dataset(num_proc=load_data_np)
 
         # 2. extract processes and optimize their orders
@@ -192,8 +195,9 @@ class DefaultExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin):
         logger.info(f"All OPs are done in {tend - tstart:.3f}s.")
 
         # 4. data export
-        logger.info("Exporting dataset to disk...")
-        self.exporter.export(dataset)
+        if not skip_export:
+            logger.info("Exporting dataset to disk...")
+            self.exporter.export(dataset)
         # compress the last dataset after exporting
         if self.cfg.use_cache and self.cfg.cache_compress:
             from data_juicer.utils.compress import compress
@@ -236,13 +240,11 @@ class DefaultExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin):
         elif self.cfg.use_checkpoint and self.ckpt_manager.ckpt_available:
             logger.info("Loading dataset from checkpoint...")
             dataset = self.ckpt_manager.load_ckpt()
-        elif hasattr(self, "formatter"):
-            logger.info("Loading dataset from data formatter...")
-            if load_data_np is None:
-                load_data_np = self.cfg.np
-            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
         else:
-            raise ValueError("No dataset available to sample from.")
+            logger.info("Loading dataset from dataset builder...")
+            if load_data_np is None:
+                load_data_np = self.np
+            dataset = self.dataset_builder.load_dataset(num_proc=load_data_np)
 
         # Perform sampling based on the specified algorithm
         if sample_algo == "uniform":

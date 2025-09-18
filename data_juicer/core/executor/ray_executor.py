@@ -62,11 +62,19 @@ class RayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin):
 
         # Initialize DAGExecutionMixin for AST/DAG functionality
         DAGExecutionMixin.__init__(self)
+
         self.adapter = Adapter(self.cfg)
+
+        # TODO: support ray
+        # self.adapter = Adapter(self.cfg)
 
         # init ray
         logger.info("Initializing Ray ...")
-        ray.init(self.cfg.ray_address)
+
+        from data_juicer.utils.ray_utils import initialize_ray
+
+        initialize_ray(cfg=cfg, force=True)
+
         self.tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
 
         # absolute path resolution logic
@@ -77,15 +85,19 @@ class RayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin):
         logger.info("Preparing exporter...")
         self.exporter = RayExporter(
             self.cfg.export_path,
+            self.cfg.export_type,
+            self.cfg.export_shard_size,
             keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
             keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
+            **self.cfg.export_extra_args,
         )
 
-    def run(self, load_data_np: Optional[PositiveInt] = None, skip_return=False):
+    def run(self, load_data_np: Optional[PositiveInt] = None, skip_export: bool = False, skip_return: bool = False):
         """
         Running the dataset process pipeline
 
         :param load_data_np: number of workers when loading the dataset.
+        :param skip_export: whether export the results into disk
         :param skip_return: skip return for API called.
         :return: processed dataset.
         """
@@ -113,13 +125,8 @@ class RayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin):
         self.log_job_start(job_config, len(ops))
 
         if self.cfg.op_fusion:
-            probe_res = None
-            if self.cfg.fusion_strategy == "probe":
-                logger.info("Probe the OP speed for OP reordering...")
-                probe_res, _ = self.adapter.probe_small_batch(dataset, ops)
-
             logger.info(f"Start OP fusion and reordering with strategy " f"[{self.cfg.fusion_strategy}]...")
-            ops = fuse_operators(ops, probe_res)
+            ops = fuse_operators(ops)
 
         with TempDirManager(self.tmp_dir):
             # 3. data process with DAG monitoring
@@ -134,8 +141,9 @@ class RayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin):
                 dataset.process(ops)
 
             # 4. data export
-            logger.info("Exporting dataset to disk...")
-            self.exporter.export(dataset.data, columns=columns)
+            if not skip_export:
+                logger.info("Exporting dataset to disk...")
+                self.exporter.export(dataset.data, columns=columns)
             tend = time.time()
             logger.info(f"All Ops are done in {tend - tstart:.3f}s.")
 

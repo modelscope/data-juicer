@@ -5,10 +5,9 @@ import yaml
 from contextlib import redirect_stdout, redirect_stderr
 from io import StringIO
 
-from jsonargparse import Namespace
+from jsonargparse import Namespace, namespace_to_dict
 
-from data_juicer.config import init_configs, get_default_cfg
-from data_juicer.config.config import validate_work_dir_config, resolve_job_id, resolve_job_directories
+from data_juicer.config import init_configs, get_default_cfg, validate_work_dir_config, resolve_job_id, resolve_job_directories
 from data_juicer.ops import load_ops
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
@@ -16,11 +15,29 @@ test_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                               'demo_4_test.yaml')
 
 test_bad_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                              'demo_4_test_bad_val.yaml')
+                                  'demo_4_test_bad_val.yaml')
+
+test_text_keys_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                        'demo_4_test_multiple_text_keys.yaml')
+
+test_same_ops_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                       'demo_4_test_same_ops.yaml')
 
 WORKDIR = os.path.join(os.getcwd(), 'outputs/demo')
 
 class ConfigTest(DataJuicerTestCaseBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.tmp_dir = 'tmp/test_config/'
+        os.makedirs(self.tmp_dir, exist_ok=True)
+
+    def tearDown(self) -> None:
+        super().tearDown()
+
+        if os.path.exists(self.tmp_dir):
+            os.system(f'rm -rf {self.tmp_dir}')
 
     def test_help_info(self):
         out = StringIO()
@@ -47,17 +64,25 @@ class ConfigTest(DataJuicerTestCaseBase):
                     'whitespace_normalization_mapper': {
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'system_key': 'system',
+                        'instruction_key': 'instruction',
+                        'prompt_key': 'prompt',
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
                         'accelerator': None,
                         'num_proc': 4,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'gpu_required': 0,
                         'turbo': False,
-                        'batch_size': 1000,
                         'index_key': None,
                         'skip_op_error': True,
                         'work_dir': WORKDIR,
@@ -70,18 +95,29 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'min_score': 0.8,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'system_key': 'system',
+                        'instruction_key': 'instruction',
+                        'prompt_key': 'prompt',
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
+                        'min_closed_interval': True,
+                        'max_closed_interval': True,
+                        'reversed_range': False,
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1000,
+                        'gpu_required': 0,
                         'index_key': None,
                         'skip_op_error': True,
                         'work_dir': WORKDIR,
@@ -143,18 +179,29 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'min_score': 0.8,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
+                        'system_key': 'system',
+                        'instruction_key': 'instruction',
+                        'prompt_key': 'prompt',
                         'audio_key': 'audios',
                         'video_key': 'videos',
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
+                        'min_closed_interval': True,
+                        'max_closed_interval': True,
+                        'reversed_range': False,
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'gpu_required': 0,
                         'turbo': False,
-                        'batch_size': 1000,
                         'index_key': None,
                         'skip_op_error': True,
                         'work_dir': WORKDIR,
@@ -167,18 +214,29 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'min_score': 0.8,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'system_key': 'system',
+                        'instruction_key': 'instruction',
+                        'prompt_key': 'prompt',
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
+                        'min_closed_interval': True,
+                        'max_closed_interval': True,
+                        'reversed_range': False,
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1000,
+                        'gpu_required': 0,
                         'index_key': None,
                         'skip_op_error': True,
                         'work_dir': WORKDIR,
@@ -191,18 +249,29 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'min_score': 0.8,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'system_key': 'system',
+                        'instruction_key': 'instruction',
+                        'prompt_key': 'prompt',
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
+                        'min_closed_interval': True,
+                        'max_closed_interval': True,
+                        'reversed_range': False,
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1000,
+                        'gpu_required': 0,
                         'index_key': None,
                         'skip_op_error': True,
                         'work_dir': WORKDIR,
@@ -215,18 +284,29 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'min_score': 0.6,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'system_key': 'system',
+                        'instruction_key': 'instruction',
+                        'prompt_key': 'prompt',
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
+                        'min_closed_interval': True,
+                        'max_closed_interval': True,
+                        'reversed_range': False,
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1000,
+                        'gpu_required': 0,
                         'index_key': None,
                         'skip_op_error': True,
                         'work_dir': WORKDIR,
@@ -239,18 +319,29 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'min_score': 0.5,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'image_bytes_key': 'image_bytes',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'system_key': 'system',
+                        'instruction_key': 'instruction',
+                        'prompt_key': 'prompt',
                         'query_key': 'query',
                         'response_key': 'response',
                         'history_key': 'history',
+                        'audio_special_token': '<__dj__audio>',
+                        'eoc_special_token': '<|__dj__eoc|>',
+                        'image_special_token': '<__dj__image>',
+                        'video_special_token': '<__dj__video>',
+                        'min_closed_interval': True,
+                        'max_closed_interval': True,
+                        'reversed_range': False,
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1000,
+                        'gpu_required': 0,
                         'index_key': None,
                         'skip_op_error': True,
                         'work_dir': WORKDIR,
@@ -263,8 +354,8 @@ class ConfigTest(DataJuicerTestCaseBase):
         from data_juicer.ops.base_op import OPERATORS
 
         base_class_params = {
-            'text_key', 'image_key', 'audio_key', 'video_key', 'query_key', 'response_key', 'history_key',
-            'accelerator', 'turbo', 'batch_size', 'num_proc', 'cpu_required', 'mem_required', 'work_dir',
+            'text_key', 'image_key', 'image_bytes_key', 'audio_key', 'video_key', 'query_key', 'response_key',
+            'history_key', 'accelerator', 'turbo', 'batch_size', 'num_proc', 'cpu_required', 'mem_required', 'work_dir',
         }
 
         parser = ArgumentParser(default_env=True, default_config_files=None)

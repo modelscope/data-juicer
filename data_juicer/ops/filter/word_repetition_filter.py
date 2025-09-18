@@ -17,8 +17,15 @@ OP_NAME = "word_repetition_filter"
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)
 class WordRepetitionFilter(Filter):
-    """Filter to keep samples with word-level n-gram repetition ratio within a
-    specific range."""
+    """Filter to keep samples with word-level n-gram repetition ratio within a specific range.
+
+    This operator calculates the word-level n-gram repetition ratio for each sample and
+    filters out those that do not fall within the specified range. The n-gram length and the
+    min/max ratio thresholds are configurable. If tokenization is enabled, a Hugging Face
+    tokenizer is used to tokenize the text. The key metric, `word_rep_ratio`, is computed as
+    the ratio of repeated n-grams to the total number of n-grams. This ratio is then
+    compared against the min and max ratio thresholds to decide whether to keep or filter
+    the sample. If the ratio is outside the specified range, the sample is filtered out."""
 
     _batched_op = True
 
@@ -103,13 +110,8 @@ class WordRepetitionFilter(Filter):
         return samples
 
     def process_batched(self, samples):
-        if isinstance(samples[Fields.stats], list):
-            return map(
-                lambda stat: self.min_ratio <= stat[StatsKeys.word_rep_ratio] <= self.max_ratio, samples[Fields.stats]
-            )
-        else:
-            # single sample for ray filter
-            if self.min_ratio <= samples[Fields.stats][StatsKeys.word_rep_ratio] <= self.max_ratio:
-                return True
-            else:
-                return False
+        assert isinstance(samples[Fields.stats], list)
+        return map(
+            lambda stat: self.get_keep_boolean(stat[StatsKeys.word_rep_ratio], self.min_ratio, self.max_ratio),
+            samples[Fields.stats],
+        )

@@ -16,11 +16,16 @@ from ..base_op import OPERATORS, Deduplicator
 
 @OPERATORS.register_module("document_deduplicator")
 class DocumentDeduplicator(Deduplicator):
-    """
-    Deduplicator to deduplicate samples at document-level using exact matching.
+    """Deduplicates samples at the document level using exact matching.
 
-    Using md5 hash to deduplicate samples.
-    """
+    This operator computes an MD5 hash for each sample's text. It can optionally convert the
+    text to lowercase and ignore non-alphabet characters, including whitespaces, digits, and
+    punctuation. The deduplication is based on the computed hash values, where samples with
+    identical hashes are considered duplicates. The `compute_hash` method adds a 'hash' key
+    to each sample, storing its MD5 hash. During processing, the first occurrence of each
+    unique hash is kept, and subsequent duplicates are filtered out. If the `show_num`
+    parameter is set, the operator also returns a specified number of duplicate pairs for
+    inspection."""
 
     def __init__(self, lowercase: bool = False, ignore_non_character: bool = False, *args, **kwargs):
         """

@@ -4,7 +4,7 @@
 # Data Processing for and with Foundation Models
 
  <img src="https://img.alicdn.com/imgextra/i1/O1CN01fUfM5A1vPclzPQ6VI_!!6000000006165-0-tps-1792-1024.jpg" width = "533" height = "300" alt="Data-Juicer"/>
-
+ 
 ![](https://img.shields.io/badge/language-Python-214870.svg)
 ![](https://img.shields.io/badge/license-Apache--2.0-000000.svg)
 [![pypi version](https://img.shields.io/pypi/v/py-data-juicer?logo=pypi&color=026cad)](https://pypi.org/project/py-data-juicer)
@@ -32,9 +32,17 @@
 Data-Juicer is a one-stop system to process text and multimodal data for and with foundation models (typically LLMs).
 We provide a [playground](http://8.138.149.181/) with a managed JupyterLab. [Try Data-Juicer](http://8.138.149.181/) straight away in your browser! If you find Data-Juicer useful for your research or development, please kindly support us by starting it (then be instantly notified of our new releases) and citing our [works](#references).
 
-[Platform for AI of Alibaba Cloud (PAI)](https://www.aliyun.com/product/bigdata/learn) has cited our work and integrated Data-Juicer into its data processing products. PAI is an AI Native large model and AIGC engineering platform that provides dataset management, computing power management, model tool chain, model development, model training, model deployment, and AI asset management. For documentation on data processing, please refer to: [PAI-Data Processing for Large Models](https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX).
+[Platform for AI of Alibaba Cloud (PAI)](https://www.aliyun.com/product/bigdata/learn) has deeply integrated Data-Juicer into its data processing products. PAI is an AI Native large model and AIGC engineering platform that provides dataset management, computing power management, model tool chain, model development, model training, model deployment, and AI asset management. For documentation on data processing, please refer to: [PAI-Data Processing for Large Models](https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX).
 
-Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets.  We welcome you to join us (via issues, PRs, [Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw)  channel, [DingDing](https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11) group, ...), in promoting data-model co-development along with research and applications of foundation models!
+Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets.  We welcome you to [join us](#contribution-and-acknowledgements), in promoting data-model co-development along with research and applications of foundation models!
+
+[Demo Video] DataJuicer-Agent: Quick start your data processing journey!
+
+https://github.com/user-attachments/assets/6eb726b7-6054-4b0c-905e-506b2b9c7927
+
+[Demo Video] DataJuicer-Sandbox: Better data-model co-dev at a lower cost!
+
+https://github.com/user-attachments/assets/a45f0eee-0f0e-4ffe-9a42-d9a55370089d
 
 
 ## News
@@ -77,7 +85,7 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 
 ## Why Data-Juicer?
 
-<img src="https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png" align="center" width="600" />
+<img src="https://img.alicdn.com/imgextra/i4/O1CN015URK6i21KU3XdkUpK_!!6000000006966-2-tps-3994-3956.png" align="center" width="500" />
 
 - **Systematic & Reusable**:
   Empowering users with a systematic library of 100+ core [OPs](docs/Operators.md), and 50+ reusable config recipes and 
@@ -86,6 +94,9 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 
 - **User-Friendly & Extensible**: 
   Designed for simplicity and flexibility, with easy-start [guides](docs/tutorial/QuickStart.md), and [DJ-Cookbook](docs/tutorial/DJ-Cookbook.md) containing fruitful demo usages. Feel free to [implement your own OPs](docs/DeveloperGuide.md#build-your-own-ops) for customizable data processing.
+
+  Data-Juicer now uses AI to automatically rewrite and optimize operator docstrings, generating detailed operator documentation to help users quickly understand the functionality and usage of each operator.  
+  For details about the implementation of this documentation enhancement workflow, please visit the [demos/op_doc_enhance_workflow folder under the `dj_agents` branch](https://github.com/modelscope/data-juicer/tree/dj_agents/demos/op_doc_enhance_workflow).
 
 - **Efficient & Robust**: Providing performance-optimized [parallel data processing](docs/Distributed.md) (Aliyun-PAI\Ray\CUDA\OP Fusion),
   faster with less resource usage, verified in large-scale production environments.
@@ -113,6 +124,7 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
   - [Distributed Data Processing in Data-Juicer](docs/Distributed.md)
   - [Sandbox](docs/Sandbox.md)
   - [Job Management & Monitoring](docs/JobManagement.md)
+  - [Data-Juicer Agent](docs/DJ_agent.md)
 - Demos
   - [demos](demos/README.md)
 - Tools
@@ -140,17 +152,17 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 ## License
 Data-Juicer is released under Apache License 2.0.
 
-## Contributing
-We are in a rapidly developing field and greatly welcome contributions of new
-features, bug fixes, and better documentation. Please refer to
-[How-to Guide for Developers](docs/DeveloperGuide.md).
+## Contribution and Acknowledgements
 
-## Acknowledgement
-Data-Juicer is used across various foundation model applications and research initiatives, such as industrial scenarios in Alibaba Tongyi and Alibaba Cloud's platform for AI (PAI).
-We look forward to more of your experience, suggestions, and discussions for collaboration!
+Data-Juicer has benefited greatly from and continues to welcome contributions at all levels: new operators (from simple functions to advanced algorithms based on existing papers), data-recipes & processing scenarios, feature requests, efficiency enhancements, bug fixes, better documentation and usage feedback. Please refer to our [Developer Guide](docs/DeveloperGuide.md) to get started. Spreading the word in the community and giving the repository a star ⭐ are also invaluable forms of support!
 
-Data-Juicer thanks many community [contributors](https://github.com/modelscope/data-juicer/graphs/contributors) and open-source projects, such as
-[Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), ....
+Our sincere gratitude goes to all our [code contributors](https://github.com/modelscope/data-juicer/graphs/contributors) who are the cornerstone of this project. We strive to keep the list below updated and look forward to including more names (alphabetical order); please reach out if we have missed any acknowledgements.
+- **Initiated by:** Alibaba Tongyi Lab
+- **Co-developed and Optimized with:** Alibaba Cloud PAI, Anyscale (Ray Team), Sun Yat-sen University ([Knowledge Engineering Lab](https://github.com/YingShen-SYSU/AIGC)), NVIDIA (NeMo Team), ...
+- **Used by & Valuable Feedback from:** [AgentScope](https://github.com/agentscope-ai/agentscope), Alibaba Group, Ant Group, BYD Auto, Bytedance, CAS, [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio), [EasyAnimate](https://github.com/aigc-apps/EasyAnimate), [Eval-Scope](https://github.com/modelscope/evalscope), JD.com, [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory), Nanjing University, OPPO, Peking University, [RM-Gallery](https://github.com/modelscope/RM-Gallery), RUC, Tsinghua University, [Trinity-RFT](https://github.com/modelscope/Trinity-RFT), UCAS, Xiaohongshu, Xiaomi, Ximalaya, Zhejiang University, ...
+- **Inspired by:** Data-Juicer also thanks pioneering open-source projects such as [Apache Arrow](https://github.com/apache/arrow), [BLOOM](https://huggingface.co/bigscience/bloom), [RedPajama-Data](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Ray](https://github.com/ray-project/ray), [Hugging Face Datasets](https://github.com/huggingface/datasets), ...
+
+We look forward to your feedback and collaboration, including partnership inquiries or proposals for new sub-projects related to Data-Juicer. Feel free to contact via issues, PRs, [Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw) channel, [DingDing](https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11) group, and [e-mails](mailto:datajuicer@outlook.com).
 
 
 

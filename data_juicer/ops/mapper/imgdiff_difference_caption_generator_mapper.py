@@ -23,8 +23,22 @@ OP_NAME = "imgdiff_difference_caption_generator_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class Difference_Caption_Generator_Mapper(Mapper):
-    """A fused operator for OPs that is used to run sequential OPs on
-    the same batch to allow fine-grained control on data processing."""
+    """Generates difference captions for bounding box regions in two images.
+
+    This operator processes pairs of images and generates captions for the differences in
+    their bounding box regions. It uses a multi-step process:
+    - Describes the content of each bounding box region using a Hugging Face model.
+    - Crops the bounding box regions from both images.
+    - Checks if the cropped regions match the generated captions.
+    - Determines if there are differences between the two captions.
+    - Marks the difference area with a red box.
+    - Generates difference captions for the marked areas.
+    - The key metric is the similarity score between the captions, computed using a CLIP
+      model.
+    - If no valid bounding boxes or differences are found, it returns empty captions and
+      zeroed bounding boxes.
+    - Uses 'cuda' as the accelerator if any of the fused operations support it.
+    - Caches temporary images during processing and clears them afterward."""
 
     _accelerator = "cuda"
 
@@ -36,6 +50,21 @@ class Difference_Caption_Generator_Mapper(Mapper):
         *args,
         **kwargs,
     ):
+        """Initialization.
+
+        :param mllm_mapper_args: Arguments for multimodal language model mapper.
+            Controls the generation of captions for bounding box regions. Default empty dict
+            will use fixed values: max_new_tokens=256, temperature=0.2, top_p=None,
+            num_beams=1, hf_model="llava-hf/llava-v1.6-vicuna-7b-hf".
+        :param image_text_matching_filter_args: Arguments for image-text matching filter.
+            Controls the matching between cropped regions and generated captions.
+            Default empty dict will use fixed values: min_score=0.1, max_score=1.0,
+            hf_blip="Salesforce/blip-itm-base-coco", num_proc=1.
+        :param text_pair_similarity_filter_args: Arguments for text pair similarity filter.
+            Controls the similarity comparison between caption pairs. Default empty dict
+            will use fixed values: min_score=0.1, max_score=1.0,
+            hf_clip="openai/clip-vit-base-patch32", text_key_second="target_text", num_proc=1.
+        """
         super().__init__(*args, **kwargs)
 
         self.FIXED_ARGS = {}

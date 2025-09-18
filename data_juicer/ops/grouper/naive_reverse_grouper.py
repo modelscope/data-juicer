@@ -9,7 +9,17 @@ from ..base_op import OPERATORS, Grouper, convert_dict_list_to_list_dict
 
 @OPERATORS.register_module("naive_reverse_grouper")
 class NaiveReverseGrouper(Grouper):
-    """Split batched samples to samples."""
+    """Split batched samples into individual samples.
+
+    This operator processes a dataset by splitting each batched sample into
+    individual samples. It also handles and optionally exports batch metadata.
+    - If a sample contains 'batch_meta', it is separated and can be exported
+    to a specified path.
+    - The operator converts the remaining data from a dictionary of lists
+    to a list of dictionaries, effectively unbatching the samples.
+    - If `batch_meta_export_path` is provided, the batch metadata is written
+    to this file in JSON format, one entry per line.
+    - If no samples are present in the dataset, the original dataset is returned."""
 
     def __init__(self, batch_meta_export_path=None, *args, **kwargs):
         """

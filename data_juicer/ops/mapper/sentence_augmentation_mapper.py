@@ -19,17 +19,14 @@ OP_NAME = "sentence_augmentation_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class SentenceAugmentationMapper(Mapper):
-    """Mapper to augment sentences.
-    The purpose of this operation is to enhance sentences.
-    If the input text is at the document level, the enhancement
-    effect may not be optimal. Therefore, please consider the
-    length of the input text carefully.
-
-    Recommended model list: [
-        lmsys/vicuna-13b-v1.5
-        Qwen/Qwen2-7B-Instruct
-    ]
-    """
+    """Augments sentences by generating enhanced versions using a Hugging Face model. This
+    operator enhances input sentences by generating new, augmented versions. It is designed
+    to work best with individual sentences rather than full documents. For optimal results,
+    ensure the input text is at the sentence level. The augmentation process uses a Hugging
+    Face model, such as `lmsys/vicuna-13b-v1.5` or `Qwen/Qwen2-7B-Instruct`. The operator
+    requires specifying both the primary and secondary text keys, where the augmented
+    sentence will be stored in the secondary key. The generation process can be customized
+    with parameters like temperature, top-p sampling, and beam search size."""
 
     _accelerator = "cuda"
 
@@ -68,8 +65,9 @@ class SentenceAugmentationMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "31GB")
-        kwargs.setdefault("num_proc", 1)
+        kwargs["mem_required"] = "31GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
+        kwargs["num_proc"] = 1 if kwargs.get("num_proc", None) is None else kwargs["num_proc"]
+
         super().__init__(*args, **kwargs)
 
         if system_prompt is None:

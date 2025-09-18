@@ -9,10 +9,14 @@ OP_NAME = "general_field_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class GeneralFieldFilter(Filter):
-    """
-    Filter to keep samples based on a general field filter condition.
-    The filter condition is a string that can include logical operators and chain comparisons.
-    """
+    """Filter to keep samples based on a general field filter condition.
+
+    The filter condition is a string that can include logical operators (and/or) and chain
+    comparisons. For example: "10 < num <= 30 and text != 'nothing here' and __dj__meta__.a
+    == 3". The condition is evaluated for each sample, and only samples that meet the
+    condition are kept. The result of the filter condition is stored in the sample's stats
+    under the key 'general_field_filter_condition'. If the filter condition is empty or
+    already computed, the sample is not re-evaluated."""
 
     def __init__(self, filter_condition: str = "", *args, **kwargs):
         """

@@ -17,6 +17,28 @@ from data_juicer.utils.common_utils import dict_to_hash
 from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 
 
+class Sizes:
+    KiB = 2**10  # 1024
+    MiB = 2**20  # 1024*1024
+    GiB = 2**30  # 1024*1024*1024
+    TiB = 2**40  # 1024*1024*1024*1024
+
+
+def byte_size_to_size_str(byte_size: int):
+    # get the string format of shard size
+    if byte_size // Sizes.TiB:
+        size_str = "%.2f TiB" % (byte_size / Sizes.TiB)
+    elif byte_size // Sizes.GiB:
+        size_str = "%.2f GiB" % (byte_size / Sizes.GiB)
+    elif byte_size // Sizes.MiB:
+        size_str = "%.2f MiB" % (byte_size / Sizes.MiB)
+    elif byte_size // Sizes.KiB:
+        size_str = "%.2f KiB" % (byte_size / Sizes.KiB)
+    else:
+        size_str = "%.2f Bytes" % byte_size
+    return size_str
+
+
 async def follow_read(
     logfile_path: str,
     skip_existing_content: bool = False,
@@ -162,12 +184,19 @@ def transfer_data_dir(original_dir, op_name):
     return new_dir
 
 
-def transfer_filename(original_filepath: Union[str, Path], op_name, **op_kwargs):
+def transfer_filename(original_filepath: Union[str, Path], op_name, save_dir: str = None, **op_kwargs):
     """
     According to the op and hashing its parameters 'op_kwargs' addition
     to the process id and current time as the 'hash_val', map the
     original_filepath to another unique file path. E.g.
 
+    When `save_dir` is provided: '/save_dir/path/to/data/'
+        /path/to/abc.jpg -->
+            /save_dir/path/to/data/abc__dj_hash_#{hash_val}#.jpg
+    When environment variable `DJ_PRODUCED_DATA_DIR` is provided: '/environment/path/to/data/'
+        /path/to/abc.jpg -->
+            /environment/path/to/data/{op_name}/abc__dj_hash_#{hash_val}#.jpg
+    When neither `save_dir` nor `DJ_PRODUCED_DATA_DIR` is provided:
         1. abc.jpg -->
             __dj__produced_data__/{op_name}/
             abc__dj_hash_#{hash_val}#.jpg
@@ -182,13 +211,25 @@ def transfer_filename(original_filepath: Union[str, Path], op_name, **op_kwargs)
             /path/to/__dj__produced_data__/{op_name}/
             abc__dj_hash_#{hash_val2}#.jpg
 
+    Priority: `save_dir` > `DJ_PRODUCED_DATA_DIR` > original data directory (default)
     """
-    # produce the directory
-    original_dir = os.path.dirname(original_filepath)
-    dir_token = f"/{Fields.multimodal_data_output_dir}/"
-    if dir_token in original_dir:
-        original_dir = original_dir.split(dir_token)[0]
-    new_dir = transfer_data_dir(original_dir, op_name)
+    # check if it's valid local path, if it's not, regard it as a remote path/url and return None
+    if not os.path.exists(original_filepath):
+        return original_filepath
+
+    if save_dir:
+        new_dir = os.path.abspath(save_dir)
+    elif produced_data_dir := os.environ.get("DJ_PRODUCED_DATA_DIR", None):
+        new_dir = os.path.join(os.path.abspath(produced_data_dir), op_name)
+    else:
+        # produce the directory
+        original_dir = os.path.dirname(original_filepath)
+        dir_token = f"/{Fields.multimodal_data_output_dir}/"
+        if dir_token in original_dir:
+            original_dir = original_dir.split(dir_token)[0]
+        new_dir = transfer_data_dir(original_dir, op_name)
+
+    create_directory_if_not_exists(new_dir)
 
     # produce the unique hash code
     unique_parameters = copy.deepcopy(op_kwargs)
@@ -387,11 +428,14 @@ def get_all_files_paths_under(root, recurse_subdirectories=True, followlinks=Fal
     return file_ls
 
 
-async def download_file(session: aiohttp.ClientSession, url: str, save_path: str, timeout: int = 300, **kwargs):
+async def download_file(
+    session: aiohttp.ClientSession, url: str, save_path: str = None, return_content=False, timeout: int = 300, **kwargs
+):
     """
     Download a file from a given URL and save it to a specified directory.
     :param url: The URL of the file to download.
     :param save_path: The path where the downloaded file will be saved.
+    :param return_content: Whether to return the content of the downloaded file.
     :param timeout: The timeout in seconds for each HTTP request.
     :param kwargs: The keyword arguments to pass to the HTTP request.
 
@@ -401,8 +445,18 @@ async def download_file(session: aiohttp.ClientSession, url: str, save_path: str
         url, timeout=aiohttp.ClientTimeout(total=timeout), raise_for_status=True, **kwargs
     ) as response:
 
-        with open(save_path, "wb") as f:
-            while chunk := await response.content.read():
-                f.write(chunk)
+        assert save_path or return_content, "save_path or return_content must be set."
+        content = b""
+
+        if save_path:
+            with open(save_path, "wb") as f:
+                while chunk := await response.content.read():
+                    f.write(chunk)
+                    content += chunk
+        else:
+            content = await response.read()
+
+        if return_content:
+            return response, content
 
         return response

@@ -25,9 +25,16 @@ OP_NAME = "video_aesthetics_filter"
 @LOADED_VIDEOS.register_module(OP_NAME)
 @INTER_SAMPLED_FRAMES.register_module(OP_NAME)
 class VideoAestheticsFilter(Filter):
-    """Filter to keep data samples with aesthetics scores for specified frames
-    in the videos within a specific range.
-    """
+    """Filter to keep data samples with aesthetics scores for specified frames in the videos
+    within a specific range.
+
+    This operator evaluates the aesthetic quality of video frames using a Hugging Face
+    model. It keeps samples where the aesthetics scores of the specified frames fall within
+    a given range. The key metric, 'video_frames_aesthetics_score', is computed by
+    averaging, taking the max, or min of the frame scores, depending on the reduce mode.
+    Frame sampling can be done uniformly or by extracting all keyframes. The filter applies
+    a 'any' or 'all' strategy to decide if a sample should be kept based on the scores of
+    multiple videos."""
 
     _accelerator = "cuda"
 
@@ -79,7 +86,7 @@ class VideoAestheticsFilter(Filter):
         :param args: Extra positional arguments.
         :param kwargs: Extra keyword arguments.
         """
-        kwargs.setdefault("mem_required", "1500MB")
+        kwargs["mem_required"] = "1500MB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         if hf_scorer_model == "":
             hf_scorer_model = "shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE"
@@ -190,7 +197,10 @@ class VideoAestheticsFilter(Filter):
             return True
 
         keep_bools = np.array(
-            [self.min_score <= aesthetics_score <= self.max_score for aesthetics_score in aesthetics_scores]
+            [
+                self.get_keep_boolean(aesthetics_score, self.min_score, self.max_score)
+                for aesthetics_score in aesthetics_scores
+            ]
         )
 
         # different strategies

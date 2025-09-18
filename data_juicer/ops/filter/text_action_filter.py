@@ -10,9 +10,13 @@ OP_NAME = "text_action_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class TextActionFilter(Filter):
-    """
-    Filter to keep texts those contain actions in the text.
-    """
+    """Filter to keep texts that contain a minimum number of actions.
+
+    This operator uses a Spacy model to detect actions in the text. It keeps samples if the
+    number of detected actions meets or exceeds the specified minimum. The supported
+    languages are English ('en') and Chinese ('zh'). The 'num_action' statistic is computed
+    and cached for each sample. Actions are identified based on part-of-speech (POS) tags
+    and specific tags for verbs."""
 
     def __init__(self, lang: str = "en", min_action_num: int = 1, *args, **kwargs):
         """
@@ -20,7 +24,7 @@ class TextActionFilter(Filter):
 
         :param lang: language of the text in the samples. 'en' for detection of
             actions in English and 'zh' for detection of actions in Chinese.
-        :param mini_action_num: The min action number in the filtering. samples
+        :param min_action_num: The min action number in the filtering. samples
             will be filtered if their action number in the text is below this
             parameter.
         """
@@ -57,7 +61,4 @@ class TextActionFilter(Filter):
 
     def process_single(self, sample):
         num_action = sample[Fields.stats][StatsKeys.num_action]
-        if self.min_action_num <= num_action:
-            return True
-        else:
-            return False
+        return self.get_keep_boolean(num_action, self.min_action_num)

@@ -11,9 +11,16 @@ OP_NAME = "ray_document_deduplicator"
 
 @OPERATORS.register_module(OP_NAME)
 class RayDocumentDeduplicator(RayBasicDeduplicator):
-    """
-    Deduplicator to deduplicate samples at document-level using exact matching.
-    """
+    """Deduplicates samples at the document level using exact matching in Ray distributed mode.
+
+    This operator computes a hash for each document and filters out duplicates based on
+    exact matches. The hash is calculated from the text content, which can be optionally
+    converted to lowercase and stripped of non-alphabet characters. The key metric used for
+    deduplication is the MD5 hash of the processed text. If the `lowercase` parameter is
+    set, the text is converted to lowercase before hashing. If `ignore_non_character` is
+    enabled, all non-alphabet characters, including whitespaces, digits, and punctuation,
+    are removed. The operator supports two backends: 'ray_actor' and 'redis', with the
+    default being 'ray_actor'."""
 
     def __init__(
         self,

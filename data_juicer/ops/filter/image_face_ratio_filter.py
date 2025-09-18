@@ -20,7 +20,15 @@ OP_NAME = "image_face_ratio_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageFaceRatioFilter(Filter):
-    """Filter to keep samples with face area ratios within a specific range."""
+    """Filter to keep samples with face area ratios within a specific range.
+
+    This operator filters samples based on the ratio of the largest face area to the total
+    image area. It uses an OpenCV classifier for face detection. The key metric,
+    'face_ratios', is computed for each image in the sample. Samples are kept if the face
+    area ratios fall within the specified min and max ratio range. The filtering strategy
+    can be set to 'any' (keep if any image meets the condition) or 'all' (keep only if all
+    images meet the condition). If no images are present in the sample, the sample is
+    retained."""
 
     _default_kwargs = {
         "scaleFactor": 1.1,
@@ -82,7 +90,9 @@ class ImageFaceRatioFilter(Filter):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         model = get_model(self.model_key)
 
@@ -107,7 +117,9 @@ class ImageFaceRatioFilter(Filter):
         if len(face_ratios) <= 0:
             return True
 
-        keep_bools = np.array([self.min_ratio <= face_ratio <= self.max_ratio for face_ratio in face_ratios])
+        keep_bools = np.array(
+            [self.get_keep_boolean(face_ratio, self.min_ratio, self.max_ratio) for face_ratio in face_ratios]
+        )
 
         # different strategies
         if self.any:

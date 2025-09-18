@@ -4,6 +4,7 @@ from copy import deepcopy
 
 from datasets import Dataset, concatenate_datasets
 from datasets.config import DEFAULT_MAX_BATCH_SIZE
+from jsonargparse import Namespace
 
 from data_juicer.analysis.measure import RelatedTTestMeasure
 from data_juicer.core.monitor import Monitor
@@ -16,7 +17,7 @@ from data_juicer.utils.process_utils import setup_mp
 class Adapter:
     MAX_BATCH_SIZE = 10000
 
-    def __init__(self, cfg: dict):
+    def __init__(self, cfg: Namespace):
         self.cfg = cfg
 
         # insight mining related
@@ -194,7 +195,7 @@ class Adapter:
         new_cfg.auto = True
         new_cfg.config = None
         if len(new_cfg.op_list_to_mine) > 0:
-            new_cfg.process = [{op_name: {}} for op_name in new_cfg.op_list_to_mine]
+            new_cfg.process = [{op_name: {"num_proc": new_cfg.np}} for op_name in new_cfg.op_list_to_mine]
         # update work dir
         new_cfg.work_dir = os.path.join(new_cfg.work_dir, "insight_mining", current_state)
         new_cfg.export_path = os.path.join(new_cfg.work_dir, f"{current_state}.jsonl")

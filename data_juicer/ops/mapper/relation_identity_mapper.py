@@ -15,9 +15,16 @@ OP_NAME = "relation_identity_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class RelationIdentityMapper(Mapper):
-    """
-    identify relation between two entity in the text.
-    """
+    """Identify the relation between two entities in a given text.
+
+    This operator uses an API model to analyze the relationship between two specified
+    entities in the text. It constructs a prompt with the provided system and input
+    templates, then sends it to the API model for analysis. The output is parsed using a
+    regular expression to extract the relationship. If the two entities are the same, the
+    relationship is identified as "another identity." The result is stored in the meta field
+    under the key 'role_relation' by default. The operator retries the API call up to a
+    specified number of times in case of errors. If `drop_text` is set to True, the original
+    text is removed from the sample after processing."""
 
     DEFAULT_SYSTEM_PROMPT_TEMPLATE = (
         "给定关于{entity1}和{entity2}的文本信息。"

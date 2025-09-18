@@ -5,10 +5,10 @@ import stat
 
 from loguru import logger
 
-from data_juicer import cuda_device_count
 from data_juicer.core.sandbox.env_manager import ENV_ROUTER
 from data_juicer.core.sandbox.evaluators import BaseEvaluator
 from data_juicer.core.sandbox.model_executors import BaseModelExecutor
+from data_juicer.utils.resource_utils import cuda_device_count
 
 
 class EasyAnimateTrainExecutor(BaseModelExecutor):

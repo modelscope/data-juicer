@@ -7,6 +7,7 @@ from enum import Enum
 import zstandard as zstd
 from loguru import logger
 
+RAY_JOB_ENV_VAR = "RAY_JOB"
 DEFAULT_PREFIX = "__dj__"
 
 
@@ -61,8 +62,10 @@ class MetaKeys(object):
     video_frames = "video_frames"
     # # image tags
     image_tags = "image_tags"
-    # bounding box tag
+    # # bounding box tag
     bbox_tag = DEFAULT_PREFIX + "bbox__"
+    # # class label (from detection) tag
+    class_label_tag = DEFAULT_PREFIX + "class_label__"
 
     # === info extraction related tags ===
     # # for event extraction
@@ -211,6 +214,8 @@ class StatsKeysConstant(object):
     avg_line_length = "avg_line_length"
     char_rep_ratio = "char_rep_ratio"
     flagged_words_ratio = "flagged_words_ratio"
+    in_context_influence = "in_context_influence"
+    ifd_score = "ifd_score"
     lang = "lang"
     lang_score = "lang_score"
     max_line_length = "max_line_length"
@@ -218,6 +223,7 @@ class StatsKeysConstant(object):
     special_char_ratio = "special_char_ratio"
     stopwords_ratio = "stopwords_ratio"
     text_len = "text_len"
+    text_embd_similarity = "text_embd_similarity"
     text_pair_similarity = "text_pair_similarity"
     num_action = "num_action"
     num_dependency_edges = "num_dependency_edges"
@@ -230,6 +236,9 @@ class StatsKeysConstant(object):
     llm_quality_record = "llm_quality_record"
     llm_difficulty_score = "llm_difficulty_score"
     llm_difficulty_record = "llm_difficulty_record"
+    llm_perplexity = "llm_perplexity"
+    llm_task_relevance = "llm_task_relevance"
+    llm_task_relevance_record = "llm_task_relevance_record"
 
     #  === image ===
     aspect_ratios = "aspect_ratios"

@@ -13,7 +13,15 @@ def split_sentence(text):
 
 @OPERATORS.register_module("remove_repeat_sentences_mapper")
 class RemoveRepeatSentencesMapper(Mapper):
-    """Mapper to remove repeat sentences in text samples."""
+    """Mapper to remove repeat sentences in text samples.
+
+    This operator processes text samples to remove duplicate sentences. It splits the text
+    into lines and then further splits each line into sentences. Sentences are considered
+    duplicates if they are identical after optional case normalization and special character
+    removal. The operator uses a hash set to track unique sentences. Sentences shorter than
+    `min_repeat_sentence_length` are not deduplicated. If `ignore_special_character` is
+    enabled, special characters (all except Chinese, letters, and numbers) are ignored when
+    checking for duplicates. The resulting text is reassembled with unique sentences."""
 
     _batched_op = True
 

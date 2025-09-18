@@ -3,19 +3,20 @@ from functools import wraps
 
 import numpy as np
 import pyarrow as pa
-from loguru import logger
 
-from data_juicer import is_cuda_available
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.mm_utils import size_to_bytes
+from data_juicer.utils.mm_utils import SpecialTokens, size_to_bytes
 from data_juicer.utils.model_utils import free_models
 from data_juicer.utils.process_utils import calculate_np
 from data_juicer.utils.registry import Registry
+from data_juicer.utils.resource_utils import is_cuda_available
 
 OPERATORS = Registry("Operators")
 UNFORKABLE = Registry("Unforkable")
 NON_STATS_FILTERS = Registry("Non-stats Filters")
 TAGGING_OPS = Registry("Tagging Operators")
+ATTRIBUTION_FILTERS = Registry("Attribution Filters")
+DEFAULT_BATCH_SIZE = 1000
 
 
 def convert_list_dict_to_dict_list(samples):
@@ -147,6 +148,8 @@ class OP:
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
+            to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
@@ -161,13 +164,19 @@ class OP:
         self.audio_key = kwargs.get("audio_key", "audios")
         self.video_key = kwargs.get("video_key", "videos")
 
+        # extra mm bytes keys
+        self.image_bytes_key = kwargs.get("image_bytes_key", "image_bytes")
+
+        self.system_key = kwargs.get("system_key", "system")
+        self.instruction_key = kwargs.get("instruction_key", "instruction")
+        self.prompt_key = kwargs.get("prompt_key", "prompt")
         self.query_key = kwargs.get("query_key", "query")
         self.response_key = kwargs.get("response_key", "response")
         self.history_key = kwargs.get("history_key", "history")
 
         self.index_key = kwargs.get("index_key", None)
 
-        self.batch_size = kwargs.get("batch_size", 1000)
+        self.batch_size = kwargs.get("batch_size", DEFAULT_BATCH_SIZE)
         self.work_dir = kwargs.get("work_dir", None)
 
         # for unittest, do not skip the error.
@@ -184,11 +193,17 @@ class OP:
         # parameters to determine the number of procs for this op
         self.num_proc = kwargs.get("num_proc", None)
         self.cpu_required = kwargs.get("cpu_required", 1)
+        self.gpu_required = kwargs.get("gpu_required", 0)
         self.mem_required = kwargs.get("mem_required", 0)
         if isinstance(self.mem_required, str):
             self.mem_required = size_to_bytes(self.mem_required) / 1024**3
 
         self.turbo = kwargs.get("turbo", False)
+        # update special tokens
+        SpecialTokens.image = kwargs.get("image_special_token", SpecialTokens.image)
+        SpecialTokens.audio = kwargs.get("audio_special_token", SpecialTokens.audio)
+        SpecialTokens.video = kwargs.get("video_special_token", SpecialTokens.video)
+        SpecialTokens.eoc = kwargs.get("eoc_special_token", SpecialTokens.eoc)
 
         # nested wrappers
         from data_juicer.core.data import wrap_func_with_nested_access
@@ -210,7 +225,12 @@ class OP:
         return self.accelerator == "cuda" and is_cuda_available()
 
     def runtime_np(self):
-        op_proc = calculate_np(self._name, self.mem_required, self.cpu_required, self.num_proc, self.use_cuda())
+        # Local import to avoid logger being serialized in multiprocessing
+        from loguru import logger
+
+        op_proc = calculate_np(self._name, self.mem_required, self.cpu_required, self.use_cuda(), self.gpu_required)
+        if self.num_proc is not None:
+            op_proc = min(op_proc, self.num_proc)
         logger.debug(f"Op [{self._name}] running with number of procs:{op_proc}")
         return op_proc
 
@@ -292,6 +312,8 @@ class Mapper(OP):
         :param audio_key: the key name of field that stores sample audio list
             to be processed
         :param video_key: the key name of field that stores sample video list
+            to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
             to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
@@ -385,13 +407,30 @@ class Filter(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
+            to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
             queries and responses
+
+        :param min_closed_interval: whether the min_val of the specified filter range is a closed interval. It's True
+            by default.
+        :param max_closed_interval: whether the max_val of the specified filter range is a closed interval. It's True
+            by default.
+        :param reversed_range: whether to reverse the target range [min_val, max_val] to (-∞, min_val) or (max_val, +∞).
+            It's False by default.
         """
         super(Filter, self).__init__(*args, **kwargs)
         self.stats_export_path = kwargs.get("stats_export_path", None)
+
+        # filter strategy related
+        self.min_closed_interval = kwargs.get("min_closed_interval", True)
+        self.max_closed_interval = kwargs.get("max_closed_interval", True)
+        self.reversed_range = kwargs.get("reversed_range", False)
+        if self.reversed_range:
+            self.min_closed_interval = not self.min_closed_interval
+            self.max_closed_interval = not self.max_closed_interval
 
         # runtime wrappers
         if self.is_batched_op():
@@ -423,6 +462,16 @@ class Filter(OP):
 
     def __call__(self, *args, **kwargs):
         return self.compute_stats(*args, **kwargs)
+
+    def get_keep_boolean(self, val, min_val=None, max_val=None):
+        res_bool = True
+        if min_val is not None:
+            res_bool = res_bool and (val >= min_val if self.min_closed_interval else val > min_val)
+        if max_val is not None:
+            res_bool = res_bool and (val <= max_val if self.max_closed_interval else val < max_val)
+        if self.reversed_range:
+            res_bool = not res_bool
+        return res_bool
 
     def compute_stats_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
@@ -494,6 +543,8 @@ class Deduplicator(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
+            to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
@@ -558,6 +609,8 @@ class Selector(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
+            to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
@@ -595,6 +648,8 @@ class Grouper(OP):
         :param audio_key: the key name of field that stores sample audio list
             to be processed
         :param video_key: the key name of field that stores sample video list
+            to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
             to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
@@ -636,6 +691,8 @@ class Aggregator(OP):
         :param audio_key: the key name of field that stores sample audio list
             to be processed
         :param video_key: the key name of field that stores sample video list
+            to be processed
+        :param image_bytes_key: the key name of field that stores sample image bytes list
             to be processed
         :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses

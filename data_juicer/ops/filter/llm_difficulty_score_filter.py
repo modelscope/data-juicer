@@ -11,9 +11,16 @@ OP_NAME = "llm_difficulty_score_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class LLMDifficultyScoreFilter(LLMAnalysisFilter):
-    """
-    Filter to keep sample with high difficulty score estimated by LLM.
-    """
+    """Filter to keep samples with high difficulty scores estimated by an LLM.
+
+    This operator uses a Hugging Face LLM to evaluate the difficulty of each sample. The LLM
+    analyzes the sample across multiple dimensions, including linguistic complexity,
+    conceptual depth, prior knowledge, step complexity, and ambiguity. Each dimension is
+    scored on a 1-5 scale, with 5 being the highest difficulty. The final difficulty score
+    is computed as the average of these dimension scores. Samples are kept if their
+    difficulty score falls within the specified range (min_score to max_score). The key
+    metric 'llm_difficulty_score' is stored in the sample's stats, along with detailed
+    records and flags."""
 
     # avoid leading whitespace
     DEFAULT_SYSTEM_PROMPT = """
@@ -90,4 +97,4 @@ json
     def process_single(self, sample, rank=None):
         itm_score = sample[Fields.stats][StatsKeys.llm_difficulty_score]
 
-        return itm_score >= self.min_score
+        return self.get_keep_boolean(itm_score, self.min_score, self.max_score)

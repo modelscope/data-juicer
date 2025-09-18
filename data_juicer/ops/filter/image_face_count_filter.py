@@ -20,7 +20,14 @@ OP_NAME = "image_face_count_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageFaceCountFilter(Filter):
-    """Filter to keep samples with the number of faces within a specific range."""
+    """Filter to keep samples with the number of faces within a specific range.
+
+    This operator uses an OpenCV classifier for face detection. It filters samples based on
+    the number of faces detected in the images, keeping only those with a face count within
+    the specified range. The operator supports two strategies: 'any' (keep if any image
+    meets the condition) and 'all' (keep only if all images meet the condition). The face
+    counts are cached in the 'face_counts' field. If no images are present in the sample,
+    the face count is set to an empty array."""
 
     _default_kwargs = {
         "scaleFactor": 1.1,
@@ -83,7 +90,9 @@ class ImageFaceCountFilter(Filter):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         model = get_model(self.model_key)
 
@@ -105,7 +114,9 @@ class ImageFaceCountFilter(Filter):
         if len(face_counts) <= 0:
             return True
 
-        keep_bools = np.array([self.min_face_count <= face_count <= self.max_face_count for face_count in face_counts])
+        keep_bools = np.array(
+            [self.get_keep_boolean(face_count, self.min_face_count, self.max_face_count) for face_count in face_counts]
+        )
 
         # different strategies
         if self.any:

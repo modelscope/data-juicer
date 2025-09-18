@@ -28,9 +28,14 @@ def VideoCapture(*args, **kwargs):
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class VideoMotionScoreFilter(Filter):
-    """Filter to keep samples with video motion scores within a specific range. The
-    Farneback's algorithm from OpenCV is used to compute dense optical flow.
-    """
+    """Filter to keep samples with video motion scores within a specific range.
+
+    The operator uses Farneback's algorithm from OpenCV to compute dense optical flow. It
+    calculates the average motion score for each video and retains samples based on the
+    specified minimum and maximum score thresholds. The 'any' or 'all' strategy determines
+    whether to keep a sample if any or all videos meet the criteria. The motion score is
+    computed as the mean magnitude of the optical flow, which can be normalized relative to
+    the frame's diagonal length. The stats are cached under the key 'video_motion_score'."""
 
     _default_kwargs = {
         "pyr_scale": 0.5,
@@ -194,7 +199,10 @@ class VideoMotionScoreFilter(Filter):
         video_motion_scores = sample[Fields.stats][StatsKeys.video_motion_score]
 
         keep_bools = np.array(
-            [self.min_score <= motion_score <= self.max_score for motion_score in video_motion_scores]
+            [
+                self.get_keep_boolean(motion_score, self.min_score, self.max_score)
+                for motion_score in video_motion_scores
+            ]
         )
         if len(keep_bools) <= 0:
             return True

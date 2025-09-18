@@ -3,10 +3,13 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from data_juicer.core.sandbox.env_manager import CondaEnv, VirtualEnv
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class TestCondaEnv(unittest.TestCase):
+class TestCondaEnv(DataJuicerTestCaseBase):
     def setUp(self):
+        super().setUp()
+
         self.test_dir = tempfile.TemporaryDirectory()
         self.env_name = "test_conda_env"
         self.config_path = os.path.join(self.test_dir.name, "env_config.yaml")
@@ -130,8 +133,10 @@ class TestCondaEnv(unittest.TestCase):
         self.assertTrue(mock_run.called)
 
 
-class TestVirtualEnv(unittest.TestCase):
+class TestVirtualEnv(DataJuicerTestCaseBase):
     def setUp(self):
+        super().setUp()
+
         self.env_name = 'test_virtual_env'
         self.test_dir = tempfile.TemporaryDirectory()
         self.requirements_file_path = os.path.join(self.test_dir.name, "requirements.txt")

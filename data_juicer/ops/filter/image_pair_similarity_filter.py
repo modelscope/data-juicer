@@ -16,8 +16,14 @@ OP_NAME = "image_pair_similarity_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImagePairSimilarityFilter(Filter):
-    """Filter to keep image pairs with similarities between images
-    within a specific range."""
+    """Filter to keep image pairs with similarities between images within a specific range.
+
+    This operator uses a Hugging Face CLIP model to compute the cosine similarity between
+    two images in each sample. It retains samples where the similarity score falls within
+    the specified minimum and maximum thresholds. The 'any' strategy keeps a sample if any
+    of the image pairs meet the condition, while the 'all' strategy requires all image pairs
+    to meet the condition. The similarity scores are cached in the 'image_pair_similarity'
+    field. Each sample must include exactly two distinct images."""
 
     _accelerator = "cuda"
 
@@ -70,7 +76,9 @@ class ImagePairSimilarityFilter(Filter):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         similarity = []
         model, processor = get_model(self.model_key, rank, self.use_cuda())
@@ -92,7 +100,9 @@ class ImagePairSimilarityFilter(Filter):
         if len(similarity) <= 0:
             return True
 
-        keep_bools = np.array([self.min_score <= sim_value <= self.max_score for sim_value in similarity])
+        keep_bools = np.array(
+            [self.get_keep_boolean(sim_value, self.min_score, self.max_score) for sim_value in similarity]
+        )
 
         # different strategies
         if self.any:

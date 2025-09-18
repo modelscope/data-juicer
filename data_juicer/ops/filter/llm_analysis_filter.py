@@ -23,10 +23,16 @@ OP_NAME = "llm_analysis_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class LLMAnalysisFilter(Filter):
-    """
-    Base filter class for leveraging LLMs to filter various samples. Provides
-    foundational functionality for dimensional scoring (0~5) and tagging.
-    """
+    """Base filter class for leveraging LLMs to analyze and filter data samples.
+
+    This operator uses an LLM to score and tag each sample across multiple quality
+    dimensions. It supports both API-based and Hugging Face models. The LLM evaluates the
+    sample on clarity, relevance, usefulness, and fluency, providing scores from 1 to 5.
+    Tags are assigned to categorize the sample, and a recommendation is made to keep,
+    review, or discard the sample. The average score is computed based on the required
+    dimension keys. Samples are kept if their average score falls within the specified min
+    and max score thresholds. The key metric 'llm_analysis_score' is cached in the sample's
+    stats."""
 
     # avoid leading whitespace
     DEFAULT_SYSTEM_PROMPT = """You are a meticulous data quality assessor for LLM training. Analyze each data sample across multiple quality dimensions and provide numerical scores, tags, and reasoning. Follow these guidelines:
@@ -101,6 +107,7 @@ json
         self,
         api_or_hf_model: str = "gpt-4o",
         min_score: float = 0.5,
+        max_score: float = 1.0,
         is_hf_model: bool = False,
         *,
         api_endpoint: Optional[str] = None,
@@ -121,8 +128,10 @@ json
         Initialization method.
 
         :param api_or_hf_model: API or huggingface model name.
-        :param min_score: The lowest score threshold to keep
-            the sample.
+        :param min_score: The min score threshold to keep the sample.
+        :param max_score: The max score threshold to keep the sample.
+        :param is_hf_model:  If true, use Transformers for loading hugging face or
+            local llm.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -135,7 +144,7 @@ json
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
         :param enable_vllm: If true, use VLLM for loading hugging face or
-            local llm. Otherwise, use API for reference.
+            local llm.
         :param model_params: Parameters for initializing the API model.
         :param sampling_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}
@@ -155,6 +164,7 @@ json
         self.dim_required_keys = dim_required_keys or self.DEFAULT_DIM_REQUIRED_KEYS
 
         self.min_score = min_score
+        self.max_score = max_score
         self.try_num = try_num
 
         self.enable_vllm = enable_vllm
@@ -294,7 +304,7 @@ json
     def process_single(self, sample, rank=None):
         itm_score = sample[Fields.stats].get(StatsKeys.llm_analysis_score)
         if itm_score:
-            return itm_score >= self.min_score
+            return self.get_keep_boolean(itm_score, self.min_score, self.max_score)
         else:
             # disable the dimension score filter
             return True

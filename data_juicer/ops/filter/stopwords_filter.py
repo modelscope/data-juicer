@@ -20,14 +20,23 @@ OP_NAME = "stopwords_filter"
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)
 class StopWordsFilter(Filter):
-    """Filter to keep samples with stopword ratio larger than a specific min
-    value."""
+    """Filter to keep samples with stopword ratio within a specified range.
+
+    This operator calculates the ratio of stopwords in a sample and keeps samples where this
+    ratio is between the specified minimum and maximum values. The stopword ratio is
+    computed as the number of stopwords divided by the total number of words. If the
+    `tokenization` parameter is set, a Hugging Face tokenizer is used to tokenize the text.
+    The stopwords are loaded from a directory, and if the language is set to "all", it
+    merges stopwords from all available languages. The key metric is `stopwords_ratio`,
+    which is character-based by default. The operator also supports word augmentation for
+    specific languages."""
 
     def __init__(
         self,
         lang: str = "en",
         tokenization: bool = False,
         min_ratio: float = 0.3,
+        max_ratio: float = 1.0,
         stopwords_dir: str = ASSET_DIR,
         use_words_aug: bool = False,
         words_aug_group_sizes: List[PositiveInt] = [2],
@@ -43,6 +52,7 @@ class StopWordsFilter(Filter):
             languages
         :param tokenization: whether to use model to tokenize documents
         :param min_ratio: The min filter ratio in this op.
+        :param max_ratio: The max filter ratio in this op.
         :param stopwords_dir: The directory storing the stopwords
             file(s) whose name includes "stopwords" and in json format
         :param use_words_aug: Whether to augment words, especially for
@@ -56,6 +66,7 @@ class StopWordsFilter(Filter):
         super().__init__(*args, **kwargs)
         self.lang = lang
         self.min_ratio = min_ratio
+        self.max_ratio = max_ratio
         self.use_words_aug = use_words_aug
         self.words_aug_group_sizes = words_aug_group_sizes
         self.words_aug_join_char = words_aug_join_char
@@ -118,4 +129,4 @@ class StopWordsFilter(Filter):
         return sample
 
     def process_single(self, sample):
-        return sample[Fields.stats][StatsKeys.stopwords_ratio] >= self.min_ratio
+        return self.get_keep_boolean(sample[Fields.stats][StatsKeys.stopwords_ratio], self.min_ratio, self.max_ratio)
