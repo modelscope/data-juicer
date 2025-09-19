@@ -15,15 +15,15 @@ Tags 标签: cpu, multimodal
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `mode` | <class 'str'> | `'description'` | mode of text generated from images, can be one of |
+| `mode` | <class 'str'> | `'description'` | mode of text generated from images, can be one of ['reasoning', 'description', 'conversation', 'custom'] |
 | `api_key` | <class 'str'> | `''` | the API key to authenticate the request. |
-| `max_token` | <class 'int'> | `500` | the maximum number of tokens to generate. |
-| `temperature` | typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | `1.0` | controls the randomness of the output (range |
-| `system_prompt` | <class 'str'> | `''` | a string prompt used to set the context of a |
-| `user_prompt` | <class 'str'> | `''` | a string prompt to guide the generation of |
-| `user_prompt_key` | typing.Optional[str] | `None` | the key name of fields in samples to store |
-| `keep_original_sample` | <class 'bool'> | `True` | whether to keep the original sample. If |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
+| `max_token` | <class 'int'> | `500` | the maximum number of tokens to generate. Default is 500. |
+| `temperature` | typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | `1.0` | controls the randomness of the output (range from 0 to 1). Default is 0. |
+| `system_prompt` | <class 'str'> | `''` | a string prompt used to set the context of a conversation and provide global guidance or rules for the gpt4-vision so that it can  generate responses in the expected way. If `mode` set to `custom`, the parameter will be used. |
+| `user_prompt` | <class 'str'> | `''` | a string prompt to guide the generation of gpt4-vision for each samples. It's "" in default, which means no prompt provided. |
+| `user_prompt_key` | typing.Optional[str] | `None` | the key name of fields in samples to store prompts for each sample. It's used for set different prompts for different samples. If it's none, use prompt in parameter "prompt". It's None in default. |
+| `keep_original_sample` | <class 'bool'> | `True` | whether to keep the original sample. If it's set to False, there will be only generated text in the final datasets and the original text will be removed. It's True in default. |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

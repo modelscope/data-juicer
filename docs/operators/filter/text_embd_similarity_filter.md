@@ -18,13 +18,13 @@ Tags 标签: cpu, api, text
 | `api_or_hf_model` | <class 'str'> | `'text-embedding-v4'` | API or huggingface embedding model name. |
 | `is_hf_model` | <class 'bool'> | `False` | Indicates if the model is from HuggingFace. |
 | `api_endpoint` | <class 'str'> | `'embeddings'` | Embedding URL endpoint for the API. |
-| `response_path` | <class 'str'> | `'data.0.embedding'` | Path to extract content from the API response. |
+| `response_path` | <class 'str'> | `'data.0.embedding'` | Path to extract content from the API response. Defaults to 'data.0.embedding' for embedding model. |
 | `model_params` | typing.Optional[typing.Dict] | `None` | Parameters for initializing the API model. |
 | `min_score` | <class 'jsonargparse.typing.ClosedUnitInterval'> | `0.1` | The min average similarity to keep samples. |
 | `max_score` | <class 'jsonargparse.typing.ClosedUnitInterval'> | `1.0` | The max average similarity to keep samples. |
-| `valid_dataset` | typing.Optional[typing.List[typing.Dict]] | `None` | The dataset to use for validation. |
-| `ebd_dim` | <class 'int'> | `4096` | The embedding's dimension via API. |
-| `pooling` | typing.Optional[str] | `None` | strategy to extract embedding from the hidden states. https://arxiv.org/abs/2503.01807 |
+| `valid_dataset` | typing.Optional[typing.List[typing.Dict]] | `None` | The dataset to use for validation. If None, 'self.prepare_valid_feature' should be manually called before applying the filter. |
+| `ebd_dim` | <class 'int'> | `4096` | The embedding's dimension via API. API specific parameter, i.e., if is_hf_model=True, this parameter will not take effect. |
+| `pooling` | typing.Optional[str] | `None` | strategy to extract embedding from the hidden states. https://arxiv.org/abs/2503.01807 None: default option, the hidden state of the last token. "mean": uniform mean of hidden states. "weighted_mean": weighted mean of hidden states. https://arxiv.org/abs/2202.08904 HF_MODEL specific parameter, i.e., if is_hf_model=False, this parameter will not take effect. |
 | `input_template` | typing.Optional[str] | `None` | Template for building the model input. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |

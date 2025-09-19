@@ -58,6 +58,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
         English-like languages, we recommend to use 'space'. And for
         Chinese-like languages, we recommend to use 'character'
 
+        :param tokenization: tokenization method for sample texts
         :param window_size: window size of shingling
         :param lowercase: whether to convert text to lower case first
         :param ignore_pattern: whether to ignore sub-strings with

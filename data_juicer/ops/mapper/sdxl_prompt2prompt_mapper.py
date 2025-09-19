@@ -52,6 +52,7 @@ class SDXLPrompt2PromptMapper(Mapper):
 
         :param hf_diffusion: diffusion model name on huggingface to generate
             the image.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param torch_dtype: the floating point type used to load the diffusion
             model.
         :param num_inference_steps: The larger the value, the better the
@@ -65,7 +66,6 @@ class SDXLPrompt2PromptMapper(Mapper):
         :param text_key_second: the key name used to store the second caption
             in the caption pair.
         :param output_dir: the storage location of the generated images.
-
         """
         kwargs["mem_required"] = "38GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)

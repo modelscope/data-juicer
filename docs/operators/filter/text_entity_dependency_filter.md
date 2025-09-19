@@ -15,9 +15,9 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `lang` | <class 'str'> | `'en'` | language of the text in the samples. 'en' for detection of |
-| `min_dependency_num` | <class 'int'> | `1` | The min token number in the filtering. |
-| `any_or_all` | <class 'str'> | `'all'` | keep this sample with 'any' or 'all' strategy. |
+| `lang` | <class 'str'> | `'en'` | language of the text in the samples. 'en' for detection of entities in English and 'zh' for detection of entities in Chinese. |
+| `min_dependency_num` | <class 'int'> | `1` | The min token number in the filtering. Objects is independent if their number of edges in the dependency tree is below this parameter. |
+| `any_or_all` | <class 'str'> | `'all'` | keep this sample with 'any' or 'all' strategy. 'any': keep this sample if any object is dependent. 'all': keep this sample only if all images are dependent. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

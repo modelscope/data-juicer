@@ -16,8 +16,8 @@ Tags 标签: cpu, hf, text
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `hf_tokenizer` | <class 'str'> | `'EleutherAI/pythia-6.9b-deduped'` | the tokenizer name of Hugging Face tokenizers. |
-| `min_num` | <class 'int'> | `10` | The min filter token number in this op, samples |
-| `max_num` | <class 'int'> | `9223372036854775807` | The max filter token number in this op, samples |
+| `min_num` | <class 'int'> | `10` | The min filter token number in this op, samples will be filtered if their token number is below this parameter. |
+| `max_num` | <class 'int'> | `9223372036854775807` | The max filter token number in this op, samples will be filtered if their token number exceeds this parameter. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

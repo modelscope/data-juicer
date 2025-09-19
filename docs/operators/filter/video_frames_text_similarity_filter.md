@@ -15,16 +15,16 @@ Tags 标签: cpu, hf, multimodal
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `hf_clip` |  | `'openai/clip-vit-base-patch32'` | clip model name on huggingface to compute |
+| `hf_clip` |  | `'openai/clip-vit-base-patch32'` | clip model name on huggingface to compute the similarity between frame image and text. It's kind of language-related. For example, for Chinese datasets, ChineseCLIP might be a better choice. |
 | `trust_remote_code` |  | `False` |  |
 | `min_score` | <class 'float'> | `0.1` | the min similarity to keep samples. |
 | `max_score` | <class 'float'> | `1.0` | the max similarity to keep samples. |
-| `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame |
-| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from |
+| `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames (the number of which depends on the duration of the video) and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes". |
+| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration. |
 | `horizontal_flip` | <class 'bool'> | `False` | flip frame image horizontally (left to right). |
 | `vertical_flip` | <class 'bool'> | `False` | flip frame image vertically (top to bottom). |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
-| `reduce_mode` | <class 'str'> | `'avg'` | reduce mode when one text corresponds to |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all videos. 'any': keep this sample if any videos meet the condition. 'all': keep this sample only if all videos meet the condition. |
+| `reduce_mode` | <class 'str'> | `'avg'` | reduce mode when one text corresponds to multiple video frame images in a chunk. 'avg': Take the average of multiple values 'max': Take the max of multiple values 'min': Take the min of multiple values |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

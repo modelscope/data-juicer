@@ -17,7 +17,7 @@ Tags 标签: cpu, hf, video
 |--------|------|--------|------|
 | `hf_ast` | <class 'str'> | `'MIT/ast-finetuned-audioset-10-10-0.4593'` | path to the HF model to tag from audios. |
 | `trust_remote_code` | <class 'bool'> | `False` | whether to trust the remote code of HF models |
-| `tag_field_name` | <class 'str'> | `'video_audio_tags'` | the field name to store the tags. It's |
+| `tag_field_name` | <class 'str'> | `'video_audio_tags'` | the field name to store the tags. It's "video_audio_tags" in default. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

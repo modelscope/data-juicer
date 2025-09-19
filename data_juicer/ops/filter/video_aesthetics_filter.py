@@ -58,6 +58,7 @@ class VideoAestheticsFilter(Filter):
             predictor. By default, we will use
             'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE',
             refer to pypi.org/project/simple-aesthetics-predictor
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param min_score: Min score for the predicted aesthetics in a video.
         :param max_score: Max score for the predicted aesthetics in a video.
         :param frame_sampling_method: sampling method of extracting frame

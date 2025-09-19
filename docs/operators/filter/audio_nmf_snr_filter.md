@@ -15,10 +15,10 @@ Tags 标签: cpu, audio
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `min_snr` | <class 'float'> | `0` | The min audio SNR to keep samples in dB. It's 0 by |
-| `max_snr` | <class 'float'> | `9223372036854775807` | The max audio SNR to keep samples in dB. It's |
-| `nmf_iter_num` | typing.Annotated[int, Gt(gt=0)] | `500` | The max number of iterations to run NMF. It's 500 |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
+| `min_snr` | <class 'float'> | `0` | The min audio SNR to keep samples in dB. It's 0 by default. |
+| `max_snr` | <class 'float'> | `9223372036854775807` | The max audio SNR to keep samples in dB. It's sys.maxsize by default. |
+| `nmf_iter_num` | typing.Annotated[int, Gt(gt=0)] | `500` | The max number of iterations to run NMF. It's 500 in default. |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all audios. 'any': keep this sample if any audios meet the condition. 'all': keep this sample only if all audios meet the condition. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

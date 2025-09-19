@@ -28,7 +28,7 @@ Tags 标签: cpu, image
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `method` | <class 'str'> | `'phash'` | hash method for image |
-| `consider_text` | <class 'bool'> | `False` | whether to consider text hash together with image |
+| `consider_text` | <class 'bool'> | `False` | whether to consider text hash together with image hash when applying deduplication. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

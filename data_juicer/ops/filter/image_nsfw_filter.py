@@ -40,6 +40,7 @@ class ImageNSFWFilter(Filter):
         Initialization method.
 
         :param hf_nsfw_model: nsfw detection model name on huggingface.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param min_score: the min nsfw score threshold for samples.
             range from 0 to 1.
         :param max_score: the max nsfw score threshold for samples.

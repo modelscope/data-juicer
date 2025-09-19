@@ -27,7 +27,7 @@ Tags 标签: cpu, video
 | `max_width` | <class 'int'> | `9223372036854775807` | The max horizontal resolution. |
 | `min_height` | <class 'int'> | `1` | The min vertical resolution. |
 | `max_height` | <class 'int'> | `9223372036854775807` | The max vertical resolution. |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all videos. 'any': keep this sample if any videos meet the condition. 'all': keep this sample only if all videos meet the condition. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

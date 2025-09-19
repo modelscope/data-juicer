@@ -15,9 +15,9 @@ Tags 标签: cpu, hf, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `tokenization` | <class 'bool'> | `False` | Whether to count the ratio of alphanumeric |
-| `min_ratio` | <class 'float'> | `0.25` | The min filter ratio in alphanumeric op, |
-| `max_ratio` | <class 'float'> | `9223372036854775807` | The max filter ratio in alphanumeric op, |
+| `tokenization` | <class 'bool'> | `False` | Whether to count the ratio of alphanumeric to the total number of tokens. if tokenization=False, it will count the ratio of alphanumeric to the total number of characters. |
+| `min_ratio` | <class 'float'> | `0.25` | The min filter ratio in alphanumeric op, samples will be filtered if their alphabet/numeric ratio is below this parameter. |
+| `max_ratio` | <class 'float'> | `9223372036854775807` | The max filter ratio in alphanumeric op, samples will be filtered if their alphabet/numeric ratio exceeds this parameter. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

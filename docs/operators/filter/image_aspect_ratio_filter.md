@@ -17,7 +17,7 @@ Tags 标签: cpu, image
 |--------|------|--------|------|
 | `min_ratio` | <class 'float'> | `0.333` | The min aspect ratio to keep samples. |
 | `max_ratio` | <class 'float'> | `3.0` | The max aspect ratio to keep samples. |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

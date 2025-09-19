@@ -17,7 +17,7 @@ Tags 标签: cpu, text
 |--------|------|--------|------|
 | `dataset_path` |  | `''` | a dataset file or a dataset directory |
 | `suffixes` |  | `None` | files with specified suffixes to be processed |
-| `add_suffix` |  | `False` | Whether to add file suffix to dataset meta |
+| `add_suffix` |  | `False` | Whether to add file suffix to dataset meta info |
 | `kwargs` |  | `''` | extra args |
 
 ## 📊 Effect demonstration 效果演示
