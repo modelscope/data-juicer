@@ -250,14 +250,12 @@ class RayDataset(DJDataset):
         )
         from data_juicer.utils.resource_utils import is_cuda_available
 
+        # TODO: split to cpu resources and gpu resources
         cuda_available = is_cuda_available()
-
         total_cpu = ray_cpu_count()
         total_gpu = ray_gpu_count()
-
         available_mem = sum(ray_available_memories()) * _OPS_MEMORY_LIMIT_FRACTION / 1024  # Convert MB to GB
         available_gpu_mem = sum(ray_available_gpu_memories()) * _OPS_MEMORY_LIMIT_FRACTION / 1024  # Convert MB to GB
-
         resource_configs = {}
 
         for op in operators:
@@ -280,10 +278,8 @@ class RayDataset(DJDataset):
                         "but the gpu is unavailable. Please check whether your environment is installed correctly"
                         " and whether there is a gpu in the resource pool."
                     )
-
             # if it is a cuda operator, mem_required will be calculated as gpu memory;
             # if it is a cpu, it will be calculated as memory.
-
             auto_proc = False if op.num_proc else True
 
             # GPU operator calculations
@@ -369,8 +365,12 @@ class RayDataset(DJDataset):
 
             for op_name, cfg in resource_configs.items():
                 if cfg["auto_proc"]:
+                    # TODO:
                     min_proc = best_combination[op_name]
+                    # issue: https://github.com/ray-project/ray/issues/55307
+                    # or min_proc = 1 ?
                     max_proc = int(max(1, remaining_max_frac / cfg["base_resource_frac"]))
+                    # or max_proc = int(max(1, 1 / cfg["base_resource_frac"])) ? use all resources
                     cfg["num_proc"] = min_proc if min_proc == max_proc else (min_proc, max_proc)
 
         for op in operators:
