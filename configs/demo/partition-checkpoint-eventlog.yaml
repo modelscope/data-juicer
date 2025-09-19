@@ -50,7 +50,7 @@ partition:
 
 # Checkpoint configuration
 checkpoint:
-  enabled: true
+  enabled: false
   strategy: "every_n_ops"
   n_ops: 3
   # strategy: "every_op"  # every_op, every_partition, every_n_ops, manual, disabled
