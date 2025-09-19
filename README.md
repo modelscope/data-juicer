@@ -46,6 +46,8 @@ https://github.com/user-attachments/assets/a45f0eee-0f0e-4ffe-9a42-d9a55370089d
 
 
 ## News
+- 🎉 [2025-09-19] Our work of [Data-Juicer 2.0](https://arxiv.org/abs/2501.14755) has been accepted as a **NeurIPS'25 Spotlight** (top 3.1% of all submissions)!
+- 🎉 [2025-09-19] Our two works about data synthesis, [DaaR](https://www.arxiv.org/abs/2502.04380) and [MindGYM](https://arxiv.org/abs/2503.09499) have been accepted by **NeurIPS'25**!
 - 🛠️ [2025-06-04] How to process feedback data in the "era of experience"? We propose [Trinity-RFT: A General-Purpose and Unified Framework for Reinforcement Fine-Tuning of LLMs](https://arxiv.org/abs/2505.17826), which leverages Data-Juicer for its data pipelines tailored for RFT scenarios.
 - 🎉 [2025-06-04] Our [Data-Model Co-development Survey](https://ieeexplore.ieee.org/document/11027559) has been accepted by IEEE Transactions on Pattern Analysis and Machine Intelligence (**TPAMI**)! Welcome to explore and contribute the [awesome-list](https://modelscope.github.io/data-juicer/en/main/docs/awesome_llm_data.html).
 - 🔎 [2025-06-04] We introduce [DetailMaster: Can Your Text-to-Image Model Handle Long Prompts?](https://www.arxiv.org/abs/2505.16915) A synthetic benchmark revealing notable performance drops despite large models' proficiency with short descriptions.
@@ -54,13 +56,13 @@ https://github.com/user-attachments/assets/a45f0eee-0f0e-4ffe-9a42-d9a55370089d
 - 🤝 [2025-02-28] DJ has been integrated in [Ray's official Ecosystem](https://docs.ray.io/en/latest/ray-overview/ray-libraries.html) and [Example Gallery](https://docs.ray.io/en/latest/ray-more-libs/data_juicer_distributed_data_processing.html). Besides, our patch in DJ2.0 for the streaming JSON reader has been officially integrated by [Apache Arrow](https://github.com/apache/arrow/pull/45084). 
 - 🎉 [2025-02-27] Our work on contrastive data synthesis, [ImgDiff](https://arxiv.org/pdf/2408.04594), has been accepted by **CVPR'25**!
 - 💡 [2025-02-05] We propose a new data selection method, [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380). It is theoretically informed, via treating diversity as a reward, achieves better overall performance across 7 benchmarks when post-training SOTA LLMs. 
-- 🚀 [2025-01-11] We release our 2.0 paper, [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://arxiv.org/abs/2501.14755). It now can process 70B data samples within 2.1h, using 6400 CPU cores on 50 Ray nodes from Alibaba Cloud cluster, and deduplicate 5TB data within 2.8h using 1280 CPU cores on 8 Ray nodes.
-- 🛠️ [2025-01-03] We support post-tuning scenarios better, via 20+ related new [OPs](https://github.com/modelscope/data-juicer/releases/tag/v1.0.2), and via unified [dataset format](https://github.com/modelscope/data-juicer/releases/tag/v1.0.3) compatible to LLaMA-Factory and ModelScope-Swift.
 
 <details>
 <summary> History News:
 </summary>>
 
+- [2025-01-11] We release our 2.0 paper, [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for and with Foundation Models](https://arxiv.org/abs/2501.14755). It now can process 70B data samples within 2.1h, using 6400 CPU cores on 50 Ray nodes from Alibaba Cloud cluster, and deduplicate 5TB data within 2.8h using 1280 CPU cores on 8 Ray nodes.
+- [2025-01-03] We support post-tuning scenarios better, via 20+ related new [OPs](https://github.com/modelscope/data-juicer/releases/tag/v1.0.2), and via unified [dataset format](https://github.com/modelscope/data-juicer/releases/tag/v1.0.3) compatible to LLaMA-Factory and ModelScope-Swift.
 - [2024-12-17] We propose *HumanVBench*, which comprises 16 human-centric tasks with synthetic data, benchmarking 22 video-MLLMs' capabilities from views of inner emotion and outer manifestations. See more details in our [paper](https://arxiv.org/abs/2412.17574), and try to [evaluate](https://github.com/modelscope/data-juicer/tree/HumanVBench) your models with it.
 - [2024-11-22] We release DJ [v1.0.0](https://github.com/modelscope/data-juicer/releases/tag/v1.0.0), in which we refactored Data-Juicer's *Operator*, *Dataset*, *Sandbox* and many other modules for better usability, such as supporting fault-tolerant, FastAPI and adaptive resource management.
 - [2024-08-25] We give a [tutorial](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html) about data processing for multimodal LLMs in KDD'2024.
@@ -171,10 +173,10 @@ If you find Data-Juicer useful for your research or development, please kindly c
 }
 
 @article{djv2,
-  title={Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models},
-  author={Chen, Daoyuan and Huang, Yilun and Pan, Xuchen and Jiang, Nana and Wang, Haibin and Ge, Ce and Chen, Yushuo and Zhang, Wenhao and Ma, Zhijian and Zhang, Yilei and Huang, Jun and Lin, Wei and Li, Yaliang and Ding, Bolin and Zhou, Jingren},
-  journal={arXiv preprint arXiv:2501.14755},
-  year={2024}
+  title={Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for and with Foundation Models},
+  author={Chen, Daoyuan and Huang, Yilun and Pan, Xuchen and Jiang, Nana and Wang, Haibin and Zhang, Yilei and Ge, Ce and Chen, Yushuo and Zhang, Wenhao and Ma, Zhijian and Huang, Jun and Lin, Wei and Li, Yaliang and Ding, Bolin and Zhou, Jingren},
+  journal={Advances in Neural Information Processing Systems},
+  year={2025}
 }
 ```
 
@@ -188,13 +190,13 @@ If you find Data-Juicer useful for your research or development, please kindly c
  
 - (TPAMI'25) [The Synergy between Data and Multi-Modal Large Language Models: A Survey from Co-Development Perspective](https://arxiv.org/abs/2407.08583)
 
+- (NeurIPS'25) [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380)
+
+- (NeurIPS'25) [MindGYM: What Matters in Question Synthesis for Thinking-Centric Fine-Tuning?](https://arxiv.org/abs/2503.09499)
+
 - (Benchmark Data) [HumanVBench: Exploring Human-Centric Video Understanding Capabilities of MLLMs with Synthetic Benchmark Data](https://arxiv.org/abs/2412.17574)
  
 - (Benchmark Data) [DetailMaster: Can Your Text-to-Image Model Handle Long Prompts?](https://www.arxiv.org/abs/2505.16915)
-
-- (Data Synthesis) [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380)
-
-- (Data Synthesis) [MindGYM: What Matters in Question Synthesis for Thinking-Centric Fine-Tuning?](https://arxiv.org/abs/2503.09499)
 
 - (Data Scaling) [BiMix: A Bivariate Data Mixing Law for Language Model Pretraining](https://arxiv.org/abs/2405.14908)
 
