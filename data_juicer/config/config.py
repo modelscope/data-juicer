@@ -28,6 +28,7 @@ from data_juicer.ops.op_fusion import FUSION_STRATEGIES
 from data_juicer.utils.constant import RAY_JOB_ENV_VAR
 from data_juicer.utils.logger_utils import setup_logger
 from data_juicer.utils.mm_utils import SpecialTokens
+from data_juicer.utils.ray_utils import is_ray_mode
 
 global_cfg = None
 global_parser = None
@@ -749,7 +750,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         "audio_key": cfg.get("audio_key", "audios"),
         "video_key": cfg.get("video_key", "videos"),
         "image_bytes_key": cfg.get("image_bytes_key", "image_bytes"),
-        "num_proc": cfg.get("np", None),
+        "num_proc": cfg.get("np", None) if not is_ray_mode() else None,
         "turbo": cfg.get("turbo", False),
         "skip_op_error": cfg.get("skip_op_error", True),
         "work_dir": cfg.work_dir,
