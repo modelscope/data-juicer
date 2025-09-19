@@ -32,7 +32,8 @@ repos:
       - id: flake8
         additional_dependencies:
           - flake8-pyproject
-          - flake8-black
+          - flake8-black==0.3.6
+          - black==25.1.0
   - repo: local
     hooks:
       - id: build-op-doc

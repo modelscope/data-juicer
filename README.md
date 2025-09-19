@@ -47,7 +47,7 @@ https://github.com/user-attachments/assets/a45f0eee-0f0e-4ffe-9a42-d9a55370089d
 
 ## News
 - 🎉 [2025-09-19] Our work of [Data-Juicer 2.0](https://arxiv.org/abs/2501.14755) has been accepted as a **NeurIPS'25 Spotlight** (top 3.1% of all submissions)!
-- 🎉 [2025-09-19] Our two works about data synthesis, [DaaR](https://www.arxiv.org/abs/2502.04380) and [MindGYM](https://arxiv.org/abs/2503.09499) have been accepted by **NeurIPS'25**!
+- 🎉 [2025-09-19] Our two works about data synthesis, [DaaR](https://arxiv.org/abs/2502.04380) and [MindGYM](https://arxiv.org/abs/2503.09499) have been accepted by **NeurIPS'25**!
 - 🛠️ [2025-06-04] How to process feedback data in the "era of experience"? We propose [Trinity-RFT: A General-Purpose and Unified Framework for Reinforcement Fine-Tuning of LLMs](https://arxiv.org/abs/2505.17826), which leverages Data-Juicer for its data pipelines tailored for RFT scenarios.
 - 🎉 [2025-06-04] Our [Data-Model Co-development Survey](https://ieeexplore.ieee.org/document/11027559) has been accepted by IEEE Transactions on Pattern Analysis and Machine Intelligence (**TPAMI**)! Welcome to explore and contribute the [awesome-list](https://modelscope.github.io/data-juicer/en/main/docs/awesome_llm_data.html).
 - 🔎 [2025-06-04] We introduce [DetailMaster: Can Your Text-to-Image Model Handle Long Prompts?](https://www.arxiv.org/abs/2505.16915) A synthetic benchmark revealing notable performance drops despite large models' proficiency with short descriptions.
@@ -190,7 +190,7 @@ If you find Data-Juicer useful for your research or development, please kindly c
  
 - (TPAMI'25) [The Synergy between Data and Multi-Modal Large Language Models: A Survey from Co-Development Perspective](https://arxiv.org/abs/2407.08583)
 
-- (NeurIPS'25) [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380)
+- (NeurIPS'25) [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://arxiv.org/abs/2502.04380)
 
 - (NeurIPS'25) [MindGYM: What Matters in Question Synthesis for Thinking-Centric Fine-Tuning?](https://arxiv.org/abs/2503.09499)
 
