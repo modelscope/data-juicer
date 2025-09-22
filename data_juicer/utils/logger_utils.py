@@ -109,7 +109,16 @@ def get_log_file_path():
             return handler._sink._file.name
 
 
-def setup_logger(save_dir, distributed_rank=0, filename="log.txt", mode="o", level="INFO", redirect=True):
+def setup_logger(
+    save_dir,
+    distributed_rank=0,
+    filename="log.txt",
+    mode="o",
+    level="INFO",
+    redirect=True,
+    max_log_size_mb=100,
+    backup_count=5,
+):
     """
     Setup logger for training and testing.
 
@@ -119,6 +128,8 @@ def setup_logger(save_dir, distributed_rank=0, filename="log.txt", mode="o", lev
     :param mode: log file write mode, `append` or `override`. default is `o`.
     :param level: log severity level. It's "INFO" in default.
     :param redirect: whether to redirect system output
+    :param max_log_size_mb: maximum log file size in MB before rotation
+    :param backup_count: number of backup files to keep
     :return: logger instance.
     """
     global LOGGER_SETUP
@@ -145,7 +156,15 @@ def setup_logger(save_dir, distributed_rank=0, filename="log.txt", mode="o", lev
             level=level,
             enqueue=True,
         )
-        logger.add(save_file)
+        logger.add(
+            save_file,
+            format=loguru_format,
+            level=level,
+            rotation=f"{max_log_size_mb} MB",
+            retention=backup_count,
+            compression="gz",
+            enqueue=True,
+        )
 
     # for interest of levels: debug, error, warning
     logger.add(
@@ -153,6 +172,9 @@ def setup_logger(save_dir, distributed_rank=0, filename="log.txt", mode="o", lev
         level="DEBUG",
         filter=lambda x: "DEBUG" == x["level"].name,
         format=loguru_format,
+        rotation=f"{max_log_size_mb} MB",
+        retention=backup_count,
+        compression="gz",
         enqueue=True,
         serialize=True,
     )
@@ -161,6 +183,9 @@ def setup_logger(save_dir, distributed_rank=0, filename="log.txt", mode="o", lev
         level="ERROR",
         filter=lambda x: "ERROR" == x["level"].name,
         format=loguru_format,
+        rotation=f"{max_log_size_mb} MB",
+        retention=backup_count,
+        compression="gz",
         enqueue=True,
         serialize=True,
     )
@@ -169,6 +194,9 @@ def setup_logger(save_dir, distributed_rank=0, filename="log.txt", mode="o", lev
         level="WARNING",
         filter=lambda x: "WARNING" == x["level"].name,
         format=loguru_format,
+        rotation=f"{max_log_size_mb} MB",
+        retention=backup_count,
+        compression="gz",
         enqueue=True,
         serialize=True,
     )
