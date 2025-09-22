@@ -65,7 +65,7 @@ dependencies = [
 # Generic ML & DL
 generic = [
     "torch==2.6.0",  # PyTorch
-    "transformers>=4.47.0",  # Hugging Face Transformers
+    "transformers>=4.47.0,<4.55.0",  # Hugging Face Transformers
     "transformers_stream_generator",  # Stream generation for Transformers
     "einops",  # Tensor operations
     "accelerate",  # Model acceleration
